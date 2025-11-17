@@ -200,7 +200,7 @@ export const AdminAnalytics = () => {
             </Link>
           </div>
           <div className="space-y-4">
-            {dashboardData?.top_products.map(product => <div key={product.id} className="flex items-center">
+            {(dashboardData?.top_products || []).map(product => <div key={product.id} className="flex items-center">
                 <img src={product.image_url} alt={product.name} className="w-10 h-10 rounded-md object-cover mr-3" />
                 <div className="flex-grow">
                   <h3 className="font-medium text-main text-sm">
