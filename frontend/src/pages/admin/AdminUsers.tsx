@@ -139,7 +139,8 @@ export const AdminUsers = () => {
       </div>
       {/* Users table */}
       <div className="bg-surface rounded-lg shadow-sm border border-border-light overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-background text-left text-copy-light text-sm">
@@ -250,8 +251,90 @@ export const AdminUsers = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile List View */}
+        <div className="md:hidden">
+          {usersLoading ? (
+            <div className="space-y-3 p-4">
+              {[...Array(5)].map((_, index) => (
+                <div key={index} className="bg-background rounded-lg p-4 border border-border-light animate-pulse">
+                  <div className="space-y-2">
+                    <div className="w-3/4 h-4 bg-surface-hover rounded"></div>
+                    <div className="w-1/2 h-3 bg-surface-hover rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : users.length > 0 ? (
+            <div className="space-y-3 p-4">
+              {console.log('Rendering users:', users) || users.map((user) => (
+                <div key={user.id} className="bg-background rounded-lg p-4 border border-border-light">
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center text-sm font-medium text-primary flex-shrink-0">
+                        {user.firstname?.[0] || user.full_name?.[0] || 'U'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-main truncate">
+                          {user.full_name || `${user.firstname} ${user.lastname}`}
+                        </p>
+                        <p className="text-xs text-copy-light truncate">{user.email}</p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs flex-shrink-0 ${
+                        user.role === 'admin' ? 'bg-error/10 text-error' :
+                        user.role === 'supplier' ? 'bg-warning/10 text-warning' :
+                        'bg-info/10 text-info'
+                      }`}>
+                        {user.role?.charAt(0).toUpperCase() + user.role?.slice(1)}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border-light text-sm">
+                      <div>
+                        <p className="text-xs text-copy-light">Status</p>
+                        <span className={`inline-flex items-center mt-1 ${
+                          user.is_active ? 'text-success' : 'text-error'
+                        }`}>
+                          {user.is_active ? <CheckCircleIcon size={14} className="mr-1" /> : <XCircleIcon size={14} className="mr-1" />}
+                          {user.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-copy-light">Verified</p>
+                        <span className={`inline-flex items-center mt-1 ${
+                          user.is_verified ? 'text-success' : 'text-warning'
+                        }`}>
+                          {user.is_verified ? <CheckCircleIcon size={14} className="mr-1" /> : <XCircleIcon size={14} className="mr-1" />}
+                          {user.is_verified ? 'Yes' : 'No'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex space-x-2 pt-2">
+                      <Link 
+                        to={`/admin/users/${user.id}/edit`}
+                        className="flex-1 text-center py-2 px-3 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/90"
+                      >
+                        Edit User
+                      </Link>
+                      <button className="py-2 px-3 border border-error text-error rounded-md text-sm hover:bg-error/10">
+                        <TrashIcon size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center text-copy-light">
+              <p>No users found</p>
+            </div>
+          )}
+        </div>
+
+        {/* Empty state for desktop */}
         {users.length === 0 && !usersLoading && (
-          <div className="py-12 text-center text-copy-light">
+          <div className="hidden md:block py-12 text-center text-copy-light">
             <p>No users found</p>
           </div>
         )}

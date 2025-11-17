@@ -292,8 +292,105 @@ export const AdminOrders = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile List View */}
+        <div className="md:hidden">
+          {ordersLoading ? (
+            <div className="space-y-3 p-4">
+              {[...Array(5)].map((_, index) => (
+                <div key={index} className="bg-background rounded-lg p-4 border border-border-light animate-pulse">
+                  <div className="space-y-2">
+                    <div className="w-3/4 h-4 bg-surface-hover rounded"></div>
+                    <div className="w-1/2 h-3 bg-surface-hover rounded"></div>
+                    <div className="w-full h-3 bg-surface-hover rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (orders || []).length > 0 ? (
+            <div className="space-y-3 p-4">
+              {(orders || []).map((order) => (
+                <div key={order.id} className="bg-background rounded-lg p-4 border border-border-light">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <Link to={`/admin/orders/${order.id}`} className="font-medium text-primary hover:underline text-sm">
+                          Order #{order.id?.slice(0, 8)}
+                        </Link>
+                        <p className="text-xs text-copy-light mt-1">
+                          {new Date(order.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        order.status === 'delivered' ? 'bg-success/10 text-success' :
+                        order.status === 'shipped' ? 'bg-info/10 text-info' :
+                        order.status === 'processing' ? 'bg-warning/10 text-warning' :
+                        'bg-error/10 text-error'
+                      }`}>
+                        {order.status?.charAt(0).toUpperCase() + order.status?.slice(1) || 'Processing'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-xs font-medium text-primary">
+                        {order.user?.firstname?.[0] || order.user?.full_name?.[0] || 'U'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-main truncate">
+                          {order.user?.full_name || `${order.user?.firstname} ${order.user?.lastname}` || 'Unknown'}
+                        </p>
+                        <p className="text-xs text-copy-light truncate">
+                          {order.user?.email || 'No email'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2 border-t border-border-light">
+                      <div>
+                        <p className="text-xs text-copy-light">Total</p>
+                        <p className="text-sm font-semibold text-main">${(order.total_amount || 0).toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-copy-light">Items</p>
+                        <p className="text-sm font-medium text-main text-center">{order.items?.length || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-copy-light">Payment</p>
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs ${
+                          order.payment_status === 'succeeded' ? 'bg-success/10 text-success' :
+                          order.payment_status === 'pending' ? 'bg-warning/10 text-warning' :
+                          'bg-error/10 text-error'
+                        }`}>
+                          {order.payment_status?.charAt(0).toUpperCase() + order.payment_status?.slice(1) || 'Pending'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex space-x-2 pt-2">
+                      <Link 
+                        to={`/admin/orders/${order.id}`} 
+                        className="flex-1 text-center py-2 px-3 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/90"
+                      >
+                        View Details
+                      </Link>
+                      <button className="py-2 px-3 border border-border-light rounded-md text-sm text-copy-light hover:bg-surface-hover">
+                        <PrinterIcon size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center text-copy-light">
+              <p>No orders found</p>
+            </div>
+          )}
+        </div>
+
+        {/* Empty state for desktop */}
         {orders.length === 0 && !ordersLoading && (
-          <div className="py-12 text-center text-copy-light">
+          <div className="hidden md:block py-12 text-center text-copy-light">
             <p>No orders found</p>
           </div>
         )}
