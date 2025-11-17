@@ -72,7 +72,8 @@ export const usePaginatedApi = <T = any>(
     setLoading(true);
     setError(null);
     try {
-      const result = await callToUse();
+      // If using the default apiCall, pass page and limit
+      const result = customApiCall ? await callToUse() : await callToUse(page, limit);
       
       // Handle different response structures
       if (result?.data) {
