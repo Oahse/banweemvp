@@ -281,6 +281,36 @@ async def ship_order(
         )
 
 
+class UpdateOrderStatusRequest(BaseModel):
+    status: str
+
+
+@router.put("/orders/{order_id}/status")
+async def update_order_status(
+    order_id: str,
+    request: UpdateOrderStatusRequest,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update order status (admin only)."""
+    try:
+        order_service = OrderService(db)
+        order = await order_service.update_order_status(
+            order_id,
+            request.status,
+            background_tasks
+        )
+        return Response(success=True, data=order, message=f"Order status updated to {request.status}")
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=f"Failed to update order status: {str(e)}"
+        )
+
+
 @router.get("/system/settings")
 async def get_system_settings(
     current_user: User = Depends(require_admin),

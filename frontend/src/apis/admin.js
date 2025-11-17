@@ -166,6 +166,13 @@ export class AdminAPI {
    */
   static async getOrder(orderId) {
     return await apiClient.get(`/admin/orders/${orderId}`);
+  }
+
+  /**
+   * Update order status
+   */
+  static async updateOrderStatus(orderId, status) {
+    return await apiClient.put(`/admin/orders/${orderId}/status`, { status });
   }  /**
    * Get order disputes
    */

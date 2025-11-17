@@ -1,4 +1,5 @@
-import React, { useEffect, useState, Suspense, lazy } from 'react';
+// eslint-disable-next-line no-unused-vars
+import React, { useEffect, useState, useCallback, Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   SearchIcon,
@@ -80,7 +81,7 @@ export const ProductList = () => {
   const { categories: categoriesData, loading: categoriesLoading, error: categoriesError } = useCategories();
 
   // Build search parameters for API call
-  const buildSearchParams = () => {
+  const buildSearchParams = useCallback(() => {
     const [sortBy, sortOrder] = sortOption.split(':');
 
     return {
@@ -94,13 +95,13 @@ export const ProductList = () => {
       page: currentPage,
       limit: 12,
     };
-  };
+  }, [searchQuery, selectedCategories, sortOption, priceRange, ratingRange, currentPage]);
 
   // Fetch products when search parameters change
   useEffect(() => {
     const searchParams = buildSearchParams();
     fetchProducts(() => ProductsAPI.getProducts(searchParams));
-  }, [searchQuery, selectedCategories, sortOption, priceRange, ratingRange, currentPage, fetchProducts, buildSearchParams]);
+  }, [buildSearchParams, fetchProducts]);
 
   // Handle search and filter changes
   const handleSearch = (query) => {
@@ -154,7 +155,9 @@ export const ProductList = () => {
   };
 
   // Transform products for display
-  const displayProducts = productsData?.data?.map(transformProduct) || [];
+  // Backend returns { data: { data: [...], total, page, per_page, total_pages } }
+  const productsArray = productsData?.data?.data || productsData?.data || [];
+  const displayProducts = Array.isArray(productsArray) ? productsArray.map(transformProduct) : [];
 
   const getCategoryDisplayName = () => {
     if (searchQuery) return `Search results for "${searchQuery}"`;
@@ -182,7 +185,7 @@ export const ProductList = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-main mb-2">{getCategoryDisplayName()}</h1>
           <p className="text-copy-light">
             {productsData ?
-              `${productsData.total} products found` :
+              `${productsData.data?.total || 0} products found` :
               'Loading products...'
             }
           </p>
@@ -270,7 +273,7 @@ export const ProductList = () => {
                 />
               ) : categoriesData ? (
                 <div className="space-y-2">
-                  {categoriesData.slice(0, 10).map((cat) => (
+                  {(Array.isArray(categoriesData) ? categoriesData : []).slice(0, 10).map((cat) => (
                     <label key={cat.id} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
@@ -383,7 +386,7 @@ export const ProductList = () => {
           </div>
 
           {/* Pagination */}
-          {productsData && productsData.total_pages > 1 && (
+          {productsData?.data?.total_pages > 1 && (
             <div className="flex items-center justify-center space-x-2 mt-8">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -393,7 +396,7 @@ export const ProductList = () => {
                 Previous
               </button>
 
-              {Array.from({ length: Math.min(5, productsData.total_pages) }, (_, i) => {
+              {Array.from({ length: Math.min(5, productsData.data.total_pages) }, (_, i) => {
                 const page = i + 1;
                 return (
                   <button
@@ -411,7 +414,7 @@ export const ProductList = () => {
 
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === productsData.total_pages}
+                disabled={currentPage === productsData.data.total_pages}
                 className="px-3 py-2 rounded-md bg-surface border border-border text-copy hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next

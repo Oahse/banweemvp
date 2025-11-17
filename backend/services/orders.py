@@ -5,7 +5,7 @@ from typing import Optional, List
 from fastapi import HTTPException, BackgroundTasks
 from models.order import Order, OrderItem
 from models.cart import Cart, CartItem
-from models.product import ProductVariant
+from models.product import ProductVariant, Product
 from models.user import Address, User
 from models.shipping import ShippingMethod
 from models.payment import PaymentMethod
@@ -518,4 +518,47 @@ class OrderService:
             "tracking_number": order.tracking_number,
             "status": order.status,
             "events": tracking_events_data
+        }
+
+    async def update_order_status(self, order_id: str, new_status: str, background_tasks: BackgroundTasks) -> dict:
+        """Update order status and notify customer."""
+        query = select(Order).options(selectinload(Order.user)).where(Order.id == order_id)
+        result = await self.db.execute(query)
+        order = result.scalar_one_or_none()
+
+        if not order:
+            raise APIException(status_code=404, message="Order not found")
+
+        # Validate status
+        valid_statuses = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"]
+        if new_status not in valid_statuses:
+            raise APIException(status_code=400, message=f"Invalid status. Must be one of: {', '.join(valid_statuses)}")
+
+        old_status = order.status
+        order.status = new_status
+
+        await self.db.commit()
+        await self.db.refresh(order)
+
+        # Send notification to customer
+        if order.user:
+            background_tasks.add_task(
+                self.notification_service.create_notification,
+                user_id=str(order.user_id),
+                message=f"Your order #{order.id} status has been updated to {new_status}",
+                type="info",
+                related_id=str(order.id)
+            )
+
+        return {
+            "id": str(order.id),
+            "status": order.status,
+            "previous_status": old_status,
+            "user": {
+                "firstname": order.user.firstname if order.user else None,
+                "lastname": order.user.lastname if order.user else None,
+                "email": order.user.email if order.user else None
+            },
+            "total_amount": order.total_amount,
+            "created_at": order.created_at.isoformat()
         }

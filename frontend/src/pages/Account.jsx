@@ -20,6 +20,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 const Dashboard = lazy(() => import('../components/account/Dashboard'));
 const Profile = lazy(() => import('../components/account/Profile'));
 const Orders = lazy(() => import('../components/account/Orders'));
+const TrackOrder = lazy(() => import('../components/account/TrackOrder'));
 const Wishlist = lazy(() => import('../components/account/Wishlist'));
 const Addresses = lazy(() => import('../components/account/Addresses'));
 const ThemeSettings = lazy(() =>
@@ -60,6 +61,7 @@ export const Account = () => {
     { path: '/account', label: 'Dashboard', icon: <UserIcon size={20} /> },
     { path: '/account/profile', label: 'Profile', icon: <UserIcon size={20} /> },
     { path: '/account/orders', label: 'Orders', icon: <ShoppingBagIcon size={20} /> },
+    { path: '/account/track-order', label: 'Track Order', icon: <PackageIcon size={20} /> },
     { path: '/account/wishlist', label: 'Wishlist', icon: <HeartIcon size={20} /> },
     { path: '/account/addresses', label: 'Addresses', icon: <MapPinIcon size={20} /> },
     { path: '/account/payment-methods', label: 'Payment Methods', icon: <CreditCardIcon size={20} /> },
@@ -161,6 +163,7 @@ export const Account = () => {
               <Route path="/" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/orders" element={<Orders />} />
+              <Route path="/track-order" element={<TrackOrder />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/addresses" element={<Addresses />} />
               <Route path="/payment-methods" element={<PaymentMethods />} />

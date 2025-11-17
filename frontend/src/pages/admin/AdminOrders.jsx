@@ -14,6 +14,7 @@ export const AdminOrders = () => {
   const [dateTo, setDateTo] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
 
   const apiCall = (page, limit) => {
     return AdminAPI.getAllOrders({
@@ -37,6 +38,7 @@ export const AdminOrders = () => {
     page: currentPage,
     limit: itemsPerPage,
     totalPages,
+    total: totalOrders,
     goToPage,
   } = usePaginatedApi(
     apiCall,
@@ -49,6 +51,20 @@ export const AdminOrders = () => {
     e.preventDefault();
     setSubmittedSearchTerm(searchTerm);
     goToPage(1);
+  };
+
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    try {
+      setUpdatingOrderId(orderId);
+      await AdminAPI.updateOrderStatus(orderId, newStatus);
+      // Refresh orders list
+      await fetchOrders();
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      alert('Failed to update order status. Please try again.');
+    } finally {
+      setUpdatingOrderId(null);
+    }
   };
 
   // Status options for filter
@@ -85,7 +101,7 @@ export const AdminOrders = () => {
   }
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, orders.length);
+  const endIndex = Math.min(startIndex + itemsPerPage, totalOrders || orders.length);
 
   return <div>
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -250,20 +266,22 @@ export const AdminOrders = () => {
                         <PrinterIcon size={18} />
                       </button>
                       <div className="relative group">
-                        <button className="p-1 text-copy-light hover:text-main">
+                        <button className="p-1 text-copy-light hover:text-main" disabled={updatingOrderId === order.id}>
                           <MoreHorizontalIcon size={18} />
                         </button>
-                        <div className="absolute right-0 mt-1 hidden group-hover:block bg-surface rounded-md shadow-lg border border-border-light z-10 w-36">
+                        <div className="absolute right-0 mt-1 hidden group-hover:block bg-surface rounded-md shadow-lg border border-border-light z-10 w-44">
                           <div className="py-1">
-                            <button className="w-full text-left px-4 py-2 text-sm text-copy hover:bg-surface-hover">
-                              Update Status
-                            </button>
-                            <button className="w-full text-left px-4 py-2 text-sm text-copy hover:bg-surface-hover">
-                              Send Invoice
-                            </button>
-                            <button className="w-full text-left px-4 py-2 text-sm text-copy hover:bg-surface-hover">
-                              Cancel Order
-                            </button>
+                            <div className="px-4 py-2 text-xs text-copy-light font-medium">Update Status</div>
+                            {statusOptions.filter(opt => opt.value !== 'all' && opt.value !== order.status).map(statusOpt => (
+                              <button
+                                key={statusOpt.value}
+                                onClick={() => handleStatusUpdate(order.id, statusOpt.value)}
+                                disabled={updatingOrderId === order.id}
+                                className="w-full text-left px-4 py-2 text-sm text-copy hover:bg-surface-hover disabled:opacity-50"
+                              >
+                                {statusOpt.label}
+                              </button>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -286,7 +304,7 @@ export const AdminOrders = () => {
           <p className="text-sm text-copy-light">
             Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
             <span className="font-medium">{endIndex}</span> of{' '}
-            <span className="font-medium">{orders.length}</span> orders
+            <span className="font-medium">{totalOrders || orders.length}</span> orders
           </p>
           <div className="flex items-center space-x-2">
             <button

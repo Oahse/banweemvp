@@ -74,7 +74,7 @@
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
   - **Git Commit:** "fix: improve product details page error handling"
 
-- [-] 11. Complete Checkout Page
+- [x] 11. Complete Checkout Page
   - Create Checkout.jsx component with order summary
   - Implement shipping address form with validation
   - Add payment method selection (Adyen integration)
@@ -100,7 +100,7 @@
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
   - **Status:** Already implemented in Account.jsx
 
-- [ ] 14. Enhance Admin Dashboard
+- [x] 14. Enhance Admin Dashboard
   - AdminService.get_dashboard_stats() already exists
   - Update AdminDashboard.jsx to properly display all stats
   - Fix recent orders display with proper data mapping
@@ -109,7 +109,7 @@
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
   - **Git Commit:** "fix: enhance admin dashboard with proper data display"
 
-- [ ] 15. Fix Admin Orders Management
+- [-] 15. Fix Admin Orders Management
   - Verify admin orders API endpoint functionality
   - Update AdminOrders.jsx to handle pagination correctly
   - Add status filter dropdown functionality

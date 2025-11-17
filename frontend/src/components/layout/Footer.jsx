@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { MapPinIcon, MailIcon, PhoneIcon, ArrowRightIcon, FacebookIcon, TwitterIcon, InstagramIcon, YoutubeIcon, LinkedinIcon } from 'lucide-react';
 
 export const Footer = () => {
-  // Categories for quick links
+  // Categories for quick links - matching backend API query parameters
   const categories = [
-    { name: 'Cereal Crops', path: '/products/cereal-crops' },
-    { name: 'Legumes', path: '/products/legumes' },
-    { name: 'Fruits & Vegetables', path: '/products/fruits-vegetables' },
-    { name: 'Spices and Herbs', path: '/products/spices-herbs' },
-    { name: 'Nuts & Beverages', path: '/products/nuts-flowers-beverages' },
+    { name: 'Cereal Crops', path: '/products?category=Cereal Crops' },
+    { name: 'Legumes', path: '/products?category=Legumes' },
+    { name: 'Fruits & Vegetables', path: '/products?category=Fruits and Vegetables' },
+    { name: 'Spices and Herbs', path: '/products?category=Spices and Herbs' },
+    { name: 'Nuts & Beverages', path: '/products?category=Nuts, Flowers and Beverages' },
   ];
 
   // Help links
