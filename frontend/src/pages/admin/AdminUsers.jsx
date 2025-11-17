@@ -63,7 +63,6 @@ export const AdminUsers = () => {
   }];
 
   if (usersError) {
-    console.log("Users API Error:", usersError);
     return (
       <div className="p-6">
         <ErrorMessage

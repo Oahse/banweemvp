@@ -109,9 +109,6 @@ const PageLoading = () => (
 );
 
 export function App() {
-  // Debug: Log React version
-  console.log('React version:', React.version);
-
   return (
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ''}>

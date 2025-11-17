@@ -19,7 +19,6 @@ export const WishlistProvider = ({ children }) => {
     }
 
     try {
-      console.log('WishlistContext: Fetching wishlists with WishlistAPI.getWishlists');
       const response = await WishlistAPI.getWishlists(user.id);
       if (response.success) {
         setWishlists(response.data);

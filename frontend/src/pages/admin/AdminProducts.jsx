@@ -56,7 +56,6 @@ export const AdminProducts = () => {
   };
 
   if (productsError) {
-    console.log("Products API Error:", productsError);
     return (
       <div className="p-6">
         <ErrorMessage

@@ -43,7 +43,6 @@ export const AdminVariants = () => {
   };
 
   if (variantsError) {
-    console.log("Variants API Error:", variantsError);
     return (
       <div className="p-6">
         <ErrorMessage

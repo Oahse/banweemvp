@@ -9,8 +9,6 @@ import {
 } from '../../lib/countries';
 import { ChevronDownIcon, SearchIcon, XIcon, GlobeIcon } from 'lucide-react';
 
-console.log('CountrySelector module - countries:', countries);
-
 export const CountrySelector = ({
   value,
   onChange,
@@ -29,8 +27,6 @@ export const CountrySelector = ({
   error = false,
   helperText
 }) => {
-  console.log('CountrySelector render - value:', value);
-  console.log('CountrySelector render - countries:', countries);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -39,11 +35,8 @@ export const CountrySelector = ({
   const listRef = useRef(null);
 
   const selectedCountry = useMemo(() => {
-    console.log('selectedCountry useMemo - value:', value);
-    console.log('selectedCountry useMemo - countries:', countries);
     const safeCountries = countries || [];
     const foundCountry = value ? safeCountries.find(c => c.code === value) : undefined;
-    console.log('selectedCountry useMemo - foundCountry:', foundCountry);
     return foundCountry;
   }, [value]);
 

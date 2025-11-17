@@ -1,0 +1,5 @@
+admin@banwee.com / adminpass
+supplier@banwee.com / supplierpass
+user3@example.com / P@ss0003
+user4@example.com / P@ss0004
+user5@example.com / P@ss0005

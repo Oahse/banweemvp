@@ -89,7 +89,6 @@ export const AdminOrders = () => {
   }];
 
   if (ordersError) {
-    console.log("Orders API Error:", ordersError);
     return (
       <div className="p-6">
         <ErrorMessage

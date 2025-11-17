@@ -5,7 +5,6 @@ import { AdminAPI } from '../../apis';
 import { themeClasses } from '../../lib/theme';
 
 export const SalesChart = () => {
-  console.log("SalesChart rendering");
   const [days, setDays] = useState(30);
 
   const { data: salesData, loading, error, execute: fetchSalesData } = useApi(

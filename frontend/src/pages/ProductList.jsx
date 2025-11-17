@@ -246,7 +246,7 @@ export const ProductList = () => {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters Sidebar - Mobile Toggle */}
         <div
-          className={`fixed inset-y-0 left-0 w-64 bg-surface z-[999] transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isFilterSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:w-64 lg:flex-shrink-0`}
+          className={`fixed inset-y-0 left-0 w-64 bg-surface z-[999] transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isFilterSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:w-64 lg:flex-shrink-0 shadow-lg lg:shadow-none`}
         >
           <div className="flex items-center justify-between p-4 border-b border-border lg:hidden">
             <h2 className="font-semibold text-lg text-copy">Filters</h2>

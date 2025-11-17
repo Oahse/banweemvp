@@ -100,8 +100,8 @@ const Checkout = () => {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch checkout data:', error);
-        toast.error('Failed to load checkout information');
+        const errorMessage = error?.response?.data?.message || error?.message || 'Failed to load checkout information';
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -166,8 +166,8 @@ const Checkout = () => {
         toast.success('Address added successfully');
       }
     } catch (error) {
-      console.error('Failed to add address:', error);
-      toast.error('Failed to add address');
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to add address';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -215,8 +215,7 @@ const Checkout = () => {
         throw new Error('Failed to place order');
       }
     } catch (error) {
-      console.error('Failed to place order:', error);
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to place order';
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to place order. Please try again.';
       toast.error(errorMessage);
     } finally {
       setProcessingPayment(false);

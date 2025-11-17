@@ -8,6 +8,7 @@ import { SkeletonCard } from '../ui/SkeletonCard';
 import { QRCodeDisplay } from './QRCodeDisplay';
 import { BarcodeDisplay } from './BarcodeDisplay';
 import { toast } from 'react-hot-toast';
+import { cn } from '../../lib/utils';
 
 /**
  * @typedef {object} ProductVariantImage
@@ -161,13 +162,13 @@ export const ProductCard = ({
                       });
                       toast.success('Item added to cart!');
                     } catch (error) {
-                      console.error('Failed to add to cart:', error);
                       // If user is not authenticated, redirect to login
                       if (error instanceof Error && error.message.includes('authenticated')) {
                         setRedirectPath(location.pathname);
                         navigate('/login');
                       } else {
-                        toast.error('Failed to add item to cart');
+                        const errorMessage = error?.response?.data?.message || error?.message || 'Failed to add item to cart';
+                        toast.error(errorMessage);
                       }
                     }
 
