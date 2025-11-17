@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import { GlobeIcon, MapIcon, ListIcon, BarChart3Icon } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';

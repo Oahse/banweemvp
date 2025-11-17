@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useFileUpload, formatFileSize, isImageFile, createFilePreview, cleanupFilePreview } from '../../hooks/useFileUpload';
 import { FiUpload, FiX, FiFile, FiTrash2, FiCheck } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';

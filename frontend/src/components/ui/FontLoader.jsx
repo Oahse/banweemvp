@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 export const FontLoader = () => {
   useEffect(() => {
     // Add Montserrat font from Google Fonts

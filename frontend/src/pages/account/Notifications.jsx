@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle, Mail, Trash2 } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import { NotificationAPI } from '../../apis/notification';

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { apiClient, ProductsAPI } from '../../apis';
 

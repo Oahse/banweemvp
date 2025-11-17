@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchIcon, XIcon } from 'lucide-react';
 import { useCategories } from '../../contexts/CategoryContext';

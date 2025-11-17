@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InteractiveChart } from './InteractiveChart';
 import { CalendarIcon, ClockIcon, TrendingUpIcon, TrendingDownIcon } from 'lucide-react';
 import { subDays, subYears, startOfDay, endOfDay } from 'date-fns';

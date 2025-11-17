@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ScanLineIcon, DownloadIcon, CopyIcon, XIcon } from 'lucide-react';
 

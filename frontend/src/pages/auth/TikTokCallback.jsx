@@ -3,7 +3,7 @@
  * Handles the callback from TikTok OAuth flow
  */
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '../../apis';

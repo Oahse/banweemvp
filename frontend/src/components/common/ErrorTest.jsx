@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 // This component is for testing error boundaries - DO NOT USE IN PRODUCTION
 export const ErrorTest = () => {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { ScanIcon, DownloadIcon, PrinterIcon, CopyIcon, CheckIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
