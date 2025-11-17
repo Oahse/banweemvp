@@ -100,14 +100,14 @@ export const ProductDetails = () => {
     loading: productLoading,
     error: productError,
     execute: fetchProduct,
-  } = useApi({ showErrorToast: false });
+  } = useApi();
 
   const {
     data: relatedProductsData,
     loading: relatedLoading,
     error: relatedError,
     execute: fetchRelatedProducts,
-  } = useApi({ showErrorToast: false });
+  } = useApi();
 
   const {
     data: reviewsData,
@@ -124,17 +124,33 @@ export const ProductDetails = () => {
     }
   }, [id, fetchProduct, fetchRelatedProducts]);
 
+  // Extract actual data from API response
+  const actualProductData = productData?.data || productData;
+  const actualRelatedData = relatedProductsData?.data || relatedProductsData;
+  const actualReviewsData = reviewsData?.data ? {
+    data: reviewsData.data.data || reviewsData.data,
+    total: reviewsData.data.total || reviewsData.total || 0,
+    limit: reviewsData.data.limit || reviewsData.limit || 10
+  } : { data: [], total: 0, limit: 10 };
+
   // Fetch reviews when product ID, filters, or page change
   useEffect(() => {
     if (id) {
+      const params = new URLSearchParams();
+      params.append('page', reviewsPage.toString());
+      params.append('limit', '10');
+      if (minRating !== undefined) params.append('min_rating', minRating.toString());
+      if (maxRating !== undefined) params.append('max_rating', maxRating.toString());
+      if (sortBy) params.append('sort_by', sortBy);
+      
       fetchReviews(() => ReviewsAPI.getProductReviews(id, reviewsPage, 10, minRating, maxRating, sortBy));
     }
   }, [id, reviewsPage, minRating, maxRating, sortBy, fetchReviews]);
 
   // Set initial variant when product loads
   useEffect(() => {
-    if (productData && productData.variants && productData.variants.length > 0) {
-      const variant = productData.variants[0];
+    if (actualProductData && actualProductData.variants && actualProductData.variants.length > 0) {
+      const variant = actualProductData.variants[0];
       setSelectedVariant({
         id: variant.id,
         name: variant.name,
@@ -149,7 +165,7 @@ export const ProductDetails = () => {
       // Reset image selection when product changes
       setSelectedImage(0);
     }
-  }, [productData]);
+  }, [actualProductData]);
 
   // Update images when variant changes
   useEffect(() => {
@@ -185,7 +201,7 @@ export const ProductDetails = () => {
     );
   }
 
-  if (productError || !productData) {
+  if (productError || !actualProductData) {
     return (
       <div className="container mx-auto px-4 py-8">
         <ErrorMessage
@@ -197,12 +213,13 @@ export const ProductDetails = () => {
   }
 
   // Calculate average rating and total reviews with null checks
-  const averageRating = reviewsData?.data && Array.isArray(reviewsData.data) && reviewsData.data.length > 0
-    ? reviewsData.data.reduce((acc, review) => acc + (review?.rating || 0), 0) / reviewsData.data.length
+  const reviewsList = actualReviewsData.data || [];
+  const averageRating = Array.isArray(reviewsList) && reviewsList.length > 0
+    ? reviewsList.reduce((acc, review) => acc + (review?.rating || 0), 0) / reviewsList.length
     : 0;
-  const totalReviews = reviewsData?.total || 0;
+  const totalReviews = actualReviewsData.total || 0;
 
-  const product = transformProduct(productData, averageRating, totalReviews);
+  const product = transformProduct(actualProductData, averageRating, totalReviews);
   
   // If product transformation failed, show error
   if (!product) {
@@ -246,8 +263,8 @@ export const ProductDetails = () => {
           <div className="space-y-4">
             <ProductImageGallery
               images={selectedVariant 
-                ? (productData.variants?.find(v => v.id === selectedVariant.id)?.images || [])
-                : (productData.variants?.[0]?.images || [])
+                ? (actualProductData.variants?.find(v => v.id === selectedVariant.id)?.images || [])
+                : (actualProductData.variants?.[0]?.images || [])
               }
               selectedImageIndex={selectedImage}
               onImageSelect={setSelectedImage}
@@ -344,11 +361,11 @@ export const ProductDetails = () => {
             </div>
 
             {/* Variant Selection */}
-            {productData?.variants && product.variants && product.variants.length > 1 && selectedVariant && (
+            {actualProductData?.variants && product.variants && product.variants.length > 1 && selectedVariant && (
               <VariantSelector
-                variants={productData.variants.map(variant => ({
+                variants={actualProductData.variants.map(variant => ({
                   id: variant.id,
-                  product_id: variant.product_id || productData.id,
+                  product_id: variant.product_id || actualProductData.id,
                   sku: variant.sku || '',
                   name: variant.name || '',
                   base_price: variant.base_price || 0,
@@ -365,7 +382,7 @@ export const ProductDetails = () => {
                 }))}
                 selectedVariant={{
                   id: selectedVariant.id,
-                  product_id: productData.id,
+                  product_id: actualProductData.id,
                   sku: selectedVariant.sku || '',
                   name: selectedVariant.name || '',
                   base_price: selectedVariant.base_price || 0,
@@ -378,10 +395,10 @@ export const ProductDetails = () => {
                     name,
                     value: String(value)
                   })) : [],
-                  images: productData.variants?.find(v => v.id === selectedVariant.id)?.images || []
+                  images: actualProductData.variants?.find(v => v.id === selectedVariant.id)?.images || []
                 }}
                 onVariantChange={(variant) => {
-                  const originalVariant = productData.variants?.find(v => v.id === variant.id);
+                  const originalVariant = actualProductData.variants?.find(v => v.id === variant.id);
                   if (originalVariant) {
                     setSelectedVariant({
                       id: originalVariant.id,
@@ -676,9 +693,9 @@ export const ProductDetails = () => {
                     error={reviewsError}
                     onRetry={() => fetchReviews(() => ReviewsAPI.getProductReviews(id, reviewsPage, 10, minRating, maxRating, sortBy))}
                   />
-                ) : reviewsData?.data && Array.isArray(reviewsData.data) && reviewsData.data.length > 0 ? (
+                ) : reviewsList.length > 0 ? (
                   <div className="space-y-6">
-                    {reviewsData.data.map((review) => (
+                    {reviewsList.map((review) => (
                       <div key={review.id} className="border-b border-gray-100 pb-6">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
@@ -704,7 +721,7 @@ export const ProductDetails = () => {
                     ))}
 
                     {/* Reviews Pagination */}
-                    {reviewsData.total > reviewsData.limit && (
+                    {actualReviewsData.total > actualReviewsData.limit && (
                       <div className="flex items-center justify-center space-x-2 mt-8">
                         <button
                           onClick={() => setReviewsPage(prev => Math.max(1, prev - 1))}
@@ -714,9 +731,9 @@ export const ProductDetails = () => {
                           Previous
                         </button>
                         
-                        {Array.from({ length: Math.ceil(reviewsData.total / reviewsData.limit) }, (_, i) => {
+                        {Array.from({ length: Math.ceil(actualReviewsData.total / actualReviewsData.limit) }, (_, i) => {
                           const page = i + 1;
-                          const totalPages = Math.ceil(reviewsData.total / reviewsData.limit);
+                          const totalPages = Math.ceil(actualReviewsData.total / actualReviewsData.limit);
                           
                           // Show first page, last page, current page, and pages around current
                           if (
@@ -744,8 +761,8 @@ export const ProductDetails = () => {
                         })}
                         
                         <button
-                          onClick={() => setReviewsPage(prev => Math.min(Math.ceil(reviewsData.total / reviewsData.limit), prev + 1))}
-                          disabled={reviewsPage === Math.ceil(reviewsData.total / reviewsData.limit)}
+                          onClick={() => setReviewsPage(prev => Math.min(Math.ceil(actualReviewsData.total / actualReviewsData.limit), prev + 1))}
+                          disabled={reviewsPage === Math.ceil(actualReviewsData.total / actualReviewsData.limit)}
                           className="px-3 py-2 rounded-md bg-surface border border-border text-copy hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Next
@@ -783,8 +800,8 @@ export const ProductDetails = () => {
                     <div className="bg-gray-200 h-3 rounded w-16"></div>
                   </div>
                 ))
-              ) : relatedProductsData && Array.isArray(relatedProductsData) && relatedProductsData.length > 0 ? (
-                relatedProductsData.map((relatedProduct) => {
+              ) : actualRelatedData && Array.isArray(actualRelatedData) && actualRelatedData.length > 0 ? (
+                actualRelatedData.map((relatedProduct) => {
                   if (!relatedProduct) return null;
                   
                   const transformedProduct = {

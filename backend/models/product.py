@@ -144,7 +144,7 @@ class ProductVariant(BaseModel):
         return next((img for img in self.images if img.is_primary),
                     self.images[0] if self.images else None)
 
-    def to_dict(self, include_images=True, include_product=True) -> dict:
+    def to_dict(self, include_images=True, include_product=False) -> dict:
         """Convert variant to dictionary for API responses"""
         data = {
             "id": str(self.id),

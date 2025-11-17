@@ -6,7 +6,6 @@ import { ProductCard } from '../components/product/ProductCard';
 import { CategoryCard } from '../components/category/CategoryCard';
 import { useApi } from '../hooks/useApi';
 import { ProductsAPI } from '../apis/products';
-import { useCategories } from '../contexts/CategoryContext';
 
 // Filter categories configuration system
 const FILTER_CATEGORIES = {
@@ -96,43 +95,83 @@ export const Home = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // API calls with quiet failure - use demo data as fallback
-  const { categories: apiCategories, loading: categoriesLoading, error: categoriesError } = useCategories();
+  // Single API call for all home page data
+  const { data: homeData, loading: homeLoading, error: homeError, execute } = useApi();
 
-  const getProductsApiCall = () => ProductsAPI.getProducts({ sort_by: 'created_at', sort_order: 'desc', page: 1, limit: 20 });
-  const { data: productsData, loading: productsLoading, error: productsError } = useApi(
-    getProductsApiCall,
-    { autoFetch: true, showErrorToast: false }
-  );
-
+  const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
   const [deals, setDeals] = useState([]);
 
+  // Fetch home data on mount
   useEffect(() => {
-    if (productsData && productsData.data) {
-      const allProducts = productsData.data.map(convertApiProductToDemo);
+    execute(ProductsAPI.getHomeData);
+  }, [execute]);
 
-      // Filter for featured products
-      const featured = allProducts.filter(p => p.isFeatured).slice(0, 4);
-      setFeaturedProducts(featured);
+  useEffect(() => {
+    console.log('Home data received:', homeData);
+    if (homeData && homeData.data) {
+      const { categories: categoriesData, featured, popular, deals: dealsData } = homeData.data;
+      console.log('Extracted data:', { categoriesData, featured, popular, dealsData });
 
-      // Filter for popular products
-      const popular = allProducts.slice(0, 8);
-      setPopularProducts(popular);
+      // Helper function to convert API products to demo format
+      const convertProduct = (product) => ({
+        id: String(product.id),
+        name: product.name,
+        price: product.variants?.[0]?.base_price || 0,
+        discountPrice: product.variants?.[0]?.sale_price || null,
+        rating: product.rating || 4.5,
+        reviewCount: product.review_count || 0,
+        image: product.variants?.[0]?.images?.[0]?.url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+        category: product.category?.name || 'General',
+        isNew: false,
+        isFeatured: product.featured,
+        variants: product.variants,
+      });
 
-      // Filter for deals
-      const dealsWithDiscount = allProducts
-        .filter(p => p.discountPrice && p.discountPrice < p.price)
-        .slice(0, 2)
-        .map(p => ({
-          ...p,
-          discountPercent: Math.round(((p.price - (p.discountPrice || 0)) / p.price) * 100),
-          endsIn: '2d 15h 22m' // Demo countdown
-        }));
-      setDeals(dealsWithDiscount);
+      // Helper function to convert API categories to demo format
+      const convertCategory = (category) => ({
+        id: category.id,
+        name: category.name,
+        image: category.image_url || getCategoryImage(category.name),
+        path: `/products?category=${encodeURIComponent(category.name)}`
+      });
+
+      // Convert categories
+      if (categoriesData && Array.isArray(categoriesData)) {
+        const convertedCategories = categoriesData.map(convertCategory);
+        setCategories(convertedCategories);
+      }
+
+      // Convert featured products
+      if (featured && Array.isArray(featured)) {
+        const convertedFeatured = featured.map(convertProduct);
+        console.log('Converted featured products:', convertedFeatured);
+        setFeaturedProducts(convertedFeatured);
+      }
+
+      // Convert popular products
+      if (popular && Array.isArray(popular)) {
+        const convertedPopular = popular.map(convertProduct);
+        console.log('Converted popular products:', convertedPopular);
+        setPopularProducts(convertedPopular);
+      }
+
+      // Convert deals
+      if (dealsData && Array.isArray(dealsData)) {
+        const convertedDeals = dealsData.map(p => {
+          const converted = convertProduct(p);
+          return {
+            ...converted,
+            discountPercent: Math.round(((converted.price - (converted.discountPrice || 0)) / converted.price) * 100),
+            endsIn: '2d 15h 22m' // Demo countdown
+          };
+        });
+        setDeals(convertedDeals);
+      }
     }
-  }, [productsData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [homeData]);
 
   const categoriesContainerRef = React.useRef(null);
 
@@ -151,29 +190,6 @@ export const Home = () => {
   const prevSlide = () => {
     setCurrentSlide((prev) => (heroSlides.length ? (prev - 1 + heroSlides.length) % heroSlides.length : 0));
   };
-
-  // Helper function to convert API products to demo format
-  const convertApiProductToDemo = (product) => ({
-    id: String(product.id),
-    name: product.name,
-    price: product.variants?.[0]?.base_price || 0,
-    discountPrice: product.variants?.[0]?.sale_price || null,
-    rating: product.rating || 4.5,
-    reviewCount: product.review_count || 0,
-    image: product.variants?.[0]?.images?.[0]?.url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-    category: product.category?.name || 'General',
-    isNew: false,
-    isFeatured: product.featured,
-    variants: product.variants, // Include variants
-  });
-
-  // Helper function to convert API categories to demo format
-  const convertApiCategoryToDemo = (category) => ({
-    id: category.id,
-    name: category.name,
-    image: category.image_url || getCategoryImage(category.name),
-    path: `/products?category=${encodeURIComponent(category.name)}`
-  });
 
   // Function to get appropriate demo images for categories
   const getCategoryImage = (categoryName) => {
@@ -378,21 +394,21 @@ export const Home = () => {
           </div>
 
           <div ref={categoriesContainerRef} className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
-            {categoriesLoading ? (
-              <p>Loading categories...</p>
-            ) : categoriesError ? (
-              <p>Error loading categories: {typeof categoriesError === 'string' ? categoriesError : 'Failed to load categories'}</p>
+            {homeLoading ? (
+              // Loading skeleton for categories
+              [...Array(5)].map((_, index) => (
+                <div key={index} className="flex-none w-40 h-40 bg-surface-hover rounded-lg animate-pulse"></div>
+              ))
+            ) : homeError ? (
+              <p className="text-error">Error loading categories</p>
+            ) : categories.length > 0 ? (
+              categories.map((category) => (
+                <div key={category.id} className="flex-none w-40">
+                  <CategoryCard category={category} />
+                </div>
+              ))
             ) : (
-              (Array.isArray(apiCategories) ? apiCategories : []).slice(0, 10).map((category) => {
-                const convertedCategory = convertApiCategoryToDemo(category);
-                return (
-                  <div key={convertedCategory.id} className="flex-none w-40">
-                    <CategoryCard
-                      category={convertedCategory}
-                    />
-                  </div>
-                );
-              })
+              <p className="text-copy-light">No categories available</p>
             )}
           </div>
         </div>
@@ -415,22 +431,26 @@ export const Home = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {productsLoading ? (
+            {homeLoading ? (
               // Loading skeleton
               [...Array(4)].map((_, index) => (
                 <ProductCard key={index} isLoading={true} />
               ))
-            ) : productsError ? (
+            ) : homeError ? (
               <div className="col-span-full text-center text-error">
-                Error loading featured products: {productsError.message}
+                Error loading featured products: {homeError.message}
               </div>
-            ) : (
+            ) : featuredProducts.length > 0 ? (
               featuredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                 />
               ))
+            ) : (
+              <div className="col-span-full text-center text-copy-light py-8">
+                No featured products available
+              </div>
             )}
           </div>
         </div>
@@ -501,14 +521,16 @@ export const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            {productsLoading ? (
+            {homeLoading ? (
               // Loading skeleton
-              [...Array(4)].map((_, index) => (
-                <ProductCard key={index} isLoading={true} />
-              ))
-            ) : productsError ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                {[...Array(4)].map((_, index) => (
+                  <ProductCard key={index} isLoading={true} />
+                ))}
+              </div>
+            ) : homeError ? (
               <div className="col-span-full text-center text-error">
-                Error loading popular products: {productsError.message}
+                Error loading popular products: {homeError.message}
               </div>
             ) : filteredPopularProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -605,7 +627,7 @@ export const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {productsLoading ? (
+            {homeLoading ? (
               // Loading skeleton
               [...Array(2)].map((_, index) => (
                 <div key={index} className="flex flex-col md:flex-row bg-background rounded-lg overflow-hidden shadow-sm animate-pulse">
@@ -618,11 +640,11 @@ export const Home = () => {
                   </div>
                 </div>
               ))
-            ) : productsError ? (
+            ) : homeError ? (
               <div className="col-span-full text-center text-error">
-                Error loading deals: {productsError.message}
+                Error loading deals: {homeError.message}
               </div>
-            ) : (
+            ) : deals.length > 0 ? (
               deals.map((product) => (
                 <div key={product.id} className="flex flex-col md:flex-row bg-background rounded-lg overflow-hidden shadow-sm">
                   <div className="md:w-1/3">
@@ -671,6 +693,10 @@ export const Home = () => {
                   </div>
                 </div>
               ))
+            ) : (
+              <div className="col-span-full text-center text-copy-light py-8">
+                No deals available at the moment
+              </div>
             )}
           </div>
         </div>

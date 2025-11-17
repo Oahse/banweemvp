@@ -63,6 +63,8 @@ let isToastVisible = false;
 class APIClient {
   constructor() {
     this.client = axios.create(API_CONFIG);
+    this.isRefreshing = false;
+    this.failedQueue = [];
     this.setupInterceptors();
   }
 
@@ -193,14 +195,22 @@ class APIClient {
       
       // Handle validation errors
       if (errorData.details || errorData.errors) {
-        apiError.message = errorData.details || errorData.errors;
-        
-        // Extract first validation error for display
         const validationErrors = errorData.details || errorData.errors;
-        if (validationErrors && typeof validationErrors === 'object') {
+        
+        // If it's a string, use it directly
+        if (typeof validationErrors === 'string') {
+          apiError.message = validationErrors;
+        } 
+        // If it's an object, extract the first error message
+        else if (validationErrors && typeof validationErrors === 'object') {
           const firstError = Object.values(validationErrors)[0];
           if (Array.isArray(firstError) && firstError.length > 0) {
             apiError.message = firstError[0];
+          } else if (typeof firstError === 'string') {
+            apiError.message = firstError;
+          } else {
+            // Fallback: stringify the object
+            apiError.message = 'Validation error occurred';
           }
         }
       }

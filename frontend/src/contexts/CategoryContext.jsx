@@ -19,7 +19,9 @@ export const CategoryProvider = ({ children }) => {
 
   useEffect(() => {
     if (data) {
-      setCategories(data);
+      // API returns { success: true, data: [...] }
+      const categoriesArray = data.data || data;
+      setCategories(Array.isArray(categoriesArray) ? categoriesArray : []);
     }
   }, [data]);
 

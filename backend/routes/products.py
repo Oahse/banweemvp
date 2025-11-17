@@ -21,6 +21,55 @@ router = APIRouter(prefix="/api/v1/products", tags=["Products"])
 # /products?sort_by=created_at&sort_order=desc&page=1&limit=12
 
 
+@router.get("/home")
+async def get_home_data(
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all data needed for the home page in one request."""
+    try:
+        product_service = ProductService(db)
+        
+        # Fetch categories (limit to 10 for home page carousel)
+        categories = await product_service.get_categories()
+        
+        # Fetch featured products (4 items)
+        featured = await product_service.get_featured_products(limit=4)
+        
+        # Fetch popular/recent products (20 items for filtering by category)
+        popular_result = await product_service.get_products(
+            page=1,
+            limit=20,
+            filters={},
+            sort_by="created_at",
+            sort_order="desc"
+        )
+        
+        # Fetch products on sale for deals section (10 items)
+        deals_result = await product_service.get_products(
+            page=1,
+            limit=10,
+            filters={"sale": True},
+            sort_by="created_at",
+            sort_order="desc"
+        )
+        
+        return Response(
+            success=True,
+            data={
+                "categories": categories[:10] if categories else [],  # Limit to 10 for home page
+                "featured": featured,
+                "popular": popular_result["data"],
+                "deals": deals_result["data"]
+            }
+        )
+    except Exception as e:
+        print(f"Error fetching home data: {e}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to fetch home data: {str(e)}"
+        )
+
+
 @router.get("/")
 async def get_products(
     page: int = Query(1, ge=1),

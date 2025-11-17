@@ -50,6 +50,13 @@ export class ProductsAPI {
   }
 
   /**
+   * Get all home page data in one request
+   */
+  static async getHomeData() {
+    return await apiClient.get('/products/home');
+  }
+
+  /**
    * Get product variants
    */
   static async getProductVariants(productId) {

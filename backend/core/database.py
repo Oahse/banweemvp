@@ -25,7 +25,7 @@ class GUID(TypeDecorator):
     """Platform-independent GUID type.
 
     Uses PostgreSQL's UUID type, otherwise uses
-    CHAR(32), storing as stringified hex values.
+    CHAR(36), storing as stringified UUID values with hyphens.
     """
     impl = CHAR
 
@@ -35,7 +35,7 @@ class GUID(TypeDecorator):
         if dialect.name == 'postgresql':
             return dialect.type_descriptor(UUID())
         else:
-            return dialect.type_descriptor(CHAR(32))
+            return dialect.type_descriptor(CHAR(36))
 
     def process_bind_param(self, value, dialect):
         if value is None:
@@ -43,14 +43,20 @@ class GUID(TypeDecorator):
         elif dialect.name == 'postgresql':
             return str(value)
         else:
+            # For SQLite, always convert to string WITH hyphens
             if not isinstance(value, uuid.UUID):
-                return str(uuid.UUID(value))
+                try:
+                    value = uuid.UUID(value)
+                except (ValueError, AttributeError, TypeError):
+                    # If conversion fails, return as-is
+                    return str(value) if value else None
             return str(value)
 
     def process_result_value(self, value, dialect):
         if value is None:
             return value
         else:
+            # Always return UUID object for consistency
             if not isinstance(value, uuid.UUID):
                 return uuid.UUID(value)
             return value
