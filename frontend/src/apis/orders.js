@@ -19,6 +19,13 @@ export class OrdersAPI {
   }
 
   /**
+   * Checkout - Place order from cart
+   */
+  static async checkout(checkoutData) {
+    return await apiClient.post('/orders/checkout', checkoutData);
+  }
+
+  /**
    * Get user's orders
    */
   static async getOrders(params) {
