@@ -98,6 +98,8 @@ class OrderService:
 
         # Process payment
         payment_service = PaymentService(self.db)
+        payment_result = None
+        
         try:
             payment_result = await payment_service.process_payment(
                 user_id=user_id,
@@ -118,19 +120,41 @@ class OrderService:
                 )
                 self.db.add(tracking_event)
 
-                # Clear cart after successful order
+                # Commit order and tracking event
+                await self.db.commit()
+                await self.db.refresh(order)
+
+                # Clear cart after successful order and commit
                 await cart_service.clear_cart(user_id)
+                
+                # Send order confirmation email in background
+                background_tasks.add_task(self._send_order_confirmation, order.id)
 
             else:
+                # Payment failed
                 order.status = "payment_failed"
+                await self.db.commit()
+                await self.db.refresh(order)
+                
+                error_message = payment_result.get("error", "Payment processing failed")
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Payment failed: {error_message}"
+                )
 
+        except HTTPException:
+            # Re-raise HTTP exceptions
+            raise
         except Exception as e:
+            # Handle unexpected errors
             order.status = "payment_failed"
+            await self.db.commit()
+            await self.db.refresh(order)
+            
             raise HTTPException(
-                status_code=400, detail=f"Payment processing failed: {str(e)}")
-
-        await self.db.commit()
-        await self.db.refresh(order)
+                status_code=400, 
+                detail=f"Payment processing failed: {str(e)}"
+            )
 
         # Send order confirmation email in background
         background_tasks.add_task(self._send_order_confirmation, order.id)
@@ -383,12 +407,6 @@ class OrderService:
                 total_price=item_data["total_price"]
             )
             self.db.add(order_item)
-
-        await self.db.commit()
-        await self.db.refresh(order)
-
-        # Send order confirmation email in background
-        background_tasks.add_task(self._send_order_confirmation, order.id)
 
         return await self._format_order_response(order)
 

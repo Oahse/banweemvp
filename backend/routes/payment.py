@@ -27,6 +27,13 @@ class CreatePaymentIntentRequest(BaseModel):
     currency: str = Field("usd", max_length=3)
 
 
+class ProcessPaymentRequest(BaseModel):
+    amount: float = Field(..., gt=0)
+    payment_method_id: UUID
+    order_id: UUID
+    currency: str = Field("USD", max_length=3)
+
+
 @payment_method_router.get("/me/payment-methods", response_model=List[PaymentMethodResponse], summary="Get all payment methods for the current user")
 async def get_my_payment_methods(
     db: AsyncSession = Depends(get_db),
@@ -171,6 +178,45 @@ async def create_payment_intent(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@payment_router.post("/process", summary="Process a payment")
+async def process_payment(
+    payload: ProcessPaymentRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_authenticated_user)
+):
+    """
+    Process a payment for an order.
+    This endpoint handles the payment processing and returns the result.
+    """
+    try:
+        service = PaymentService(db)
+        result = await service.process_payment(
+            user_id=current_user.id,
+            amount=payload.amount,
+            payment_method_id=payload.payment_method_id,
+            order_id=payload.order_id
+        )
+        
+        if result.get("status") == "failed":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=result.get("error", "Payment processing failed")
+            )
+        
+        return {
+            "success": True,
+            "data": result,
+            "message": "Payment processed successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to process payment - {str(e)}"
+        )
 
 
 @payment_router.post("/stripe-webhook", summary="Handle Stripe webhook events")

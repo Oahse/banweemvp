@@ -98,4 +98,82 @@ class NotificationService:
             Notification.created_at < threshold_date)
         await self.db.execute(delete_stmt)
         await self.db.commit()
+
+    async def send_order_confirmation(self, order_id: str):
+        """Send order confirmation notification and email."""
+        from models.order import Order
+        from models.user import User
+        from core.utils.messages.email import send_email
+        from core.config import settings
+        
+        # Get order details
+        query = select(Order).where(Order.id == order_id).options(
+            selectinload(Order.items)
+        )
+        result = await self.db.execute(query)
+        order = result.scalar_one_or_none()
+        
+        if not order:
+            print(f"Order {order_id} not found for confirmation")
+            return
+        
+        # Get user details
+        user_query = select(User).where(User.id == order.user_id)
+        user_result = await self.db.execute(user_query)
+        user = user_result.scalar_one_or_none()
+        
+        if not user:
+            print(f"User not found for order {order_id}")
+            return
+        
+        # Create notification
+        await self.create_notification(
+            user_id=str(order.user_id),
+            message=f"Your order #{str(order.id)[:8]} has been confirmed!",
+            type="order",
+            related_id=str(order.id)
+        )
+        
+        # Send email
+        try:
+            context = {
+                "customer_name": user.firstname or user.email,
+                "order_number": str(order.id)[:8],
+                "order_total": f"${order.total_amount:.2f}",
+                "order_date": order.created_at.strftime("%B %d, %Y") if order.created_at else "",
+                "order_url": f"{settings.FRONTEND_URL}/account/orders/{order.id}",
+                "company_name": "Banwee",
+            }
+            
+            await send_email(
+                to_email=user.email,
+                mail_type='order_confirmation',
+                context=context
+            )
+            print(f"Order confirmation email sent to {user.email}")
+        except Exception as e:
+            print(f"Failed to send order confirmation email: {e}")
+
+    async def notify_order_created(self, order_id: str, user_id: str):
+        """Send notification when order is created."""
+        await self.create_notification(
+            user_id=user_id,
+            message=f"Order #{str(order_id)[:8]} has been created",
+            type="order",
+            related_id=str(order_id)
+        )
+
+    async def notify_order_updated(self, order_id: str, user_id: str, status: str):
+        """Send notification when order status is updated."""
+        await self.create_notification(
+            user_id=user_id,
+            message=f"Order #{str(order_id)[:8]} status updated to {status}",
+            type="order",
+            related_id=str(order_id)
+        )
+
+    async def notify_cart_updated(self, user_id: str, cart_data: dict):
+        """Send WebSocket notification for cart update (placeholder)."""
+        # This would integrate with WebSocket service
+        pass
         print(f"Deleted notifications older than {days_old} days.")
