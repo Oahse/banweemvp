@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SearchIcon, FilterIcon, MoreHorizontalIcon, TrashIcon, EditIcon, CheckCircleIcon, XCircleIcon, UserPlusIcon, ChevronDownIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePaginatedApi } from '../../hooks/useApi';
@@ -13,7 +13,7 @@ export const AdminUsers = () => {
   const [status, setStatus] = useState('all');
   const [verified, setVerified] = useState('all');
 
-  const apiCall = (page, limit) => {
+  const apiCall = useCallback((page, limit) => {
     return AdminAPI.getUsers({
       role: filterRole !== 'all' ? filterRole : undefined,
       search: submittedSearchTerm || undefined,
@@ -22,7 +22,7 @@ export const AdminUsers = () => {
       page,
       limit,
     });
-  };
+  }, [filterRole, submittedSearchTerm, status, verified]);
 
   // API call for users
   const {

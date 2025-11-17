@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { SearchIcon, FilterIcon, ChevronDownIcon, EyeIcon, PrinterIcon, MoreHorizontalIcon, CalendarIcon } from 'lucide-react';
 import { usePaginatedApi } from '../../hooks/useApi';
@@ -16,7 +16,7 @@ export const AdminOrders = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
 
-  const apiCall = (page, limit) => {
+  const apiCall = useCallback((page, limit) => {
     return AdminAPI.getAllOrders({
       status: filterStatus !== 'all' ? filterStatus : undefined,
       q: submittedSearchTerm || undefined,
@@ -27,7 +27,7 @@ export const AdminOrders = () => {
       page,
       limit,
     });
-  };
+  }, [filterStatus, submittedSearchTerm, dateFrom, dateTo, minPrice, maxPrice]);
 
   // API call for orders
   const {

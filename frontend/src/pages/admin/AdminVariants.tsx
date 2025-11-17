@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { SearchIcon, FilterIcon, EditIcon, TrashIcon, MoreHorizontalIcon, PlusIcon } from 'lucide-react';
 import { usePaginatedApi } from '../../hooks/useApi';
@@ -11,14 +11,14 @@ export const AdminVariants = () => {
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [productId, setProductId] = useState('');
 
-  const apiCall = (page, limit) => {
+  const apiCall = useCallback((page, limit) => {
     return AdminAPI.getAllVariants({
       search: submittedSearchTerm || undefined,
       product_id: productId || undefined,
       page,
       limit,
     });
-  };
+  }, [submittedSearchTerm, productId]);
 
   const {
     data: variants,
