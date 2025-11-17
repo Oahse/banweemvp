@@ -17,11 +17,11 @@ export const useImagePreloader = () => {
       img.onerror = reject;
       img.src = src;
     });
-
+  };
 
   const preloadImages = (srcs) => {
     return Promise.all(srcs.map(preloadImage));
-
+  };
 
   return { preloadImage, preloadImages };
 };

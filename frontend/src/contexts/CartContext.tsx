@@ -1,12 +1,29 @@
 import React, { useEffect, createContext, useState, useCallback, useContext } from 'react';
 import { TokenManager } from '../apis/client';
 import { CartAPI } from '../apis/cart';
+import { Cart, AddToCartRequest } from '../types';
 
-export const CartContext = createContext(undefined);
+interface CartContextType {
+  cart: Cart | null;
+  loading: boolean;
+  fetchCart: () => Promise<void>;
+  addItem: (item: AddToCartRequest) => Promise<boolean>;
+  removeItem: (itemId: string) => Promise<void>;
+  updateQuantity: (itemId: string, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
+  totalItems: number;
+  items: Cart['items'];
+}
 
-export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState(null);
-  const [loading, setLoading] = useState(false);
+export const CartContext = createContext<CartContextType | undefined>(undefined);
+
+interface CartProviderProps {
+  children: React.ReactNode;
+}
+
+export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+  const [cart, setCart] = useState<Cart | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // ✅ Fetch the cart
   const fetchCart = useCallback(async () => {
@@ -34,7 +51,7 @@ export const CartProvider = ({ children }) => {
   }, [fetchCart]);
 
   // ✅ Add item to cart
-  const addItem = async (item) => {
+  const addItem = async (item: AddToCartRequest): Promise<boolean> => {
     const token = TokenManager.getToken();
     if (!token) {
       throw new Error('User must be authenticated to add items to cart');
@@ -55,7 +72,7 @@ export const CartProvider = ({ children }) => {
   };
 
   // ✅ Remove item from cart
-  const removeItem = async (itemId) => {
+  const removeItem = async (itemId: string): Promise<void> => {
     const token = TokenManager.getToken();
     if (!token) {
       throw new Error('User must be authenticated to remove items from cart');
@@ -75,7 +92,7 @@ export const CartProvider = ({ children }) => {
   };
 
   // ✅ Update item quantity
-  const updateQuantity = async (itemId, quantity) => {
+  const updateQuantity = async (itemId: string, quantity: number): Promise<void> => {
     const token = TokenManager.getToken();
     if (!token) {
       throw new Error('User must be authenticated to update cart items');
@@ -141,7 +158,7 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
-export const useCart = () => {
+export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
   if (context === undefined) {
     throw new Error('useCart error: must be used within a CartProvider');
