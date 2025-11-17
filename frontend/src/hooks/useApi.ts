@@ -79,12 +79,38 @@ export const usePaginatedApi = <T = any>(
       console.log('usePaginatedApi result:', result);
       
       if (result?.data) {
-        // Ensure data is always an array
-        const dataArray = Array.isArray(result.data) ? result.data : [];
+        let dataArray: T[] = [];
+        
+        // Check if result.data is directly an array
+        if (Array.isArray(result.data)) {
+          dataArray = result.data;
+        } 
+        // Check if result.data is an object with nested arrays (common backend pattern)
+        else if (typeof result.data === 'object') {
+          // Look for common array property names
+          const possibleArrayKeys = ['orders', 'users', 'products', 'variants', 'items', 'results', 'data'];
+          for (const key of possibleArrayKeys) {
+            if (Array.isArray(result.data[key])) {
+              dataArray = result.data[key];
+              break;
+            }
+          }
+          
+          // If no array found in nested properties, check if data itself should be treated as single item
+          if (dataArray.length === 0 && Object.keys(result.data).length > 0) {
+            console.log('Data is object, checking for pagination info in data:', result.data);
+            // Check for pagination info in the data object
+            if (result.data.total !== undefined) {
+              setTotal(result.data.total);
+              setTotalPages(result.data.total_pages || result.data.pages || Math.ceil(result.data.total / limit));
+            }
+          }
+        }
+        
         console.log('Setting data array:', dataArray);
         setData(dataArray);
         
-        // Check for pagination info
+        // Check for pagination info at root level
         if (result.pagination) {
           setTotal(result.pagination.total || 0);
           setTotalPages(result.pagination.pages || 0);
