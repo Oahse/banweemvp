@@ -76,8 +76,6 @@ export const usePaginatedApi = <T = any>(
       const result = customApiCall ? await callToUse() : await callToUse(page, limit);
       
       // Handle different response structures
-      console.log('usePaginatedApi result:', result);
-      
       if (result?.data) {
         let dataArray: T[] = [];
         
@@ -98,7 +96,6 @@ export const usePaginatedApi = <T = any>(
           
           // If no array found in nested properties, check if data itself should be treated as single item
           if (dataArray.length === 0 && Object.keys(result.data).length > 0) {
-            console.log('Data is object, checking for pagination info in data:', result.data);
             // Check for pagination info in the data object
             if (result.data.total !== undefined) {
               setTotal(result.data.total);
@@ -107,7 +104,6 @@ export const usePaginatedApi = <T = any>(
           }
         }
         
-        console.log('Setting data array:', dataArray);
         setData(dataArray);
         
         // Check for pagination info at root level
@@ -119,11 +115,9 @@ export const usePaginatedApi = <T = any>(
           setTotalPages(result.total_pages || Math.ceil(result.total / limit));
         }
       } else if (Array.isArray(result)) {
-        console.log('Result is array:', result);
         setData(result);
       } else {
         // Fallback to empty array if result is not in expected format
-        console.log('Fallback to empty array, result:', result);
         setData([]);
       }
       

@@ -5,7 +5,7 @@ from sqlalchemy import select, or_, func, cast, String
 from sqlalchemy.orm import selectinload
 
 from models.product import Product, Category, ProductVariant
-from models.order import Order
+from models.order import Order, OrderItem
 from models.user import User
 
 from models.settings import SystemSettings

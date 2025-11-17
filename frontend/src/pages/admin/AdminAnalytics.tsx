@@ -4,7 +4,7 @@ import { BarChart3Icon, TrendingUpIcon, UsersIcon, ShoppingCartIcon, DollarSignI
 import { useApi } from '../../hooks/useApi';
 import { AnalyticsAPI } from '../../apis';
 
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 export const AdminAnalytics = () => {
   const [timeRange, setTimeRange] = useState('30d');
@@ -131,7 +131,7 @@ export const AdminAnalytics = () => {
           <div className="h-64">
             {analyticsData?.sales_trend && analyticsData.sales_trend.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={analyticsData.sales_trend}>
+                <BarChart data={analyticsData.sales_trend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                   <XAxis dataKey="date" stroke="var(--color-copy-lighter)" fontSize={12} />
                   <YAxis stroke="var(--color-copy-lighter)" fontSize={12} />
@@ -143,8 +143,8 @@ export const AdminAnalytics = () => {
                     }}
                   />
                   <Legend />
-                  <Line type="monotone" dataKey={chartView === 'revenue' ? 'sales' : 'orders'} stroke="var(--color-primary)" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                </LineChart>
+                  <Bar dataKey={chartView === 'revenue' ? 'sales' : 'orders'} fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
+                </BarChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-full flex items-center justify-center bg-background rounded-md border border-border">
