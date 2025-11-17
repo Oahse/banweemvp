@@ -1,34 +1,34 @@
 # App Completion Implementation Tasks
 
-- [x] 1. Fix Backend API Exception Handling
+- [ ] 1. Fix Backend API Exception Handling
   - Fix all APIException calls to use `message` parameter instead of `detail`
   - Update admin routes, product routes, cart routes, order routes
   - Test all API endpoints return proper error structure
   - _Requirements: 11.2_
   - **Git Commit:** "fix: update APIException calls to use message parameter"
 
-- [ ] 2. Fix Product List Backend SQL Query
+- [x] 2. Fix Product List Backend SQL Query
   - Remove duplicate JOIN statements in ProductService.get_products()
   - Join ProductVariant only once when filters are applied
   - Test product list with various filters (price, category, availability)
   - _Requirements: 9.1, 9.2, 9.3, 9.4_
   - **Git Commit:** "fix: remove duplicate JOIN in product list query"
 
-- [ ] 3. Fix Product List API Response Structure
+- [x] 3. Fix Product List API Response Structure
   - Update ProductService.get_products() to return dict with data, total, page, per_page, total_pages
   - Remove ProductListResponse schema usage
   - Test pagination works correctly
   - _Requirements: 11.4_
   - **Git Commit:** "fix: update product list API response structure"
 
-- [ ] 4. Fix Cart API to Include Product Names
+- [x] 4. Fix Cart API to Include Product Names
   - Update CartService._serialize_variant() to call to_dict(include_product=True)
   - Ensure variant includes product_name and product_description
   - Test cart displays product names correctly
   - _Requirements: 2.2_
   - **Git Commit:** "fix: include product names in cart API response"
 
-- [ ] 5. Fix Cart Frontend Display
+- [x] 5. Fix Cart Frontend Display
   - Update Cart.tsx to display product names and variant names separately
   - Fix cart calculations (subtotal, tax, shipping)
   - Handle empty cart state
@@ -36,14 +36,14 @@
   - _Requirements: 2.2, 2.3, 2.5_
   - **Git Commit:** "fix: improve cart display with product and variant names"
 
-- [ ] 6. Fix Wishlist Backend to Load Product Variants
+- [x] 6. Fix Wishlist Backend to Load Product Variants
   - Update WishlistService to load product with variants and images
   - Import Product model in wishlist service
   - Test wishlist returns complete product data
   - _Requirements: 3.2_
   - **Git Commit:** "fix: load product variants in wishlist API"
 
-- [ ] 7. Fix Wishlist Frontend Add to Cart
+- [x] 7. Fix Wishlist Frontend Add to Cart
   - Update Wishlist.tsx to get variant_id from product.variants[0]
   - Fix handleAddToCart to use correct variant_id
   - Display product images and prices from variant data
@@ -51,14 +51,14 @@
   - _Requirements: 3.3_
   - **Git Commit:** "fix: enable add to cart from wishlist"
 
-- [ ] 8. Fix AddToCartRequest Type
+- [x] 8. Fix AddToCartRequest Type
   - Remove product_id from AddToCartRequest interface
   - Update all addToCart calls to only pass variant_id and quantity
   - Fix ProductDetails, ProductCard, Wishlist components
   - _Requirements: 2.1_
   - **Git Commit:** "fix: update AddToCartRequest to match backend schema"
 
-- [ ] 9. Fix Admin Layout Notifications
+- [x] 9. Fix Admin Layout Notifications
   - Import useNotifications hook (plural)
   - Fix notification display to use title, message, and timestamp
   - Fix user display to use firstname, lastname, full_name
@@ -66,7 +66,7 @@
   - _Requirements: 10.2, 10.3_
   - **Git Commit:** "fix: correct notification hook usage in admin layout"
 
-- [ ] 10. Fix Product Details Page
+- [x] 10. Fix Product Details Page
   - Add proper null checks for product data
   - Fix variant selection to update price and images
   - Fix reviews pagination structure
@@ -195,3 +195,28 @@
   - Prepare for deployment
   - _Requirements: All_
   - **Git Commit:** "docs: update documentation for deployment"
+
+- [ ] 25. Branch Management and Cleanup
+  - Verify main branch is up to date
+  - Delete remote master branch if exists
+  - Update default branch to main in repository settings
+  - _Requirements: Repository Management_
+  - **Git Commit:** "chore: cleanup master branch and set main as default"
+
+- [ ] 26. Convert Frontend from JSX to TSX
+  - Convert all .jsx files to .tsx in frontend/src
+  - Add proper TypeScript types and interfaces
+  - Fix type errors and add type annotations
+  - Update imports and exports
+  - Test all components work correctly
+  - _Requirements: Code Quality_
+  - **Git Commit:** "refactor: convert frontend from JSX to TSX"
+
+- [ ] 27. Implement FastAPI Background Tasks
+  - Add BackgroundTasks to email sending operations
+  - Add BackgroundTasks to notification creation
+  - Add BackgroundTasks to order processing
+  - Add BackgroundTasks to analytics updates
+  - Test background tasks execute correctly
+  - _Requirements: Performance Optimization_
+  - **Git Commit:** "perf: implement FastAPI background tasks for async operations"
