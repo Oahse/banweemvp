@@ -170,7 +170,8 @@ export const AdminOrders = () => {
       </div>
       {/* Orders table */}
       <div className="bg-surface rounded-lg shadow-sm border border-border-light overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-background text-left text-copy-light text-sm">
