@@ -5,12 +5,13 @@ from uuid import UUID
 from core.database import get_db
 from core.utils.response import Response
 from core.exceptions import APIException
-from schemas.order import OrderCreate, OrderUpdate, CheckoutRequest
+from schemas.order import OrderCreate, CheckoutRequest
 from services.order import OrderService
 from models.user import User
 from core.dependencies import get_current_auth_user
 
 router = APIRouter(prefix="/api/v1/orders", tags=["Orders"])
+
 
 @router.post("/")
 async def create_order(
@@ -31,6 +32,7 @@ async def create_order(
             status_code=status.HTTP_400_BAD_REQUEST,
             message=f"Failed to create order: {str(e)}"
         )
+
 
 @router.post("/checkout")
 async def checkout(
@@ -81,6 +83,7 @@ async def get_orders(
             message=f"Failed to fetch orders: {str(e)}"
         )
 
+
 @router.get("/{order_id}")
 async def get_order(
     order_id: UUID,
@@ -110,6 +113,7 @@ async def get_order(
             message=f"Failed to fetch order: {str(e)}"
         )
 
+
 @router.put("/{order_id}/cancel")
 async def cancel_order(
     order_id: UUID,
@@ -127,6 +131,7 @@ async def cancel_order(
             message="Failed to cancel order"
         )
 
+
 @router.get("/{order_id}/tracking")
 async def get_order_tracking(
     order_id: UUID,
@@ -143,6 +148,7 @@ async def get_order_tracking(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message="Failed to fetch tracking information"
         )
+
 
 @router.post("/{order_id}/refund")
 async def request_refund(
@@ -162,6 +168,7 @@ async def request_refund(
             message=f"Failed to request refund: {str(e)}"
         )
 
+
 @router.post("/{order_id}/reorder")
 async def reorder(
     order_id: UUID,
@@ -178,6 +185,7 @@ async def reorder(
             status_code=status.HTTP_400_BAD_REQUEST,
             message=f"Failed to reorder: {str(e)}"
         )
+
 
 @router.get("/{order_id}/invoice")
 async def get_order_invoice(
@@ -196,6 +204,7 @@ async def get_order_invoice(
             message="Failed to generate invoice"
         )
 
+
 @router.post("/{order_id}/notes")
 async def add_order_note(
     order_id: UUID,
@@ -213,6 +222,7 @@ async def add_order_note(
             status_code=status.HTTP_400_BAD_REQUEST,
             message=f"Failed to add note: {str(e)}"
         )
+
 
 @router.get("/{order_id}/notes")
 async def get_order_notes(

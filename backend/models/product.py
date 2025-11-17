@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Boolean, ForeignKey, Text, Float, JSON, Integer
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, selectinload
+from sqlalchemy.orm import relationship
 from core.database import BaseModel, CHAR_LENGTH
 
 
@@ -33,19 +33,23 @@ class Product(BaseModel):
 
     name = Column(String(CHAR_LENGTH), nullable=False)
     description = Column(Text, nullable=True)
-    category_id = Column(UUID(as_uuid=True), ForeignKey("categories.id"), nullable=False)
-    supplier_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    category_id = Column(UUID(as_uuid=True), ForeignKey(
+        "categories.id"), nullable=False)
+    supplier_id = Column(UUID(as_uuid=True),
+                         ForeignKey("users.id"), nullable=False)
     featured = Column(Boolean, default=False)
     rating = Column(Float, default=0.0)
     review_count = Column(Integer, default=0)
     origin = Column(String(100), nullable=True)
-    dietary_tags = Column(JSON, nullable=True)  # ["organic", "gluten-free", etc.]
+    # ["organic", "gluten-free", etc.]
+    dietary_tags = Column(JSON, nullable=True)
     is_active = Column(Boolean, default=True)
 
     # Relationships with lazy loading
     category = relationship("Category", back_populates="products")
     supplier = relationship("User", back_populates="supplied_products")
-    variants = relationship("ProductVariant", back_populates="product", cascade="all, delete-orphan", lazy="selectin")
+    variants = relationship("ProductVariant", back_populates="product",
+                            cascade="all, delete-orphan", lazy="selectin")
     reviews = relationship("Review", back_populates="product")
     wishlist_items = relationship("WishlistItem", back_populates="product")
 
@@ -61,11 +65,12 @@ class Product(BaseModel):
         """Get min and max price from variants"""
         if not self.variants:
             return {"min": 0, "max": 0}
-        
-        prices = [v.sale_price or v.base_price for v in self.variants if v.is_active]
+
+        prices = [
+            v.sale_price or v.base_price for v in self.variants if v.is_active]
         if not prices:
             return {"min": 0, "max": 0}
-        
+
         return {"min": min(prices), "max": max(prices)}
 
     @property
@@ -92,28 +97,32 @@ class Product(BaseModel):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
-        
+
         if include_variants:
             data["variants"] = [v.to_dict() for v in self.variants]
-        
+
         return data
 
 
 class ProductVariant(BaseModel):
     __tablename__ = "product_variants"
 
-    product_id = Column(UUID(as_uuid=True), ForeignKey("products.id"), nullable=False)
+    product_id = Column(UUID(as_uuid=True), ForeignKey(
+        "products.id"), nullable=False)
     sku = Column(String(100), unique=True, nullable=False)
-    name = Column(String(CHAR_LENGTH), nullable=False)  # e.g., "1kg Bag", "5kg Pack"
+    # e.g., "1kg Bag", "5kg Pack"
+    name = Column(String(CHAR_LENGTH), nullable=False)
     base_price = Column(Float, nullable=False)
     sale_price = Column(Float, nullable=True)
     stock = Column(Integer, default=0)
-    attributes = Column(JSON, nullable=True)  # {"size": "1kg", "color": "red", etc.}
+    # {"size": "1kg", "color": "red", etc.}
+    attributes = Column(JSON, nullable=True)
     is_active = Column(Boolean, default=True)
 
     # Relationships with lazy loading
     product = relationship("Product", back_populates="variants")
-    images = relationship("ProductImage", back_populates="variant", cascade="all, delete-orphan", lazy="selectin")
+    images = relationship("ProductImage", back_populates="variant",
+                          cascade="all, delete-orphan", lazy="selectin")
     cart_items = relationship("CartItem", back_populates="variant")
     order_items = relationship("OrderItem", back_populates="variant")
 
@@ -132,8 +141,8 @@ class ProductVariant(BaseModel):
     @property
     def primary_image(self):
         """Get primary image"""
-        return next((img for img in self.images if img.is_primary), 
-                   self.images[0] if self.images else None)
+        return next((img for img in self.images if img.is_primary),
+                    self.images[0] if self.images else None)
 
     def to_dict(self, include_images=True, include_product=True) -> dict:
         """Convert variant to dictionary for API responses"""
@@ -152,22 +161,24 @@ class ProductVariant(BaseModel):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
-        
+
         if include_images:
             data["images"] = [img.to_dict() for img in self.images]
-            data["primary_image"] = self.primary_image.to_dict() if self.primary_image else None
-        
+            data["primary_image"] = self.primary_image.to_dict(
+            ) if self.primary_image else None
+
         if include_product and self.product:
             data["product_name"] = self.product.name
             data["product_description"] = self.product.description
-        
+
         return data
 
 
 class ProductImage(BaseModel):
     __tablename__ = "product_images"
 
-    variant_id = Column(UUID(as_uuid=True), ForeignKey("product_variants.id"), nullable=False)
+    variant_id = Column(UUID(as_uuid=True), ForeignKey(
+        "product_variants.id"), nullable=False)
     url = Column(String(500), nullable=False)
     alt_text = Column(String(CHAR_LENGTH), nullable=True)
     is_primary = Column(Boolean, default=False)

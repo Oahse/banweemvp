@@ -13,6 +13,7 @@ from core.exceptions import APIException
 
 router = APIRouter(prefix="/api/v1/users", tags=["Wishlists"])
 
+
 @router.post("/{user_id}/wishlists/default")
 async def create_default_wishlist(
     user_id: UUID,
@@ -27,13 +28,14 @@ async def create_default_wishlist(
                 status_code=status.HTTP_403_FORBIDDEN,
                 message="Access denied: Cannot create wishlist for other users"
             )
-        
+
         service = WishlistService(db)
-        
+
         # Check if user already has a default wishlist
         existing_wishlists = await service.get_wishlists(user_id)
-        default_wishlist = next((w for w in existing_wishlists if w.is_default), None)
-        
+        default_wishlist = next(
+            (w for w in existing_wishlists if w.is_default), None)
+
         if default_wishlist:
             # Return existing default wishlist
             wishlist_data = {
@@ -46,12 +48,12 @@ async def create_default_wishlist(
                 "items": []
             }
             return Response(success=True, data=WishlistResponse.model_validate(wishlist_data))
-        
+
         # Create new default wishlist
         from schemas.wishlist import WishlistCreate
         payload = WishlistCreate(name="My Wishlist", is_default=True)
         wishlist = await service.create_wishlist(user_id, payload)
-        
+
         wishlist_data = {
             "id": wishlist.id,
             "user_id": wishlist.user_id,
@@ -61,7 +63,7 @@ async def create_default_wishlist(
             "updated_at": wishlist.updated_at.isoformat() if wishlist.updated_at else None,
             "items": []
         }
-        
+
         return Response(success=True, data=WishlistResponse.model_validate(wishlist_data), code=status.HTTP_201_CREATED)
     except APIException:
         raise
@@ -73,6 +75,7 @@ async def create_default_wishlist(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to create default wishlist: {str(e)}"
         )
+
 
 @router.get("/{user_id}/wishlists")
 async def get_wishlists(
@@ -87,11 +90,12 @@ async def get_wishlists(
                 status_code=status.HTTP_403_FORBIDDEN,
                 message="Access denied: Cannot access other user's wishlists"
             )
-        
-        print(f"Attempting to get wishlists for user_id: {user_id} (type: {type(user_id)})")
+
+        print(
+            f"Attempting to get wishlists for user_id: {user_id} (type: {type(user_id)})")
         service = WishlistService(db)
         wishlists = await service.get_wishlists(user_id)
-        
+
         # Serialize wishlists with proper datetime handling
         serialized_wishlists = []
         for wishlist in wishlists:
@@ -112,7 +116,8 @@ async def get_wishlists(
                         }
                         items.append(item_data)
                     except Exception as e:
-                        print(f"Error serializing wishlist item {item.id}: {e}")
+                        print(
+                            f"Error serializing wishlist item {item.id}: {e}")
                         # Add minimal item data
                         items.append({
                             "id": item.id,
@@ -124,7 +129,7 @@ async def get_wishlists(
                             "product": None,
                             "variant": None
                         })
-                
+
                 wishlist_data = {
                     "id": wishlist.id,
                     "user_id": wishlist.user_id,
@@ -134,7 +139,8 @@ async def get_wishlists(
                     "updated_at": wishlist.updated_at.isoformat() if wishlist.updated_at else None,
                     "items": items
                 }
-                serialized_wishlists.append(WishlistResponse.model_validate(wishlist_data))
+                serialized_wishlists.append(
+                    WishlistResponse.model_validate(wishlist_data))
             except Exception as e:
                 print(f"Error serializing wishlist {wishlist.id}: {e}")
                 # Add minimal wishlist data
@@ -148,11 +154,12 @@ async def get_wishlists(
                         "updated_at": wishlist.updated_at.isoformat() if wishlist.updated_at else None,
                         "items": []
                     }
-                    serialized_wishlists.append(WishlistResponse.model_validate(minimal_data))
+                    serialized_wishlists.append(
+                        WishlistResponse.model_validate(minimal_data))
                 except Exception as e2:
                     print(f"Error creating minimal wishlist data: {e2}")
                     continue
-        
+
         return Response(success=True, data=serialized_wishlists)
     except APIException:
         raise
@@ -164,6 +171,7 @@ async def get_wishlists(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch wishlists: {str(e)}"
         )
+
 
 @router.post("/{user_id}/wishlists")
 async def create_wishlist(
@@ -179,11 +187,12 @@ async def create_wishlist(
                 status_code=status.HTTP_403_FORBIDDEN,
                 message="Access denied: Cannot create wishlist for other users"
             )
-        
-        print(f"Attempting to create wishlist for user_id: {user_id} (type: {type(user_id)}), payload: {payload})")
+
+        print(
+            f"Attempting to create wishlist for user_id: {user_id} (type: {type(user_id)}), payload: {payload})")
         service = WishlistService(db)
         wishlist = await service.create_wishlist(user_id, payload)
-        
+
         # Serialize the created wishlist
         wishlist_data = {
             "id": wishlist.id,
@@ -194,7 +203,7 @@ async def create_wishlist(
             "updated_at": wishlist.updated_at.isoformat() if wishlist.updated_at else None,
             "items": []
         }
-        
+
         return Response(success=True, data=WishlistResponse.model_validate(wishlist_data), code=status.HTTP_201_CREATED)
     except APIException:
         raise
@@ -207,6 +216,7 @@ async def create_wishlist(
             message=f"Failed to create wishlist: {str(e)}"
         )
 
+
 @router.get("/{user_id}/wishlists/{wishlist_id}")
 async def get_wishlist_by_id(
     user_id: UUID,
@@ -217,8 +227,10 @@ async def get_wishlist_by_id(
     service = WishlistService(db)
     wishlist = await service.get_wishlist_by_id(wishlist_id, user_id)
     if not wishlist:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, message="Wishlist not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, message="Wishlist not found")
     return Response(success=True, data=WishlistResponse.from_orm(wishlist))
+
 
 @router.put("/{user_id}/wishlists/{wishlist_id}")
 async def update_wishlist(
@@ -231,8 +243,10 @@ async def update_wishlist(
     service = WishlistService(db)
     updated_wishlist = await service.update_wishlist(wishlist_id, user_id, payload)
     if not updated_wishlist:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, message="Wishlist not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, message="Wishlist not found")
     return Response(success=True, data=WishlistResponse.from_orm(updated_wishlist))
+
 
 @router.delete("/{user_id}/wishlists/{wishlist_id}")
 async def delete_wishlist(
@@ -244,8 +258,10 @@ async def delete_wishlist(
     service = WishlistService(db)
     deleted = await service.delete_wishlist(wishlist_id, user_id)
     if not deleted:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, message="Wishlist not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, message="Wishlist not found")
     return Response(success=True, code=status.HTTP_204_NO_CONTENT)
+
 
 @router.post("/{user_id}/wishlists/{wishlist_id}/items")
 async def add_item_to_wishlist(
@@ -262,10 +278,10 @@ async def add_item_to_wishlist(
                 status_code=status.HTTP_403_FORBIDDEN,
                 message="Access denied: Cannot add items to other user's wishlists"
             )
-        
+
         service = WishlistService(db)
         item = await service.add_item_to_wishlist(wishlist_id, payload)
-        
+
         # Serialize the item properly
         item_data = {
             "id": item.id,
@@ -277,7 +293,7 @@ async def add_item_to_wishlist(
             "product": item.product.to_dict() if item.product else None,
             "variant": item.variant.to_dict() if item.variant else None
         }
-        
+
         return Response(success=True, data=WishlistItemResponse.model_validate(item_data), code=status.HTTP_201_CREATED)
     except APIException:
         raise
@@ -289,6 +305,7 @@ async def add_item_to_wishlist(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to add item to wishlist: {str(e)}"
         )
+
 
 @router.delete("/{user_id}/wishlists/{wishlist_id}/items/{item_id}")
 async def remove_item_from_wishlist(
@@ -305,7 +322,7 @@ async def remove_item_from_wishlist(
                 status_code=status.HTTP_403_FORBIDDEN,
                 message="Access denied: Cannot remove items from other user's wishlists"
             )
-        
+
         service = WishlistService(db)
         deleted = await service.remove_item_from_wishlist(wishlist_id, item_id)
         if not deleted:
@@ -313,7 +330,8 @@ async def remove_item_from_wishlist(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Wishlist item not found"
             )
-        print(f"Successfully removed item {item_id} from wishlist {wishlist_id}")
+        print(
+            f"Successfully removed item {item_id} from wishlist {wishlist_id}")
         return Response(success=True, data=None, message="Item removed successfully")
     except APIException:
         raise
@@ -323,6 +341,7 @@ async def remove_item_from_wishlist(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to remove item from wishlist: {str(e)}"
         )
+
 
 @router.put("/{user_id}/wishlists/{wishlist_id}/default")
 async def set_default_wishlist(
@@ -338,7 +357,7 @@ async def set_default_wishlist(
                 status_code=status.HTTP_403_FORBIDDEN,
                 message="Access denied: Cannot modify other user's wishlists"
             )
-        
+
         service = WishlistService(db)
         default_wishlist = await service.set_default_wishlist(user_id, wishlist_id)
         if not default_wishlist:
@@ -346,7 +365,7 @@ async def set_default_wishlist(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Wishlist not found"
             )
-        
+
         # Serialize the wishlist properly
         wishlist_data = {
             "id": default_wishlist.id,
@@ -357,7 +376,7 @@ async def set_default_wishlist(
             "updated_at": default_wishlist.updated_at.isoformat() if default_wishlist.updated_at else None,
             "items": []  # Simplified for this endpoint
         }
-        
+
         return Response(success=True, data=WishlistResponse.model_validate(wishlist_data))
     except APIException:
         raise

@@ -1,7 +1,7 @@
 """
 Response utility for consistent API responses
 """
-from typing import Any, Optional, Dict, List
+from typing import Any, Optional, Dict
 from fastapi.responses import JSONResponse
 from fastapi import status
 from pydantic import BaseModel
@@ -14,7 +14,7 @@ class Response(JSONResponse):
     Standardized API response wrapper that matches frontend expectations
     Inherits from JSONResponse to be directly returnable from FastAPI routes
     """
-    
+
     def __init__(
         self,
         success: bool = True,
@@ -31,28 +31,28 @@ class Response(JSONResponse):
         """
         # Use code parameter if provided for backward compatibility
         final_status_code = code if code is not None else status_code
-        
+
         # Convert Pydantic models to dictionaries for JSON serialization
         serialized_data = self._serialize_data(data)
-        
+
         response_data = {
             "success": success,
             "data": serialized_data,
             "message": message
         }
-        
+
         if pagination:
             response_data["pagination"] = pagination
-            
+
         if errors:
             response_data["errors"] = errors
-            
+
         super().__init__(
             content=response_data,
             status_code=final_status_code,
             **kwargs
         )
-    
+
     def _serialize_data(self, data: Any) -> Any:
         """
         Convert Pydantic models and other non-serializable objects to JSON-serializable format
@@ -77,7 +77,7 @@ class Response(JSONResponse):
         else:
             # Return as-is for JSON-serializable types
             return data
-    
+
     @staticmethod
     def success(
         data: Any = None,
@@ -97,7 +97,7 @@ class Response(JSONResponse):
             code=code,
             pagination=pagination
         )
-    
+
     @staticmethod
     def error(
         message: str = "An error occurred",

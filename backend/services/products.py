@@ -9,10 +9,11 @@ from models.cart import CartItem
 from models.user import User
 from schemas.product import (
     ProductCreate, ProductUpdate, ProductResponse, ProductListResponse,
-    ProductVariantResponse, CategoryResponse, SupplierResponse, 
+    ProductVariantResponse, CategoryResponse, SupplierResponse,
     ProductImageResponse, PriceRange
 )
 from core.exceptions import APIException
+
 
 class ProductService:
     def __init__(self, db: AsyncSession):
@@ -47,7 +48,8 @@ class ProductService:
                 name=getattr(variant, 'name', ''),
                 base_price=getattr(variant, 'base_price', 0.0),
                 sale_price=getattr(variant, 'sale_price', None),
-                current_price=getattr(variant, 'sale_price', None) or getattr(variant, 'base_price', 0.0),
+                current_price=getattr(variant, 'sale_price', None) or getattr(
+                    variant, 'base_price', 0.0),
                 discount_percentage=0,
                 stock=getattr(variant, 'stock', 0),
                 attributes=getattr(variant, 'attributes', {}),
@@ -63,7 +65,7 @@ class ProductService:
         try:
             # Use the model's built-in to_dict method and then convert to response
             product_dict = product.to_dict(include_variants=True)
-            
+
             # Convert category
             category = None
             if include_relationships and product.category:
@@ -74,8 +76,10 @@ class ProductService:
                         description=product.category.description,
                         image_url=product.category.image_url,
                         is_active=product.category.is_active,
-                        created_at=product.category.created_at.isoformat() if product.category.created_at else "",
-                        updated_at=product.category.updated_at.isoformat() if product.category.updated_at else None
+                        created_at=product.category.created_at.isoformat(
+                        ) if product.category.created_at else "",
+                        updated_at=product.category.updated_at.isoformat(
+                        ) if product.category.updated_at else None
                     )
                 except Exception as e:
                     print(f"Error converting category: {e}")
@@ -102,11 +106,12 @@ class ProductService:
             for variant in (product.variants or []):
                 try:
                     variant_dict = variant.to_dict(include_images=True)
-                    variants.append(ProductVariantResponse.model_validate(variant_dict))
+                    variants.append(
+                        ProductVariantResponse.model_validate(variant_dict))
                 except Exception as e:
                     print(f"Error converting variant {variant.id}: {e}")
                     continue
-            
+
             # Get primary variant
             primary_variant = variants[0] if variants else None
 
@@ -122,7 +127,8 @@ class ProductService:
                 origin=product.origin,
                 dietary_tags=product.dietary_tags,
                 is_active=product.is_active,
-                price_range=PriceRange(min=product.price_range["min"], max=product.price_range["max"]),
+                price_range=PriceRange(
+                    min=product.price_range["min"], max=product.price_range["max"]),
                 in_stock=product.in_stock,
                 created_at=product.created_at.isoformat() if product.created_at else "",
                 updated_at=product.updated_at.isoformat() if product.updated_at else None,
@@ -165,21 +171,23 @@ class ProductService:
         sort_order: str = "desc"
     ) -> Dict[str, Any]:
         """Get products with filtering and pagination."""
-        print(f"Getting products: page={page}, limit={limit}, filters={filters}")
+        print(
+            f"Getting products: page={page}, limit={limit}, filters={filters}")
         offset = (page - 1) * limit
-        
+
         query = select(Product).options(
             selectinload(Product.category),
             selectinload(Product.supplier),
             selectinload(Product.variants).selectinload(ProductVariant.images)
         ).where(Product.is_active == True)
-        
+
         # Apply filters
         variant_joined = False
         if filters:
             if filters.get("category"):
-                query = query.join(Category).where(Category.name == filters['category'])
-            
+                query = query.join(Category).where(
+                    Category.name == filters['category'])
+
             if filters.get("q"):
                 search_term = f"%{filters['q']}%"
                 query = query.where(
@@ -188,48 +196,52 @@ class ProductService:
                         Product.description.ilike(search_term)
                     )
                 )
-            
+
             # Join ProductVariant only once if any price/availability/sale filters are applied
             price_filters = []
             if filters.get("min_price") is not None:
-                price_filters.append(ProductVariant.base_price >= filters["min_price"])
-            
+                price_filters.append(
+                    ProductVariant.base_price >= filters["min_price"])
+
             if filters.get("max_price") is not None:
-                price_filters.append(ProductVariant.base_price <= filters["max_price"])
-            
+                price_filters.append(
+                    ProductVariant.base_price <= filters["max_price"])
+
             if filters.get("availability") is not None:
                 if filters["availability"]:
                     price_filters.append(ProductVariant.stock > 0)
                 else:
                     price_filters.append(ProductVariant.stock == 0)
-            
+
             if filters.get("sale"):
                 price_filters.append(ProductVariant.sale_price.isnot(None))
-            
+
             # Apply variant filters if any exist
             if price_filters:
                 query = query.join(ProductVariant).where(and_(*price_filters))
                 variant_joined = True
-            
+
             if filters.get("min_rating") is not None:
                 query = query.where(Product.rating >= filters["min_rating"])
-            
+
             if filters.get("max_rating") is not None:
                 query = query.where(Product.rating <= filters["max_rating"])
-        
+
         # Apply sorting
         if hasattr(Product, sort_by):
             if sort_order.lower() == "desc":
                 query = query.order_by(getattr(Product, sort_by).desc())
             else:
                 query = query.order_by(getattr(Product, sort_by).asc())
-        
+
         # Get total count for pagination
-        count_query = select(func.count(Product.id.distinct())).where(Product.is_active == True)
+        count_query = select(func.count(Product.id.distinct())).where(
+            Product.is_active == True)
         if filters:
             if filters.get("category"):
                 count_query = count_query.select_from(Product).join(Category).where(
-                    and_(Product.is_active == True, Category.name == filters['category'])
+                    and_(Product.is_active == True,
+                         Category.name == filters['category'])
                 )
             if filters.get("q"):
                 search_term = f"%{filters['q']}%"
@@ -242,19 +254,19 @@ class ProductService:
                         )
                     )
                 )
-        
+
         count_result = await self.db.execute(count_query)
         total = count_result.scalar()
-        
+
         # Apply pagination
         query = query.offset(offset).limit(limit)
-        
+
         result = await self.db.execute(query)
         products = result.scalars().all()
-        
+
         print(f"Found {len(products)} products in database")
         print(f"Total count from count query: {total}")
-        
+
         # Convert to response format
         products_data = []
         for product in products:
@@ -264,9 +276,9 @@ class ProductService:
             except Exception as e:
                 print(f"Error converting product {product.id}: {e}")
                 continue
-        
+
         print(f"Successfully converted {len(products_data)} products")
-        
+
         return {
             "data": products_data,
             "total": total,
@@ -285,7 +297,8 @@ class ProductService:
             .options(
                 selectinload(Product.category),
                 selectinload(Product.supplier),
-                selectinload(Product.variants).selectinload(ProductVariant.images),
+                selectinload(Product.variants).selectinload(
+                    ProductVariant.images),
             )
             .where(Product.featured.is_(True))  # safer than == True
             .order_by(Product.created_at.desc())
@@ -297,13 +310,15 @@ class ProductService:
 
         print(f"Found {len(products)} featured products in DB.")
         for p in products:
-            print(f"  - {p.name} (Featured: {p.featured}, Variants: {len(p.variants)})")
+            print(
+                f"  - {p.name} (Featured: {p.featured}, Variants: {len(p.variants)})")
 
         if not products:
-            print("⚠️ No featured products found. Check your DB data or 'featured' column values.")
+            print(
+                "⚠️ No featured products found. Check your DB data or 'featured' column values.")
 
         return [self._convert_product_to_response(product) for product in products]
-    
+
     async def get_popular_products(self, limit: int = 4) -> List[ProductResponse]:
         """Get popular products based on cart additions or fallback to highest rated products."""
         # First, try to get products based on cart additions
@@ -317,7 +332,8 @@ class ProductService:
             .options(
                 selectinload(Product.category),
                 selectinload(Product.supplier),
-                selectinload(Product.variants).selectinload(ProductVariant.images)
+                selectinload(Product.variants).selectinload(
+                    ProductVariant.images)
             )
         )
 
@@ -329,12 +345,13 @@ class ProductService:
             fallback_query = select(Product).options(
                 selectinload(Product.category),
                 selectinload(Product.supplier),
-                selectinload(Product.variants).selectinload(ProductVariant.images)
+                selectinload(Product.variants).selectinload(
+                    ProductVariant.images)
             ).order_by(Product.rating.desc(), Product.review_count.desc()).limit(limit)
-            
+
             fallback_result = await self.db.execute(fallback_query)
             fallback_products = fallback_result.scalars().all()
-            
+
             return [self._convert_product_to_response(product) for product in fallback_products]
 
         # Process cart-based popular products
@@ -347,22 +364,23 @@ class ProductService:
         product_query = select(Product).where(Product.id == product_id)
         product_result = await self.db.execute(product_query)
         product = product_result.scalar_one_or_none()
-        
+
         if not product:
             return []
-        
+
         # Get products from the same category
         query = select(Product).options(
             selectinload(Product.category),
             selectinload(Product.supplier),
             selectinload(Product.variants).selectinload(ProductVariant.images)
         ).where(
-            and_(Product.category_id == product.category_id, Product.id != product_id)
+            and_(Product.category_id == product.category_id,
+                 Product.id != product_id)
         ).limit(limit)
-        
+
         result = await self.db.execute(query)
         products = result.scalars().all()
-        
+
         return [self._convert_product_to_response(product) for product in products]
 
     async def get_categories(self) -> List[CategoryResponse]:
@@ -378,7 +396,7 @@ class ProductService:
         )
         result = await self.db.execute(query)
         categories_with_counts = result.all()
-        
+
         categories = []
         for category, product_count in categories_with_counts:
             categories.append(CategoryResponse(
@@ -390,15 +408,15 @@ class ProductService:
                 created_at=category.created_at.isoformat() if category.created_at else "",
                 updated_at=category.updated_at.isoformat() if category.updated_at else None
             ))
-        
+
         return categories
-    
+
     async def get_category_by_id(self, category_id: UUID) -> Optional[CategoryResponse]:
         """Get Category by ID."""
         query = select(Category).where(Category.id == category_id)
         result = await self.db.execute(query)
         category = result.scalar_one_or_none()
-        
+
         if category:
             return CategoryResponse(
                 id=category.id,
@@ -418,10 +436,10 @@ class ProductService:
             selectinload(Product.supplier),
             selectinload(Product.variants).selectinload(ProductVariant.images)
         ).where(Product.id == product_id)
-        
+
         result = await self.db.execute(query)
         product = result.scalar_one_or_none()
-        
+
         if product:
             return self._convert_product_to_response(product)
         return None
@@ -431,10 +449,10 @@ class ProductService:
         query = select(ProductVariant).options(
             selectinload(ProductVariant.images)
         ).where(ProductVariant.id == variant_id)
-        
+
         result = await self.db.execute(query)
         variant = result.scalar_one_or_none()
-        
+
         if variant:
             return self._convert_variant_to_response(variant)
         return None
@@ -444,10 +462,10 @@ class ProductService:
         query = select(ProductVariant).options(
             selectinload(ProductVariant.images)
         ).where(ProductVariant.product_id == product_id)
-        
+
         result = await self.db.execute(query)
         variants = result.scalars().all()
-        
+
         return [self._convert_variant_to_response(variant) for variant in variants]
 
     async def generate_qr_code(self, variant_id: UUID) -> Optional[str]:
@@ -455,7 +473,7 @@ class ProductService:
         variant = await self.get_variant_by_id(variant_id)
         if not variant:
             return None
-        
+
         # For now, return a placeholder QR code URL
         # In a real implementation, you would generate an actual QR code
         return f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=variant_{variant_id}"
@@ -465,7 +483,7 @@ class ProductService:
         variant = await self.get_variant_by_id(variant_id)
         if not variant:
             return None
-        
+
         # For now, return a placeholder barcode URL
         # In a real implementation, you would generate an actual barcode
         return f"https://barcode.tec-it.com/barcode.ashx?data={variant.sku}&code=Code128&translate-esc=on"
@@ -481,10 +499,10 @@ class ProductService:
             origin=product_data.origin,
             dietary_tags=product_data.dietary_tags or []
         )
-        
+
         self.db.add(db_product)
         await self.db.flush()  # Get the product ID
-        
+
         # Create variants
         for variant_data in product_data.variants:
             db_variant = ProductVariant(
@@ -497,9 +515,9 @@ class ProductService:
                 attributes=variant_data.attributes or {}
             )
             self.db.add(db_variant)
-        
+
         await self.db.commit()
-        
+
         # Return the created product
         return await self.get_product_by_id(db_product.id)
 
@@ -508,20 +526,21 @@ class ProductService:
         query = select(Product).where(Product.id == product_id)
         result = await self.db.execute(query)
         product = result.scalar_one_or_none()
-        
+
         if not product:
             raise HTTPException(status_code=404, detail="Product not found")
-        
+
         # Check if user owns the product (for suppliers) or is admin
         if product.supplier_id != user_id:
-            raise HTTPException(status_code=403, detail="Not authorized to update this product")
-        
+            raise HTTPException(
+                status_code=403, detail="Not authorized to update this product")
+
         # Update fields
         for field, value in product_data.dict(exclude_unset=True).items():
             setattr(product, field, value)
-        
+
         await self.db.commit()
-        
+
         # Return the updated product
         return await self.get_product_by_id(product_id)
 
@@ -530,13 +549,14 @@ class ProductService:
         query = select(Product).where(Product.id == product_id)
         result = await self.db.execute(query)
         product = result.scalar_one_or_none()
-        
+
         if not product:
             raise HTTPException(status_code=404, detail="Product not found")
-        
+
         # Check if user owns the product (for suppliers) or is admin
         if product.supplier_id != user_id:
-            raise HTTPException(status_code=403, detail="Not authorized to delete this product")
-        
+            raise HTTPException(
+                status_code=403, detail="Not authorized to delete this product")
+
         await self.db.delete(product)
         await self.db.commit()

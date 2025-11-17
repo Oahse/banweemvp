@@ -3,8 +3,9 @@ from typing import Optional
 from fastapi import BackgroundTasks
 from core.config import settings
 
+
 class WhatsappBotHandler:
-    def __init__(self,whatsapp_token,phone_number_id, background_tasks: BackgroundTasks):
+    def __init__(self, whatsapp_token, phone_number_id, background_tasks: BackgroundTasks):
         self.background_tasks = background_tasks
         self.whatsapp_token = whatsapp_token
         self.phone_number_id = phone_number_id
@@ -42,8 +43,9 @@ class WhatsappBotHandler:
             response.raise_for_status()
             return response.json()
 
-    
+
 WHATSAPP_ACCESS_TOKEN = str(settings.WHATSAPP_ACCESS_TOKEN)
 PHONE_NUMBER_ID = str(settings.PHONE_NUMBER_ID)
 
-whatapp_bot = WhatsappBotHandler(WHATSAPP_ACCESS_TOKEN,PHONE_NUMBER_ID,BackgroundTasks)
+whatapp_bot = WhatsappBotHandler(
+    WHATSAPP_ACCESS_TOKEN, PHONE_NUMBER_ID, BackgroundTasks)

@@ -6,6 +6,7 @@ from models.shipping import ShippingMethod
 from schemas.shipping import ShippingMethodCreate, ShippingMethodUpdate
 from core.exceptions import APIException
 
+
 class ShippingService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -30,11 +31,12 @@ class ShippingService:
     async def update_shipping_method(self, shipping_method_id: UUID, shipping_method_data: ShippingMethodUpdate) -> Optional[ShippingMethod]:
         shipping_method = await self.get_shipping_method_by_id(shipping_method_id)
         if not shipping_method:
-            raise APIException(status_code=404, detail="Shipping method not found")
-        
+            raise APIException(
+                status_code=404, message="Shipping method not found")
+
         for key, value in shipping_method_data.dict(exclude_unset=True).items():
             setattr(shipping_method, key, value)
-        
+
         await self.db.commit()
         await self.db.refresh(shipping_method)
         return shipping_method
@@ -43,7 +45,7 @@ class ShippingService:
         shipping_method = await self.get_shipping_method_by_id(shipping_method_id)
         if not shipping_method:
             return False
-        
+
         await self.db.delete(shipping_method)
         await self.db.commit()
         return True
@@ -57,8 +59,8 @@ class ShippingService:
             method = await self.get_shipping_method_by_id(shipping_method_id)
             if method and method.is_active:
                 return method.price
-        
+
         # Default logic if no specific method is chosen or found
         if cart_subtotal >= 50:
             return 0.0  # Free shipping for orders over $50
-        return 5.99 # Standard shipping cost
+        return 5.99  # Standard shipping cost

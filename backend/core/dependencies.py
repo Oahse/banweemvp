@@ -7,6 +7,7 @@ from services.auth import AuthService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     """Get current authenticated user with proper error handling"""
     try:
@@ -27,6 +28,7 @@ async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSe
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     """Get current authenticated user"""
     try:
@@ -45,11 +47,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+
 async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     """Get current active user"""
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
 
 async def require_admin(current_user: User = Depends(get_current_active_user)) -> User:
     """Require admin role"""
@@ -60,6 +64,7 @@ async def require_admin(current_user: User = Depends(get_current_active_user)) -
         )
     return current_user
 
+
 async def verify_user_or_admin_access(current_user: User = Depends(get_current_active_user)) -> User:
     """Verify user has access (user or admin)"""
     if not current_user.active:
@@ -68,6 +73,7 @@ async def verify_user_or_admin_access(current_user: User = Depends(get_current_a
             detail="Account is not active"
         )
     return current_user
+
 
 async def require_supplier(current_user: User = Depends(get_current_active_user)) -> User:
     """Require supplier role"""

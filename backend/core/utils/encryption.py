@@ -2,7 +2,7 @@
 Encryption and password utilities
 """
 from passlib.context import CryptContext
-from typing import Optional
+
 import secrets
 import string
 
@@ -14,21 +14,21 @@ class PasswordManager:
     """
     Password management utility for hashing and verification
     """
-    
+
     @staticmethod
     def hash_password(password: str) -> str:
         """
         Hash a password using Argon2
         """
         return pwd_context.hash(password)
-    
+
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """
         Verify a password against its Argon2 hash
         """
         return pwd_context.verify(plain_password, hashed_password)
-    
+
     @staticmethod
     def generate_random_password(length: int = 12) -> str:
         """
@@ -37,7 +37,7 @@ class PasswordManager:
         alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
         password = ''.join(secrets.choice(alphabet) for _ in range(length))
         return password
-    
+
     @staticmethod
     def generate_token(length: int = 32) -> str:
         """

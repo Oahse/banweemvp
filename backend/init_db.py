@@ -8,7 +8,6 @@ Database initialization + batched seeding script for Banwee API.
 """
 
 import asyncio
-import sys
 import argparse
 import random
 import uuid
@@ -17,15 +16,13 @@ from typing import List
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
-from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import AsyncSessionDB
 from core.config import settings
 from core.utils.encryption import PasswordManager
 from core.database import Base
 from models.user import User, Address
 from models.product import Product, ProductVariant, ProductImage, Category
-from models.cart import Cart, CartItem
-from models.order import Order, OrderItem, TrackingEvent
+from models.order import Order, OrderItem
 from models.blog import BlogPost
 from models.subscription import Subscription
 from models.review import Review
@@ -34,8 +31,8 @@ from models.promocode import Promocode
 from models.shipping import ShippingMethod
 from models.transaction import Transaction
 from models.wishlist import Wishlist, WishlistItem
-from models.settings import SystemSettings # Added SystemSettings import
-from models.notification import Notification # Added Notification import
+from models.settings import SystemSettings  # Added SystemSettings import
+from models.notification import Notification  # Added Notification import
 
 # ---------------- Config ----------------
 FILTER_CATEGORIES = {
@@ -97,29 +94,29 @@ FILTER_CATEGORIES = {
 
 # Diverse product images for different categories
 image_urls = [
-  # Grains and cereals
-  "https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1574323347407-f5e1c0cf4b7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1547496614-54c9948c22a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  # Fruits and vegetables
-  "https://images.unsplash.com/photo-1559181567-c3190ca9959b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1610832958506-aa56368176cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1506976785307-8732e854ad03?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  # Nuts and seeds
-  "https://images.unsplash.com/photo-1508061253366-f7da158b6d46?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1553909489-cd47e0ef937f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  # Spices and herbs
-  "https://images.unsplash.com/photo-1532336414038-cf19250c5757?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  # Legumes and beans
-  "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1585238342028-4a1f3d1d0f4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  # Beverages and liquids
-  "https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  # General food products
-  "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    # Grains and cereals
+    "https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1574323347407-f5e1c0cf4b7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1547496614-54c9948c22a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    # Fruits and vegetables
+    "https://images.unsplash.com/photo-1559181567-c3190ca9959b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1610832958506-aa56368176cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1506976785307-8732e854ad03?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    # Nuts and seeds
+    "https://images.unsplash.com/photo-1508061253366-f7da158b6d46?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1553909489-cd47e0ef937f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    # Spices and herbs
+    "https://images.unsplash.com/photo-1532336414038-cf19250c5757?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    # Legumes and beans
+    "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1585238342028-4a1f3d1d0f4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    # Beverages and liquids
+    "https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    # General food products
+    "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
 ]
 
 DEFAULT_NUM_CATEGORIES = len(FILTER_CATEGORIES)
@@ -129,6 +126,7 @@ DEFAULT_VARIANTS_PER_PRODUCT = 3
 DEFAULT_BATCH_SIZE = 50
 
 # ---------------- DB Utilities ----------------
+
 
 async def create_tables():
     """Create all database tables (drop then create)."""
@@ -184,14 +182,17 @@ async def seed_sample_data(
         # -------- Shipping Methods --------
         shipping_methods_batch = []
         shipping_methods_data = [
-            {"name": "Standard Shipping", "price": 4.99, "estimated_days": 5, "is_active": True},
-            {"name": "Express Shipping", "price": 9.99, "estimated_days": 2, "is_active": True},
-            {"name": "Next-Day Shipping", "price": 19.99, "estimated_days": 1, "is_active": True},
+            {"name": "Standard Shipping", "price": 4.99,
+                "estimated_days": 5, "is_active": True},
+            {"name": "Express Shipping", "price": 9.99,
+                "estimated_days": 2, "is_active": True},
+            {"name": "Next-Day Shipping", "price": 19.99,
+                "estimated_days": 1, "is_active": True},
         ]
         for data in shipping_methods_data:
             method = ShippingMethod(**data)
             shipping_methods_batch.append(method)
-        
+
         if shipping_methods_batch:
             session.add_all(shipping_methods_batch)
             await session.commit()
@@ -204,7 +205,8 @@ async def seed_sample_data(
 
         predefined = [
             ("admin@banwee.com", "Admin", "User", "adminpass", "Admin"),
-            ("supplier@banwee.com", "Supplier", "User", "supplierpass", "Supplier"),
+            ("supplier@banwee.com", "Supplier",
+             "User", "supplierpass", "Supplier"),
         ]
 
         for email, fname, lname, pwd_plain, role in predefined:
@@ -280,13 +282,14 @@ async def seed_sample_data(
                 user_id=user.id,
                 street=f"{random.randint(1, 999)} Main St",
                 city=random.choice(["Accra", "Lagos", "Nairobi", "Kampala"]),
-                state=random.choice(["Greater Accra", "Lagos State", "Nairobi County"]),
+                state=random.choice(
+                    ["Greater Accra", "Lagos State", "Nairobi County"]),
                 country=random.choice(["Ghana", "Nigeria", "Kenya", "Uganda"]),
                 post_code=f"{random.randint(10000, 99999)}",
                 kind="Shipping"
             )
             addresses_batch.append(address)
-        
+
         if addresses_batch:
             session.add_all(addresses_batch)
             await session.commit()
@@ -299,9 +302,8 @@ async def seed_sample_data(
             result = await session.execute(select(User).where(User.role == "Supplier"))
             suppliers = result.scalars().all()
 
-        print(f"👥 Created users; suppliers: {len(suppliers)}, admins: {len(admins)}")
-
-
+        print(
+            f"👥 Created users; suppliers: {len(suppliers)}, admins: {len(admins)}")
 
         # -------- Payment Methods --------
         payment_methods_batch = []
@@ -327,14 +329,17 @@ async def seed_sample_data(
         # -------- Promocodes --------
         promocodes_batch = []
         promocodes_data = [
-            {"code": "SAVE10", "discount_type": "percentage", "value": 10, "is_active": True},
-            {"code": "FREESHIP", "discount_type": "fixed", "value": 0, "is_active": True}, # This might need special handling in logic
-            {"code": "SAVE20", "discount_type": "percentage", "value": 20, "is_active": False},
+            {"code": "SAVE10", "discount_type": "percentage",
+                "value": 10, "is_active": True},
+            {"code": "FREESHIP", "discount_type": "fixed", "value": 0,
+                "is_active": True},  # This might need special handling in logic
+            {"code": "SAVE20", "discount_type": "percentage",
+                "value": 20, "is_active": False},
         ]
         for data in promocodes_data:
             promo = Promocode(**data)
             promocodes_batch.append(promo)
-        
+
         if promocodes_batch:
             session.add_all(promocodes_batch)
             await session.commit()
@@ -368,19 +373,23 @@ async def seed_sample_data(
             chosen_category = all_categories[(i - 1) % len(all_categories)]
             chosen_supplier = random.choice(suppliers)
             cat_keywords = next(
-                (v['keywords'] for k, v in FILTER_CATEGORIES.items() if v['name'] == chosen_category.name), []
+                (v['keywords'] for k, v in FILTER_CATEGORIES.items()
+                 if v['name'] == chosen_category.name), []
             )
-            keyword = random.choice(cat_keywords) if cat_keywords else "Premium"
-            
+            keyword = random.choice(
+                cat_keywords) if cat_keywords else "Premium"
+
             # Create better product names
-            adjectives = ["Premium", "Organic", "Fresh", "Quality", "Natural", "Pure", "Artisan", "Traditional"]
+            adjectives = ["Premium", "Organic", "Fresh", "Quality",
+                          "Natural", "Pure", "Artisan", "Traditional"]
             adjective = random.choice(adjectives)
             product_name = f"{adjective} {keyword.title()}"
             if i <= 10:  # Add numbers to first 10 for uniqueness
                 product_name += f" {i}"
 
             # Ensure we have at least 25% featured products (more than the random 20%)
-            is_featured = i <= max(5, products_count // 4) or random.random() < 0.15
+            is_featured = i <= max(5, products_count //
+                                   4) or random.random() < 0.15
 
             product = Product(
                 name=product_name,
@@ -390,32 +399,37 @@ async def seed_sample_data(
                 featured=is_featured,
                 rating=round(random.uniform(3.5, 5.0), 1),  # Higher ratings
                 review_count=random.randint(5, 150),  # Ensure some reviews
-                origin=random.choice(["Ghana", "Nigeria", "Kenya", "Uganda", "Tanzania", "Ethiopia", "Mali"]),
-                dietary_tags=random.sample(["organic", "gluten-free", "vegan", "non-GMO", "fair-trade", "kosher", "halal"], k=random.randint(1, 3)),
+                origin=random.choice(
+                    ["Ghana", "Nigeria", "Kenya", "Uganda", "Tanzania", "Ethiopia", "Mali"]),
+                dietary_tags=random.sample(
+                    ["organic", "gluten-free", "vegan", "non-GMO", "fair-trade", "kosher", "halal"], k=random.randint(1, 3)),
                 is_active=True  # Ensure all products are active
             )
             session.add(product)
-            await session.flush() # Ensure product.id is populated
+            await session.flush()  # Ensure product.id is populated
 
             # Ensure at least 1 variant per product, up to variants_per_product
-            num_variants = max(1, min(variants_per_product, random.randint(1, 3)))
+            num_variants = max(
+                1, min(variants_per_product, random.randint(1, 3)))
             for v_idx in range(1, num_variants + 1):
                 sku = f"{product.name[:3].upper().replace(' ', '')}-{str(product.id)[:8]}-{v_idx}"
-                
+
                 # Better variant names based on category
                 variant_names = {
                     1: ["500g Pack", "1kg Bag", "Small Size"],
-                    2: ["1kg Pack", "2kg Bag", "Medium Size"], 
+                    2: ["1kg Pack", "2kg Bag", "Medium Size"],
                     3: ["2kg Pack", "5kg Bag", "Large Size"]
                 }
-                variant_name = variant_names.get(v_idx, [f"Variant {v_idx}"])[0]
-                
+                variant_name = variant_names.get(
+                    v_idx, [f"Variant {v_idx}"])[0]
+
                 # More realistic pricing
                 base_price = round(random.uniform(8.99, 89.99), 2)
                 sale_price = None
                 if random.random() < 0.3:  # 30% chance of sale
-                    sale_price = round(base_price * random.uniform(0.7, 0.9), 2)
-                
+                    sale_price = round(
+                        base_price * random.uniform(0.7, 0.9), 2)
+
                 variant = ProductVariant(
                     product_id=product.id,
                     sku=sku,
@@ -423,7 +437,8 @@ async def seed_sample_data(
                     base_price=base_price,
                     sale_price=sale_price,
                     stock=random.randint(10, 200),  # Ensure stock availability
-                    attributes={"size": variant_name, "weight": f"{v_idx * 500}g"},
+                    attributes={"size": variant_name,
+                                "weight": f"{v_idx * 500}g"},
                     is_active=True
                 )
                 session.add(variant)
@@ -442,7 +457,7 @@ async def seed_sample_data(
                         format="jpg",
                     )
                     session.add(image)
-            
+
             all_products_with_variants.append(product)
 
             if len(all_products_with_variants) >= batch_size:
@@ -475,13 +490,14 @@ async def seed_sample_data(
         all_payment_methods = all_payment_methods_result.scalars().all()
 
         for user in all_users:
-            for i in range(random.randint(1, 5)): # 1 to 5 orders per user
+            for i in range(random.randint(1, 5)):  # 1 to 5 orders per user
                 chosen_shipping_method = random.choice(all_shipping_methods)
-                user_payment_methods = [pm for pm in all_payment_methods if pm.user_id == user.id]
+                user_payment_methods = [
+                    pm for pm in all_payment_methods if pm.user_id == user.id]
                 if not user_payment_methods:
                     continue
                 chosen_payment_method = random.choice(user_payment_methods)
-                
+
                 order_total = 0
                 order = Order(
                     id=uuid.uuid4(),
@@ -490,14 +506,16 @@ async def seed_sample_data(
                     shipping_address_id=user.addresses[0].id if user.addresses else None,
                     shipping_method_id=chosen_shipping_method.id,
                     payment_method_id=chosen_payment_method.id,
-                    total_amount=0, # Will be updated after calculating items
-                    carrier_name=random.choice(["DHL", "FedEx", "UPS"]) if chosen_shipping_method else None,
-                    tracking_number=str(uuid.uuid4()) if chosen_shipping_method else None,
+                    total_amount=0,  # Will be updated after calculating items
+                    carrier_name=random.choice(
+                        ["DHL", "FedEx", "UPS"]) if chosen_shipping_method else None,
+                    tracking_number=str(
+                        uuid.uuid4()) if chosen_shipping_method else None,
                 )
                 orders_batch.append(order)
                 await session.flush()
 
-                for j in range(random.randint(1, 3)): # 1 to 3 items per order
+                for j in range(random.randint(1, 3)):  # 1 to 3 items per order
                     chosen_variant = random.choice(all_variants)
                     item_total = chosen_variant.base_price * 1
                     order_item = OrderItem(
@@ -509,13 +527,14 @@ async def seed_sample_data(
                     )
                     order_items_batch.append(order_item)
                     order_total += item_total
-                
+
                 order.total_amount = order_total
 
                 transaction = Transaction(
                     user_id=user.id,
                     order_id=order.id,
-                    stripe_payment_intent_id=str(uuid.uuid4()), # Generate a dummy ID for seeding
+                    # Generate a dummy ID for seeding
+                    stripe_payment_intent_id=str(uuid.uuid4()),
                     amount=order_total,
                     currency="USD",
                     status="succeeded",
@@ -529,7 +548,8 @@ async def seed_sample_data(
             session.add_all(order_items_batch)
             session.add_all(transactions_batch)
             await session.commit()
-        print(f"🛒 Created {len(orders_batch)} orders with items and transactions.")
+        print(
+            f"🛒 Created {len(orders_batch)} orders with items and transactions.")
 
         # -------- Wishlists --------
         wishlists_batch = []
@@ -542,7 +562,7 @@ async def seed_sample_data(
         for user in all_users_for_wishlist:
             if not all_products_for_wishlist:
                 continue
-            
+
             # Create a wishlist for the user
             wishlist = Wishlist(
                 user_id=user.id,
@@ -550,7 +570,7 @@ async def seed_sample_data(
                 is_default=True
             )
             session.add(wishlist)
-            await session.flush() # Ensure wishlist.id is populated
+            await session.flush()  # Ensure wishlist.id is populated
 
             # Add 0 to 3 items to the wishlist
             for i in range(random.randint(0, 3)):
@@ -558,30 +578,32 @@ async def seed_sample_data(
                 wishlist_item = WishlistItem(
                     wishlist_id=wishlist.id,
                     product_id=chosen_product.id,
-                    quantity=1 # Default quantity for wishlist item
+                    quantity=1  # Default quantity for wishlist item
                 )
                 wishlist_items_batch.append(wishlist_item)
-        
+
         if wishlist_items_batch:
             session.add_all(wishlist_items_batch)
             await session.commit()
-        print(f"❤️ Created {len(wishlist_items_batch)} wishlist items across various wishlists.")
+        print(
+            f"❤️ Created {len(wishlist_items_batch)} wishlist items across various wishlists.")
 
         # -------- Blog Posts --------
         blog_posts_batch = []
-        for i in range(1, 11): # Create 10 dummy blog posts
+        for i in range(1, 11):  # Create 10 dummy blog posts
             chosen_admin = random.choice(admins)
             post = BlogPost(
                 id=uuid.uuid4(),
                 title=f"Blog Post Title {i}",
                 content=f"This is the content for blog post number {i}. It discusses various organic farming techniques and sustainable practices.",
                 author_id=chosen_admin.id,
-                tags=random.sample(["organic", "farming", "sustainability", "health", "recipes"], k=random.randint(1, 3)),
+                tags=random.sample(
+                    ["organic", "farming", "sustainability", "health", "recipes"], k=random.randint(1, 3)),
                 image_url=random.choice(image_urls),
                 is_published=True,
             )
             blog_posts_batch.append(post)
-        
+
         if blog_posts_batch:
             session.add_all(blog_posts_batch)
             await session.commit()
@@ -594,7 +616,7 @@ async def seed_sample_data(
         all_users = await session.execute(select(User))
         all_users = all_users.scalars().all()
 
-        for i in range(1, 21): # Create 20 dummy subscriptions
+        for i in range(1, 21):  # Create 20 dummy subscriptions
             chosen_user = random.choice(all_users)
             subscription = Subscription(
                 id=uuid.uuid4(),
@@ -604,7 +626,7 @@ async def seed_sample_data(
                 auto_renew=random.choice([True, False]),
             )
             subscriptions_batch.append(subscription)
-        
+
         if subscriptions_batch:
             session.add_all(subscriptions_batch)
             await session.commit()
@@ -616,7 +638,7 @@ async def seed_sample_data(
         reviews_batch = []
         all_products = await session.execute(select(Product))
         all_products = all_products.scalars().all()
-        
+
         # Get featured products for more reviews
         featured_products = [p for p in all_products if p.featured]
         regular_products = [p for p in all_products if not p.featured]
@@ -645,14 +667,15 @@ async def seed_sample_data(
                 review = Review(
                     product_id=product.id,
                     user_id=chosen_user.id,
-                    rating=random.randint(4, 5),  # Featured products get better ratings
+                    # Featured products get better ratings
+                    rating=random.randint(4, 5),
                     comment=random.choice(review_comments),
                     is_verified_purchase=random.choice([True, False]),
                     is_approved=True
                 )
                 reviews_batch.append(review)
                 review_count += 1
-        
+
         # Create fewer reviews for regular products (0-2 reviews each)
         for product in regular_products:
             if review_count >= 100:  # Cap total reviews
@@ -673,7 +696,7 @@ async def seed_sample_data(
                     )
                     reviews_batch.append(review)
                     review_count += 1
-        
+
         if reviews_batch:
             session.add_all(reviews_batch)
             await session.commit()
@@ -695,21 +718,23 @@ async def seed_sample_data(
             "Your review for Premium Wheat has been approved.",
             "Maintenance alert: Our site will be down for 1 hour tonight.",
             "Your payment method ending in ****1234 is expiring soon.",
-            "You have unread messages from support.", # This will be replaced by actual notifications
+            # This will be replaced by actual notifications
+            "You have unread messages from support.",
             "Admin: New user registered: user123@example.com."
         ]
 
-        for i in range(30): # Create 30 dummy notifications
+        for i in range(30):  # Create 30 dummy notifications
             chosen_user = random.choice(all_users_for_notifications)
             notification = Notification(
                 user_id=str(chosen_user.id),
                 message=random.choice(notification_messages),
                 read=random.choice([True, False]),
                 type=random.choice(["info", "success", "warning", "error"]),
-                related_id=str(uuid.uuid4()) if random.random() < 0.5 else None # 50% chance of related_id
+                related_id=str(uuid.uuid4()) if random.random(
+                ) < 0.5 else None  # 50% chance of related_id
             )
             notifications_batch.append(notification)
-        
+
         if notifications_batch:
             session.add_all(notifications_batch)
             await session.commit()
@@ -720,16 +745,21 @@ async def seed_sample_data(
         with open(users_file_path, "w") as f:
             for email, pwd in plaintext_passwords.items():
                 f.write(f"{email} / {pwd}\n")
-        print(f"🔐 Plaintext credentials saved to {users_file_path} (DEV ONLY).")
+        print(
+            f"🔐 Plaintext credentials saved to {users_file_path} (DEV ONLY).")
 
 
 async def main():
-    parser = argparse.ArgumentParser(description="Initialize DB and optionally seed sample data in batches.")
-    parser.add_argument("--seed", action="store_true", help="Seed sample data after creating tables")
-    parser.add_argument("--categories", type=int, default=DEFAULT_NUM_CATEGORIES)
+    parser = argparse.ArgumentParser(
+        description="Initialize DB and optionally seed sample data in batches.")
+    parser.add_argument("--seed", action="store_true",
+                        help="Seed sample data after creating tables")
+    parser.add_argument("--categories", type=int,
+                        default=DEFAULT_NUM_CATEGORIES)
     parser.add_argument("--users", type=int, default=DEFAULT_NUM_USERS)
     parser.add_argument("--products", type=int, default=DEFAULT_NUM_PRODUCTS)
-    parser.add_argument("--variants", type=int, default=DEFAULT_VARIANTS_PER_PRODUCT)
+    parser.add_argument("--variants", type=int,
+                        default=DEFAULT_VARIANTS_PER_PRODUCT)
     parser.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE)
     args = parser.parse_args()
 

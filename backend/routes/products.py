@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional, List
+from typing import Optional
 from uuid import UUID
 from core.database import get_db
 from core.utils.response import Response
@@ -13,11 +13,14 @@ from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     return await AuthService.get_current_user(token, db)
 
 router = APIRouter(prefix="/api/v1/products", tags=["Products"])
 # /products?sort_by=created_at&sort_order=desc&page=1&limit=12
+
+
 @router.get("/")
 async def get_products(
     page: int = Query(1, ge=1),
@@ -39,7 +42,7 @@ async def get_products(
     """Get products with optional filtering and pagination."""
     try:
         product_service = ProductService(db)
-        
+
         filters = {
             "category": category,
             "q": q,
@@ -52,7 +55,7 @@ async def get_products(
             "popular": popular,
             "sale": sale
         }
-        
+
         result = await product_service.get_products(
             page=page,
             limit=limit,
@@ -60,7 +63,7 @@ async def get_products(
             sort_by=sort_by,
             sort_order=sort_order
         )
-        
+
         return Response(success=True, data=result)
     except Exception as e:
         raise APIException(
@@ -100,6 +103,7 @@ async def get_products(
 #              message="Failed to fetch popular products"
 #         )
 
+
 @router.get("/categories")
 async def get_categories(db: AsyncSession = Depends(get_db)):
     """Get all product categories."""
@@ -110,8 +114,9 @@ async def get_categories(db: AsyncSession = Depends(get_db)):
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-             message=f"Failed to fetch categories {str(e)}"
+            message=f"Failed to fetch categories {str(e)}"
         )
+
 
 @router.get("/{product_id}/recommendations")
 async def get_recommended_products(
@@ -127,8 +132,9 @@ async def get_recommended_products(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-             message=f"Failed to fetch recommended products - {str(e)}"
+            message=f"Failed to fetch recommended products - {str(e)}"
         )
+
 
 @router.get("/{product_id}/variants")
 async def get_product_variants(
@@ -145,6 +151,7 @@ async def get_product_variants(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch product variants - {str(e)}"
         )
+
 
 @router.get("/variants/{variant_id}")
 async def get_variant(
@@ -169,6 +176,7 @@ async def get_variant(
             message=f"Failed to fetch product variant - {str(e)}"
         )
 
+
 @router.get("/variants/{variant_id}/qrcode")
 async def get_variant_qr_code(
     variant_id: UUID,
@@ -192,6 +200,7 @@ async def get_variant_qr_code(
             message=f"Failed to generate QR code - {str(e)}"
         )
 
+
 @router.get("/variants/{variant_id}/barcode")
 async def get_variant_barcode(
     variant_id: UUID,
@@ -214,6 +223,7 @@ async def get_variant_barcode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to generate barcode - {str(e)}"
         )
+
 
 @router.get("/{product_id}")
 async def get_product(
@@ -243,6 +253,7 @@ async def get_product(
             message=f"Failed to fetch product: {str(e)}"
         )
 
+
 @router.get("/categories/{category_id}")
 async def get_category(
     category_id: UUID,
@@ -255,7 +266,7 @@ async def get_category(
         if not category:
             raise APIException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                 message="Category not found"
+                message="Category not found"
             )
         return Response(success=True, data=category)
     except APIException:
@@ -263,8 +274,9 @@ async def get_category(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-             message="Failed to fetch category"
+            message="Failed to fetch category"
         )
+
 
 @router.post("/")
 async def create_product(
@@ -277,9 +289,9 @@ async def create_product(
         if current_user.role not in ["Supplier", "Admin"]:
             raise APIException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                 message="Only suppliers can create products"
+                message="Only suppliers can create products"
             )
-        
+
         product_service = ProductService(db)
         product = await product_service.create_product(product_data, current_user.id)
         return Response(success=True, data=product, message="Product created successfully")
@@ -288,8 +300,9 @@ async def create_product(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-             message="Failed to create product"
+            message="Failed to create product"
         )
+
 
 @router.put("/{product_id}")
 async def update_product(
@@ -308,8 +321,9 @@ async def update_product(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-             message="Failed to update product"
+            message="Failed to update product"
         )
+
 
 @router.delete("/{product_id}")
 async def delete_product(
@@ -327,5 +341,5 @@ async def delete_product(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-             message="Failed to delete product"
+            message="Failed to delete product"
         )

@@ -1,16 +1,13 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.sessions import SessionMiddleware
-import logging
-import traceback
-from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
-from core.database import AsyncSessionDB # Add this import
-from services.notification import NotificationService # Add this import
-import asyncio # Add this import
+from core.database import AsyncSessionDB  # Add this import
+from services.notification import NotificationService  # Add this import
+import asyncio  # Add this import
 # Import exceptions and handlers
 from core.exceptions import (
     APIException,
@@ -20,8 +17,7 @@ from core.exceptions import (
     sqlalchemy_exception_handler,
     general_exception_handler
 )
-from core.config import settings, logger
-from core.utils.response import Response
+from core.config import settings
 from routes.websockets import ws_router
 from routes.auth import router as auth_router
 from routes.user import router as user_router
@@ -51,7 +47,8 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.BACKEND_CORS_ORIGINS if hasattr(settings, 'BACKEND_CORS_ORIGINS') else ["*"],
+    allow_origins=settings.BACKEND_CORS_ORIGINS if hasattr(
+        settings, 'BACKEND_CORS_ORIGINS') else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -69,9 +66,6 @@ if hasattr(settings, 'ALLOWED_HOSTS'):
         TrustedHostMiddleware,
         allowed_hosts=settings.ALLOWED_HOSTS
     )
-
-
-
 
 
 # Include all routers with API versioning
@@ -94,17 +88,21 @@ app.include_router(notification_router)
 # Include WebSocket router
 app.include_router(ws_router)
 
+
 async def run_notification_cleanup():
     while True:
         async with AsyncSessionDB() as db:
             notification_service = NotificationService(db)
             await notification_service.delete_old_notifications(days_old=settings.NOTIFICATION_CLEANUP_DAYS)
-        await asyncio.sleep(settings.NOTIFICATION_CLEANUP_INTERVAL_SECONDS) # Run every X seconds
+        # Run every X seconds
+        await asyncio.sleep(settings.NOTIFICATION_CLEANUP_INTERVAL_SECONDS)
+
 
 @app.on_event("startup")
 async def startup_event():
     # Start the notification cleanup task in the background
     asyncio.create_task(run_notification_cleanup())
+
 
 @app.get("/")
 async def read_root():
@@ -116,6 +114,8 @@ async def read_root():
     }
 
 # Legacy health endpoint - redirects to new health router
+
+
 @app.get("/health")
 async def legacy_health_check():
     """Legacy health check endpoint - use /health/ for detailed checks."""
@@ -125,7 +125,6 @@ async def legacy_health_check():
         "version": "1.0.0",
         "note": "Use /health/ endpoints for detailed health checks"
     }
-
 
 
 # Register exception handlers

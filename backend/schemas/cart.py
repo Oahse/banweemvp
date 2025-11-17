@@ -4,12 +4,15 @@ from datetime import datetime
 from uuid import UUID
 from schemas.product import ProductVariantResponse
 
+
 class AddToCartRequest(BaseModel):
     variant_id: str
     quantity: int
 
+
 class ApplyPromocodeRequest(BaseModel):
     code: str
+
 
 class CartItemResponse(BaseModel):
     id: UUID
@@ -18,12 +21,13 @@ class CartItemResponse(BaseModel):
     price_per_unit: float
     total_price: float
     created_at: str = Field(..., description="ISO format datetime string")
-    
+
     class Config:
         from_attributes = True
         json_encoders = {
             datetime: lambda v: v.isoformat() if v else None
         }
+
 
 class CartResponse(BaseModel):
     items: List[CartItemResponse]
@@ -35,6 +39,7 @@ class CartResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class UpdateCartItemRequest(BaseModel):
     quantity: int

@@ -1,19 +1,23 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, Float, Text
+from sqlalchemy import Column, String, ForeignKey, Float, Text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, selectinload
-from core.database import BaseModel, CHAR_LENGTH
+from sqlalchemy.orm import relationship
+from core.database import BaseModel
 
 
 class Transaction(BaseModel):
     __tablename__ = "transactions"
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    order_id = Column(UUID(as_uuid=True), ForeignKey("orders.id"), nullable=True)
-    stripe_payment_intent_id = Column(String(CHAR_LENGTH), nullable=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey(
+        "users.id"), nullable=False)
+    order_id = Column(UUID(as_uuid=True), ForeignKey(
+        "orders.id"), nullable=True)
+    stripe_payment_intent_id = Column(String(225), nullable=True)
     amount = Column(Float, nullable=False)
     currency = Column(String(3), default="USD")
-    status = Column(String(50), nullable=False)  # pending, succeeded, failed, cancelled
-    transaction_type = Column(String(50), nullable=False)  # payment, refund, payout
+    # pending, succeeded, failed, cancelled
+    status = Column(String(50), nullable=False)
+    # payment, refund, payout
+    transaction_type = Column(String(50), nullable=False)
     description = Column(Text, nullable=True)
     meta_data = Column(Text, nullable=True)  # JSON string for additional data
 

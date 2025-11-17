@@ -20,12 +20,14 @@ class NotificationService:
         if read is not None:
             query = query.where(Notification.read == read)
 
-        query = query.order_by(Notification.created_at.desc()).offset(offset).limit(limit)
+        query = query.order_by(Notification.created_at.desc()).offset(
+            offset).limit(limit)
 
         result = await self.db.execute(query)
         notifications = result.scalars().all()
 
-        count_query = select(func.count(Notification.id)).where(Notification.user_id == user_id)
+        count_query = select(func.count(Notification.id)).where(
+            Notification.user_id == user_id)
         if read is not None:
             count_query = count_query.where(Notification.read == read)
         count_result = await self.db.execute(count_query)
@@ -43,12 +45,14 @@ class NotificationService:
 
     async def mark_notification_as_read(self, notification_id: str, user_id: str) -> dict:
         """Mark a specific notification as read."""
-        query = select(Notification).where(Notification.id == notification_id, Notification.user_id == user_id)
+        query = select(Notification).where(Notification.id ==
+                                           notification_id, Notification.user_id == user_id)
         result = await self.db.execute(query)
         notification = result.scalar_one_or_none()
 
         if not notification:
-            raise APIException(status_code=404, message="Notification not found or does not belong to user")
+            raise APIException(
+                status_code=404, message="Notification not found or does not belong to user")
 
         notification.read = True
         await self.db.commit()
@@ -70,12 +74,14 @@ class NotificationService:
 
     async def delete_notification(self, notification_id: str, user_id: str):
         """Delete a specific notification."""
-        query = select(Notification).where(Notification.id == notification_id, Notification.user_id == user_id)
+        query = select(Notification).where(Notification.id ==
+                                           notification_id, Notification.user_id == user_id)
         result = await self.db.execute(query)
         notification = result.scalar_one_or_none()
 
         if not notification:
-            raise APIException(status_code=404, message="Notification not found or does not belong to user")
+            raise APIException(
+                status_code=404, message="Notification not found or does not belong to user")
 
         await self.db.delete(notification)
         await self.db.commit()
@@ -86,9 +92,10 @@ class NotificationService:
         from sqlalchemy import delete
 
         threshold_date = datetime.utcnow() - timedelta(days=days_old)
-        
+
         # Delete notifications older than threshold_date
-        delete_stmt = delete(Notification).where(Notification.created_at < threshold_date)
+        delete_stmt = delete(Notification).where(
+            Notification.created_at < threshold_date)
         await self.db.execute(delete_stmt)
         await self.db.commit()
         print(f"Deleted notifications older than {days_old} days.")

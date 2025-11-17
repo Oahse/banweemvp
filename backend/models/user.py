@@ -1,14 +1,14 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, Text,DateTime
+from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, selectinload
+from sqlalchemy.orm import relationship
 from core.database import BaseModel, CHAR_LENGTH
-
 
 
 class User(BaseModel):
     __tablename__ = "users"
 
-    email = Column(String(CHAR_LENGTH), unique=True, index=True, nullable=False)
+    email = Column(String(CHAR_LENGTH), unique=True,
+                   index=True, nullable=False)
     firstname = Column(String(CHAR_LENGTH), nullable=False)
     lastname = Column(String(CHAR_LENGTH), nullable=False)
     hashed_password = Column(String(CHAR_LENGTH), nullable=False)
@@ -20,16 +20,24 @@ class User(BaseModel):
     last_login = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships with lazy loading
-    addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    addresses = relationship(
+        "Address", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
     orders = relationship("Order", back_populates="user", lazy="selectin")
     reviews = relationship("Review", back_populates="user", lazy="selectin")
-    wishlists = relationship("Wishlist", back_populates="user", lazy="selectin")
-    blog_posts = relationship("BlogPost", back_populates="author", lazy="selectin")
-    subscriptions = relationship("Subscription", back_populates="user", lazy="selectin")
-    payment_methods = relationship("PaymentMethod", back_populates="user", lazy="selectin")
-    transactions = relationship("Transaction", back_populates="user", lazy="selectin")
-    supplied_products = relationship("Product", back_populates="supplier", lazy="selectin")
-    notifications = relationship("Notification", back_populates="user", lazy="selectin")
+    wishlists = relationship(
+        "Wishlist", back_populates="user", lazy="selectin")
+    blog_posts = relationship(
+        "BlogPost", back_populates="author", lazy="selectin")
+    subscriptions = relationship(
+        "Subscription", back_populates="user", lazy="selectin")
+    payment_methods = relationship(
+        "PaymentMethod", back_populates="user", lazy="selectin")
+    transactions = relationship(
+        "Transaction", back_populates="user", lazy="selectin")
+    supplied_products = relationship(
+        "Product", back_populates="supplier", lazy="selectin")
+    notifications = relationship(
+        "Notification", back_populates="user", lazy="selectin")
 
     @property
     def full_name(self) -> str:
@@ -62,7 +70,8 @@ class User(BaseModel):
 class Address(BaseModel):
     __tablename__ = "addresses"
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey(
+        "users.id"), nullable=False)
     street = Column(String(CHAR_LENGTH), nullable=False)
     city = Column(String(100), nullable=False)
     state = Column(String(100), nullable=False)

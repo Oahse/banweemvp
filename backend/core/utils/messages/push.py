@@ -19,6 +19,7 @@ import asyncio
 # except Exception as e:
 #     raise e
 
+
 async def push(id: str, to_user_id: str, title: str, body: str, type: str, token: str, data: dict = {}):
     # Simulate sending notification asynchronously
     print(f"Pushing notification {id} to {to_user_id}")
@@ -36,6 +37,7 @@ async def push(id: str, to_user_id: str, title: str, body: str, type: str, token
     # response = await messaging.send(message)
     # print(f"Notification sent: {response}")
 
+
 def send_push(id: str, to_user_id: str, title: str, body: str, type: str, token: str, data: dict = {}):
     # If you're inside a running event loop (e.g., FastAPI), use this instead:
     try:
@@ -45,7 +47,8 @@ def send_push(id: str, to_user_id: str, title: str, body: str, type: str, token:
 
     if loop and loop.is_running():
         # If inside an async context (like FastAPI), schedule push task
-        asyncio.create_task(push(id, to_user_id, title, body, type, token, data))
+        asyncio.create_task(
+            push(id, to_user_id, title, body, type, token, data))
     else:
         # Otherwise, run it synchronously (blocking) as entry point
         asyncio.run(push(id, to_user_id, title, body, type, token, data))

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional, List
+from typing import Optional
 from uuid import UUID
 from core.database import get_db
 from core.utils.response import Response
@@ -14,10 +14,12 @@ from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     return await AuthService.get_current_user(token, db)
 
 router = APIRouter(prefix="/api/v1/blog", tags=["Blog"])
+
 
 @router.post("/")
 async def create_blog_post(
@@ -30,7 +32,7 @@ async def create_blog_post(
         if current_user.role not in ["Admin", "SuperAdmin"]:
             raise APIException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Admin access required"
+                message="Admin access required"
             )
         blog_service = BlogService(db)
         post = await blog_service.create_blog_post(post_data, current_user.id)
@@ -40,8 +42,9 @@ async def create_blog_post(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create blog post: {str(e)}"
+            message=f"Failed to create blog post: {str(e)}"
         )
+
 
 @router.get("/")
 async def get_blog_posts(
@@ -59,8 +62,9 @@ async def get_blog_posts(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch blog posts: {str(e)}"
+            message=f"Failed to fetch blog posts: {str(e)}"
         )
+
 
 @router.get("/{post_id}")
 async def get_blog_post(
@@ -74,7 +78,7 @@ async def get_blog_post(
         if not post:
             raise APIException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Blog post not found"
+                message="Blog post not found"
             )
         return Response(success=True, data=post)
     except APIException:
@@ -82,8 +86,9 @@ async def get_blog_post(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch blog post: {str(e)}"
+            message=f"Failed to fetch blog post: {str(e)}"
         )
+
 
 @router.put("/{post_id}")
 async def update_blog_post(
@@ -97,7 +102,7 @@ async def update_blog_post(
         if current_user.role not in ["Admin", "SuperAdmin"]:
             raise APIException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Admin access required"
+                message="Admin access required"
             )
         blog_service = BlogService(db)
         post = await blog_service.update_blog_post(post_id, post_data, current_user.id)
@@ -107,8 +112,9 @@ async def update_blog_post(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update blog post: {str(e)}"
+            message=f"Failed to update blog post: {str(e)}"
         )
+
 
 @router.delete("/{post_id}")
 async def delete_blog_post(
@@ -121,7 +127,7 @@ async def delete_blog_post(
         if current_user.role not in ["Admin", "SuperAdmin"]:
             raise APIException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Admin access required"
+                message="Admin access required"
             )
         blog_service = BlogService(db)
         await blog_service.delete_blog_post(post_id, current_user.id)
@@ -131,5 +137,5 @@ async def delete_blog_post(
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete blog post: {str(e)}"
+            message=f"Failed to delete blog post: {str(e)}"
         )

@@ -3,6 +3,7 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 from uuid import UUID
 
+
 class ProductImageResponse(BaseModel):
     id: UUID
     variant_id: UUID
@@ -19,6 +20,7 @@ class ProductImageResponse(BaseModel):
             datetime: lambda v: v.isoformat() if v else None
         }
 
+
 class ProductVariantCreate(BaseModel):
     sku: str
     name: str
@@ -26,6 +28,7 @@ class ProductVariantCreate(BaseModel):
     sale_price: Optional[float] = None
     stock: int
     attributes: Optional[Dict[str, Any]] = {}
+
 
 class ProductCreate(BaseModel):
     name: str
@@ -35,12 +38,14 @@ class ProductCreate(BaseModel):
     origin: Optional[str] = None
     dietary_tags: Optional[List[str]] = []
 
+
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     category_id: Optional[UUID] = None
     origin: Optional[str] = None
     dietary_tags: Optional[List[str]] = None
+
 
 class CategoryResponse(BaseModel):
     id: UUID
@@ -50,9 +55,10 @@ class CategoryResponse(BaseModel):
     is_active: bool
     created_at: str
     updated_at: Optional[str]
-    
+
     class Config:
         from_attributes = True
+
 
 class SupplierResponse(BaseModel):
     id: UUID
@@ -61,9 +67,10 @@ class SupplierResponse(BaseModel):
     lastname: str
     phone: Optional[str]
     role: str
-    
+
     class Config:
         from_attributes = True
+
 
 class ProductVariantResponse(BaseModel):
     id: UUID
@@ -83,16 +90,18 @@ class ProductVariantResponse(BaseModel):
     updated_at: Optional[str]
     product_name: Optional[str] = None
     product_description: Optional[str] = None
-    
+
     class Config:
         from_attributes = True
         json_encoders = {
             datetime: lambda v: v.isoformat() if v else None
         }
 
+
 class PriceRange(BaseModel):
     min: float
     max: float
+
 
 class ProductResponse(BaseModel):
     id: UUID
@@ -115,9 +124,10 @@ class ProductResponse(BaseModel):
     supplier: Optional[SupplierResponse] = None
     variants: List[ProductVariantResponse] = []
     primary_variant: Optional[ProductVariantResponse] = None
-    
+
     class Config:
         from_attributes = True
+
 
 class ProductListResponse(BaseModel):
     products: List[ProductResponse]
@@ -125,6 +135,7 @@ class ProductListResponse(BaseModel):
     page: int
     per_page: int
     pages: int
+
 
 class ProductDetailResponse(ProductResponse):
     # Includes all product fields plus additional details

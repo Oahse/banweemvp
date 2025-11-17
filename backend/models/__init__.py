@@ -11,45 +11,45 @@ from .promocode import Promocode
 from .shipping import ShippingMethod
 from .transaction import Transaction
 from .wishlist import Wishlist, WishlistItem
-from .notification import Notification # Added Notification model
+from .notification import Notification  # Added Notification model
 
 __all__ = [
     # User models
     "User",
     "Address",
-    
+
     # Product models
     "Product",
-    "ProductVariant", 
+    "ProductVariant",
     "ProductImage",
     "Category",
-    
+
     # Cart models
     "Cart",
     "CartItem",
-    
+
     # Order models
     "Order",
     "OrderItem",
     "TrackingEvent",
-    
+
     # Content models
     "BlogPost",
     "Review",
-    
+
     # Commerce models
     "PaymentMethod",
     "Promocode",
     "ShippingMethod",
     "Transaction",
-    
+
     # Wishlist models
     "Wishlist",
     "WishlistItem",
-    
+
     # Subscription models
     "Subscription",
-    
+
     # Notification models
     "Notification",
 ]

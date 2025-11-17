@@ -6,6 +6,7 @@ from models.promocode import Promocode
 from schemas.promocode import PromocodeCreate, PromocodeUpdate
 from core.exceptions import APIException
 
+
 class PromocodeService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -34,11 +35,11 @@ class PromocodeService:
     async def update_promocode(self, promocode_id: UUID, promocode_data: PromocodeUpdate) -> Optional[Promocode]:
         promocode = await self.get_promocode_by_id(promocode_id)
         if not promocode:
-            raise APIException(status_code=404, detail="Promocode not found")
-        
+            raise APIException(status_code=404, message="Promocode not found")
+
         for key, value in promocode_data.dict(exclude_unset=True).items():
             setattr(promocode, key, value)
-        
+
         await self.db.commit()
         await self.db.refresh(promocode)
         return promocode
@@ -47,7 +48,7 @@ class PromocodeService:
         promocode = await self.get_promocode_by_id(promocode_id)
         if not promocode:
             return False
-        
+
         await self.db.delete(promocode)
         await self.db.commit()
         return True

@@ -10,12 +10,12 @@ from services.admin import AdminService
 from services.orders import OrderService
 from models.user import User
 from services.auth import AuthService
-from models.settings import SystemSettings
-from schemas.auth import UserCreate # Added UserCreate import
+from schemas.auth import UserCreate  # Added UserCreate import
 
 from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 class UpdateSystemSettingsRequest(BaseModel):
     maintenance_mode: Optional[bool] = None
@@ -25,14 +25,17 @@ class UpdateSystemSettingsRequest(BaseModel):
     email_notifications: Optional[bool] = None
     sms_notifications: Optional[bool] = None
 
+
 async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     return await AuthService.get_current_user(token, db)
 
 router = APIRouter(prefix="/api/v1/admin", tags=["Admin"])
 
+
 class ShipOrderRequest(BaseModel):
     tracking_number: str
     carrier_name: str
+
 
 def require_admin(current_user: User = Depends(get_current_auth_user)):
     """Require admin role."""
@@ -42,6 +45,7 @@ def require_admin(current_user: User = Depends(get_current_auth_user)):
             message="Admin access required"
         )
     return current_user
+
 
 @router.get("/stats")
 async def get_admin_stats(
@@ -59,6 +63,7 @@ async def get_admin_stats(
             message=f"Failed to fetch admin stats {str(e)}"
         )
 
+
 @router.get("/overview")
 async def get_platform_overview(
     current_user: User = Depends(require_admin),
@@ -74,6 +79,7 @@ async def get_platform_overview(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch platform overview  {str(e)}"
         )
+
 
 @router.get("/orders")
 async def get_all_orders(
@@ -99,6 +105,7 @@ async def get_all_orders(
             message=f"Failed to fetch orders {str(e)}"
         )
 
+
 @router.get("/users")
 async def get_all_users(
     page: int = Query(1, ge=1),
@@ -121,6 +128,7 @@ async def get_all_users(
             message="Failed to fetch users"
         )
 
+
 @router.post("/users")
 async def create_user_admin(
     user_data: UserCreate,
@@ -140,6 +148,7 @@ async def create_user_admin(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to create user: {str(e)}"
         )
+
 
 @router.get("/products")
 async def get_all_products_admin(
@@ -163,6 +172,7 @@ async def get_all_products_admin(
             message="Failed to fetch products"
         )
 
+
 @router.get("/variants")
 async def get_all_variants_admin(
     page: int = Query(1, ge=1),
@@ -184,7 +194,6 @@ async def get_all_variants_admin(
         )
 
 
-
 @router.put("/users/{user_id}/status")
 async def update_user_status(
     user_id: str,
@@ -203,6 +212,7 @@ async def update_user_status(
             message="Failed to update user status"
         )
 
+
 @router.delete("/users/{user_id}")
 async def delete_user(
     user_id: str,
@@ -219,6 +229,7 @@ async def delete_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             message="Failed to delete user"
         )
+
 
 @router.get("/orders/{order_id}")
 async def get_order_by_id(
@@ -241,6 +252,7 @@ async def get_order_by_id(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch order: {str(e)}"
         )
+
 
 @router.put("/orders/{order_id}/ship")
 async def ship_order(
@@ -268,6 +280,7 @@ async def ship_order(
             message=f"Failed to update order: {str(e)}"
         )
 
+
 @router.get("/system/settings")
 async def get_system_settings(
     current_user: User = Depends(require_admin),
@@ -283,6 +296,7 @@ async def get_system_settings(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch system settings {str(e)}"
         )
+
 
 @router.put("/system/settings")
 async def update_system_settings(

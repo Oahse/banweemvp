@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 
+
 class SubscriptionBase(BaseModel):
     user_id: Optional[str] = None
     plan_id: str = Field(..., min_length=1)
@@ -10,8 +11,10 @@ class SubscriptionBase(BaseModel):
     end_date: Optional[datetime] = None
     auto_renew: bool = True
 
+
 class SubscriptionCreate(SubscriptionBase):
     pass
+
 
 class SubscriptionUpdate(SubscriptionBase):
     plan_id: Optional[str] = None
@@ -19,6 +22,7 @@ class SubscriptionUpdate(SubscriptionBase):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     auto_renew: Optional[bool] = None
+
 
 class SubscriptionInDB(SubscriptionBase):
     id: str

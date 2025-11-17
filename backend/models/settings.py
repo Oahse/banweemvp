@@ -1,5 +1,5 @@
-from sqlalchemy import Column, String, Boolean, Integer, Text
-from core.database import BaseModel, CHAR_LENGTH
+from sqlalchemy import Column, Boolean, Integer, Text
+from core.database import BaseModel
 
 
 class SystemSettings(BaseModel):
@@ -8,7 +8,8 @@ class SystemSettings(BaseModel):
     maintenance_mode = Column(Boolean, default=False)
     registration_enabled = Column(Boolean, default=True)
     max_file_size = Column(Integer, default=10)  # Max file size in MB
-    allowed_file_types = Column(Text, default="jpg,jpeg,png,pdf")  # Comma separated
+    allowed_file_types = Column(
+        Text, default="jpg,jpeg,png,pdf")  # Comma separated
     email_notifications = Column(Boolean, default=True)
     sms_notifications = Column(Boolean, default=False)
 

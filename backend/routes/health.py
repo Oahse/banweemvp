@@ -4,12 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from datetime import datetime, timedelta
+from datetime import datetime
 import psutil
 import asyncio
 import aiohttp
 import time
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 import logging
 
 from core.database import get_db
@@ -20,13 +20,16 @@ router = APIRouter(prefix="/health", tags=["health"])
 logger = logging.getLogger(__name__)
 
 # Health check response models
+
+
 class HealthStatus:
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
 
+
 class ComponentHealth:
-    def __init__(self, name: str, status: str, response_time: float = 0, 
+    def __init__(self, name: str, status: str, response_time: float = 0,
                  details: Optional[Dict[str, Any]] = None, error: Optional[str] = None):
         self.name = name
         self.status = status
@@ -36,6 +39,8 @@ class ComponentHealth:
         self.timestamp = datetime.utcnow().isoformat()
 
 # Basic liveness check
+
+
 @router.get("/live")
 async def liveness_check():
     """
@@ -49,6 +54,8 @@ async def liveness_check():
     }
 
 # Readiness check
+
+
 @router.get("/ready")
 async def readiness_check(db: Session = Depends(get_db)):
     """
@@ -57,14 +64,14 @@ async def readiness_check(db: Session = Depends(get_db)):
     """
     checks = []
     overall_status = HealthStatus.HEALTHY
-    
+
     # Database connectivity check
     db_health = await check_database_health(db)
     checks.append(db_health)
-    
+
     if db_health.status != HealthStatus.HEALTHY:
         overall_status = HealthStatus.UNHEALTHY
-    
+
     response_data = {
         "status": overall_status,
         "timestamp": datetime.utcnow().isoformat(),
@@ -79,11 +86,13 @@ async def readiness_check(db: Session = Depends(get_db)):
             for check in checks
         ]
     }
-    
+
     status_code = 200 if overall_status == HealthStatus.HEALTHY else 503
     return JSONResponse(content=response_data, status_code=status_code)
 
 # Detailed health check
+
+
 @router.get("/detailed")
 async def detailed_health_check(db: Session = Depends(get_db)):
     """
@@ -92,7 +101,7 @@ async def detailed_health_check(db: Session = Depends(get_db)):
     start_time = time.time()
     checks = []
     overall_status = HealthStatus.HEALTHY
-    
+
     # Run all health checks concurrently
     health_checks = [
         check_database_health(db),
@@ -100,10 +109,10 @@ async def detailed_health_check(db: Session = Depends(get_db)):
         check_external_services(),
         check_application_metrics(db)
     ]
-    
+
     try:
         results = await asyncio.gather(*health_checks, return_exceptions=True)
-        
+
         for result in results:
             if isinstance(result, Exception):
                 logger.error(f"Health check failed: {result}")
@@ -119,13 +128,13 @@ async def detailed_health_check(db: Session = Depends(get_db)):
                     overall_status = HealthStatus.UNHEALTHY
                 elif result.status == HealthStatus.DEGRADED and overall_status == HealthStatus.HEALTHY:
                     overall_status = HealthStatus.DEGRADED
-    
+
     except Exception as e:
         logger.error(f"Health check error: {e}")
         overall_status = HealthStatus.UNHEALTHY
-    
+
     total_time = (time.time() - start_time) * 1000  # Convert to milliseconds
-    
+
     response_data = {
         "status": overall_status,
         "timestamp": datetime.utcnow().isoformat(),
@@ -145,11 +154,13 @@ async def detailed_health_check(db: Session = Depends(get_db)):
             for check in checks
         ]
     }
-    
+
     status_code = 200 if overall_status != HealthStatus.UNHEALTHY else 503
     return JSONResponse(content=response_data, status_code=status_code)
 
 # Dependencies health check
+
+
 @router.get("/dependencies")
 async def dependencies_health_check():
     """
@@ -157,17 +168,17 @@ async def dependencies_health_check():
     """
     checks = []
     overall_status = HealthStatus.HEALTHY
-    
+
     # Check external services
     external_health = await check_external_services()
     checks.append(external_health)
-    
+
     if external_health.status != HealthStatus.HEALTHY:
         if external_health.status == HealthStatus.UNHEALTHY:
             overall_status = HealthStatus.UNHEALTHY
         elif overall_status == HealthStatus.HEALTHY:
             overall_status = HealthStatus.DEGRADED
-    
+
     response_data = {
         "status": overall_status,
         "timestamp": datetime.utcnow().isoformat(),
@@ -182,11 +193,13 @@ async def dependencies_health_check():
             for check in checks
         ]
     }
-    
+
     status_code = 200 if overall_status != HealthStatus.UNHEALTHY else 503
     return JSONResponse(content=response_data, status_code=status_code)
 
 # WebSocket health check
+
+
 @router.get("/websockets")
 async def websocket_health_check():
     """
@@ -194,7 +207,7 @@ async def websocket_health_check():
     """
     # This would integrate with your WebSocket manager
     # For now, return a basic health status
-    
+
     websocket_health = ComponentHealth(
         name="websockets",
         status=HealthStatus.HEALTHY,
@@ -206,7 +219,7 @@ async def websocket_health_check():
             "average_connection_duration": 0
         }
     )
-    
+
     return {
         "status": websocket_health.status,
         "timestamp": websocket_health.timestamp,
@@ -214,6 +227,8 @@ async def websocket_health_check():
     }
 
 # API endpoints health check
+
+
 @router.get("/api-endpoints")
 async def api_endpoints_health_check():
     """
@@ -225,17 +240,17 @@ async def api_endpoints_health_check():
         "/api/v1/orders",
         "/api/v1/cart"
     ]
-    
+
     checks = []
     overall_status = HealthStatus.HEALTHY
-    
+
     for endpoint in endpoints_to_check:
         try:
             start_time = time.time()
             # This would make internal requests to check endpoints
             # For now, simulate the check
             response_time = (time.time() - start_time) * 1000
-            
+
             endpoint_health = ComponentHealth(
                 name=f"endpoint_{endpoint.replace('/', '_')}",
                 status=HealthStatus.HEALTHY,
@@ -243,7 +258,7 @@ async def api_endpoints_health_check():
                 details={"endpoint": endpoint}
             )
             checks.append(endpoint_health)
-            
+
         except Exception as e:
             endpoint_health = ComponentHealth(
                 name=f"endpoint_{endpoint.replace('/', '_')}",
@@ -253,7 +268,7 @@ async def api_endpoints_health_check():
             )
             checks.append(endpoint_health)
             overall_status = HealthStatus.UNHEALTHY
-    
+
     return {
         "status": overall_status,
         "timestamp": datetime.utcnow().isoformat(),
@@ -270,6 +285,8 @@ async def api_endpoints_health_check():
     }
 
 # Performance metrics endpoint
+
+
 @router.get("/metrics")
 async def performance_metrics(
     current_user: User = Depends(get_current_user),
@@ -283,36 +300,38 @@ async def performance_metrics(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions"
         )
-    
+
     metrics = await get_performance_metrics(db)
-    
+
     return {
         "timestamp": datetime.utcnow().isoformat(),
         "metrics": metrics
     }
 
 # Health check helper functions
+
+
 async def check_database_health(db: Session) -> ComponentHealth:
     """Check database connectivity and performance"""
     start_time = time.time()
-    
+
     try:
         # Test basic connectivity
         result = db.execute(text("SELECT 1"))
         result.fetchone()
-        
+
         # Test a more complex query
         user_count = db.execute(text("SELECT COUNT(*) FROM users")).scalar()
-        
+
         response_time = (time.time() - start_time) * 1000
-        
+
         # Check if response time is acceptable
         status = HealthStatus.HEALTHY
         if response_time > 1000:  # 1 second
             status = HealthStatus.DEGRADED
         elif response_time > 5000:  # 5 seconds
             status = HealthStatus.UNHEALTHY
-        
+
         return ComponentHealth(
             name="database",
             status=status,
@@ -323,7 +342,7 @@ async def check_database_health(db: Session) -> ComponentHealth:
                 "user_count": user_count
             }
         )
-        
+
     except Exception as e:
         response_time = (time.time() - start_time) * 1000
         return ComponentHealth(
@@ -333,27 +352,28 @@ async def check_database_health(db: Session) -> ComponentHealth:
             error=str(e)
         )
 
+
 async def check_system_resources() -> ComponentHealth:
     """Check system resource usage"""
     try:
         # CPU usage
         cpu_percent = psutil.cpu_percent(interval=1)
-        
+
         # Memory usage
         memory = psutil.virtual_memory()
         memory_percent = memory.percent
-        
+
         # Disk usage
         disk = psutil.disk_usage('/')
         disk_percent = disk.percent
-        
+
         # Determine status based on resource usage
         status = HealthStatus.HEALTHY
         if cpu_percent > 80 or memory_percent > 80 or disk_percent > 80:
             status = HealthStatus.DEGRADED
         elif cpu_percent > 95 or memory_percent > 95 or disk_percent > 95:
             status = HealthStatus.UNHEALTHY
-        
+
         return ComponentHealth(
             name="system_resources",
             status=status,
@@ -366,7 +386,7 @@ async def check_system_resources() -> ComponentHealth:
                 "load_average": list(psutil.getloadavg()) if hasattr(psutil, 'getloadavg') else None
             }
         )
-        
+
     except Exception as e:
         return ComponentHealth(
             name="system_resources",
@@ -374,26 +394,27 @@ async def check_system_resources() -> ComponentHealth:
             error=str(e)
         )
 
+
 async def check_external_services() -> ComponentHealth:
     """Check external service dependencies"""
     services_to_check = [
         {"name": "stripe", "url": "https://api.stripe.com/v1/charges", "timeout": 5},
         # Add other external services here
     ]
-    
+
     service_results = []
     overall_status = HealthStatus.HEALTHY
-    
+
     async with aiohttp.ClientSession() as session:
         for service in services_to_check:
             try:
                 start_time = time.time()
                 async with session.get(
-                    service["url"], 
+                    service["url"],
                     timeout=aiohttp.ClientTimeout(total=service["timeout"])
                 ) as response:
                     response_time = (time.time() - start_time) * 1000
-                    
+
                     status = HealthStatus.HEALTHY
                     if response.status >= 500:
                         status = HealthStatus.UNHEALTHY
@@ -402,14 +423,14 @@ async def check_external_services() -> ComponentHealth:
                         status = HealthStatus.DEGRADED
                         if overall_status == HealthStatus.HEALTHY:
                             overall_status = HealthStatus.DEGRADED
-                    
+
                     service_results.append({
                         "name": service["name"],
                         "status": status,
                         "response_time": response_time,
                         "http_status": response.status
                     })
-                    
+
             except asyncio.TimeoutError:
                 service_results.append({
                     "name": service["name"],
@@ -417,7 +438,7 @@ async def check_external_services() -> ComponentHealth:
                     "error": "Timeout"
                 })
                 overall_status = HealthStatus.UNHEALTHY
-                
+
             except Exception as e:
                 service_results.append({
                     "name": service["name"],
@@ -425,12 +446,13 @@ async def check_external_services() -> ComponentHealth:
                     "error": str(e)
                 })
                 overall_status = HealthStatus.UNHEALTHY
-    
+
     return ComponentHealth(
         name="external_services",
         status=overall_status,
         details={"services": service_results}
     )
+
 
 async def check_application_metrics(db: Session) -> ComponentHealth:
     """Check application-specific metrics"""
@@ -445,19 +467,20 @@ async def check_application_metrics(db: Session) -> ComponentHealth:
             )).scalar(),
             "active_sessions": 0,  # Would get from session store
         }
-        
+
         return ComponentHealth(
             name="application_metrics",
             status=HealthStatus.HEALTHY,
             details=metrics
         )
-        
+
     except Exception as e:
         return ComponentHealth(
             name="application_metrics",
             status=HealthStatus.UNHEALTHY,
             error=str(e)
         )
+
 
 async def get_performance_metrics(db: Session) -> Dict[str, Any]:
     """Get detailed performance metrics"""
@@ -491,6 +514,7 @@ async def get_performance_metrics(db: Session) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error getting performance metrics: {e}")
         return {"error": str(e)}
+
 
 def get_uptime() -> float:
     """Get application uptime in seconds"""

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional, List
+from typing import Optional
 from uuid import UUID
 from core.database import get_db
 from core.utils.response import Response
@@ -14,10 +14,12 @@ from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     return await AuthService.get_current_user(token, db)
 
 router = APIRouter(prefix="/api/v1/reviews", tags=["Reviews"])
+
 
 @router.post("/")
 async def create_review(
@@ -37,6 +39,7 @@ async def create_review(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to create review: {str(e)}"
         )
+
 
 @router.get("/{review_id}")
 async def get_review(
@@ -61,6 +64,7 @@ async def get_review(
             message=f"Failed to fetch review: {str(e)}"
         )
 
+
 @router.get("/product/{product_id}")
 async def get_reviews_for_product(
     product_id: UUID,
@@ -68,7 +72,8 @@ async def get_reviews_for_product(
     limit: int = Query(10, ge=1, le=100),
     min_rating: Optional[int] = Query(None, ge=1, le=5),
     max_rating: Optional[int] = Query(None, ge=1, le=5),
-    sort_by: Optional[str] = Query(None, regex="^(created_at|rating)_(asc|desc)$"),
+    sort_by: Optional[str] = Query(
+        None, regex="^(created_at|rating)_(asc|desc)$"),
     db: AsyncSession = Depends(get_db)
 ):
     """Get all reviews for a specific product with optional filtering and sorting."""
@@ -83,6 +88,7 @@ async def get_reviews_for_product(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch reviews for product: {str(e)}"
         )
+
 
 @router.put("/{review_id}")
 async def update_review(
@@ -103,6 +109,7 @@ async def update_review(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to update review: {str(e)}"
         )
+
 
 @router.delete("/{review_id}")
 async def delete_review(

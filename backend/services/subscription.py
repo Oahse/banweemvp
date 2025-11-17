@@ -12,6 +12,7 @@ from core.config import settings
 from uuid import uuid4, UUID
 from datetime import datetime
 
+
 class SubscriptionService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -29,8 +30,10 @@ class SubscriptionService:
 
     async def get_user_subscriptions(self, user_id: UUID, page: int = 1, limit: int = 10) -> dict:
         offset = (page - 1) * limit
-        query = select(Subscription).filter(Subscription.user_id == user_id).order_by(desc(Subscription.created_at))
-        total_query = select(func.count()).select_from(Subscription).filter(Subscription.user_id == user_id)
+        query = select(Subscription).filter(Subscription.user_id ==
+                                            user_id).order_by(desc(Subscription.created_at))
+        total_query = select(func.count()).select_from(
+            Subscription).filter(Subscription.user_id == user_id)
 
         total_subscriptions = (await self.db.execute(total_query)).scalar_one()
         subscriptions = (await self.db.execute(query.offset(offset).limit(limit))).scalars().all()
@@ -49,8 +52,9 @@ class SubscriptionService:
     async def update_subscription(self, subscription_id: UUID, subscription_data: SubscriptionUpdate, user_id: UUID, background_tasks: BackgroundTasks) -> Subscription:
         subscription = await self.get_subscription_by_id(subscription_id, user_id)
         if not subscription:
-            raise APIException(status_code=404, detail="Subscription not found")
-        
+            raise APIException(
+                status_code=404, message="Subscription not found")
+
         old_plan_id = subscription.plan_id
 
         for key, value in subscription_data.dict(exclude_unset=True).items():
@@ -58,7 +62,8 @@ class SubscriptionService:
         await self.db.commit()
         await self.db.refresh(subscription)
 
-        background_tasks.add_task(self.send_subscription_update_email, subscription, old_plan_id)
+        background_tasks.add_task(
+            self.send_subscription_update_email, subscription, old_plan_id)
 
         return subscription
 
@@ -77,7 +82,7 @@ class SubscriptionService:
             "old_plan_name": old_plan_id,
             "subscription_status": subscription.status,
             "next_billing_date": subscription.end_date.strftime("%B %d, %Y") if subscription.end_date else "N/A",
-            "next_billing_amount": "N/A", # Price not available in model
+            "next_billing_amount": "N/A",  # Price not available in model
             "manage_subscription_url": f"{settings.FRONTEND_URL}/account/subscriptions",
             "company_name": "Banwee",
         }
@@ -88,14 +93,17 @@ class SubscriptionService:
                 mail_type='subscription_update',
                 context=context
             )
-            print(f"Subscription update email sent to {user.email} successfully.")
+            print(
+                f"Subscription update email sent to {user.email} successfully.")
         except Exception as e:
-            print(f"Failed to send subscription update email to {user.email}. Error: {e}")
+            print(
+                f"Failed to send subscription update email to {user.email}. Error: {e}")
 
     async def delete_subscription(self, subscription_id: UUID, user_id: UUID):
         subscription = await self.get_subscription_by_id(subscription_id, user_id)
         if not subscription:
-            raise APIException(status_code=404, detail="Subscription not found")
-        
+            raise APIException(
+                status_code=404, message="Subscription not found")
+
         await self.db.delete(subscription)
         await self.db.commit()

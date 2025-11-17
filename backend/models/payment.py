@@ -1,14 +1,16 @@
 from sqlalchemy import Column, String, Boolean, ForeignKey, Text, Integer
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, selectinload
-from core.database import BaseModel, CHAR_LENGTH
+from sqlalchemy.orm import relationship
+from core.database import BaseModel
 
 
 class PaymentMethod(BaseModel):
     __tablename__ = "payment_methods"
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    type = Column(String(50), nullable=False)  # card, bank_account, mobile_money
+    user_id = Column(UUID(as_uuid=True), ForeignKey(
+        "users.id"), nullable=False)
+    # card, bank_account, mobile_money
+    type = Column(String(50), nullable=False)
     provider = Column(String(50), nullable=False)  # stripe, paypal, momo
     last_four = Column(String(4), nullable=True)
     expiry_month = Column(Integer, nullable=True)

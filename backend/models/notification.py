@@ -9,8 +9,10 @@ class Notification(BaseModel):
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
     message = Column(Text, nullable=False)
     read = Column(Boolean, default=False)
-    type = Column(String(CHAR_LENGTH), default="info") # e.g., 'info', 'warning', 'error', 'success'
-    related_id = Column(String(CHAR_LENGTH), nullable=True) # e.g., order_id, product_id
+    # e.g., 'info', 'warning', 'error', 'success'
+    type = Column(String(CHAR_LENGTH), default="info")
+    # e.g., order_id, product_id
+    related_id = Column(String(CHAR_LENGTH), nullable=True)
 
     user = relationship("User", back_populates="notifications")
 

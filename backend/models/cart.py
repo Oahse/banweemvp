@@ -1,19 +1,22 @@
 from sqlalchemy import Column, String, Boolean, ForeignKey, Float, Integer
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, selectinload
+from sqlalchemy.orm import relationship
 from core.database import BaseModel
 
 
 class Cart(BaseModel):
     __tablename__ = "carts"
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey(
+        "users.id"), nullable=False)
     session_id = Column(String(255), nullable=True)  # For guest carts
-    promocode_id = Column(UUID(as_uuid=True), ForeignKey("promocodes.id"), nullable=True)
+    promocode_id = Column(UUID(as_uuid=True), ForeignKey(
+        "promocodes.id"), nullable=True)
     discount_amount = Column(Float, default=0.0)
 
     # Relationships
-    items = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan", lazy="selectin")
+    items = relationship("CartItem", back_populates="cart",
+                         cascade="all, delete-orphan", lazy="selectin")
     promocode = relationship("Promocode", foreign_keys=[promocode_id])
 
     def get_item(self, variant_id):
@@ -55,7 +58,7 @@ class Cart(BaseModel):
                     "issue": "insufficient_stock",
                     "message": f"Only {item.variant.stock} items available"
                 })
-        
+
         return {
             "valid": len(issues) == 0,
             "issues": issues
@@ -77,8 +80,10 @@ class Cart(BaseModel):
 class CartItem(BaseModel):
     __tablename__ = "cart_items"
 
-    cart_id = Column(UUID(as_uuid=True), ForeignKey("carts.id"), nullable=False)
-    variant_id = Column(UUID(as_uuid=True), ForeignKey("product_variants.id"), nullable=False)
+    cart_id = Column(UUID(as_uuid=True), ForeignKey(
+        "carts.id"), nullable=False)
+    variant_id = Column(UUID(as_uuid=True), ForeignKey(
+        "product_variants.id"), nullable=False)
     quantity = Column(Integer, nullable=False, default=1)
     price_per_unit = Column(Float, nullable=False)
     total_price = Column(Float, nullable=False)

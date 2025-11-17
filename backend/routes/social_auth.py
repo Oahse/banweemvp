@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import httpx
 
-import schemas, services
+import schemas
+import services
 from core.database import get_db
 from core.config import settings
 
@@ -16,7 +17,8 @@ async def facebook_callback(code: str, db: Session = Depends(get_db)):
     params = {
         "client_id": settings.FACEBOOK_APP_ID,
         "client_secret": settings.FACEBOOK_APP_SECRET,
-        "redirect_uri": "http://localhost:5173/auth/facebook/callback", # This should match the redirect_uri in your Facebook App settings
+        # This should match the redirect_uri in your Facebook App settings
+        "redirect_uri": "http://localhost:5173/auth/facebook/callback",
         "code": code,
     }
     async with httpx.AsyncClient() as client:
@@ -54,7 +56,8 @@ async def tiktok_callback(code: str, db: Session = Depends(get_db)):
         "client_secret": settings.TIKTOK_CLIENT_SECRET,
         "code": code,
         "grant_type": "authorization_code",
-        "redirect_uri": "http://localhost:5173/auth/tiktok/callback", # This should match the redirect_uri in your TikTok App settings
+        # This should match the redirect_uri in your TikTok App settings
+        "redirect_uri": "http://localhost:5173/auth/tiktok/callback",
     }
     async with httpx.AsyncClient() as client:
         response = await client.post(token_url, headers=headers, data=data)

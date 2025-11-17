@@ -14,15 +14,17 @@ import httpx
 from core.config import settings
 from core.utils.encryption import PasswordManager
 
+
 class UserService:
     def __init__(self, db: AsyncSession):
         self.db = db
         self.password_manager = PasswordManager()
 
     async def create_user(self, user_data: UserCreate, background_tasks: BackgroundTasks) -> User:
-        hashed_password = self.password_manager.hash_password(user_data.password)
+        hashed_password = self.password_manager.hash_password(
+            user_data.password)
         verification_token = secrets.token_urlsafe(32)
-        token_expiration = datetime.now() + timedelta(hours=24) # Token valid for 24 hours
+        token_expiration = datetime.now() + timedelta(hours=24)  # Token valid for 24 hours
 
         new_user = User(
             id=uuid4(),
@@ -40,7 +42,8 @@ class UserService:
         await self.db.refresh(new_user)
 
         # Send verification email in the background
-        background_tasks.add_task(self.send_verification_email, new_user, verification_token)
+        background_tasks.add_task(
+            self.send_verification_email, new_user, verification_token)
 
         return new_user
 
@@ -51,7 +54,7 @@ class UserService:
             return
 
         verification_link = f"{settings.FRONTEND_URL}/verify-email?token={token}"
-        
+
         context = {
             "customer_name": user.firstname,
             "verification_link": verification_link,
@@ -59,7 +62,7 @@ class UserService:
             "expiry_time": "24 hours",
             "current_year": datetime.now().year,
         }
-        
+
         try:
             await send_email(
                 to_email=user.email,
@@ -68,7 +71,8 @@ class UserService:
             )
             print(f"Verification email sent to {user.email} successfully.")
         except Exception as e:
-            print(f"Failed to send verification email to {user.email}. Error: {e}")
+            print(
+                f"Failed to send verification email to {user.email}. Error: {e}")
 
     async def verify_email(self, token: str, background_tasks: BackgroundTasks):
         """Verify user email with token and send welcome email."""
@@ -80,7 +84,7 @@ class UserService:
         if not user or user.token_expiration < datetime.now():
             raise APIException(
                 status_code=400,
-                detail="Invalid or expired verification token",
+                message="Invalid or expired verification token",
             )
 
         user.verified = True
@@ -106,6 +110,8 @@ class UserService:
             print(f"Welcome email sent to {user.email} successfully.")
         except Exception as e:
             print(f"Failed to send welcome email to {user.email}. Error: {e}")
+
+
 class AddressService:
     """Service layer for managing user addresses."""
 
@@ -161,10 +167,11 @@ class AddressService:
     async def update_address(self, address_id: UUID, user_id: UUID, **kwargs) -> Optional[Address]:
         """Update address fields dynamically."""
         query = update(Address)
-        query = query.where(and_(Address.id == address_id, Address.user_id == user_id))
+        query = query.where(and_(Address.id == address_id,
+                            Address.user_id == user_id))
         query = query.values(**kwargs)
         query = query.execution_options(synchronize_session="fetch")
-        
+
         await self.db.execute(query)
         await self.db.commit()
         return await self.get_address(address_id)
@@ -204,16 +211,17 @@ class AddressService:
     async def get_users(self, page: int = 1, limit: int = 10) -> dict:
         """Get paginated list of users"""
         offset = (page - 1) * limit
-        
+
         # Get total count
         count_result = await self.db.execute(select(User))
         total = len(count_result.scalars().all())
-        
+
         # Get paginated results
-        query = select(User).offset(offset).limit(limit).order_by(User.created_at.desc())
+        query = select(User).offset(offset).limit(
+            limit).order_by(User.created_at.desc())
         result = await self.db.execute(query)
         users = result.scalars().all()
-        
+
         return {
             "users": users,
             "pagination": {
@@ -237,15 +245,15 @@ class AddressService:
         query = select(User).where(User.id == user_id)
         result = await self.db.execute(query)
         user = result.scalar_one_or_none()
-        
+
         if not user:
             return None
-        
+
         # Update fields
         for field, value in user_data.model_dump(exclude_unset=True).items():
             if hasattr(user, field):
                 setattr(user, field, value)
-        
+
         await self.db.commit()
         await self.db.refresh(user)
         return user
@@ -255,10 +263,10 @@ class AddressService:
         query = select(User).where(User.id == user_id)
         result = await self.db.execute(query)
         user = result.scalar_one_or_none()
-        
+
         if not user:
             return False
-        
+
         await self.db.delete(user)
         await self.db.commit()
         return True

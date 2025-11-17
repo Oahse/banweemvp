@@ -11,18 +11,21 @@ from core.config import settings
 from models.user import User
 from schemas.auth import UserCreate, Token, UserResponse, AuthResponse
 from services.user import UserService
-from services.notification import NotificationService # Added NotificationService import
+# Added NotificationService import
+from services.notification import NotificationService
 from core.database import get_db
 from core.utils.messages.email import send_email
 from core.utils.encryption import PasswordManager
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 class AuthService:
     def __init__(self, db: AsyncSession):
         self.db = db
         self.password_manager = PasswordManager()
-        self.notification_service = NotificationService(db) # Initialize NotificationService
+        self.notification_service = NotificationService(
+            db)  # Initialize NotificationService
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash."""
@@ -40,7 +43,8 @@ class AuthService:
         else:
             expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        encoded_jwt = jwt.encode(
+            to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
         return encoded_jwt
 
     def create_refresh_token(self, data: dict, expires_delta: Optional[timedelta] = None):
@@ -51,7 +55,8 @@ class AuthService:
         else:
             expire = datetime.utcnow() + timedelta(days=7)  # Refresh tokens last 7 days
         to_encode.update({"exp": expire, "type": "refresh"})
-        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        encoded_jwt = jwt.encode(
+            to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
         return encoded_jwt
 
     async def get_user_by_email(self, email: str) -> Optional[User]:
@@ -61,9 +66,10 @@ class AuthService:
 
     async def _send_verification_email(self, email: str, verification_code: str):
         """Placeholder for sending a verification email."""
-        print(f"Sending verification email to {email} with code {verification_code}")
+        print(
+            f"Sending verification email to {email} with code {verification_code}")
         # In a real application, integrate with an email service here
-        
+
     async def _send_welcome_sms(self, phone_number: str):
         """Placeholder for sending a welcome SMS."""
         print(f"Sending welcome SMS to {phone_number}")
@@ -80,9 +86,9 @@ class AuthService:
             )
 
         user_service = UserService(self.db)
-        print(user_data,'---')
+        print(user_data, '---')
         new_user = await user_service.create_user(user_data, background_tasks)
-    
+
         # --- Send Notification to Admin for New User Registration ---
         admin_user_query = select(User.id).where(User.role == "Admin")
         admin_user_id = (await self.db.execute(admin_user_query)).scalar_one_or_none()
@@ -109,8 +115,9 @@ class AuthService:
                 detail="Incorrect email or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        
-        password_verified = self.verify_password(password, user.hashed_password)
+
+        password_verified = self.verify_password(
+            password, user.hashed_password)
         print(f"Password verification for {email}: {password_verified}")
 
         if not password_verified:
@@ -119,7 +126,7 @@ class AuthService:
                 detail="Incorrect email or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        
+
         # Update last_login timestamp
         user.last_login = func.now()
         self.db.add(user)
@@ -144,16 +151,18 @@ class AuthService:
             )
             print(f"Login alert email task added for {user.email}.")
         except Exception as e:
-            print(f"Failed to add login alert email task for {user.email}. Error: {e}")
+            print(
+                f"Failed to add login alert email task for {user.email}. Error: {e}")
 
-        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token_expires = timedelta(
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         print(f"Access token expires in: {access_token_expires}")
         access_token = self.create_access_token(
             data={"sub": user.email}, expires_delta=access_token_expires
         )
         refresh_token = self.create_refresh_token(data={"sub": user.email})
         print(f"Generated access token: {access_token}")
-        
+
         auth_response = AuthResponse(
             access_token=access_token,
             token_type="bearer",
@@ -175,15 +184,16 @@ class AuthService:
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-        
+
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            payload = jwt.decode(token, settings.SECRET_KEY,
+                                 algorithms=[settings.ALGORITHM])
             email: str = payload.get("sub")
             if email is None:
                 raise credentials_exception
         except JWTError:
             raise credentials_exception
-        
+
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
         if user is None:
@@ -196,20 +206,20 @@ class AuthService:
         if not user:
             # Don't reveal if email exists for security
             return
-        
+
         # Generate reset token
         reset_token = self.create_access_token(
             data={"sub": user.email, "type": "password_reset"},
             expires_delta=timedelta(hours=1)  # Reset tokens expire in 1 hour
         )
-        
+
         # Send reset email
         context = {
             "customer_name": user.firstname,
             "reset_link": f"{settings.FRONTEND_URL}/reset-password?token={reset_token}",
             "company_name": "Banwee",
         }
-        
+
         try:
             background_tasks.add_task(
                 send_email,
@@ -223,10 +233,11 @@ class AuthService:
     async def reset_password(self, token: str, new_password: str):
         """Reset password using reset token."""
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            payload = jwt.decode(token, settings.SECRET_KEY,
+                                 algorithms=[settings.ALGORITHM])
             email: str = payload.get("sub")
             token_type: str = payload.get("type")
-            
+
             if email is None or token_type != "password_reset":
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -237,7 +248,7 @@ class AuthService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid or expired reset token"
             )
-        
+
         # Get user and update password
         user = await self.get_user_by_email(email)
         if not user:
@@ -245,7 +256,7 @@ class AuthService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="User not found"
             )
-        
+
         # Update password
         user_service = UserService(self.db)
         hashed_password = self.get_password_hash(new_password)

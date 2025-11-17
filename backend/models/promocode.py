@@ -1,6 +1,5 @@
 from sqlalchemy import Column, String, Boolean, DateTime, Float, Text, Integer
-from sqlalchemy.dialects.postgresql import UUID
-from core.database import BaseModel, CHAR_LENGTH
+from core.database import BaseModel
 
 
 class Promocode(BaseModel):

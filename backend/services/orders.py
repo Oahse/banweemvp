@@ -17,9 +17,11 @@ from services.cart import CartService
 from services.user import AddressService
 from services.shipping import ShippingService
 from services.payment import PaymentService
-from services.notification import NotificationService # Added NotificationService import
+# Added NotificationService import
+from services.notification import NotificationService
 from core.utils.messages.email import send_email
 from core.config import settings
+
 
 class OrderService:
     def __init__(self, db: AsyncSession):
@@ -28,44 +30,52 @@ class OrderService:
         self.address_service = AddressService(db)
         self.shipping_service = ShippingService(db)
         self.payment_service = PaymentService(db)
-        self.notification_service = NotificationService(db) # Initialize NotificationService
+        self.notification_service = NotificationService(
+            db)  # Initialize NotificationService
 
     async def place_order(self, user_id: UUID, checkout_request: CheckoutRequest, background_tasks: BackgroundTasks) -> OrderResponse:
         # 1. Get and validate cart
         cart = await self.cart_service.get_or_create_cart(user_id)
         if not cart.items:
-            raise APIException(status_code=400, detail="Cart is empty")
+            raise APIException(status_code=400, message="Cart is empty")
 
         # Validate stock for all items in cart
         for item in cart.items:
-            if item.saved_for_later: # Skip saved for later items
+            if item.saved_for_later:  # Skip saved for later items
                 continue
             variant = (await self.db.execute(
-                select(ProductVariant).where(ProductVariant.id == item.variant_id)
+                select(ProductVariant).where(
+                    ProductVariant.id == item.variant_id)
             )).scalar_one_or_none()
             if not variant or variant.stock < item.quantity:
-                raise APIException(status_code=400, detail=f"Insufficient stock for {variant.name if variant else 'unknown product'}. Available: {variant.stock if variant else 0}")
+                raise APIException(
+                    status_code=400, message=f"Insufficient stock for {variant.name if variant else 'unknown product'}. Available: {variant.stock if variant else 0}")
 
         # 2. Get and validate shipping address, method, and payment method
         shipping_address = await self.address_service.get_address(checkout_request.shipping_address_id)
         if not shipping_address or shipping_address.user_id != user_id:
-            raise APIException(status_code=404, detail="Shipping address not found or does not belong to user")
+            raise APIException(
+                status_code=404, message="Shipping address not found or does not belong to user")
 
         shipping_method = await self.shipping_service.get_shipping_method_by_id(checkout_request.shipping_method_id)
         if not shipping_method or not shipping_method.is_active:
-            raise APIException(status_code=404, detail="Shipping method not found or inactive")
+            raise APIException(
+                status_code=404, message="Shipping method not found or inactive")
 
         payment_method = await self.payment_service.get_payment_methods(user_id)
-        payment_method = next((pm for pm in payment_method if pm.id == checkout_request.payment_method_id), None)
+        payment_method = next(
+            (pm for pm in payment_method if pm.id == checkout_request.payment_method_id), None)
         if not payment_method:
-            raise APIException(status_code=404, detail="Payment method not found or does not belong to user")
+            raise APIException(
+                status_code=404, message="Payment method not found or does not belong to user")
 
         # 3. Calculate final totals
         base_shipping_cost = await self.shipping_service.calculate_shipping_cost(
             cart.subtotal(), {}, checkout_request.shipping_method_id
         )
-        
-        final_total_amount = cart.subtotal() + cart.tax_amount() + base_shipping_cost - cart.discount_amount
+
+        final_total_amount = cart.subtotal() + cart.tax_amount() + \
+            base_shipping_cost - cart.discount_amount
 
         # Create Order record before payment attempt
         new_order = Order(
@@ -79,7 +89,7 @@ class OrderService:
             notes=checkout_request.notes
         )
         self.db.add(new_order)
-        await self.db.flush() # Flush to get the new_order.id
+        await self.db.flush()  # Flush to get the new_order.id
 
         # 4. Process payment
         try:
@@ -96,7 +106,8 @@ class OrderService:
 
         except Exception as e:
             await self.db.rollback()
-            raise APIException(status_code=400, detail=f"Payment failed: {str(e)}")
+            raise APIException(
+                status_code=400, message=f"Payment failed: {str(e)}")
 
         # 6. Create Order Items and update product stock
         for item in cart.items:
@@ -112,7 +123,8 @@ class OrderService:
             self.db.add(order_item)
 
             variant = (await self.db.execute(
-                select(ProductVariant).where(ProductVariant.id == item.variant_id)
+                select(ProductVariant).where(
+                    ProductVariant.id == item.variant_id)
             )).scalar_one()
             variant.stock -= item.quantity
             await self.db.execute(update(ProductVariant).where(ProductVariant.id == variant.id).values(stock=variant.stock))
@@ -124,9 +136,10 @@ class OrderService:
         await self.db.refresh(new_order)
 
         # Send order confirmation email in the background
-        background_tasks.add_task(self.send_order_confirmation_email, new_order)
+        background_tasks.add_task(
+            self.send_order_confirmation_email, new_order)
 
-        # --- Send Notifications for New Order --- 
+        # --- Send Notifications for New Order ---
         # 1. Get Admin User ID
         admin_user_query = select(User.id).where(User.role == "Admin")
         admin_user_id = (await self.db.execute(admin_user_query)).scalar_one_or_none()
@@ -135,7 +148,8 @@ class OrderService:
         supplier_ids = set()
         for item in new_order.items:
             variant = (await self.db.execute(
-                select(ProductVariant).where(ProductVariant.id == item.variant_id)
+                select(ProductVariant).where(
+                    ProductVariant.id == item.variant_id)
             )).scalar_one_or_none()
             if variant and variant.product_id:
                 product = (await self.db.execute(
@@ -158,7 +172,8 @@ class OrderService:
 
         # To Suppliers
         for supplier_id in supplier_ids:
-            supplier_order_link = f"{settings.FRONTEND_URL}/supplier/orders/{new_order.id}" # Assuming a supplier order view
+            # Assuming a supplier order view
+            supplier_order_link = f"{settings.FRONTEND_URL}/supplier/orders/{new_order.id}"
             await self.notification_service.create_notification(
                 user_id=supplier_id,
                 message=f"New Order #{new_order.id} received for your product(s). Total: ${new_order.total_amount:.2f}. View details: {supplier_order_link}",
@@ -211,9 +226,11 @@ class OrderService:
                 mail_type='order_confirmation',
                 context=context
             )
-            print(f"Order confirmation email sent to {user.email} successfully.")
+            print(
+                f"Order confirmation email sent to {user.email} successfully.")
         except Exception as e:
-            print(f"Failed to send order confirmation email to {user.email}. Error: {e}")
+            print(
+                f"Failed to send order confirmation email to {user.email}. Error: {e}")
 
     async def update_order_shipping_info(self, order_id: str, tracking_number: str, carrier_name: str, background_tasks: BackgroundTasks) -> Order:
         """Updates an order with shipping information and sends a notification."""
@@ -222,7 +239,7 @@ class OrderService:
         order = result.scalar_one_or_none()
 
         if not order:
-            raise APIException(status_code=404, detail="Order not found")
+            raise APIException(status_code=404, message="Order not found")
 
         order.status = "shipped"
         order.tracking_number = tracking_number
@@ -232,7 +249,8 @@ class OrderService:
         await self.db.commit()
         await self.db.refresh(order)
 
-        background_tasks.add_task(self.send_shipping_update_email, order, carrier_name)
+        background_tasks.add_task(
+            self.send_shipping_update_email, order, carrier_name)
 
         return order
 
@@ -255,7 +273,8 @@ class OrderService:
                 "line1": shipping_address.street,
                 "city": shipping_address.city,
             } if shipping_address else {},
-            "tracking_url": f"https://www.google.com/search?q={carrier_name}+{order.tracking_number}", # Generic tracking URL
+            # Generic tracking URL
+            "tracking_url": f"https://www.google.com/search?q={carrier_name}+{order.tracking_number}",
             "company_name": "Banwee",
         }
 
@@ -267,8 +286,8 @@ class OrderService:
             )
             print(f"Shipping update email sent to {user.email} successfully.")
         except Exception as e:
-            print(f"Failed to send shipping update email to {user.email}. Error: {e}")
-
+            print(
+                f"Failed to send shipping update email to {user.email}. Error: {e}")
 
     async def create_order(self, order_data: OrderCreate, user_id: UUID) -> Order:
         """Create a new order from direct items (e.g., for admin or specific scenarios)."""
@@ -279,13 +298,16 @@ class OrderService:
             # Validate items and calculate total amount
             for item_data in order_data.items:
                 variant = (await self.db.execute(
-                    select(ProductVariant).where(ProductVariant.id == item_data.variant_id)
+                    select(ProductVariant).where(
+                        ProductVariant.id == item_data.variant_id)
                 )).scalar_one_or_none()
                 if not variant:
-                    raise APIException(status_code=404, detail=f"Product variant {item_data.variant_id} not found")
+                    raise APIException(
+                        status_code=404, message=f"Product variant {item_data.variant_id} not found")
                 if variant.stock < item_data.quantity:
-                    raise APIException(status_code=400, detail=f"Insufficient stock for {variant.name}. Available: {variant.stock}")
-                
+                    raise APIException(
+                        status_code=400, message=f"Insufficient stock for {variant.name}. Available: {variant.stock}")
+
                 price = variant.sale_price or variant.base_price
                 order_item = OrderItem(
                     variant_id=item_data.variant_id,
@@ -313,10 +335,11 @@ class OrderService:
             for order_item in order_items_to_add:
                 order_item.order_id = order.id
                 self.db.add(order_item)
-                
+
                 # Decrement stock
                 variant = (await self.db.execute(
-                    select(ProductVariant).where(ProductVariant.id == order_item.variant_id)
+                    select(ProductVariant).where(
+                        ProductVariant.id == order_item.variant_id)
                 )).scalar_one()
                 variant.stock -= order_item.quantity
                 await self.db.execute(update(ProductVariant).where(ProductVariant.id == variant.id).values(stock=variant.stock))
@@ -330,33 +353,35 @@ class OrderService:
             raise
         except Exception as e:
             await self.db.rollback()
-            raise APIException(status_code=500, detail=f"Failed to create order: {str(e)}")
+            raise APIException(
+                status_code=500, message=f"Failed to create order: {str(e)}")
 
     async def get_user_orders(self, user_id: UUID, page: int = 1, limit: int = 10, status_filter: Optional[str] = None) -> dict:
         """Get user's orders with pagination."""
         offset = (page - 1) * limit
-        
+
         query = select(Order).where(Order.user_id == user_id).options(
             selectinload(Order.items)
         )
-        
+
         if status_filter:
             query = query.where(Order.status == status_filter)
-        
-        query = query.order_by(Order.created_at.desc()).offset(offset).limit(limit)
-        
+
+        query = query.order_by(Order.created_at.desc()
+                               ).offset(offset).limit(limit)
+
         result = await self.db.execute(query)
         orders = result.scalars().all()
-        
+
         # Get total count
         count_query = select(Order).where(Order.user_id == user_id)
         if status_filter:
             count_query = count_query.where(Order.status == status_filter)
-        
+
         count_result = await self.db.execute(count_query)
         total = len(count_result.scalars().all())
-        print(orders,'ooooooooooo')
-        
+        print(orders, 'ooooooooooo')
+
         return {
             "data": [
                 {
@@ -376,15 +401,15 @@ class OrderService:
                     "updated_at": order.updated_at.isoformat() if order.updated_at else None,
 
                     "items": [
-                    {
-                        "id": str(item.id),
-                        "variant_id": str(item.variant_id),
-                        "quantity": item.quantity,
-                        "total_price": item.total_price,
-                        # add more order item fields as needed
-                    }
-                    for item in order.items
-            ] if order.items else [],
+                        {
+                            "id": str(item.id),
+                            "variant_id": str(item.variant_id),
+                            "quantity": item.quantity,
+                            "total_price": item.total_price,
+                            # add more order item fields as needed
+                        }
+                        for item in order.items
+                    ] if order.items else [],
 
 
                 }
@@ -403,13 +428,13 @@ class OrderService:
         query = select(Order).options(
             selectinload(Order.items)
         ).where(and_(Order.id == order_id, Order.user_id == user_id))
-        
+
         result = await self.db.execute(query)
         order = result.scalar_one_or_none()
-        
+
         if not order:
             return None
-        
+
         return {
             "id": str(order.id),
             "user_id": str(order.user_id),
@@ -443,19 +468,21 @@ class OrderService:
 
     async def cancel_order(self, order_id: UUID, user_id: UUID) -> dict:
         """Cancel an order."""
-        query = select(Order).where(and_(Order.id == order_id, Order.user_id == user_id))
+        query = select(Order).where(
+            and_(Order.id == order_id, Order.user_id == user_id))
         result = await self.db.execute(query)
         order = result.scalar_one_or_none()
-        
+
         if not order:
-            raise APIException(status_code=404, detail="Order not found")
-        
+            raise APIException(status_code=404, message="Order not found")
+
         if order.status not in ["pending", "confirmed"]:
-            raise APIException(status_code=400, detail="Order cannot be cancelled")
-        
+            raise APIException(
+                status_code=400, message="Order cannot be cancelled")
+
         order.status = "cancelled"
         await self.db.commit()
-        
+
         return {
             "id": str(order.id),
             "status": order.status,
@@ -469,10 +496,10 @@ class OrderService:
         ).where(and_(Order.id == order_id, Order.user_id == user_id))
         result = await self.db.execute(query)
         order = result.scalar_one_or_none()
-        
+
         if not order:
-            raise APIException(status_code=404, detail="Order not found")
-        
+            raise APIException(status_code=404, message="Order not found")
+
         tracking_events_data = []
         for event in order.tracking_events:
             tracking_events_data.append({
@@ -482,7 +509,7 @@ class OrderService:
                 "location": event.location,
                 "carrier": event.carrier
             })
-        
+
         # Sort events by timestamp if not already sorted by default relationship loading
         tracking_events_data.sort(key=lambda x: x["timestamp"])
 

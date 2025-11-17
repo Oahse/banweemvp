@@ -10,6 +10,7 @@ from uuid import uuid4, UUID
 from datetime import datetime
 from sqlalchemy.orm import selectinload
 
+
 class ReviewService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -18,14 +19,16 @@ class ReviewService:
         # Check if product exists
         product = await self.db.get(Product, review_data.product_id)
         if not product:
-            raise APIException(status_code=404, detail="Product not found")
+            raise APIException(status_code=404, message="Product not found")
 
         # Check if user has already reviewed this product
         existing_review = await self.db.execute(
-            select(Review).filter_by(product_id=review_data.product_id, user_id=user_id)
+            select(Review).filter_by(
+                product_id=review_data.product_id, user_id=user_id)
         )
         if existing_review.scalars().first():
-            raise APIException(status_code=400, detail="You have already reviewed this product")
+            raise APIException(
+                status_code=400, detail="You have already reviewed this product")
 
         new_review = Review(
             id=uuid4(),
@@ -43,8 +46,10 @@ class ReviewService:
 
     async def get_reviews_for_product(self, product_id: UUID, page: int = 1, limit: int = 10, min_rating: Optional[int] = None, max_rating: Optional[int] = None, sort_by: Optional[str] = None) -> dict:
         offset = (page - 1) * limit
-        query = select(Review).filter_by(product_id=product_id).options(selectinload(Review.user))
-        total_query = select(func.count()).select_from(Review).filter_by(product_id=product_id)
+        query = select(Review).filter_by(
+            product_id=product_id).options(selectinload(Review.user))
+        total_query = select(func.count()).select_from(
+            Review).filter_by(product_id=product_id)
 
         if min_rating is not None:
             query = query.filter(Review.rating >= min_rating)
@@ -79,10 +84,11 @@ class ReviewService:
     async def update_review(self, review_id: UUID, review_data: ReviewUpdate, user_id: UUID) -> Review:
         review = await self.get_review_by_id(review_id)
         if not review:
-            raise APIException(status_code=404, detail="Review not found")
-        
+            raise APIException(status_code=404, message="Review not found")
+
         if review.user_id != user_id:
-            raise APIException(status_code=403, detail="Not authorized to update this review")
+            raise APIException(
+                status_code=403, message="Not authorized to update this review")
 
         for key, value in review_data.dict(exclude_unset=True).items():
             setattr(review, key, value)
@@ -98,10 +104,11 @@ class ReviewService:
     async def delete_review(self, review_id: UUID, user_id: UUID):
         review = await self.get_review_by_id(review_id)
         if not review:
-            raise APIException(status_code=404, detail="Review not found")
-        
+            raise APIException(status_code=404, message="Review not found")
+
         if review.user_id != user_id:
-            raise APIException(status_code=403, detail="Not authorized to delete this review")
+            raise APIException(
+                status_code=403, message="Not authorized to delete this review")
 
         await self.db.delete(review)
         await self.db.commit()

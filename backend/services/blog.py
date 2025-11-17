@@ -9,6 +9,7 @@ from uuid import uuid4, UUID
 from datetime import datetime
 from sqlalchemy.orm import selectinload
 
+
 class BlogService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -35,7 +36,8 @@ class BlogService:
 
         if is_published is not None:
             query = query.filter(BlogPost.is_published == is_published)
-            total_query = total_query.filter(BlogPost.is_published == is_published)
+            total_query = total_query.filter(
+                BlogPost.is_published == is_published)
 
         if search:
             search_pattern = f"%{search}%"
@@ -67,10 +69,11 @@ class BlogService:
     async def update_blog_post(self, post_id: UUID, post_data: BlogPostUpdate, author_id: UUID) -> BlogPost:
         post = await self.get_blog_post_by_id(post_id)
         if not post:
-            raise APIException(status_code=404, detail="Blog post not found")
-        
+            raise APIException(status_code=404, message="Blog post not found")
+
         if post.author_id != author_id:
-            raise APIException(status_code=403, detail="Not authorized to update this post")
+            raise APIException(
+                status_code=403, message="Not authorized to update this post")
 
         for key, value in post_data.dict(exclude_unset=True).items():
             setattr(post, key, value)
@@ -82,10 +85,11 @@ class BlogService:
     async def delete_blog_post(self, post_id: UUID, author_id: UUID):
         post = await self.get_blog_post_by_id(post_id)
         if not post:
-            raise APIException(status_code=404, detail="Blog post not found")
-        
+            raise APIException(status_code=404, message="Blog post not found")
+
         if post.author_id != author_id:
-            raise APIException(status_code=403, detail="Not authorized to delete this post")
+            raise APIException(
+                status_code=403, message="Not authorized to delete this post")
 
         await self.db.delete(post)
         await self.db.commit()

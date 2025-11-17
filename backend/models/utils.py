@@ -2,33 +2,27 @@
 Utility functions for model operations and lazy loading
 """
 
-from typing import List, Optional, Type, TypeVar, Dict, Any
-from sqlalchemy.orm import Session, selectinload, joinedload
+from typing import List, Optional, TypeVar, Dict, Any
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from sqlalchemy.orm.strategy_options import Load
 
-from .user import User, Address
-from .product import Product, ProductVariant, ProductImage, Category
+from .user import User
+from .product import Product, ProductVariant
 from .cart import Cart, CartItem
-from .order import Order, OrderItem, TrackingEvent
-from .blog import BlogPost
-from .subscription import Subscription
+from .order import Order, OrderItem
 from .review import Review
-from .payment import PaymentMethod
-from .promocode import Promocode
-from .shipping import ShippingMethod
-from .transaction import Transaction
 from .wishlist import Wishlist, WishlistItem
 
 T = TypeVar('T')
 
+
 class ModelLoader:
     """Utility class for loading models with proper relationships"""
-    
+
     @staticmethod
     async def load_user_with_relations(
-        session: AsyncSession, 
+        session: AsyncSession,
         user_id: int,
         include_addresses: bool = False,
         include_orders: bool = False,
@@ -37,7 +31,7 @@ class ModelLoader:
     ) -> Optional[User]:
         """Load user with specified relationships"""
         query = select(User).where(User.id == user_id)
-        
+
         if include_addresses:
             query = query.options(selectinload(User.addresses))
         if include_orders:
@@ -46,10 +40,10 @@ class ModelLoader:
             query = query.options(selectinload(User.wishlists))
         if include_payment_methods:
             query = query.options(selectinload(User.payment_methods))
-            
+
         result = await session.execute(query)
         return result.scalar_one_or_none()
-    
+
     @staticmethod
     async def load_product_with_relations(
         session: AsyncSession,
@@ -62,7 +56,7 @@ class ModelLoader:
     ) -> Optional[Product]:
         """Load product with specified relationships"""
         query = select(Product).where(Product.id == product_id)
-        
+
         if include_category:
             query = query.options(selectinload(Product.category))
         if include_supplier:
@@ -70,7 +64,8 @@ class ModelLoader:
         if include_variants:
             if include_images:
                 query = query.options(
-                    selectinload(Product.variants).selectinload(ProductVariant.images)
+                    selectinload(Product.variants).selectinload(
+                        ProductVariant.images)
                 )
             else:
                 query = query.options(selectinload(Product.variants))
@@ -78,10 +73,10 @@ class ModelLoader:
             query = query.options(
                 selectinload(Product.reviews).selectinload(Review.user)
             )
-            
+
         result = await session.execute(query)
         return result.scalar_one_or_none()
-    
+
     @staticmethod
     async def load_products_with_relations(
         session: AsyncSession,
@@ -95,27 +90,28 @@ class ModelLoader:
     ) -> List[Product]:
         """Load multiple products with relationships"""
         query = select(Product).where(Product.is_active == True)
-        
+
         if category_id:
             query = query.where(Product.category_id == category_id)
         if featured_only:
             query = query.where(Product.featured == True)
-            
+
         if include_category:
             query = query.options(selectinload(Product.category))
-            
+
         if include_variants:
             if include_primary_image:
                 query = query.options(
-                    selectinload(Product.variants).selectinload(ProductVariant.images)
+                    selectinload(Product.variants).selectinload(
+                        ProductVariant.images)
                 )
             else:
                 query = query.options(selectinload(Product.variants))
-        
+
         query = query.limit(limit).offset(offset)
         result = await session.execute(query)
         return result.scalars().all()
-    
+
     @staticmethod
     async def load_cart_with_items(
         session: AsyncSession,
@@ -123,13 +119,15 @@ class ModelLoader:
     ) -> Optional[Cart]:
         """Load cart with items and variant details"""
         query = select(Cart).where(Cart.user_id == user_id).options(
-            selectinload(Cart.items).selectinload(CartItem.variant).selectinload(ProductVariant.product),
-            selectinload(Cart.items).selectinload(CartItem.variant).selectinload(ProductVariant.images)
+            selectinload(Cart.items).selectinload(
+                CartItem.variant).selectinload(ProductVariant.product),
+            selectinload(Cart.items).selectinload(
+                CartItem.variant).selectinload(ProductVariant.images)
         )
-        
+
         result = await session.execute(query)
         return result.scalar_one_or_none()
-    
+
     @staticmethod
     async def load_order_with_details(
         session: AsyncSession,
@@ -138,16 +136,17 @@ class ModelLoader:
     ) -> Optional[Order]:
         """Load order with full details"""
         query = select(Order).where(Order.id == order_id).options(
-            selectinload(Order.items).selectinload(OrderItem.variant).selectinload(ProductVariant.product),
+            selectinload(Order.items).selectinload(
+                OrderItem.variant).selectinload(ProductVariant.product),
             selectinload(Order.user)
         )
-        
+
         if include_tracking:
             query = query.options(selectinload(Order.tracking_events))
-            
+
         result = await session.execute(query)
         return result.scalar_one_or_none()
-    
+
     @staticmethod
     async def load_wishlist_with_items(
         session: AsyncSession,
@@ -155,34 +154,36 @@ class ModelLoader:
     ) -> Optional[Wishlist]:
         """Load wishlist with product details"""
         query = select(Wishlist).where(Wishlist.id == wishlist_id).options(
-            selectinload(Wishlist.items).selectinload(WishlistItem.product).selectinload(Product.variants).selectinload(ProductVariant.images)
+            selectinload(Wishlist.items).selectinload(WishlistItem.product).selectinload(
+                Product.variants).selectinload(ProductVariant.images)
         )
-        
+
         result = await session.execute(query)
         return result.scalar_one_or_none()
 
 
 class ModelSerializer:
     """Utility class for serializing models to dictionaries"""
-    
+
     @staticmethod
     def serialize_user(user: User, include_relations: bool = False) -> Dict[str, Any]:
         """Serialize user to dictionary"""
         data = user.to_dict()
-        
+
         if include_relations:
             if hasattr(user, 'addresses') and user.addresses:
                 data['addresses'] = [addr.to_dict() for addr in user.addresses]
             if hasattr(user, 'payment_methods') and user.payment_methods:
-                data['payment_methods'] = [pm.to_dict() for pm in user.payment_methods]
-                
+                data['payment_methods'] = [pm.to_dict()
+                                           for pm in user.payment_methods]
+
         return data
-    
+
     @staticmethod
     def serialize_product(product: Product, include_relations: bool = True) -> Dict[str, Any]:
         """Serialize product to dictionary"""
         data = product.to_dict()
-        
+
         if include_relations:
             if hasattr(product, 'category') and product.category:
                 data['category'] = {
@@ -198,17 +199,18 @@ class ModelSerializer:
                     'full_name': product.supplier.full_name
                 }
             if hasattr(product, 'variants') and product.variants:
-                data['variants'] = [variant.to_dict() for variant in product.variants]
-                
+                data['variants'] = [variant.to_dict()
+                                    for variant in product.variants]
+
         return data
-    
+
     @staticmethod
     def serialize_cart(cart: Cart) -> Dict[str, Any]:
         """Serialize cart to dictionary"""
         items_data = []
         total_amount = 0
         total_items = 0
-        
+
         for item in cart.items:
             item_data = {
                 'id': item.id,
@@ -221,7 +223,7 @@ class ModelSerializer:
             items_data.append(item_data)
             total_amount += item_data['total_price']
             total_items += item.quantity
-        
+
         return {
             'id': cart.id,
             'user_id': cart.user_id,
@@ -231,7 +233,7 @@ class ModelSerializer:
             'created_at': cart.created_at.isoformat() if cart.created_at else None,
             'updated_at': cart.updated_at.isoformat() if cart.updated_at else None,
         }
-    
+
     @staticmethod
     def serialize_order(order: Order, include_items: bool = True) -> Dict[str, Any]:
         """Serialize order to dictionary"""
@@ -250,7 +252,7 @@ class ModelSerializer:
             'created_at': order.created_at.isoformat() if order.created_at else None,
             'updated_at': order.updated_at.isoformat() if order.updated_at else None,
         }
-        
+
         if include_items and hasattr(order, 'items') and order.items:
             data['items'] = []
             for item in order.items:
@@ -264,7 +266,7 @@ class ModelSerializer:
                 if hasattr(item, 'variant') and item.variant:
                     item_data['variant'] = item.variant.to_dict()
                 data['items'].append(item_data)
-        
+
         if hasattr(order, 'tracking_events') and order.tracking_events:
             data['tracking_events'] = [
                 {
@@ -276,7 +278,7 @@ class ModelSerializer:
                 }
                 for event in order.tracking_events
             ]
-        
+
         return data
 
 
@@ -288,10 +290,10 @@ async def get_user_cart_count(session: AsyncSession, user_id: int) -> int:
     )
     result = await session.execute(query)
     cart = result.scalar_one_or_none()
-    
+
     if not cart:
         return 0
-    
+
     return sum(item.quantity for item in cart.items)
 
 
@@ -302,7 +304,7 @@ async def get_user_wishlist_count(session: AsyncSession, user_id: int) -> int:
     )
     result = await session.execute(query)
     wishlists = result.scalars().all()
-    
+
     return sum(len(wishlist.items) for wishlist in wishlists)
 
 
@@ -314,8 +316,8 @@ async def get_product_average_rating(session: AsyncSession, product_id: int) -> 
     )
     result = await session.execute(query)
     reviews = result.scalars().all()
-    
+
     if not reviews:
         return 0.0
-    
+
     return sum(review.rating for review in reviews) / len(reviews)

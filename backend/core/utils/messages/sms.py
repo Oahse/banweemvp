@@ -1,6 +1,7 @@
 import httpx
 import logging
 
+
 async def send_sms(to_phone_number: str, message: str):
     """
     Send SMS using your preferred SMS provider API.
@@ -28,7 +29,8 @@ async def send_sms(to_phone_number: str, message: str):
             return response.json()
 
     except httpx.HTTPStatusError as e:
-        logging.error(f"SMS API Error: {e.response.status_code} - {e.response.text}")
+        logging.error(
+            f"SMS API Error: {e.response.status_code} - {e.response.text}")
         raise
     except Exception as e:
         logging.error(f"SMS Send Error: {e}")

@@ -9,16 +9,20 @@ from schemas.product import ProductVariantResponse
 from services.promocode import PromocodeService
 from services.shipping import ShippingService
 from services.payment import PaymentService
-from uuid import UUID # Import UUID
+from uuid import UUID  # Import UUID
 from datetime import datetime
+
+
 class CartService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def get_or_create_cart(self, user_id: UUID) -> Cart:
         query = select(Cart).where(Cart.user_id == user_id).options(
-            selectinload(Cart.items).selectinload(CartItem.variant).selectinload(ProductVariant.images),
-            selectinload(Cart.items).selectinload(CartItem.variant).selectinload(ProductVariant.product)
+            selectinload(Cart.items).selectinload(
+                CartItem.variant).selectinload(ProductVariant.images),
+            selectinload(Cart.items).selectinload(
+                CartItem.variant).selectinload(ProductVariant.product)
         )
         result = await self.db.execute(query)
         cart = result.scalar_one_or_none()
@@ -38,16 +42,19 @@ class CartService:
             select(ProductVariant).where(ProductVariant.id == variant_id)
         )).scalar_one_or_none()
         if not variant:
-            raise HTTPException(status_code=404, detail="Product variant not found")
+            raise HTTPException(
+                status_code=404, detail="Product variant not found")
 
         if variant.stock < quantity:
-            raise HTTPException(status_code=400, detail=f"Insufficient stock for {variant.name}. Available: {variant.stock}")
+            raise HTTPException(
+                status_code=400, detail=f"Insufficient stock for {variant.name}. Available: {variant.stock}")
 
         item = cart.get_item(variant.id)
         if item:
             new_quantity = item.quantity + quantity
             if new_quantity > variant.stock:
-                raise HTTPException(status_code=400, detail=f"Cannot add {quantity} more of {variant.name}. Only {variant.stock - item.quantity} available.")
+                raise HTTPException(
+                    status_code=400, detail=f"Cannot add {quantity} more of {variant.name}. Only {variant.stock - item.quantity} available.")
             item.quantity = new_quantity
             item.recalc_total()
         else:
@@ -66,16 +73,18 @@ class CartService:
 
     async def get_cart(self, user_id: UUID) -> CartResponse:
         cart = await self.get_or_create_cart(user_id)
-        active_items = [item for item in cart.items if not item.saved_for_later]
-        
+        active_items = [
+            item for item in cart.items if not item.saved_for_later]
+
         # Convert cart items with proper datetime handling
         serialized_items = []
         for item in active_items:
             try:
                 # Serialize variant as ProductVariantResponse
                 variant_dict = self._serialize_variant(item.variant)
-                variant_response = ProductVariantResponse.model_validate(variant_dict) if variant_dict else None
-                
+                variant_response = ProductVariantResponse.model_validate(
+                    variant_dict) if variant_dict else None
+
                 item_dict = {
                     "id": item.id,
                     "variant": variant_response,
@@ -84,12 +93,13 @@ class CartService:
                     "total_price": item.total_price,
                     "created_at": item.created_at.isoformat() if item.created_at else None
                 }
-                serialized_items.append(CartItemResponse.model_validate(item_dict))
+                serialized_items.append(
+                    CartItemResponse.model_validate(item_dict))
             except Exception as e:
                 print(f"Error serializing cart item {item.id}: {e}")
                 # Skip problematic items rather than failing the entire request
                 continue
-        
+
         return CartResponse(
             items=serialized_items,
             subtotal=cart.subtotal(),
@@ -102,13 +112,14 @@ class CartService:
         """Helper method to serialize product variant with proper datetime handling"""
         if not variant:
             return None
-            
+
         try:
             # Use the model's built-in to_dict method which handles datetime serialization
             # Include product information so we get product_name and product_description
             return variant.to_dict(include_images=True, include_product=True)
         except Exception as e:
-            print(f"Error serializing variant {getattr(variant, 'id', 'unknown')}: {e}")
+            print(
+                f"Error serializing variant {getattr(variant, 'id', 'unknown')}: {e}")
             # Return a minimal variant object to prevent complete failure
             return {
                 "id": str(getattr(variant, 'id', '')),
@@ -171,10 +182,12 @@ class CartService:
         promocode = await promocode_service.get_promocode_by_code(code)
 
         if not promocode:
-            raise HTTPException(status_code=400, detail="Invalid or inactive promocode")
+            raise HTTPException(
+                status_code=400, detail="Invalid or inactive promocode")
 
         if promocode.expiration_date and promocode.expiration_date < datetime.now():
-            raise HTTPException(status_code=400, detail="Promocode has expired")
+            raise HTTPException(
+                status_code=400, detail="Promocode has expired")
 
         discount_amount = 0.0
         if promocode.discount_type == "fixed":
@@ -191,7 +204,7 @@ class CartService:
 
         # Send WebSocket notification
         await self._notify_cart_updated(user_id)
-        
+
         return {
             "message": f"Promocode {code} applied",
             "promocode": promocode.code,
@@ -221,7 +234,7 @@ class CartService:
     async def get_shipping_options(self, user_id: UUID, address: dict):
         shipping_service = ShippingService(self.db)
         active_methods = await shipping_service.get_all_active_shipping_methods()
-        
+
         options = []
         for method in active_methods:
             # For now, we use the method's base price. More complex logic would involve
@@ -233,11 +246,12 @@ class CartService:
                 "price": method.price,
                 "estimated_days": method.estimated_days
             })
-        
+
         # Example: Offer free shipping if cart subtotal is above a certain threshold
         cart = await self.get_or_create_cart(user_id)
         if cart.subtotal() >= 50:
-            options.append({"id": "free_shipping", "name": "Free Shipping", "description": "Orders over $50", "price": 0.00, "estimated_days": 5})
+            options.append({"id": "free_shipping", "name": "Free Shipping",
+                           "description": "Orders over $50", "price": 0.00, "estimated_days": 5})
 
         return options
 
@@ -265,7 +279,8 @@ class CartService:
 
     async def move_to_cart(self, user_id: UUID, item_id: UUID):
         cart = await self.get_or_create_cart(user_id)
-        item = next((i for i in cart.items if i.id == item_id and i.saved_for_later), None)
+        item = next((i for i in cart.items if i.id ==
+                    item_id and i.saved_for_later), None)
         if item:
             item.saved_for_later = False
             await self.db.commit()
@@ -276,14 +291,15 @@ class CartService:
     async def get_saved_items(self, user_id: UUID) -> list[CartItemResponse]:
         cart = await self.get_or_create_cart(user_id)
         saved_items = [item for item in cart.items if item.saved_for_later]
-        
+
         serialized_items = []
         for item in saved_items:
             try:
                 # Serialize variant as ProductVariantResponse
                 variant_dict = self._serialize_variant(item.variant)
-                variant_response = ProductVariantResponse.model_validate(variant_dict) if variant_dict else None
-                
+                variant_response = ProductVariantResponse.model_validate(
+                    variant_dict) if variant_dict else None
+
                 item_dict = {
                     "id": item.id,
                     "variant": variant_response,
@@ -292,11 +308,12 @@ class CartService:
                     "total_price": item.total_price,
                     "created_at": item.created_at.isoformat() if item.created_at else None
                 }
-                serialized_items.append(CartItemResponse.model_validate(item_dict))
+                serialized_items.append(
+                    CartItemResponse.model_validate(item_dict))
             except Exception as e:
                 print(f"Error serializing saved item {item.id}: {e}")
                 continue
-        
+
         return serialized_items
 
     async def merge_cart(self, user_id: UUID, items: list):

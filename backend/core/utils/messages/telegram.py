@@ -52,7 +52,7 @@ class TelegramBotHandler:
             "/help - show help"
         )
 
-# BOT_TOKEN = str(settings.TELEGRAM_BOT_TOKEN) 
+# BOT_TOKEN = str(settings.TELEGRAM_BOT_TOKEN)
 
 # try:
 #     if not BOT_TOKEN or BOT_TOKEN.strip() == "":

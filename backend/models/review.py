@@ -1,14 +1,16 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, Text, Integer
+from sqlalchemy import Column, Boolean, ForeignKey, Text, Integer
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, selectinload
+from sqlalchemy.orm import relationship
 from core.database import BaseModel
 
 
 class Review(BaseModel):
     __tablename__ = "reviews"
 
-    product_id = Column(UUID(as_uuid=True), ForeignKey("products.id"), nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    product_id = Column(UUID(as_uuid=True), ForeignKey(
+        "products.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey(
+        "users.id"), nullable=False)
     rating = Column(Integer, nullable=False)  # 1-5 stars
     comment = Column(Text, nullable=True)
     is_verified_purchase = Column(Boolean, default=False)

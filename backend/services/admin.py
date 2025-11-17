@@ -11,17 +11,19 @@ from models.user import User
 from models.settings import SystemSettings
 from core.exceptions import APIException
 from services.analytics import AnalyticsService
-from schemas.auth import UserCreate # Added UserCreate import
-from services.auth import AuthService # Added AuthService import
-from services.notification import NotificationService # Added NotificationService import
-from fastapi import BackgroundTasks # Added BackgroundTasks import
+from schemas.auth import UserCreate  # Added UserCreate import
+from services.auth import AuthService  # Added AuthService import
+# Added NotificationService import
+from services.notification import NotificationService
+from fastapi import BackgroundTasks  # Added BackgroundTasks import
 
 
 class AdminService:
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.auth_service = AuthService(db) # Initialize AuthService
-        self.notification_service = NotificationService(db) # Initialize NotificationService
+        self.auth_service = AuthService(db)  # Initialize AuthService
+        self.notification_service = NotificationService(
+            db)  # Initialize NotificationService
 
     async def get_dashboard_stats(self) -> dict:
         """Get admin dashboard statistics."""
@@ -127,7 +129,7 @@ class AdminService:
                         User.email.ilike(f"%{q}%")
                     )
                 )
-            
+
             if date_from:
                 query = query.where(Order.created_at >= date_from)
             if date_to:
@@ -161,10 +163,11 @@ class AdminService:
             if date_to:
                 count_query = count_query.where(Order.created_at <= date_to)
             if min_price is not None:
-                count_query = count_query.where(Order.total_amount >= min_price)
+                count_query = count_query.where(
+                    Order.total_amount >= min_price)
             if max_price is not None:
-                count_query = count_query.where(Order.total_amount <= max_price)
-
+                count_query = count_query.where(
+                    Order.total_amount <= max_price)
 
             count_result = await self.db.execute(count_query)
             total = count_result.scalar()
@@ -228,7 +231,7 @@ class AdminService:
                 User.lastname.ilike(f"%{search}%"),
                 User.email.ilike(f"%{search}%")
             ))
-        
+
         if status:
             if status == 'active':
                 query = query.where(User.active == True)
@@ -307,7 +310,7 @@ class AdminService:
         if category:
             query = (query.join(Category)
                      .where(Category.name.ilike(f"%{category}%")))
-        
+
         if status:
             if status == 'active':
                 query = query.where(Product.is_active == True)
@@ -396,7 +399,7 @@ class AdminService:
         user = result.scalar_one_or_none()
 
         if not user:
-            raise APIException(status_code=404, detail="User not found")
+            raise APIException(status_code=404, message="User not found")
 
         user.active = active
         await self.db.commit()
@@ -415,7 +418,7 @@ class AdminService:
         user = result.scalar_one_or_none()
 
         if not user:
-            raise APIException(status_code=404, detail="User not found")
+            raise APIException(status_code=404, message="User not found")
 
         await self.db.delete(user)
         await self.db.commit()
@@ -426,7 +429,8 @@ class AdminService:
             select(Order)
             .where(Order.id == order_id)
             .options(
-                selectinload(Order.items).selectinload(OrderItem.variant).selectinload(ProductVariant.product),
+                selectinload(Order.items).selectinload(
+                    OrderItem.variant).selectinload(ProductVariant.product),
                 selectinload(Order.transactions),
                 selectinload(Order.user)
             )
@@ -453,7 +457,8 @@ class AdminService:
         if product_id:
             query = query.where(ProductVariant.product_id == product_id)
 
-        query = query.order_by(ProductVariant.created_at.desc()).offset(offset).limit(limit)
+        query = query.order_by(ProductVariant.created_at.desc()).offset(
+            offset).limit(limit)
 
         result = await self.db.execute(query)
         variants = result.scalars().all()
@@ -468,7 +473,8 @@ class AdminService:
                 )
             )
         if product_id:
-            count_query = count_query.where(ProductVariant.product_id == product_id)
+            count_query = count_query.where(
+                ProductVariant.product_id == product_id)
 
         count_result = await self.db.execute(count_query)
         total = count_result.scalar()
@@ -488,9 +494,11 @@ class AdminService:
         # Check if user already exists
         existing_user = await self.auth_service.get_user_by_email(user_data.email)
         if existing_user:
-            raise APIException(status_code=400, message="Email already registered")
+            raise APIException(
+                status_code=400, message="Email already registered")
 
-        hashed_password = self.auth_service.get_password_hash(user_data.password)
+        hashed_password = self.auth_service.get_password_hash(
+            user_data.password)
 
         new_user = User(
             email=user_data.email,
@@ -498,7 +506,7 @@ class AdminService:
             lastname=user_data.lastname,
             hashed_password=hashed_password,
             role=user_data.role,
-            verified=True, # Admin created users are verified by default
+            verified=True,  # Admin created users are verified by default
             active=True,   # Admin created users are active by default
         )
         self.db.add(new_user)

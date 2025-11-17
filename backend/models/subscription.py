@@ -1,15 +1,17 @@
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Float
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, selectinload
+from sqlalchemy.orm import relationship
 from core.database import BaseModel
 
 
 class Subscription(BaseModel):
     __tablename__ = "subscriptions"
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey(
+        "users.id"), nullable=False)
     plan_id = Column(String(100), nullable=False)  # basic, premium, enterprise
-    status = Column(String(50), default="active")  # active, cancelled, expired, paused
+    # active, cancelled, expired, paused
+    status = Column(String(50), default="active")
     price = Column(Float, nullable=True)
     currency = Column(String(3), default="USD")
     billing_cycle = Column(String(20), default="monthly")  # monthly, yearly

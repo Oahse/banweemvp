@@ -1,5 +1,5 @@
 import os
-from typing import List, Literal, Optional
+from typing import List, Literal
 from dotenv import load_dotenv
 import logging
 from enum import Enum
@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 ENV_PATH = os.path.join(BASE_DIR, '.env')
 load_dotenv(ENV_PATH)
+
 
 def parse_cors(value: str) -> List[str]:
     """
@@ -30,17 +31,14 @@ def parse_cors(value: str) -> List[str]:
         return [i.strip() for i in value.split(",")]
     raise ValueError("Invalid CORS format")
 
+
 class Settings:
     # Environment
     DOMAIN: str = os.getenv('DOMAIN', 'localhost')
-    ENVIRONMENT: Literal["local", "staging", "production"] = os.getenv('ENVIRONMENT', 'local')
+    ENVIRONMENT: Literal["local", "staging",
+                         "production"] = os.getenv('ENVIRONMENT', 'local')
 
-    KAFKA_BOOTSTRAP_SERVERS : List[str] = parse_cors(os.getenv('KAFKA_BOOTSTRAP_SERVERS', "[kafka:9092]"))
-    KAFKA_TOPIC: str = os.getenv('KAFKA_TOPIC', 'products_topic')
-    KAFKA_GROUP: str = os.getenv('KAFKA_GROUP', 'product_group')
-    KAFKA_HOST: str = os.getenv('KAFKA_HOST', 'kafka')
-    KAFKA_PORT: str = os.getenv('KAFKA_PORT', '9092')
-    
+
     # SMS
     # SMS_API_KEY: Optional[str] = os.getenv('SMS_API_KEY')
     # SMS_API_URL: Optional[str] = os.getenv('SMS_API_URL')
@@ -50,23 +48,31 @@ class Settings:
 
     # PostgreSQL
     POSTGRES_USER: str = os.getenv('POSTGRES_USER', 'postgres')
-    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD', '0ZTftS7B0Bsf3tlzddQs')
-    POSTGRES_SERVER: str = os.getenv('POSTGRES_SERVER', 'banwee-db.c2po20oyum9p.us-east-1.rds.amazonaws.com')
+    POSTGRES_PASSWORD: str = os.getenv(
+        'POSTGRES_PASSWORD', '0ZTftS7B0Bsf3tlzddQs')
+    POSTGRES_SERVER: str = os.getenv(
+        'POSTGRES_SERVER', 'banwee-db.c2po20oyum9p.us-east-1.rds.amazonaws.com')
     POSTGRES_PORT: int = int(os.getenv('POSTGRES_PORT', 5432))
     POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'banwee_db')
-    POSTGRES_DB_URL: str = os.getenv('POSTGRES_DB_URL', "postgresql+asyncpg://postgres:0ZTftS7B0Bsf3tlzddQs@banwee-db.c2po20oyum9p.us-east-1.rds.amazonaws.com:5432/banwee_db")
-    
+    POSTGRES_DB_URL: str = os.getenv(
+        'POSTGRES_DB_URL', "postgresql+asyncpg://postgres:0ZTftS7B0Bsf3tlzddQs@banwee-db.c2po20oyum9p.us-east-1.rds.amazonaws.com:5432/banwee_db")
+
     # SQLite (fallback if needed)
     SQLITE_DB_PATH: str = os.getenv('SQLITE_DB_PATH', 'db1.db')
 
     # Security
     SECRET_KEY: str = os.getenv('SECRET_KEY', 'changeme-super-secret-key')
-    STRIPE_SECRET_KEY: str = os.getenv('STRIPE_SECRET_KEY', 'changeme-super-secret-key')
-    STRIPE_WEBHOOK_SECRET: str = os.getenv('STRIPE_WEBHOOK_SECRET', 'changeme-super-secret-webhook-key')
+    STRIPE_SECRET_KEY: str = os.getenv(
+        'STRIPE_SECRET_KEY', 'changeme-super-secret-key')
+    STRIPE_WEBHOOK_SECRET: str = os.getenv(
+        'STRIPE_WEBHOOK_SECRET', 'changeme-super-secret-webhook-key')
     ALGORITHM: str = os.getenv('ALGORITHM', "HS256")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30))
-    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS', 7))
-    RESEND_API_KEY: str = os.getenv('RESEND_API_KEY', "re_J9sfHbqG_Go1YUSTfYS14y6Te1L2jNEUj") 
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(
+        os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30))
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(
+        os.getenv('REFRESH_TOKEN_EXPIRE_DAYS', 7))
+    RESEND_API_KEY: str = os.getenv(
+        'RESEND_API_KEY', "re_J9sfHbqG_Go1YUSTfYS14y6Te1L2jNEUj")
 
     MAILGUN_API_KEY: str = os.getenv('MAILGUN_API_KEY', '')
     MAILGUN_DOMAIN: str = os.getenv('MAILGUN_DOMAIN', '')
@@ -76,8 +82,10 @@ class Settings:
     FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
     # Notification Cleanup
-    NOTIFICATION_CLEANUP_DAYS: int = int(os.getenv('NOTIFICATION_CLEANUP_DAYS', 30))
-    NOTIFICATION_CLEANUP_INTERVAL_SECONDS: int = int(os.getenv('NOTIFICATION_CLEANUP_INTERVAL_SECONDS', 86400)) # 24 hours
+    NOTIFICATION_CLEANUP_DAYS: int = int(
+        os.getenv('NOTIFICATION_CLEANUP_DAYS', 30))
+    NOTIFICATION_CLEANUP_INTERVAL_SECONDS: int = int(
+        os.getenv('NOTIFICATION_CLEANUP_INTERVAL_SECONDS', 86400))  # 24 hours
 
     # CORS
     RAW_CORS_ORIGINS: str = os.getenv('BACKEND_CORS_ORIGINS', '')
@@ -117,8 +125,10 @@ class Settings:
         else:
             raise ValueError("Invalid ENVIRONMENT for database connection")
 
+
 # Instantiate the settings object
 settings = Settings()
+
 
 class SecurityLevel(Enum):
     LOW = "low"

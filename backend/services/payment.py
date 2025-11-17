@@ -1,32 +1,22 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete
-from uuid import UUID
-from typing import List, Optional
-import stripe
-
-from core.config import settings
-from models.payment import PaymentMethod
-from models.transaction import Transaction
-from schemas.payment import PaymentMethodCreate, PaymentMethodUpdate, PaymentMethodResponse
-from schemas.transaction import TransactionCreate
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete
-from uuid import UUID
-from typing import List, Optional
-import stripe
-
-from core.config import settings
-from models.payment import PaymentMethod
-from models.transaction import Transaction
-from models.user import User
-from schemas.payment import PaymentMethodCreate, PaymentMethodUpdate, PaymentMethodResponse
-from schemas.transaction import TransactionCreate
 from core.utils.messages.email import send_email
+from models.user import User
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, update, delete
+from uuid import UUID
+from typing import List, Optional
+import stripe
+
+from core.config import settings
+from models.payment import PaymentMethod
+from models.transaction import Transaction
+from schemas.payment import PaymentMethodCreate, PaymentMethodUpdate, PaymentMethodResponse
+from schemas.transaction import TransactionCreate
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
 
 class PaymentService:
     def __init__(self, db: AsyncSession):
@@ -57,7 +47,8 @@ class PaymentService:
         return new_method
 
     async def update_payment_method(self, user_id: UUID, method_id: UUID, payload: PaymentMethodUpdate) -> Optional[PaymentMethod]:
-        query = select(PaymentMethod).where(PaymentMethod.id == method_id, PaymentMethod.user_id == user_id)
+        query = select(PaymentMethod).where(PaymentMethod.id ==
+                                            method_id, PaymentMethod.user_id == user_id)
         result = await self.db.execute(query)
         method = result.scalar_one_or_none()
 
@@ -69,7 +60,7 @@ class PaymentService:
             await self._clear_default_payment_method(user_id, exclude_method_id=method_id)
         elif payload.is_default is False and method.is_default:
             # Prevent unsetting default if it's the only one, or handle logic to set another as default
-            pass # More complex logic might be needed here
+            pass  # More complex logic might be needed here
 
         for field, value in payload.dict(exclude_unset=True).items():
             setattr(method, field, value)
@@ -79,7 +70,8 @@ class PaymentService:
         return method
 
     async def delete_payment_method(self, user_id: UUID, method_id: UUID) -> bool:
-        query = select(PaymentMethod).where(PaymentMethod.id == method_id, PaymentMethod.user_id == user_id)
+        query = select(PaymentMethod).where(PaymentMethod.id ==
+                                            method_id, PaymentMethod.user_id == user_id)
         result = await self.db.execute(query)
         method = result.scalar_one_or_none()
 
@@ -95,7 +87,8 @@ class PaymentService:
         await self._clear_default_payment_method(user_id)
 
         # Set the new default
-        query = update(PaymentMethod).where(PaymentMethod.id == method_id, PaymentMethod.user_id == user_id).values(is_default=True)
+        query = update(PaymentMethod).where(PaymentMethod.id == method_id,
+                                            PaymentMethod.user_id == user_id).values(is_default=True)
         await self.db.execute(query)
         await self.db.commit()
 
@@ -162,10 +155,11 @@ class PaymentService:
         if event_type == "payment_intent.succeeded":
             payment_intent_id = data["id"]
             status = data["status"]
-            query = update(Transaction).where(Transaction.stripe_payment_intent_id == payment_intent_id).values(status=status)
+            query = update(Transaction).where(
+                Transaction.stripe_payment_intent_id == payment_intent_id).values(status=status)
             await self.db.execute(query)
             await self.db.commit()
-            
+
             transaction_result = await self.db.execute(select(Transaction).where(Transaction.stripe_payment_intent_id == payment_intent_id))
             transaction = transaction_result.scalar_one_or_none()
             if transaction:
@@ -174,8 +168,10 @@ class PaymentService:
         elif event_type == "payment_intent.payment_failed":
             payment_intent_id = data["id"]
             status = data["status"]
-            failure_reason = data.get("last_payment_error", {}).get("message", "Unknown error")
-            query = update(Transaction).where(Transaction.stripe_payment_intent_id == payment_intent_id).values(status=status)
+            failure_reason = data.get("last_payment_error", {}).get(
+                "message", "Unknown error")
+            query = update(Transaction).where(
+                Transaction.stripe_payment_intent_id == payment_intent_id).values(status=status)
             await self.db.execute(query)
             await self.db.commit()
 
@@ -209,7 +205,8 @@ class PaymentService:
             )
             print(f"Payment receipt email sent to {user.email} successfully.")
         except Exception as e:
-            print(f"Failed to send payment receipt email to {user.email}. Error: {e}")
+            print(
+                f"Failed to send payment receipt email to {user.email}. Error: {e}")
 
     async def send_payment_failed_email(self, transaction: Transaction, failure_reason: str):
         user_result = await self.db.execute(select(User).where(User.id == transaction.user_id))
@@ -234,7 +231,8 @@ class PaymentService:
             )
             print(f"Payment failed email sent to {user.email} successfully.")
         except Exception as e:
-            print(f"Failed to send payment failed email to {user.email}. Error: {e}")
+            print(
+                f"Failed to send payment failed email to {user.email}. Error: {e}")
 
         try:
             # Create a Stripe PaymentIntent
@@ -285,7 +283,8 @@ class PaymentService:
             payment_intent_id = data["id"]
             status = data["status"]
             # Update transaction status in your database
-            query = update(Transaction).where(Transaction.stripe_payment_intent_id == payment_intent_id).values(status=status)
+            query = update(Transaction).where(
+                Transaction.stripe_payment_intent_id == payment_intent_id).values(status=status)
             await self.db.execute(query)
             await self.db.commit()
             print(f"PaymentIntent {payment_intent_id} succeeded.")
@@ -294,7 +293,8 @@ class PaymentService:
             payment_intent_id = data["id"]
             status = data["status"]
             # Update transaction status in your database
-            query = update(Transaction).where(Transaction.stripe_payment_intent_id == payment_intent_id).values(status=status)
+            query = update(Transaction).where(
+                Transaction.stripe_payment_intent_id == payment_intent_id).values(status=status)
             await self.db.execute(query)
             await self.db.commit()
             print(f"PaymentIntent {payment_intent_id} failed.")

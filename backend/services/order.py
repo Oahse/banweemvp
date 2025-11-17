@@ -26,38 +26,45 @@ class OrderService:
         # Get user's cart
         cart_service = CartService(self.db)
         cart = await cart_service.get_or_create_cart(user_id)
-        
+
         if not cart.items or len([item for item in cart.items if not item.saved_for_later]) == 0:
             raise HTTPException(status_code=400, detail="Cart is empty")
 
         # Validate cart items availability
         validation_result = await cart_service.validate_cart(user_id)
         if not validation_result.get("valid", False):
-            raise HTTPException(status_code=400, detail="Cart validation failed")
+            raise HTTPException(
+                status_code=400, detail="Cart validation failed")
 
         # Verify shipping address exists
         shipping_address = await self.db.execute(
-            select(Address).where(and_(Address.id == request.shipping_address_id, Address.user_id == user_id))
+            select(Address).where(
+                and_(Address.id == request.shipping_address_id, Address.user_id == user_id))
         )
         shipping_address = shipping_address.scalar_one_or_none()
         if not shipping_address:
-            raise HTTPException(status_code=404, detail="Shipping address not found")
+            raise HTTPException(
+                status_code=404, detail="Shipping address not found")
 
         # Verify shipping method exists
         shipping_method = await self.db.execute(
-            select(ShippingMethod).where(ShippingMethod.id == request.shipping_method_id)
+            select(ShippingMethod).where(
+                ShippingMethod.id == request.shipping_method_id)
         )
         shipping_method = shipping_method.scalar_one_or_none()
         if not shipping_method:
-            raise HTTPException(status_code=404, detail="Shipping method not found")
+            raise HTTPException(
+                status_code=404, detail="Shipping method not found")
 
         # Verify payment method exists
         payment_method = await self.db.execute(
-            select(PaymentMethod).where(and_(PaymentMethod.id == request.payment_method_id, PaymentMethod.user_id == user_id))
+            select(PaymentMethod).where(and_(PaymentMethod.id ==
+                                             request.payment_method_id, PaymentMethod.user_id == user_id))
         )
         payment_method = payment_method.scalar_one_or_none()
         if not payment_method:
-            raise HTTPException(status_code=404, detail="Payment method not found")
+            raise HTTPException(
+                status_code=404, detail="Payment method not found")
 
         # Calculate total amount
         total_amount = cart.total_amount()
@@ -77,7 +84,8 @@ class OrderService:
         await self.db.flush()  # Get the order ID
 
         # Create order items from cart items
-        active_cart_items = [item for item in cart.items if not item.saved_for_later]
+        active_cart_items = [
+            item for item in cart.items if not item.saved_for_later]
         for cart_item in active_cart_items:
             order_item = OrderItem(
                 order_id=order.id,
@@ -97,10 +105,10 @@ class OrderService:
                 payment_method_id=request.payment_method_id,
                 order_id=order.id
             )
-            
+
             if payment_result.get("status") == "success":
                 order.status = "confirmed"
-                
+
                 # Create initial tracking event
                 tracking_event = TrackingEvent(
                     order_id=order.id,
@@ -109,16 +117,17 @@ class OrderService:
                     location="Processing Center"
                 )
                 self.db.add(tracking_event)
-                
+
                 # Clear cart after successful order
                 await cart_service.clear_cart(user_id)
-                
+
             else:
                 order.status = "payment_failed"
-                
+
         except Exception as e:
             order.status = "payment_failed"
-            raise HTTPException(status_code=400, detail=f"Payment processing failed: {str(e)}")
+            raise HTTPException(
+                status_code=400, detail=f"Payment processing failed: {str(e)}")
 
         await self.db.commit()
         await self.db.refresh(order)
@@ -134,31 +143,31 @@ class OrderService:
             selectinload(Order.items).selectinload(OrderItem.variant),
             selectinload(Order.tracking_events)
         )
-        
+
         if status_filter:
             query = query.where(Order.status == status_filter)
-            
+
         query = query.order_by(desc(Order.created_at))
-        
+
         # Calculate offset
         offset = (page - 1) * limit
-        
+
         # Get total count
         count_query = select(Order).where(Order.user_id == user_id)
         if status_filter:
             count_query = count_query.where(Order.status == status_filter)
-        
+
         total_result = await self.db.execute(count_query)
         total = len(total_result.scalars().all())
-        
+
         # Get paginated results
         result = await self.db.execute(query.offset(offset).limit(limit))
         orders = result.scalars().all()
-        
+
         formatted_orders = []
         for order in orders:
             formatted_orders.append(await self._format_order_response(order))
-        
+
         return {
             "orders": formatted_orders,
             "pagination": {
@@ -175,29 +184,31 @@ class OrderService:
             selectinload(Order.items).selectinload(OrderItem.variant),
             selectinload(Order.tracking_events)
         )
-        
+
         result = await self.db.execute(query)
         order = result.scalar_one_or_none()
-        
+
         if not order:
             return None
-            
+
         return await self._format_order_response(order)
 
     async def cancel_order(self, order_id: UUID, user_id: UUID) -> OrderResponse:
         """Cancel an order"""
-        query = select(Order).where(and_(Order.id == order_id, Order.user_id == user_id))
+        query = select(Order).where(
+            and_(Order.id == order_id, Order.user_id == user_id))
         result = await self.db.execute(query)
         order = result.scalar_one_or_none()
-        
+
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-            
+
         if order.status not in ["pending", "confirmed"]:
-            raise HTTPException(status_code=400, detail="Order cannot be cancelled")
-            
+            raise HTTPException(
+                status_code=400, detail="Order cannot be cancelled")
+
         order.status = "cancelled"
-        
+
         # Add tracking event
         tracking_event = TrackingEvent(
             order_id=order.id,
@@ -206,10 +217,10 @@ class OrderService:
             location="System"
         )
         self.db.add(tracking_event)
-        
+
         await self.db.commit()
         await self.db.refresh(order)
-        
+
         return await self._format_order_response(order)
 
     async def get_order_tracking(self, order_id: UUID, user_id: UUID) -> Dict[str, Any]:
@@ -217,13 +228,13 @@ class OrderService:
         query = select(Order).where(and_(Order.id == order_id, Order.user_id == user_id)).options(
             selectinload(Order.tracking_events)
         )
-        
+
         result = await self.db.execute(query)
         order = result.scalar_one_or_none()
-        
+
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         tracking_events = []
         for event in order.tracking_events:
             tracking_events.append({
@@ -233,13 +244,15 @@ class OrderService:
                 "location": event.location,
                 "timestamp": event.created_at.isoformat()
             })
-        
+
         # Calculate estimated delivery
         estimated_delivery = None
         if order.status in ["confirmed", "shipped"] and hasattr(order, 'shipping_method'):
-            estimated_days = getattr(order.shipping_method, 'estimated_days', 5)
-            estimated_delivery = (order.created_at + timedelta(days=estimated_days)).isoformat()
-        
+            estimated_days = getattr(
+                order.shipping_method, 'estimated_days', 5)
+            estimated_delivery = (
+                order.created_at + timedelta(days=estimated_days)).isoformat()
+
         return {
             "order_id": str(order.id),
             "status": order.status,
@@ -267,14 +280,14 @@ class OrderService:
         query = select(Order).where(Order.id == order_id)
         result = await self.db.execute(query)
         order = result.scalar_one_or_none()
-        
+
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         order.status = status
         if tracking_number:
             order.tracking_number = tracking_number
-        
+
         # Add tracking event
         tracking_event = TrackingEvent(
             order_id=order.id,
@@ -283,7 +296,7 @@ class OrderService:
             location="Fulfillment Center"
         )
         self.db.add(tracking_event)
-        
+
         await self.db.commit()
         await self.db.refresh(order)
         return order
@@ -299,13 +312,14 @@ class OrderService:
                 price_per_unit=item.price_per_unit,
                 total_price=item.total_price
             ))
-        
+
         # Calculate estimated delivery
         estimated_delivery = None
         if order.status in ["confirmed", "shipped"]:
             estimated_days = 5  # Default, could be from shipping method
-            estimated_delivery = (order.created_at + timedelta(days=estimated_days)).isoformat()
-        
+            estimated_delivery = (
+                order.created_at + timedelta(days=estimated_days)).isoformat()
+
         return OrderResponse(
             id=str(order.id),
             user_id=str(order.user_id),
@@ -323,22 +337,25 @@ class OrderService:
         # Validate items availability
         total_amount = 0.0
         order_items = []
-        
+
         for item_data in request.items:
             variant = await self.db.execute(
-                select(ProductVariant).where(ProductVariant.id == UUID(item_data.variant_id))
+                select(ProductVariant).where(
+                    ProductVariant.id == UUID(item_data.variant_id))
             )
             variant = variant.scalar_one_or_none()
             if not variant:
-                raise HTTPException(status_code=404, detail=f"Product variant {item_data.variant_id} not found")
-            
+                raise HTTPException(
+                    status_code=404, detail=f"Product variant {item_data.variant_id} not found")
+
             if variant.stock < item_data.quantity:
-                raise HTTPException(status_code=400, detail=f"Insufficient stock for {variant.name}")
-            
+                raise HTTPException(
+                    status_code=400, detail=f"Insufficient stock for {variant.name}")
+
             price = variant.sale_price or variant.base_price
             item_total = price * item_data.quantity
             total_amount += item_total
-            
+
             order_items.append({
                 "variant_id": variant.id,
                 "quantity": item_data.quantity,
@@ -380,10 +397,10 @@ class OrderService:
         order = await self.get_order_by_id(order_id, user_id)
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         # Create refund request (simplified - would need proper refund model)
         refund_id = str(UUID())
-        
+
         return {
             "message": "Refund request submitted successfully",
             "refund_id": refund_id
@@ -394,14 +411,14 @@ class OrderService:
         original_order = await self.get_order_by_id(order_id, user_id)
         if not original_order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         # Get original order items
         query = select(Order).where(and_(Order.id == order_id, Order.user_id == user_id)).options(
             selectinload(Order.items)
         )
         result = await self.db.execute(query)
         order = result.scalar_one_or_none()
-        
+
         # Create new order with same items
         new_order = Order(
             user_id=user_id,
@@ -432,7 +449,7 @@ class OrderService:
         order = await self.get_order_by_id(order_id, user_id)
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         # Simplified invoice data
         return {
             "invoice_id": f"INV-{order_id}",
@@ -446,7 +463,7 @@ class OrderService:
         order = await self.get_order_by_id(order_id, user_id)
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         # For now, just return success (would need proper notes model)
         return {
             "message": "Note added successfully",
@@ -458,7 +475,7 @@ class OrderService:
         order = await self.get_order_by_id(order_id, user_id)
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         # Return empty list for now (would need proper notes model)
         return []
 

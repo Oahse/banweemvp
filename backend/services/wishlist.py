@@ -5,8 +5,10 @@ from uuid import UUID
 from typing import List, Optional
 
 from models.wishlist import Wishlist, WishlistItem
-from models.product import Product, ProductVariant # Import Product and ProductVariant
+# Import Product and ProductVariant
+from models.product import Product, ProductVariant
 from schemas.wishlist import WishlistCreate, WishlistUpdate, WishlistItemCreate
+
 
 class WishlistService:
     def __init__(self, db: AsyncSession):
@@ -15,8 +17,10 @@ class WishlistService:
     async def get_wishlists(self, user_id: UUID) -> List[Wishlist]:
         try:
             query = select(Wishlist).where(Wishlist.user_id == user_id).options(
-                selectinload(Wishlist.items).selectinload(WishlistItem.product).selectinload(Product.variants).selectinload(ProductVariant.images),
-                selectinload(Wishlist.items).selectinload(WishlistItem.variant).selectinload(ProductVariant.images)
+                selectinload(Wishlist.items).selectinload(WishlistItem.product).selectinload(
+                    Product.variants).selectinload(ProductVariant.images),
+                selectinload(Wishlist.items).selectinload(
+                    WishlistItem.variant).selectinload(ProductVariant.images)
             )
             result = await self.db.execute(query)
             return result.scalars().all()
@@ -27,8 +31,10 @@ class WishlistService:
 
     async def get_wishlist_by_id(self, wishlist_id: UUID, user_id: UUID) -> Optional[Wishlist]:
         query = select(Wishlist).where(Wishlist.id == wishlist_id, Wishlist.user_id == user_id).options(
-            selectinload(Wishlist.items).selectinload(WishlistItem.product).selectinload(Product.variants).selectinload(ProductVariant.images),
-            selectinload(Wishlist.items).selectinload(WishlistItem.variant).selectinload(ProductVariant.images)
+            selectinload(Wishlist.items).selectinload(WishlistItem.product).selectinload(
+                Product.variants).selectinload(ProductVariant.images),
+            selectinload(Wishlist.items).selectinload(
+                WishlistItem.variant).selectinload(ProductVariant.images)
         )
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
@@ -51,12 +57,14 @@ class WishlistService:
         refetched_wishlist = await self.get_wishlist_by_id(new_wishlist.id, user_id)
         if not refetched_wishlist:
             # This should ideally not happen if creation was successful
-            raise Exception("Failed to retrieve newly created wishlist with items.")
+            raise Exception(
+                "Failed to retrieve newly created wishlist with items.")
 
         return refetched_wishlist
 
     async def update_wishlist(self, wishlist_id: UUID, user_id: UUID, payload: WishlistUpdate) -> Optional[Wishlist]:
-        query = select(Wishlist).where(Wishlist.id == wishlist_id, Wishlist.user_id == user_id)
+        query = select(Wishlist).where(
+            Wishlist.id == wishlist_id, Wishlist.user_id == user_id)
         result = await self.db.execute(query)
         wishlist = result.scalar_one_or_none()
 
@@ -77,7 +85,8 @@ class WishlistService:
         return wishlist
 
     async def delete_wishlist(self, wishlist_id: UUID, user_id: UUID) -> bool:
-        query = select(Wishlist).where(Wishlist.id == wishlist_id, Wishlist.user_id == user_id)
+        query = select(Wishlist).where(
+            Wishlist.id == wishlist_id, Wishlist.user_id == user_id)
         result = await self.db.execute(query)
         wishlist = result.scalar_one_or_none()
 
@@ -102,18 +111,21 @@ class WishlistService:
         # Re-fetch the wishlist item with product and variant eagerly loaded
         query = select(WishlistItem).where(WishlistItem.id == new_item.id).options(
             selectinload(WishlistItem.product),
-            selectinload(WishlistItem.variant).selectinload(ProductVariant.images)
+            selectinload(WishlistItem.variant).selectinload(
+                ProductVariant.images)
         )
         refetched_item = await self.db.execute(query)
         refetched_item = refetched_item.scalar_one_or_none()
 
         if not refetched_item:
-            raise Exception("Failed to retrieve newly created wishlist item with relationships.")
+            raise Exception(
+                "Failed to retrieve newly created wishlist item with relationships.")
 
         return refetched_item
 
     async def remove_item_from_wishlist(self, wishlist_id: UUID, item_id: UUID) -> bool:
-        query = select(WishlistItem).where(WishlistItem.id == item_id, WishlistItem.wishlist_id == wishlist_id)
+        query = select(WishlistItem).where(WishlistItem.id ==
+                                           item_id, WishlistItem.wishlist_id == wishlist_id)
         result = await self.db.execute(query)
         item = result.scalar_one_or_none()
 
@@ -127,7 +139,8 @@ class WishlistService:
     async def set_default_wishlist(self, user_id: UUID, wishlist_id: UUID) -> Optional[Wishlist]:
         await self._clear_default_wishlist(user_id)
 
-        query = update(Wishlist).where(Wishlist.id == wishlist_id, Wishlist.user_id == user_id).values(is_default=True)
+        query = update(Wishlist).where(Wishlist.id == wishlist_id,
+                                       Wishlist.user_id == user_id).values(is_default=True)
         await self.db.execute(query)
         await self.db.commit()
 

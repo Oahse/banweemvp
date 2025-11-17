@@ -5,13 +5,16 @@ from datetime import datetime
 
 from schemas.product import ProductResponse, ProductVariantResponse
 
+
 class WishlistItemBase(BaseModel):
     product_id: UUID
     variant_id: Optional[UUID] = None
     quantity: int = Field(1, gt=0)
 
+
 class WishlistItemCreate(WishlistItemBase):
     pass
+
 
 class WishlistItemResponse(WishlistItemBase):
     id: UUID
@@ -26,16 +29,20 @@ class WishlistItemResponse(WishlistItemBase):
             datetime: lambda v: v.isoformat() if v else None
         }
 
+
 class WishlistBase(BaseModel):
     name: Optional[str] = None
     is_default: bool = False
 
+
 class WishlistCreate(WishlistBase):
     pass
+
 
 class WishlistUpdate(WishlistBase):
     name: Optional[str] = None
     is_default: Optional[bool] = None
+
 
 class WishlistResponse(WishlistBase):
     id: UUID

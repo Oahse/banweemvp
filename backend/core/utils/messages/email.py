@@ -17,8 +17,9 @@ env = Environment(
 )
 
 # Utility to render Jinja2 template with context
+
+
 def render_email(template_name: str, context: dict) -> str:
-    
 
     try:
         template = env.get_template(template_name)
@@ -28,6 +29,8 @@ def render_email(template_name: str, context: dict) -> str:
         raise RuntimeError(f"Template rendering error: {e}")
 
 # Central dispatch function
+
+
 def send_email(
     to_email: str,
     from_email: str,
@@ -68,7 +71,7 @@ def send_email(
         "welcome": "Welcome to Our Store!",
         "onboarding": "Let’s Get You Started",
         "activation": "Activate Your Account",
-        "email_change":'Change Email',
+        "email_change": 'Change Email',
         "password_reset": "Reset Your Password",
         "login_alert": "Login Alert",
         "profile_update": "Profile Update Confirmation",

@@ -14,10 +14,12 @@ from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     return await AuthService.get_current_user(token, db)
 
 router = APIRouter(prefix="/api/v1/subscriptions", tags=["Subscriptions"])
+
 
 @router.post("/")
 async def create_subscription(
@@ -38,6 +40,7 @@ async def create_subscription(
             message=f"Failed to create subscription: {str(e)}"
         )
 
+
 @router.get("/")
 async def get_subscriptions(
     page: int = Query(1, ge=1),
@@ -55,6 +58,7 @@ async def get_subscriptions(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch subscriptions: {str(e)}"
         )
+
 
 @router.get("/{subscription_id}")
 async def get_subscription(
@@ -80,6 +84,7 @@ async def get_subscription(
             message=f"Failed to fetch subscription: {str(e)}"
         )
 
+
 @router.put("/{subscription_id}")
 async def update_subscription(
     subscription_id: UUID,
@@ -100,6 +105,7 @@ async def update_subscription(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to update subscription: {str(e)}"
         )
+
 
 @router.delete("/{subscription_id}")
 async def delete_subscription(

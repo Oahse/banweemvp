@@ -28,7 +28,7 @@ async def api_exception_handler(request: Request, exc: APIException) -> JSONResp
 async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
     """Handle standard HTTP exceptions"""
     correlation_id = str(uuid.uuid4())
-    
+
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -44,13 +44,14 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """Handle validation errors"""
     correlation_id = str(uuid.uuid4())
-    
+
     # Format validation errors
     errors = {}
     for error in exc.errors():
-        field = ".".join(str(loc) for loc in error["loc"][1:])  # Skip 'body' prefix
+        field = ".".join(str(loc)
+                         for loc in error["loc"][1:])  # Skip 'body' prefix
         errors[field] = error["msg"]
-    
+
     return JSONResponse(
         status_code=422,
         content={
@@ -67,11 +68,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError) -> JSONResponse:
     """Handle SQLAlchemy database errors"""
     correlation_id = str(uuid.uuid4())
-    
+
     # Log the full error for debugging
     print(f"Database error [{correlation_id}]: {str(exc)}")
     print(traceback.format_exc())
-    
+
     return JSONResponse(
         status_code=500,
         content={
@@ -87,11 +88,11 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError) -
 async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle unexpected exceptions"""
     correlation_id = str(uuid.uuid4())
-    
+
     # Log the full error for debugging
     print(f"Unexpected error [{correlation_id}]: {str(exc)}")
     print(traceback.format_exc())
-    
+
     return JSONResponse(
         status_code=500,
         content={
