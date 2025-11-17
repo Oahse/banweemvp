@@ -175,57 +175,76 @@ class ProductService:
             f"Getting products: page={page}, limit={limit}, filters={filters}")
         offset = (page - 1) * limit
 
-        query = select(Product).options(
-            selectinload(Product.category),
-            selectinload(Product.supplier),
-            selectinload(Product.variants).selectinload(ProductVariant.images)
-        ).where(Product.is_active == True)
-
-        # Apply filters
-        variant_joined = False
+        # Build filter conditions
+        base_conditions = [Product.is_active == True]
+        
         if filters:
-            if filters.get("category"):
-                query = query.join(Category).where(
-                    Category.name == filters['category'])
-
             if filters.get("q"):
                 search_term = f"%{filters['q']}%"
-                query = query.where(
+                base_conditions.append(
                     or_(
                         Product.name.ilike(search_term),
                         Product.description.ilike(search_term)
                     )
                 )
-
-            # Join ProductVariant only once if any price/availability/sale filters are applied
+            
+            if filters.get("min_rating") is not None:
+                base_conditions.append(Product.rating >= filters["min_rating"])
+            
+            if filters.get("max_rating") is not None:
+                base_conditions.append(Product.rating <= filters["max_rating"])
+        
+        # Build subquery for filtering by category
+        if filters and filters.get("category"):
+            # Get category first
+            cat_query = select(Category.id).where(Category.name == filters['category'])
+            cat_result = await self.db.execute(cat_query)
+            category_id = cat_result.scalar_one_or_none()
+            if category_id:
+                base_conditions.append(Product.category_id == category_id)
+        
+        # Build subquery for filtering by variant properties
+        if filters:
             price_filters = []
             if filters.get("min_price") is not None:
-                price_filters.append(
-                    ProductVariant.base_price >= filters["min_price"])
-
+                price_filters.append(ProductVariant.base_price >= filters["min_price"])
+            
             if filters.get("max_price") is not None:
-                price_filters.append(
-                    ProductVariant.base_price <= filters["max_price"])
-
+                price_filters.append(ProductVariant.base_price <= filters["max_price"])
+            
             if filters.get("availability") is not None:
                 if filters["availability"]:
                     price_filters.append(ProductVariant.stock > 0)
                 else:
                     price_filters.append(ProductVariant.stock == 0)
-
+            
             if filters.get("sale"):
                 price_filters.append(ProductVariant.sale_price.isnot(None))
-
-            # Apply variant filters if any exist
+            
             if price_filters:
-                query = query.join(ProductVariant).where(and_(*price_filters))
-                variant_joined = True
-
-            if filters.get("min_rating") is not None:
-                query = query.where(Product.rating >= filters["min_rating"])
-
-            if filters.get("max_rating") is not None:
-                query = query.where(Product.rating <= filters["max_rating"])
+                # Use EXISTS with correlated subquery for better performance
+                variant_subquery = (
+                    select(1)
+                    .where(
+                        and_(
+                            ProductVariant.product_id == Product.id,
+                            *price_filters
+                        )
+                    )
+                    .exists()
+                )
+                base_conditions.append(variant_subquery)
+        
+        # Build the main query
+        query = (
+            select(Product)
+            .where(and_(*base_conditions))
+            .options(
+                selectinload(Product.category),
+                selectinload(Product.supplier),
+                selectinload(Product.variants).selectinload(ProductVariant.images)
+            )
+        )
 
         # Apply sorting
         if hasattr(Product, sort_by):
@@ -234,26 +253,10 @@ class ProductService:
             else:
                 query = query.order_by(getattr(Product, sort_by).asc())
 
-        # Get total count for pagination
-        count_query = select(func.count(Product.id.distinct())).where(
-            Product.is_active == True)
-        if filters:
-            if filters.get("category"):
-                count_query = count_query.select_from(Product).join(Category).where(
-                    and_(Product.is_active == True,
-                         Category.name == filters['category'])
-                )
-            if filters.get("q"):
-                search_term = f"%{filters['q']}%"
-                count_query = count_query.where(
-                    and_(
-                        Product.is_active == True,
-                        or_(
-                            Product.name.ilike(search_term),
-                            Product.description.ilike(search_term)
-                        )
-                    )
-                )
+        # Get total count for pagination - must match the main query filters
+        count_query = select(func.count(Product.id))
+        for condition in base_conditions:
+            count_query = count_query.where(condition)
 
         count_result = await self.db.execute(count_query)
         total = count_result.scalar()

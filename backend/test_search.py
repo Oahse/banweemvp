@@ -31,11 +31,11 @@ async def test_search_queries():
             print(f"   First result: {result['data'][0].name}")
         
         # Test 2: Category filter
-        print("\n2. Testing category filter (category='Vegetables')...")
+        print("\n2. Testing category filter (category='Fruits & Veggies')...")
         result = await service.get_products(
             page=1,
             limit=5,
-            filters={"category": "Vegetables"},
+            filters={"category": "Fruits & Veggies"},
             sort_by="created_at",
             sort_order="desc"
         )
@@ -44,11 +44,11 @@ async def test_search_queries():
             print(f"   First result: {result['data'][0].name}")
         
         # Test 3: Price range filter
-        print("\n3. Testing price range filter (min_price=5, max_price=20)...")
+        print("\n3. Testing price range filter (min_price=10, max_price=50)...")
         result = await service.get_products(
             page=1,
             limit=5,
-            filters={"min_price": 5, "max_price": 20},
+            filters={"min_price": 10, "max_price": 50},
             sort_by="created_at",
             sort_order="desc"
         )
@@ -73,13 +73,13 @@ async def test_search_queries():
                 print(f"   - {p.name}: {p.rating} stars")
         
         # Test 5: Combined filters
-        print("\n5. Testing combined filters (category='Fruits', min_price=3, min_rating=3)...")
+        print("\n5. Testing combined filters (category='Legumes', min_price=20, min_rating=3)...")
         result = await service.get_products(
             page=1,
             limit=5,
             filters={
-                "category": "Fruits",
-                "min_price": 3,
+                "category": "Legumes",
+                "min_price": 20,
                 "min_rating": 3
             },
             sort_by="created_at",
@@ -92,11 +92,11 @@ async def test_search_queries():
                 print(f"   - {p.name}: ${price}, {p.rating} stars")
         
         # Test 6: Search with category
-        print("\n6. Testing search with category (q='fresh', category='Vegetables')...")
+        print("\n6. Testing search with category (q='organic', category='Cereal Crops')...")
         result = await service.get_products(
             page=1,
             limit=5,
-            filters={"q": "fresh", "category": "Vegetables"},
+            filters={"q": "organic", "category": "Cereal Crops"},
             sort_by="created_at",
             sort_order="desc"
         )
