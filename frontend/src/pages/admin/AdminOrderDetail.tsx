@@ -1,4 +1,4 @@
-
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
@@ -8,10 +8,15 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 export const AdminOrderDetail = () => {
   const { id } = useParams();
 
-  const { data: order, loading, error } = useApi(
-    () => AdminAPI.getOrder(id),
-    { autoFetch: true, showErrorToast: true }
-  );
+  const { data: orderResponse, loading, error, execute } = useApi();
+
+  React.useEffect(() => {
+    if (id) {
+      execute(() => AdminAPI.getOrder(id));
+    }
+  }, [id, execute]);
+
+  const order = orderResponse?.data || orderResponse;
 
   if (loading) {
     return <div className="p-6">Loading order details...</div>;
@@ -20,7 +25,7 @@ export const AdminOrderDetail = () => {
   if (error) {
     return (
       <div className="p-6">
-        <ErrorMessage error={error} onRetry={() => {}} />
+        <ErrorMessage error={error} onRetry={() => execute(() => AdminAPI.getOrder(id))} />
       </div>
     );
   }

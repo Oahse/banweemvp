@@ -9,18 +9,18 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 export const AdminAnalytics = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const [chartView, setChartView] = useState('revenue');
-  const { data: dashboardData, loading, error, execute: fetchDashboardData } = useApi(undefined, { showErrorToast: false });
+  const { data: dashboardData, loading, error, execute: fetchDashboardData } = useApi();
 
   useEffect(() => {
-    const date_from = new Date();
-    date_from.setDate(date_from.getDate() - 30);
     fetchDashboardData(() => AnalyticsAPI.getDashboardData({ date_range: timeRange }));
   }, [fetchDashboardData, timeRange]);
 
-  const overviewStats = dashboardData ? [
+  const analyticsData = dashboardData?.data || dashboardData;
+  
+  const overviewStats = analyticsData ? [
     {
       title: 'Total Revenue',
-      value: `${(dashboardData.total_sales || 0).toLocaleString()}`,
+      value: `${(analyticsData.total_sales || 0).toLocaleString()}`,
       previousValue: '$0', // Placeholder
       change: '+0%', // Placeholder
       increasing: true, // Placeholder
@@ -29,7 +29,7 @@ export const AdminAnalytics = () => {
     },
     {
       title: 'Orders',
-      value: (dashboardData.total_orders || 0).toLocaleString(),
+      value: (analyticsData.total_orders || 0).toLocaleString(),
       previousValue: '0', // Placeholder
       change: '+0%', // Placeholder
       increasing: true, // Placeholder
@@ -38,7 +38,7 @@ export const AdminAnalytics = () => {
     },
     {
       title: 'Customers',
-      value: (dashboardData.total_users || 0).toLocaleString(),
+      value: (analyticsData.total_users || 0).toLocaleString(),
       previousValue: '0', // Placeholder
       change: '+0%', // Placeholder
       increasing: true, // Placeholder
@@ -47,7 +47,7 @@ export const AdminAnalytics = () => {
     },
     {
       title: 'Conversion Rate',
-      value: `${(dashboardData.conversion_rate || 0).toFixed(2)}%`,
+      value: `${(analyticsData.conversion_rate || 0).toFixed(2)}%`,
       previousValue: '0%', // Placeholder
       change: '-0%', // Placeholder
       increasing: false, // Placeholder
@@ -129,9 +129,9 @@ export const AdminAnalytics = () => {
             </div>
           </div>
           <div className="h-64">
-            {dashboardData?.sales_trend && dashboardData.sales_trend.length > 0 ? (
+            {analyticsData?.sales_trend && analyticsData.sales_trend.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={dashboardData.sales_trend}>
+                <LineChart data={analyticsData.sales_trend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                   <XAxis dataKey="date" stroke="var(--color-copy-lighter)" fontSize={12} />
                   <YAxis stroke="var(--color-copy-lighter)" fontSize={12} />
@@ -164,7 +164,7 @@ export const AdminAnalytics = () => {
             </h2>
           </div>
           <div className="space-y-4">
-            {Object.entries(dashboardData?.order_status_distribution || {}).map(([status, count], index) => {
+            {Object.entries(analyticsData?.order_status_distribution || {}).map(([status, count], index) => {
               const colors = ['bg-success', 'bg-warning', 'bg-info', 'bg-error', 'bg-secondary'];
               const color = colors[index % colors.length];
               return (
@@ -179,7 +179,7 @@ export const AdminAnalytics = () => {
                   </div>
                   <div className="w-full h-2 bg-surface-hover rounded-full overflow-hidden">
                     <div className={`h-full ${color}`} style={{
-                      width: `${(count / dashboardData.total_orders) * 100}%`
+                      width: `${(count / (analyticsData.total_orders || 1)) * 100}%`
                     }}></div>
                   </div>
                 </div>
@@ -200,7 +200,7 @@ export const AdminAnalytics = () => {
             </Link>
           </div>
           <div className="space-y-4">
-            {(dashboardData?.top_products || []).map(product => <div key={product.id} className="flex items-center">
+            {(analyticsData?.top_products || []).map(product => <div key={product.id} className="flex items-center">
                 <img src={product.image_url} alt={product.name} className="w-10 h-10 rounded-md object-cover mr-3" />
                 <div className="flex-grow">
                   <h3 className="font-medium text-main text-sm">
