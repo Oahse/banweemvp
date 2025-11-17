@@ -1,12 +1,16 @@
-# Banwee E-commerce Platform
+<div align="center">
+  <img src="frontend/public/banwe_logo_green.png" alt="Banwee Logo" width="200"/>
+  
+  # Banwee E-commerce Platform
 
-[![Build Status](https://github.com/banwee/platform/workflows/CI/badge.svg)](https://github.com/banwee/platform/actions)
-[![Coverage](https://codecov.io/gh/banwee/platform/branch/main/graph/badge.svg)](https://codecov.io/gh/banwee/platform)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Node.js 18+](https://img.shields.io/badge/node.js-18+-green.svg)](https://nodejs.org/)
+  [![Build Status](https://github.com/banwee/platform/workflows/CI/badge.svg)](https://github.com/banwee/platform/actions)
+  [![Coverage](https://codecov.io/gh/banwee/platform/branch/main/graph/badge.svg)](https://codecov.io/gh/banwee/platform)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+  [![Node.js 18+](https://img.shields.io/badge/node.js-18+-green.svg)](https://nodejs.org/)
 
-A comprehensive, modern e-commerce platform built with FastAPI and React, featuring advanced analytics, real-time capabilities, and a focus on performance and user experience.
+  A comprehensive, modern e-commerce platform built with FastAPI and React, featuring advanced analytics, real-time capabilities, and a focus on performance and user experience.
+</div>
 
 ## 🚀 Features
 
@@ -64,12 +68,6 @@ A comprehensive, modern e-commerce platform built with FastAPI and React, featur
 - React Router for navigation
 - Framer Motion for animations
 
-**DevOps & Monitoring:**
-- Docker containerization
-- GitHub Actions CI/CD
-- Prometheus metrics
-- Grafana dashboards
-- ELK stack for logging
 
 ## 🚀 Quick Start
 

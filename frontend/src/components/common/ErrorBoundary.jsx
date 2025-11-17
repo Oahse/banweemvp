@@ -2,8 +2,8 @@ import { Component } from 'react';
 
 /**
  * @typedef {object} Props
- * @property {React.ReactNode} children
- * @property {React.ReactNode} [fallback]
+ * @property {import('react').ReactNode} children
+ * @property {import('react').ReactNode} [fallback]
  */
 
 /**
@@ -29,7 +29,7 @@ export class ErrorBoundary extends Component {
 
   /**
    * @param {Error} error
-   * @param {React.ErrorInfo} errorInfo
+   * @param {import('react').ErrorInfo} errorInfo
    */
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
