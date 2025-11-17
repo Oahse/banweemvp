@@ -22,6 +22,8 @@ export class ProductsAPI {
     if (params?.category) queryParams.append('category', params.category);
     if (params?.min_price) queryParams.append('min_price', params.min_price.toString());
     if (params?.max_price) queryParams.append('max_price', params.max_price.toString());
+    if (params?.min_rating) queryParams.append('min_rating', params.min_rating.toString());
+    if (params?.max_rating) queryParams.append('max_rating', params.max_rating.toString());
     if (params?.availability !== undefined) queryParams.append('availability', params.availability.toString());
     if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
     if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
