@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChevronRightIcon, SearchIcon, TagIcon } from 'lucide-react';
 import { BlogAPI } from '../apis';
-import { usePaginatedApi } from '../hooks/useApi';
+import { useApi } from '../hooks/useApi';
 
 export const Blog = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,7 +17,7 @@ export const Blog = () => {
     loading,
     error,
     execute: fetchBlogPosts,
-  } = usePaginatedApi();
+  } = useApi();
 
   // Fetch blog posts when filters or page change
   useEffect(() => {
