@@ -208,7 +208,7 @@ export const AdminOrders = () => {
                   </tr>
                 ))
               ) : (
-                orders.map((order) => (
+                (orders || []).map((order) => (
                   <tr key={order.id} className="border-t border-border-light hover:bg-surface-hover">
                     <td className="py-3 px-4">
                       <Link to={`/admin/orders/${order.id}`} className="font-medium text-primary hover:underline">
