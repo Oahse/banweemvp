@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from uuid import UUID
@@ -14,11 +14,9 @@ class ProductImageResponse(BaseModel):
     format: Optional[str]
     created_at: str
 
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat() if v else None
-        }
+    model_config = ConfigDict(from_attributes=True, json_encoders={
+        datetime: lambda v: v.isoformat() if v else None
+    })
 
 
 class ProductVariantCreate(BaseModel):
@@ -56,8 +54,7 @@ class CategoryResponse(BaseModel):
     created_at: str
     updated_at: Optional[str]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SupplierResponse(BaseModel):
@@ -68,8 +65,7 @@ class SupplierResponse(BaseModel):
     phone: Optional[str]
     role: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProductVariantResponse(BaseModel):
@@ -91,11 +87,9 @@ class ProductVariantResponse(BaseModel):
     product_name: Optional[str] = None
     product_description: Optional[str] = None
 
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat() if v else None
-        }
+    model_config = ConfigDict(from_attributes=True, json_encoders={
+        datetime: lambda v: v.isoformat() if v else None
+    })
 
 
 class PriceRange(BaseModel):
@@ -125,8 +119,7 @@ class ProductResponse(BaseModel):
     variants: List[ProductVariantResponse] = []
     primary_variant: Optional[ProductVariantResponse] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProductListResponse(BaseModel):

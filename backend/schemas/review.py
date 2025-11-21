@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -8,8 +8,7 @@ class ReviewUser(BaseModel):
     firstname: str
     lastname: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ReviewResponse(BaseModel):
@@ -19,8 +18,7 @@ class ReviewResponse(BaseModel):
     created_at: datetime
     user: ReviewUser
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ReviewBase(BaseModel):
@@ -45,5 +43,4 @@ class ReviewInDB(ReviewBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

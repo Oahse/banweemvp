@@ -1,4 +1,6 @@
-from pydantic import BaseModel, EmailStr
+
+
+from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
@@ -23,13 +25,13 @@ class AddressUpdate(AddressBase):
 
 class AddressResponse(AddressBase):
     id: UUID
-    user_id: UUID
     created_at: datetime
-    updated_at: Optional[datetime]
+    updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True  # For Pydantic v2
-        # orm_mode = True # For Pydantic v1
+    model_config = ConfigDict(from_attributes=True)
+
+
+
 
 
 class UserBase(BaseModel):
@@ -74,5 +76,4 @@ class UserResponse(BaseModel):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

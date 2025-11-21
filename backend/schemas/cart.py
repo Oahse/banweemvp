@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 from datetime import datetime
 from uuid import UUID
@@ -22,11 +22,9 @@ class CartItemResponse(BaseModel):
     total_price: float
     created_at: str = Field(..., description="ISO format datetime string")
 
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat() if v else None
-        }
+    model_config = ConfigDict(from_attributes=True, json_encoders={
+        datetime: lambda v: v.isoformat() if v else None
+    })
 
 
 class CartResponse(BaseModel):
@@ -37,8 +35,7 @@ class CartResponse(BaseModel):
     total_amount: float
     currency: str = "USD"
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UpdateCartItemRequest(BaseModel):
