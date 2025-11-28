@@ -1,10 +1,11 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
+from uuid import UUID
 
 
 class ReviewUser(BaseModel):
-    id: str
+    id: UUID
     firstname: str
     lastname: str
 
@@ -12,7 +13,7 @@ class ReviewUser(BaseModel):
 
 
 class ReviewResponse(BaseModel):
-    id: str
+    id: UUID
     rating: int
     comment: Optional[str]
     created_at: datetime

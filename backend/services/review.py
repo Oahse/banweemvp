@@ -4,11 +4,12 @@ from sqlalchemy import func, desc
 from typing import Optional, List
 from models.review import Review
 from models.product import Product
+from models.user import User
 from schemas.review import ReviewCreate, ReviewUpdate, ReviewResponse
 from core.exceptions import APIException
 from uuid import uuid4, UUID
 from datetime import datetime
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, load_only
 
 
 class ReviewService:
@@ -46,8 +47,10 @@ class ReviewService:
 
     async def get_reviews_for_product(self, product_id: UUID, page: int = 1, limit: int = 10, min_rating: Optional[int] = None, max_rating: Optional[int] = None, sort_by: Optional[str] = None) -> dict:
         offset = (page - 1) * limit
-        query = select(Review).filter_by(
-            product_id=product_id).options(selectinload(Review.user))
+        query = select(Review).filter_by(product_id=product_id).options(
+            selectinload(Review.user).load_only(
+                User.id, User.firstname, User.lastname)
+        )
         total_query = select(func.count()).select_from(
             Review).filter_by(product_id=product_id)
 

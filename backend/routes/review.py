@@ -83,6 +83,8 @@ async def get_reviews_for_product(
             product_id, page, limit, min_rating, max_rating, sort_by
         )
         return Response(success=True, data=reviews)
+    except APIException:
+        raise
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
