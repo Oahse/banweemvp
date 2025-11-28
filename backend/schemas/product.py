@@ -20,12 +20,13 @@ class ProductImageResponse(BaseModel):
 
 
 class ProductVariantCreate(BaseModel):
-    sku: str
+    sku: Optional[str] = None  # Optional - will be auto-generated if not provided
     name: str
     base_price: float
     sale_price: Optional[float] = None
-    stock: int
+    stock: int = 0
     attributes: Optional[Dict[str, Any]] = {}
+    image_urls: Optional[List[str]] = []  # jsDelivr CDN URLs
 
 
 class ProductCreate(BaseModel):

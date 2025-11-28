@@ -173,6 +173,13 @@ export class AdminAPI {
    */
   static async updateOrderStatus(orderId, status) {
     return await apiClient.put(`/admin/orders/${orderId}/status`, { status });
+  }
+
+  /**
+   * Get order invoice (admin)
+   */
+  static async getOrderInvoice(orderId) {
+    await apiClient.download(`/admin/orders/${orderId}/invoice`, `invoice-${orderId}.pdf`);
   }  /**
    * Get order disputes
    */

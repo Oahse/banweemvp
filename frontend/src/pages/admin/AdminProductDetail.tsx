@@ -12,28 +12,11 @@ export const AdminProductDetail = () => {
   const { data: apiResponse, loading, error, execute } = useApi();
 
   useEffect(() => {
-    // Don't fetch if id is 'new' or 'edit' (reserved routes)
+    // Only fetch if we have a valid product ID
     if (id && id !== 'new' && id !== 'edit') {
       execute(ProductsAPI.getProduct, id);
     }
   }, [id, execute]);
-
-  // Redirect if trying to access reserved routes
-  if (id === 'new' || id === 'edit') {
-    return (
-      <div className="p-6">
-        <div className="bg-warning/10 border border-warning text-warning p-4 rounded-md">
-          <p>This page is under construction. Please use the product list to manage products.</p>
-          <button
-            onClick={() => navigate('/admin/products')}
-            className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
-          >
-            Back to Products
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (

@@ -1,12 +1,15 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { PrinterIcon, ArrowLeftIcon } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { toast } from 'react-hot-toast';
 
 
 export const AdminOrderDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const { data: orderResponse, loading, error, execute } = useApi();
 
@@ -25,7 +28,11 @@ export const AdminOrderDetail = () => {
   if (error) {
     return (
       <div className="p-6">
-        <ErrorMessage error={error} onRetry={() => execute(() => AdminAPI.getOrder(id))} />
+        <ErrorMessage 
+          error={error} 
+          onRetry={() => execute(() => AdminAPI.getOrder(id))} 
+          onDismiss={() => navigate('/admin/orders')}
+        />
       </div>
     );
   }
@@ -34,11 +41,39 @@ export const AdminOrderDetail = () => {
     return <div className="p-6">Order not found.</div>;
   }
 
+  const handleDownloadInvoice = async () => {
+    try {
+      await AdminAPI.getOrderInvoice(id);
+      toast.success('Invoice downloaded successfully');
+    } catch (error) {
+      toast.error('Failed to download invoice');
+      console.error('Error downloading invoice:', error);
+    }
+  };
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Order Details: {order.id}</h1>
+      <button
+        onClick={() => navigate('/admin/orders')}
+        className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-6"
+      >
+        <ArrowLeftIcon size={20} className="mr-2" />
+        Back to Orders
+      </button>
+
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Order Details: {order.id}</h1>
+        <button
+          onClick={handleDownloadInvoice}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+        >
+          <PrinterIcon size={18} />
+          Download Invoice
+        </button>
+      </div>
       <div className="bg-white shadow-sm rounded-lg p-4">
         <p><strong>Customer:</strong> {order.user?.firstname} {order.user?.lastname}</p>
+        <p><strong>Email:</strong> {order.user?.email}</p>
         <p><strong>Status:</strong> {order.status}</p>
         <p><strong>Total Amount:</strong> ${order.total_amount?.toFixed(2)}</p>
         <p><strong>Created At:</strong> {new Date(order.created_at).toLocaleString()}</p>
@@ -53,28 +88,31 @@ export const AdminOrderDetail = () => {
       <div className="mt-6 bg-white shadow-sm rounded-lg p-4">
         <h2 className="text-xl font-bold mb-4">Payment Details</h2>
         <p><strong>Payment Method ID:</strong> {order.payment_method_id || 'Not available'}</p>
-        <h3 className="text-lg font-bold mt-4 mb-2">Transactions</h3>
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {order.transactions?.map(transaction => (
-              <tr key={transaction.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{transaction.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap">${transaction.amount.toFixed(2)} {transaction.currency}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{transaction.status}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{transaction.transaction_type}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
+
+      {order.tracking_events && order.tracking_events.length > 0 && (
+        <div className="mt-6 bg-white shadow-sm rounded-lg p-4">
+          <h2 className="text-xl font-bold mb-4">Tracking Events</h2>
+          <div className="space-y-3">
+            {order.tracking_events.map((event: any) => (
+              <div key={event.id} className="border-l-4 border-primary pl-4 py-2">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold text-gray-900">{event.status}</p>
+                    <p className="text-sm text-gray-600">{event.description}</p>
+                    {event.location && (
+                      <p className="text-xs text-gray-500 mt-1">📍 {event.location}</p>
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {new Date(event.created_at).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-4">Order Items</h2>
@@ -89,12 +127,15 @@ export const AdminOrderDetail = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {order.items?.map(item => (
+              {order.items?.map((item: any) => (
                 <tr key={item.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.variant?.product_name} ({item.variant?.name})</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.variant?.product?.name || item.variant?.product_name || 'Product'}
+                    {item.variant?.name && ` (${item.variant.name})`}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.quantity}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">${item.price_per_unit.toFixed(2)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">${item.total_price.toFixed(2)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">${item.price_per_unit?.toFixed(2)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">${item.total_price?.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>

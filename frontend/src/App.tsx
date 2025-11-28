@@ -94,6 +94,9 @@ const AdminVariants = lazy(() =>
 const AdminNewUser = lazy(() =>
   import('./pages/admin/AdminNewUser').then((module) => ({ default: module.AdminNewUser }))
 );
+const AdminNewProduct = lazy(() =>
+  import('./pages/admin/AdminNewProduct').then((module) => ({ default: module.AdminNewProduct }))
+);
 
 const AdminSettings = lazy(() =>
   import('./pages/admin/AdminSettings').then((module) => ({ default: module.AdminSettings }))
@@ -183,6 +186,14 @@ export const App: React.FC = () => {
                                 }
                               />
                               <Route
+                                path="/admin/products/new"
+                                element={
+                                  <AdminLayout>
+                                    <AdminNewProduct />
+                                  </AdminLayout>
+                                }
+                              />
+                              <Route
                                 path="/admin/products/:id"
                                 element={
                                   <AdminLayout>
@@ -199,18 +210,18 @@ export const App: React.FC = () => {
                                 }
                               />
                               <Route
-                                path="/admin/users/:id"
-                                element={
-                                  <AdminLayout>
-                                    <AdminUserDetail />
-                                  </AdminLayout>
-                                }
-                              />
-                              <Route
                                 path="/admin/users/new"
                                 element={
                                   <AdminLayout>
                                     <AdminNewUser />
+                                  </AdminLayout>
+                                }
+                              />
+                              <Route
+                                path="/admin/users/:id"
+                                element={
+                                  <AdminLayout>
+                                    <AdminUserDetail />
                                   </AdminLayout>
                                 }
                               />

@@ -507,10 +507,15 @@ class ProductService:
         await self.db.flush()  # Get the product ID
 
         # Create variants
-        for variant_data in product_data.variants:
+        for v_idx, variant_data in enumerate(product_data.variants):
+            # Auto-generate SKU: PROD-{product_id[:8]}-{variant_index}
+            # Format: First 3 chars of product name + first 8 chars of product ID + variant index
+            product_prefix = db_product.name[:3].upper().replace(' ', '')
+            auto_sku = f"{product_prefix}-{str(db_product.id)[:8]}-{v_idx}"
+            
             db_variant = ProductVariant(
                 product_id=db_product.id,
-                sku=variant_data.sku,
+                sku=variant_data.sku if variant_data.sku else auto_sku,  # Use provided SKU or auto-generate
                 name=variant_data.name,
                 base_price=variant_data.base_price,
                 sale_price=variant_data.sale_price,
@@ -518,6 +523,19 @@ class ProductService:
                 attributes=variant_data.attributes or {}
             )
             self.db.add(db_variant)
+            await self.db.flush()  # Get variant ID
+            
+            # Create variant images from CDN URLs
+            if variant_data.image_urls:
+                from models.product import ProductImage
+                for img_idx, image_url in enumerate(variant_data.image_urls):
+                    db_image = ProductImage(
+                        variant_id=db_variant.id,
+                        url=image_url,
+                        is_primary=(img_idx == 0),  # First image is primary
+                        sort_order=img_idx
+                    )
+                    self.db.add(db_image)
 
         await self.db.commit()
 

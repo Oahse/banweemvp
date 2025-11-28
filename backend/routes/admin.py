@@ -2,6 +2,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from typing import Optional
 from core.database import get_db
 from core.utils.response import Response
@@ -9,6 +10,7 @@ from core.exceptions import APIException
 from services.admin import AdminService
 from services.orders import OrderService
 from models.user import User
+from models.order import Order
 from services.auth import AuthService
 from schemas.auth import UserCreate  # Added UserCreate import
 
@@ -349,6 +351,63 @@ async def update_order_status(
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
             message=f"Failed to update order status: {str(e)}"
+        )
+
+
+@router.get("/orders/{order_id}/invoice")
+async def get_order_invoice_admin(
+    order_id: UUID,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get order invoice (admin only)."""
+    from fastapi.responses import FileResponse
+    from services.order import OrderService as EnhancedOrderService
+    import os
+    
+    try:
+        order_service = EnhancedOrderService(db)
+        # Get order to verify it exists
+        order_query = await db.execute(
+            select(Order).where(Order.id == order_id)
+        )
+        order = order_query.scalar_one_or_none()
+        
+        if not order:
+            raise APIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                message="Order not found"
+            )
+        
+        # Generate invoice (this works for any user as admin)
+        invoice = await order_service.generate_invoice(order_id, order.user_id)
+        
+        # If invoice_path exists, return the file for download
+        if 'invoice_path' in invoice and os.path.exists(invoice['invoice_path']):
+            file_path = invoice['invoice_path']
+            # Determine file type
+            if file_path.endswith('.pdf'):
+                return FileResponse(
+                    path=file_path,
+                    filename=f"invoice-{order_id}.pdf",
+                    media_type="application/pdf"
+                )
+            else:  # DOCX
+                return FileResponse(
+                    path=file_path,
+                    filename=f"invoice-{order_id}.docx",
+                    media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
+        
+        # Otherwise return invoice data
+        return Response(success=True, data=invoice)
+    except APIException:
+        raise
+    except Exception as e:
+        print(f"Error generating invoice: {e}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to generate invoice: {str(e)}"
         )
 
 

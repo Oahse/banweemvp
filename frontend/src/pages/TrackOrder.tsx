@@ -6,7 +6,8 @@ import {
   CheckCircleIcon, 
   ClockIcon,
   MapPinIcon,
-  ArrowLeftIcon 
+  ArrowLeftIcon,
+  PrinterIcon
 } from 'lucide-react';
 import { OrdersAPI } from '../apis/orders';
 import { toast } from 'react-hot-toast';
@@ -134,6 +135,16 @@ export const TrackOrder = () => {
 
   const currentStepIndex = getCurrentStepIndex(tracking.status);
 
+  const handleDownloadInvoice = async () => {
+    try {
+      await OrdersAPI.getOrderInvoice(orderId);
+      toast.success('Invoice downloaded successfully');
+    } catch (error) {
+      toast.error('Failed to download invoice');
+      console.error('Error downloading invoice:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-4xl mx-auto">
@@ -146,12 +157,23 @@ export const TrackOrder = () => {
         </button>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Track Your Order
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
-            Order ID: {tracking.order_id}
-          </p>
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                Track Your Order
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400">
+                Order ID: {tracking.order_id}
+              </p>
+            </div>
+            <button
+              onClick={handleDownloadInvoice}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+            >
+              <PrinterIcon size={18} />
+              Download Invoice
+            </button>
+          </div>
 
           {tracking.tracking_number && (
             <div className="flex items-center gap-2 mb-4">

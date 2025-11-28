@@ -63,7 +63,7 @@ export const AdminVariants = () => {
     <div>
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold text-main mb-2 md:mb-0">Product Variants</h1>
-        <Link to="/admin/products/new-variant" className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors">
+        <Link to="/admin/variants/new" className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors">
           <PlusIcon size={18} className="mr-2" />
           Add Variant
         </Link>

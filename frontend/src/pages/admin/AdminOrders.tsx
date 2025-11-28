@@ -4,6 +4,7 @@ import { SearchIcon, FilterIcon, ChevronDownIcon, EyeIcon, PrinterIcon, MoreHori
 import { usePaginatedApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { toast } from 'react-hot-toast';
 
 export const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,9 +15,9 @@ export const AdminOrders = () => {
   const [dateTo, setDateTo] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-  const [updatingOrderId, setUpdatingOrderId] = useState(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
-  const apiCall = useCallback((page, limit) => {
+  const apiCall = useCallback((page: number, limit: number) => {
     return AdminAPI.getAllOrders({
       status: filterStatus !== 'all' ? filterStatus : undefined,
       q: submittedSearchTerm || undefined,
@@ -47,23 +48,36 @@ export const AdminOrders = () => {
     { showErrorToast: false, autoFetch: true }
   );
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmittedSearchTerm(searchTerm);
     goToPage(1);
   };
 
-  const handleStatusUpdate = async (orderId, newStatus) => {
+  const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
       setUpdatingOrderId(orderId);
       await AdminAPI.updateOrderStatus(orderId, newStatus);
       // Refresh orders list
       await fetchOrders();
+      toast.success('Order status updated successfully');
     } catch (error) {
       console.error('Failed to update order status:', error);
-      alert('Failed to update order status. Please try again.');
+      toast.error('Failed to update order status. Please try again.');
     } finally {
       setUpdatingOrderId(null);
+    }
+  };
+
+  const handleDownloadInvoice = async (orderId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await AdminAPI.getOrderInvoice(orderId);
+      toast.success('Invoice downloaded successfully');
+    } catch (error) {
+      console.error('Failed to download invoice:', error);
+      toast.error('Failed to download invoice');
     }
   };
 
@@ -94,6 +108,7 @@ export const AdminOrders = () => {
         <ErrorMessage
           error={ordersError}
           onRetry={() => fetchOrders()}
+          onDismiss={() => window.location.reload()}
         />
       </div>
     );
@@ -235,22 +250,24 @@ export const AdminOrders = () => {
                       {new Date(order.created_at).toLocaleDateString()}
                     </td>
                     <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        order.status === 'delivered' ? 'bg-success/10 text-success' :
-                        order.status === 'shipped' ? 'bg-info/10 text-info' :
-                        order.status === 'processing' ? 'bg-warning/10 text-warning' :
-                        'bg-error/10 text-error'
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        order.status === 'delivered' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                        order.status === 'shipped' || order.status === 'out_for_delivery' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
+                        order.status === 'confirmed' || order.status === 'processing' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                        order.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                       }`}>
-                        {order.status?.charAt(0).toUpperCase() + order.status?.slice(1) || 'Processing'}
+                        {order.status?.charAt(0).toUpperCase() + order.status?.slice(1).replace('_', ' ') || 'Pending'}
                       </span>
                     </td>
                     <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        order.payment_status === 'succeeded' ? 'bg-success/10 text-success' :
-                        order.payment_status === 'pending' ? 'bg-warning/10 text-warning' :
-                        'bg-error/10 text-error'
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        order.payment_status === 'completed' || order.payment_status === 'succeeded' || order.payment_status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                        order.payment_status === 'pending' || order.payment_status === 'processing' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                        order.payment_status === 'failed' || order.payment_status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                       }`}>
-                        {order.payment_status?.charAt(0).toUpperCase() + order.payment_status?.slice(1) || 'Pending'}
+                        {order.payment_status?.charAt(0).toUpperCase() + order.payment_status?.slice(1).replace('_', ' ') || 'Completed'}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-center">{order.items?.length || 0}</td>
@@ -262,7 +279,11 @@ export const AdminOrders = () => {
                       <Link to={`/admin/orders/${order.id}`} className="p-1 text-copy-light hover:text-primary" title="View">
                         <EyeIcon size={18} />
                       </Link>
-                      <button className="p-1 text-copy-light hover:text-main" title="Print">
+                      <button 
+                        onClick={(e) => handleDownloadInvoice(order.id, e)}
+                        className="p-1 text-copy-light hover:text-main" 
+                        title="Download Invoice"
+                      >
                         <PrinterIcon size={18} />
                       </button>
                       <div className="relative group">
@@ -321,13 +342,14 @@ export const AdminOrders = () => {
                           {new Date(order.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        order.status === 'delivered' ? 'bg-success/10 text-success' :
-                        order.status === 'shipped' ? 'bg-info/10 text-info' :
-                        order.status === 'processing' ? 'bg-warning/10 text-warning' :
-                        'bg-error/10 text-error'
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        order.status === 'delivered' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                        order.status === 'shipped' || order.status === 'out_for_delivery' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
+                        order.status === 'confirmed' || order.status === 'processing' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                        order.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                       }`}>
-                        {order.status?.charAt(0).toUpperCase() + order.status?.slice(1) || 'Processing'}
+                        {order.status?.charAt(0).toUpperCase() + order.status?.slice(1).replace('_', ' ') || 'Pending'}
                       </span>
                     </div>
                     
@@ -356,12 +378,13 @@ export const AdminOrders = () => {
                       </div>
                       <div>
                         <p className="text-xs text-copy-light">Payment</p>
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs ${
-                          order.payment_status === 'succeeded' ? 'bg-success/10 text-success' :
-                          order.payment_status === 'pending' ? 'bg-warning/10 text-warning' :
-                          'bg-error/10 text-error'
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                          order.payment_status === 'completed' || order.payment_status === 'succeeded' || order.payment_status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                          order.payment_status === 'pending' || order.payment_status === 'processing' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                          order.payment_status === 'failed' || order.payment_status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+                          'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                         }`}>
-                          {order.payment_status?.charAt(0).toUpperCase() + order.payment_status?.slice(1) || 'Pending'}
+                          {order.payment_status?.charAt(0).toUpperCase() + order.payment_status?.slice(1).replace('_', ' ') || 'Completed'}
                         </span>
                       </div>
                     </div>
@@ -373,7 +396,11 @@ export const AdminOrders = () => {
                       >
                         View Details
                       </Link>
-                      <button className="py-2 px-3 border border-border-light rounded-md text-sm text-copy-light hover:bg-surface-hover">
+                      <button 
+                        onClick={(e) => handleDownloadInvoice(order.id, e)}
+                        className="py-2 px-3 border border-border-light rounded-md text-sm text-copy-light hover:bg-surface-hover"
+                        title="Download Invoice"
+                      >
                         <PrinterIcon size={16} />
                       </button>
                     </div>
