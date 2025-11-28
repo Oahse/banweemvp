@@ -20,6 +20,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 const Dashboard = lazy(() => import('../components/account/Dashboard'));
 const Profile = lazy(() => import('../components/account/Profile'));
 const Orders = lazy(() => import('../components/account/Orders'));
+const OrderDetail = lazy(() => import('../components/account/OrderDetail'));
 const TrackOrder = lazy(() => import('../components/account/TrackOrder'));
 const Wishlist = lazy(() => import('../components/account/Wishlist'));
 const Addresses = lazy(() => import('../components/account/Addresses'));
@@ -164,6 +165,7 @@ export const Account = () => {
               <Route path="/" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/orders" element={<Orders />} />
+              <Route path="/orders/:orderId" element={<OrderDetail />} />
               <Route path="/track-order" element={<TrackOrder />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/addresses" element={<Addresses />} />

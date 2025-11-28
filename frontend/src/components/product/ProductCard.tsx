@@ -134,11 +134,7 @@ export const ProductCard = ({
 
         }
 
-
         const variantToAdd = displayVariant || (product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
-
-    
-
         if (!variantToAdd) {
 
           toast.error("This product has no variants available.");

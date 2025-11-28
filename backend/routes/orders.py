@@ -138,7 +138,7 @@ async def get_order_tracking(
     current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get order tracking information."""
+    """Get order tracking information (authenticated)."""
     try:
         order_service = OrderService(db)
         tracking = await order_service.get_order_tracking(order_id, current_user.id)
@@ -147,6 +147,24 @@ async def get_order_tracking(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message="Failed to fetch tracking information"
+        )
+
+
+@router.get("/track/{order_id}")
+async def track_order_public(
+    order_id: UUID,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get order tracking information (public - no authentication required)."""
+    try:
+        order_service = OrderService(db)
+        # Get order without user_id verification for public access
+        tracking = await order_service.get_order_tracking_public(order_id)
+        return Response(success=True, data=tracking)
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            message="Order not found or tracking information unavailable"
         )
 
 
@@ -194,14 +212,37 @@ async def get_order_invoice(
     db: AsyncSession = Depends(get_db)
 ):
     """Get order invoice."""
+    from fastapi.responses import FileResponse
+    import os
+    
     try:
         order_service = OrderService(db)
         invoice = await order_service.generate_invoice(order_id, current_user.id)
+        
+        # If invoice_path exists, return the file for download
+        if 'invoice_path' in invoice and os.path.exists(invoice['invoice_path']):
+            file_path = invoice['invoice_path']
+            # Determine file type
+            if file_path.endswith('.pdf'):
+                return FileResponse(
+                    path=file_path,
+                    filename="invoice.pdf",
+                    media_type="application/pdf"
+                )
+            else:  # DOCX
+                return FileResponse(
+                    path=file_path,
+                    filename="invoice.docx",
+                    media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
+        
+        # Otherwise return invoice data
         return Response(success=True, data=invoice)
     except Exception as e:
+        print(f"Error generating invoice: {e}")
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Failed to generate invoice"
+            message=f"Failed to generate invoice: {str(e)}"
         )
 
 

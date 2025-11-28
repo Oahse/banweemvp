@@ -308,6 +308,10 @@ async def ship_order(
 
 class UpdateOrderStatusRequest(BaseModel):
     status: str
+    tracking_number: Optional[str] = None
+    carrier_name: Optional[str] = None
+    location: Optional[str] = None
+    description: Optional[str] = None
 
 
 @router.put("/orders/{order_id}/status")
@@ -318,15 +322,27 @@ async def update_order_status(
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    """Update order status (admin only)."""
+    """Update order status with tracking information (admin only)."""
     try:
-        order_service = OrderService(db)
+        # Import the order service from order.py which has the enhanced method
+        from services.order import OrderService as EnhancedOrderService
+        
+        order_service = EnhancedOrderService(db)
         order = await order_service.update_order_status(
-            order_id,
-            request.status,
-            background_tasks
+            order_id=UUID(order_id),
+            status=request.status,
+            tracking_number=request.tracking_number,
+            carrier_name=request.carrier_name,
+            location=request.location,
+            description=request.description
         )
-        return Response(success=True, data=order, message=f"Order status updated to {request.status}")
+        
+        return Response(success=True, data={
+            "id": str(order.id),
+            "status": order.status,
+            "tracking_number": order.tracking_number,
+            "carrier_name": order.carrier_name
+        }, message=f"Order status updated to {request.status}")
     except APIException:
         raise
     except Exception as e:

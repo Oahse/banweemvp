@@ -101,6 +101,12 @@ const AdminSettings = lazy(() =>
 const Notifications = lazy(() =>
   import('./pages/account/Notifications').then((module) => ({ default: module.Notifications }))
 );
+const TrackOrder = lazy(() =>
+  import('./pages/TrackOrder').then((module) => ({ default: module.TrackOrder }))
+);
+const TrackOrderSearch = lazy(() =>
+  import('./components/account/TrackOrder').then((module) => ({ default: module.default }))
+);
 
 // Lazy load supplier pages
 const SupplierDashboard = lazy(() =>
@@ -278,6 +284,8 @@ export const App: React.FC = () => {
                               <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
                               <Route path="/account/*" element={<Layout><Account /></Layout>} />
                               <Route path="/account/notifications" element={<Layout><Notifications /></Layout>} />
+                              <Route path="/account/track-order" element={<Layout><TrackOrderSearch /></Layout>} />
+                              <Route path="/track-order/:orderId" element={<Layout><TrackOrder /></Layout>} />
                               <Route
                                 path="/login"
                                 element={

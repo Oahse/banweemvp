@@ -64,11 +64,11 @@ class AdminService:
         recent_users_result = await self.db.execute(recent_users_query)
         recent_users = recent_users_result.scalars().all()
 
-        # Get recent orders
+        # Get recent orders - ordered by order creation date, not user creation
         recent_orders_query = (select(Order)
                                .join(User)
                                .options(selectinload(Order.user))
-                               .order_by(User.created_at.desc())
+                               .order_by(Order.created_at.desc())
                                .limit(5))
         recent_orders_result = await self.db.execute(recent_orders_query)
         recent_orders = recent_orders_result.scalars().all()
@@ -78,6 +78,34 @@ class AdminService:
         top_products = await analytics_service.get_top_products(
             user_id="", user_role="Admin", limit=5
         )
+
+        # Get recent activity (orders, users, reviews)
+        recent_activity = []
+        
+        # Add recent orders to activity
+        for order in recent_orders[:3]:
+            recent_activity.append({
+                "id": str(order.id),
+                "type": "order",
+                "description": f"New order #{str(order.id)[:8]} from {order.user.firstname if order.user else 'Unknown'} {order.user.lastname if order.user else 'User'}",
+                "amount": order.total_amount,
+                "status": order.status,
+                "timestamp": order.created_at.isoformat()
+            })
+        
+        # Add recent users to activity
+        for user in recent_users[:2]:
+            recent_activity.append({
+                "id": str(user.id),
+                "type": "user",
+                "description": f"New user registered: {user.firstname} {user.lastname}",
+                "email": user.email,
+                "role": user.role,
+                "timestamp": user.created_at.isoformat()
+            })
+        
+        # Sort activity by timestamp (most recent first)
+        recent_activity.sort(key=lambda x: x["timestamp"], reverse=True)
 
         return {
             "recent_users": [
@@ -107,7 +135,8 @@ class AdminService:
                 }
                 for order in recent_orders
             ],
-            "top_products": top_products  # Add top_products here
+            "top_products": top_products,
+            "recent_activity": recent_activity[:10]  # Limit to 10 most recent activities
         }
 
     async def get_all_orders(self, page: int = 1, limit: int = 10, order_status: Optional[str] = None, q: Optional[str] = None, date_from: Optional[str] = None, date_to: Optional[str] = None, min_price: Optional[float] = None, max_price: Optional[float] = None) -> dict:
@@ -424,15 +453,15 @@ class AdminService:
         await self.db.commit()
 
     async def get_order_by_id(self, order_id: str) -> Optional[dict]:
-        """Get a single order by ID, with related items and transactions."""
+        """Get a single order by ID, with related items."""
         query = (
             select(Order)
             .where(Order.id == order_id)
             .options(
                 selectinload(Order.items).selectinload(
                     OrderItem.variant).selectinload(ProductVariant.product),
-                selectinload(Order.transactions),
-                selectinload(Order.user)
+                selectinload(Order.user),
+                selectinload(Order.tracking_events)
             )
         )
         result = await self.db.execute(query)
@@ -483,16 +512,16 @@ class AdminService:
                 }
                 for item in order.items
             ] if order.items else [],
-            "transactions": [
+            "tracking_events": [
                 {
-                    "id": str(transaction.id),
-                    "amount": float(transaction.amount),
-                    "status": transaction.status,
-                    "payment_method": transaction.payment_method,
-                    "created_at": transaction.created_at.isoformat()
+                    "id": str(event.id),
+                    "status": event.status,
+                    "description": event.description,
+                    "location": event.location,
+                    "created_at": event.created_at.isoformat() if event.created_at else None
                 }
-                for transaction in order.transactions
-            ] if order.transactions else []
+                for event in order.tracking_events
+            ] if hasattr(order, 'tracking_events') and order.tracking_events else []
         }
 
     async def get_all_variants(self, page: int = 1, limit: int = 10, search: Optional[str] = None, product_id: Optional[str] = None) -> dict:

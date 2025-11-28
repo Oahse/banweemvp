@@ -164,8 +164,11 @@ class OrderService:
 
     async def get_user_orders(self, user_id: UUID, page: int = 1, limit: int = 10, status_filter: Optional[str] = None) -> Dict[str, Any]:
         """Get paginated list of user's orders"""
+        from models.product import ProductVariant, Product
+        
         query = select(Order).where(Order.user_id == user_id).options(
-            selectinload(Order.items).selectinload(OrderItem.variant),
+            selectinload(Order.items).selectinload(OrderItem.variant).selectinload(ProductVariant.images),
+            selectinload(Order.items).selectinload(OrderItem.variant).selectinload(ProductVariant.product),
             selectinload(Order.tracking_events)
         )
 
@@ -205,8 +208,11 @@ class OrderService:
 
     async def get_order_by_id(self, order_id: UUID, user_id: UUID) -> Optional[OrderResponse]:
         """Get a specific order by ID"""
+        from models.product import ProductVariant, Product
+        
         query = select(Order).where(and_(Order.id == order_id, Order.user_id == user_id)).options(
-            selectinload(Order.items).selectinload(OrderItem.variant),
+            selectinload(Order.items).selectinload(OrderItem.variant).selectinload(ProductVariant.images),
+            selectinload(Order.items).selectinload(OrderItem.variant).selectinload(ProductVariant.product),
             selectinload(Order.tracking_events)
         )
 
@@ -249,7 +255,7 @@ class OrderService:
         return await self._format_order_response(order)
 
     async def get_order_tracking(self, order_id: UUID, user_id: UUID) -> Dict[str, Any]:
-        """Get order tracking information"""
+        """Get order tracking information (authenticated)"""
         query = select(Order).where(and_(Order.id == order_id, Order.user_id == user_id)).options(
             selectinload(Order.tracking_events)
         )
@@ -287,6 +293,48 @@ class OrderService:
             "tracking_events": tracking_events
         }
 
+    async def get_order_tracking_public(self, order_id: UUID) -> Dict[str, Any]:
+        """Get order tracking information (public - no authentication required)"""
+        query = select(Order).where(Order.id == order_id).options(
+            selectinload(Order.tracking_events)
+        )
+
+        result = await self.db.execute(query)
+        order = result.scalar_one_or_none()
+
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+
+        tracking_events = []
+        # Sort events by created_at descending (most recent first)
+        sorted_events = sorted(order.tracking_events, key=lambda x: x.created_at, reverse=True)
+        
+        for event in sorted_events:
+            tracking_events.append({
+                "id": str(event.id),
+                "status": event.status,
+                "description": event.description,
+                "location": event.location,
+                "timestamp": event.created_at.isoformat()
+            })
+
+        # Calculate estimated delivery
+        estimated_delivery = None
+        if order.status in ["confirmed", "shipped", "processing"]:
+            estimated_days = 5  # Default delivery estimate
+            estimated_delivery = (
+                order.created_at + timedelta(days=estimated_days)).isoformat()
+
+        return {
+            "order_id": str(order.id),
+            "status": order.status,
+            "tracking_number": order.tracking_number,
+            "carrier_name": order.carrier_name,
+            "estimated_delivery": estimated_delivery,
+            "tracking_events": tracking_events,
+            "created_at": order.created_at.isoformat()
+        }
+
     async def add_tracking_event(self, order_id: UUID, status: str, description: str, location: Optional[str] = None) -> TrackingEvent:
         """Add a tracking event to an order (admin function)"""
         tracking_event = TrackingEvent(
@@ -300,7 +348,15 @@ class OrderService:
         await self.db.refresh(tracking_event)
         return tracking_event
 
-    async def update_order_status(self, order_id: UUID, status: str, tracking_number: Optional[str] = None) -> Order:
+    async def update_order_status(
+        self, 
+        order_id: UUID, 
+        status: str, 
+        tracking_number: Optional[str] = None,
+        carrier_name: Optional[str] = None,
+        location: Optional[str] = None,
+        description: Optional[str] = None
+    ) -> Order:
         """Update order status (admin function)"""
         query = select(Order).where(Order.id == order_id)
         result = await self.db.execute(query)
@@ -312,13 +368,41 @@ class OrderService:
         order.status = status
         if tracking_number:
             order.tracking_number = tracking_number
+        if carrier_name:
+            order.carrier_name = carrier_name
+
+        # Generate appropriate description based on status
+        if not description:
+            status_descriptions = {
+                'pending': 'Order placed and awaiting confirmation',
+                'confirmed': 'Order confirmed and payment processed',
+                'processing': 'Order is being prepared for shipment',
+                'shipped': 'Package has been shipped and is in transit',
+                'out_for_delivery': 'Package is out for delivery',
+                'delivered': 'Package has been successfully delivered',
+                'cancelled': 'Order has been cancelled'
+            }
+            description = status_descriptions.get(status, f"Order status updated to {status}")
+
+        # Determine location based on status if not provided
+        if not location:
+            location_map = {
+                'pending': 'System',
+                'confirmed': 'Processing Center',
+                'processing': 'Warehouse',
+                'shipped': 'In Transit',
+                'out_for_delivery': 'Local Distribution Center',
+                'delivered': 'Delivery Address',
+                'cancelled': 'System'
+            }
+            location = location_map.get(status, 'Fulfillment Center')
 
         # Add tracking event
         tracking_event = TrackingEvent(
             order_id=order.id,
             status=status,
-            description=f"Order status updated to {status}",
-            location="Fulfillment Center"
+            description=description,
+            location=location
         )
         self.db.add(tracking_event)
 
@@ -335,12 +419,33 @@ class OrderService:
         """Format order for response"""
         items = []
         for item in order.items:
+            # Include variant details with images
+            variant_data = None
+            if item.variant:
+                variant_data = {
+                    "id": str(item.variant.id),
+                    "name": item.variant.name,
+                    "product_name": item.variant.product.name if item.variant.product else None,
+                    "product_id": str(item.variant.product_id) if item.variant.product_id else None,
+                    "sku": item.variant.sku,
+                    "images": [
+                        {
+                            "id": str(img.id),
+                            "url": img.url,
+                            "is_primary": img.is_primary,
+                            "sort_order": img.sort_order
+                        }
+                        for img in item.variant.images
+                    ] if item.variant.images else []
+                }
+            
             items.append(OrderItemResponse(
                 id=str(item.id),
                 variant_id=str(item.variant_id),
                 quantity=item.quantity,
                 price_per_unit=item.price_per_unit,
-                total_price=item.total_price
+                total_price=item.total_price,
+                variant=variant_data
             ))
 
         # Calculate estimated delivery
@@ -469,18 +574,109 @@ class OrderService:
         return await self._format_order_response(new_order)
 
     async def generate_invoice(self, order_id: UUID, user_id: UUID) -> dict:
-        """Generate invoice for order"""
-        order = await self.get_order_by_id(order_id, user_id)
-        if not order:
+        """Generate invoice PDF using Jinja2 and WeasyPrint"""
+        from pathlib import Path
+        from sqlalchemy import select
+        from core.utils.invoice_generator import InvoiceGenerator
+        
+        order_response = await self.get_order_by_id(order_id, user_id)
+        if not order_response:
             raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Convert OrderResponse to dict for easier access
+        if hasattr(order_response, 'model_dump'):
+            order = order_response.model_dump()
+        elif hasattr(order_response, 'dict'):
+            order = order_response.dict()
+        else:
+            order = dict(order_response)
 
-        # Simplified invoice data
-        return {
-            "invoice_id": f"INV-{order_id}",
-            "order_id": str(order_id),
-            "invoice_url": f"/invoices/{order_id}.pdf",
-            "generated_at": datetime.now().isoformat()
-        }
+        try:
+            # Fetch user details
+            try:
+                from models.user import User
+                user_result = await self.db.execute(select(User).where(User.id == UUID(order.get('user_id'))))
+                user = user_result.scalar_one_or_none()
+                if user:
+                    customer_name = f"{user.firstname} {user.lastname}".strip() or "Customer"
+                    customer_email = user.email or ""
+                    customer_phone = user.phone or "N/A"
+                else:
+                    customer_name = "Customer"
+                    customer_email = ""
+                    customer_phone = "N/A"
+            except Exception as e:
+                print(f"Error fetching user: {e}")
+                customer_name = "Customer"
+                customer_email = ""
+                customer_phone = "N/A"
+            
+            # Prepare order data for invoice generator
+            order_data = {
+                'order_id': str(order_id),
+                'created_at': datetime.fromisoformat(order.get('created_at')) if order.get('created_at') else datetime.now(),
+                'customer_name': customer_name,
+                'customer_email': customer_email,
+                'customer_phone': customer_phone,
+                'subtotal': float(order.get('total_amount', 0)),
+                'tax_rate': 10,  # Get from settings or calculate
+                'tax_amount': float(order.get('total_amount', 0)) * 0.1,  # Calculate based on tax rate
+                'discount_amount': 0,  # Add if you have discount logic
+                'total_amount': float(order.get('total_amount', 0)),
+                'items': [
+                    {
+                        'product_name': item.get('variant', {}).get('product_name', 'Product'),
+                        'variant_name': item.get('variant', {}).get('name', ''),
+                        'price_per_unit': float(item.get('price_per_unit', 0)),
+                        'quantity': item.get('quantity', 1),
+                        'total_price': float(item.get('total_price', 0))
+                    }
+                    for item in order.get('items', [])
+                ]
+            }
+            
+            # Generate invoice using InvoiceGenerator
+            generator = InvoiceGenerator()
+            
+            # Create output directory
+            output_dir = Path(__file__).parent.parent / "generated_invoices"
+            output_dir.mkdir(exist_ok=True)
+            pdf_path = output_dir / f"invoice_{order_id}.pdf"
+            
+            # Generate PDF
+            generator.generate_pdf(order_data, str(pdf_path))
+            
+            invoice_number = f"INV-{str(order_id)[:8].upper()}"
+            
+            print(f"✓ Invoice PDF generated: {pdf_path} ({pdf_path.stat().st_size} bytes)")
+            
+            return {
+                "invoice_id": invoice_number,
+                "order_id": str(order_id),
+                "invoice_path": str(pdf_path),
+                "generated_at": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            print(f"Error generating invoice: {e}")
+            import traceback
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to generate invoice: {str(e)}"
+            )
+    
+    def _format_address(self, address: dict) -> str:
+        """Format address for invoice"""
+        if not address:
+            return "N/A"
+        parts = [
+            address.get('street', ''),
+            f"{address.get('city', '')}, {address.get('state', '')} {address.get('post_code', '')}",
+            address.get('country', '')
+        ]
+        return "\n".join([p for p in parts if p.strip()])
+
 
     async def add_order_note(self, order_id: UUID, user_id: UUID, note: str) -> dict:
         """Add note to order"""

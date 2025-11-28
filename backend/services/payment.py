@@ -159,7 +159,7 @@ class PaymentService:
                 "payment_intent_id": payment_intent.id,
                 "status": payment_intent.status
             }
-        except stripe.error.StripeError as e:
+        except stripe.StripeError as e:
             # Handle Stripe API errors
             print(f"Stripe Error: {e}")
             raise e
@@ -311,7 +311,7 @@ class PaymentService:
                 "transaction_id": str(new_transaction.id)
             }
 
-        except stripe.error.CardError as e:
+        except stripe.CardError as e:
             # Card was declined
             error_message = e.user_message or "Card was declined"
             print(f"Card Error: {error_message}")
@@ -319,7 +319,7 @@ class PaymentService:
                 "status": "failed",
                 "error": error_message
             }
-        except stripe.error.StripeError as e:
+        except stripe.StripeError as e:
             # Other Stripe errors
             error_message = str(e)
             print(f"Stripe Error: {error_message}")

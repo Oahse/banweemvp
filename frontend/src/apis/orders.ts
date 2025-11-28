@@ -22,7 +22,8 @@ export class OrdersAPI {
    * Checkout - Place order from cart
    */
   static async checkout(checkoutData) {
-    return await apiClient.post('/orders/checkout', checkoutData);
+    // Increase timeout for checkout as it involves payment processing
+    return await apiClient.post('/orders/checkout', checkoutData, { timeout: 60000 });
   }
 
   /**
@@ -49,10 +50,17 @@ export class OrdersAPI {
   }
 
   /**
-   * Get order tracking information
+   * Get order tracking information (authenticated)
    */
   static async getOrderTracking(orderId) {
     return await apiClient.get(`/orders/${orderId}/tracking`);
+  }
+
+  /**
+   * Get order tracking information (public - no auth required)
+   */
+  static async trackOrderPublic(orderId) {
+    return await apiClient.get(`/orders/track/${orderId}`);
   }
 
   /**

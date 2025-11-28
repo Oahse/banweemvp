@@ -1,11 +1,11 @@
 import { OrderItemDetails } from './OrderItemDetails';
-import React, { useState, useEffect } from 'react';
-import { ChevronDownIcon, ChevronUpIcon, EyeIcon, DownloadIcon, ShoppingBagIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronDownIcon, ChevronUpIcon, EyeIcon, DownloadIcon, ShoppingBagIcon, TruckIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SkeletonOrderTable } from '../ui/SkeletonTable';
 import { usePaginatedApi } from '../../hooks/useApi';
-import { apiClient } from '../../apis';
 import OrdersAPI from '../../apis/orders';
+import { toast } from 'react-hot-toast';
 
 /**
  * @typedef {object} OrdersProps
@@ -22,7 +22,7 @@ export const Orders = ({
     execute(OrdersAPI.getOrders);
   }, [execute]);
 
-  const orders = paginatedData?.data || [];
+  const orders = paginatedData || [];
 
   const toggleOrderExpand = (orderId) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
@@ -31,12 +31,19 @@ export const Orders = ({
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'delivered':
+      case 'confirmed':
+      case 'completed':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
       case 'shipped':
+      case 'out_for_delivery':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
       case 'processing':
+      case 'pending':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
       case 'cancelled':
+      case 'payment_failed':
+      case 'failed':
+      case 'refunded':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
@@ -124,11 +131,25 @@ export const Orders = ({
                       </p>
                     </div>
                     <div className="flex space-x-2">
+                      <Link to={`/track-order/${order.id}`} className="flex items-center px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <TruckIcon size={16} className="mr-1" />
+                        Track
+                      </Link>
                       <Link to={`/account/orders/${order.id}`} className="flex items-center px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
                         <EyeIcon size={16} className="mr-1" />
-                        View details
+                        Details
                       </Link>
-                      <button className="flex items-center px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <button 
+                        onClick={async () => {
+                          try {
+                            await OrdersAPI.getOrderInvoice(order.id);
+                            toast.success('Invoice downloaded successfully');
+                          } catch (error) {
+                            toast.error('Failed to download invoice');
+                          }
+                        }}
+                        className="flex items-center px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
                         <DownloadIcon size={16} className="mr-1" />
                         Invoice
                       </button>

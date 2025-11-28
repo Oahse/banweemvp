@@ -72,8 +72,11 @@ class APIClient {
     // Request interceptor
     this.client.interceptors.request.use(
       (config) => {
+        // Check if this is a public endpoint
+        const isPublic = this.isPublicEndpoint(config.url || '');
+        
         const token = TokenManager.getToken();
-        if (token && !this.isPublicEndpoint(config.url || '')) {
+        if (token && !isPublic) {
           config.headers.Authorization = `Bearer ${token}`;
         }
 
@@ -302,7 +305,8 @@ class APIClient {
       '/api/v1/products',
       '/api/v1/products/categories',
       '/api/v1/auth/refresh',
-      '/api/v1/users/profile'
+      '/api/v1/users/profile',
+      '/api/v1/orders/track/'  // Public order tracking
     ];
 
     return publicEndpoints.some(endpoint => url.includes(endpoint));

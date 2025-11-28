@@ -191,7 +191,7 @@ async def create_payment_intent(
             currency=payload.currency
         )
         return result
-    except stripe.error.StripeError as e:
+    except stripe.StripeError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
@@ -259,7 +259,7 @@ async def stripe_webhook(request: Request, background_tasks: BackgroundTasks, db
             # Invalid payload
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-        except stripe.error.SignatureVerificationError as e:
+        except stripe.SignatureVerificationError as e:
             # Invalid signature
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

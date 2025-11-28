@@ -1,25 +1,22 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchIcon, PackageIcon } from 'lucide-react';
-import { Input } from '../forms/Input';
 
 const TrackOrder = () => {
   const [orderNumber, setOrderNumber] = useState('');
-  const [email, setEmail] = useState('');
   const navigate = useNavigate();
 
-  const handleTrackOrder = (e) => {
+  const handleTrackOrder = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (orderNumber.trim()) {
-      // Navigate to orders page with the order number
-      navigate(`/account/orders?search=${orderNumber}`);
+      // Navigate to track order page with the order ID
+      navigate(`/track-order/${orderNumber}`);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto py-8">
       <div className="bg-surface rounded-lg shadow-sm border border-border-light p-6 md:p-8">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
@@ -27,7 +24,7 @@ const TrackOrder = () => {
           </div>
           <h1 className="text-2xl font-bold text-main mb-2">Track Your Order</h1>
           <p className="text-copy-light">
-            Enter your order number and email to track your order status
+            Enter your order number to view tracking details and order status
           </p>
         </div>
 
@@ -36,31 +33,18 @@ const TrackOrder = () => {
             <label htmlFor="orderNumber" className="block text-sm font-medium text-copy mb-2">
               Order Number
             </label>
-            <Input
+            <input
               id="orderNumber"
               type="text"
-              placeholder="e.g., ORD-123456"
+              placeholder="Enter your order ID (e.g., 550e8400-e29b-41d4-a716-446655440000)"
               value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOrderNumber(e.target.value)}
               required
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             />
             <p className="text-xs text-copy-light mt-1">
-              You can find this in your order confirmation email
+              You can find your order number in your order confirmation email
             </p>
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-copy mb-2">
-              Email Address
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
           </div>
 
           <button

@@ -44,6 +44,7 @@ class OrderItemResponse(BaseModel):
     quantity: int
     price_per_unit: float
     total_price: float
+    variant: Optional[dict] = None  # Include variant details
 
     model_config = ConfigDict(from_attributes=True)
 

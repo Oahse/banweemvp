@@ -186,20 +186,24 @@ class AnalyticsService:
         }
 
     async def get_sales_trend(self, user_id: str, user_role: str, days: int = 30) -> List[dict]:
-        """Get sales trend data."""
+        """Get sales trend data grouped by date."""
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
 
+        # Use date truncation to group by day
         query = select(
-            Order.created_at.label("date"),
+            func.date(Order.created_at).label("date"),
             func.sum(Order.total_amount).label("sales"),
             func.count(Order.id).label("orders")
         ).where(
-            Order.created_at >= start_date
+            and_(
+                Order.created_at >= start_date,
+                Order.created_at <= end_date
+            )
         ).group_by(
-            Order.created_at
+            func.date(Order.created_at)
         ).order_by(
-            Order.created_at
+            func.date(Order.created_at)
         )
 
         # Filter by supplier if user_role is Supplier
@@ -211,29 +215,42 @@ class AnalyticsService:
             if not supplier_product_ids:
                 return []
 
-            query = query.join(OrderItem, Order.id == OrderItem.order_id).join(
+            query = select(
+                func.date(Order.created_at).label("date"),
+                func.sum(OrderItem.total_price).label("sales"),
+                func.count(Order.id.distinct()).label("orders")
+            ).join(
+                OrderItem, Order.id == OrderItem.order_id
+            ).join(
                 ProductVariant, OrderItem.variant_id == ProductVariant.id
             ).where(
-                ProductVariant.product_id.in_(supplier_product_ids)
+                and_(
+                    ProductVariant.product_id.in_(supplier_product_ids),
+                    Order.created_at >= start_date,
+                    Order.created_at <= end_date
+                )
             ).group_by(
-                Order.created_at
+                func.date(Order.created_at)
             ).order_by(
-                Order.created_at
+                func.date(Order.created_at)
             )
 
         result = await self.db.execute(query)
         trend_data = []
         for row in result.all():
             trend_data.append({
-                "date": row.date.strftime("%Y-%m-%d"),
+                "date": row.date.strftime("%Y-%m-%d") if hasattr(row.date, 'strftime') else str(row.date),
                 "sales": float(row.sales or 0),
-                "orders": row.orders or 0
+                "orders": int(row.orders or 0)
             })
 
         return trend_data
 
     async def get_top_products(self, user_id: str, user_role: str, limit: int = 10) -> List[dict]:
-        """Get top performing products."""
+        """Get top performing products by revenue."""
+        # Get the most recent orders to ensure fresh data
+        from sqlalchemy.orm import selectinload
+        
         query = select(
             Product.id,
             Product.name,
@@ -243,6 +260,10 @@ class AnalyticsService:
             ProductVariant, Product.id == ProductVariant.product_id
         ).join(
             OrderItem, ProductVariant.id == OrderItem.variant_id
+        ).join(
+            Order, OrderItem.order_id == Order.id
+        ).where(
+            Order.status.in_(['confirmed', 'shipped', 'delivered', 'processing'])
         ).group_by(
             Product.id,
             Product.name
@@ -256,11 +277,24 @@ class AnalyticsService:
         result = await self.db.execute(query)
         products_data = []
         for row in result.all():
+            # Get product image from first variant
+            image_query = select(ProductVariant).where(
+                ProductVariant.product_id == row.id
+            ).options(selectinload(ProductVariant.images)).limit(1)
+            variant_result = await self.db.execute(image_query)
+            variant = variant_result.scalar_one_or_none()
+            
+            image_url = None
+            if variant and variant.images:
+                primary_image = next((img for img in variant.images if img.is_primary), None)
+                image_url = primary_image.url if primary_image else (variant.images[0].url if variant.images else None)
+            
             products_data.append({
                 "id": str(row.id),
                 "name": row.name,
-                "sales": float(row.total_sales_quantity or 0),
-                "revenue": float(row.total_revenue or 0)
+                "sales": int(row.total_sales_quantity or 0),
+                "revenue": float(row.total_revenue or 0),
+                "image_url": image_url
             })
 
         return products_data
