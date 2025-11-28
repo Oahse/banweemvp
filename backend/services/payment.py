@@ -106,6 +106,26 @@ class PaymentService:
         await self.db.execute(query)
         await self.db.commit()
 
+    async def get_default_payment_method(self, user_id: UUID) -> Optional[PaymentMethod]:
+        """Get a user's default payment method."""
+        # First, try to find a payment method marked as default
+        query = select(PaymentMethod).where(
+            PaymentMethod.user_id == user_id,
+            PaymentMethod.is_default == True
+        )
+        result = await self.db.execute(query)
+        method = result.scalars().first()
+
+        if method:
+            return method
+
+        # If no default is set, return the most recent payment method
+        query = select(PaymentMethod).where(
+            PaymentMethod.user_id == user_id
+        ).order_by(PaymentMethod.created_at.desc())
+        result = await self.db.execute(query)
+        return result.scalars().first()
+
     async def create_payment_intent(self, user_id: UUID, order_id: UUID, amount: float, currency: str) -> dict:
         try:
             # Create a Stripe PaymentIntent

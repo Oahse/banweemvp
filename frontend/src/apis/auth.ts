@@ -257,6 +257,13 @@ export class AuthAPI {
   static async setDefaultPaymentMethod(paymentMethodId) {
     return await apiClient.put(`/users/payment-methods/${paymentMethodId}/default`);
   }
+
+  /**
+   * Get user's default payment method
+   */
+  static async getDefaultPaymentMethod() {
+    return await apiClient.get('/users/me/payment-methods/default');
+  }
 }
 
 export default AuthAPI;

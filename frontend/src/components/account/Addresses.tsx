@@ -10,7 +10,9 @@ import { AuthAPI } from '../../apis';
  */
 export const Addresses = () => {
   // Custom hook to fetch user addresses from the API
-  const { data: addresses, loading, error, execute: fetchAddresses, setData: setAddresses } = useApi();
+  const { data: addresses, loading, error, execute: fetchAddresses } = useApi();
+  // Local state for managing addresses
+  const [localAddresses, setLocalAddresses] = useState<any[]>([]);
   // State to control the visibility of the address form
   const [showAddressForm, setShowAddressForm] = useState(false);
   // State to store the ID of the address being edited (null if adding a new address)
@@ -30,12 +32,19 @@ export const Addresses = () => {
     fetchAddresses(AuthAPI.getAddresses);
   }, [fetchAddresses]);
 
+  // Sync local state with fetched data
+  useEffect(() => {
+    if (addresses) {
+      setLocalAddresses(Array.isArray(addresses) ? addresses : []);
+    }
+  }, [addresses]);
+
   /**
    * Handles changes to form input fields.
    * Updates the formData state based on input name and value.
    * @param {object} e - The event object from the input change.
    */
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -45,23 +54,23 @@ export const Addresses = () => {
    * Calls the AuthAPI to perform the respective action and updates the local state.
    * @param {object} e - The form submission event.
    */
-  const handleAddressSubmit = async (e) => {
+  const handleAddressSubmit = async (e: any) => {
     e.preventDefault(); // Prevent default form submission behavior
     try {
       if (editingAddressId) {
         // If editing an existing address
         const result = await AuthAPI.updateAddress(editingAddressId, formData);
-        if (result) {
+        if (result?.data) {
           // Update the local state with the modified address
-          setAddresses(addresses?.map(a => a.id === editingAddressId ? result : a));
+          setLocalAddresses(localAddresses?.map((a: any) => a.id === editingAddressId ? result.data : a));
           toast.success('Address updated successfully');
         }
       } else {
         // If adding a new address
-        const result = await AuthAPI.addAddress(formData);
-        if (result) {
+        const result = await AuthAPI.createAddress(formData);
+        if (result?.data) {
           // Add the new address to the local state
-          setAddresses(addresses ? [...addresses, result] : [result]);
+          setLocalAddresses(localAddresses ? [...localAddresses, result.data] : [result.data]);
           toast.success('Address added successfully');
         }
       }
@@ -76,7 +85,7 @@ export const Addresses = () => {
    * Populates the form with the selected address's data.
    * @param {object} address - The address object to edit.
    */
-  const handleEditAddress = (address) => {
+  const handleEditAddress = (address: any) => {
     setFormData({
       street: address.street,
       city: address.city,
@@ -94,11 +103,11 @@ export const Addresses = () => {
    * Calls the AuthAPI to delete the address and updates the local state.
    * @param {string} id - The ID of the address to delete.
    */
-  const handleDeleteAddress = async (id) => {
+  const handleDeleteAddress = async (id: string) => {
     try {
       await AuthAPI.deleteAddress(id);
       // Remove the deleted address from the local state
-      setAddresses(addresses?.filter(a => a.id !== id));
+      setLocalAddresses(localAddresses?.filter((a: any) => a.id !== id));
       toast.success('Address removed');
     } catch (error) {
       toast.error('Failed to remove address');
@@ -126,7 +135,7 @@ export const Addresses = () => {
    * @param {string} type - The type of address (e.g., 'Shipping', 'Billing').
    * @returns {JSX.Element} The icon component.
    */
-  const getAddressTypeIcon = (type) => {
+  const getAddressTypeIcon = (type: string) => {
     switch (type) {
       case 'Shipping':
         return <HomeIcon size={16} />;
@@ -165,9 +174,9 @@ export const Addresses = () => {
           </button>
         </div>
         {/* Display existing addresses or a message if none are saved */}
-        {addresses && addresses.length > 0 ? (
+        {localAddresses && localAddresses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {addresses.map(address => (
+            {localAddresses.map((address: any) => (
               <div key={address.id} className={`border rounded-lg p-4 border-gray-200 dark:border-gray-700'`}>
                 <div className="flex justify-between mb-2">
                   <div className="flex items-center">

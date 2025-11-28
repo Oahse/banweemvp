@@ -9,7 +9,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 
-const Checkout = () => {
+export const Checkout = () => {
   const navigate = useNavigate();
   const { cart, loading: cartLoading, clearCart } = useCart();
   const { isAuthenticated } = useAuth();
@@ -63,39 +63,54 @@ const Checkout = () => {
 
         // Fetch addresses
         const addressResponse = await AuthAPI.getAddresses();
-        if (addressResponse?.data) {
-          setAddresses(addressResponse.data);
-          // Auto-select first address if available
-          if (addressResponse.data.length > 0 && !checkoutData.shipping_address_id) {
-            setCheckoutData(prev => ({
-              ...prev,
-              shipping_address_id: addressResponse.data[0].id
-            }));
-          }
+        // Backend returns list directly, apiClient returns response.data which is the list
+        const addressList = Array.isArray(addressResponse) ? addressResponse : (addressResponse?.data || []);
+        setAddresses(addressList);
+        // Auto-select first address if available
+        if (addressList.length > 0 && !checkoutData.shipping_address_id) {
+          setCheckoutData(prev => ({
+            ...prev,
+            shipping_address_id: addressList[0].id
+          }));
         }
 
         // Fetch shipping methods
         const shippingResponse = await CartAPI.getShippingOptions({});
-        if (shippingResponse?.data) {
-          setShippingMethods(shippingResponse.data);
-          // Auto-select first shipping method if available
-          if (shippingResponse.data.length > 0 && !checkoutData.shipping_method_id) {
-            setCheckoutData(prev => ({
-              ...prev,
-              shipping_method_id: shippingResponse.data[0].id
-            }));
-          }
+        const shippingList = Array.isArray(shippingResponse) ? shippingResponse : (shippingResponse?.data || []);
+        setShippingMethods(shippingList);
+        // Auto-select first shipping method if available
+        if (shippingList.length > 0 && !checkoutData.shipping_method_id) {
+          setCheckoutData(prev => ({
+            ...prev,
+            shipping_method_id: shippingList[0].id
+          }));
         }
 
         // Fetch payment methods
         const paymentResponse = await AuthAPI.getPaymentMethods();
-        if (paymentResponse?.data) {
-          setPaymentMethods(paymentResponse.data);
-          // Auto-select first payment method if available
-          if (paymentResponse.data.length > 0 && !checkoutData.payment_method_id) {
+        const paymentList = Array.isArray(paymentResponse) ? paymentResponse : (paymentResponse?.data || []);
+        setPaymentMethods(paymentList);
+        // Auto-select first payment method if available
+        if (paymentList.length > 0 && !checkoutData.payment_method_id) {
+          try {
+            const defaultPaymentMethod = await AuthAPI.getDefaultPaymentMethod();
+            const defaultMethod = defaultPaymentMethod?.data || defaultPaymentMethod;
+            if (defaultMethod?.id) {
+              setCheckoutData(prev => ({
+                ...prev,
+                payment_method_id: defaultMethod.id
+              }));
+            } else {
+              setCheckoutData(prev => ({
+                ...prev,
+                payment_method_id: paymentList[0].id
+              }));
+            }
+          } catch (error) {
+            // If no default, use first payment method
             setCheckoutData(prev => ({
               ...prev,
-              payment_method_id: paymentResponse.data[0].id
+              payment_method_id: paymentList[0].id
             }));
           }
         }
@@ -455,21 +470,35 @@ const Checkout = () => {
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
                 {cart?.items?.map((item) => (
                   <div key={item.id} className="flex gap-3">
-                    {item.variant?.primary_image && (
-                      <img
-                        src={item.variant.primary_image}
-                        alt={item.variant.product_name || item.variant.name}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    )}
+                    <div className="w-16 h-16 flex-shrink-0">
+                      {(item.variant?.primary_image || item.variant?.images?.[0]?.url) ? (
+                        <img
+                          src={item.variant?.primary_image || item.variant?.images?.[0]?.url}
+                          alt={item.variant.product_name || item.variant.name || 'Product'}
+                          className="w-full h-full object-cover rounded"
+                          onError={(e) => {
+                            // Fallback to placeholder on error
+                            e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f3f4f6"/%3E%3Cpath d="M32 20c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%239ca3af"/%3E%3Cpath d="M44 16H20c-2.2 0-4 1.8-4 4v24c0 2.2 1.8 4 4 4h24c2.2 0 4-1.8 4-4V20c0-2.2-1.8-4-4-4zm0 28H20V20h24v24z" fill="%239ca3af"/%3E%3C/svg%3E';
+                            e.currentTarget.onerror = null; // Prevent infinite loop
+                          }}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 rounded flex items-center justify-center">
+                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {item.variant?.product_name || 'Product'}
+                        {item.variant?.product_name || item.product?.name || 'Product'}
                       </p>
-                      <p className="text-sm text-gray-500">{item.variant?.name}</p>
+                      <p className="text-sm text-gray-500">{item.variant?.name || 'Default'}</p>
                       <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                     </div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900 whitespace-nowrap">
                       ${(item.price_per_unit * item.quantity).toFixed(2)}
                     </p>
                   </div>
@@ -526,4 +555,3 @@ const Checkout = () => {
   );
 };
 
-export default Checkout;

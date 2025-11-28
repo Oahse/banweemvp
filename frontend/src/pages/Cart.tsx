@@ -77,12 +77,34 @@ export const Cart = () => {
                   <div key={item.id} className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                       <div className="col-span-6 flex items-center">
-                        <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
-                          <img 
-                            src={item.variant.images?.[0]?.url || '/placeholder-image.jpg'} 
-                            alt={item.variant.product_name || item.variant.product?.name || item.variant.name} 
-                            className="w-full h-full object-cover" 
-                          />
+                        <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
+                          {(() => {
+                            // Get primary image from variant images array (same logic as ProductCard)
+                            let imageUrl = null;
+                            if (item.variant?.images && item.variant.images.length > 0) {
+                              const primaryImage = item.variant.images.find(img => img.is_primary);
+                              imageUrl = primaryImage?.url || item.variant.images[0]?.url;
+                            }
+                            
+                            return imageUrl ? (
+                              <img 
+                                src={imageUrl} 
+                                alt={item.variant.product_name || item.variant.product?.name || item.variant.name} 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect width="80" height="80" fill="%23f3f4f6"/%3E%3Cpath d="M40 25c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zm0 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z" fill="%239ca3af"/%3E%3Cpath d="M55 20H25c-2.8 0-5 2.2-5 5v30c0 2.8 2.2 5 5 5h30c2.8 0 5-2.2 5-5V25c0-2.8-2.2-5-5-5zm0 35H25V25h30v30z" fill="%239ca3af"/%3E%3C/svg%3E';
+                                  e.currentTarget.onerror = null;
+                                }}
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                            );
+                          })()}
                         </div>
                         <div className="ml-4">
                           <Link

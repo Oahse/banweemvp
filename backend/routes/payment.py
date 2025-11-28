@@ -155,6 +155,25 @@ async def set_default_payment_method(
         )
 
 
+@payment_method_router.get("/me/payment-methods/default", response_model=PaymentMethodResponse, summary="Get default payment method for the current user")
+async def get_my_default_payment_method(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_authenticated_user)
+):
+    try:
+        service = PaymentService(db)
+        payment_method = await service.get_default_payment_method(current_user.id)
+        if not payment_method:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Default payment method not found")
+        return payment_method
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch default payment method - {str(e)}"
+        )
+
+
 @payment_router.post("/create-payment-intent", summary="Create a Stripe Payment Intent")
 async def create_payment_intent(
     payload: CreatePaymentIntentRequest,

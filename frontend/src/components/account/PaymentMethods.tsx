@@ -9,11 +9,13 @@ import { PaymentsAPI } from '../../apis/payments';
  */
 export const PaymentMethods = () => {
   // Custom hook to fetch payment methods from the API
-  const { data: paymentMethods, loading, error, execute: fetchPaymentMethods, setData: setPaymentMethods } = useApi();
+  const { data: paymentMethods, loading, error, execute: fetchPaymentMethods } = useApi();
+  // Local state for managing payment methods
+  const [localPaymentMethods, setLocalPaymentMethods] = useState<any[]>([]);
   // State to control the visibility of the add/edit card form
   const [showAddCardForm, setShowAddCardForm] = useState(false);
   // State to store the ID of the card being edited (null if adding a new card)
-  const [editingCard, setEditingCard] = useState(null);
+  const [editingCard, setEditingCard] = useState<string | null>(null);
   // State to store data for the new or edited card form
   const [newCardData, setNewCardData] = useState({
     type: 'credit_card',
@@ -29,18 +31,26 @@ export const PaymentMethods = () => {
     fetchPaymentMethods(PaymentsAPI.getPaymentMethods);
   }, [fetchPaymentMethods]);
 
+  // Sync local state with fetched data
+  useEffect(() => {
+    if (paymentMethods) {
+      setLocalPaymentMethods(Array.isArray(paymentMethods) ? paymentMethods : []);
+    }
+  }, [paymentMethods]);
+
   /**
    * Handles setting a payment method as default.
    * @param {string} id - The ID of the payment method to set as default.
    */
-  const handleSetDefault = async (id) => {
+  const handleSetDefault = async (id: string) => {
     try {
       await PaymentsAPI.setDefaultPaymentMethod(id);
       // Update the local state to reflect the new default payment method
-      setPaymentMethods(paymentMethods?.map(pm => ({ ...pm, is_default: pm.id === id })));
+      setLocalPaymentMethods(localPaymentMethods?.map((pm: any) => ({ ...pm, is_default: pm.id === id })));
       toast.success('Default payment method updated');
-    } catch (error) {
-      toast.error('Failed to set default payment method');
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to set default payment method';
+      toast.error(errorMessage);
     }
   };
 
@@ -48,14 +58,15 @@ export const PaymentMethods = () => {
    * Handles deleting a payment method.
    * @param {string} id - The ID of the payment method to delete.
    */
-  const handleDeleteCard = async (id) => {
+  const handleDeleteCard = async (id: string) => {
     try {
       await PaymentsAPI.deletePaymentMethod(id);
       // Remove the deleted payment method from the local state
-      setPaymentMethods(paymentMethods?.filter(pm => pm.id !== id));
+      setLocalPaymentMethods(localPaymentMethods?.filter((pm: any) => pm.id !== id));
       toast.success('Payment method removed');
-    } catch (error) {
-      toast.error('Failed to remove payment method');
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to remove payment method';
+      toast.error(errorMessage);
     }
   };
 
@@ -64,7 +75,7 @@ export const PaymentMethods = () => {
    * Populates the form with the selected payment method's data.
    * @param {object} method - The payment method object to edit.
    */
-  const handleEditCard = (method) => {
+  const handleEditCard = (method: any) => {
     setEditingCard(method.id);
     setNewCardData({
       type: method.type,
@@ -81,27 +92,28 @@ export const PaymentMethods = () => {
    * Handles adding a new card or updating an existing one.
    * @param {object} e - The form submission event.
    */
-  const handleAddCard = async (e) => {
+  const handleAddCard = async (e: any) => {
     e.preventDefault();
     try {
       if (editingCard) {
         // If editing an existing card
         const result = await PaymentsAPI.updatePaymentMethod(editingCard, newCardData);
         if (result) {
-          setPaymentMethods(paymentMethods?.map(pm => pm.id === editingCard ? result : pm));
+          setLocalPaymentMethods(localPaymentMethods?.map((pm: any) => pm.id === editingCard ? result : pm));
           toast.success('Payment method updated');
         }
       } else {
         // If adding a new card
         const result = await PaymentsAPI.addPaymentMethod(newCardData);
         if (result) {
-          setPaymentMethods(paymentMethods ? [...paymentMethods, result] : [result]);
+          setLocalPaymentMethods(localPaymentMethods ? [...localPaymentMethods, result] : [result]);
           toast.success('New payment method added');
         }
       }
       resetForm(); // Reset the form after successful operation
-    } catch (error) {
-      toast.error('Failed to add or update payment method');
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to add or update payment method';
+      toast.error(errorMessage);
     }
   };
 
@@ -126,7 +138,7 @@ export const PaymentMethods = () => {
    * @param {string} type - The type of card provider (e.g., 'visa', 'mastercard').
    * @returns {JSX.Element} The SVG icon component.
    */
-  const getCardIcon = (type) => {
+  const getCardIcon = (type: string) => {
     switch (type) {
       case 'visa':
         return <svg className="w-8 h-6" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -186,9 +198,9 @@ export const PaymentMethods = () => {
           </button>
         </div>
         {/* Display existing payment methods or a message if none are saved */}
-        {paymentMethods && paymentMethods.length > 0 ? (
+        {localPaymentMethods && localPaymentMethods.length > 0 ? (
           <div className="space-y-4">
-            {paymentMethods.map(method => (
+            {localPaymentMethods.map((method: any) => (
               <div key={method.id} className={`border rounded-lg p-4 ${method.is_default ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-gray-200 dark:border-gray-700'}`}>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">

@@ -73,7 +73,7 @@ const transformProduct = (product, averageRating, reviewCount) => {
   };
 };
 
-const ProductDetails = () => {
+export const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -840,4 +840,3 @@ const ProductDetails = () => {
     </div>
   );
 };
-export default ProductDetails;

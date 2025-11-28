@@ -113,33 +113,9 @@ class CartService:
         if not variant:
             return None
 
-        try:
-            # Use the model's built-in to_dict method which handles datetime serialization
-            # Include product information so we get product_name and product_description
-            return variant.to_dict(include_images=True, include_product=True)
-        except Exception as e:
-            print(
-                f"Error serializing variant {getattr(variant, 'id', 'unknown')}: {e}")
-            # Return a minimal variant object to prevent complete failure
-            return {
-                "id": str(getattr(variant, 'id', '')),
-                "product_id": str(getattr(variant, 'product_id', '')),
-                "sku": getattr(variant, 'sku', ''),
-                "name": getattr(variant, 'name', ''),
-                "base_price": getattr(variant, 'base_price', 0.0),
-                "sale_price": getattr(variant, 'sale_price', None),
-                "current_price": getattr(variant, 'sale_price', None) or getattr(variant, 'base_price', 0.0),
-                "discount_percentage": 0,
-                "stock": getattr(variant, 'stock', 0),
-                "attributes": {},
-                "is_active": True,
-                "images": [],
-                "primary_image": None,
-                "product_name": getattr(variant.product, 'name', None) if hasattr(variant, 'product') and variant.product else None,
-                "product_description": getattr(variant.product, 'description', None) if hasattr(variant, 'product') and variant.product else None,
-                "created_at": None,
-                "updated_at": None
-            }
+        # Use the model's built-in to_dict method which handles datetime serialization
+        # Include product information so we get product_name and product_description
+        return variant.to_dict(include_images=True, include_product=True)
 
     async def update_cart_item_quantity(self, user_id: UUID, item_id: UUID, quantity: int) -> CartResponse:
         cart = await self.get_or_create_cart(user_id)
