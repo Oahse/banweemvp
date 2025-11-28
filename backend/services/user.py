@@ -191,6 +191,19 @@ class AddressService:
 
     async def get_default_shipping(self, user_id: UUID) -> Optional[Address]:
         """Get a user's default shipping address."""
+        # First, try to find an address marked as default
+        query = select(Address).where(
+            Address.user_id == user_id,
+            Address.is_default == True,
+            Address.kind == "Shipping"
+        )
+        result = await self.db.execute(query)
+        address = result.scalars().first()
+
+        if address:
+            return address
+
+        # If no default is set, return the most recent shipping address
         query = select(Address).where(
             Address.user_id == user_id,
             Address.kind == "Shipping"

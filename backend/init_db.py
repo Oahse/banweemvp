@@ -275,20 +275,23 @@ async def seed_sample_data(
 
         # -------- Addresses --------
         addresses_batch = []
-        all_users_for_address = await session.execute(select(User))
-        all_users_for_address = all_users_for_address.scalars().all()
+        all_users_for_address = await session.execute(select(User).options(selectinload(User.addresses)))
+        all_users_for_address = all_users_for_address.scalars().unique().all()
         for user in all_users_for_address:
-            address = Address(
-                user_id=user.id,
-                street=f"{random.randint(1, 999)} Main St",
-                city=random.choice(["Accra", "Lagos", "Nairobi", "Kampala"]),
-                state=random.choice(
-                    ["Greater Accra", "Lagos State", "Nairobi County"]),
-                country=random.choice(["Ghana", "Nigeria", "Kenya", "Uganda"]),
-                post_code=f"{random.randint(10000, 99999)}",
-                kind="Shipping"
-            )
-            addresses_batch.append(address)
+            # Check if user already has addresses to avoid adding duplicates
+            if not user.addresses:
+                address = Address(
+                    user_id=user.id,
+                    street=f"{random.randint(1, 999)} Main St",
+                    city=random.choice(["Accra", "Lagos", "Nairobi", "Kampala"]),
+                    state=random.choice(
+                        ["Greater Accra", "Lagos State", "Nairobi County"]),
+                    country=random.choice(["Ghana", "Nigeria", "Kenya", "Uganda"]),
+                    post_code=f"{random.randint(10000, 99999)}",
+                    kind="Shipping",
+                    is_default=True  # Set the first address as default
+                )
+                addresses_batch.append(address)
 
         if addresses_batch:
             session.add_all(addresses_batch)
