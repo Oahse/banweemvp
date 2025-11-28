@@ -14,7 +14,7 @@ export const OptimizedRoutes = {
   ),
   
   ProductDetails: withSuspense(
-    createLazyRoute(() => import('./pages/ProductDetails').then(m => ({ default: m.ProductDetails })), true),
+    createLazyRoute(() => import('./pages/ProductDetails'), true),
     <PageSkeleton />
   ),
 
