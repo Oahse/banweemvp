@@ -76,6 +76,8 @@ const RevenueAnalyticsWidget = () => {
       defaultTimeRange="30d"
       showComparison={true}
       showTrend={true}
+      onTimeRangeChange={() => {}}
+      onDataUpdate={() => {}}
       className="border-0 shadow-none"
     />
   );
@@ -103,9 +105,14 @@ const ExpenseBreakdownWidget = () => {
     <InteractiveChart
       type="doughnut"
       data={expenseData}
+      title="Expense Breakdown"
       height={300}
       showTooltips={true}
       showLegend={true}
+      drillDownData={null}
+      onDataPointClick={() => {}}
+      onExport={() => {}}
+      onRefresh={() => {}}
       className="border-0 shadow-none"
     />
   );
@@ -136,9 +143,14 @@ const CashFlowWidget = () => {
     <InteractiveChart
       type="bar"
       data={cashFlowData}
+      title="Cash Flow Analysis"
       height={300}
       showTooltips={true}
       showLegend={true}
+      drillDownData={null}
+      onDataPointClick={() => {}}
+      onExport={() => {}}
+      onRefresh={() => {}}
       className="border-0 shadow-none"
     />
   );
@@ -204,7 +216,7 @@ const TransactionsTableWidget = () => {
       key: 'transaction_id',
       label: 'Transaction ID',
       sortable: true,
-      render: (value) => (
+      render: (value: any) => (
         <span className="font-mono text-sm text-blue-600">{value}</span>
       )
     },
@@ -218,7 +230,7 @@ const TransactionsTableWidget = () => {
       key: 'type',
       label: 'Type',
       sortable: true,
-      render: (value) => (
+      render: (value: any) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value === 'Revenue' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
@@ -235,8 +247,8 @@ const TransactionsTableWidget = () => {
       key: 'amount',
       label: 'Amount',
       sortable: true,
-      align: 'right',
-      render: (value) => (
+      align: 'right' as const,
+      render: (value: any) => (
         <span className={`font-semibold ${value > 0 ? 'text-green-600' : 'text-red-600'}`}>
           {value > 0 ? '+' : ''}${Math.abs(value).toLocaleString()}
         </span>
@@ -246,7 +258,7 @@ const TransactionsTableWidget = () => {
       key: 'status',
       label: 'Status',
       sortable: true,
-      render: (value) => (
+      render: (value: any) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
         }`}>
@@ -265,11 +277,15 @@ const TransactionsTableWidget = () => {
     <AdvancedTable
       columns={columns}
       data={transactionData}
+      title="Recent Transactions"
       searchable={true}
       sortable={true}
       exportable={true}
       pagination={true}
       pageSize={10}
+      onRowClick={() => {}}
+      onSelectionChange={() => {}}
+      onExport={() => {}}
       className="border-0 shadow-none"
     />
   );
@@ -301,16 +317,21 @@ const ProfitMarginWidget = () => {
     <InteractiveChart
       type="line"
       data={marginData}
+      title="Profit Margin Trends"
       height={250}
       showTooltips={true}
       showLegend={true}
+      drillDownData={null}
+      onDataPointClick={() => {}}
+      onExport={() => {}}
+      onRefresh={() => {}}
       className="border-0 shadow-none"
     />
   );
 };
 
 export const FinancialDashboard = () => {
-  const [widgets, setWidgets] = useState([]);
+  const [widgets, setWidgets] = useState<any[]>([]);
 
   const widgetTemplates = [
     {
@@ -478,11 +499,11 @@ export const FinancialDashboard = () => {
     setWidgets(defaultWidgets);
   }, []);
 
-  const handleWidgetsChange = (updatedWidgets) => {
+  const handleWidgetsChange = (updatedWidgets: any[]) => {
     setWidgets(updatedWidgets);
   };
 
-  const handleSave = (layout) => {
+  const handleSave = (_layout: any) => {
     // Save dashboard layout to backend
     // TODO: Implement API call to persist layout preferences
   };
