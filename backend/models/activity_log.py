@@ -9,7 +9,7 @@ class ActivityLog(BaseModel):
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=True)
     action_type = Column(String(100), nullable=False)  # order, registration, review, low_stock, payment
     description = Column(String(CHAR_LENGTH), nullable=False)
-    metadata = Column(JSON, nullable=True)
+    meta_data = Column(JSON, nullable=True)  # Renamed from metadata to avoid SQLAlchemy reserved name
 
     # Relationships
     user = relationship("User", back_populates="activity_logs", lazy="selectin")
@@ -21,6 +21,6 @@ class ActivityLog(BaseModel):
             "user_id": str(self.user_id) if self.user_id else None,
             "action_type": self.action_type,
             "description": self.description,
-            "metadata": self.metadata,
+            "metadata": self.meta_data,  # Return as metadata in API
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }

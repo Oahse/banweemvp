@@ -30,10 +30,11 @@ async def get_current_authenticated_user(db: AsyncSession = Depends(get_db), tok
 async def list_users(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
+    role: Optional[str] = Query(None, description="Filter by user role"),
     db: AsyncSession = Depends(get_db)
 ):
     service = UserService(db)
-    users = await service.get_users(page=page, limit=limit)
+    users = await service.get_users(page=page, limit=limit, role=role)
     return Response.success(data=users)
 
 

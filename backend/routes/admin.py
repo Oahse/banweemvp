@@ -113,7 +113,7 @@ async def get_all_orders(
 async def get_all_users(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
-    role_filter: Optional[str] = None,
+    role: Optional[str] = None,
     search: Optional[str] = None,
     status: Optional[str] = None,
     verified: Optional[bool] = None,
@@ -123,7 +123,7 @@ async def get_all_users(
     """Get all users (admin only)."""
     try:
         admin_service = AdminService(db)
-        users = await admin_service.get_all_users(page, limit, role_filter, search, status, verified)
+        users = await admin_service.get_all_users(page, limit, role, search, status, verified)
         return Response(success=True, data=users)
     except Exception as e:
         raise APIException(

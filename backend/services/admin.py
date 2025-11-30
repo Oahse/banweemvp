@@ -312,14 +312,22 @@ class AdminService:
             print(f"Error in get_all_orders: {e}")
             raise  # Re-raise the exception to be caught by the route handler
 
-    async def get_all_users(self, page: int = 1, limit: int = 10, role_filter: Optional[str] = None, search: Optional[str] = None, status: Optional[str] = None, verified: Optional[bool] = None) -> dict:
-        """Get all users with pagination."""
+    async def get_all_users(self, page: int = 1, limit: int = 10, role: Optional[str] = None, search: Optional[str] = None, status: Optional[str] = None, verified: Optional[bool] = None) -> dict:
+        """Get all users with pagination and order count using SQL aggregation."""
         offset = (page - 1) * limit
 
-        query = select(User).options(selectinload(User.orders))
+        # Build query with order count using SQL aggregation
+        query = (
+            select(
+                User,
+                func.count(Order.id).label('order_count')
+            )
+            .outerjoin(Order, User.id == Order.user_id)
+            .group_by(User.id)
+        )
 
-        if role_filter:
-            query = query.where(User.role == role_filter)
+        if role:
+            query = query.where(User.role == role)
 
         if search:
             query = query.where(or_(
@@ -341,12 +349,12 @@ class AdminService:
                                ).offset(offset).limit(limit)
 
         result = await self.db.execute(query)
-        users = result.scalars().all()
+        rows = result.all()
 
         # Get total count
         count_query = select(func.count(User.id))
-        if role_filter:
-            count_query = count_query.where(User.role == role_filter)
+        if role:
+            count_query = count_query.where(User.role == role)
         if search:
             count_query = count_query.where(or_(
                 User.firstname.ilike(f"%{search}%"),
@@ -367,20 +375,20 @@ class AdminService:
         return {
             "data": [
                 {
-                    "id": str(user.id),
-                    "firstname": user.firstname,
-                    "lastname": user.lastname,
-                    "email": user.email,
-                    "role": user.role,
-                    "verified": user.verified,
-                    "active": user.active,
-                    "phone": user.phone,
-                    "avatar_url": user.avatar_url,
-                    "last_login": user.last_login.isoformat() if user.last_login else None,
-                    "orders_count": len(user.orders) if user.orders else 0,
-                    "created_at": user.created_at.isoformat()
+                    "id": str(row[0].id),
+                    "firstname": row[0].firstname,
+                    "lastname": row[0].lastname,
+                    "email": row[0].email,
+                    "role": row[0].role,
+                    "verified": row[0].verified,
+                    "active": row[0].active,
+                    "phone": row[0].phone,
+                    "avatar_url": row[0].avatar_url,
+                    "last_login": row[0].last_login.isoformat() if row[0].last_login else None,
+                    "orders_count": row[1],  # Use aggregated count
+                    "created_at": row[0].created_at.isoformat()
                 }
-                for user in users
+                for row in rows
             ],
             "pagination": {
                 "page": page,

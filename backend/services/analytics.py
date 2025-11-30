@@ -653,7 +653,7 @@ class AnalyticsService:
                 "user_name": activity.user.full_name if activity.user else "System",
                 "action_type": activity.action_type,
                 "description": activity.description,
-                "metadata": activity.metadata,
+                "metadata": activity.meta_data,  # Use meta_data column name
                 "created_at": activity.created_at.isoformat() if activity.created_at else None
             }
             for activity in activities

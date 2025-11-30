@@ -1,10 +1,11 @@
 from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, and_
+from sqlalchemy import select, update, delete, and_, func
 from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from uuid import UUID, uuid4
 from models.user import Address, User
+from models.order import Order
 from core.exceptions import APIException
 from schemas.user import UserCreate, UserUpdate
 from datetime import datetime, timedelta
@@ -221,22 +222,47 @@ class AddressService:
         return result.scalars().first()
 
     # Add missing methods to UserService
-    async def get_users(self, page: int = 1, limit: int = 10) -> dict:
-        """Get paginated list of users"""
+    async def get_users(self, page: int = 1, limit: int = 10, role: Optional[str] = None) -> dict:
+        """Get paginated list of users with order count"""
         offset = (page - 1) * limit
 
-        # Get total count
-        count_result = await self.db.execute(select(User))
-        total = len(count_result.scalars().all())
+        # Build base query with order count using SQL aggregation
+        query = (
+            select(
+                User,
+                func.count(Order.id).label('order_count')
+            )
+            .outerjoin(Order, User.id == Order.user_id)
+            .group_by(User.id)
+        )
 
-        # Get paginated results
-        query = select(User).offset(offset).limit(
-            limit).order_by(User.created_at.desc())
+        # Apply role filter if provided
+        if role:
+            query = query.where(User.role == role)
+
+        # Get total count
+        count_query = select(func.count()).select_from(User)
+        if role:
+            count_query = count_query.where(User.role == role)
+        count_result = await self.db.execute(count_query)
+        total = count_result.scalar()
+
+        # Apply pagination and ordering
+        query = query.offset(offset).limit(limit).order_by(User.created_at.desc())
         result = await self.db.execute(query)
-        users = result.scalars().all()
+        rows = result.all()
+
+        # Convert to list of dicts with user and order_count
+        users_with_counts = []
+        for row in rows:
+            user = row[0]
+            order_count = row[1]
+            # Add order_count as an attribute to the user object
+            user.order_count = order_count
+            users_with_counts.append(user)
 
         return {
-            "users": users,
+            "users": users_with_counts,
             "pagination": {
                 "page": page,
                 "limit": limit,

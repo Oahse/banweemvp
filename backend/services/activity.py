@@ -22,7 +22,7 @@ class ActivityService:
             user_id=user_id,
             action_type=action_type,
             description=description,
-            metadata=metadata
+            meta_data=metadata  # Use meta_data column name
         )
         self.db.add(activity)
         await self.db.commit()
