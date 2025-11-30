@@ -6,15 +6,15 @@ Feature: app-enhancements
 import pytest
 from hypothesis import given, strategies as st, settings, HealthCheck
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from uuid import UUID, uuid4
 from decimal import Decimal
 
-from models.user import User
-from models.product import Product, ProductVariant
+from models.user import User, Address
+from models.product import Product, ProductVariant, Category
 from models.cart import Cart, CartItem
 from models.shipping import ShippingMethod
 from models.payment import PaymentMethod
-from models.address import Address
 from services.order import OrderService
 from schemas.order import CheckoutRequest
 from fastapi import BackgroundTasks
@@ -53,6 +53,9 @@ async def test_property_48_order_placement_without_greenlet_errors(
     This test verifies that order placement uses proper async session management
     and doesn't trigger greenlet errors by mixing sync/async contexts.
     """
+    # Rollback any pending transactions from previous iterations
+    await db_session.rollback()
+    
     # Setup: Create test user
     user = User(
         id=uuid4(),
@@ -66,14 +69,23 @@ async def test_property_48_order_placement_without_greenlet_errors(
     )
     db_session.add(user)
     
+    # Create test category first with unique name
+    category = Category(
+        id=uuid4(),
+        name=f"Category-{uuid4()}",
+        description="Test Category",
+        is_active=True
+    )
+    db_session.add(category)
+    
     # Create test product and variant
     product = Product(
         id=uuid4(),
         name="Test Product",
         description="Test Description",
-        category="Electronics",
-        brand="TestBrand",
-        active=True
+        category_id=category.id,
+        supplier_id=user.id,
+        is_active=True
     )
     db_session.add(product)
     
@@ -100,6 +112,7 @@ async def test_property_48_order_placement_without_greenlet_errors(
         variant_id=variant.id,
         quantity=1,
         price_per_unit=Decimal("99.99"),
+        total_price=Decimal("99.99"),
         saved_for_later=False
     )
     db_session.add(cart_item)
@@ -138,6 +151,14 @@ async def test_property_48_order_placement_without_greenlet_errors(
     db_session.add(payment_method)
     
     await db_session.commit()
+    
+    # Refresh cart with eager loading to avoid greenlet errors
+    from sqlalchemy.orm import selectinload
+    cart_query = select(Cart).where(Cart.id == cart.id).options(
+        selectinload(Cart.items).selectinload(CartItem.variant)
+    )
+    cart_result = await db_session.execute(cart_query)
+    cart = cart_result.scalar_one()
     
     # Test: Place order - should not raise greenlet errors
     order_service = OrderService(db_session)

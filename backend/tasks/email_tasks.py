@@ -9,8 +9,7 @@ from datetime import datetime, timedelta
 
 from core.config import settings
 from models.order import Order
-from models.user import User
-from models.address import Address
+from models.user import User, Address
 from models.product import ProductVariant
 from core.utils.messages.email import send_email
 

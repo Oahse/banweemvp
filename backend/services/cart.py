@@ -31,7 +31,10 @@ class CartService:
             cart = Cart(user_id=user_id, promocode_id=None)
             self.db.add(cart)
             await self.db.commit()
-            await self.db.refresh(cart)
+            
+            # Re-query with eager loading to avoid greenlet errors
+            result = await self.db.execute(query)
+            cart = result.scalar_one()
 
         return cart
 
