@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
-import { HeartIcon, ShoppingCartIcon, XCircleIcon } from 'lucide-react';
+import { HeartIcon, ShoppingCartIcon, XCircleIcon, RefreshCwIcon, AlertCircleIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 export const Wishlist = () => {
-  const { defaultWishlist, removeItem, fetchWishlists } = useWishlist();
+  const { defaultWishlist, removeItem, fetchWishlists, loading, error } = useWishlist();
   const { addItem: addToCart } = useCart();
 
   useEffect(() => {
@@ -33,7 +33,54 @@ export const Wishlist = () => {
     }
   };
 
-  if (!defaultWishlist || defaultWishlist.items.length === 0) {
+  const handleRetry = () => {
+    fetchWishlists();
+  };
+
+  // Loading state - show skeleton
+  if (loading && !defaultWishlist) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-main mb-6">My Wishlist</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-surface rounded-lg shadow-sm overflow-hidden animate-pulse">
+              <div className="h-48 bg-gray-300"></div>
+              <div className="p-4">
+                <div className="h-4 bg-gray-300 rounded mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded w-2/3 mb-4"></div>
+                <div className="flex items-center justify-between">
+                  <div className="h-6 bg-gray-300 rounded w-20"></div>
+                  <div className="h-10 bg-gray-300 rounded w-32"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Error state - show error message with retry button
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <AlertCircleIcon size={48} className="mx-auto text-error mb-4" />
+        <h1 className="text-2xl font-bold text-main mb-2">Failed to Load Wishlist</h1>
+        <p className="text-copy-light mb-6">{error}</p>
+        <button
+          onClick={handleRetry}
+          className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors inline-flex items-center"
+        >
+          <RefreshCwIcon size={18} className="mr-2" />
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (!defaultWishlist || !defaultWishlist.items || defaultWishlist.items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <HeartIcon size={48} className="mx-auto text-gray-400 mb-4" />

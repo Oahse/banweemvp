@@ -121,9 +121,12 @@ export interface AddToCartRequest {
 // Wishlist Types
 export interface WishlistItem {
   id: string;
-  product: Product;
+  product_id: string;
+  product?: Product;
   variant_id?: string;
+  variant?: ProductVariant;
   quantity: number;
+  wishlist_id: string;
   added_at: string;
 }
 
@@ -131,6 +134,7 @@ export interface Wishlist {
   id: string;
   user_id: string;
   name: string;
+  is_default?: boolean;
   items: WishlistItem[];
   created_at: string;
   updated_at?: string;
