@@ -11,9 +11,14 @@ from sqlalchemy.orm import sessionmaker
 from main import app
 from core.database import get_db, Base
 
-SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+# Use PostgreSQL in Docker for testing
+SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://banwee:banwee_password@localhost:5432/banwee_db"
 
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_async_engine(
+    SQLALCHEMY_DATABASE_URL,
+    echo=False,
+    pool_pre_ping=True
+)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
 
 Base.metadata.bind = engine

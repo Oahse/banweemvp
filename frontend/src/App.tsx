@@ -15,6 +15,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { CategoryProvider } from './contexts/CategoryContext';
+import { ProtectedRoute } from './components/routing/ProtectedRoute';
 // import { initPerformanceMonitoring } from './utils/performance';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
@@ -172,106 +173,132 @@ export const App: React.FC = () => {
                               <Route
                                 path="/admin"
                                 element={
-                                  <AdminLayout>
-                                    <AdminDashboard />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                    <AdminLayout>
+                                      <AdminDashboard />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/products"
                                 element={
-                                  <AdminLayout>
-                                    <AdminProducts />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                    <AdminLayout>
+                                      <AdminProducts />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/products/new"
                                 element={
-                                  <AdminLayout>
-                                    <AdminNewProduct />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                    <AdminLayout>
+                                      <AdminNewProduct />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/products/:id"
                                 element={
-                                  <AdminLayout>
-                                    <AdminProductDetail />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                    <AdminLayout>
+                                      <AdminProductDetail />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/users"
                                 element={
-                                  <AdminLayout>
-                                    <AdminUsers />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin']}>
+                                    <AdminLayout>
+                                      <AdminUsers />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/users/new"
                                 element={
-                                  <AdminLayout>
-                                    <AdminNewUser />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin']}>
+                                    <AdminLayout>
+                                      <AdminNewUser />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/users/:id"
                                 element={
-                                  <AdminLayout>
-                                    <AdminUserDetail />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin']}>
+                                    <AdminLayout>
+                                      <AdminUserDetail />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/orders"
                                 element={
-                                  <AdminLayout>
-                                    <AdminOrders />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                    <AdminLayout>
+                                      <AdminOrders />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/orders/:id"
                                 element={
-                                  <AdminLayout>
-                                    <AdminOrderDetail />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                    <AdminLayout>
+                                      <AdminOrderDetail />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/variants"
                                 element={
-                                  <AdminLayout>
-                                    <AdminVariants />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                    <AdminLayout>
+                                      <AdminVariants />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
 
                               <Route
                                 path="/admin/analytics"
                                 element={
-                                  <AdminLayout>
-                                    <AdminAnalytics />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin']}>
+                                    <AdminLayout>
+                                      <AdminAnalytics />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/notifications"
                                 element={
-                                  <AdminLayout>
-                                    <AdminNotifications />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                    <AdminLayout>
+                                      <AdminNotifications />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route
                                 path="/admin/settings"
                                 element={
-                                  <AdminLayout>
-                                    <AdminSettings />
-                                  </AdminLayout>
+                                  <ProtectedRoute requiredRole={['Admin']}>
+                                    <AdminLayout>
+                                      <AdminSettings />
+                                    </AdminLayout>
+                                  </ProtectedRoute>
                                 }
                               />
                               <Route path="/admin/register" element={<AuthLayout><AdminRegister /></AuthLayout>} />
@@ -281,9 +308,11 @@ export const App: React.FC = () => {
                               <Route
                                 path="/supplier"
                                 element={
-                                  <Layout>
-                                    <SupplierDashboard />
-                                  </Layout>
+                                  <ProtectedRoute requiredRole={['Supplier']}>
+                                    <Layout>
+                                      <SupplierDashboard />
+                                    </Layout>
+                                  </ProtectedRoute>
                                 }
                               />
 
@@ -292,11 +321,11 @@ export const App: React.FC = () => {
                               <Route path="/products" element={<Layout><ProductList /></Layout>} />
                               <Route path="/product/:id" element={<Layout><ProductDetails /></Layout>} />
                               <Route path="/cart" element={<Layout><Cart /></Layout>} />
-                              <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
-                              <Route path="/account/*" element={<Layout><Account /></Layout>} />
-                              <Route path="/account/notifications" element={<Layout><Notifications /></Layout>} />
-                              <Route path="/account/track-order" element={<Layout><TrackOrderSearch /></Layout>} />
-                              <Route path="/track-order/:orderId" element={<Layout><TrackOrder /></Layout>} />
+                              <Route path="/checkout" element={<ProtectedRoute><Layout><Checkout /></Layout></ProtectedRoute>} />
+                              <Route path="/account/*" element={<ProtectedRoute><Layout><Account /></Layout></ProtectedRoute>} />
+                              <Route path="/account/notifications" element={<ProtectedRoute><Layout><Notifications /></Layout></ProtectedRoute>} />
+                              <Route path="/account/track-order" element={<ProtectedRoute><Layout><TrackOrderSearch /></Layout></ProtectedRoute>} />
+                              <Route path="/track-order/:orderId" element={<ProtectedRoute><Layout><TrackOrder /></Layout></ProtectedRoute>} />
                               <Route
                                 path="/login"
                                 element={
@@ -319,7 +348,7 @@ export const App: React.FC = () => {
                               <Route path="/faq" element={<Layout><FAQ /></Layout>} />
                               <Route path="/blog" element={<Layout><Blog /></Layout>} />
                               <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} />
-                              <Route path="/account/wishlist" element={<Layout><Wishlist /></Layout>} />
+                              <Route path="/account/wishlist" element={<ProtectedRoute><Layout><Wishlist /></Layout></ProtectedRoute>} />
                               <Route
                                 path="/subscription"
                                 element={

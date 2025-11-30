@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [redirectPath, setRedirectPath] = useState(null);
+  const [intendedDestination, setIntendedDestination] = useState(null);
 
   // Transform API user to local user format
   const transformUser = (apiUser) => ({
@@ -62,6 +63,9 @@ export const AuthProvider = ({ children }) => {
       setUser(transformedUser);
       setIsAuthenticated(true);
       toast.success('Login successful!');
+      
+      // Return the user so the login component can handle navigation
+      return transformedUser;
     } catch (error) {
       console.error('Login error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
@@ -154,6 +158,14 @@ export const AuthProvider = ({ children }) => {
     TokenManager.setUser(transformedUser);
   };
 
+  const setIntendedDestinationWithAction = (path, action = null) => {
+    // Don't store login page as intended destination
+    if (path === '/login' || path === '/register') {
+      return;
+    }
+    setIntendedDestination({ path, action });
+  };
+
   // Derived roles
   const isAdmin = user?.role === 'Admin';
   const isSupplier = user?.role === 'Supplier';
@@ -172,6 +184,8 @@ export const AuthProvider = ({ children }) => {
     isCustomer,
     redirectPath,
     setRedirectPath,
+    intendedDestination,
+    setIntendedDestination: setIntendedDestinationWithAction,
     updateUserPreferences,
     updateUser,
   };

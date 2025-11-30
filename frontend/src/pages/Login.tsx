@@ -25,7 +25,7 @@ export const Login = ({ isInitialLoading = false }) => {
   const [loading, setLoading] = useState(false);
 
   // Auth context for login functionality and authentication status
-  const { login, isAuthenticated, isAdmin, isSupplier, redirectPath, setRedirectPath } = useAuth();
+  const { login, isAuthenticated, isAdmin, isSupplier, redirectPath, setRedirectPath, intendedDestination } = useAuth();
   // Custom hook for managing skeleton loading state
   const skeleton = useSkeleton(isInitialLoading, { showOnMount: false });
   // React Router hooks for navigation and location
@@ -34,17 +34,24 @@ export const Login = ({ isInitialLoading = false }) => {
 
   /**
    * Determines the appropriate redirect path after successful login.
-   * Checks for a 'redirect' parameter in the URL or defaults based on user role.
+   * Checks for intended destination, 'redirect' parameter in the URL, or defaults based on user role.
    * @returns {string} The path to redirect to.
    */
-  const getRedirectPath = useCallback(() => {
+  const getRedirectPath = useCallback((user: any) => {
+    // First priority: intended destination (from protected route)
+    if (intendedDestination && (intendedDestination as any).path !== '/login') {
+      return (intendedDestination as any).path;
+    }
+    
+    // Second priority: redirect query parameter
     const params = new URLSearchParams(location.search);
     const redirect = params.get('redirect');
     if (redirect) return redirect;
-    if (isAdmin) return '/admin';
-    if (isSupplier) return '/account/products';
-    return '/';
-  }, [location.search, isAdmin, isSupplier]);
+    
+    // Third priority: role-based default
+    if (user?.role === 'Admin' || user?.role === 'Supplier') return '/admin';
+    return '/account';
+  }, [location.search, intendedDestination]);
 
   /**
    * Effect hook to redirect authenticated users.
@@ -52,11 +59,11 @@ export const Login = ({ isInitialLoading = false }) => {
    */
   useEffect(() => {
     if (isAuthenticated) {
-      const path = redirectPath || getRedirectPath();
+      const path = redirectPath || getRedirectPath({ role: isAdmin ? 'Admin' : isSupplier ? 'Supplier' : 'Customer' });
       navigate(path);
       setRedirectPath(null); // Clear redirect path after navigation
     }
-  }, [getRedirectPath, isAuthenticated, navigate, redirectPath, setRedirectPath]);
+  }, [getRedirectPath, isAuthenticated, navigate, redirectPath, setRedirectPath, isAdmin, isSupplier]);
 
   /**
    * Handles the form submission for user login.
@@ -75,12 +82,10 @@ export const Login = ({ isInitialLoading = false }) => {
     try {
       setLoading(true); // Show loading indicator
       // Attempt to log in the user through the AuthContext
-      const path = await login(email, password);
-      if (path) {
-        navigate(path);
-      } else {
-        navigate(getRedirectPath());
-      }
+      const user = await login(email, password);
+      // Navigate to intended destination or default path
+      const path = getRedirectPath(user);
+      navigate(path);
     } catch (error) {
       // Display error message if login fails
       toast.error('Login failed. Please check your email and password.');

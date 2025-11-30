@@ -78,9 +78,6 @@ class Settings:
     # Redis Configuration
     REDIS_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
     
-    # Database URL (for Celery and async operations)
-    DATABASE_URL: str = os.getenv('DATABASE_URL', '')
-
     # Frontend URL
     FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
@@ -114,24 +111,19 @@ class Settings:
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
-        # If DATABASE_URL is set, use it (for Docker/production)
+        # Always use PostgreSQL with async support
+        # Priority: POSTGRES_DB_URL > DATABASE_URL > build from components
+        if self.POSTGRES_DB_URL:
+            return self.POSTGRES_DB_URL
+        
         if self.DATABASE_URL:
             return self.DATABASE_URL
         
-        # Otherwise, determine based on environment
-        if self.ENVIRONMENT in ["local"]:
-            # Use SQLite for local development
-            return f"sqlite+aiosqlite:///{self.SQLITE_DB_PATH}"
-        elif self.ENVIRONMENT in ["staging", "production"]:
-            # Use PostgreSQL for staging and production
-            if self.POSTGRES_DB_URL:
-                return self.POSTGRES_DB_URL
-            return (
-                f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
-                f"@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-            )
-        else:
-            raise ValueError("Invalid ENVIRONMENT for database connection")
+        # Build PostgreSQL URL from components
+        return (
+            f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
 
 
 # Instantiate the settings object

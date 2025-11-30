@@ -39,17 +39,8 @@ class GUID(TypeDecorator):
     def process_bind_param(self, value, dialect):
         if value is None:
             return value
-        elif dialect.name == 'postgresql':
-            return str(value)
-        else:
-            # For SQLite, always convert to string WITH hyphens
-            if not isinstance(value, uuid.UUID):
-                try:
-                    value = uuid.UUID(value)
-                except (ValueError, AttributeError, TypeError):
-                    # If conversion fails, return as-is
-                    return str(value) if value else None
-            return str(value)
+        # Always use PostgreSQL - convert UUID to string
+        return str(value)
 
     def process_result_value(self, value, dialect):
         if value is None:
@@ -74,6 +65,7 @@ class BaseModel(Base):
 SQLALCHEMY_DATABASE_URL = str(settings.SQLALCHEMY_DATABASE_URI)
 
 # Enhanced engine configuration with connection pooling and resilience
+# Always use async PostgreSQL
 engine_db = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
     echo=settings.ENVIRONMENT == "local",  # Only echo in local development
@@ -81,10 +73,7 @@ engine_db = create_async_engine(
     pool_recycle=3600,   # Recycle connections every hour
     pool_size=10,        # Connection pool size
     max_overflow=20,     # Maximum overflow connections
-    pool_timeout=30,     # Timeout for getting connection from pool
-    connect_args={
-        "check_same_thread": False if "sqlite" in SQLALCHEMY_DATABASE_URL else {}
-    }
+    pool_timeout=30      # Timeout for getting connection from pool
 )
 
 # Session factory for the database (Async)
