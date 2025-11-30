@@ -16,6 +16,35 @@ interface AnalyticsFilters {
   orderStatus?: string;
 }
 
+// Helper function to format relative time
+const formatRelativeTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+  return date.toLocaleDateString();
+};
+
+// Helper function to get icon and color for activity type
+const getActivityIcon = (actionType: string): { icon: JSX.Element; color: string } => {
+  switch (actionType) {
+    case 'order':
+      return { icon: <ShoppingCartIcon size={16} />, color: 'bg-success/10 text-success' };
+    case 'registration':
+      return { icon: <UsersIcon size={16} />, color: 'bg-info/10 text-info' };
+    case 'review':
+      return { icon: <PackageIcon size={16} />, color: 'bg-warning/10 text-warning' };
+    case 'payment':
+      return { icon: <DollarSignIcon size={16} />, color: 'bg-secondary/10 text-secondary' };
+    default:
+      return { icon: <PackageIcon size={16} />, color: 'bg-gray-100 text-gray-600' };
+  }
+};
+
 export const AdminAnalytics = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const [chartView, setChartView] = useState('revenue');
@@ -32,6 +61,7 @@ export const AdminAnalytics = () => {
     orderStatus: ''
   });
   const { data: dashboardData, loading, error, execute: fetchDashboardData } = useApi();
+  const { data: activityData, loading: activityLoading, execute: fetchActivity } = useApi();
 
   // Close export dropdown when clicking outside
   useEffect(() => {
@@ -67,6 +97,17 @@ export const AdminAnalytics = () => {
     
     fetchDashboardData(() => AnalyticsAPI.getDashboardData(apiFilters));
   }, [fetchDashboardData, timeRange, filters]);
+
+  // Fetch recent activity on mount and auto-refresh every 30 seconds
+  useEffect(() => {
+    fetchActivity(() => AnalyticsAPI.getRecentActivity({ limit: 10 }));
+    
+    const interval = setInterval(() => {
+      fetchActivity(() => AnalyticsAPI.getRecentActivity({ limit: 10 }));
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [fetchActivity]);
 
   const analyticsData = dashboardData?.data || dashboardData;
   
@@ -492,54 +533,40 @@ export const AdminAnalytics = () => {
               View All <ArrowRightIcon size={16} className="ml-1" />
             </Link>
           </div>
-          <div className="space-y-4">
-            <div className="flex items-start">
-              <div className="w-8 h-8 rounded-full bg-success/10 text-success flex items-center justify-center mr-3 flex-shrink-0">
-                <ShoppingCartIcon size={16} />
-              </div>
-              <div>
-                <p className="text-sm text-main">
-                  <span className="font-medium">New order</span> from Jane Smith
-                </p>
-                <p className="text-xs text-copy-light">15 minutes ago</p>
-              </div>
+          {activityLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-start animate-pulse">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 mr-3 flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex items-start">
-              <div className="w-8 h-8 rounded-full bg-info/10 text-info flex items-center justify-center mr-3 flex-shrink-0">
-                <UsersIcon size={16} />
-              </div>
-              <div>
-                <p className="text-sm text-main">
-                  <span className="font-medium">New customer</span> registered
-                </p>
-                <p className="text-xs text-copy-light">1 hour ago</p>
-              </div>
+          ) : activityData?.data && activityData.data.length > 0 ? (
+            <div className="space-y-4">
+              {activityData.data.map((activity: any) => {
+                const { icon, color } = getActivityIcon(activity.action_type);
+                return (
+                  <div key={activity.id} className="flex items-start">
+                    <div className={`w-8 h-8 rounded-full ${color} flex items-center justify-center mr-3 flex-shrink-0`}>
+                      {icon}
+                    </div>
+                    <div>
+                      <p className="text-sm text-main">{activity.description}</p>
+                      <p className="text-xs text-copy-light">{formatRelativeTime(activity.created_at)}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="flex items-start">
-              <div className="w-8 h-8 rounded-full bg-warning/10 text-warning flex items-center justify-center mr-3 flex-shrink-0">
-                <PackageIcon size={16} />
-              </div>
-              <div>
-                <p className="text-sm text-main">
-                  <span className="font-medium">Product update:</span> Moringa
-                  Powder is low in stock
-                </p>
-                <p className="text-xs text-copy-light">2 hours ago</p>
-              </div>
+          ) : (
+            <div className="text-center py-8 text-copy-light">
+              <p>No recent activity</p>
             </div>
-            <div className="flex items-start">
-              <div className="w-8 h-8 rounded-full bg-secondary/10 text-secondary flex items-center justify-center mr-3 flex-shrink-0">
-                <DollarSignIcon size={16} />
-              </div>
-              <div>
-                <p className="text-sm text-main">
-                  <span className="font-medium">Payment received</span> for
-                  order #ORD-1234
-                </p>
-                <p className="text-xs text-copy-light">5 hours ago</p>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>;

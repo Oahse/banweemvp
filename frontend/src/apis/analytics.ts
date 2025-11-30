@@ -164,6 +164,19 @@ export class AnalyticsAPI {
   static async getPerformanceMetrics() {
     return await apiClient.get('/analytics/performance');
   }
+
+  /**
+   * Get recent activity logs
+   */
+  static async getRecentActivity(params?: { limit?: number; since?: string }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.since) queryParams.append('since', params.since);
+
+    const url = `/analytics/recent-activity${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url);
+  }
 }
 
 export default AnalyticsAPI;
