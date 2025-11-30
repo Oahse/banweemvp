@@ -3,6 +3,9 @@ import {
   notificationService,
   browserNotificationService 
 } from '../lib/notifications';
+import NotificationAPI from '../apis/notification';
+import { useAuth } from './AuthContext';
+import { toast } from 'react-hot-toast';
 
 
 export const NotificationContext = createContext(undefined);
@@ -14,18 +17,41 @@ export const NotificationProvider = ({ children }) => {
   const [preferences, setPreferences] = useState(
     notificationService.getPreferences()
   );
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+
+  // Fetch notifications from backend
+  const fetchNotifications = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      const response = await NotificationAPI.getUserNotifications({ limit: 50 });
+      setNotifications(response.data.data || []);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Subscribe to notification changes
-    const unsubscribe = notificationService.subscribe((newNotifications) => {
-      setNotifications(newNotifications);
-    });
-
-    // Initialize with current notifications
-    setNotifications(notificationService.getAll());
-
-    return unsubscribe;
-  }, []);
+    // Fetch notifications when user is logged in
+    if (user) {
+      fetchNotifications();
+      
+      // Poll for new notifications every 30 seconds
+      const interval = setInterval(fetchNotifications, 30000);
+      return () => clearInterval(interval);
+    } else {
+      // Fall back to local notifications when not logged in
+      const unsubscribe = notificationService.subscribe((newNotifications) => {
+        setNotifications(newNotifications);
+      });
+      setNotifications(notificationService.getAll());
+      return unsubscribe;
+    }
+  }, [user]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -47,12 +73,50 @@ export const NotificationProvider = ({ children }) => {
     notificationService.remove(id);
   };
 
-  const markAsRead = (id) => {
-    notificationService.markAsRead(id);
+  const markAsRead = async (id) => {
+    if (!user) {
+      // Local notification
+      notificationService.markAsRead(id);
+      return;
+    }
+
+    // Optimistic update
+    setNotifications(prev => prev.map(n => 
+      n.id === id ? { ...n, read: true } : n
+    ));
+
+    try {
+      await NotificationAPI.markNotificationAsRead(id);
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+      // Revert on error
+      setNotifications(prev => prev.map(n => 
+        n.id === id ? { ...n, read: false } : n
+      ));
+      toast.error('Failed to mark notification as read');
+    }
   };
 
-  const markAllAsRead = () => {
-    notificationService.markAllAsRead();
+  const markAllAsRead = async () => {
+    if (!user) {
+      // Local notifications
+      notificationService.markAllAsRead();
+      return;
+    }
+
+    // Optimistic update
+    const previousNotifications = [...notifications];
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+
+    try {
+      await NotificationAPI.markAllNotificationsAsRead();
+      toast.success('All notifications marked as read');
+    } catch (error) {
+      console.error('Failed to mark all as read:', error);
+      // Revert on error
+      setNotifications(previousNotifications);
+      toast.error('Failed to mark all as read');
+    }
   };
 
   const clearAll = () => {
@@ -89,6 +153,7 @@ export const NotificationProvider = ({ children }) => {
     notifications,
     unreadCount,
     preferences,
+    loading,
     addNotification,
     removeNotification,
     markAsRead,
@@ -96,6 +161,7 @@ export const NotificationProvider = ({ children }) => {
     clearAll,
     updatePreferences,
     requestBrowserPermission,
+    fetchNotifications,
     success,
     error,
     warning,

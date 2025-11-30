@@ -21,7 +21,7 @@ import { LayoutDashboardIcon,
 
 export const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { notifications, markAllAsRead, unreadCount } = useNotifications();
+  const { notifications, markAllAsRead, markAsRead, unreadCount } = useNotifications();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -145,20 +145,45 @@ export const AdminLayout = ({ children }) => {
                     </button>
                   </div>
                   <div className="max-h-60 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-3 border-b border-border-light last:border-0 ${!notification.read ? 'bg-primary/10' : ''
-                          }`}>
-                        <p className="text-sm font-medium">{notification.title}</p>
-                        {notification.message && (
-                          <p className="text-sm text-copy-light">{notification.message}</p>
-                        )}
-                        <p className="text-xs text-copy-lighter mt-1">
-                          {notification.timestamp.toLocaleString()}
-                        </p>
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-copy-light text-sm">
+                        No notifications
                       </div>
-                    ))}
+                    ) : (
+                      notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className={`p-3 border-b border-border-light last:border-0 ${!notification.read ? 'bg-primary/10' : ''
+                            }`}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium">{notification.title || notification.message}</p>
+                              {notification.message && notification.title && (
+                                <p className="text-sm text-copy-light">{notification.message}</p>
+                              )}
+                              <p className="text-xs text-copy-lighter mt-1">
+                                {notification.timestamp ? notification.timestamp.toLocaleString() : 
+                                 notification.created_at ? new Date(notification.created_at).toLocaleString() : 'Just now'}
+                              </p>
+                            </div>
+                            {!notification.read && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  markAsRead(notification.id);
+                                }}
+                                className="ml-2 p-1 text-copy-light hover:text-primary"
+                                title="Mark as read"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className="p-2 border-t border-border-light text-center">
                     <Link to="/admin/notifications" className="text-sm text-primary hover:underline">
