@@ -193,9 +193,18 @@ export class OrdersAPI {
     if (params?.status) queryParams.append('status', params.status);
     if (params?.date_from) queryParams.append('date_from', params.date_from);
     if (params?.date_to) queryParams.append('date_to', params.date_to);
+    if (params?.q) queryParams.append('q', params.q);
+    if (params?.min_price) queryParams.append('min_price', params.min_price.toString());
+    if (params?.max_price) queryParams.append('max_price', params.max_price.toString());
 
     const url = `/admin/orders/export${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    const filename = `orders-export-${new Date().toISOString().split('T')[0]}.${params?.format || 'csv'}`;
+    
+    // Determine file extension based on format
+    let extension = 'csv';
+    if (params?.format === 'excel') extension = 'xlsx';
+    else if (params?.format === 'pdf') extension = 'pdf';
+    
+    const filename = `orders-export-${new Date().toISOString().split('T')[0]}.${extension}`;
     
     await apiClient.download(url, filename);
   }

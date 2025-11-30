@@ -69,11 +69,17 @@ class Settings:
         os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30))
     REFRESH_TOKEN_EXPIRE_DAYS: int = int(
         os.getenv('REFRESH_TOKEN_EXPIRE_DAYS', 7))
-    RESEND_API_KEY: str = os.getenv('RESEND_API_KEY')
 
+    # Mailgun Configuration
     MAILGUN_API_KEY: str = os.getenv('MAILGUN_API_KEY', '')
     MAILGUN_DOMAIN: str = os.getenv('MAILGUN_DOMAIN', '')
-    MAILGUN_SENDER_EMAIL: str = os.getenv('MAILGUN_SENDER_EMAIL', '')
+    MAILGUN_FROM_EMAIL: str = os.getenv('MAILGUN_FROM_EMAIL', 'Banwee <noreply@banwee.com>')
+    
+    # Redis Configuration
+    REDIS_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+    
+    # Database URL (for Celery and async operations)
+    DATABASE_URL: str = os.getenv('DATABASE_URL', '')
 
     # Frontend URL
     FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'http://localhost:5173')
@@ -108,8 +114,13 @@ class Settings:
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
+        # If DATABASE_URL is set, use it (for Docker/production)
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
+        
+        # Otherwise, determine based on environment
         if self.ENVIRONMENT in ["local"]:
-            # Use SQLite for local development with PostgreSQL-compatible schema
+            # Use SQLite for local development
             return f"sqlite+aiosqlite:///{self.SQLITE_DB_PATH}"
         elif self.ENVIRONMENT in ["staging", "production"]:
             # Use PostgreSQL for staging and production

@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react';
-import { BellIcon, CheckIcon, TrashIcon, MailIcon, AlertCircleIcon, InfoIcon } from 'lucide-react';
+import { BellIcon, CheckIcon, TrashIcon, MailIcon, AlertCircleIcon, InfoIcon, CheckCheckIcon } from 'lucide-react';
 import { usePaginatedApi } from '../../hooks/useApi';
 import NotificationAPI from '../../apis/notification';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { toast } from 'react-hot-toast';
 
 export const AdminNotifications = () => {
   const [filter, setFilter] = useState('all');
+  const [markingAllAsRead, setMarkingAllAsRead] = useState(false);
 
   const apiCall = useCallback((page: number, limit: number) => {
     return NotificationAPI.getUserNotifications({
@@ -43,6 +45,42 @@ export const AdminNotifications = () => {
     );
   }
 
+  const handleMarkAsRead = async (notificationId: string) => {
+    try {
+      await NotificationAPI.markNotificationAsRead(notificationId);
+      await fetchNotifications();
+      toast.success('Notification marked as read');
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+      toast.error('Failed to mark notification as read');
+    }
+  };
+
+  const handleDelete = async (notificationId: string) => {
+    try {
+      await NotificationAPI.deleteNotification(notificationId);
+      await fetchNotifications();
+      toast.success('Notification deleted');
+    } catch (error) {
+      console.error('Failed to delete notification:', error);
+      toast.error('Failed to delete notification');
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      setMarkingAllAsRead(true);
+      await NotificationAPI.markAllNotificationsAsRead();
+      await fetchNotifications();
+      toast.success('All notifications marked as read');
+    } catch (error) {
+      console.error('Failed to mark all as read:', error);
+      toast.error('Failed to mark all as read');
+    } finally {
+      setMarkingAllAsRead(false);
+    }
+  };
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'success':
@@ -63,7 +101,15 @@ export const AdminNotifications = () => {
           <BellIcon size={28} className="mr-3 text-primary" />
           <h1 className="text-2xl font-bold text-main">Notifications</h1>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-wrap gap-2">
+          <button
+            onClick={handleMarkAllAsRead}
+            disabled={markingAllAsRead || notifications.length === 0}
+            className="flex items-center px-3 py-2 bg-surface border border-border rounded-md text-sm text-copy hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <CheckCheckIcon size={16} className="mr-2" />
+            {markingAllAsRead ? 'Marking...' : 'Mark all as read'}
+          </button>
           <button
             onClick={() => setFilter('all')}
             className={`px-4 py-2 rounded-md text-sm ${
@@ -143,6 +189,7 @@ export const AdminNotifications = () => {
                       <div className="flex items-center space-x-2 ml-4">
                         {!notification.read && (
                           <button
+                            onClick={() => handleMarkAsRead(notification.id)}
                             className="p-1 text-copy-light hover:text-success"
                             title="Mark as read"
                           >
@@ -150,6 +197,7 @@ export const AdminNotifications = () => {
                           </button>
                         )}
                         <button
+                          onClick={() => handleDelete(notification.id)}
                           className="p-1 text-copy-light hover:text-error"
                           title="Delete"
                         >

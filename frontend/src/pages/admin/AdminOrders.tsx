@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { SearchIcon, FilterIcon, ChevronDownIcon, EyeIcon, PrinterIcon, MoreHorizontalIcon, CalendarIcon } from 'lucide-react';
+import { SearchIcon, FilterIcon, ChevronDownIcon, EyeIcon, PrinterIcon, MoreHorizontalIcon, CalendarIcon, DownloadIcon } from 'lucide-react';
 import { usePaginatedApi } from '../../hooks/useApi';
-import { AdminAPI } from '../../apis';
+import { AdminAPI, OrdersAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';
 
@@ -16,6 +16,21 @@ export const AdminOrders = () => {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Close export menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showExportMenu && !target.closest('.export-menu-container')) {
+        setShowExportMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showExportMenu]);
 
   const apiCall = useCallback((page: number, limit: number) => {
     return AdminAPI.getAllOrders({
@@ -81,6 +96,30 @@ export const AdminOrders = () => {
     }
   };
 
+  const handleExport = async (format: 'csv' | 'excel' | 'pdf') => {
+    try {
+      setIsExporting(true);
+      setShowExportMenu(false);
+      
+      await OrdersAPI.exportOrders({
+        format,
+        status: filterStatus !== 'all' ? filterStatus : undefined,
+        q: submittedSearchTerm || undefined,
+        date_from: dateFrom || undefined,
+        date_to: dateTo || undefined,
+        min_price: minPrice ? parseFloat(minPrice) : undefined,
+        max_price: maxPrice ? parseFloat(maxPrice) : undefined,
+      });
+      
+      toast.success(`Orders exported to ${format.toUpperCase()} successfully`);
+    } catch (error) {
+      console.error('Failed to export orders:', error);
+      toast.error('Failed to export orders');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // Status options for filter
   const statusOptions = [{
     value: 'all',
@@ -125,9 +164,41 @@ export const AdminOrders = () => {
             <CalendarIcon size={16} className="mr-2" />
             Last 30 Days
           </button>
-          <button className="px-3 py-1.5 bg-primary text-white rounded-md text-sm">
-            Export
-          </button>
+          <div className="relative export-menu-container">
+            <button 
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              disabled={isExporting}
+              className="flex items-center px-3 py-1.5 bg-primary text-white rounded-md text-sm hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <DownloadIcon size={16} className="mr-2" />
+              {isExporting ? 'Exporting...' : 'Export'}
+              <ChevronDownIcon size={16} className="ml-1" />
+            </button>
+            {showExportMenu && !isExporting && (
+              <div className="absolute right-0 mt-2 w-40 bg-surface rounded-md shadow-lg border border-border-light z-20">
+                <div className="py-1">
+                  <button
+                    onClick={() => handleExport('csv')}
+                    className="w-full text-left px-4 py-2 text-sm text-copy hover:bg-surface-hover"
+                  >
+                    Export as CSV
+                  </button>
+                  <button
+                    onClick={() => handleExport('excel')}
+                    className="w-full text-left px-4 py-2 text-sm text-copy hover:bg-surface-hover"
+                  >
+                    Export as Excel
+                  </button>
+                  <button
+                    onClick={() => handleExport('pdf')}
+                    className="w-full text-left px-4 py-2 text-sm text-copy hover:bg-surface-hover"
+                  >
+                    Export as PDF
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       {/* Filters and search */}

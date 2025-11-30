@@ -2,7 +2,7 @@
 """
 Database initialization + batched seeding script for Banwee API.
 
-- Creates tables (drops then creates).
+- Creates tables (drops then creates) in PostgreSQL.
 - Optionally seeds with sample data in configurable batch sizes (default batch_size=50).
 - Prints plaintext passwords for test accounts (ONLY FOR LOCAL/DEV USE).
 """
@@ -11,6 +11,7 @@ import asyncio
 import argparse
 import random
 import uuid
+import os
 from typing import List
 
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -129,13 +130,32 @@ DEFAULT_BATCH_SIZE = 50
 
 
 async def create_tables():
-    """Create all database tables (drop then create)."""
-    engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI, echo=True)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
-    await engine.dispose()
-    print("✅ Database tables created successfully!")
+    """Create all database tables (drop then create) in PostgreSQL."""
+    # Ensure we're using PostgreSQL
+    db_uri = settings.SQLALCHEMY_DATABASE_URI
+    if 'postgresql' not in db_uri:
+        print("⚠️  WARNING: Database URI does not appear to be PostgreSQL!")
+        print(f"   Current URI: {db_uri}")
+        response = input("   Continue anyway? (yes/no): ")
+        if response.lower() != 'yes':
+            print("❌ Aborted.")
+            return
+    
+    print(f"🔗 Connecting to PostgreSQL: {db_uri.split('@')[-1] if '@' in db_uri else 'database'}")
+    engine = create_async_engine(db_uri, echo=True)
+    
+    try:
+        async with engine.begin() as conn:
+            print("🗑️  Dropping existing tables...")
+            await conn.run_sync(Base.metadata.drop_all)
+            print("🏗️  Creating new tables...")
+            await conn.run_sync(Base.metadata.create_all)
+        await engine.dispose()
+        print("✅ PostgreSQL database tables created successfully!")
+    except Exception as e:
+        print(f"❌ Error creating tables: {e}")
+        await engine.dispose()
+        raise
 
 
 async def seed_sample_data(

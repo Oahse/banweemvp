@@ -1,4 +1,5 @@
 from uuid import UUID
+from datetime import datetime
 from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -443,4 +444,84 @@ async def update_system_settings(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to update system settings {str(e)}"
+        )
+
+
+@router.get("/orders/export")
+async def export_orders(
+    format: str = Query("csv"),
+    order_status: Optional[str] = Query(None, alias="status"),
+    q: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Export orders to CSV, Excel, or PDF (admin only)."""
+    from fastapi.responses import StreamingResponse
+    from services.export import ExportService
+    
+    # Validate format
+    if format not in ['csv', 'excel', 'pdf']:
+        raise APIException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message="Invalid format. Use csv, excel, or pdf"
+        )
+    
+    try:
+        admin_service = AdminService(db)
+        
+        # Get all orders without pagination for export
+        orders_data = await admin_service.get_all_orders(
+            page=1, 
+            limit=10000,  # Large limit to get all orders
+            order_status=order_status,
+            q=q,
+            date_from=date_from,
+            date_to=date_to,
+            min_price=min_price,
+            max_price=max_price
+        )
+        
+        orders = orders_data.get('data', [])
+        
+        # Generate export based on format
+        export_service = ExportService()
+        
+        if format == "csv":
+            output = export_service.export_orders_to_csv(orders)
+            media_type = "text/csv"
+            filename = f"orders_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        elif format == "excel":
+            output = export_service.export_orders_to_excel(orders)
+            media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            filename = f"orders_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        elif format == "pdf":
+            output = export_service.export_orders_to_pdf(orders)
+            media_type = "application/pdf"
+            filename = f"orders_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        else:
+            raise APIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                message="Invalid format. Use csv, excel, or pdf"
+            )
+        
+        return StreamingResponse(
+            output,
+            media_type=media_type,
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except APIException:
+        raise
+    except Exception as e:
+        print(f"Error exporting orders: {e}")
+        import traceback
+        traceback.print_exc()
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to export orders: {str(e)}"
         )

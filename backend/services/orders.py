@@ -135,9 +135,9 @@ class OrderService:
         await self.db.commit()
         await self.db.refresh(new_order)
 
-        # Send order confirmation email in the background
-        background_tasks.add_task(
-            self.send_order_confirmation_email, new_order)
+        # Send order confirmation email via Celery
+        from tasks.email_tasks import send_order_confirmation_email
+        send_order_confirmation_email.delay(str(new_order.id))
 
         # --- Send Notifications for New Order ---
         # 1. Get Admin User ID
@@ -184,50 +184,15 @@ class OrderService:
 
         return OrderResponse.from_orm(new_order)
 
-    async def send_order_confirmation_email(self, order: Order):
-        """Sends an order confirmation email to the user."""
-        user_result = await self.db.execute(select(User).where(User.id == order.user_id))
-        user = user_result.scalar_one_or_none()
-        if not user:
-            return
-
-        order_items = []
-        for item in order.items:
-            variant_result = await self.db.execute(select(ProductVariant).where(ProductVariant.id == item.variant_id))
-            variant = variant_result.scalar_one_or_none()
-            order_items.append({
-                "name": variant.name if variant else "Unknown Item",
-                "quantity": item.quantity,
-                "price": f"${item.total_price:.2f}"
-            })
-
-        shipping_address_result = await self.db.execute(select(Address).where(Address.id == order.shipping_address_id))
-        shipping_address = shipping_address_result.scalar_one_or_none()
-
-        context = {
-            "customer_name": user.firstname,
-            "order_number": str(order.id),
-            "order_date": order.created_at.strftime("%B %d, %Y"),
-            "order_total": f"${order.total_amount:.2f}",
-            "order_items": order_items,
-            "shipping_address": {
-                "line1": shipping_address.street,
-                "city": shipping_address.city,
-                "state_zip": f"{shipping_address.state} {shipping_address.post_code}",
-                "country": shipping_address.country
-            } if shipping_address else {},
-            "order_tracking_url": f"{settings.FRONTEND_URL}/account/orders/{order.id}",
-            "company_name": "Banwee",
-        }
-
+    def send_order_confirmation_email(self, order: Order):
+        """Sends an order confirmation email to the user (synchronous for background task)."""
+        # Note: This is called as a background task, so we can't use async db operations
+        # For now, we'll just log. TODO: Implement proper async background task handling
         try:
-            await send_email(
-                to_email=user.email,
-                mail_type='order_confirmation',
-                context=context
-            )
-            print(
-                f"Order confirmation email sent to {user.email} successfully.")
+            print(f"Order confirmation email queued for order: {order.id}")
+            # TODO: Use Celery or similar for proper async email sending with database access
+        except Exception as e:
+            print(f"Failed to queue order confirmation email: {e}")
         except Exception as e:
             print(
                 f"Failed to send order confirmation email to {user.email}. Error: {e}")
@@ -249,45 +214,21 @@ class OrderService:
         await self.db.commit()
         await self.db.refresh(order)
 
-        background_tasks.add_task(
-            self.send_shipping_update_email, order, carrier_name)
+        # Send shipping update email via Celery
+        from tasks.email_tasks import send_shipping_update_email
+        send_shipping_update_email.delay(str(order.id), carrier_name)
 
         return order
 
-    async def send_shipping_update_email(self, order: Order, carrier_name: str):
-        """Sends a shipping update email to the user."""
-        user_result = await self.db.execute(select(User).where(User.id == order.user_id))
-        user = user_result.scalar_one_or_none()
-        if not user:
-            return
-
-        shipping_address_result = await self.db.execute(select(Address).where(Address.id == order.shipping_address_id))
-        shipping_address = shipping_address_result.scalar_one_or_none()
-
-        context = {
-            "customer_name": user.firstname,
-            "order_number": str(order.id),
-            "tracking_number": order.tracking_number,
-            "carrier_name": carrier_name,
-            "shipping_address": {
-                "line1": shipping_address.street,
-                "city": shipping_address.city,
-            } if shipping_address else {},
-            # Generic tracking URL
-            "tracking_url": f"https://www.google.com/search?q={carrier_name}+{order.tracking_number}",
-            "company_name": "Banwee",
-        }
-
+    def send_shipping_update_email(self, order: Order, carrier_name: str):
+        """Sends a shipping update email to the user (synchronous for background task)."""
+        # Note: This is called as a background task, so we can't use async db operations
+        # For now, we'll just log. TODO: Implement proper async background task handling
         try:
-            await send_email(
-                to_email=user.email,
-                mail_type='shipping_update',
-                context=context
-            )
-            print(f"Shipping update email sent to {user.email} successfully.")
+            print(f"Shipping update email queued for order: {order.id}, carrier: {carrier_name}")
+            # TODO: Use Celery or similar for proper async email sending with database access
         except Exception as e:
-            print(
-                f"Failed to send shipping update email to {user.email}. Error: {e}")
+            print(f"Failed to queue shipping update email: {e}")
 
     async def create_order(self, order_data: OrderCreate, user_id: UUID) -> Order:
         """Create a new order from direct items (e.g., for admin or specific scenarios)."""
@@ -542,8 +483,9 @@ class OrderService:
 
         # Send notification to customer
         if order.user:
-            background_tasks.add_task(
-                self.notification_service.create_notification,
+            # Create notification via Celery
+            from tasks.notification_tasks import create_notification
+            create_notification.delay(
                 user_id=str(order.user_id),
                 message=f"Your order #{order.id} status has been updated to {new_status}",
                 type="info",
