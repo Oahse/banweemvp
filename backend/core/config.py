@@ -21,6 +21,7 @@ def parse_cors(value: str) -> List[str]:
     if not value:
         return [
             "http://localhost:5173",  # Vite dev server
+            "http://0.0.0.0:5173",  # Vite dev server when binding to all interfaces
             "http://127.0.0.1:5173",
             "http://localhost:3000",  # optional if you also use CRA
         ]
