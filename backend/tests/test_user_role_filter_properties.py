@@ -86,6 +86,35 @@ async def test_property_all_roles_display(dummy, db_session: AsyncSession):
     
     **Validates: Requirements 8.2**
     """
+    from models.user import User
+    from core.utils.encryption import PasswordManager
+    from uuid import uuid4
+
+    pm = PasswordManager()
+    hashed_password = pm.hash_password("testpassword123")
+
+    # Ensure at least one user of each role exists for the test
+    roles_to_create = ["Admin", "Supplier", "Customer"]
+    existing_roles = set()
+    result = await db_session.execute(select(User.role).distinct())
+    for role_tuple in result.scalars().all():
+        existing_roles.add(role_tuple)
+
+    for role_name in roles_to_create:
+        if role_name not in existing_roles:
+            user = User(
+                id=uuid4(),
+                email=f"{role_name.lower()}_{uuid4().hex}@example.com",
+                firstname=role_name,
+                lastname="Test",
+                role=role_name,
+                active=True,
+                verified=True,
+                hashed_password=hashed_password
+            )
+            db_session.add(user)
+    await db_session.commit()
+    
     # Create admin service
     admin_service = AdminService(db_session)
     

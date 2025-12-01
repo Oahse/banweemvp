@@ -14,15 +14,31 @@ from core.database import get_db, Base
 # Use PostgreSQL in Docker for testing
 SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://banwee:banwee_password@localhost:5432/banwee_db"
 
-engine = create_async_engine(
-    SQLALCHEMY_DATABASE_URL,
-    echo=False,
-    pool_pre_ping=True,
-    poolclass=None  # Disable pooling for tests to avoid connection issues
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession, expire_on_commit=False)
+@pytest.fixture(scope="session")
+async def async_engine():
+    """Provides a session-scoped async SQLAlchemy engine."""
+    engine = create_async_engine(
+        SQLALCHEMY_DATABASE_URL,
+        echo=False,
+        pool_pre_ping=True,
+        poolclass=None  # Disable pooling for tests to avoid connection issues
+    )
+    yield engine
+    await engine.dispose()
 
-Base.metadata.bind = engine
+TestingSessionLocal = None # Initialize to None, will be set in fixture
+
+@pytest.fixture(scope="session", autouse=True)
+async def setup_test_database(async_engine):
+    """Sets up the test database schema once per session."""
+    global TestingSessionLocal
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=async_engine, class_=AsyncSession, expire_on_commit=False)
+    
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
 async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
     async with TestingSessionLocal() as session:
@@ -32,13 +48,13 @@ app.dependency_overrides[get_db] = override_get_db
 
 @pytest.fixture(scope="session")
 def event_loop():
-    """Create an instance of the default event loop for the test session."""
+    """Custom event loop for pytest-asyncio with session scope."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
 
 @pytest.fixture(scope="function", autouse=True)
-async def db_setup_and_teardown():
+async def db_setup_and_teardown(request):
     """Setup and teardown database for each test function."""
     # Don't create/drop tables for every test - too slow
     # Instead, just ensure tables exist
@@ -47,13 +63,76 @@ async def db_setup_and_teardown():
             await conn.run_sync(Base.metadata.create_all)
     except Exception:
         pass  # Tables might already exist
+    
+    # Clean up test data BEFORE each test to ensure clean state
+    try:
+        async with TestingSessionLocal() as session:
+            from sqlalchemy import text
+            
+            # Use TRUNCATE CASCADE for faster and more reliable cleanup
+            # This will delete all data and reset sequences
+            tables_to_truncate = [
+                "activity_logs", "notifications", "reviews", "tracking_events",
+                "transactions", "order_items", "orders", "product_images",
+                "product_variants", "products", "payment_methods", "addresses",
+                "cart_items", "carts", "wishlist_items", "wishlists", "users", "categories"
+            ]
+            
+            for table in tables_to_truncate:
+                try:
+                    await session.execute(text(f"TRUNCATE TABLE {table} CASCADE"))
+                except Exception:
+                    pass  # Table might not exist or might be empty
+            
+            # Delete test categories (don't delete users as they have many dependencies)
+            # await session.execute(text("DELETE FROM categories WHERE name LIKE 'Test Category%'"))
+            await session.commit()
+    except Exception as e:
+        print(f"Warning: Pre-test cleanup failed: {e}")
+    
     yield
-    # Don't drop tables after each test - causes issues with concurrent tests
+    
+    # Clean up test data after each test to avoid conflicts
+    # Only clean up if the test didn't explicitly skip cleanup
+    if not hasattr(request, 'param') or request.param != 'skip_cleanup':
+        try:
+            async with TestingSessionLocal() as session:
+                # Import models with correct paths
+                import sys
+                import os
+                # Add backend directory to path if not already there
+                backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                if backend_dir not in sys.path:
+                    sys.path.insert(0, backend_dir)
+                
+                from sqlalchemy import delete, text
+                
+                # Use TRUNCATE CASCADE for faster and more reliable cleanup
+                tables_to_truncate = [
+                    "activity_logs", "notifications", "reviews", "tracking_events",
+                    "transactions", "order_items", "orders", "product_images",
+                    "product_variants", "products", "payment_methods", "addresses",
+                    "cart_items", "carts", "wishlist_items", "wishlists", "users", "categories"
+                ]
+                
+                for table in tables_to_truncate:
+                    try:
+                        await session.execute(text(f"TRUNCATE TABLE {table} CASCADE"))
+                    except Exception:
+                        pass  # Table might not exist or might be empty
+                
+                # Delete test categories
+                # await session.execute(text("DELETE FROM categories WHERE name LIKE 'Test Category%'"))
+                await session.commit()
+        except Exception as e:
+            # If cleanup fails, log but don't fail the test
+            print(f"Warning: Test cleanup failed: {e}")
 
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
     async with TestingSessionLocal() as session:
         yield session
+    await session.close()
 
 @pytest.fixture
 def client() -> TestClient:
@@ -63,6 +142,36 @@ def client() -> TestClient:
 async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
+
+def get_unique_name(base_name: str) -> str:
+    """Generate a unique name for test data."""
+    import time
+    import random
+    timestamp = int(time.time() * 1000000)
+    random_suffix = random.randint(1000, 9999)
+    return f"{base_name} {timestamp}{random_suffix}"
+
+@pytest.fixture
+async def test_category(db_session: AsyncSession):
+    """Create a unique test category for each test."""
+    from models.category import Category
+    from uuid import uuid4
+    
+    # Create unique category name
+    category_name = get_unique_name("Test Category")
+    
+    category = Category(
+        id=uuid4(),
+        name=category_name,
+        description="Test category description",
+        is_active=True
+    )
+    
+    db_session.add(category)
+    await db_session.commit()
+    await db_session.refresh(category)
+    
+    return category
 
 @pytest.fixture
 async def auth_headers(db_session: AsyncSession) -> dict:
@@ -104,4 +213,46 @@ async def auth_headers(db_session: AsyncSession) -> dict:
     jwt_manager = JWTManager()
     access_token = jwt_manager.create_access_token(data={"sub": test_email})
     
+    return {"Authorization": f"Bearer {access_token}"}
+
+@pytest.fixture
+async def admin_auth_headers(db_session: AsyncSession) -> dict:
+    """Create a test admin user and return auth headers"""
+    from models.user import User
+    from core.utils.auth.jwt_auth import JWTManager
+    from uuid import uuid4
+    import bcrypt
+    from sqlalchemy import select
+    import time
+
+    # Use unique email for each test to avoid conflicts
+    admin_email = f"admin_{int(time.time() * 1000000)}@example.com"
+
+    # Check if user already exists
+    result = await db_session.execute(select(User).where(User.email == admin_email))
+    existing_admin = result.scalar_one_or_none()
+
+    if existing_admin:
+        test_admin = existing_admin
+    else:
+        # Create a test admin user
+        test_admin = User(
+            id=uuid4(),
+            email=admin_email,
+            firstname="Admin",
+            lastname="User",
+            role="Admin", # Set role to Admin
+            active=True,
+            verified=True,
+            hashed_password=bcrypt.hashpw("adminpassword123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        )
+
+        db_session.add(test_admin)
+        await db_session.commit()
+        await db_session.refresh(test_admin)
+
+    # Create access token using stored email
+    jwt_manager = JWTManager()
+    access_token = jwt_manager.create_access_token(data={"sub": admin_email, "role": "Admin"})
+
     return {"Authorization": f"Bearer {access_token}"}

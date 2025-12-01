@@ -139,7 +139,9 @@ class AnalyticsService:
             user_id="", 
             user_role="Admin", 
             days=(end_date - start_date).days,
-            filters=filters
+            filters=filters,
+            start_date=start_date,
+            end_date=end_date
         )
         top_products = await self.get_top_products(
             user_id="", 
@@ -320,13 +322,16 @@ class AnalyticsService:
             ]
         }
 
-    async def get_sales_trend(self, user_id: str, user_role: str, days: int = 30, filters: dict = None) -> List[dict]:
+    async def get_sales_trend(self, user_id: str, user_role: str, days: int = 30, filters: dict = None, start_date: datetime = None, end_date: datetime = None) -> List[dict]:
         """Get sales trend data grouped by date with filters."""
         if filters is None:
             filters = {}
             
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
+        # Use provided dates if available, otherwise calculate from days
+        if end_date is None:
+            end_date = datetime.now()
+        if start_date is None:
+            start_date = end_date - timedelta(days=days)
 
         date_conditions = and_(
             Order.created_at >= start_date,
