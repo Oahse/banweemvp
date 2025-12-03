@@ -33,7 +33,7 @@ def parse_cors(value: str) -> List[str]:
         value = value.strip()
         if value.startswith("[") and value.endswith("]"):
             # Handles list-like string format (e.g., "['http://a.com', 'http://b.com']")
-            parsed_list = [i.strip().strip("'"") for i in value[1:-1].split(",")]
+            parsed_list = [i.strip().strip('"') for i in value[1:-1].split(",")]
             return parsed_list
         # Handles comma-separated string format (e.g., "http://a.com,http://b.com")
         parsed_list = [i.strip() for i in value.split(",")]
@@ -71,8 +71,7 @@ class Settings:
     # Default is an empty string, allowing the URL to be constructed from components or
     # to be provided by Docker Compose environment variables.
     POSTGRES_DB_URL: str = os.getenv('POSTGRES_DB_URL', "")
-    # Generic DATABASE_URL, used as a fallback for connection string if POSTGRES_DB_URL is not set.
-    DATABASE_URL: str = os.getenv('DATABASE_URL', '')
+
 
     # SQLite (fallback if needed for testing or specific local environments)
     SQLITE_DB_PATH: str = os.getenv('SQLITE_DB_PATH', 'db1.db')
@@ -153,12 +152,9 @@ class Settings:
         Ensures async PostgreSQL driver is specified.
         """
         # Always use PostgreSQL with async support
-        # Priority: POSTGRES_DB_URL (specific full URL) > DATABASE_URL (generic full URL) > build from individual components
+        # Priority: POSTGRES_DB_URL (specific full URL) > build from individual components
         if self.POSTGRES_DB_URL:
             return self.POSTGRES_DB_URL
-        
-        if self.DATABASE_URL:
-            return self.DATABASE_URL
         
         # Build PostgreSQL URL from individual components if no full URL is provided
         return (
