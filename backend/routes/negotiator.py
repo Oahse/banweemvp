@@ -1,16 +1,16 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional, Dict
-import uuid
-from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from core.database import get_db
 from core.exceptions import APIException
-from services.cart import CartService
-from models.user import User
 from core.utils.response import Response
 from core.dependencies import get_current_auth_user
+from models.user import User  # Assuming User model is needed for current_user dependency
+
 from services.negotiator import Buyer, Seller, NegotiationEngine
 
 router = APIRouter(
@@ -19,8 +19,10 @@ router = APIRouter(
 )
 
 # In-memory store for ongoing negotiations (NOT production-ready)
-# In a real application, this would be persisted in a database or Redis.
-negotiations_store: Dict[str, NegotiationEngine] = {}
+# WARNING: This store is volatile and will be reset when the application restarts.
+# For production environments, negotiation sessions should be persisted in a database
+# (e.g., PostgreSQL, Redis) and retrieved using a unique session ID.
+negotiations_store: Dict[UUID, NegotiationEngine] = {}
 
 class NegotiationAgentConfig(BaseModel):
     """Configuration for a single negotiation agent."""
@@ -36,7 +38,7 @@ class NegotiationStartRequest(BaseModel):
 
 class NegotiationStateResponse(BaseModel):
     """Response model for the current state of a negotiation."""
-    negotiation_id: str
+    negotiation_id: UUID
     round: int
     finished: bool
     message: str
@@ -46,16 +48,24 @@ class NegotiationStateResponse(BaseModel):
 
 class NegotiationStepRequest(BaseModel):
     """Request model for advancing a negotiation by one step."""
-    negotiation_id: str = Field(..., description="ID of the ongoing negotiation.")
+    negotiation_id: UUID = Field(..., description="ID of the ongoing negotiation.")
     buyer_new_target: Optional[float] = Field(None, gt=0, description="Optional new target price for the buyer.")
     seller_new_target: Optional[float] = Field(None, gt=0, description="Optional new target price for the seller.")
 
-@router.post("/start", response_model=NegotiationStateResponse, status_code=status.HTTP_201_CREATED)
-async def start_negotiation(request: NegotiationStartRequest):
+@router.post("/start", response_model=Response[NegotiationStateResponse], status_code=status.HTTP_201_CREATED)
+async def start_negotiation(
+    request: NegotiationStartRequest,
+    current_user: User = Depends(get_current_auth_user), # Requires authentication
+    db: AsyncSession = Depends(get_db) # Database session dependency (for future persistence)
+):
     """
     Initializes a new negotiation session between a buyer and a seller.
     Returns the initial state of the negotiation.
+    The negotiation session is stored in-memory. In production, this would be stored in a database
+    and linked to the `current_user`.
     """
+    # For future: Logic to store buyer/seller config in DB, linked to current_user
+    # For now, just create agent instances.
     buyer = Buyer(
         name=request.buyer_config.name,
         target_price=request.buyer_config.target_price,
@@ -70,13 +80,13 @@ async def start_negotiation(request: NegotiationStartRequest):
     )
 
     engine = NegotiationEngine(buyer, seller)
-    negotiation_id = str(uuid.uuid4())
+    negotiation_id = uuid.uuid4() # Generate UUID for the session
     negotiations_store[negotiation_id] = engine
 
-    # Run the first step to get initial offers
+    # Run the first step to get initial offers and check for immediate closure
     initial_state = engine.step()
 
-    return NegotiationStateResponse(
+    response_data = NegotiationStateResponse(
         negotiation_id=negotiation_id,
         round=initial_state["round"],
         finished=initial_state["finished"],
@@ -85,30 +95,38 @@ async def start_negotiation(request: NegotiationStartRequest):
         buyer_current_offer=initial_state.get("buyer_offer"),
         seller_current_offer=initial_state.get("seller_offer")
     )
+    return Response.success(response_data, message="Negotiation started successfully.")
 
-@router.post("/step", response_model=NegotiationStateResponse)
-async def step_negotiation(request: NegotiationStepRequest):
+
+@router.post("/step", response_model=Response[NegotiationStateResponse])
+async def step_negotiation(
+    request: NegotiationStepRequest,
+    current_user: User = Depends(get_current_auth_user), # Requires authentication
+    db: AsyncSession = Depends(get_db) # Database session dependency (for future persistence)
+):
     """
     Advances an ongoing negotiation by one step (round).
     Optionally allows updating buyer's or seller's target prices before the step.
     Returns the updated state of the negotiation.
+    In production, this would retrieve the NegotiationEngine state from the database,
+    update it, and then persist the new state.
     """
     negotiation_id = request.negotiation_id
     engine = negotiations_store.get(negotiation_id)
 
     if not engine:
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Negotiation with ID {negotiation_id} not found."
+            message=f"Negotiation with ID {negotiation_id} not found."
         )
 
     if engine.finished:
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Negotiation with ID {negotiation_id} has already finished."
+            message=f"Negotiation with ID {negotiation_id} has already finished."
         )
 
-    # Apply optional new target prices
+    # Apply optional new target prices for the agents
     if request.buyer_new_target is not None:
         engine.buyer.set_price(request.buyer_new_target)
     if request.seller_new_target is not None:
@@ -116,7 +134,8 @@ async def step_negotiation(request: NegotiationStepRequest):
 
     next_state = engine.step()
 
-    return NegotiationStateResponse(
+    # For future: Persist the updated engine state back to the database
+    response_data = NegotiationStateResponse(
         negotiation_id=negotiation_id,
         round=next_state["round"],
         finished=next_state["finished"],
@@ -125,33 +144,39 @@ async def step_negotiation(request: NegotiationStepRequest):
         buyer_current_offer=next_state.get("buyer_offer"),
         seller_current_offer=next_state.get("seller_offer")
     )
+    return Response.success(response_data, message=next_state["message"])
 
-@router.get("/{negotiation_id}", response_model=NegotiationStateResponse)
-async def get_negotiation_state(negotiation_id: str):
+
+@router.get("/{negotiation_id}", response_model=Response[NegotiationStateResponse])
+async def get_negotiation_state(
+    negotiation_id: UUID, # Use UUID type directly for path parameter
+    current_user: User = Depends(get_current_auth_user), # Requires authentication
+    db: AsyncSession = Depends(get_db) # Database session dependency
+):
     """
     Retrieves the current state of a specific negotiation session.
+    In production, this would retrieve the NegotiationEngine state from the database.
     """
     engine = negotiations_store.get(negotiation_id)
     if not engine:
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Negotiation with ID {negotiation_id} not found."
+            message=f"Negotiation with ID {negotiation_id} not found."
         )
     
-    # Return the last known state, re-run step if necessary to determine current offers (if not finished)
-    # For simplicity, we'll just reconstruct the state response from the engine's current properties
-    # This might not exactly match the *last* returned offers if the engine wasn't stepped.
-    # A more robust solution would store previous step's result in the engine or store.
+    # Reconstruct the state response from the engine's current properties
+    # Note: This approach might not reflect the *exact* last offers if the engine wasn't stepped
+    # right before this GET request, but rather the internal target prices of the agents.
     current_state = {
         "round": engine.round,
         "finished": engine.finished,
         "message": "Negotiation ongoing." if not engine.finished else f"Deal reached at ₦{engine.final_price:.2f}",
         "final_price": engine.final_price,
-        "buyer_offer": getattr(engine.buyer, 'target', None), # Assuming target holds last offer
-        "seller_offer": getattr(engine.seller, 'target', None) # Assuming target holds last offer
+        "buyer_offer": getattr(engine.buyer, 'target', None),
+        "seller_offer": getattr(engine.seller, 'target', None)
     }
 
-    return NegotiationStateResponse(
+    response_data = NegotiationStateResponse(
         negotiation_id=negotiation_id,
         round=current_state["round"],
         finished=current_state["finished"],
@@ -160,17 +185,25 @@ async def get_negotiation_state(negotiation_id: str):
         buyer_current_offer=current_state.get("buyer_offer"),
         seller_current_offer=current_state.get("seller_offer")
     )
+    return Response.success(response_data, message="Negotiation state retrieved successfully.")
+
 
 @router.delete("/{negotiation_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_negotiation(negotiation_id: str):
+async def delete_negotiation(
+    negotiation_id: UUID, # Use UUID type directly for path parameter
+    current_user: User = Depends(get_current_auth_user), # Requires authentication
+    db: AsyncSession = Depends(get_db) # Database session dependency (for future cleanup)
+):
     """
     Deletes an ongoing negotiation session from memory.
-    (Note: In a production system, this would involve database cleanup).
+    (Note: In a production system, this would involve deleting the session from the database).
     """
     if negotiation_id in negotiations_store:
         del negotiations_store[negotiation_id]
+        # For future: Delete negotiation session from the database
+        return Response.success(message="Negotiation session deleted successfully.")
     else:
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Negotiation with ID {negotiation_id} not found."
+            message=f"Negotiation with ID {negotiation_id} not found."
         )
