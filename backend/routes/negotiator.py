@@ -13,15 +13,16 @@ from core.dependencies import get_current_auth_user
 from models.user import User
 
 from services.negotiator import Buyer, Seller, NegotiationEngine
-from backend.tasks.negotiation_tasks import perform_negotiation_step # Import the Celery task
+from backend.tasks.negotiation_tasks import perform_negotiation_step # Import the Celery task for async processing
 
 router = APIRouter(
     prefix="/negotiate",
     tags=["Negotiator"],
 )
 
-# Initialize Redis client for negotiation state persistence
-# This client will be used by both FastAPI routes and Celery tasks.
+# Initialize Redis client for negotiation state persistence.
+# This client is used by the FastAPI routes to store and retrieve the serialized
+# state of NegotiationEngine instances, which are then processed by Celery tasks.
 redis_client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=True)
 
 
@@ -66,12 +67,12 @@ async def start_negotiation(
 ):
     """
     Initializes a new negotiation session and dispatches the first step as a Celery task.
-    The negotiation state is stored in Redis.
+    The negotiation state is stored in Redis for persistence.
     """
-    negotiation_id = uuid.uuid4() # Generate UUID for the session
+    negotiation_id = uuid.uuid4() # Generate a unique UUID for the new negotiation session
     negotiation_key = f"negotiation:{negotiation_id}"
 
-    # Initialize agents and engine
+    # Initialize Buyer, Seller agents and the NegotiationEngine
     buyer = Buyer(
         name=request.buyer_config.name,
         target_price=request.buyer_config.target_price,
@@ -86,10 +87,10 @@ async def start_negotiation(
     )
     engine = NegotiationEngine(buyer, seller)
 
-    # Save initial engine state to Redis
+    # Serialize the initial engine state and save it to Redis
     redis_client.set(negotiation_key, json.dumps(engine.to_dict()))
 
-    # Dispatch the first negotiation step asynchronously
+    # Dispatch the first negotiation step as an asynchronous Celery task
     task = perform_negotiation_step.delay(str(negotiation_id))
 
     return Response.success(
@@ -106,18 +107,20 @@ async def step_negotiation(
     """
     Dispatches a Celery task to advance an ongoing negotiation by one step (round).
     Optionally allows updating buyer's or seller's target prices before the step.
-    Returns the ID of the dispatched Celery task.
+    Returns the ID of the dispatched Celery task for tracking.
     """
     negotiation_id = request.negotiation_id
     negotiation_key = f"negotiation:{negotiation_id}"
 
+    # Check if the negotiation exists in Redis
     if not redis_client.exists(negotiation_key):
         raise APIException(
             status_code=status.HTTP_404_NOT_FOUND,
             message=f"Negotiation with ID {negotiation_id} not found."
         )
     
-    # Dispatch the negotiation step asynchronously
+    # Dispatch the negotiation step as an asynchronous Celery task.
+    # The task will retrieve the state from Redis, perform the step, and save the updated state back.
     task = perform_negotiation_step.delay(
         str(negotiation_id),
         buyer_new_target=request.buyer_new_target,
@@ -147,7 +150,9 @@ async def get_negotiation_state(
             message=f"Negotiation with ID {negotiation_id} not found."
         )
     
+    # Deserialize the negotiation state from JSON stored in Redis
     negotiation_data = json.loads(negotiation_data_json)
+    # Reconstruct the NegotiationEngine from the deserialized data
     engine = NegotiationEngine.from_dict(negotiation_data)
 
     response_data = NegotiationStateResponse(
@@ -169,9 +174,11 @@ async def delete_negotiation(
 ):
     """
     Deletes an ongoing negotiation session from Redis.
+    This endpoint is used to clean up completed or abandoned negotiation sessions.
     """
     negotiation_key = f"negotiation:{negotiation_id}"
     if redis_client.delete(negotiation_key):
+        # Redis delete command returns the number of keys removed (1 if successful, 0 if not found)
         return Response.success(message="Negotiation session deleted successfully.")
     else:
         raise APIException(

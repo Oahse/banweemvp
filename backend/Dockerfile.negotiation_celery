@@ -1,10 +1,15 @@
-# Use Alpine Python for smaller image size
+# Dockerfile for the dedicated Celery worker for negotiation tasks.
+# This image is optimized to include only the necessary code and dependencies,
+# reducing its size and attack surface compared to copying the entire backend.
+
+# Use Alpine Python for smaller image size, ideal for Docker environments.
 FROM python:3.11-alpine
 
-# Set working directory
+# Set working directory inside the container. All subsequent commands will run from here.
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies required for building Python packages (e.g., psycopg2-binary, cryptography)
+# and for other utilities like curl.
 RUN apk add --no-cache \
     gcc \
     musl-dev \
@@ -15,38 +20,45 @@ RUN apk add --no-cache \
     rust \
     curl
 
-# Copy requirements
+# Copy Python dependency requirements file. This is copied early to leverage Docker cache.
 COPY requirements.txt .
 
-# Install Python dependencies
+# Install Python dependencies. Uses --no-cache-dir to keep the image slim.
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Celery and Redis-related packages
+# Install Celery and Redis-related packages specifically needed for worker functionality.
 RUN pip install --no-cache-dir \
     celery[redis]==5.3.4 \
     flower==2.0.1 \
     redis==4.6.0
 
-# Selective Copy of application code needed for the negotiation Celery worker
-# Copy core configuration
+# Selective Copy of application code needed for the negotiation Celery worker.
+# This avoids copying unnecessary files like API routes, tests, or migration scripts,
+# adhering to the principle of least privilege and minimizing image size.
+
+# Copy core configuration, essential for settings (like REDIS_URL).
 COPY backend/core/config.py backend/core/
-# Copy base Celery app definition
+# Copy the base Celery app definition.
 COPY backend/celery_app.py backend/
-# Copy negotiation services and tasks
+# Copy negotiation services and tasks logic.
 COPY backend/services/negotiator.py backend/services/
 COPY backend/tasks/negotiation_tasks.py backend/tasks/
-# Copy models (if needed for serialization/deserialization within tasks)
+# Copy models that are absolutely necessary for the tasks (e.g., User model for context, if needed).
 COPY backend/models/__init__.py backend/models/
-COPY backend/models/user.py backend/models/ # User model might be needed for current_user context
-# Ensure __init__.py files are present for module structure
+COPY backend/models/user.py backend/models/ # User model might be needed for current_user context or deserialization
+# Ensure __init__.py files are present for Python's module system to work correctly.
 COPY backend/__init__.py backend/
 COPY backend/tasks/__init__.py backend/tasks/
 COPY backend/services/__init__.py backend/services/
 COPY backend/models/__init__.py backend/models/
 
 
-# Set Python path
+# Set Python path to ensure imported modules are discoverable within the container.
 ENV PYTHONPATH=/app
 
-# Command to run Celery worker specifically for negotiation tasks
+# Command to run the Celery worker specifically for negotiation tasks.
+# -A celery_app: specifies the Celery application instance.
+# -Q negotiation: instructs this worker to only consume tasks from the 'negotiation' queue.
+# --loglevel=info: sets logging level.
+# --pool=solo: runs tasks synchronously within a single process, suitable for debugging and simpler tasks.
 CMD ["celery", "-A", "celery_app", "worker", "-Q", "negotiation", "--loglevel=info", "--pool=solo"]

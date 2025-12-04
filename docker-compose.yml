@@ -47,11 +47,11 @@ services:
     networks:
       - banwee_network
 
-  # Celery Worker (Alpine Python) - for general tasks (e.g., emails, notifications)
-  # This service runs Celery workers to process asynchronous tasks.
-  # It connects to the PostgreSQL database and Redis.
+  # Celery Worker (Alpine Python) - for general tasks (e.g., emails, notifications, orders)
+  # This service runs Celery workers that consume tasks from 'emails', 'notifications', and 'orders' queues.
+  # It connects to the PostgreSQL database and Redis for broker and backend operations.
   # 'environment' variables define the database connection string (POSTGRES_DB_URL) and Redis URL.
-  # 'depends_on' ensures postgres and redis are healthy before starting.
+  # 'depends_on' ensures postgres and redis are healthy before starting this worker.
   celery_worker:
     build:
       context: ./backend
@@ -77,16 +77,17 @@ services:
     restart: unless-stopped
 
   # Celery Worker (Alpine Python) - dedicated for negotiation tasks
-  # This service runs a dedicated Celery worker for negotiation tasks.
-  # It connects to Redis for task brokering and state storage.
+  # This service runs a specialized Celery worker that *only* consumes tasks from the 'negotiation' queue.
+  # It uses Redis for task brokering and for storing/retrieving negotiation session states.
+  # This separation ensures negotiation tasks do not contend with general tasks for resources.
   negotiation_celery_worker:
     build:
       context: ./backend
-      dockerfile: Dockerfile.negotiation_celery # Use dedicated Dockerfile for negotiation worker
+      dockerfile: Dockerfile.negotiation_celery # Uses a dedicated Dockerfile optimized for negotiation worker
     container_name: banwee_negotiation_celery_worker
     command: celery -A celery_app worker -Q negotiation --loglevel=info --pool=solo # Only process 'negotiation' queue
     environment:
-      - REDIS_URL=redis://redis:6379/0 # Only Redis needed for this worker
+      - REDIS_URL=redis://redis:6379/0 # Only Redis connection is needed for this worker
     depends_on:
       redis:
         condition: service_healthy

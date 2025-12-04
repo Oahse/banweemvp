@@ -6,62 +6,63 @@ from celery import Celery
 from kombu import Queue
 from core.config import settings
 
-# Create Celery app
+# Create Celery app instance
 celery_app = Celery(
     'banwee',
-    broker=settings.REDIS_URL,
-    backend=settings.REDIS_URL,
+    broker=settings.REDIS_URL,  # Redis is used as the message broker for Celery tasks
+    backend=settings.REDIS_URL, # Redis is used as the result backend for Celery tasks
     include=[
         'tasks.email_tasks',
         'tasks.notification_tasks',
         'tasks.order_tasks',
-        'tasks.negotiation_tasks' # Added negotiation tasks
+        'tasks.negotiation_tasks' # Include negotiation-specific tasks
     ]
 )
 
 # Celery configuration
 celery_app.conf.update(
-    # Task settings
+    # Task serialization settings
     task_serializer='json',
-    accept_content=['json'],
+    accept_content=['json'], # Specify accepted content types for tasks
     result_serializer='json',
-    timezone='UTC',
+    timezone='UTC', # Use UTC timezone for consistent task scheduling and logging
     enable_utc=True,
     
-    # Task execution
-    task_track_started=True,
-    task_time_limit=300,  # 5 minutes
-    task_soft_time_limit=240,  # 4 minutes
+    # Task execution behavior
+    task_track_started=True, # Enable tracking of task's STARTED state
+    task_time_limit=300,  # Hard time limit for task execution (5 minutes)
+    task_soft_time_limit=240,  # Soft time limit before a warning is issued (4 minutes)
     
-    # Result backend
-    result_expires=3600,  # 1 hour
+    # Result backend settings
+    result_expires=3600,  # Results will expire after 1 hour
     result_backend_transport_options={
-        'master_name': 'mymaster',
-        'visibility_timeout': 3600,
+        'master_name': 'mymaster', # For Redis Sentinel, if used
+        'visibility_timeout': 3600, # How long a message remains visible to other workers if not acknowledged
     },
     
-    # Worker settings
-    worker_prefetch_multiplier=4,
-    worker_max_tasks_per_child=1000,
+    # Worker performance settings
+    worker_prefetch_multiplier=4, # How many tasks a worker can prefetch
+    worker_max_tasks_per_child=1000, # Max tasks a worker can execute before restarting (helps with memory leaks)
     
-    # Task routing
+    # Task routing configuration
+    # This maps task modules to specific queues for organized processing.
     task_routes={
         'tasks.email_tasks.*': {'queue': 'emails'},
         'tasks.notification_tasks.*': {'queue': 'notifications'},
         'tasks.order_tasks.*': {'queue': 'orders'},
-        'tasks.negotiation_tasks.*': {'queue': 'negotiation'}, # Added negotiation task route
+        'tasks.negotiation_tasks.*': {'queue': 'negotiation'}, # Route negotiation tasks to their dedicated queue
     },
     
-    # Task queues
+    # Definition of task queues
     task_queues=(
         Queue('default', routing_key='default'),
         Queue('emails', routing_key='emails'),
         Queue('notifications', routing_key='notifications'),
         Queue('orders', routing_key='orders'),
-        Queue('negotiation', routing_key='negotiation'), # Added negotiation queue
+        Queue('negotiation', routing_key='negotiation'), # Dedicated queue for negotiation tasks
     ),
     
-    # Beat schedule (for periodic tasks)
+    # Beat schedule (for periodic tasks managed by Celery Beat)
     beat_schedule={
         'send-cart-abandonment-emails': {
             'task': 'tasks.email_tasks.send_cart_abandonment_emails',
@@ -78,10 +79,11 @@ celery_app.conf.update(
     },
 )
 
-# Helper function to run async tasks in Celery
+# Helper function to run async tasks within a Celery worker context
 def run_async_task(coro):
     """
-    Run an async coroutine in Celery task
+    Runs an asynchronous coroutine within a new event loop.
+    Useful for integrating async functions into synchronous Celery tasks.
     """
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
