@@ -34,7 +34,7 @@ from routes.review import router as review_router
 from routes.payment import payment_method_router, payment_router
 from routes.wishlist import router as wishlist_router
 from routes.notification import router as notification_router
-from routes.health import router as health_router
+from routes.negotiator import router as negotiator_router
 
 
 from contextlib import asynccontextmanager
@@ -101,6 +101,7 @@ app.include_router(payment_router)
 app.include_router(wishlist_router)
 app.include_router(notification_router)
 app.include_router(health_router)
+app.include_router(negotiator_router)
 
 # Include WebSocket router
 app.include_router(ws_router)
