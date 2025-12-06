@@ -7,6 +7,9 @@ from fastapi.security import HTTPBearer
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
+from core.database import get_db # NEW
+from core.config import SecurityValidator # NEW
 
 from core.middleware.auth import require_admin, get_current_user
 from core.security_config import get_security_config, get_security_monitor, get_security_validator
@@ -165,7 +168,9 @@ async def get_security_config_info(
 async def test_security_feature(
     request: Request,
     test_request: SecurityTestRequest,
-    current_user: User = Depends(require_admin)
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db), # NEW: Add db dependency
+    validator: SecurityValidator = Depends(get_security_validator) # NEW: Use async dependency
 ):
     """
     Test security features (for development and testing)
@@ -174,7 +179,7 @@ async def test_security_feature(
     correlation_id = get_correlation_id()
 
     try:
-        validator = get_security_validator()
+        # validator is now injected
         monitor = get_security_monitor()
 
         test_results = {}
@@ -218,7 +223,7 @@ async def test_security_feature(
             filename = test_data.get("filename", "test.txt")
             file_size = test_data.get("file_size", 1024)
 
-            file_result = validator.validate_file_upload(filename, file_size)
+            file_result = await validator.validate_file_upload(filename, file_size) # NEW: Await the call
             test_results = {
                 "filename": filename,
                 "file_size": file_size,
