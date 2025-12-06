@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from core.database import AsyncSessionDB  # Add this import
 from services.notification import NotificationService  # Add this import
 import asyncio  # Add this import
+from core.middleware import MaintenanceModeMiddleware  # Add this import
 # Import exceptions and handlers
 from core.exceptions import (
     APIException,
@@ -34,6 +35,7 @@ from routes.review import router as review_router
 from routes.payment import payment_method_router, payment_router
 from routes.wishlist import router as wishlist_router
 from routes.notification import router as notification_router
+from routes.health import router as health_router
 from routes.negotiator import router as negotiator_router
 
 
@@ -81,6 +83,9 @@ if hasattr(settings, 'ALLOWED_HOSTS'):
         TrustedHostMiddleware,
         allowed_hosts=settings.ALLOWED_HOSTS
     )
+
+# Maintenance Mode Middleware (NEW ADDITION)
+app.add_middleware(MaintenanceModeMiddleware)
 
 
 # Include all routers with API versioning
