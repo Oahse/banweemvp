@@ -42,9 +42,8 @@ const Register = lazy(() => import('./pages/Register').then((module) => ({ defau
 const About = lazy(() => import('./pages/About').then((module) => ({ default: module.About })));
 const Contact = lazy(() => import('./pages/Contact').then((module) => ({ default: module.Contact })));
 const FAQ = lazy(() => import('./pages/FAQ').then((module) => ({ default: module.FAQ })));
-// Blog feature disabled
-// const Blog = lazy(() => import('./pages/Blog').then((module) => ({ default: module.Blog })));
-// const BlogPost = lazy(() => import('./pages/BlogPost').then((module) => ({ default: module.BlogPost })));
+const Blog = lazy(() => import('./pages/Blog').then((module) => ({ default: module.Blog })));
+const BlogPost = lazy(() => import('./pages/BlogPost').then((module) => ({ default: module.BlogPost })));
 const Wishlist = lazy(() => import('./pages/Wishlist').then((module) => ({ default: module.Wishlist })));
 const Subscription = lazy(() =>
   import('./pages/Subscription').then((module) => ({ default: module.Subscription }))
@@ -460,10 +459,8 @@ export const App: React.FC = () => {
                               <Route path="/about" element={<Layout><About /></Layout>} />
                               <Route path="/contact" element={<Layout><Contact /></Layout>} />
                               <Route path="/faq" element={<Layout><FAQ /></Layout>} />
-                              {/* Blog routes disabled */}
-                              {/* <Route path="/blog" element={<Layout><Blog /></Layout>} /> */}
-                              {/* <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} /> */}
-                              <Route path="/account/wishlist" element={<ProtectedRoute><Layout><Wishlist /></Layout></ProtectedRoute>} />
+                              <Route path="/blog" element={<Layout><Blog /></Layout>} />
+                              <Route path="/blog/:slug" element={<Layout><BlogPost /></Layout>} />                              <Route path="/account/wishlist" element={<ProtectedRoute><Layout><Wishlist /></Layout></ProtectedRoute>} />
                               <Route
                                 path="/subscription"
                                 element={
