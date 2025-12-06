@@ -105,6 +105,14 @@ const AdminNewProduct = lazy(() =>
 const AdminSettings = lazy(() =>
   import('./pages/admin/AdminSettings').then((module) => ({ default: module.AdminSettings }))
 );
+// New Blog Admin Pages
+const AdminBlogPosts = lazy(() => import('./pages/admin/AdminBlogPosts').then((module) => ({ default: module.AdminBlogPosts })));
+const AdminBlogCategories = lazy(() => import('./pages/admin/AdminBlogCategories').then((module) => ({ default: module.AdminBlogCategories })));
+const AdminBlogCategoryForm = lazy(() => import('./pages/admin/AdminBlogCategoryForm').then((module) => ({ default: module.AdminBlogCategoryForm })));
+const AdminBlogTags = lazy(() => import('./pages/admin/AdminBlogTags').then((module) => ({ default: module.AdminBlogTags })));
+const AdminBlogTagForm = lazy(() => import('./pages/admin/AdminBlogTagForm').then((module) => ({ default: module.AdminBlogTagForm })));
+const AdminComments = lazy(() => import('./pages/admin/AdminComments').then((module) => ({ default: module.AdminComments })));
+const AdminBlogPostForm = lazy(() => import('./pages/admin/AdminBlogPostForm').then((module) => ({ default: module.AdminBlogPostForm })));
 const Notifications = lazy(() =>
   import('./pages/account/Notifications').then((module) => ({ default: module.Notifications }))
 );
@@ -305,6 +313,107 @@ export const App: React.FC = () => {
                                     </AdminLayout>
                                   </ProtectedRoute>
                                 }
+                              />
+                              {/* Blog Management Routes */}
+                              <Route
+                                  path="/admin/blog/posts"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminBlogPosts />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/blog/posts/new"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminBlogPostForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/blog/posts/edit/:postId"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminBlogPostForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/blog/categories"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminBlogCategories />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/blog/categories/new"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminBlogCategoryForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/blog/categories/edit/:categoryId"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminBlogCategoryForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/blog/tags"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminBlogTags />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/blog/tags/new"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminBlogTagForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/blog/tags/edit/:tagId"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminBlogTagForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/blog/comments"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <AdminComments />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
                               />
                               <Route path="/admin/register" element={<AuthLayout><AdminRegister /></AuthLayout>} />
                               <Route path="/admin/login" element={<AuthLayout><Login /></AuthLayout>} />
