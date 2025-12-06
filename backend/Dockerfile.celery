@@ -1,60 +1,48 @@
-# Dockerfile for the general Celery worker for processing standard background tasks.
-# This image is optimized to include only the necessary code and dependencies,
-# reducing its size and attack surface.
+# Optimized Dockerfile for general Celery worker
+# This copies only necessary files for task processing, not the entire backend
 
-# Use Alpine Python for smaller image size, ideal for Docker environments.
 FROM python:3.11-alpine
 
-# Set working directory inside the container. All subsequent commands will run from here.
 WORKDIR /app
 
-# Install system dependencies required for building Python packages (e.g., psycopg2-binary, cryptography)
-# and for other utilities.
+# Install minimal system dependencies
 RUN apk add --no-cache \
     gcc \
     musl-dev \
     postgresql-dev \
     libffi-dev \
-    openssl-dev \
-    cargo \
-    rust
+    openssl-dev
 
-# Copy Python dependency requirements file. This is copied early to leverage Docker cache.
+# Copy and install Python dependencies
 COPY requirements.txt .
-
-# Install Python dependencies. Uses --no-cache-dir to keep the image slim.
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install additional Celery and Redis-related packages specifically needed for worker functionality.
-RUN pip install --no-cache-dir \
-    celery[redis]==5.3.4 \
-    flower==2.0.1 \
-    redis==4.6.0
+# Copy only necessary files for Celery worker
+# Core configuration and utilities
+COPY core/ ./core/
 
-# Selective Copy of application code needed for the general Celery worker.
-# This avoids copying unnecessary files like API routes or frontend code.
+# Models (needed for database operations)
+COPY models/ ./models/
 
-# Copy core configuration, essential for settings (like REDIS_URL, database credentials).
-COPY core/config.py core/
-# Copy the base Celery app definition.
+# Services (needed by tasks)
+COPY services/email.py ./services/email.py
+COPY services/notification.py ./services/notification.py
+COPY services/order.py ./services/order.py
+COPY services/orders.py ./services/orders.py
+COPY services/user.py ./services/user.py
+COPY services/payment.py ./services/payment.py
+COPY services/shipping.py ./services/shipping.py
+COPY services/websockets.py ./services/websockets.py
+COPY services/__init__.py ./services/__init__.py
+
+# Celery app configuration
 COPY celery_app.py .
-# Copy all task modules for general purpose tasks (emails, notifications, orders).
-COPY tasks/ tasks/
-# Copy models and core database setup (for ORM access in tasks that interact with DB).
-COPY models/ models/
-COPY core/database.py core/
-# Copy services that might be used by tasks (e.g., notification service, email service).
-COPY services/ services/
-# Ensure __init__.py files are present for Python's module system to work correctly.
-COPY __init__.py .
-COPY tasks/__init__.py tasks/
-COPY services/__init__.py services/
-COPY models/__init__.py models/
 
+# Task modules
+COPY tasks/ ./tasks/
 
 # Set Python path
 ENV PYTHONPATH=/app
 
-# Default command to run the general Celery worker.
-# This command is typically overridden in docker-compose.yml to specify which queues to consume.
+# Default command (overridden in docker-compose.yml)
 CMD ["celery", "-A", "celery_app", "worker", "--loglevel=info"]

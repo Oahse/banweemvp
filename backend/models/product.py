@@ -47,12 +47,7 @@ class Product(BaseModel):
     dietary_tags = Column(JSON, nullable=True)
     is_active = Column(Boolean, default=True, index=True)
     
-    # SEO Fields
-    seo_title = Column(String(60), nullable=True)  # Optimal: 50-60 chars
-    seo_description = Column(String(160), nullable=True)  # Optimal: 150-160 chars
-    seo_keywords = Column(JSON, nullable=True)  # Array of keywords
-    slug = Column(String(CHAR_LENGTH), unique=True, nullable=True, index=True)
-
+    
     # Relationships with lazy loading
     category = relationship("models.product.Category", back_populates="products")
     supplier = relationship("models.user.User", back_populates="supplied_products")
@@ -108,10 +103,6 @@ class Product(BaseModel):
 
         if include_seo:
             data["seo"] = {
-                "title": self.seo_title or f"{self.name} - Authentic African Products | Banwee",
-                "description": self.seo_description or (self.description[:157] + "..." if self.description and len(self.description) > 157 else self.description),
-                "keywords": self.seo_keywords or self.dietary_tags or [],
-                "slug": self.slug or str(self.id),
                 "canonical_url": f"https://banwee.com/products/{self.slug or self.id}",
                 "og_image": self.primary_variant.primary_image.url if self.primary_variant and self.primary_variant.primary_image else None,
                 "og_type": "product",

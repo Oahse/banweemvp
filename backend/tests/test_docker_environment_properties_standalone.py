@@ -1,5 +1,6 @@
 """
 Property-based tests for Docker environment variable propagation.
+These tests run standalone without database dependencies.
 
 Feature: docker-full-functionality
 Properties tested:
@@ -9,8 +10,15 @@ Properties tested:
 
 import pytest
 import os
+import sys
 from hypothesis import given, strategies as st, settings
 from typing import Dict, List
+from pathlib import Path
+
+# Add backend directory to path
+backend_dir = Path(__file__).parent.parent
+if str(backend_dir) not in sys.path:
+    sys.path.insert(0, str(backend_dir))
 
 
 # Feature: docker-full-functionality, Property 1: Backend environment variable propagation
@@ -93,11 +101,8 @@ def test_frontend_environment_variable_propagation():
     Note: This test verifies that the frontend .env file structure is correct.
     Actual runtime verification would require running the frontend container.
     """
-    import configparser
-    from pathlib import Path
-    
     # Read the frontend .env file
-    frontend_env_path = Path(__file__).parent.parent.parent / "frontend" / ".env"
+    frontend_env_path = backend_dir.parent / "frontend" / ".env"
     
     # Check if the file exists
     assert frontend_env_path.exists(), "frontend/.env file does not exist"
@@ -138,9 +143,7 @@ def test_backend_env_file_structure():
     
     Validates: Requirements 1.1, 1.4
     """
-    from pathlib import Path
-    
-    backend_env_path = Path(__file__).parent.parent / ".env"
+    backend_env_path = backend_dir / ".env"
     
     # Check if the file exists
     assert backend_env_path.exists(), "backend/.env file does not exist"
@@ -180,10 +183,9 @@ def test_docker_compose_uses_env_files():
     
     Validates: Requirements 1.3, 10.1, 10.2, 10.3
     """
-    from pathlib import Path
     import yaml
     
-    docker_compose_path = Path(__file__).parent.parent.parent / "docker-compose.yml"
+    docker_compose_path = backend_dir.parent / "docker-compose.yml"
     
     # Check if the file exists
     assert docker_compose_path.exists(), "docker-compose.yml file does not exist"
@@ -218,10 +220,9 @@ def test_service_dependencies_configured():
     
     Validates: Requirements 10.1, 10.2, 10.3, 10.4, 10.5
     """
-    from pathlib import Path
     import yaml
     
-    docker_compose_path = Path(__file__).parent.parent.parent / "docker-compose.yml"
+    docker_compose_path = backend_dir.parent / "docker-compose.yml"
     
     with open(docker_compose_path, 'r') as f:
         compose_content = yaml.safe_load(f)
@@ -262,9 +263,7 @@ def test_service_names_for_inter_container_communication():
     
     Validates: Requirements 10.2, 10.3
     """
-    from pathlib import Path
-    
-    backend_env_path = Path(__file__).parent.parent / ".env"
+    backend_env_path = backend_dir / ".env"
     
     with open(backend_env_path, 'r') as f:
         env_content = f.read()

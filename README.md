@@ -13,13 +13,11 @@
     <a href="#quick-start">Quick Start</a> •
     <a href="#documentation">Documentation</a> •
     <a href="#contributing">Contributing</a> •
-    <a href="#license">License</a>
   </p>
 
   <p align="center">
     <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python Version" />
     <img src="https://img.shields.io/badge/node-18+-green.svg" alt="Node Version" />
-    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" />
   </p>
 </div>
@@ -43,7 +41,6 @@
 - [Development](#development)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
 
 ---
@@ -85,7 +82,7 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 ### Technical Features
 - 🚀 **Async Operations** - FastAPI with async/await for high performance
 - 🔄 **Real-time Updates** - WebSocket support for live notifications
-- 📧 **Email System** - 45+ email templates with Mailgun integration
+- 📧 **Email System** - email templates with Mailgun integration
 - 🎨 **Modern UI** - Tailwind CSS with custom theming
 - 🔒 **Security** - JWT authentication, password hashing, CORS protection
 - 🐳 **Docker Support** - Complete containerized deployment
@@ -127,7 +124,6 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 - **Database**: PostgreSQL 16
 - **Cache/Queue**: Redis 7
 - **Image CDN**: GitHub + jsDelivr
-- **Monitoring**: Celery Flower
 
 ---
 
@@ -178,8 +174,6 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 **Default credentials:**
 - Admin: `admin@banwee.com` / `adminpass`
 - Supplier: `supplier@banwee.com` / `supplierpass`
-
-📖 **See [DOCKER_SETUP_GUIDE.md](./DOCKER_SETUP_GUIDE.md) for complete Docker documentation**
 
 ### Local Development Setup
 
@@ -280,8 +274,6 @@ Once the application is running, you can access:
 - **Backend API**: http://localhost:8000
 - **API Documentation (Swagger)**: http://localhost:8000/docs
 - **API Documentation (ReDoc)**: http://localhost:8000/redoc
-- **Celery Flower (Task Monitor)**: http://localhost:5555
-
 ### Default Credentials
 
 The seeded database includes the following test accounts:
@@ -360,8 +352,8 @@ The seeded database includes the following test accounts:
                             │
                             │ HTTP/WebSocket
                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                         Backend                              │
+┌────────────────────────────────────────────────────────────┐
+│                         Backend                            │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │  FastAPI + Python 3.11                               │  │
 │  │  - Async/Await Operations                            │  │
@@ -369,7 +361,7 @@ The seeded database includes the following test accounts:
 │  │  - SQLAlchemy 2.0 (Async)                            │  │
 │  │  - Pydantic Validation                               │  │
 │  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+└────────────────────────────────────────────────────────────┘
          │                    │                    │
          │                    │                    │
          ▼                    ▼                    ▼

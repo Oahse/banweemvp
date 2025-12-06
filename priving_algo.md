@@ -26,4 +26,4 @@ You can also reply from your domain using Gmail SMTP workaround
 email-, 
 payment-stripe and starling bank(uk), 
 domain-cloudflare(https://dash.cloudflare.com/59fda70066cea1ddbbbdbddaf5f18042/registrar/register), 
-hosting-
+hosting-cloudflare and aws

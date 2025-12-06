@@ -50,7 +50,7 @@ services:
   # Celery Worker (Alpine Python) - for general tasks (e.g., emails, notifications, orders)
   # This service runs Celery workers that consume tasks from 'emails', 'notifications', and 'orders' queues.
   # It connects to the PostgreSQL database and Redis for broker and backend operations.
-  # 'environment' variables define the database connection string (POSTGRES_DB_URL) and Redis URL.
+  # Environment variables are loaded from backend/.env file.
   # 'depends_on' ensures postgres and redis are healthy before starting this worker.
   celery_worker:
     build:
@@ -58,20 +58,15 @@ services:
       dockerfile: Dockerfile.celery
     container_name: banwee_celery_worker
     command: celery -A celery_app worker -Q emails,notifications,orders --loglevel=info --pool=solo
-    environment:
-      - POSTGRES_DB_URL=postgresql+asyncpg://banwee:banwee_password@postgres:5432/banwee_db
-      - REDIS_URL=redis://redis:6379/0
-      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
-      - MAILGUN_DOMAIN=${MAILGUN_DOMAIN}
-      - MAILGUN_FROM_EMAIL=${MAILGUN_FROM_EMAIL}
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app:cached
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
     networks:
       - banwee_network
     restart: unless-stopped
@@ -79,28 +74,28 @@ services:
   # Celery Worker (Alpine Python) - dedicated for negotiation tasks
   # This service runs a specialized Celery worker that *only* consumes tasks from the 'negotiation' queue.
   # It uses Redis for task brokering and for storing/retrieving negotiation session states.
+  # Environment variables are loaded from backend/.env file.
   # This separation ensures negotiation tasks do not contend with general tasks for resources.
   negotiation_celery_worker:
     build:
       context: ./backend
-      dockerfile: Dockerfile.negotiation_celery # Uses a dedicated Dockerfile optimized for negotiation worker
+      dockerfile: Dockerfile.negotiation_celery
     container_name: banwee_negotiation_celery_worker
-    command: celery -A celery_app worker -Q negotiation --loglevel=info --pool=solo # Only process 'negotiation' queue
-    environment:
-      - REDIS_URL=redis://redis:6379/0 # Only Redis connection is needed for this worker
+    command: celery -A celery_app worker -Q negotiation --loglevel=info --pool=solo
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app:cached
     depends_on:
       redis:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
     networks:
       - banwee_network
     restart: unless-stopped
 
   # Celery Beat (Scheduler)
   # This service runs the Celery Beat scheduler, which handles periodic tasks.
-  # It also requires database and Redis connections.
-  # 'environment' variables define database and Redis connection strings.
+  # Environment variables are loaded from backend/.env file.
   # 'depends_on' ensures postgres and redis are healthy before starting.
   celery_beat:
     build:
@@ -108,16 +103,15 @@ services:
       dockerfile: Dockerfile.celery
     container_name: banwee_celery_beat
     command: celery -A celery_app beat --loglevel=info
-    environment:
-      - POSTGRES_DB_URL=postgresql+asyncpg://banwee:banwee_password@postgres:5432/banwee_db
-      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app:cached
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
     networks:
       - banwee_network
     restart: unless-stopped
@@ -125,8 +119,8 @@ services:
   # Backend API
   # This service runs the FastAPI backend application.
   # It exposes the API on port 8000 and connects to PostgreSQL and Redis.
-  # 'environment' variables configure database, Redis, Mailgun, Stripe, and CORS settings.
-  # 'BACKEND_CORS_ORIGINS' is critical for allowing frontend access during development.
+  # Environment variables are loaded from backend/.env file.
+  # 'depends_on' ensures postgres and redis are healthy before starting.
   # 'healthcheck' verifies the backend API is responsive.
   backend:
     build:
@@ -136,24 +130,15 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
-    environment:
-      - POSTGRES_DB_URL=postgresql+asyncpg://banwee:banwee_password@postgres:5432/banwee_db
-      - REDIS_URL=redis://redis:6379/0
-      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
-      - MAILGUN_DOMAIN=${MAILGUN_DOMAIN}
-      - MAILGUN_FROM_EMAIL=${MAILGUN_FROM_EMAIL}
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
-      - SECRET_KEY=${SECRET_KEY}
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      - BACKEND_CORS_ORIGINS=http://localhost:5173,http://0.0.0.0:5173,http://127.0.0.1:5173
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
     networks:
       - banwee_network
     restart: unless-stopped
@@ -167,7 +152,7 @@ services:
   # Frontend
   # This service runs the Vite-based React frontend application.
   # It exposes the frontend on port 5173 and connects to the backend API.
-  # 'environment' variables configure the API base URL and Stripe public key for frontend use.
+  # Environment variables are loaded from frontend/.env file.
   # 'healthcheck' verifies the frontend is accessible.
   frontend:
     build:
@@ -176,12 +161,13 @@ services:
     container_name: banwee_frontend
     ports:
       - "5173:5173"
-    environment:
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
-      - VITE_STRIPE_PUBLIC_KEY=${VITE_STRIPE_PUBLIC_KEY}
+    env_file:
+      - ./frontend/.env
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    depends_on:
+      - backend
     networks:
       - banwee_network
     restart: unless-stopped
