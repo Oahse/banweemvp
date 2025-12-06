@@ -199,6 +199,24 @@ def send_referral_request_email(user_email: str, context: Dict[str, Any]):
         raise
 
 
+@celery_app.task(name='tasks.email_tasks.send_low_stock_alert_email')
+def send_low_stock_alert_email(recipient_email: str, context: Dict[str, Any]):
+    """
+    Send low stock alert email to admin/supplier.
+    """
+    try:
+        asyncio.run(send_email_mailgun(
+            to_email=recipient_email,
+            mail_type='low_stock_alert', # This email template needs to be created
+            context=context
+        ))
+        print(f"✅ Low stock alert email sent to {recipient_email}")
+    except Exception as e:
+        print(f"❌ Failed to send low stock alert email: {e}")
+        raise
+
+
+
 @celery_app.task(name='tasks.email_tasks.send_review_requests')
 def send_review_requests():
     """

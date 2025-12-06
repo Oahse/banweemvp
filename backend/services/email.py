@@ -18,6 +18,7 @@ from backend.tasks.email_tasks import (
     send_order_delivered_email,
     send_return_process_email,
     send_referral_request_email,
+    send_low_stock_alert_email, # NEW
 )
 from backend.core.config import settings
 from backend.core.exceptions import CustomException # Assuming CustomException is suitable for service layer errors
@@ -184,5 +185,22 @@ class EmailService:
             "company_name": "Banwee",
         }
         send_referral_request_email.delay(str(user_id), referral_code, context)
+
+    async def send_low_stock_alert(self, recipient_email: str, product_name: str, variant_name: str, location_name: str, current_stock: int, threshold: int):
+        """
+        Sends an email notification for a low stock alert.
+        """
+        context = {
+            "recipient_email": recipient_email,
+            "product_name": product_name,
+            "variant_name": variant_name,
+            "location_name": location_name,
+            "current_stock": current_stock,
+            "threshold": threshold,
+            "admin_inventory_link": f"{settings.FRONTEND_URL}/admin/inventory", # Link to admin inventory page
+            "company_name": "Banwee",
+        }
+        send_low_stock_alert_email.delay(recipient_email, context)
+        print(f"📧 Celery task dispatched to send low stock alert email to {recipient_email}.")
 
     # TODO: Implement other email types like cart abandonment, password reset success, etc.

@@ -76,6 +76,10 @@ celery_app.conf.update(
             'task': 'tasks.notification_tasks.cleanup_old_notifications',
             'schedule': 86400.0,  # Every day
         },
+        'check-low-stock': { # NEW ENTRY
+            'task': 'tasks.notification_tasks.check_low_stock_task',
+            'schedule': 3600.0,  # Check every hour for low stock
+        },
     },
 )
 

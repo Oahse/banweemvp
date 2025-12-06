@@ -211,3 +211,42 @@ class NotificationService:
     async def notify_cart_updated(self, user_id: str, cart_data: dict):
         """Send WebSocket notification for cart update."""
         await websocket_manager.broadcast_cart_update(user_id, cart_data)
+
+    async def send_low_stock_alert(self, product_name: str, variant_name: str, location_name: str, current_stock: int, threshold: int):
+        """
+        Sends low stock alert notifications (in-app and email).
+        """
+        message = f"Low stock alert! {product_name} ({variant_name}) at {location_name} has {current_stock} units left (threshold: {threshold})."
+        
+        # 1. Create in-app notification for admin
+        admin_user_id = UUID(settings.ADMIN_USER_ID) # Assuming ADMIN_USER_ID is set in core.config
+        await self.create_notification(
+            user_id=admin_user_id,
+            message=message,
+            type="low_stock",
+            related_id=None # No specific related_id for now, could be inventory_item_id
+        )
+        print(f"✅ In-app low stock notification created for admin for {product_name} ({variant_name}).")
+
+        # 2. Trigger email notification for admin
+        # This part will call a method in EmailService
+        from services.email import EmailService # Import here to avoid circular dependency
+        email_service = EmailService() # EmailService might not need db, but depends on its constructor
+        
+        # Fetch admin user details to get their email
+        from models.user import User
+        from sqlalchemy import select
+        admin_user = await self.db.scalar(select(User).filter_by(id=admin_user_id))
+
+        if admin_user and admin_user.email:
+            await email_service.send_low_stock_alert(
+                recipient_email=admin_user.email,
+                product_name=product_name,
+                variant_name=variant_name,
+                location_name=location_name,
+                current_stock=current_stock,
+                threshold=threshold
+            )
+            print(f"📧 Low stock email sent to admin ({admin_user.email}) for {product_name} ({variant_name}).")
+        else:
+            print(f"❌ Admin user or email not found for low stock alert for {product_name} ({variant_name}).")

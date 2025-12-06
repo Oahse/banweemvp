@@ -121,6 +121,9 @@ class Settings:
     # FRONTEND_URL is the base URL of the frontend application, used for redirects, etc.
     FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
+    # --- Admin User ID (for notifications, etc.) ---
+    ADMIN_USER_ID: str = os.getenv('ADMIN_USER_ID', 'your_admin_uuid_here') # NEW
+
     # --- Notification Cleanup Settings ---
     # NOTIFICATION_CLEANUP_DAYS specifies how old notifications must be before deletion.
     NOTIFICATION_CLEANUP_DAYS: int = int(
