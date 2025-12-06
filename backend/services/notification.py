@@ -1,15 +1,40 @@
+import json
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
+from datetime import datetime, timedelta, UTC
+from sqlalchemy import delete
 
 from models.notification import Notification
 from core.exceptions import APIException
+from backend.routes.websockets import manager as websocket_manager
 
 
 class NotificationService:
     def __init__(self, db: AsyncSession):
         self.db = db
+
+    async def _send_websocket_notification(self, notification: Notification, event_type: str = "notification_update"):
+        """Sends a notification to the user's active WebSocket connections."""
+        if not notification.user_id:
+            return
+
+        websocket_message = {
+            "type": event_type,
+            "notification": {
+                "id": str(notification.id),
+                "user_id": str(notification.user_id),
+                "message": notification.message,
+                "read": notification.read,
+                "type": notification.type,
+                "related_id": notification.related_id,
+                "created_at": notification.created_at.isoformat(),
+                "updated_at": notification.updated_at.isoformat() if notification.updated_at else None,
+            },
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        await websocket_manager.send_to_user(str(notification.user_id), json.dumps(websocket_message))
 
     async def get_user_notifications(self, user_id: str, page: int = 1, limit: int = 10, read: Optional[bool] = None) -> dict:
         """Get notifications for a specific user with pagination."""
@@ -57,6 +82,9 @@ class NotificationService:
         notification.read = True
         await self.db.commit()
         await self.db.refresh(notification)
+
+        await self._send_websocket_notification(notification) # Send WebSocket update
+
         return notification.to_dict()
 
     async def mark_all_as_read(self, user_id: str) -> dict:
@@ -69,11 +97,23 @@ class NotificationService:
         notifications = result.scalars().all()
 
         count = 0
+        updated_notification_ids = []
         for notification in notifications:
             notification.read = True
             count += 1
+            updated_notification_ids.append(str(notification.id))
 
         await self.db.commit()
+
+        # Send a bulk update for WebSocket
+        websocket_message = {
+            "type": "all_notifications_read",
+            "user_id": user_id,
+            "notification_ids": updated_notification_ids,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        await websocket_manager.send_to_user(user_id, json.dumps(websocket_message))
+        
         return {"marked_count": count, "message": f"Marked {count} notifications as read"}
 
     async def create_notification(self, user_id: str, message: str, type: str = "info", related_id: Optional[str] = None) -> Notification:
@@ -87,6 +127,9 @@ class NotificationService:
         self.db.add(notification)
         await self.db.commit()
         await self.db.refresh(notification)
+
+        await self._send_websocket_notification(notification, event_type="new_notification") # Send WebSocket for new notification
+
         return notification
 
     async def delete_notification(self, notification_id: str, user_id: str):
@@ -103,12 +146,26 @@ class NotificationService:
         await self.db.delete(notification)
         await self.db.commit()
 
+        # Send WebSocket message for deleted notification
+        websocket_message = {
+            "type": "notification_deleted",
+            "notification_id": str(notification.id),
+            "user_id": str(notification.user_id),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        await websocket_manager.send_to_user(str(notification.user_id), json.dumps(websocket_message))
+
     async def delete_old_notifications(self, days_old: int = 30):
         """Deletes notifications older than a specified number of days."""
-        from datetime import datetime, timedelta, UTC
-        from sqlalchemy import delete
-
         threshold_date = datetime.now(UTC) - timedelta(days=days_old)
+
+        # Fetch notifications to be deleted to send WebSocket updates
+        select_stmt = select(Notification).where(Notification.created_at < threshold_date)
+        result = await self.db.execute(select_stmt)
+        notifications_to_delete = result.scalars().all()
+        
+        if not notifications_to_delete:
+            return
 
         # Delete notifications older than threshold_date
         delete_stmt = delete(Notification).where(
@@ -116,81 +173,41 @@ class NotificationService:
         await self.db.execute(delete_stmt)
         await self.db.commit()
 
-    async def send_order_confirmation(self, order_id: str):
-        """Send order confirmation notification and email."""
-        from models.order import Order
-        from models.user import User
-        from core.utils.messages.email import send_email
-        from core.config import settings
-        
-        # Get order details
-        query = select(Order).where(Order.id == order_id).options(
-            selectinload(Order.items)
-        )
-        result = await self.db.execute(query)
-        order = result.scalar_one_or_none()
-        
-        if not order:
-            print(f"Order {order_id} not found for confirmation")
-            return
-        
-        # Get user details
-        user_query = select(User).where(User.id == order.user_id)
-        user_result = await self.db.execute(user_query)
-        user = user_result.scalar_one_or_none()
-        
-        if not user:
-            print(f"User not found for order {order_id}")
-            return
-        
-        # Create notification
-        await self.create_notification(
-            user_id=str(order.user_id),
-            message=f"Your order #{str(order.id)[:8]} has been confirmed!",
-            type="order",
-            related_id=str(order.id)
-        )
-        
-        # Send email
-        try:
-            context = {
-                "customer_name": user.firstname or user.email,
-                "order_number": str(order.id)[:8],
-                "order_total": f"${order.total_amount:.2f}",
-                "order_date": order.created_at.strftime("%B %d, %Y") if order.created_at else "",
-                "order_url": f"{settings.FRONTEND_URL}/account/orders/{order.id}",
-                "company_name": "Banwee",
+        # Send WebSocket messages for deleted notifications
+        for notification in notifications_to_delete:
+            websocket_message = {
+                "type": "notification_deleted",
+                "notification_id": str(notification.id),
+                "user_id": str(notification.user_id),
+                "timestamp": datetime.utcnow().isoformat()
             }
-            
-            await send_email(
-                to_email=user.email,
-                mail_type='order_confirmation',
-                context=context
-            )
-            print(f"Order confirmation email sent to {user.email}")
-        except Exception as e:
-            print(f"Failed to send order confirmation email: {e}")
+            await websocket_manager.send_to_user(str(notification.user_id), json.dumps(websocket_message))
+
+    # Removed send_order_confirmation as its logic moves to EmailService
+    # async def send_order_confirmation(self, order_id: str):
+    #     """Send order confirmation notification and email."""
+    #     ...
 
     async def notify_order_created(self, order_id: str, user_id: str):
         """Send notification when order is created."""
-        await self.create_notification(
+        notification = await self.create_notification(
             user_id=user_id,
-            message=f"Order #{str(order_id)[:8]} has been created",
+            message=f"Your order #{str(order_id)[:8]} has been created", # Corrected message for clarity
             type="order",
             related_id=str(order_id)
         )
+        # WebSocket send already handled by create_notification
 
     async def notify_order_updated(self, order_id: str, user_id: str, status: str):
         """Send notification when order status is updated."""
-        await self.create_notification(
+        notification = await self.create_notification(
             user_id=user_id,
             message=f"Order #{str(order_id)[:8]} status updated to {status}",
             type="order",
             related_id=str(order_id)
         )
+        # WebSocket send already handled by create_notification
 
     async def notify_cart_updated(self, user_id: str, cart_data: dict):
-        """Send WebSocket notification for cart update (placeholder)."""
-        # This would integrate with WebSocket service
-        pass
-        print(f"Deleted notifications older than {days_old} days.")
+        """Send WebSocket notification for cart update."""
+        await websocket_manager.broadcast_cart_update(user_id, cart_data)
