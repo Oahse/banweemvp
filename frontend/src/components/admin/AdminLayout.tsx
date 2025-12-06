@@ -17,7 +17,11 @@ import {
   EditIcon,
   FolderIcon,
   HashIcon,
-  MessageSquareIcon
+  MessageSquareIcon,
+  ActivityIcon,
+  BoxesIcon,
+  MapPinIcon,
+  ArrowUpDownIcon
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -52,6 +56,10 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { title: 'Blog Categories', path: '/admin/blog/categories', icon: <FolderIcon size={20} /> },
     { title: 'Blog Tags', path: '/admin/blog/tags', icon: <HashIcon size={20} /> },
     { title: 'Blog Comments', path: '/admin/blog/comments', icon: <MessageSquareIcon size={20} /> },
+    { title: 'Activity Logs', path: '/admin/activity-logs', icon: <ActivityIcon size={20} /> },
+    { title: 'Inventory', path: '/admin/inventory', icon: <BoxesIcon size={20} /> },
+    { title: 'Locations', path: '/admin/inventory/locations', icon: <MapPinIcon size={20} /> },
+    { title: 'Adjustments', path: '/admin/inventory/adjustments', icon: <ArrowUpDownIcon size={20} /> },
     { title: 'Website', path: '/', icon: <GlobeIcon size={20} /> },
   ];
 

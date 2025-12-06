@@ -101,9 +101,14 @@ const AdminNewProduct = lazy(() =>
   import('./pages/admin/AdminNewProduct').then((module) => ({ default: module.AdminNewProduct }))
 );
 
-const AdminSettings = lazy(() =>
-  import('./pages/admin/AdminSettings').then((module) => ({ default: module.AdminSettings }))
-);
+const AdminActivityLogs = lazy(() => import('./pages/admin/AdminActivityLogs').then((module) => ({ default: module.AdminActivityLogs })));
+// New Inventory Admin Pages
+const AdminInventory = lazy(() => import('./pages/admin/AdminInventory').then((module) => ({ default: module.AdminInventory })));
+const AdminWarehouseLocations = lazy(() => import('./pages/admin/AdminWarehouseLocations').then((module) => ({ default: module.AdminWarehouseLocations })));
+const AdminWarehouseLocationForm = lazy(() => import('./pages/admin/AdminWarehouseLocationForm').then((module) => ({ default: module.AdminWarehouseLocationForm })));
+const AdminInventoryAdjustmentForm = lazy(() => import('./pages/admin/AdminInventoryAdjustmentForm').then((module) => ({ default: module.AdminInventoryAdjustmentForm })));
+const AdminStockAdjustments = lazy(() => import('./pages/admin/AdminStockAdjustments').then((module) => ({ default: module.AdminStockAdjustments })));
+const AdminInventoryItemForm = lazy(() => import('./pages/admin/AdminInventoryItemForm').then((module) => ({ default: module.AdminInventoryItemForm })));
 // New Blog Admin Pages
 const AdminBlogPosts = lazy(() => import('./pages/admin/AdminBlogPosts').then((module) => ({ default: module.AdminBlogPosts })));
 const AdminBlogCategories = lazy(() => import('./pages/admin/AdminBlogCategories').then((module) => ({ default: module.AdminBlogCategories })));
@@ -410,6 +415,87 @@ export const App: React.FC = () => {
                                       <ProtectedRoute requiredRole={['Admin']}>
                                           <AdminLayout>
                                               <AdminComments />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              {/* Inventory Management Routes */}
+                              <Route
+                                  path="/admin/inventory"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                          <AdminLayout>
+                                              <AdminInventory />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/inventory/locations"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                          <AdminLayout>
+                                              <AdminWarehouseLocations />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/inventory/locations/new"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                          <AdminLayout>
+                                              <AdminWarehouseLocationForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/inventory/locations/edit/:locationId"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                          <AdminLayout>
+                                              <AdminWarehouseLocationForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/inventory/adjustments/new"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                          <AdminLayout>
+                                              <AdminInventoryAdjustmentForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/inventory/adjustments"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                          <AdminLayout>
+                                              <AdminStockAdjustments />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/inventory/:inventoryId/adjustments"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                          <AdminLayout>
+                                              <AdminStockAdjustments />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              <Route
+                                  path="/admin/inventory/edit/:inventoryId"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                          <AdminLayout>
+                                              <AdminInventoryItemForm />
                                           </AdminLayout>
                                       </ProtectedRoute>
                                   }
