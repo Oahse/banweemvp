@@ -52,6 +52,7 @@ services:
   # It connects to the PostgreSQL database and Redis for broker and backend operations.
   # Environment variables are loaded from backend/.env file.
   # 'depends_on' ensures postgres and redis are healthy before starting this worker.
+  # Note: volumes are commented out for optimized production deployment. Uncomment for development.
   celery_worker:
     build:
       context: ./backend
@@ -60,8 +61,8 @@ services:
     command: celery -A celery_app worker -Q emails,notifications,orders --loglevel=info --pool=solo
     env_file:
       - ./backend/.env
-    volumes:
-      - ./backend:/app:cached
+    # volumes:
+    #   - ./backend:/app:cached  # Uncomment for development hot-reload
     depends_on:
       postgres:
         condition: service_healthy
@@ -76,6 +77,7 @@ services:
   # It uses Redis for task brokering and for storing/retrieving negotiation session states.
   # Environment variables are loaded from backend/.env file.
   # This separation ensures negotiation tasks do not contend with general tasks for resources.
+  # Note: volumes are commented out for optimized production deployment. Uncomment for development.
   negotiation_celery_worker:
     build:
       context: ./backend
@@ -84,8 +86,8 @@ services:
     command: celery -A celery_app worker -Q negotiation --loglevel=info --pool=solo
     env_file:
       - ./backend/.env
-    volumes:
-      - ./backend:/app:cached
+    # volumes:
+    #   - ./backend:/app:cached  # Uncomment for development hot-reload
     depends_on:
       redis:
         condition: service_healthy
@@ -97,6 +99,7 @@ services:
   # This service runs the Celery Beat scheduler, which handles periodic tasks.
   # Environment variables are loaded from backend/.env file.
   # 'depends_on' ensures postgres and redis are healthy before starting.
+  # Note: volumes are commented out for optimized production deployment. Uncomment for development.
   celery_beat:
     build:
       context: ./backend
@@ -105,8 +108,8 @@ services:
     command: celery -A celery_app beat --loglevel=info
     env_file:
       - ./backend/.env
-    volumes:
-      - ./backend:/app:cached
+    # volumes:
+    #   - ./backend:/app:cached  # Uncomment for development hot-reload
     depends_on:
       postgres:
         condition: service_healthy
