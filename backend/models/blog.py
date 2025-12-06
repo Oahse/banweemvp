@@ -4,17 +4,68 @@ from sqlalchemy.orm import relationship
 from core.database import BaseModel, CHAR_LENGTH, GUID
 
 
+class BlogCategory(BaseModel):
+    __tablename__ = "blog_categories"
+
+    name = Column(String(CHAR_LENGTH), unique=True, nullable=False)
+    slug = Column(String(CHAR_LENGTH), unique=True, nullable=False)
+    description = Column(Text, nullable=True)
+
+    posts = relationship("BlogPost", back_populates="category")
+
+
+class BlogTag(BaseModel):
+    __tablename__ = "blog_tags"
+
+    name = Column(String(CHAR_LENGTH), unique=True, nullable=False)
+    slug = Column(String(CHAR_LENGTH), unique=True, nullable=False)
+
+
 class BlogPost(BaseModel):
     __tablename__ = "blog_posts"
 
     title = Column(String(CHAR_LENGTH), nullable=False)
+    slug = Column(String(CHAR_LENGTH), unique=True, nullable=False) # Add slug for SEO-friendly URLs
     content = Column(Text, nullable=False)
     excerpt = Column(Text, nullable=True)
     author_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
-    tags = Column(JSON, nullable=True)  # ["organic", "farming", "health"]
+    category_id = Column(GUID(), ForeignKey("blog_categories.id"), nullable=True) # Link to BlogCategory
     image_url = Column(String(500), nullable=True)
     is_published = Column(Boolean, default=False)
     published_at = Column(DateTime(timezone=True), nullable=True)
+    seo_title = Column(String(CHAR_LENGTH), nullable=True) # Add SEO fields
+    seo_description = Column(Text, nullable=True)
+    seo_keywords = Column(Text, nullable=True) # Store as comma-separated string or JSON list if needed
 
     # Relationships
     author = relationship("User", back_populates="blog_posts")
+    category = relationship("BlogCategory", back_populates="posts")
+    tags = relationship("BlogPostTag", back_populates="blog_post", cascade="all, delete-orphan") # Link to BlogPostTag for many-to-many
+    comments = relationship("Comment", back_populates="blog_post", cascade="all, delete-orphan") # Link to Comment
+
+
+class BlogPostTag(BaseModel):
+    """Association table for BlogPost and BlogTag Many-to-Many relationship."""
+    __tablename__ = "blog_post_tags"
+
+    blog_post_id = Column(GUID(), ForeignKey("blog_posts.id"), primary_key=True)
+    blog_tag_id = Column(GUID(), ForeignKey("blog_tags.id"), primary_key=True)
+
+    blog_post = relationship("BlogPost", back_populates="tags")
+    blog_tag = relationship("BlogTag")
+
+
+class Comment(BaseModel):
+    __tablename__ = "comments"
+
+    content = Column(Text, nullable=False)
+    author_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
+    blog_post_id = Column(GUID(), ForeignKey("blog_posts.id"), nullable=False)
+    parent_id = Column(GUID(), ForeignKey("comments.id"), nullable=True) # For nested comments
+    is_approved = Column(Boolean, default=False)
+
+    # Relationships
+    author = relationship("User", back_populates="comments") # Need to add comments relationship to User model
+    blog_post = relationship("BlogPost", back_populates="comments")
+    parent = relationship("Comment", remote_side='Comment.id')
+    replies = relationship("Comment", back_populates="parent")

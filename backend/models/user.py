@@ -51,6 +51,7 @@ class User(BaseModel):
         "Notification", back_populates="user", lazy="selectin")
     activity_logs = relationship(
         "ActivityLog", back_populates="user", lazy="selectin")
+    comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan", lazy="selectin")
 
     @property
     def full_name(self) -> str:
