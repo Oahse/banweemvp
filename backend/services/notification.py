@@ -8,7 +8,7 @@ from sqlalchemy import delete
 
 from models.notification import Notification
 from core.exceptions import APIException
-from backend.routes.websockets import manager as websocket_manager
+from routes.websockets import manager as websocket_manager
 
 
 class NotificationService:

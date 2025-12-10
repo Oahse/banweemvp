@@ -27,15 +27,43 @@ from core.database import Base, initialize_db, db_manager
 from main import app
 from httpx import AsyncClient
 
+# Import all models to register them with Base.metadata
+from models.user import User, Address
+from models.product import Product, ProductVariant, ProductImage, Category
+from models.cart import Cart, CartItem
+from models.order import Order, OrderItem, TrackingEvent
+from models.payment import PaymentMethod
+from models.transaction import Transaction
+from models.review import Review
+from models.notification import Notification
+from models.wishlist import Wishlist, WishlistItem
+from models.blog import BlogPost, BlogCategory, BlogTag, Comment, BlogPostTag
+from models.subscription import Subscription
+from models.inventory import Inventory, StockAdjustment, WarehouseLocation
+from models.activity_log import ActivityLog
+from models.settings import SystemSettings
+from models.promocode import Promocode
+from models.shipping import ShippingMethod
+
 
 def get_test_db_url():
     """Generate unique test database URL"""
-    unique_db_name = f"banwee_empty_test_{random.randint(0, 1000000)}"
+    import time
+    unique_db_name = f"banwee_empty_test_{int(time.time() * 1000000)}_{random.randint(0, 1000000)}"
     return f"postgresql+asyncpg://banwee:banwee_password@localhost:5432/{unique_db_name}", unique_db_name
 
 
+# Override fixtures to prevent conftest from running
+@pytest.fixture(scope="function")
+def async_engine():
+    return None
+
+@pytest.fixture(scope="function", autouse=False)
+async def setup_test_database():
+    yield
+
+
 @pytest.mark.asyncio
-@settings(max_examples=5, suppress_health_check=[HealthCheck.function_scoped_fixture])
 async def test_property_33_migration_with_empty_database():
     """
     Feature: docker-full-functionality, Property 33: Migration with empty database
@@ -53,33 +81,36 @@ async def test_property_33_migration_with_empty_database():
     conn = psycopg2.connect(base_url)
     conn.autocommit = True
     cursor = conn.cursor()
+    engine = None
     
     try:
-        # Create empty database
+        # Terminate existing connections and drop database if exists
+        cursor.execute(f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{test_db_name}';")
         cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         cursor.execute(f"CREATE DATABASE {test_db_name}")
         
         # Create engine and run migrations
-        engine = create_async_engine(test_db_url, echo=False)
+        engine = create_async_engine(test_db_url, echo=False, pool_pre_ping=True, poolclass=None)
         
-        # Run migrations (create all tables)
+        # Run migrations (create all tables) - use checkfirst=True to avoid duplicate errors
         async with engine.begin() as conn_async:
-            await conn_async.run_sync(Base.metadata.create_all)
+            await conn_async.run_sync(lambda sync_conn: Base.metadata.create_all(sync_conn, checkfirst=True))
         
         # Verify no errors occurred - if we got here, migrations succeeded
         assert True, "Migrations completed successfully on empty database"
         
-        # Cleanup
-        await engine.dispose()
-        cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
-        
     finally:
+        # Cleanup
+        if engine:
+            await engine.dispose()
+        # Terminate connections before dropping
+        cursor.execute(f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{test_db_name}';")
+        cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         cursor.close()
         conn.close()
 
 
 @pytest.mark.asyncio
-@settings(max_examples=5, suppress_health_check=[HealthCheck.function_scoped_fixture])
 async def test_property_34_schema_creation():
     """
     Feature: docker-full-functionality, Property 34: Schema creation
@@ -97,18 +128,20 @@ async def test_property_34_schema_creation():
     conn = psycopg2.connect(base_url)
     conn.autocommit = True
     cursor = conn.cursor()
+    engine = None
     
     try:
-        # Create empty database
+        # Terminate existing connections and drop database if exists
+        cursor.execute(f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{test_db_name}';")
         cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         cursor.execute(f"CREATE DATABASE {test_db_name}")
         
         # Create engine and run migrations
-        engine = create_async_engine(test_db_url, echo=False)
+        engine = create_async_engine(test_db_url, echo=False, pool_pre_ping=True, poolclass=None)
         
-        # Run migrations (create all tables)
+        # Run migrations (create all tables) - use checkfirst=True to avoid duplicate errors
         async with engine.begin() as conn_async:
-            await conn_async.run_sync(Base.metadata.create_all)
+            await conn_async.run_sync(lambda sync_conn: Base.metadata.create_all(sync_conn, checkfirst=True))
         
         # Verify tables were created
         async with engine.connect() as conn_async:
@@ -128,17 +161,18 @@ async def test_property_34_schema_creation():
             for table in essential_tables:
                 assert table in tables, f"Essential table '{table}' was not created"
         
-        # Cleanup
-        await engine.dispose()
-        cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
-        
     finally:
+        # Cleanup
+        if engine:
+            await engine.dispose()
+        # Terminate connections before dropping
+        cursor.execute(f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{test_db_name}';")
+        cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         cursor.close()
         conn.close()
 
 
 @pytest.mark.asyncio
-@settings(max_examples=3, suppress_health_check=[HealthCheck.function_scoped_fixture])
 async def test_property_35_empty_database_error_handling():
     """
     Feature: docker-full-functionality, Property 35: Empty database error handling
@@ -156,14 +190,16 @@ async def test_property_35_empty_database_error_handling():
     conn = psycopg2.connect(base_url)
     conn.autocommit = True
     cursor = conn.cursor()
+    engine = None
     
     try:
-        # Create empty database
+        # Terminate existing connections and drop database if exists
+        cursor.execute(f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{test_db_name}';")
         cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         cursor.execute(f"CREATE DATABASE {test_db_name}")
         
         # Create engine and session
-        engine = create_async_engine(test_db_url, echo=False)
+        engine = create_async_engine(test_db_url, echo=False, pool_pre_ping=True)
         TestingSessionLocal = sessionmaker(
             autocommit=False, 
             autoflush=False, 
@@ -196,10 +232,14 @@ async def test_property_35_empty_database_error_handling():
         
         # Cleanup
         app.dependency_overrides.clear()
-        await engine.dispose()
-        cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         
     finally:
+        # Cleanup
+        if engine:
+            await engine.dispose()
+        # Terminate connections before dropping
+        cursor.execute(f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{test_db_name}';")
+        cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         cursor.close()
         conn.close()
 
@@ -230,14 +270,16 @@ async def test_property_36_empty_response_handling(endpoint: str):
     conn = psycopg2.connect(base_url)
     conn.autocommit = True
     cursor = conn.cursor()
+    engine = None
     
     try:
-        # Create empty database
+        # Terminate existing connections and drop database if exists
+        cursor.execute(f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{test_db_name}';")
         cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         cursor.execute(f"CREATE DATABASE {test_db_name}")
         
         # Create engine and session
-        engine = create_async_engine(test_db_url, echo=False)
+        engine = create_async_engine(test_db_url, echo=False, pool_pre_ping=True)
         TestingSessionLocal = sessionmaker(
             autocommit=False, 
             autoflush=False, 
@@ -295,9 +337,13 @@ async def test_property_36_empty_response_handling(endpoint: str):
         
         # Cleanup
         app.dependency_overrides.clear()
-        await engine.dispose()
-        cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         
     finally:
+        # Cleanup
+        if engine:
+            await engine.dispose()
+        # Terminate connections before dropping
+        cursor.execute(f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{test_db_name}';")
+        cursor.execute(f"DROP DATABASE IF EXISTS {test_db_name}")
         cursor.close()
         conn.close()

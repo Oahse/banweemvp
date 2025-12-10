@@ -5,7 +5,7 @@ from uuid import UUID
 from core.database import get_db
 from core.utils.response import Response
 from core.exceptions import APIException
-from backend.schemas.blog import (
+from schemas.blog import (
     BlogPostCreate, BlogPostUpdate, BlogPostResponse,
     BlogCategoryCreate, BlogCategoryUpdate, BlogCategoryResponse,
     BlogTagCreate, BlogTagUpdate, BlogTagResponse,

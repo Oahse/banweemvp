@@ -14,7 +14,7 @@ from core.dependencies import get_current_auth_user
 from models.user import User
 
 from services.negotiator import Buyer, Seller, NegotiationEngine
-from backend.tasks.negotiation_tasks import perform_negotiation_step # Import the Celery task for async processing
+from tasks.negotiation_tasks import perform_negotiation_step # Import the Celery task for async processing
 
 router = APIRouter(
     prefix="/negotiate",

@@ -7,10 +7,10 @@ from starlette.responses import Response, JSONResponse
 from starlette.types import ASGIApp
 from fastapi import status
 
-from backend.services.settings import SettingsService
-from backend.services.activity import ActivityService # NEW: Import ActivityService
-from backend.core.database import AsyncSessionDB
-from backend.core.constants import UserRole
+from services.settings import SettingsService
+from services.activity import ActivityService # NEW: Import ActivityService
+from core.database import AsyncSessionDB
+from core.constants import UserRole
 
 
 # Helper function to filter sensitive data from request body

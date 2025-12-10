@@ -5,10 +5,10 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from backend.models.user import User, Address
-from backend.models.order import Order
-from backend.models.product import ProductVariant
-from backend.tasks.email_tasks import (
+from models.user import User, Address
+from models.order import Order
+from models.product import ProductVariant
+from tasks.email_tasks import (
     send_order_confirmation_email,
     send_shipping_update_email,
     send_welcome_email,
@@ -20,8 +20,8 @@ from backend.tasks.email_tasks import (
     send_referral_request_email,
     send_low_stock_alert_email, # NEW
 )
-from backend.core.config import settings
-from backend.core.exceptions import CustomException # Assuming CustomException is suitable for service layer errors
+from core.config import settings
+from core.exceptions import CustomException # Assuming CustomException is suitable for service layer errors
 
 
 class EmailService:

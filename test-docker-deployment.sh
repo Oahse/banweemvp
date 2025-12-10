@@ -134,7 +134,7 @@ check_health_status() {
 
 # Function to test database connection
 test_database_connection() {
-    echo "6. Testing database connection from backend..."
+    echo "6. Testing database connection from .."
     
     if docker exec banwee_backend python -c "
 import asyncio

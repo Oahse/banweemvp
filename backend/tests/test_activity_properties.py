@@ -47,7 +47,7 @@ async def test_property_20_activity_fetching_on_dashboard_load(activity_data, db
     **Property 20: Activity fetching on dashboard load**
     **Validates: Requirements 7.1**
     
-    For any admin dashboard load, the system should fetch recent activity from the backend.
+    For any admin dashboard load, the system should fetch recent activity from the 
     """
     # Create a test activity
     activity_service = ActivityService(db_session)

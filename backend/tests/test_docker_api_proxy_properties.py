@@ -1,5 +1,5 @@
 """
-Property-based tests for Docker API proxy from frontend to backend.
+Property-based tests for Docker API proxy from frontend to 
 
 **Feature: app-enhancements, Property 63: API proxy from frontend to backend**
 **Validates: Requirements 19.4**

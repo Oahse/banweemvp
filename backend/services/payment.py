@@ -186,6 +186,18 @@ class PaymentService:
             # Handle other errors
             raise e
 
+    async def _process_successful_payment(self, payment_intent_id: str, status: str):
+        query = update(Transaction).where(
+            Transaction.stripe_payment_intent_id == payment_intent_id
+        ).values(status=status)
+        await self.db.execute(query)
+        await self.db.commit()
+
+        transaction_result = await self.db.execute(select(Transaction).where(Transaction.stripe_payment_intent_id == payment_intent_id))
+        transaction = transaction_result.scalar_one_or_none()
+        if transaction:
+            await self.send_payment_receipt_email(transaction)
+
     async def handle_stripe_webhook(self, event: dict):
         event_type = event["type"]
         data = event["data"]["object"]
@@ -193,15 +205,12 @@ class PaymentService:
         if event_type == "payment_intent.succeeded":
             payment_intent_id = data["id"]
             status = data["status"]
-            query = update(Transaction).where(
-                Transaction.stripe_payment_intent_id == payment_intent_id).values(status=status)
-            await self.db.execute(query)
-            await self.db.commit()
+            await self._process_successful_payment(payment_intent_id, status)
 
-            transaction_result = await self.db.execute(select(Transaction).where(Transaction.stripe_payment_intent_id == payment_intent_id))
-            transaction = transaction_result.scalar_one_or_none()
-            if transaction:
-                await self.send_payment_receipt_email(transaction)
+        elif event_type == "charge.succeeded":
+            payment_intent_id = data.get("payment_intent")
+            if payment_intent_id:
+                await self._process_successful_payment(payment_intent_id, "succeeded")
 
         elif event_type == "payment_intent.payment_failed":
             payment_intent_id = data["id"]

@@ -2,15 +2,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import desc, func, or_
 from typing import Optional, List
-from backend.models.blog import BlogPost, BlogCategory, BlogTag, BlogPostTag, Comment
-from backend.models.user import User # To get user info for comments
-from backend.schemas.blog import (
+from models.blog import BlogPost, BlogCategory, BlogTag, BlogPostTag, Comment
+from models.user import User # To get user info for comments
+from schemas.blog import (
     BlogPostCreate, BlogPostUpdate, BlogPostResponse,
     BlogCategoryCreate, BlogCategoryUpdate, BlogCategoryResponse,
     BlogTagCreate, BlogTagUpdate, BlogTagResponse,
     CommentCreate, CommentUpdate, CommentResponse
 )
-from backend.core.exceptions import APIException
+from core.exceptions import APIException
 from uuid import uuid4, UUID
 from datetime import datetime
 from sqlalchemy.orm import selectinload, joinedload

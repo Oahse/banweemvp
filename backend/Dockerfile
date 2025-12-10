@@ -14,7 +14,9 @@ RUN apk add --no-cache \
     openssl-dev \
     cargo \
     rust \
-    curl
+    curl \
+    python3-dev \
+    linux-headers
 
 # Copy Python dependency requirements file
 COPY requirements.txt .
@@ -29,10 +31,13 @@ COPY . .
 RUN chmod +x migrate.sh
 
 # Set Python path to include the /app directory, allowing Python to find modules
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/backend
 # Explicitly set the PostgreSQL database URL for the backend application.
 # This uses the 'postgres' service name for inter-container communication within Docker.
 ENV POSTGRES_DB_URL=postgresql+asyncpg://banwee:banwee_password@postgres:5432/banwee_db
+
+# Explicitly set PATH to ensure executables like uvicorn are found
+ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"
 
 # Expose port 8000, which is where the FastAPI application will listen
 EXPOSE 8000
@@ -40,4 +45,4 @@ EXPOSE 8000
 # Command to run when the container starts:
 # 1. Execute database migrations (./migrate.sh).
 # 2. Start the Uvicorn server for the FastAPI application.
-CMD ["sh", "-c", "./migrate.sh && uvicorn main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "./migrate.sh && python -m uvicorn main:app --host 0.0.0.0 --port 8000"]
