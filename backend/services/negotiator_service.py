@@ -86,9 +86,14 @@ class NegotiatorService:
         # Update negotiation state
         negotiation.current_price = offer_price
         negotiation.last_offer_by = user_id
-        negotiation.offers.append(
-            {"user_id": str(user_id), "offer_price": offer_price, "timestamp": datetime.now(UTC).isoformat()}
-        )
+        
+        # Create new offer entry
+        new_offer = {"user_id": str(user_id), "offer_price": offer_price, "timestamp": datetime.now(UTC).isoformat()}
+        
+        # For JSONB fields, we need to create a new list to trigger SQLAlchemy change detection
+        current_offers = negotiation.offers or []
+        negotiation.offers = current_offers + [new_offer]
+        
         negotiation.status = NegotiationStatus.IN_PROGRESS if negotiation.status == NegotiationStatus.PENDING else NegotiationStatus.COUNTERED
         negotiation.updated_at = datetime.now(UTC)
 

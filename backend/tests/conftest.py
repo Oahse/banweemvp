@@ -324,11 +324,14 @@ async def test_product_variant(db_session: AsyncSession, test_product):
     import time
 
     variant_name = get_unique_name("Negotiation Variant")
+    # Create unique SKU using timestamp and random number
+    import random
+    unique_sku = f"NEG-SKU-{int(time.time() * 1000000)}-{random.randint(1000, 9999)}"
     test_variant = ProductVariant(
         id=uuid4(),
         product_id=test_product.id,
         name=variant_name,
-        sku=f"NEG-SKU-{int(time.time())}",
+        sku=unique_sku,
         base_price=50.0, # Explicitly set base_price
         sale_price=45.0, # Explicitly set sale_price
         # price_override=None, # Removed
