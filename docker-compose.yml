@@ -85,7 +85,8 @@ services:
       context: ./scheduler
       dockerfile: Dockerfile
     container_name: banwee_scheduler
-    command: python main.py
+    command: python app/main.py
+    working_dir: /
     volumes:
       - ./scheduler:/app
       - ./backend:/backend
