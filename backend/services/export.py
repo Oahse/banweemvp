@@ -1,18 +1,13 @@
-"""
-Export service for generating CSV, Excel, and PDF files
-"""
 import csv
 import io
 from typing import List, Dict, Any
 from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter, A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+
+# Import Jinja2 and WeasyPrint
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from weasyprint import HTML, CSS
 
 
 class ExportService:
@@ -103,82 +98,117 @@ class ExportService:
     
     @staticmethod
     def export_orders_to_pdf(orders: List[Dict[str, Any]]) -> io.BytesIO:
-        """Export orders to PDF format"""
-        output = io.BytesIO()
-        doc = SimpleDocTemplate(output, pagesize=A4)
-        elements = []
-        
-        # Styles
-        styles = getSampleStyleSheet()
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=24,
-            textColor=colors.HexColor('#1a1a1a'),
-            spaceAfter=30,
-            alignment=TA_CENTER
+        """Export orders to PDF format using Jinja2 and WeasyPrint"""
+        # Basic HTML template for the order export
+        # In a real application, this would likely be loaded from a separate .html file
+        template_string = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Orders Export Report</title>
+            <style>
+                body { font-family: sans-serif; margin: 0; padding: 0; font-size: 10px; }
+                .container { width: 100%; margin: 0 auto; padding: 20px; }
+                h1 { text-align: center; color: #1a1a1a; font-size: 20px; margin-bottom: 20px; }
+                .meta { text-align: center; margin-bottom: 30px; color: #555; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #4472C4; color: white; font-weight: bold; font-size: 11px;}
+                tr:nth-child(even) { background-color: #f2f2f2; }
+                .summary { margin-top: 20px; font-size: 11px; }
+                .summary span { font-weight: bold; }
+                .order-items { margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px; font-size: 9px; }
+                .order-item { margin-bottom: 3px; }
+                .order-item-detail { margin-left: 15px; color: #666; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Orders Export Report</h1>
+                <p class="meta">Generated on: {{ generation_date }}</p>
+
+                {% if not orders %}
+                    <p style="text-align: center;">No orders to export.</p>
+                {% else %}
+                    <div class="summary">
+                        <span>Total Orders:</span> {{ orders|length }} |
+                        <span>Total Revenue:</span> ${{ "%.2f"|format(total_revenue) }}
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.id[:8] }}...</td>
+                                <td>{{ order.customer_name }}</td>
+                                <td>{{ order.status }}</td>
+                                <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                                <td>{{ order.created_at[:10] }}</td>
+                                <td>
+                                    {% if order.items %}
+                                        <div class="order-items">
+                                            {% for item in order.items %}
+                                                <div class="order-item">
+                                                    {{ item.variant.product_name }} ({{ item.variant.name }}) - {{ item.quantity }} x ${{ "%.2f"|format(item.price_per_unit) }}
+                                                    <div class="order-item-detail">Total: ${{ "%.2f"|format(item.total_price) }}</div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        No items
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </body>
+        </html>
+        """
+
+        # Setup Jinja2 environment to load from a string
+        env = Environment(loader=FileSystemLoader("."), autoescape=select_autoescape(["html", "xml"]))
+        template = env.from_string(template_string)
+
+        total_revenue = sum(order.get('total_amount', 0) for order in orders)
+        generation_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Prepare data for rendering
+        rendered_orders = []
+        for order in orders:
+            user = order.get('user', {})
+            customer_name = f"{user.get('firstname', '')} {user.get('lastname', '')}".strip() or 'N/A'
+            rendered_orders.append({
+                'id': order.get('id', ''),
+                'customer_name': customer_name,
+                'status': order.get('status', ''),
+                'total_amount': order.get('total_amount', 0),
+                'created_at': order.get('created_at', ''),
+                'items': order.get('items', [])
+            })
+
+        html_content = template.render(
+            orders=rendered_orders,
+            total_revenue=total_revenue,
+            generation_date=generation_date
         )
-        
-        # Title
-        title = Paragraph("Orders Export Report", title_style)
-        elements.append(title)
-        
-        # Export date
-        date_text = Paragraph(
-            f"<para align=center>Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</para>",
-            styles['Normal']
-        )
-        elements.append(date_text)
-        elements.append(Spacer(1, 20))
-        
-        if not orders:
-            no_data = Paragraph("<para align=center>No orders to export</para>", styles['Normal'])
-            elements.append(no_data)
-        else:
-            # Summary
-            total_revenue = sum(order.get('total_amount', 0) for order in orders)
-            summary_text = f"<b>Total Orders:</b> {len(orders)} | <b>Total Revenue:</b> ${total_revenue:.2f}"
-            summary = Paragraph(summary_text, styles['Normal'])
-            elements.append(summary)
-            elements.append(Spacer(1, 20))
-            
-            # Table data
-            data = [['Order ID', 'Customer', 'Status', 'Amount', 'Date']]
-            
-            for order in orders:
-                user = order.get('user', {})
-                customer_name = f"{user.get('firstname', '')} {user.get('lastname', '')}".strip() or 'N/A'
-                order_id = str(order.get('id', ''))[:8] + '...'  # Truncate for space
-                
-                data.append([
-                    order_id,
-                    customer_name,
-                    order.get('status', ''),
-                    f"${order.get('total_amount', 0):.2f}",
-                    order.get('created_at', '')[:10]  # Date only
-                ])
-            
-            # Create table
-            table = Table(data, colWidths=[1.5*inch, 2*inch, 1.2*inch, 1*inch, 1.3*inch])
-            
-            # Table style
-            table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4472C4')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 9),
-                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
-            ]))
-            
-            elements.append(table)
-        
-        # Build PDF
-        doc.build(elements)
+
+        # Convert HTML to PDF using WeasyPrint
+        pdf_bytes = HTML(string=html_content).write_pdf()
+
+        output = io.BytesIO(pdf_bytes)
         output.seek(0)
         return output

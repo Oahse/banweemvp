@@ -17,14 +17,21 @@ RUN apk add --no-cache \
     curl \
     python3-dev \
     linux-headers \
-    librdkafka-dev
+    librdkafka-dev \
+    pango-dev \
+    cairo-dev \
+    gdk-pixbuf-dev \
+    fontconfig-dev \
+    libxml2-dev \
+    libxslt-dev
 
 # Copy Python dependency requirements file
 COPY requirements.txt .
 
 # Install Python dependencies using pip
 RUN pip install --no-cache-dir -r requirements.txt
-
+# Copy the core directory
+COPY core core/
 # Copy the entire backend application code into the container
 COPY . .
 
@@ -32,7 +39,7 @@ COPY . .
 RUN chmod +x migrate.sh
 
 # Set Python path to include the /app directory, allowing Python to find modules
-ENV PYTHONPATH=/app/backend
+ENV PYTHONPATH=/app
 # Explicitly set the PostgreSQL database URL for the backend application.
 # This uses the 'postgres' service name for inter-container communication within Docker.
 ENV POSTGRES_DB_URL=postgresql+asyncpg://banwee:banwee_password@postgres:5432/banwee_db
