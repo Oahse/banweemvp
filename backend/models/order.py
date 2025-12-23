@@ -10,7 +10,7 @@ class Order(BaseModel):
 
     user_id = Column(GUID(), ForeignKey(
         "users.id"), nullable=False)
-    # pending, confirmed, shipped, delivered, cancelled
+    # pending, confirmed, shipped, delivered, cancelled, refunded, partially_refunded
     status = Column(String(50), default="pending")
     total_amount = Column(Float, nullable=False)
     shipping_address_id = Column(
