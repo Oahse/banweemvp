@@ -122,8 +122,12 @@ class KafkaProducer:
             logger.error(f"Failed to send message to topic '{topic}': {e}")
             raise
 
-# Global Kafka Producer instance
-kafka_producer_service = KafkaProducer()
+# Global Kafka Producer instance - initialized lazily
+kafka_producer_service = None
 
 async def get_kafka_producer_service() -> KafkaProducer:
+    global kafka_producer_service
+    if kafka_producer_service is None:
+        kafka_producer_service = KafkaProducer()
+        await kafka_producer_service.start()
     return kafka_producer_service

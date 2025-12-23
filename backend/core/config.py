@@ -184,6 +184,16 @@ class Settings:
     TIKTOK_CLIENT_KEY: str = os.getenv('TIKTOK_CLIENT_KEY')
     TIKTOK_CLIENT_SECRET: str = os.getenv('TIKTOK_CLIENT_SECRET')
 
+    # --- Tax Service Configuration ---
+    # TAX_API_KEY for services like TaxJar, Avalara for US/CA tax calculations
+    TAX_API_KEY: str = os.getenv('TAX_API_KEY', '')
+    # TAX_API_URL for the primary tax service API endpoint
+    TAX_API_URL: str = os.getenv('TAX_API_URL', 'https://api.taxjar.com/v2')
+    # VAT_API_KEY for European VAT calculations and validation
+    VAT_API_KEY: str = os.getenv('VAT_API_KEY', '')
+    # VAT_API_URL for VAT service API endpoint
+    VAT_API_URL: str = os.getenv('VAT_API_URL', 'https://vatlayer.com/api')
+
     @property
     def server_host(self) -> str:
         """Determines the server host URL based on the environment."""

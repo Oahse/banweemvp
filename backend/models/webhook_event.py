@@ -7,6 +7,7 @@ import uuid
 
 class WebhookEvent(BaseModel):
     __tablename__ = "webhook_events"
+    __table_args__ = {'extend_existing': True}
 
     stripe_event_id = Column(String(255), unique=True, nullable=False, index=True)
     event_type = Column(String(100), nullable=False, index=True)

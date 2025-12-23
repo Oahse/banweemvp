@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from core.config import settings # ADDED for Kafka topics
 from core.kafka import get_kafka_producer_service # ADD THIS LINE
-from negotiator.service import NegotiatorService # ADDED
+# from negotiator.service import NegotiatorService # ADDED - Commented out to avoid circular import
 
 
 class OrderService:

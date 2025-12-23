@@ -9,7 +9,7 @@ from models.order import Order
 from core.config import settings # ADDED for Kafka topics
 from core.kafka import KafkaProducer, get_kafka_producer_service # ADDED for Kafka dispatch
 
-from services.notification import NotificationService # Import NotificationService to encapsulate logic
+# Import NotificationService lazily to avoid circular imports
 from sqlalchemy.ext.asyncio import AsyncSession # Directly use AsyncSession from consumer
 
 

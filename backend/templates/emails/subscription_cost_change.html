@@ -19,8 +19,8 @@
     </div>
     <div class="cost-item cost-total">
         <span>Difference:</span>
-        <span style="color: {% if cost_difference > 0 %}#dc3545{% else %}#28a745{% endif %};">
-            {% if cost_difference > 0 %}+{% endif %}{{ cost_difference | currency }}
+        <span style="color: {% if cost_difference|float > 0 %}#dc3545{% else %}#28a745{% endif %};">
+            {% if cost_difference|float > 0 %}+{% endif %}{{ cost_difference | currency }}
         </span>
     </div>
 </div>
