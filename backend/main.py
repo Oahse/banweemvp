@@ -5,10 +5,10 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.exc import SQLAlchemyError
-from core.database import AsyncSessionDB, initialize_db, db_manager  # Add this import
-from services.notification import NotificationService  # Add this import
-import asyncio  # Add this import
-from core.middleware import MaintenanceModeMiddleware, ActivityLoggingMiddleware  # Add this import
+from core.database import AsyncSessionDB, initialize_db, db_manager 
+from services.notification import NotificationService 
+import asyncio 
+from core.middleware import MaintenanceModeMiddleware, ActivityLoggingMiddleware 
 # Import exceptions and handlers
 from core.exceptions import (
     APIException,
@@ -49,19 +49,26 @@ async def lifespan(app: FastAPI):
     # Initialize the database engine and session factory
     from core.config import settings # Import settings here to avoid circular dependency
     initialize_db(settings.SQLALCHEMY_DATABASE_URI, settings.ENVIRONMENT == "local")
-    #  start kafka consumer worker
-    asyncio.run(consume_messages())
 
     # Start Kafka Producer
-    await kafka_producer_service.start() # ADD THIS LINE
+    await kafka_producer_service.start()
+
+    # Start Kafka Consumer as a background task
+    consumer_task = asyncio.create_task(consume_messages())
 
     asyncio.create_task(run_notification_cleanup())
     yield
-    # Shutdown event (if any)
-    # For example, gracefully stop background tasks here
-    
+    # Shutdown event
     # Stop Kafka Producer
-    await kafka_producer_service.stop() # ADD THIS LINE
+    await kafka_producer_service.stop()
+
+    # Cancel Kafka Consumer background task
+    consumer_task.cancel()
+    try:
+        await consumer_task
+    except asyncio.CancelledError:
+        # Log or handle the cancellation, as it's expected during shutdown
+        logger.info("Kafka consumer task cancelled successfully during shutdown.")
 
 
 app = FastAPI(
