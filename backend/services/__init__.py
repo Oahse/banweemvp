@@ -7,7 +7,10 @@ from .blog import BlogService
 from .cart import CartService
 from .email import EmailService
 from .export import ExportService
+from .enhanced_export import EnhancedExportService
 from .inventory import InventoryService
+from .inventory_integration import InventoryIntegrationService
+from .loyalty import LoyaltyService
 from .negotiator_service import NegotiatorService # NEW
 from .notification import NotificationService
 from .order import OrderService
@@ -20,5 +23,6 @@ from .settings import SettingsService
 from .shipping import ShippingService
 from .subscription import SubscriptionService
 from .user import UserService
+from .variant_tracking import VariantTrackingService
 
 from .wishlist import WishlistService

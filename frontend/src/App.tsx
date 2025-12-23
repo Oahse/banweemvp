@@ -19,6 +19,7 @@ import { LocaleProvider } from './contexts/LocaleContext';
 import { ProtectedRoute } from './components/routing/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { OfflineIndicator } from './components/common/OfflineIndicator';
+import { AdminSettings } from './pages/admin/AdminSettings';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 

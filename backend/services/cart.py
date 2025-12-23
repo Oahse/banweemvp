@@ -11,7 +11,7 @@ from services.shipping import ShippingService
 from services.payment import PaymentService
 from uuid import UUID  # Import UUID
 from datetime import datetime
-from negotiator.service import NegotiatorService # ADDED
+
 
 class CartService:
     def __init__(self, db: AsyncSession):
@@ -54,12 +54,9 @@ class CartService:
 
         item = cart.get_item(variant.id)
         
-        # --- Check for negotiated price ---
-        negotiator_service = NegotiatorService(self.db) # Initialize service
-        negotiated_price = await negotiator_service.get_negotiated_price_for_user_product(user_id, variant_id)
-        
-        effective_price = negotiated_price if negotiated_price is not None else (variant.sale_price or variant.base_price)
-        # --- End negotiated price check ---
+        # --- Original price calculation without negotiation ---
+        effective_price = variant.sale_price or variant.base_price
+        # --- End original price calculation ---
 
         if item:
             new_quantity = item.quantity + quantity
@@ -134,20 +131,12 @@ class CartService:
         if not item:
             raise HTTPException(status_code=404, detail="Cart item not found")
 
-        # --- Check for negotiated price (if quantity is updated, price might need re-evaluation) ---
-        negotiator_service = NegotiatorService(self.db)
-        negotiated_price = await negotiator_service.get_negotiated_price_for_user_product(user_id, item.variant_id)
-        
-        # If there's a negotiated price, it should apply regardless of original variant price
-        if negotiated_price is not None:
-            effective_price = negotiated_price
-        else:
-            # Otherwise, fetch current variant price (from DB)
-            variant = (await self.db.execute(
-                select(ProductVariant).where(ProductVariant.id == item.variant_id)
-            )).scalar_one_or_none()
-            effective_price = variant.sale_price or variant.base_price if variant else item.price_per_unit
-        # --- End negotiated price check ---
+        # --- Original price calculation without negotiation ---
+        variant = (await self.db.execute(
+            select(ProductVariant).where(ProductVariant.id == item.variant_id)
+        )).scalar_one_or_none()
+        effective_price = variant.sale_price or variant.base_price if variant else item.price_per_unit
+        # --- End original price calculation ---
 
         if quantity <= 0:
             await self.db.delete(item)

@@ -13,7 +13,7 @@ from models.order import Order
 from models.user import User
 from models.product import ProductVariant
 from core.utils.messages.email import send_email_mailgun # Import async version
-from services.email import EmailService # Import EmailService to encapsulate logic
+# from services.email import EmailService # Removed due to circular import
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,7 @@ async def send_order_confirmation_email(db: AsyncSession, order_id: str):
     Send order confirmation email based on order_id.
     """
     try:
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         await email_service.send_order_confirmation(UUID(order_id)) # Use existing EmailService method
         logger.info(f"✅ Order confirmation email dispatched for order {order_id}")
@@ -36,6 +37,7 @@ async def send_shipping_update_email(db: AsyncSession, order_id: str, carrier_na
     Send shipping update email.
     """
     try:
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         await email_service.send_shipping_update(UUID(order_id), carrier_name, tracking_number)
         logger.info(f"✅ Shipping update email dispatched for order {order_id}")
@@ -49,6 +51,7 @@ async def send_welcome_email(db: AsyncSession, user_id: str):
     Send welcome email to new user.
     """
     try:
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         await email_service.send_welcome(UUID(user_id))
         logger.info(f"✅ Welcome email dispatched for user {user_id}")
@@ -63,6 +66,7 @@ async def send_password_reset_email(db: AsyncSession, user_id: str, reset_token:
     """
     try:
         # Email service already constructs the context
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         await email_service.send_password_reset(UUID(user_id), reset_token)
         logger.info(f"✅ Password reset email dispatched for user {user_id}")
@@ -92,6 +96,7 @@ async def send_email_verification(db: AsyncSession, user_id: str, verification_t
     Send email verification link.
     """
     try:
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         await email_service.send_email_verification_link(UUID(user_id), verification_token)
         logger.info(f"✅ Email verification dispatched for user {user_id}")
@@ -105,6 +110,7 @@ async def send_email_change_confirmation(db: AsyncSession, user_id: str, new_ema
     Send email change confirmation.
     """
     try:
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         await email_service.send_email_change_confirmation_link(UUID(user_id), new_email, old_email, confirmation_token)
         logger.info(f"✅ Email change confirmation dispatched for user {user_id}")
@@ -118,6 +124,7 @@ async def send_order_delivered_email(db: AsyncSession, order_id: str):
     Send order delivered email.
     """
     try:
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         await email_service.send_order_delivered(UUID(order_id))
         logger.info(f"✅ Order delivered email dispatched for order {order_id}")
@@ -131,6 +138,7 @@ async def send_return_process_email(db: AsyncSession, order_id: str, return_inst
     Send return process instructions email.
     """
     try:
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         await email_service.send_return_process_instructions(UUID(order_id), return_instructions)
         logger.info(f"✅ Return process email dispatched for order {order_id}")
@@ -144,6 +152,7 @@ async def send_referral_request_email(db: AsyncSession, user_id: str, referral_c
     Send referral request email after positive review or repeat purchase.
     """
     try:
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         await email_service.send_referral_request(UUID(user_id), referral_code)
         logger.info(f"✅ Referral request email dispatched for user {user_id}")
@@ -157,6 +166,7 @@ async def send_low_stock_alert_email(db: AsyncSession, recipient_email: str, con
     Send low stock alert email to admin/supplier.
     """
     try:
+        from services.email import EmailService # Imported locally
         email_service = EmailService(db)
         # Assuming EmailService has a method to handle the context
         # If not, you'd integrate mailgun directly here as before
@@ -192,10 +202,61 @@ async def send_payment_method_expiration_email(recipient_email: str, context: Di
         await send_email_mailgun(
             to_email=recipient_email,
             subject="Your Payment Method is Expiring Soon",
-            template_name="payment_method_expiring",
+            template_name="emails/payment_method_expiring.html",
             context=context
         )
         logger.info(f"✅ Payment method expiration email sent to {recipient_email}")
     except Exception as e:
         logger.error(f"❌ Failed to send payment method expiration email to {recipient_email}: {e}")
+        raise
+
+
+async def send_subscription_cost_change_email(recipient_email: str, context: Dict[str, Any]):
+    """
+    Send subscription cost change notification email.
+    """
+    try:
+        await send_email_mailgun(
+            to_email=recipient_email,
+            subject="Your Subscription Cost Has Changed",
+            template_name="emails/subscription_cost_change.html",
+            context=context
+        )
+        logger.info(f"✅ Subscription cost change email sent to {recipient_email}")
+    except Exception as e:
+        logger.error(f"❌ Failed to send subscription cost change email to {recipient_email}: {e}")
+        raise
+
+
+async def send_payment_confirmation_email(recipient_email: str, context: Dict[str, Any]):
+    """
+    Send payment confirmation email.
+    """
+    try:
+        await send_email_mailgun(
+            to_email=recipient_email,
+            subject="Payment Confirmation - Thank You!",
+            template_name="emails/payment_confirmation.html",
+            context=context
+        )
+        logger.info(f"✅ Payment confirmation email sent to {recipient_email}")
+    except Exception as e:
+        logger.error(f"❌ Failed to send payment confirmation email to {recipient_email}: {e}")
+        raise
+
+
+async def send_payment_failure_email(recipient_email: str, context: Dict[str, Any]):
+    """
+    Send payment failure notification email.
+    """
+    try:
+        await send_email_mailgun(
+            to_email=recipient_email,
+            subject="Payment Issue - Action Required",
+            template_name="emails/payment_failure.html",
+            context=context
+        )
+        logger.info(f"✅ Payment failure email sent to {recipient_email}")
+    except Exception as e:
+        logger.error(f"❌ Failed to send payment failure email to {recipient_email}: {e}")
         raise

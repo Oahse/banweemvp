@@ -11,7 +11,7 @@ from core.config import settings
 from services.notification import NotificationService
 from services.inventory import InventoryService
 from models.notification import Notification # Still needed for cleanup
-from services.email import EmailService # For sending low stock alert emails
+    # The EmailService import is moved inside check_low_stock_task to break circular dependency.
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +51,7 @@ async def check_low_stock_task(db: AsyncSession):
     """
     Periodic task to check for low stock inventory items and send notifications.
     """
+    from services.email import EmailService # Imported here to break circular dependency
     try:
         inventory_service = InventoryService(db)
         notification_service = NotificationService(db)

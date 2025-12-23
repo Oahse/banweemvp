@@ -79,10 +79,6 @@ services:
       - banwee_network
     restart: unless-stopped
 
-
-
-
-
   # Backend API
   # This service runs the FastAPI backend application.
   # It exposes the API on port 8000 and connects to PostgreSQL and Redis.

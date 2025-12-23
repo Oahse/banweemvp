@@ -15,6 +15,13 @@ from .notification import Notification
 from .activity_log import ActivityLog
 from .webhook_event import WebhookEvent
 
+# Enhanced subscription and payment models
+from .pricing_config import PricingConfig, SubscriptionCostHistory
+from .payment_intent import PaymentIntent
+from .analytics import SubscriptionAnalytics, PaymentAnalytics
+from .loyalty import LoyaltyAccount, PointsTransaction
+from .variant_tracking import VariantTrackingEntry, VariantPriceHistory, VariantAnalytics, VariantSubstitution
+
 __all__ = [
     # User models
     "User",
@@ -60,4 +67,19 @@ __all__ = [
     
     # Webhook models
     "WebhookEvent",
+    
+    # Enhanced subscription and payment models
+    "PricingConfig",
+    "SubscriptionCostHistory",
+    "PaymentIntent",
+    "SubscriptionAnalytics",
+    "PaymentAnalytics",
+    "LoyaltyAccount",
+    "PointsTransaction",
+    
+    # Variant tracking models
+    "VariantTrackingEntry",
+    "VariantPriceHistory",
+    "VariantAnalytics",
+    "VariantSubstitution",
 ]

@@ -9,7 +9,8 @@ subscription_product_association = Table(
     "subscription_product_association",
     Base.metadata, # Assuming Base is imported from core.database
     Column("subscription_id", GUID(), ForeignKey("subscriptions.id"), primary_key=True),
-    Column("product_variant_id", GUID(), ForeignKey("product_variants.id"), primary_key=True)
+    Column("product_variant_id", GUID(), ForeignKey("product_variants.id"), primary_key=True),
+    extend_existing=True
 )
 
 class Subscription(BaseModel):

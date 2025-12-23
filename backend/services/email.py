@@ -8,6 +8,7 @@ from sqlalchemy.future import select
 from models.user import User, Address
 from models.order import Order
 from models.product import ProductVariant
+from services.jinja_template import JinjaTemplateService
 from tasks.email_tasks import (
     send_order_confirmation_email,
     send_shipping_update_email,
@@ -22,26 +23,27 @@ from tasks.email_tasks import (
 )
 from core.config import settings
 from core.kafka import get_kafka_producer_service # ADD THIS LINE
-from core.exceptions import APIException # Assuming CustomException is suitable for service layer errors
-from core.kafka import get_kafka_producer_service # ADD THIS LINE
+from core.exceptions import APIException # Assuming APIException is suitable for service layer errors
+
 
 
 class EmailService:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
+        self.template_service = JinjaTemplateService(template_dir="templates")
 
     async def _get_user_by_id(self, user_id: UUID) -> User:
         result = await self.db_session.execute(select(User).filter(User.id == user_id))
         user = result.scalars().first()
         if not user:
-            raise CustomException(status_code=404, message="User not found for email operation.")
+            raise APIException(status_code=404, message="User not found for email operation.")
         return user
 
     async def _get_order_by_id(self, order_id: UUID) -> Order:
         result = await self.db_session.execute(select(Order).filter(Order.id == order_id))
         order = result.scalars().first()
         if not order:
-            raise CustomException(status_code=404, message="Order not found for email operation.")
+            raise APIException(status_code=404, message="Order not found for email operation.")
         return order
 
     async def _get_address_by_id(self, address_id: UUID) -> Optional[Address]:
@@ -213,35 +215,150 @@ class EmailService:
         }
         producer_service = await get_kafka_producer_service()
         await producer_service.send_message(settings.KAFKA_TOPIC_EMAIL, {"task": "send_low_stock_alert_email", "args": [recipient_email, context]})
-                print(f"📧 Kafka message dispatched to send low stock alert email to {recipient_email}.")
+        print(f"📧 Kafka message dispatched to send low stock alert email to {recipient_email}.")
         
-            async def send_payment_method_expiration_notice(self, user_id: UUID, payment_method_id: UUID):
-                """
-                Sends an email notification to a user about their expiring payment method.
-                """
-                from models.payment import PaymentMethod
+    async def send_payment_method_expiration_notice(self, user_id: UUID, payment_method_id: UUID):
+        """
+        Sends an email notification to a user about their expiring payment method.
+        """
+        from models.payment import PaymentMethod
         
-                user = await self._get_user_by_id(user_id)
-                payment_method = await self.db_session.get(PaymentMethod, payment_method_id)
-                
-                if not user or not payment_method:
-                    return
+        user = await self._get_user_by_id(user_id)
+        payment_method = await self.db_session.get(PaymentMethod, payment_method_id)
         
-                context = {
-                    "user_name": user.firstname,
-                    "payment_method_provider": payment_method.provider.title(),
-                    "payment_method_last_four": payment_method.last_four,
-                    "expiry_date": f"{payment_method.expiry_month:02d}/{payment_method.expiry_year}",
-                    "update_payment_url": f"{settings.FRONTEND_URL}/account/payment-methods",
-                    "company_name": "Banwee",
-                }
-                producer_service = await get_kafka_producer_service()
-                await producer_service.send_message(
-                    settings.KAFKA_TOPIC_EMAIL,
-                    {
-                        "task": "send_payment_method_expiration_email",
-                        "args": [user.email, context]
-                    }
-                )
-                print(f"📧 Kafka message dispatched for payment method expiration notice to {user.email}.")
+        if not user or not payment_method:
+            return
+
+        context = {
+            "user_name": user.firstname,
+            "payment_method_provider": payment_method.provider.title(),
+            "payment_method_last_four": payment_method.last_four,
+            "expiry_date": f"{payment_method.expiry_month:02d}/{payment_method.expiry_year}",
+        "update_payment_url": f"{settings.FRONTEND_URL}/account/payment-methods",
+        "company_name": "Banwee",
+        }
+        producer_service = await get_kafka_producer_service()
+        await producer_service.send_message(
+            settings.KAFKA_TOPIC_EMAIL,
+            {
+                "task": "send_payment_method_expiration_email",
+                "args": [user.email, context]
+            }
+        )
+        print(f"📧 Kafka message dispatched for payment method expiration notice to {user.email}.")
+    
+    async def send_subscription_cost_change_notification(
+        self, 
+        user_id: UUID, 
+        subscription_id: UUID,
+        old_cost: float,
+        new_cost: float,
+        change_reason: str
+    ):
+        """
+        Send notification when subscription cost changes
+        """
+        user = await self._get_user_by_id(user_id)
         
+        context = {
+            "user_name": user.firstname,
+            "subscription_id": str(subscription_id),
+            "old_cost": old_cost,
+            "new_cost": new_cost,
+            "cost_difference": new_cost - old_cost,
+            "change_reason": change_reason,
+            "subscription_management_url": f"{settings.FRONTEND_URL}/account/subscriptions/{subscription_id}",
+            "company_name": "Banwee",
+        }
+        
+        producer_service = await get_kafka_producer_service()
+        await producer_service.send_message(
+            settings.KAFKA_TOPIC_EMAIL,
+            {
+                "task": "send_subscription_cost_change_email",
+                "args": [user.email, context]
+            }
+        )
+        print(f"📧 Subscription cost change notification sent to {user.email}")
+    
+    async def send_payment_confirmation(
+        self,
+        user_id: UUID,
+        subscription_id: UUID,
+        payment_amount: float,
+        payment_method: str,
+        cost_breakdown: Dict[str, Any]
+    ):
+        """
+        Send payment confirmation email with detailed cost breakdown
+        """
+        user = await self._get_user_by_id(user_id)
+        
+        context = {
+            "user_name": user.firstname,
+            "subscription_id": str(subscription_id),
+            "payment_amount": payment_amount,
+            "payment_method": payment_method,
+            "cost_breakdown": cost_breakdown,
+            "payment_date": datetime.now().strftime("%B %d, %Y"),
+            "subscription_management_url": f"{settings.FRONTEND_URL}/account/subscriptions/{subscription_id}",
+            "company_name": "Banwee",
+        }
+        
+        producer_service = await get_kafka_producer_service()
+        await producer_service.send_message(
+            settings.KAFKA_TOPIC_EMAIL,
+            {
+                "task": "send_payment_confirmation_email",
+                "args": [user.email, context]
+            }
+        )
+        print(f"📧 Payment confirmation sent to {user.email}")
+    
+    async def send_payment_failure_notification(
+        self,
+        user_id: UUID,
+        subscription_id: UUID,
+        failure_reason: str,
+        retry_url: str
+    ):
+        """
+        Send payment failure notification with retry instructions
+        """
+        user = await self._get_user_by_id(user_id)
+        
+        context = {
+            "user_name": user.firstname,
+            "subscription_id": str(subscription_id),
+            "failure_reason": failure_reason,
+            "retry_url": retry_url,
+            "subscription_management_url": f"{settings.FRONTEND_URL}/account/subscriptions/{subscription_id}",
+            "support_email": "support@banwee.com",
+            "company_name": "Banwee",
+        }
+        
+        producer_service = await get_kafka_producer_service()
+        await producer_service.send_message(
+            settings.KAFKA_TOPIC_EMAIL,
+            {
+                "task": "send_payment_failure_email",
+                "args": [user.email, context]
+            }
+        )
+        print(f"📧 Payment failure notification sent to {user.email}")
+    
+    async def render_email_with_template(
+        self,
+        template_name: str,
+        context: Dict[str, Any]
+    ) -> str:
+        """
+        Render an email using Jinja template
+        """
+        try:
+            rendered = await self.template_service.render_email_template(template_name, context)
+            return rendered.content
+        except Exception as e:
+            print(f"❌ Failed to render email template {template_name}: {e}")
+            raise
+    

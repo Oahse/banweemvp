@@ -1,21 +1,30 @@
 import json
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_, or_
 from sqlalchemy.orm import selectinload
 from datetime import datetime, timedelta, UTC
 from sqlalchemy import delete
-from uuid import UUID # Import UUID
+from uuid import UUID
+import logging
 
 from models.notification import Notification
+from models.notification_preference import NotificationPreference, NotificationHistory
+from models.user import User
+from models.subscription import Subscription
+from models.product import ProductVariant
 from core.exceptions import APIException
 from routes.websockets import manager as websocket_manager
 from core.config import settings
+from services.email import EmailService
+
+logger = logging.getLogger(__name__)
 
 
-class NotificationService:
+class EnhancedNotificationService:
     def __init__(self, db: AsyncSession):
         self.db = db
+        self.email_service = EmailService(db)
 
     async def _send_websocket_notification(self, notification: Notification, event_type: str = "notification_update"):
         """Sends a notification to the user's active WebSocket connections."""
@@ -38,6 +47,531 @@ class NotificationService:
         }
         await websocket_manager.send_to_user(str(notification.user_id), json.dumps(websocket_message))
 
+    async def _get_user_preferences(self, user_id: UUID) -> NotificationPreference:
+        """Get user notification preferences, create default if not exists"""
+        result = await self.db.execute(
+            select(NotificationPreference).where(NotificationPreference.user_id == user_id)
+        )
+        preferences = result.scalar_one_or_none()
+        
+        if not preferences:
+            # Create default preferences
+            preferences = NotificationPreference(user_id=user_id)
+            self.db.add(preferences)
+            await self.db.commit()
+            await self.db.refresh(preferences)
+        
+        return preferences
+
+    async def _log_notification_history(
+        self,
+        user_id: UUID,
+        notification_id: UUID = None,
+        channel: str = "inapp",
+        notification_type: str = "general",
+        subject: str = None,
+        message: str = "",
+        status: str = "sent",
+        metadata: Dict[str, Any] = None
+    ) -> NotificationHistory:
+        """Log notification to history"""
+        history = NotificationHistory(
+            user_id=user_id,
+            notification_id=notification_id,
+            channel=channel,
+            notification_type=notification_type,
+            subject=subject,
+            message=message,
+            status=status,
+            metadata=metadata or {}
+        )
+        self.db.add(history)
+        await self.db.commit()
+        await self.db.refresh(history)
+        return history
+
+    async def send_multi_channel_notification(
+        self,
+        user_id: UUID,
+        notification_type: str,
+        subject: str,
+        message: str,
+        related_id: str = None,
+        metadata: Dict[str, Any] = None,
+        channels: List[str] = None
+    ) -> Dict[str, bool]:
+        """Send notification through multiple channels based on user preferences"""
+        preferences = await self._get_user_preferences(user_id)
+        results = {}
+        
+        # Default to all channels if none specified
+        if channels is None:
+            channels = ["inapp", "email", "push", "sms"]
+        
+        # In-app notification (always send if enabled)
+        if "inapp" in channels and preferences.inapp_enabled:
+            if self._should_send_inapp_notification(preferences, notification_type):
+                try:
+                    notification = await self.create_notification(
+                        user_id=str(user_id),
+                        message=message,
+                        type=notification_type,
+                        related_id=related_id
+                    )
+                    await self._log_notification_history(
+                        user_id=user_id,
+                        notification_id=notification.id,
+                        channel="inapp",
+                        notification_type=notification_type,
+                        subject=subject,
+                        message=message,
+                        status="sent",
+                        metadata=metadata
+                    )
+                    results["inapp"] = True
+                except Exception as e:
+                    logger.error(f"Failed to send in-app notification: {e}")
+                    results["inapp"] = False
+            else:
+                results["inapp"] = False
+        
+        # Email notification
+        if "email" in channels and preferences.email_enabled:
+            if self._should_send_email_notification(preferences, notification_type):
+                try:
+                    await self._send_email_notification(
+                        user_id=user_id,
+                        notification_type=notification_type,
+                        subject=subject,
+                        message=message,
+                        metadata=metadata
+                    )
+                    await self._log_notification_history(
+                        user_id=user_id,
+                        channel="email",
+                        notification_type=notification_type,
+                        subject=subject,
+                        message=message,
+                        status="sent",
+                        metadata=metadata
+                    )
+                    results["email"] = True
+                except Exception as e:
+                    logger.error(f"Failed to send email notification: {e}")
+                    await self._log_notification_history(
+                        user_id=user_id,
+                        channel="email",
+                        notification_type=notification_type,
+                        subject=subject,
+                        message=message,
+                        status="failed",
+                        metadata={**(metadata or {}), "error": str(e)}
+                    )
+                    results["email"] = False
+            else:
+                results["email"] = False
+        
+        # Push notification
+        if "push" in channels and preferences.push_enabled:
+            if self._should_send_push_notification(preferences, notification_type):
+                try:
+                    await self._send_push_notification(
+                        user_id=user_id,
+                        subject=subject,
+                        message=message,
+                        metadata=metadata,
+                        device_tokens=preferences.device_tokens
+                    )
+                    await self._log_notification_history(
+                        user_id=user_id,
+                        channel="push",
+                        notification_type=notification_type,
+                        subject=subject,
+                        message=message,
+                        status="sent",
+                        metadata=metadata
+                    )
+                    results["push"] = True
+                except Exception as e:
+                    logger.error(f"Failed to send push notification: {e}")
+                    await self._log_notification_history(
+                        user_id=user_id,
+                        channel="push",
+                        notification_type=notification_type,
+                        subject=subject,
+                        message=message,
+                        status="failed",
+                        metadata={**(metadata or {}), "error": str(e)}
+                    )
+                    results["push"] = False
+            else:
+                results["push"] = False
+        
+        # SMS notification
+        if "sms" in channels and preferences.sms_enabled and preferences.phone_number:
+            if self._should_send_sms_notification(preferences, notification_type):
+                try:
+                    await self._send_sms_notification(
+                        phone_number=preferences.phone_number,
+                        message=message,
+                        metadata=metadata
+                    )
+                    await self._log_notification_history(
+                        user_id=user_id,
+                        channel="sms",
+                        notification_type=notification_type,
+                        subject=subject,
+                        message=message,
+                        status="sent",
+                        metadata=metadata
+                    )
+                    results["sms"] = True
+                except Exception as e:
+                    logger.error(f"Failed to send SMS notification: {e}")
+                    await self._log_notification_history(
+                        user_id=user_id,
+                        channel="sms",
+                        notification_type=notification_type,
+                        subject=subject,
+                        message=message,
+                        status="failed",
+                        metadata={**(metadata or {}), "error": str(e)}
+                    )
+                    results["sms"] = False
+            else:
+                results["sms"] = False
+        
+        return results
+
+    def _should_send_inapp_notification(self, preferences: NotificationPreference, notification_type: str) -> bool:
+        """Check if in-app notification should be sent based on preferences"""
+        if not preferences.inapp_enabled:
+            return False
+        
+        type_mapping = {
+            "subscription_change": preferences.inapp_subscription_changes,
+            "payment_confirmation": preferences.inapp_payment_confirmations,
+            "payment_failure": preferences.inapp_payment_failures,
+            "variant_unavailable": preferences.inapp_variant_unavailable,
+        }
+        
+        return type_mapping.get(notification_type, True)
+
+    def _should_send_email_notification(self, preferences: NotificationPreference, notification_type: str) -> bool:
+        """Check if email notification should be sent based on preferences"""
+        if not preferences.email_enabled:
+            return False
+        
+        type_mapping = {
+            "subscription_change": preferences.email_subscription_changes,
+            "payment_confirmation": preferences.email_payment_confirmations,
+            "payment_failure": preferences.email_payment_failures,
+            "variant_unavailable": preferences.email_variant_unavailable,
+            "promotional": preferences.email_promotional,
+        }
+        
+        return type_mapping.get(notification_type, True)
+
+    def _should_send_push_notification(self, preferences: NotificationPreference, notification_type: str) -> bool:
+        """Check if push notification should be sent based on preferences"""
+        if not preferences.push_enabled:
+            return False
+        
+        type_mapping = {
+            "subscription_change": preferences.push_subscription_changes,
+            "payment_confirmation": preferences.push_payment_confirmations,
+            "payment_failure": preferences.push_payment_failures,
+            "variant_unavailable": preferences.push_variant_unavailable,
+        }
+        
+        return type_mapping.get(notification_type, True)
+
+    def _should_send_sms_notification(self, preferences: NotificationPreference, notification_type: str) -> bool:
+        """Check if SMS notification should be sent based on preferences"""
+        if not preferences.sms_enabled:
+            return False
+        
+        type_mapping = {
+            "payment_failure": preferences.sms_payment_failures,
+            "urgent_alert": preferences.sms_urgent_alerts,
+        }
+        
+        return type_mapping.get(notification_type, False)
+
+    async def _send_email_notification(
+        self,
+        user_id: UUID,
+        notification_type: str,
+        subject: str,
+        message: str,
+        metadata: Dict[str, Any] = None
+    ):
+        """Send email notification using EmailService"""
+        metadata = metadata or {}
+        
+        if notification_type == "subscription_change":
+            await self.email_service.send_subscription_cost_change_notification(
+                user_id=user_id,
+                subscription_id=UUID(metadata.get("subscription_id")),
+                old_cost=metadata.get("old_cost", 0),
+                new_cost=metadata.get("new_cost", 0),
+                change_reason=metadata.get("change_reason", "Unknown")
+            )
+        elif notification_type == "payment_confirmation":
+            await self.email_service.send_payment_confirmation(
+                user_id=user_id,
+                subscription_id=UUID(metadata.get("subscription_id")),
+                payment_amount=metadata.get("payment_amount", 0),
+                payment_method=metadata.get("payment_method", "Unknown"),
+                cost_breakdown=metadata.get("cost_breakdown", {})
+            )
+        elif notification_type == "payment_failure":
+            await self.email_service.send_payment_failure_notification(
+                user_id=user_id,
+                subscription_id=UUID(metadata.get("subscription_id")),
+                failure_reason=metadata.get("failure_reason", "Unknown"),
+                retry_url=metadata.get("retry_url", "")
+            )
+        else:
+            # Generic email notification - would need template
+            logger.info(f"Generic email notification not implemented for type: {notification_type}")
+
+    async def _send_push_notification(
+        self,
+        user_id: UUID,
+        subject: str,
+        message: str,
+        metadata: Dict[str, Any] = None,
+        device_tokens: List[str] = None
+    ):
+        """Send push notification to user's devices"""
+        if not device_tokens:
+            logger.info(f"No device tokens for user {user_id}")
+            return
+        
+        # This would integrate with a push notification service like FCM or APNs
+        # For now, we'll log the notification
+        logger.info(f"Push notification sent to {len(device_tokens)} devices for user {user_id}: {subject}")
+        
+        # In a real implementation, you would:
+        # 1. Use Firebase Cloud Messaging (FCM) for Android
+        # 2. Use Apple Push Notification service (APNs) for iOS
+        # 3. Handle device token validation and cleanup
+        
+        # Example FCM integration would look like:
+        # from firebase_admin import messaging
+        # 
+        # for token in device_tokens:
+        #     message = messaging.Message(
+        #         notification=messaging.Notification(
+        #             title=subject,
+        #             body=message
+        #         ),
+        #         token=token,
+        #         data=metadata or {}
+        #     )
+        #     try:
+        #         response = messaging.send(message)
+        #         logger.info(f"Push notification sent successfully: {response}")
+        #     except Exception as e:
+        #         logger.error(f"Failed to send push notification: {e}")
+
+    async def _send_sms_notification(
+        self,
+        phone_number: str,
+        message: str,
+        metadata: Dict[str, Any] = None
+    ):
+        """Send SMS notification"""
+        # This would integrate with an SMS service like Twilio
+        # For now, we'll log the notification
+        logger.info(f"SMS notification sent to {phone_number}: {message}")
+        
+        # In a real implementation, you would:
+        # 1. Use Twilio, AWS SNS, or similar SMS service
+        # 2. Handle phone number validation
+        # 3. Manage SMS delivery status
+        
+        # Example Twilio integration would look like:
+        # from twilio.rest import Client
+        # 
+        # client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        # try:
+        #     message = client.messages.create(
+        #         body=message,
+        #         from_=settings.TWILIO_PHONE_NUMBER,
+        #         to=phone_number
+        #     )
+        #     logger.info(f"SMS sent successfully: {message.sid}")
+        # except Exception as e:
+        #     logger.error(f"Failed to send SMS: {e}")
+
+    # Specific notification methods for subscription and payment events
+    async def notify_subscription_cost_change(
+        self,
+        user_id: UUID,
+        subscription_id: UUID,
+        old_cost: float,
+        new_cost: float,
+        change_reason: str
+    ):
+        """Send notification when subscription cost changes"""
+        cost_diff = new_cost - old_cost
+        cost_change_text = "increased" if cost_diff > 0 else "decreased"
+        
+        subject = f"Subscription Cost {cost_change_text.title()}"
+        message = f"Your subscription cost has {cost_change_text} from ${old_cost:.2f} to ${new_cost:.2f} due to {change_reason}"
+        
+        metadata = {
+            "subscription_id": str(subscription_id),
+            "old_cost": old_cost,
+            "new_cost": new_cost,
+            "change_reason": change_reason,
+            "cost_difference": cost_diff
+        }
+        
+        await self.send_multi_channel_notification(
+            user_id=user_id,
+            notification_type="subscription_change",
+            subject=subject,
+            message=message,
+            related_id=str(subscription_id),
+            metadata=metadata
+        )
+
+    async def notify_payment_success(
+        self,
+        user_id: UUID,
+        subscription_id: UUID,
+        payment_amount: float,
+        payment_method: str,
+        cost_breakdown: Dict[str, Any]
+    ):
+        """Send notification when payment succeeds"""
+        subject = "Payment Confirmation"
+        message = f"Your payment of ${payment_amount:.2f} for subscription has been processed successfully"
+        
+        metadata = {
+            "subscription_id": str(subscription_id),
+            "payment_amount": payment_amount,
+            "payment_method": payment_method,
+            "cost_breakdown": cost_breakdown
+        }
+        
+        await self.send_multi_channel_notification(
+            user_id=user_id,
+            notification_type="payment_confirmation",
+            subject=subject,
+            message=message,
+            related_id=str(subscription_id),
+            metadata=metadata
+        )
+
+    async def notify_payment_failure(
+        self,
+        user_id: UUID,
+        subscription_id: UUID,
+        failure_reason: str,
+        retry_url: str = None
+    ):
+        """Send notification when payment fails"""
+        subject = "Payment Failed"
+        message = f"Your subscription payment failed: {failure_reason}. Please update your payment method."
+        
+        metadata = {
+            "subscription_id": str(subscription_id),
+            "failure_reason": failure_reason,
+            "retry_url": retry_url or f"{settings.FRONTEND_URL}/account/subscriptions/{subscription_id}"
+        }
+        
+        # Payment failures should be sent via all channels for urgency
+        await self.send_multi_channel_notification(
+            user_id=user_id,
+            notification_type="payment_failure",
+            subject=subject,
+            message=message,
+            related_id=str(subscription_id),
+            metadata=metadata,
+            channels=["inapp", "email", "push", "sms"]
+        )
+
+    async def notify_variant_unavailable(
+        self,
+        user_id: UUID,
+        subscription_id: UUID,
+        variant_name: str,
+        alternative_variants: List[Dict[str, Any]] = None
+    ):
+        """Send notification when a variant becomes unavailable"""
+        subject = "Product Unavailable"
+        message = f"The product '{variant_name}' in your subscription is no longer available."
+        
+        if alternative_variants:
+            alternatives_text = ", ".join([alt["name"] for alt in alternative_variants[:3]])
+            message += f" Suggested alternatives: {alternatives_text}"
+        
+        metadata = {
+            "subscription_id": str(subscription_id),
+            "variant_name": variant_name,
+            "alternative_variants": alternative_variants or []
+        }
+        
+        await self.send_multi_channel_notification(
+            user_id=user_id,
+            notification_type="variant_unavailable",
+            subject=subject,
+            message=message,
+            related_id=str(subscription_id),
+            metadata=metadata
+        )
+
+    async def notify_subscription_renewal_failure(
+        self,
+        user_id: UUID,
+        subscription_id: UUID,
+        failure_reason: str
+    ):
+        """Send notification when subscription renewal fails"""
+        subject = "Subscription Renewal Failed"
+        message = f"Your subscription renewal failed: {failure_reason}. Please check your payment method."
+        
+        metadata = {
+            "subscription_id": str(subscription_id),
+            "failure_reason": failure_reason
+        }
+        
+        # Renewal failures are urgent - send via all channels
+        await self.send_multi_channel_notification(
+            user_id=user_id,
+            notification_type="payment_failure",
+            subject=subject,
+            message=message,
+            related_id=str(subscription_id),
+            metadata=metadata,
+            channels=["inapp", "email", "push", "sms"]
+        )
+
+    # Real-time WebSocket notifications for payment processing
+    async def send_payment_processing_update(
+        self,
+        user_id: UUID,
+        subscription_id: UUID,
+        status: str,
+        message: str
+    ):
+        """Send real-time WebSocket notification for payment processing updates"""
+        websocket_message = {
+            "type": "payment_processing_update",
+            "subscription_id": str(subscription_id),
+            "status": status,
+            "message": message,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        await websocket_manager.send_to_user(str(user_id), json.dumps(websocket_message))
+        logger.info(f"Payment processing update sent to user {user_id}: {status}")
+
+    # Legacy methods for backward compatibility
     async def get_user_notifications(self, user_id: str, page: int = 1, limit: int = 10, read: Optional[bool] = None) -> dict:
         """Get notifications for a specific user with pagination."""
         offset = (page - 1) * limit
@@ -85,7 +619,7 @@ class NotificationService:
         await self.db.commit()
         await self.db.refresh(notification)
 
-        await self._send_websocket_notification(notification) # Send WebSocket update
+        await self._send_websocket_notification(notification)
 
         return notification.to_dict()
 
@@ -130,7 +664,7 @@ class NotificationService:
         await self.db.commit()
         await self.db.refresh(notification)
 
-        await self._send_websocket_notification(notification, event_type="new_notification") # Send WebSocket for new notification
+        await self._send_websocket_notification(notification, event_type="new_notification")
 
         return notification
 
@@ -185,20 +719,14 @@ class NotificationService:
             }
             await websocket_manager.send_to_user(str(notification.user_id), json.dumps(websocket_message))
 
-    # Removed send_order_confirmation as its logic moves to EmailService
-    # async def send_order_confirmation(self, order_id: str):
-    #     """Send order confirmation notification and email."""
-    #     ...
-
     async def notify_order_created(self, order_id: str, user_id: str):
         """Send notification when order is created."""
         notification = await self.create_notification(
             user_id=user_id,
-            message=f"Your order #{str(order_id)[:8]} has been created", # Corrected message for clarity
+            message=f"Your order #{str(order_id)[:8]} has been created",
             type="order",
             related_id=str(order_id)
         )
-        # WebSocket send already handled by create_notification
 
     async def notify_order_updated(self, order_id: str, user_id: str, status: str):
         """Send notification when order status is updated."""
@@ -208,7 +736,6 @@ class NotificationService:
             type="order",
             related_id=str(order_id)
         )
-        # WebSocket send already handled by create_notification
 
     async def notify_cart_updated(self, user_id: str, cart_data: dict):
         """Send WebSocket notification for cart update."""
@@ -221,27 +748,22 @@ class NotificationService:
         message = f"Low stock alert! {product_name} ({variant_name}) at {location_name} has {current_stock} units left (threshold: {threshold})."
         
         # 1. Create in-app notification for admin
-        admin_user_id = UUID(settings.ADMIN_USER_ID) # Assuming ADMIN_USER_ID is set in core.config
+        admin_user_id = UUID(settings.ADMIN_USER_ID)
         await self.create_notification(
             user_id=admin_user_id,
             message=message,
             type="low_stock",
-            related_id=None # No specific related_id for now, could be inventory_item_id
+            related_id=None
         )
         print(f"✅ In-app low stock notification created for admin for {product_name} ({variant_name}).")
 
         # 2. Trigger email notification for admin
-        # This part will call a method in EmailService
-        from services.email import EmailService # Import here to avoid circular dependency
-        email_service = EmailService(self.db) # Pass self.db to EmailService constructor
-        
-        # Fetch admin user details to get their email
         from models.user import User
         from sqlalchemy import select
         admin_user = await self.db.scalar(select(User).filter_by(id=admin_user_id))
 
         if admin_user and admin_user.email:
-            await email_service.send_low_stock_alert(
+            await self.email_service.send_low_stock_alert(
                 recipient_email=admin_user.email,
                 product_name=product_name,
                 variant_name=variant_name,
@@ -252,3 +774,9 @@ class NotificationService:
             print(f"📧 Low stock email sent to admin ({admin_user.email}) for {product_name} ({variant_name}).")
         else:
             print(f"❌ Admin user or email not found for low stock alert for {product_name} ({variant_name}).")
+
+
+# Maintain backward compatibility
+class NotificationService(EnhancedNotificationService):
+    """Legacy NotificationService for backward compatibility"""
+    pass

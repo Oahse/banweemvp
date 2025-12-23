@@ -60,6 +60,14 @@ class User(BaseModel):
     negotiations_as_seller = relationship(
         "Negotiation", foreign_keys="Negotiation.seller_id", back_populates="seller"
     )
+    
+    # Enhanced payment and loyalty relationships
+    payment_intents = relationship(
+        "models.payment_intent.PaymentIntent", back_populates="user", lazy="selectin")
+    loyalty_account = relationship(
+        "models.loyalty.LoyaltyAccount", back_populates="user", uselist=False, lazy="selectin")
+    notification_preferences = relationship(
+        "models.notification_preference.NotificationPreference", back_populates="user", uselist=False, lazy="selectin")
 
     @property
     def full_name(self) -> str:
