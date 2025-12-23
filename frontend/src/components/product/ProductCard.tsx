@@ -28,6 +28,8 @@ import { cn } from '../../lib/utils';
  * @property {string} name
  * @property {number} base_price
  * @property {number} [sale_price]
+ * @property {number} current_price
+ * @property {number} discount_percentage
  * @property {number} stock
  * @property {string} [barcode]
  * @property {string} [qr_code]
@@ -321,13 +323,16 @@ export const ProductCard = ({
         </div>
         <div className={cn('flex items-center justify-between', viewMode === 'list' && 'flex-grow md:flex-row-reverse md:justify-start md:space-x-4 md:space-x-reverse')}>
           <div>
-            {discountPrice ? (
+            {displayVariant?.discount_percentage > 0 && displayVariant?.sale_price ? (
               <div className="flex items-center">
-                <span className="font-bold text-primary mr-2 text-sm sm:text-base">${discountPrice.toFixed(2)}</span>
-                <span className="text-xs text-copy-lighter line-through">${price.toFixed(2)}</span>
+                <span className="font-bold text-primary mr-2 text-sm sm:text-base">${displayVariant.current_price.toFixed(2)}</span>
+                <span className="text-xs text-copy-lighter line-through">${displayVariant.base_price.toFixed(2)}</span>
+                <span className="bg-error text-white text-xs font-medium px-2 py-1 rounded-full ml-2">
+                  -{displayVariant.discount_percentage}%
+                </span>
               </div>
             ) : (
-              <span className="font-bold text-primary text-sm sm:text-base">${price.toFixed(2)}</span>
+              <span className="font-bold text-primary text-sm sm:text-base">${displayVariant?.current_price.toFixed(2)}</span>
             )}
             {displayVariant && (
               <div className="text-xs text-copy-lighter mt-1">

@@ -336,21 +336,21 @@ export const ProductDetails = () => {
               </div>
 
               <div className="flex items-center space-x-4 mb-4">
-                {selectedVariant?.sale_price ? (
+                {selectedVariant?.discount_percentage > 0 && selectedVariant?.sale_price ? (
                   <>
                     <span className="text-3xl font-bold text-primary">
-                      ${selectedVariant.sale_price.toFixed(2)}
+                      ${selectedVariant.current_price.toFixed(2)}
                     </span>
                     <span className="text-xl text-copy-light line-through">
                       ${selectedVariant.base_price.toFixed(2)}
                     </span>
                     <span className="bg-error-100 text-error-600 px-2 py-1 rounded text-sm font-medium">
-                      Save ${(selectedVariant.base_price - selectedVariant.sale_price).toFixed(2)}
+                      {selectedVariant.discount_percentage}% OFF
                     </span>
                   </>
                 ) : (
                   <span className="text-3xl font-bold text-primary">
-                    ${selectedVariant?.base_price?.toFixed(2) || product.price.toFixed(2)}
+                    ${selectedVariant?.current_price.toFixed(2) || product.price.toFixed(2)}
                   </span>
                 )}
               </div>
