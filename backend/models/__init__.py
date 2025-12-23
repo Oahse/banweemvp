@@ -12,6 +12,7 @@ from .shipping import ShippingMethod
 from .transaction import Transaction
 from .wishlist import Wishlist, WishlistItem
 from .notification import Notification
+from .notification_preference import NotificationPreference, NotificationHistory
 from .activity_log import ActivityLog
 from .webhook_event import WebhookEvent
 
@@ -61,6 +62,8 @@ __all__ = [
 
     # Notification models
     "Notification",
+    "NotificationPreference",
+    "NotificationHistory",
 
     # Activity models
     "ActivityLog",

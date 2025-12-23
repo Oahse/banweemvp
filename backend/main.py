@@ -27,6 +27,7 @@ from routes.products import router as products_router
 from routes.cart import router as cart_router
 from routes.orders import router as orders_router
 from routes.admin import router as admin_router
+from routes.admin_pricing import router as admin_pricing_router
 from routes.analytics import router as analytics_router
 from routes.social_auth import router as social_auth_router
 from routes.blog import router as blog_router
@@ -120,6 +121,7 @@ app.include_router(products_router)
 app.include_router(cart_router)
 app.include_router(orders_router)
 app.include_router(admin_router)
+app.include_router(admin_pricing_router)
 app.include_router(analytics_router)
 app.include_router(social_auth_router)
 app.include_router(blog_router)

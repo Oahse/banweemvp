@@ -178,3 +178,48 @@ async def import_notification_preferences(
         message="Notification preferences imported successfully",
         data=preferences.to_dict()
     )
+
+
+@router.get("/summary", response_model=StandardResponse)
+async def get_notification_summary(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get comprehensive notification summary for user"""
+    service = NotificationPreferenceService(db)
+    summary = await service.get_notification_summary(current_user.id)
+    
+    return StandardResponse(
+        success=True,
+        message="Notification summary retrieved successfully",
+        data=summary
+    )
+
+
+@router.post("/test-notification", response_model=StandardResponse)
+async def send_test_notification(
+    test_data: Dict[str, str],
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Send a test notification to verify settings"""
+    from services.notification import EnhancedNotificationService
+    
+    notification_service = EnhancedNotificationService(db)
+    
+    channel = test_data.get("channel", "inapp")
+    message = test_data.get("message", "This is a test notification")
+    
+    results = await notification_service.send_multi_channel_notification(
+        user_id=current_user.id,
+        notification_type="test",
+        subject="Test Notification",
+        message=message,
+        channels=[channel]
+    )
+    
+    return StandardResponse(
+        success=True,
+        message="Test notification sent",
+        data={"results": results}
+    )

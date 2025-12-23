@@ -91,7 +91,7 @@ class NotificationHistory(BaseModel):
     error_message = Column(String, nullable=True)
     
     # Metadata
-    metadata = Column(JSON, default=dict)  # Additional context data
+    notification_metadata = Column(JSON, default=dict)  # Additional context data
     
     user = relationship("models.user.User")
     notification = relationship("models.notification.Notification")
@@ -108,7 +108,7 @@ class NotificationHistory(BaseModel):
             "status": self.status,
             "delivery_attempts": self.delivery_attempts,
             "error_message": self.error_message,
-            "metadata": self.metadata,
+            "metadata": self.notification_metadata,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

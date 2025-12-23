@@ -17,6 +17,8 @@ from core.exceptions import APIException
 from routes.websockets import manager as websocket_manager
 from core.config import settings
 from services.email import EmailService
+from services.push_notification import push_service
+from services.sms_notification import sms_service
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +74,7 @@ class EnhancedNotificationService:
         subject: str = None,
         message: str = "",
         status: str = "sent",
-        metadata: Dict[str, Any] = None
+        notification_metadata: Dict[str, Any] = None
     ) -> NotificationHistory:
         """Log notification to history"""
         history = NotificationHistory(
@@ -83,7 +85,7 @@ class EnhancedNotificationService:
             subject=subject,
             message=message,
             status=status,
-            metadata=metadata or {}
+            notification_metadata=notification_metadata or {}
         )
         self.db.add(history)
         await self.db.commit()
@@ -126,7 +128,7 @@ class EnhancedNotificationService:
                         subject=subject,
                         message=message,
                         status="sent",
-                        metadata=metadata
+                        notification_metadata=metadata
                     )
                     results["inapp"] = True
                 except Exception as e:
@@ -153,7 +155,7 @@ class EnhancedNotificationService:
                         subject=subject,
                         message=message,
                         status="sent",
-                        metadata=metadata
+                        notification_metadata=metadata
                     )
                     results["email"] = True
                 except Exception as e:
@@ -165,7 +167,7 @@ class EnhancedNotificationService:
                         subject=subject,
                         message=message,
                         status="failed",
-                        metadata={**(metadata or {}), "error": str(e)}
+                        notification_metadata={**(metadata or {}), "error": str(e)}
                     )
                     results["email"] = False
             else:
@@ -189,7 +191,7 @@ class EnhancedNotificationService:
                         subject=subject,
                         message=message,
                         status="sent",
-                        metadata=metadata
+                        notification_metadata=metadata
                     )
                     results["push"] = True
                 except Exception as e:
@@ -201,7 +203,7 @@ class EnhancedNotificationService:
                         subject=subject,
                         message=message,
                         status="failed",
-                        metadata={**(metadata or {}), "error": str(e)}
+                        notification_metadata={**(metadata or {}), "error": str(e)}
                     )
                     results["push"] = False
             else:
@@ -223,7 +225,7 @@ class EnhancedNotificationService:
                         subject=subject,
                         message=message,
                         status="sent",
-                        metadata=metadata
+                        notification_metadata=metadata
                     )
                     results["sms"] = True
                 except Exception as e:
@@ -235,7 +237,7 @@ class EnhancedNotificationService:
                         subject=subject,
                         message=message,
                         status="failed",
-                        metadata={**(metadata or {}), "error": str(e)}
+                        notification_metadata={**(metadata or {}), "error": str(e)}
                     )
                     results["sms"] = False
             else:
@@ -349,32 +351,30 @@ class EnhancedNotificationService:
             logger.info(f"No device tokens for user {user_id}")
             return
         
-        # This would integrate with a push notification service like FCM or APNs
-        # For now, we'll log the notification
-        logger.info(f"Push notification sent to {len(device_tokens)} devices for user {user_id}: {subject}")
+        # Clean up invalid tokens
+        valid_tokens = await push_service.cleanup_invalid_tokens(device_tokens)
         
-        # In a real implementation, you would:
-        # 1. Use Firebase Cloud Messaging (FCM) for Android
-        # 2. Use Apple Push Notification service (APNs) for iOS
-        # 3. Handle device token validation and cleanup
+        if not valid_tokens:
+            logger.info(f"No valid device tokens for user {user_id}")
+            return
         
-        # Example FCM integration would look like:
-        # from firebase_admin import messaging
-        # 
-        # for token in device_tokens:
-        #     message = messaging.Message(
-        #         notification=messaging.Notification(
-        #             title=subject,
-        #             body=message
-        #         ),
-        #         token=token,
-        #         data=metadata or {}
-        #     )
-        #     try:
-        #         response = messaging.send(message)
-        #         logger.info(f"Push notification sent successfully: {response}")
-        #     except Exception as e:
-        #         logger.error(f"Failed to send push notification: {e}")
+        # Send to all valid devices
+        results = await push_service.send_to_multiple_devices(
+            device_tokens=valid_tokens,
+            title=subject,
+            body=message,
+            data=metadata or {}
+        )
+        
+        # Log results
+        successful = sum(1 for success in results.values() if success)
+        logger.info(f"Push notification sent to {successful}/{len(valid_tokens)} devices for user {user_id}")
+        
+        # Update user preferences to remove invalid tokens
+        if len(valid_tokens) < len(device_tokens):
+            preferences = await self._get_user_preferences(user_id)
+            preferences.device_tokens = valid_tokens
+            await self.db.commit()
 
     async def _send_sms_notification(
         self,
@@ -383,28 +383,17 @@ class EnhancedNotificationService:
         metadata: Dict[str, Any] = None
     ):
         """Send SMS notification"""
-        # This would integrate with an SMS service like Twilio
-        # For now, we'll log the notification
-        logger.info(f"SMS notification sent to {phone_number}: {message}")
+        result = await sms_service.send_sms(
+            phone_number=phone_number,
+            message=message,
+            metadata=metadata
+        )
         
-        # In a real implementation, you would:
-        # 1. Use Twilio, AWS SNS, or similar SMS service
-        # 2. Handle phone number validation
-        # 3. Manage SMS delivery status
-        
-        # Example Twilio integration would look like:
-        # from twilio.rest import Client
-        # 
-        # client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-        # try:
-        #     message = client.messages.create(
-        #         body=message,
-        #         from_=settings.TWILIO_PHONE_NUMBER,
-        #         to=phone_number
-        #     )
-        #     logger.info(f"SMS sent successfully: {message.sid}")
-        # except Exception as e:
-        #     logger.error(f"Failed to send SMS: {e}")
+        if result["success"]:
+            logger.info(f"SMS notification sent successfully to {phone_number}")
+        else:
+            logger.error(f"SMS notification failed to {phone_number}: {result.get('error', 'Unknown error')}")
+            raise Exception(result.get('error', 'SMS sending failed'))
 
     # Specific notification methods for subscription and payment events
     async def notify_subscription_cost_change(

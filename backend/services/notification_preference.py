@@ -234,3 +234,143 @@ class NotificationPreferenceService:
             prefs.pop(field, None)
         
         return await self.update_user_preferences(user_id, prefs)
+
+    async def get_users_with_notification_type_enabled(
+        self,
+        notification_type: str,
+        channel: str = "email"
+    ) -> List[UUID]:
+        """Get list of user IDs who have a specific notification type enabled"""
+        from sqlalchemy import and_
+        
+        # Map notification types to preference fields
+        type_mapping = {
+            "email": {
+                "subscription_change": "email_subscription_changes",
+                "payment_confirmation": "email_payment_confirmations",
+                "payment_failure": "email_payment_failures",
+                "variant_unavailable": "email_variant_unavailable",
+                "promotional": "email_promotional",
+            },
+            "push": {
+                "subscription_change": "push_subscription_changes",
+                "payment_confirmation": "push_payment_confirmations",
+                "payment_failure": "push_payment_failures",
+                "variant_unavailable": "push_variant_unavailable",
+            },
+            "inapp": {
+                "subscription_change": "inapp_subscription_changes",
+                "payment_confirmation": "inapp_payment_confirmations",
+                "payment_failure": "inapp_payment_failures",
+                "variant_unavailable": "inapp_variant_unavailable",
+            },
+            "sms": {
+                "payment_failure": "sms_payment_failures",
+                "urgent_alert": "sms_urgent_alerts",
+            }
+        }
+        
+        channel_enabled_field = f"{channel}_enabled"
+        type_field = type_mapping.get(channel, {}).get(notification_type)
+        
+        if not type_field:
+            logger.warning(f"Unknown notification type {notification_type} for channel {channel}")
+            return []
+        
+        # Build query conditions
+        conditions = [
+            getattr(NotificationPreference, channel_enabled_field) == True,
+            getattr(NotificationPreference, type_field) == True
+        ]
+        
+        # For SMS, also check that phone number is set
+        if channel == "sms":
+            conditions.append(NotificationPreference.phone_number.isnot(None))
+            conditions.append(NotificationPreference.phone_number != "")
+        
+        result = await self.db.execute(
+            select(NotificationPreference.user_id).where(and_(*conditions))
+        )
+        
+        return [row[0] for row in result.fetchall()]
+
+    async def bulk_update_preferences(
+        self,
+        user_ids: List[UUID],
+        preferences_data: Dict[str, Any]
+    ) -> int:
+        """Bulk update notification preferences for multiple users"""
+        from sqlalchemy import update
+        
+        # Validate preference fields
+        valid_fields = {
+            field for field in preferences_data.keys()
+            if hasattr(NotificationPreference, field) and field not in ["id", "user_id", "created_at", "updated_at"]
+        }
+        
+        if not valid_fields:
+            return 0
+        
+        # Filter to only valid fields
+        filtered_data = {k: v for k, v in preferences_data.items() if k in valid_fields}
+        
+        # Perform bulk update
+        stmt = update(NotificationPreference).where(
+            NotificationPreference.user_id.in_(user_ids)
+        ).values(**filtered_data)
+        
+        result = await self.db.execute(stmt)
+        await self.db.commit()
+        
+        return result.rowcount
+
+    async def get_notification_summary(self, user_id: UUID) -> Dict[str, Any]:
+        """Get a summary of user's notification settings and recent activity"""
+        preferences = await self.get_user_preferences(user_id)
+        
+        # Get recent notification counts
+        from datetime import datetime, timedelta
+        from sqlalchemy import func, and_
+        
+        last_30_days = datetime.utcnow() - timedelta(days=30)
+        
+        # Count notifications by channel in last 30 days
+        channel_counts = await self.db.execute(
+            select(
+                NotificationHistory.channel,
+                func.count(NotificationHistory.id).label('count')
+            )
+            .where(and_(
+                NotificationHistory.user_id == user_id,
+                NotificationHistory.created_at >= last_30_days
+            ))
+            .group_by(NotificationHistory.channel)
+        )
+        
+        channel_stats = {row.channel: row.count for row in channel_counts}
+        
+        # Count by status
+        status_counts = await self.db.execute(
+            select(
+                NotificationHistory.status,
+                func.count(NotificationHistory.id).label('count')
+            )
+            .where(and_(
+                NotificationHistory.user_id == user_id,
+                NotificationHistory.created_at >= last_30_days
+            ))
+            .group_by(NotificationHistory.status)
+        )
+        
+        status_stats = {row.status: row.count for row in status_counts}
+        
+        return {
+            "preferences": preferences.to_dict(),
+            "last_30_days": {
+                "by_channel": channel_stats,
+                "by_status": status_stats,
+                "total": sum(channel_stats.values())
+            },
+            "device_token_count": len(preferences.device_tokens) if preferences.device_tokens else 0,
+            "sms_enabled": preferences.sms_enabled and bool(preferences.phone_number)
+        }
