@@ -7,7 +7,10 @@
 
 set -e  # Exit on error
 
-echo "🚀 Starting Banwee Application in Docker..."
+# Default to 'dev' if no environment is specified
+ENV=${1:-dev}
+
+echo "🚀 Starting Banwee Application in Docker ($ENV mode)..."
 echo ""
 
 # Check if .env file exists
@@ -19,37 +22,50 @@ if [ ! -f .env ]; then
     echo ""
 fi
 
-# Check if backend/.env exists
-if [ ! -f backend/.env ]; then
-    echo "⚠️  backend/.env file not found!"
-    echo "📝 Creating backend/.env from backend/.env.example..."
-    cp backend/.env.example backend/.env
-    echo "✅ backend/.env file created."
-    echo ""
+if [ "$ENV" = "prod" ]; then
+    # Production environment
+    if [ ! -f docker-compose.prod.yml ]; then
+        echo "❌ Error: docker-compose.prod.yml not found for production environment."
+        exit 1
+    fi
+    echo "🐳 Building and starting production containers..."
+    docker-compose -f docker-compose.prod.yml up --build -d
+else
+    # Development environment
+    echo "🐳 Building and starting development containers..."
+    docker-compose up --build -d
 fi
-
-# Check if frontend/.env exists
-if [ ! -f frontend/.env ]; then
-    echo "⚠️  frontend/.env file not found!"
-    echo "📝 Creating frontend/.env from frontend/.env.example..."
-    cp frontend/.env.example frontend/.env
-    echo "✅ frontend/.env file created."
-    echo ""
-fi
-
-echo "🐳 Building and starting Docker containers..."
-docker-compose up --build -d
 
 echo ""
 echo "⏳ Waiting for services to be healthy..."
-sleep 10
+sleep 20 # Increased sleep time to allow services to start
 
 # Check service health
 echo ""
 echo "🔍 Checking service status..."
-docker-compose ps
+if [ "$ENV" = "prod" ]; then
+    docker-compose -f docker-compose.prod.yml ps
+else
+    docker-compose ps
+fi
 
 echo ""
+echo "⚙️ Applying database migrations..."
+if [ "$ENV" = "prod" ]; then
+    docker-compose -f docker-compose.prod.yml exec backend alembic upgrade head
+else
+    docker-compose exec backend alembic upgrade head
+fi
+echo "✅ Migrations applied successfully."
+echo ""
+
+if [ "$ENV" = "dev" ]; then
+    echo "🌱 Seeding database with sample data for development..."
+    ./seed-database.sh
+    echo "✅ Database seeded successfully."
+    echo ""
+fi
+
 echo "✅ Banwee application is starting!"
 echo ""
 echo "📍 Service URLs:"
@@ -60,9 +76,14 @@ echo "   PostgreSQL: localhost:5432"
 echo "   Redis:     localhost:6379"
 echo ""
 echo "📊 View logs with: docker-compose logs -f [service_name]"
-echo "   Services: backend, frontend, postgres, redis, celery_worker, celery_beat"
+echo "   Services: backend, frontend, postgres, redis, kafka"
 echo ""
 echo "🛑 Stop all services with: docker-compose down"
 echo ""
-echo "⚠️  IMPORTANT: Run './seed-database.sh' to populate the database with sample data"
-echo ""
+
+if [ "$ENV" = "dev" ]; then
+    echo "🔐 Default Admin Account:"
+    echo "   Email:    admin@banwee.com"
+    echo "   Password: adminpass"
+    echo ""
+fi

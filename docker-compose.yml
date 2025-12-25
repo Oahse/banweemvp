@@ -8,10 +8,8 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: banwee_postgres
-    environment:
-      POSTGRES_USER: banwee
-      POSTGRES_PASSWORD: banwee_password
-      POSTGRES_DB: banwee_db
+    env_file:
+      - ./.env
     ports:
       - "5432:5432"
     volumes:
@@ -95,7 +93,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
+      - ./.env
     environment:
       - PYTHONPATH=/app
     depends_on:
@@ -128,7 +126,7 @@ services:
     ports:
       - "5173:5173"
     env_file:
-      - ./frontend/.env
+      - ./.env
     volumes:
       - ./frontend:/app
       - /app/node_modules
