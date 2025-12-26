@@ -160,54 +160,29 @@ class InventoryService:
         await self.db.commit()
 
     async def adjust_stock(self, adjustment_data: StockAdjustmentCreate, adjusted_by_user_id: Optional[UUID] = None, commit: bool = True) -> Inventory:
-        """Adjust stock levels with optional transaction control"""
-        # Find the inventory item by variant_id and location_id
-        if adjustment_data.variant_id and adjustment_data.location_id:
-            inventory_item_query = select(Inventory).filter(
-                and_(
-                    Inventory.variant_id == adjustment_data.variant_id,
-                    Inventory.location_id == adjustment_data.location_id
-                )
+        """Adjust stock levels atomically with SELECT ... FOR UPDATE"""
+        try:
+            # Use atomic stock operation from the model
+            from models.inventories import atomic_stock_operation
+            
+            result = await atomic_stock_operation(
+                db=self.db,
+                variant_id=adjustment_data.variant_id,
+                operation="update",
+                quantity_change=adjustment_data.quantity_change,
+                reason=adjustment_data.reason,
+                user_id=adjusted_by_user_id,
+                notes=adjustment_data.notes
             )
-        elif adjustment_data.variant_id:
-            inventory_item_query = select(Inventory).filter(Inventory.variant_id == adjustment_data.variant_id)
-        else:
-            raise APIException(status_code=400, message="Variant ID is required for stock adjustment.")
-
-        inventory_item = await self.db.scalar(inventory_item_query)
-        
-        if not inventory_item:
-            if adjustment_data.variant_id and adjustment_data.location_id:
-                initial_inventory_data = InventoryCreate(
-                    variant_id=adjustment_data.variant_id,
-                    location_id=adjustment_data.location_id,
-                    quantity=adjustment_data.quantity_change,
-                    low_stock_threshold=10
-                )
-                inventory_item = await self.create_inventory_item(initial_inventory_data)
-            else:
-                raise APIException(status_code=404, message="Inventory item not found and cannot be auto-created without variant_id and location_id.")
-        else:
-            inventory_item.quantity += adjustment_data.quantity_change
-            inventory_item.updated_at = datetime.utcnow()
-            if commit:
-                await self.db.commit()
-                await self.db.refresh(inventory_item)
-
-        # Log the stock adjustment
-        new_adjustment = StockAdjustment(
-            inventory_id=inventory_item.id,
-            quantity_change=adjustment_data.quantity_change,
-            reason=adjustment_data.reason,
-            adjusted_by_user_id=adjusted_by_user_id,
-            notes=adjustment_data.notes
-        )
-        self.db.add(new_adjustment)
-        if commit:
-            await self.db.commit()
-            await self.db.refresh(new_adjustment)
-        
-        return inventory_item
+            
+            return result["inventory"]
+            
+        except Exception as e:
+            logger.error(f"Error in atomic stock adjustment: {e}")
+            raise APIException(
+                status_code=500,
+                message=f"Failed to adjust stock: {str(e)}"
+            )
 
     async def get_stock_adjustments_for_inventory(self, inventory_id: UUID) -> List[StockAdjustment]:
         result = await self.db.execute(
@@ -452,28 +427,48 @@ class InventoryService:
         user_id: Optional[UUID] = None
     ) -> Dict[str, Any]:
         """
-        Decrement stock immediately on successful purchase
-        Uses distributed locking to prevent race conditions across multiple instances
+        Atomically decrement stock on purchase using SELECT ... FOR UPDATE
         """
         try:
-            # Use distributed lock for inventory operations if available
-            if self.lock_service:
-                async with self.lock_service.get_inventory_lock(variant_id, timeout=10) as lock:
-                    if not lock.acquired:
-                        raise APIException(
-                            status_code=409,
-                            message=f"Could not acquire inventory lock for variant {variant_id}. Please try again."
-                        )
-                    
-                    return await self._perform_stock_decrement(variant_id, quantity, location_id, order_id, user_id)
-            else:
-                # Fallback to database-only locking if Redis lock service not available
-                return await self._perform_stock_decrement(variant_id, quantity, location_id, order_id, user_id)
-                
+            # Get inventory with atomic lock
+            inventory = await Inventory.get_with_lock(self.db, variant_id)
+            
+            if not inventory:
+                raise APIException(
+                    status_code=404,
+                    message=f"Inventory not found for variant {variant_id}"
+                )
+            
+            # Perform atomic stock update
+            adjustment = await inventory.atomic_update_stock(
+                db=self.db,
+                quantity_change=-quantity,
+                reason="order_purchase",
+                user_id=user_id,
+                notes=f"Stock decremented for order {order_id}" if order_id else "Stock decremented for purchase"
+            )
+            
+            await self.db.commit()
+            
+            logger.info(f"Atomically decremented stock for variant {variant_id}: -{quantity}")
+            
+            return {
+                "success": True,
+                "old_quantity": inventory.quantity_available + quantity,
+                "new_quantity": inventory.quantity_available,
+                "quantity_decremented": quantity,
+                "inventory_id": str(inventory.id),
+                "is_now_out_of_stock": inventory.quantity_available == 0,
+                "is_low_stock": inventory.quantity_available <= inventory.low_stock_threshold,
+                "adjustment_id": str(adjustment.id)
+            }
+            
         except APIException:
+            await self.db.rollback()
             raise
         except Exception as e:
-            logger.error(f"Failed to decrement stock: {e}")
+            await self.db.rollback()
+            logger.error(f"Failed to decrement stock atomically: {e}")
             raise APIException(
                 status_code=500,
                 message=f"Failed to decrement stock: {str(e)}"
@@ -577,31 +572,266 @@ class InventoryService:
         user_id: Optional[UUID] = None
     ) -> Dict[str, Any]:
         """
-        Increment stock when order is cancelled or refunded
-        Uses distributed locking for consistency across multiple instances
+        Atomically increment stock when order is cancelled using SELECT ... FOR UPDATE
         """
         try:
-            # Use distributed lock for inventory operations if available
-            if self.lock_service:
-                async with self.lock_service.get_inventory_lock(variant_id, timeout=10) as lock:
-                    if not lock.acquired:
-                        raise APIException(
-                            status_code=409,
-                            message=f"Could not acquire inventory lock for variant {variant_id}. Please try again."
-                        )
-                    
-                    return await self._perform_stock_increment(variant_id, quantity, location_id, order_id, user_id)
-            else:
-                # Fallback to database-only locking if Redis lock service not available
-                return await self._perform_stock_increment(variant_id, quantity, location_id, order_id, user_id)
-                
+            # Get inventory with atomic lock
+            inventory = await Inventory.get_with_lock(self.db, variant_id)
+            
+            if not inventory:
+                raise APIException(
+                    status_code=404,
+                    message=f"Inventory not found for variant {variant_id}"
+                )
+            
+            # Perform atomic stock update
+            adjustment = await inventory.atomic_update_stock(
+                db=self.db,
+                quantity_change=quantity,
+                reason="order_cancelled",
+                user_id=user_id,
+                notes=f"Stock restored from cancelled order {order_id}" if order_id else "Stock restored from cancellation"
+            )
+            
+            await self.db.commit()
+            
+            logger.info(f"Atomically incremented stock for variant {variant_id}: +{quantity}")
+            
+            return {
+                "success": True,
+                "old_quantity": inventory.quantity_available - quantity,
+                "new_quantity": inventory.quantity_available,
+                "quantity_incremented": quantity,
+                "inventory_id": str(inventory.id),
+                "adjustment_id": str(adjustment.id)
+            }
+            
         except APIException:
+            await self.db.rollback()
             raise
         except Exception as e:
-            logger.error(f"Failed to increment stock: {e}")
+            await self.db.rollback()
+            logger.error(f"Failed to increment stock atomically: {e}")
             raise APIException(
                 status_code=500,
                 message=f"Failed to increment stock: {str(e)}"
+            )
+
+    async def reserve_stock_for_order(
+        self,
+        variant_id: UUID,
+        quantity: int,
+        order_id: Optional[UUID] = None,
+        expiry_minutes: int = 15
+    ) -> Dict[str, Any]:
+        """
+        Atomically reserve stock for an order using SELECT ... FOR UPDATE
+        """
+        try:
+            # Get inventory with atomic lock
+            inventory = await Inventory.get_with_lock(self.db, variant_id)
+            
+            if not inventory:
+                raise APIException(
+                    status_code=404,
+                    message=f"Inventory not found for variant {variant_id}"
+                )
+            
+            # Perform atomic stock reservation
+            reservation = await inventory.atomic_reserve_stock(
+                db=self.db,
+                quantity=quantity,
+                order_id=order_id,
+                expiry_minutes=expiry_minutes
+            )
+            
+            await self.db.commit()
+            
+            logger.info(f"Atomically reserved stock for variant {variant_id}: {quantity} units")
+            
+            return {
+                "success": True,
+                "reservation": reservation.to_dict(),
+                "inventory": inventory.to_dict()
+            }
+            
+        except APIException:
+            await self.db.rollback()
+            raise
+        except Exception as e:
+            await self.db.rollback()
+            logger.error(f"Failed to reserve stock atomically: {e}")
+            raise APIException(
+                status_code=500,
+                message=f"Failed to reserve stock: {str(e)}"
+            )
+
+    async def confirm_stock_reservation(
+        self,
+        reservation_id: UUID,
+        user_id: Optional[UUID] = None
+    ) -> Dict[str, Any]:
+        """
+        Atomically confirm a stock reservation using SELECT ... FOR UPDATE
+        """
+        try:
+            # Get reservation
+            reservation_query = select(InventoryReservation).where(
+                InventoryReservation.id == reservation_id
+            )
+            result = await self.db.execute(reservation_query)
+            reservation = result.scalar_one_or_none()
+            
+            if not reservation:
+                raise APIException(
+                    status_code=404,
+                    message=f"Reservation {reservation_id} not found"
+                )
+            
+            # Get inventory with atomic lock
+            inventory = await Inventory.get_with_lock(self.db, reservation.inventory_id)
+            
+            if not inventory:
+                raise APIException(
+                    status_code=404,
+                    message=f"Inventory not found for reservation {reservation_id}"
+                )
+            
+            # Perform atomic confirmation
+            adjustment = await inventory.atomic_confirm_reservation(
+                db=self.db,
+                reservation=reservation,
+                user_id=user_id
+            )
+            
+            await self.db.commit()
+            
+            logger.info(f"Atomically confirmed reservation {reservation_id}")
+            
+            return {
+                "success": True,
+                "reservation": reservation.to_dict(),
+                "inventory": inventory.to_dict(),
+                "adjustment_id": str(adjustment.id)
+            }
+            
+        except APIException:
+            await self.db.rollback()
+            raise
+        except Exception as e:
+            await self.db.rollback()
+            logger.error(f"Failed to confirm reservation atomically: {e}")
+            raise APIException(
+                status_code=500,
+                message=f"Failed to confirm reservation: {str(e)}"
+            )
+
+    async def cancel_stock_reservation(
+        self,
+        reservation_id: UUID
+    ) -> Dict[str, Any]:
+        """
+        Atomically cancel a stock reservation using SELECT ... FOR UPDATE
+        """
+        try:
+            # Get reservation
+            reservation_query = select(InventoryReservation).where(
+                InventoryReservation.id == reservation_id
+            )
+            result = await self.db.execute(reservation_query)
+            reservation = result.scalar_one_or_none()
+            
+            if not reservation:
+                raise APIException(
+                    status_code=404,
+                    message=f"Reservation {reservation_id} not found"
+                )
+            
+            # Get inventory with atomic lock
+            inventory = await Inventory.get_with_lock(self.db, reservation.inventory_id)
+            
+            if not inventory:
+                raise APIException(
+                    status_code=404,
+                    message=f"Inventory not found for reservation {reservation_id}"
+                )
+            
+            # Perform atomic cancellation
+            await inventory.atomic_cancel_reservation(self.db, reservation)
+            
+            await self.db.commit()
+            
+            logger.info(f"Atomically cancelled reservation {reservation_id}")
+            
+            return {
+                "success": True,
+                "reservation": reservation.to_dict(),
+                "inventory": inventory.to_dict()
+            }
+            
+        except APIException:
+            await self.db.rollback()
+            raise
+        except Exception as e:
+            await self.db.rollback()
+            logger.error(f"Failed to cancel reservation atomically: {e}")
+            raise APIException(
+                status_code=500,
+                message=f"Failed to cancel reservation: {str(e)}"
+            )
+
+    async def cleanup_expired_reservations(self) -> Dict[str, Any]:
+        """
+        Clean up expired reservations atomically
+        """
+        try:
+            cleaned_count = await InventoryReservation.cleanup_expired(self.db)
+            await self.db.commit()
+            
+            return {
+                "success": True,
+                "cleaned_count": cleaned_count,
+                "message": f"Cleaned up {cleaned_count} expired reservations"
+            }
+            
+        except Exception as e:
+            await self.db.rollback()
+            logger.error(f"Failed to cleanup expired reservations: {e}")
+            raise APIException(
+                status_code=500,
+                message=f"Failed to cleanup expired reservations: {str(e)}"
+            )
+
+    async def bulk_stock_update(
+        self,
+        stock_changes: List[Dict],
+        reason: str,
+        user_id: Optional[UUID] = None
+    ) -> Dict[str, Any]:
+        """
+        Atomically update multiple stock levels using SELECT ... FOR UPDATE
+        """
+        try:
+            from models.inventories import atomic_bulk_stock_update
+            
+            results = await atomic_bulk_stock_update(
+                db=self.db,
+                stock_changes=stock_changes,
+                reason=reason,
+                user_id=user_id
+            )
+            
+            return {
+                "success": True,
+                "updated_count": len(results),
+                "results": results
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed bulk stock update: {e}")
+            raise APIException(
+                status_code=500,
+                message=f"Failed to update bulk stock: {str(e)}"
             )
     
     async def _perform_stock_increment(

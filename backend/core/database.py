@@ -1,18 +1,19 @@
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy import text, Column, DateTime, func, TypeDecorator, CHAR, Index
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import text, Column, DateTime, func, TypeDecorator, CHAR, Index, String, Boolean, Integer, Text
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.exc import SQLAlchemyError, DisconnectionError, OperationalError
 from sqlalchemy.pool import QueuePool
 import asyncio
 import time
 import uuid
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 from contextlib import asynccontextmanager
 from fastapi import HTTPException
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 import logging
+from datetime import datetime as dt
 
 # from core.config import settings # REMOVE THIS IMPORT
 from core.utils.logging import structured_logger
@@ -57,12 +58,51 @@ class GUID(TypeDecorator):
 
 
 class BaseModel(Base):
-    """Base model with UUID primary key and timestamps"""
+    """Optimized base model with UUID primary key, timestamps, and essential tracking - HARD DELETE ONLY"""
     __abstract__ = True
 
+    # Core fields - always present
     id = Column(GUID(), primary_key=True, default=uuid.uuid4, index=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Audit fields - minimal overhead
+    created_by = Column(GUID(), nullable=True, index=True)
+    updated_by = Column(GUID(), nullable=True)
+    
+    # Version for optimistic locking
+    version = Column(Integer, default=1, nullable=False)
+
+
+class StatusMixin:
+    """Mixin for models that need status tracking"""
+    status = Column(String(50), nullable=False, default="active", index=True)
+
+
+class MetadataMixin:
+    """Mixin for models that need flexible metadata (use JSONB sparingly)"""
+    metadata_json = Column(JSONB, nullable=True)
+
+
+class SearchMixin:
+    """Mixin for models that need full-text search"""
+    search_vector = Column(Text, nullable=True)  # For full-text search
+
+
+# Optimized base models for different use cases - ALL HARD DELETE
+class HardDeleteModel(BaseModel):
+    """Base model for all entities - hard delete only"""
+    __abstract__ = True
+
+
+class StatusModel(BaseModel, StatusMixin):
+    """Base model for entities with status tracking - hard delete only"""
+    __abstract__ = True
+
+
+class FullTrackingModel(BaseModel, StatusMixin, MetadataMixin):
+    """Base model with full tracking capabilities - hard delete only"""
+    __abstract__ = True
 
 
 # Database connection configuration - NOW INITIALIZED LATER

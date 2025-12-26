@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, Integer
+from sqlalchemy import Column, String, Boolean, ForeignKey, Integer, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, GUID
@@ -6,7 +6,16 @@ from core.database import BaseModel, GUID
 
 class Wishlist(BaseModel):
     __tablename__ = "wishlists"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_wishlists_user_id', 'user_id'),
+        Index('idx_wishlists_default', 'is_default'),
+        Index('idx_wishlists_public', 'is_public'),
+        Index('idx_wishlists_name', 'name'),
+        # Composite indexes for common queries
+        Index('idx_wishlists_user_default', 'user_id', 'is_default'),
+        {'extend_existing': True}
+    )
 
     user_id = Column(GUID(), ForeignKey(
         "users.id"), nullable=False)
@@ -22,7 +31,16 @@ class Wishlist(BaseModel):
 
 class WishlistItem(BaseModel):
     __tablename__ = "wishlist_items"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_wishlist_items_wishlist_id', 'wishlist_id'),
+        Index('idx_wishlist_items_product_id', 'product_id'),
+        Index('idx_wishlist_items_variant_id', 'variant_id'),
+        Index('idx_wishlist_items_created_at', 'created_at'),
+        # Composite indexes for common queries
+        Index('idx_wishlist_items_wishlist_product', 'wishlist_id', 'product_id'),
+        {'extend_existing': True}
+    )
 
     wishlist_id = Column(GUID(), ForeignKey(
         "wishlists.id"), nullable=False)

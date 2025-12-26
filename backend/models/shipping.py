@@ -1,10 +1,19 @@
-from sqlalchemy import Column, String, Boolean, Float, Text, Integer
+from sqlalchemy import Column, String, Boolean, Float, Text, Integer, Index
 from core.database import BaseModel, CHAR_LENGTH
 
 
 class ShippingMethod(BaseModel):
     __tablename__ = "shipping_methods"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_shipping_methods_name', 'name'),
+        Index('idx_shipping_methods_active', 'is_active'),
+        Index('idx_shipping_methods_price', 'price'),
+        Index('idx_shipping_methods_estimated_days', 'estimated_days'),
+        # Composite indexes for common queries
+        Index('idx_shipping_methods_active_price', 'is_active', 'price'),
+        {'extend_existing': True}
+    )
 
     name = Column(String(CHAR_LENGTH), nullable=False)
     description = Column(Text, nullable=True)

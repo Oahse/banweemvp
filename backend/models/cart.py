@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, Float, Integer
+from sqlalchemy import Column, String, Boolean, ForeignKey, Float, Integer, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, GUID
@@ -6,7 +6,14 @@ from core.database import BaseModel, GUID
 
 class Cart(BaseModel):
     __tablename__ = "carts"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_carts_user_id', 'user_id'),
+        Index('idx_carts_session_id', 'session_id'),
+        Index('idx_carts_promocode_id', 'promocode_id'),
+        Index('idx_carts_created_at', 'created_at'),
+        {'extend_existing': True}
+    )
 
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
     session_id = Column(String(255), nullable=True)  # For guest carts
@@ -79,7 +86,15 @@ class Cart(BaseModel):
 
 class CartItem(BaseModel):
     __tablename__ = "cart_items"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_cart_items_cart_id', 'cart_id'),
+        Index('idx_cart_items_variant_id', 'variant_id'),
+        Index('idx_cart_items_saved_for_later', 'saved_for_later'),
+        # Composite indexes for common queries
+        Index('idx_cart_items_cart_saved', 'cart_id', 'saved_for_later'),
+        {'extend_existing': True}
+    )
 
     cart_id = Column(GUID(), ForeignKey(
         "carts.id"), nullable=False)

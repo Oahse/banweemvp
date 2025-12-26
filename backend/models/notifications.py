@@ -2,7 +2,7 @@
 Consolidated notification models
 Includes: Notification, NotificationPreference, NotificationHistory
 """
-from sqlalchemy import Column, String, Boolean, ForeignKey, Text, JSON
+from sqlalchemy import Column, String, Boolean, ForeignKey, Text, JSON, Index
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, CHAR_LENGTH, GUID
 
@@ -10,7 +10,18 @@ from core.database import BaseModel, CHAR_LENGTH, GUID
 class Notification(BaseModel):
     """Core notification model for in-app notifications"""
     __tablename__ = "notifications"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_notifications_user_id', 'user_id'),
+        Index('idx_notifications_read', 'read'),
+        Index('idx_notifications_type', 'type'),
+        Index('idx_notifications_related_id', 'related_id'),
+        Index('idx_notifications_created_at', 'created_at'),
+        # Composite indexes for common queries
+        Index('idx_notifications_user_read', 'user_id', 'read'),
+        Index('idx_notifications_user_type', 'user_id', 'type'),
+        {'extend_existing': True}
+    )
 
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
     message = Column(Text, nullable=False)
@@ -41,7 +52,14 @@ class Notification(BaseModel):
 class NotificationPreference(BaseModel):
     """User notification preferences for all channels"""
     __tablename__ = "notification_preferences"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_notification_preferences_user_id', 'user_id'),
+        Index('idx_notification_preferences_email_enabled', 'email_enabled'),
+        Index('idx_notification_preferences_sms_enabled', 'sms_enabled'),
+        Index('idx_notification_preferences_push_enabled', 'push_enabled'),
+        {'extend_existing': True}
+    )
 
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False, unique=True)
     
@@ -111,7 +129,20 @@ class NotificationPreference(BaseModel):
 class NotificationHistory(BaseModel):
     """History of all notifications sent across all channels"""
     __tablename__ = "notification_history"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_notification_history_user_id', 'user_id'),
+        Index('idx_notification_history_notification_id', 'notification_id'),
+        Index('idx_notification_history_channel', 'channel'),
+        Index('idx_notification_history_type', 'notification_type'),
+        Index('idx_notification_history_status', 'status'),
+        Index('idx_notification_history_created_at', 'created_at'),
+        # Composite indexes for common queries
+        Index('idx_notification_history_user_channel', 'user_id', 'channel'),
+        Index('idx_notification_history_user_status', 'user_id', 'status'),
+        Index('idx_notification_history_channel_status', 'channel', 'status'),
+        {'extend_existing': True}
+    )
 
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
     notification_id = Column(GUID(), ForeignKey("notifications.id"), nullable=True)

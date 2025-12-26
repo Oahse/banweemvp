@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, JSON, Text, Float
+from sqlalchemy import Column, String, Integer, ForeignKey, JSON, Text, Float, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, GUID
@@ -8,7 +8,15 @@ from typing import Dict, Any
 class LoyaltyAccount(BaseModel):
     """Customer loyalty account with points and tier tracking"""
     __tablename__ = "loyalty_accounts"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_loyalty_accounts_user_id', 'user_id'),
+        Index('idx_loyalty_accounts_tier', 'tier'),
+        Index('idx_loyalty_accounts_status', 'status'),
+        Index('idx_loyalty_accounts_total_points', 'total_points'),
+        Index('idx_loyalty_accounts_available_points', 'available_points'),
+        {'extend_existing': True}
+    )
 
     # User reference
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False, unique=True, index=True)
@@ -64,7 +72,20 @@ class LoyaltyAccount(BaseModel):
 class PointsTransaction(BaseModel):
     """Individual points transaction record"""
     __tablename__ = "points_transactions"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_points_transactions_loyalty_account_id', 'loyalty_account_id'),
+        Index('idx_points_transactions_subscription_id', 'subscription_id'),
+        Index('idx_points_transactions_order_id', 'order_id'),
+        Index('idx_points_transactions_type', 'transaction_type'),
+        Index('idx_points_transactions_status', 'status'),
+        Index('idx_points_transactions_reason_code', 'reason_code'),
+        Index('idx_points_transactions_created_at', 'created_at'),
+        # Composite indexes for common queries
+        Index('idx_points_transactions_account_type', 'loyalty_account_id', 'transaction_type'),
+        Index('idx_points_transactions_account_status', 'loyalty_account_id', 'status'),
+        {'extend_existing': True}
+    )
 
     # Loyalty account reference
     loyalty_account_id = Column(GUID(), ForeignKey("loyalty_accounts.id"), nullable=False, index=True)

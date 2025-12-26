@@ -1,71 +1,87 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime, Integer
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
-from core.database import BaseModel, CHAR_LENGTH, GUID
+from core.database import BaseModel, CHAR_LENGTH, GUID, Index
 
 
 class User(BaseModel):
+    """Optimized User model with hard delete only"""
     __tablename__ = "users"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Optimized indexes for common queries
+        Index('idx_users_email_active', 'email', 'active'),
+        Index('idx_users_role_verified', 'role', 'verified'),
+        Index('idx_users_country_language', 'country', 'language'),
+        Index('idx_users_last_login', 'last_login'),
+        Index('idx_users_stripe_customer', 'stripe_customer_id'),
+        # Partial index for active users only
+        Index('idx_users_active_only', 'email', 'role', postgresql_where='active = true'),
+        {'extend_existing': True}
+    )
 
-    email = Column(String(CHAR_LENGTH), unique=True,
-                   index=True, nullable=False)
+    # Core identity fields - frequently queried
+    email = Column(String(CHAR_LENGTH), unique=True, nullable=False)
     firstname = Column(String(CHAR_LENGTH), nullable=False)
     lastname = Column(String(CHAR_LENGTH), nullable=False)
     hashed_password = Column(String(CHAR_LENGTH), nullable=False)
-    role = Column(String(50), default="Customer")  # Customer, Supplier, Admin
+    
+    # Status fields as columns for fast filtering
+    role = Column(String(50), default="customer", nullable=False)
+    account_status = Column(String(50), default="active", nullable=False)
+    verification_status = Column(String(50), default="unverified", nullable=False)
+    
+    # Legacy fields (keep for backward compatibility)
     verified = Column(Boolean, default=False)
     active = Column(Boolean, default=True)
-    phone = Column(String(20), nullable=True)
-    avatar_url = Column(String(500), nullable=True)
-    last_login = Column(DateTime(timezone=True), nullable=True)
-    stripe_customer_id = Column(String(CHAR_LENGTH), nullable=True, unique=True) # NEW: Store Stripe Customer ID
     
-    # Profile fields
-    age = Column(String(10), nullable=True)
-    gender = Column(String(50), nullable=True)
+    # Contact information
+    phone = Column(String(20), nullable=True)
+    phone_verified = Column(Boolean, default=False)
+    
+    # Profile information - frequently accessed
     country = Column(String(100), nullable=True)
     language = Column(String(10), default="en")
     timezone = Column(String(100), nullable=True)
+    avatar_url = Column(String(500), nullable=True)
     
-    # Verification fields
+    # Activity tracking
+    last_login = Column(DateTime(timezone=True), nullable=True)
+    last_activity_at = Column(DateTime(timezone=True), nullable=True)
+    login_count = Column(Integer, default=0)
+    
+    # Security fields
+    failed_login_attempts = Column(Integer, default=0)
+    locked_until = Column(DateTime(timezone=True), nullable=True)
+    
+    # External integrations
+    stripe_customer_id = Column(String(CHAR_LENGTH), nullable=True, unique=True)
+    
+    # Use JSONB only for complex user preferences that need querying
+    preferences = Column(JSONB, nullable=True)  # User settings, notification prefs
+    
+    # Simple fields as text for better performance
     verification_token = Column(String(255), nullable=True)
     token_expiration = Column(DateTime(timezone=True), nullable=True)
-
-    # Relationships with lazy loading
-    addresses = relationship(
-        "Address", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
-    orders = relationship("Order", back_populates="user", lazy="selectin")
-    reviews = relationship("Review", back_populates="user", lazy="selectin")
-    wishlists = relationship(
-        "Wishlist", back_populates="user", lazy="selectin")
-    blog_posts = relationship(
-        "BlogPost", back_populates="author", lazy="selectin")
-    subscriptions = relationship(
-        "Subscription", back_populates="user", lazy="selectin")
-    payment_methods = relationship(
-        "PaymentMethod", back_populates="user", lazy="selectin")
-    transactions = relationship(
-        "Transaction", back_populates="user", lazy="selectin")
-    supplied_products = relationship(
-        "Product", back_populates="supplier", lazy="selectin")
-    notifications = relationship(
-        "Notification", back_populates="user", lazy="selectin")
-    comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan", lazy="selectin")
-    # negotiations_as_buyer = relationship(
-    #     "Negotiation", foreign_keys="Negotiation.buyer_id", back_populates="buyer"
-    # )
-    # negotiations_as_seller = relationship(
-    #     "Negotiation", foreign_keys="Negotiation.seller_id", back_populates="seller"
-    # )
     
-    # Enhanced payment and loyalty relationships
-    payment_intents = relationship(
-        "PaymentIntent", back_populates="user", lazy="selectin")
-    loyalty_account = relationship(
-        "LoyaltyAccount", back_populates="user", uselist=False, lazy="selectin")
-    notification_preferences = relationship(
-        "NotificationPreference", back_populates="user", uselist=False, lazy="selectin")
+    # Legacy profile fields (consider moving to preferences JSONB)
+    age = Column(String(10), nullable=True)
+    gender = Column(String(50), nullable=True)
+
+    # Relationships with optimized lazy loading
+    addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    orders = relationship("Order", back_populates="user", lazy="select")  # Don't eager load orders
+    reviews = relationship("Review", back_populates="user", lazy="select")
+    wishlists = relationship("Wishlist", back_populates="user", lazy="select")
+    blog_posts = relationship("BlogPost", back_populates="author", lazy="select")
+    subscriptions = relationship("Subscription", back_populates="user", lazy="select")
+    payment_methods = relationship("PaymentMethod", back_populates="user", lazy="select")
+    transactions = relationship("Transaction", back_populates="user", lazy="select")
+    supplied_products = relationship("Product", back_populates="supplier", lazy="select")
+    notifications = relationship("Notification", back_populates="user", lazy="select")
+    comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan", lazy="select")
+    payment_intents = relationship("PaymentIntent", back_populates="user", lazy="select")
+    loyalty_account = relationship("LoyaltyAccount", back_populates="user", uselist=False, lazy="select")
+    notification_preferences = relationship("NotificationPreference", back_populates="user", uselist=False, lazy="selectin")
 
     @property
     def full_name(self) -> str:
@@ -77,6 +93,11 @@ class User(BaseModel):
         """Get user's default address"""
         return next((addr for addr in self.addresses if addr.is_default), None)
 
+    @property
+    def is_active_verified(self) -> bool:
+        """Check if user is both active and verified"""
+        return self.active and self.verified
+
     def to_dict(self) -> dict:
         """Convert user to dictionary for API responses"""
         return {
@@ -86,18 +107,40 @@ class User(BaseModel):
             "lastname": self.lastname,
             "full_name": self.full_name,
             "role": self.role,
-            "verified": self.verified,
-            "active": self.active,
+            "account_status": self.account_status,
+            "verification_status": self.verification_status,
+            "verified": self.verified,  # Legacy field
+            "active": self.active,  # Legacy field
             "phone": self.phone,
+            "phone_verified": self.phone_verified,
             "avatar_url": self.avatar_url,
+            "country": self.country,
+            "language": self.language,
+            "timezone": self.timezone,
+            "last_login": self.last_login.isoformat() if self.last_login else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
 
 
 class Address(BaseModel):
+    """Address model - no soft delete needed, addresses are typically replaced"""
     __tablename__ = "addresses"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_addresses_user_id', 'user_id'),
+        Index('idx_addresses_city', 'city'),
+        Index('idx_addresses_state', 'state'),
+        Index('idx_addresses_country', 'country'),
+        Index('idx_addresses_post_code', 'post_code'),
+        Index('idx_addresses_kind', 'kind'),
+        Index('idx_addresses_default', 'is_default'),
+        # Composite indexes for common queries
+        Index('idx_addresses_user_default', 'user_id', 'is_default'),
+        Index('idx_addresses_user_kind', 'user_id', 'kind'),
+        Index('idx_addresses_country_city', 'country', 'city'),
+        {'extend_existing': True}
+    )
 
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
     street = Column(String(CHAR_LENGTH), nullable=False)
@@ -105,7 +148,7 @@ class Address(BaseModel):
     state = Column(String(100), nullable=False)
     country = Column(String(100), nullable=False)
     post_code = Column(String(20), nullable=False)
-    kind = Column(String(50), default="Shipping")  # Shipping, Billing
+    kind = Column(String(50), default="shipping", nullable=False)  # shipping, billing
     is_default = Column(Boolean, default=False)
 
     # Relationships

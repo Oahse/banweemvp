@@ -2,7 +2,7 @@
 Consolidated admin and pricing models
 Includes: PricingConfig, SubscriptionCostHistory, SubscriptionAnalytics, PaymentAnalytics
 """
-from sqlalchemy import Column, String, Float, DateTime, JSON, Text, Integer, Date, ForeignKey
+from sqlalchemy import Column, String, Float, DateTime, JSON, Text, Integer, Date, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, GUID
@@ -13,7 +13,14 @@ from typing import Dict, Any
 class PricingConfig(BaseModel):
     """Admin-configurable pricing settings for subscriptions"""
     __tablename__ = "pricing_configs"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_pricing_configs_version', 'version'),
+        Index('idx_pricing_configs_active', 'is_active'),
+        Index('idx_pricing_configs_updated_by', 'updated_by'),
+        Index('idx_pricing_configs_created_at', 'created_at'),
+        {'extend_existing': True}
+    )
 
     # Subscription percentage (0.1% to 50%)
     subscription_percentage = Column(Float, nullable=False, default=10.0)
@@ -59,7 +66,17 @@ class PricingConfig(BaseModel):
 class SubscriptionCostHistory(BaseModel):
     """Historical record of subscription cost changes"""
     __tablename__ = "subscription_cost_history"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_subscription_cost_history_subscription_id', 'subscription_id'),
+        Index('idx_subscription_cost_history_change_reason', 'change_reason'),
+        Index('idx_subscription_cost_history_effective_date', 'effective_date'),
+        Index('idx_subscription_cost_history_changed_by', 'changed_by'),
+        Index('idx_subscription_cost_history_created_at', 'created_at'),
+        # Composite indexes for common queries
+        Index('idx_subscription_cost_history_sub_effective', 'subscription_id', 'effective_date'),
+        {'extend_existing': True}
+    )
 
     subscription_id = Column(GUID(), nullable=False, index=True)
     
@@ -99,7 +116,15 @@ class SubscriptionCostHistory(BaseModel):
 class SubscriptionAnalytics(BaseModel):
     """Daily subscription analytics and metrics"""
     __tablename__ = "subscription_analytics"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_subscription_analytics_date', 'date'),
+        Index('idx_subscription_analytics_currency', 'currency'),
+        Index('idx_subscription_analytics_revenue', 'total_revenue'),
+        Index('idx_subscription_analytics_mrr', 'monthly_recurring_revenue'),
+        Index('idx_subscription_analytics_churn_rate', 'churn_rate'),
+        {'extend_existing': True}
+    )
 
     # Date for this analytics record
     date = Column(Date, nullable=False, index=True)
@@ -165,7 +190,15 @@ class SubscriptionAnalytics(BaseModel):
 class PaymentAnalytics(BaseModel):
     """Daily payment analytics and metrics"""
     __tablename__ = "payment_analytics"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_payment_analytics_date', 'date'),
+        Index('idx_payment_analytics_currency', 'currency'),
+        Index('idx_payment_analytics_success_rate', 'success_rate'),
+        Index('idx_payment_analytics_total_volume', 'total_volume'),
+        Index('idx_payment_analytics_total_payments', 'total_payments'),
+        {'extend_existing': True}
+    )
 
     # Date for this analytics record
     date = Column(Date, nullable=False, index=True)

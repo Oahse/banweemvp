@@ -1,12 +1,20 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, Text, Float, JSON, Integer
-from sqlalchemy.dialects.postgresql import UUID
+"""
+Optimized product models with strategic JSONB usage
+"""
+from sqlalchemy import Column, String, Boolean, ForeignKey, Text, Float, Integer, DateTime
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
-from core.database import BaseModel, CHAR_LENGTH, GUID
+from core.database import BaseModel, CHAR_LENGTH, GUID, Index
 
 
 class Category(BaseModel):
+    """Product categories with hard delete only"""
     __tablename__ = "categories"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        Index('idx_categories_name', 'name'),
+        Index('idx_categories_active', 'is_active'),
+        {'extend_existing': True}
+    )
 
     name = Column(String(CHAR_LENGTH), unique=True, nullable=False)
     description = Column(Text, nullable=True)
@@ -30,32 +38,80 @@ class Category(BaseModel):
 
 
 class Product(BaseModel):
+    """Optimized product model with hard delete only and strategic JSONB usage"""
     __tablename__ = "products"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Optimized indexes for product queries
+        Index('idx_products_category_status', 'category_id', 'product_status'),
+        Index('idx_products_supplier_status', 'supplier_id', 'product_status'),
+        Index('idx_products_featured_rating', 'is_featured', 'rating_average'),
+        Index('idx_products_price_range', 'min_price', 'max_price'),
+        Index('idx_products_availability', 'availability_status'),
+        Index('idx_products_published', 'published_at', 'product_status'),
+        Index('idx_products_slug', 'slug'),
+        # GIN index for JSONB specifications
+        Index('idx_products_specifications', 'specifications', postgresql_using='gin'),
+        {'extend_existing': True}
+    )
 
-    name = Column(String(CHAR_LENGTH), nullable=False, index=True)
+    # Core product information as columns for performance
+    name = Column(String(CHAR_LENGTH), nullable=False)
+    slug = Column(String(CHAR_LENGTH), unique=True, nullable=False)
     description = Column(Text, nullable=True)
-    category_id = Column(GUID(), ForeignKey(
-        "categories.id"), nullable=False, index=True)
-    supplier_id = Column(GUID(),
-                         ForeignKey("users.id"), nullable=False, index=True)
-    featured = Column(Boolean, default=False, index=True)
-    rating = Column(Float, default=0.0, index=True)
+    short_description = Column(String(500), nullable=True)
+
+    # Foreign key relationships
+    category_id = Column(GUID(), ForeignKey("categories.id"), nullable=False)
+    supplier_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
+
+    # Status fields as columns for indexing and fast filtering
+    product_status = Column(String(50), default="active", nullable=False)  # active, inactive, draft, discontinued
+    availability_status = Column(String(50), default="available", nullable=False)  # available, out_of_stock, pre_order
+
+    # Pricing summary (calculated from variants)
+    min_price = Column(Float, nullable=True)
+    max_price = Column(Float, nullable=True)
+
+    # Quality metrics as columns for sorting/filtering
+    rating_average = Column(Float, default=0.0)
+    rating_count = Column(Integer, default=0)
     review_count = Column(Integer, default=0)
-    origin = Column(String(100), nullable=True, index=True)
-    # ["organic", "gluten-free", etc.]
-    dietary_tags = Column(JSON, nullable=True)
-    is_active = Column(Boolean, default=True, index=True)
-    
-    
-    # Relationships with lazy loading
+
+    # Marketing flags as columns for fast filtering
+    is_featured = Column(Boolean, default=False)
+    is_bestseller = Column(Boolean, default=False)
+    featured = Column(Boolean, default=False)  # Legacy field
+    rating = Column(Float, default=0.0)  # Legacy field
+    is_active = Column(Boolean, default=True)  # Legacy field
+
+    # SEO fields as columns (frequently accessed)
+    meta_title = Column(String(255), nullable=True)
+    meta_description = Column(String(500), nullable=True)
+
+    # Use JSONB only for complex, queryable data
+    specifications = Column(JSONB, nullable=True)  # Technical specs that need filtering
+    dietary_tags = Column(JSONB, nullable=True)  # Dietary information for filtering
+
+    # Simple tags as text for better performance (comma-separated)
+    tags = Column(Text, nullable=True)  # "organic,gluten-free,vegan"
+    keywords = Column(Text, nullable=True)  # SEO keywords as text
+
+    # Dates for lifecycle management
+    published_at = Column(DateTime(timezone=True), nullable=True)
+
+    # Analytics as columns
+    view_count = Column(Integer, default=0)
+    purchase_count = Column(Integer, default=0)
+
+    # Legacy fields for backward compatibility
+    origin = Column(String(100), nullable=True)
+
+    # Relationships with optimized lazy loading
     category = relationship("Category", back_populates="products")
     supplier = relationship("User", back_populates="supplied_products")
-    variants = relationship("ProductVariant", back_populates="product",
-                            cascade="all, delete-orphan", lazy="selectin")
-    reviews = relationship("Review", back_populates="product")
-    wishlist_items = relationship("WishlistItem", back_populates="product")
-    # negotiations = relationship("Negotiation", back_populates="product") # NEW - Commented out
+    variants = relationship("ProductVariant", back_populates="product", cascade="all, delete-orphan", lazy="selectin")
+    reviews = relationship("Review", back_populates="product", lazy="select")
+    wishlist_items = relationship("WishlistItem", back_populates="product", lazy="select")
 
     @property
     def primary_variant(self):
@@ -70,8 +126,7 @@ class Product(BaseModel):
         if not self.variants:
             return {"min": 0, "max": 0}
 
-        prices = [
-            v.sale_price or v.base_price for v in self.variants if v.is_active]
+        prices = [v.sale_price or v.base_price for v in self.variants if v.is_active]
         if not prices:
             return {"min": 0, "max": 0}
 
@@ -87,87 +142,86 @@ class Product(BaseModel):
         data = {
             "id": str(self.id),
             "name": self.name,
+            "slug": self.slug,
             "description": self.description,
+            "short_description": self.short_description,
             "category_id": str(self.category_id),
             "supplier_id": str(self.supplier_id),
-            "featured": self.featured,
-            "rating": self.rating,
+            "product_status": self.product_status,
+            "availability_status": self.availability_status,
+            "min_price": self.min_price,
+            "max_price": self.max_price,
+            "rating_average": self.rating_average,
+            "rating_count": self.rating_count,
             "review_count": self.review_count,
-            "origin": self.origin,
+            "is_featured": self.is_featured,
+            "is_bestseller": self.is_bestseller,
+            "specifications": self.specifications,
             "dietary_tags": self.dietary_tags,
-            "is_active": self.is_active,
+            "tags": self.tags.split(",") if self.tags else [],
+            "keywords": self.keywords.split(",") if self.keywords else [],
+            "published_at": self.published_at.isoformat() if self.published_at else None,
+            "view_count": self.view_count,
+            "purchase_count": self.purchase_count,
+            "origin": self.origin,
             "price_range": self.price_range,
             "in_stock": self.in_stock,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            # Legacy fields
+            "featured": self.featured,
+            "rating": self.rating,
+            "is_active": self.is_active,
         }
-
-        if include_seo:
-            data["seo"] = {
-                "canonical_url": f"https://banwee.com/products/{self.slug or self.id}",
-                "og_image": self.primary_variant.primary_image.url if self.primary_variant and self.primary_variant.primary_image else None,
-                "og_type": "product",
-                "product_schema": {
-                    "@context": "https://schema.org/",
-                    "@type": "Product",
-                    "name": self.name,
-                    "description": self.description,
-                    "image": self.primary_variant.primary_image.url if self.primary_variant and self.primary_variant.primary_image else None,
-                    "brand": {
-                        "@type": "Brand",
-                        "name": "Banwee"
-                    },
-                    "offers": {
-                        "@type": "Offer",
-                        "url": f"https://banwee.com/products/{self.slug or self.id}",
-                        "priceCurrency": "USD",
-                        "price": self.price_range["min"],
-                        "availability": "https://schema.org/InStock" if self.in_stock else "https://schema.org/OutOfStock",
-                        "seller": {
-                            "@type": "Organization",
-                            "name": "Banwee"
-                        }
-                    },
-                    "aggregateRating": {
-                        "@type": "AggregateRating",
-                        "ratingValue": self.rating,
-                        "reviewCount": self.review_count
-                    } if self.review_count > 0 else None
-                }
-            }
 
         if include_variants:
             data["variants"] = [v.to_dict() for v in self.variants]
+
+        if include_seo:
+            data["seo"] = {
+                "meta_title": self.meta_title,
+                "meta_description": self.meta_description,
+                "canonical_url": f"https://banwee.com/products/{self.slug}",
+                "og_image": self.primary_variant.primary_image.url if self.primary_variant and self.primary_variant.primary_image else None,
+            }
 
         return data
 
 
 class ProductVariant(BaseModel):
+    """Product variants with hard delete only"""
     __tablename__ = "product_variants"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        Index('idx_variants_product_id', 'product_id'),
+        Index('idx_variants_sku', 'sku'),
+        Index('idx_variants_active', 'is_active'),
+        Index('idx_variants_price', 'base_price', 'sale_price'),
+        {'extend_existing': True}
+    )
 
-    product_id = Column(GUID(), ForeignKey(
-        "products.id"), nullable=False)
+    product_id = Column(GUID(), ForeignKey("products.id"), nullable=False)
     sku = Column(String(100), unique=True, nullable=False)
-    # e.g., "1kg Bag", "5kg Pack"
     name = Column(String(CHAR_LENGTH), nullable=False)
+    
+    # Pricing as columns
     base_price = Column(Float, nullable=False)
     sale_price = Column(Float, nullable=True)
 
-    # NEW FIELDS FOR BARCODE AND QR_CODE
+    # Barcodes as text (simple storage)
     barcode = Column(Text, nullable=True)
     qr_code = Column(Text, nullable=True)
 
-    # {"size": "1kg", "color": "red", etc.}
-    attributes = Column(JSON, nullable=True)
+    # Use JSONB only for complex attributes that need querying
+    attributes = Column(JSONB, nullable=True)  # {"size": "1kg", "color": "red"}
+    
+    # Status as column
     is_active = Column(Boolean, default=True)
 
-    # Relationships with lazy loading
+    # Relationships
     product = relationship("Product", back_populates="variants")
-    images = relationship("ProductImage", back_populates="variant",
-                          cascade="all, delete-orphan", lazy="selectin")
-    cart_items = relationship("CartItem", back_populates="variant")
-    order_items = relationship("OrderItem", back_populates="variant")
+    images = relationship("ProductImage", back_populates="variant", cascade="all, delete-orphan", lazy="selectin")
+    cart_items = relationship("CartItem", back_populates="variant", lazy="select")
+    order_items = relationship("OrderItem", back_populates="variant", lazy="select")
     inventory = relationship("Inventory", uselist=False, back_populates="variant", cascade="all, delete-orphan", lazy="selectin")
 
     @property
@@ -199,19 +253,18 @@ class ProductVariant(BaseModel):
             "sale_price": self.sale_price,
             "current_price": self.current_price,
             "discount_percentage": self.discount_percentage,
-            "stock": self.inventory.quantity if self.inventory else 0, # GET STOCK FROM INVENTORY
+            "stock": self.inventory.quantity if self.inventory else 0,
             "attributes": self.attributes,
             "is_active": self.is_active,
-            "barcode": self.barcode,  # NEW
-            "qr_code": self.qr_code,  # NEW
+            "barcode": self.barcode,
+            "qr_code": self.qr_code,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
 
         if include_images:
             data["images"] = [img.to_dict() for img in self.images]
-            data["primary_image"] = self.primary_image.to_dict(
-            ) if self.primary_image else None
+            data["primary_image"] = self.primary_image.to_dict() if self.primary_image else None
 
         if include_product and self.product:
             data["product_name"] = self.product.name
@@ -221,11 +274,15 @@ class ProductVariant(BaseModel):
 
 
 class ProductImage(BaseModel):
+    """Product images - no soft delete needed"""
     __tablename__ = "product_images"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        Index('idx_images_variant_id', 'variant_id'),
+        Index('idx_images_primary', 'is_primary'),
+        {'extend_existing': True}
+    )
 
-    variant_id = Column(GUID(), ForeignKey(
-        "product_variants.id"), nullable=False)
+    variant_id = Column(GUID(), ForeignKey("product_variants.id"), nullable=False)
     url = Column(String(500), nullable=False)
     alt_text = Column(String(CHAR_LENGTH), nullable=True)
     is_primary = Column(Boolean, default=False)

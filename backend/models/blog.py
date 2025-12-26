@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Text, JSON
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Text, JSON, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, CHAR_LENGTH, GUID
@@ -6,7 +6,12 @@ from core.database import BaseModel, CHAR_LENGTH, GUID
 
 class BlogCategory(BaseModel):
     __tablename__ = "blog_categories"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_blog_categories_name', 'name'),
+        Index('idx_blog_categories_slug', 'slug'),
+        {'extend_existing': True}
+    )
 
     name = Column(String(CHAR_LENGTH), unique=True, nullable=False)
     slug = Column(String(CHAR_LENGTH), unique=True, nullable=False)
@@ -17,7 +22,12 @@ class BlogCategory(BaseModel):
 
 class BlogTag(BaseModel):
     __tablename__ = "blog_tags"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_blog_tags_name', 'name'),
+        Index('idx_blog_tags_slug', 'slug'),
+        {'extend_existing': True}
+    )
 
     name = Column(String(CHAR_LENGTH), unique=True, nullable=False)
     slug = Column(String(CHAR_LENGTH), unique=True, nullable=False)
@@ -25,7 +35,24 @@ class BlogTag(BaseModel):
 
 class BlogPost(BaseModel):
     __tablename__ = "blog_posts"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_blog_posts_title', 'title'),
+        Index('idx_blog_posts_slug', 'slug'),
+        Index('idx_blog_posts_author_id', 'author_id'),
+        Index('idx_blog_posts_category_id', 'category_id'),
+        Index('idx_blog_posts_published', 'is_published'),
+        Index('idx_blog_posts_published_at', 'published_at'),
+        Index('idx_blog_posts_created_at', 'created_at'),
+        # Composite indexes for common queries
+        Index('idx_blog_posts_published_date', 'is_published', 'published_at'),
+        Index('idx_blog_posts_author_published', 'author_id', 'is_published'),
+        Index('idx_blog_posts_category_published', 'category_id', 'is_published'),
+        # Full-text search index for blog content (PostgreSQL specific)
+        Index('idx_blog_posts_title_fts', 'title', postgresql_using='gin', 
+              postgresql_ops={'title': 'gin_trgm_ops'}),
+        {'extend_existing': True}
+    )
 
     title = Column(String(CHAR_LENGTH), nullable=False)
     slug = Column(String(CHAR_LENGTH), unique=True, nullable=False) # Add slug for SEO-friendly URLs
@@ -50,7 +77,12 @@ class BlogPost(BaseModel):
 class BlogPostTag(BaseModel):
     """Association table for BlogPost and BlogTag Many-to-Many relationship."""
     __tablename__ = "blog_post_tags"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_blog_post_tags_post_id', 'blog_post_id'),
+        Index('idx_blog_post_tags_tag_id', 'blog_tag_id'),
+        {'extend_existing': True}
+    )
 
     blog_post_id = Column(GUID(), ForeignKey("blog_posts.id"), primary_key=True)
     blog_tag_id = Column(GUID(), ForeignKey("blog_tags.id"), primary_key=True)
@@ -61,7 +93,18 @@ class BlogPostTag(BaseModel):
 
 class Comment(BaseModel):
     __tablename__ = "comments"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_comments_author_id', 'author_id'),
+        Index('idx_comments_blog_post_id', 'blog_post_id'),
+        Index('idx_comments_parent_id', 'parent_id'),
+        Index('idx_comments_approved', 'is_approved'),
+        Index('idx_comments_created_at', 'created_at'),
+        # Composite indexes for common queries
+        Index('idx_comments_post_approved', 'blog_post_id', 'is_approved'),
+        Index('idx_comments_author_approved', 'author_id', 'is_approved'),
+        {'extend_existing': True}
+    )
 
     content = Column(Text, nullable=False)
     author_id = Column(GUID(), ForeignKey("users.id"), nullable=False)

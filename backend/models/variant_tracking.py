@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, JSON, Text, Boolean
+from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, JSON, Text, Boolean, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, GUID
@@ -9,7 +9,18 @@ from datetime import datetime
 class VariantTrackingEntry(BaseModel):
     """Track when variants are added to subscriptions"""
     __tablename__ = "variant_tracking_entries"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_variant_tracking_entries_variant_id', 'variant_id'),
+        Index('idx_variant_tracking_entries_subscription_id', 'subscription_id'),
+        Index('idx_variant_tracking_entries_action_type', 'action_type'),
+        Index('idx_variant_tracking_entries_timestamp', 'tracking_timestamp'),
+        Index('idx_variant_tracking_entries_currency', 'currency'),
+        # Composite indexes for common queries
+        Index('idx_variant_tracking_entries_variant_action', 'variant_id', 'action_type'),
+        Index('idx_variant_tracking_entries_sub_timestamp', 'subscription_id', 'tracking_timestamp'),
+        {'extend_existing': True}
+    )
 
     # Core tracking information
     variant_id = Column(GUID(), ForeignKey("product_variants.id"), nullable=False, index=True)
@@ -49,7 +60,17 @@ class VariantTrackingEntry(BaseModel):
 class VariantPriceHistory(BaseModel):
     """Track price changes for variants over time"""
     __tablename__ = "variant_price_history"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_variant_price_history_variant_id', 'variant_id'),
+        Index('idx_variant_price_history_changed_by', 'changed_by_user_id'),
+        Index('idx_variant_price_history_effective_date', 'effective_date'),
+        Index('idx_variant_price_history_change_reason', 'change_reason'),
+        Index('idx_variant_price_history_currency', 'currency'),
+        # Composite indexes for common queries
+        Index('idx_variant_price_history_variant_effective', 'variant_id', 'effective_date'),
+        {'extend_existing': True}
+    )
 
     # Variant reference
     variant_id = Column(GUID(), ForeignKey("product_variants.id"), nullable=False, index=True)
@@ -99,7 +120,19 @@ class VariantPriceHistory(BaseModel):
 class VariantAnalytics(BaseModel):
     """Aggregated analytics for product variants"""
     __tablename__ = "variant_analytics"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_variant_analytics_variant_id', 'variant_id'),
+        Index('idx_variant_analytics_date', 'date'),
+        Index('idx_variant_analytics_period_type', 'period_type'),
+        Index('idx_variant_analytics_currency', 'currency'),
+        Index('idx_variant_analytics_popularity_rank', 'popularity_rank'),
+        Index('idx_variant_analytics_total_revenue', 'total_revenue'),
+        # Composite indexes for common queries
+        Index('idx_variant_analytics_variant_date', 'variant_id', 'date'),
+        Index('idx_variant_analytics_date_period', 'date', 'period_type'),
+        {'extend_existing': True}
+    )
 
     # Variant reference
     variant_id = Column(GUID(), ForeignKey("product_variants.id"), nullable=False, index=True)
@@ -156,7 +189,19 @@ class VariantAnalytics(BaseModel):
 class VariantSubstitution(BaseModel):
     """Track variant substitution suggestions and usage"""
     __tablename__ = "variant_substitutions"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_variant_substitutions_original_id', 'original_variant_id'),
+        Index('idx_variant_substitutions_substitute_id', 'substitute_variant_id'),
+        Index('idx_variant_substitutions_similarity_score', 'similarity_score'),
+        Index('idx_variant_substitutions_reason', 'substitution_reason'),
+        Index('idx_variant_substitutions_active', 'is_active'),
+        Index('idx_variant_substitutions_acceptance_rate', 'acceptance_rate'),
+        # Composite indexes for common queries
+        Index('idx_variant_substitutions_original_active', 'original_variant_id', 'is_active'),
+        Index('idx_variant_substitutions_substitute_active', 'substitute_variant_id', 'is_active'),
+        {'extend_existing': True}
+    )
 
     # Original and substitute variants
     original_variant_id = Column(GUID(), ForeignKey("product_variants.id"), nullable=False, index=True)

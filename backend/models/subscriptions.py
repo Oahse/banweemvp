@@ -2,7 +2,7 @@
 Consolidated subscription models
 Includes: Subscription and related subscription models
 """
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Float, Table, JSON, Text, Integer
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Float, Table, JSON, Text, Integer, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, GUID, Base
@@ -21,7 +21,23 @@ subscription_product_association = Table(
 class Subscription(BaseModel):
     """Enhanced subscription model with comprehensive tracking"""
     __tablename__ = "subscriptions"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        # Indexes for search and performance
+        Index('idx_subscriptions_user_id', 'user_id'),
+        Index('idx_subscriptions_plan_id', 'plan_id'),
+        Index('idx_subscriptions_status', 'status'),
+        Index('idx_subscriptions_billing_cycle', 'billing_cycle'),
+        Index('idx_subscriptions_auto_renew', 'auto_renew'),
+        Index('idx_subscriptions_current_period_end', 'current_period_end'),
+        Index('idx_subscriptions_next_billing_date', 'next_billing_date'),
+        Index('idx_subscriptions_cancelled_at', 'cancelled_at'),
+        Index('idx_subscriptions_created_at', 'created_at'),
+        # Composite indexes for common queries
+        Index('idx_subscriptions_user_status', 'user_id', 'status'),
+        Index('idx_subscriptions_status_billing', 'status', 'next_billing_date'),
+        Index('idx_subscriptions_plan_status', 'plan_id', 'status'),
+        {'extend_existing': True}
+    )
 
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
     plan_id = Column(String(100), nullable=False)  # basic, premium, enterprise
