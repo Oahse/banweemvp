@@ -10,8 +10,20 @@ import { AuthAPI } from '../../apis/auth';
 import { toast } from 'react-hot-toast';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { debounce } from 'lodash';
+import { CheckCircle, AlertTriangle } from 'lucide-react';
+
+// Simple debounce function
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
 interface SmartCheckoutFormProps {
   onSuccess: (orderId: string) => void;
@@ -237,7 +249,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   : 'border-gray-300 text-gray-400'
               }`}>
                 {currentStep > step.number ? (
-                  <CheckCircleIcon className="w-6 h-6" />
+                  <CheckCircle className="w-6 h-6" />
                 ) : (
                   <span className="text-lg">{step.icon}</span>
                 )}
@@ -327,7 +339,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 
                 {validationErrors.shipping_address_id && (
                   <div className="mt-2 text-sm text-red-600 flex items-center">
-                    <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
+                    <AlertTriangle className="w-4 h-4 mr-1" />
                     {validationErrors.shipping_address_id}
                   </div>
                 )}
@@ -375,7 +387,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 
                 {validationErrors.shipping_method_id && (
                   <div className="mt-2 text-sm text-red-600 flex items-center">
-                    <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
+                    <AlertTriangle className="w-4 h-4 mr-1" />
                     {validationErrors.shipping_method_id}
                   </div>
                 )}
@@ -443,7 +455,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 
                 {validationErrors.payment_method_id && (
                   <div className="mt-2 text-sm text-red-600 flex items-center">
-                    <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
+                    <AlertTriangle className="w-4 h-4 mr-1" />
                     {validationErrors.payment_method_id}
                   </div>
                 )}
@@ -556,7 +568,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             {realTimeValidation && Object.keys(realTimeValidation).length > 0 && (
               <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center text-sm text-green-800">
-                  <CheckCircleIcon className="w-4 h-4 mr-2" />
+                  <CheckCircle className="w-4 h-4 mr-2" />
                   Order validated and ready to place
                 </div>
               </div>

@@ -9,7 +9,7 @@ import { OrdersAPI } from '../../apis/orders';
 import { AuthAPI } from '../../apis/auth';
 import { toast } from 'react-hot-toast';
 import { Button } from '../ui/Button';
-import { CreditCardIcon, TruckIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { CreditCard, Truck, MapPin } from 'lucide-react';
 
 interface ExpressCheckoutProps {
   onSuccess: (orderId: string) => void;
@@ -132,7 +132,7 @@ export const ExpressCheckout: React.FC<ExpressCheckoutProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Shipping Address */}
         <div className="flex items-start space-x-3">
-          <MapPinIcon className="w-5 h-5 text-gray-400 mt-1" />
+          <MapPin className="w-5 h-5 text-gray-400 mt-1" />
           <div>
             <div className="text-sm font-medium text-gray-900">Ship to</div>
             <div className="text-sm text-gray-600">
@@ -144,7 +144,7 @@ export const ExpressCheckout: React.FC<ExpressCheckoutProps> = ({
 
         {/* Shipping Method */}
         <div className="flex items-start space-x-3">
-          <TruckIcon className="w-5 h-5 text-gray-400 mt-1" />
+          <Truck className="w-5 h-5 text-gray-400 mt-1" />
           <div>
             <div className="text-sm font-medium text-gray-900">Shipping</div>
             <div className="text-sm text-gray-600">
@@ -156,7 +156,7 @@ export const ExpressCheckout: React.FC<ExpressCheckoutProps> = ({
 
         {/* Payment Method */}
         <div className="flex items-start space-x-3">
-          <CreditCardIcon className="w-5 h-5 text-gray-400 mt-1" />
+          <CreditCard className="w-5 h-5 text-gray-400 mt-1" />
           <div>
             <div className="text-sm font-medium text-gray-900">Payment</div>
             <div className="text-sm text-gray-600">
