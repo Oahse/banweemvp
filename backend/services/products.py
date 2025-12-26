@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_, func
+from sqlalchemy import select, and_, or_, func, text
 from sqlalchemy.orm import selectinload
 from typing import Optional, List, Dict, Any
 from fastapi import HTTPException
@@ -18,6 +18,20 @@ from core.exceptions import APIException
 class ProductService:
     def __init__(self, db: AsyncSession):
         self.db = db
+        
+        # Search configuration
+        self.similarity_threshold = 0.3
+        self.weights = {
+            "exact": 1.0,
+            "prefix": 0.8,
+            "fuzzy": 0.5
+        }
+        self.product_field_weights = {
+            "name": 1.0,
+            "description": 0.6,
+            "category": 0.4,
+            "tags": 0.3
+        }
 
     def _convert_image_to_response(self, image: ProductImage) -> ProductImageResponse:
         """Convert ProductImage model to response format."""
@@ -516,6 +530,202 @@ class ProductService:
         except Exception as e:
             print(f"Error updating variant codes: {e}")
             raise HTTPException(status_code=500, detail=f"Failed to update codes: {str(e)}")
+
+    async def search_products(
+        self, 
+        query: str, 
+        limit: int = 20,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Advanced search for products with fuzzy matching and weighted ranking.
+        """
+        if not query or len(query.strip()) < 2:
+            return []
+            
+        query = query.strip().lower()
+        
+        # Build base conditions
+        base_conditions = ["p.is_active = true"]
+        params = {
+            "query": query,
+            "similarity_threshold": self.similarity_threshold,
+            "limit": limit,
+            "exact_weight": self.weights["exact"],
+            "prefix_weight": self.weights["prefix"],
+            "fuzzy_weight": self.weights["fuzzy"],
+            "name_weight": self.product_field_weights["name"],
+            "desc_weight": self.product_field_weights["description"],
+            "cat_weight": self.product_field_weights["category"],
+            "tag_weight": self.product_field_weights["tags"]
+        }
+        
+        # Add filters
+        if filters:
+            if filters.get("category_id"):
+                base_conditions.append("p.category_id = :category_id")
+                params["category_id"] = filters["category_id"]
+                
+            if filters.get("min_price") is not None:
+                base_conditions.append("""
+                    EXISTS (
+                        SELECT 1 FROM product_variants pv 
+                        WHERE pv.product_id = p.id 
+                        AND pv.base_price >= :min_price
+                    )
+                """)
+                params["min_price"] = filters["min_price"]
+                
+            if filters.get("max_price") is not None:
+                base_conditions.append("""
+                    EXISTS (
+                        SELECT 1 FROM product_variants pv 
+                        WHERE pv.product_id = p.id 
+                        AND pv.base_price <= :max_price
+                    )
+                """)
+                params["max_price"] = filters["max_price"]
+        
+        where_clause = " AND ".join(base_conditions)
+        
+        sql_query = text(f"""
+            SELECT 
+                p.id,
+                p.name,
+                p.description,
+                p.rating,
+                p.review_count,
+                c.name as category_name,
+                -- Calculate weighted relevance score
+                (
+                    -- Name matching (highest weight)
+                    CASE WHEN LOWER(p.name) = :query THEN :exact_weight * :name_weight
+                         WHEN LOWER(p.name) LIKE CONCAT(:query, '%') THEN :prefix_weight * :name_weight * 0.9
+                         WHEN LOWER(p.name) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * :name_weight * 0.7
+                         ELSE similarity(LOWER(p.name), :query) * :fuzzy_weight * :name_weight
+                    END +
+                    -- Description matching
+                    CASE WHEN LOWER(p.description) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * :desc_weight
+                         ELSE similarity(LOWER(p.description), :query) * :fuzzy_weight * :desc_weight
+                    END +
+                    -- Category matching
+                    CASE WHEN LOWER(c.name) = :query THEN :exact_weight * :cat_weight
+                         WHEN LOWER(c.name) LIKE CONCAT(:query, '%') THEN :prefix_weight * :cat_weight
+                         WHEN LOWER(c.name) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * :cat_weight * 0.7
+                         ELSE similarity(LOWER(c.name), :query) * :fuzzy_weight * :cat_weight
+                    END +
+                    -- Dietary tags matching (if tags contain the query)
+                    CASE WHEN p.dietary_tags::text ILIKE CONCAT('%', :query, '%') THEN :prefix_weight * :tag_weight
+                         ELSE 0
+                    END +
+                    -- Boost for higher rated products
+                    (p.rating / 5.0) * 0.1 +
+                    -- Boost for products with more reviews
+                    LEAST(p.review_count / 100.0, 0.1)
+                ) as relevance_score
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE {where_clause}
+            AND (
+                LOWER(p.name) LIKE CONCAT('%', :query, '%')
+                OR LOWER(p.description) LIKE CONCAT('%', :query, '%')
+                OR LOWER(c.name) LIKE CONCAT('%', :query, '%')
+                OR p.dietary_tags::text ILIKE CONCAT('%', :query, '%')
+                OR similarity(LOWER(p.name), :query) > :similarity_threshold
+                OR similarity(LOWER(p.description), :query) > :similarity_threshold
+                OR similarity(LOWER(c.name), :query) > :similarity_threshold
+            )
+            ORDER BY relevance_score DESC, p.rating DESC, p.review_count DESC
+            LIMIT :limit
+        """)
+        
+        result = await self.db.execute(sql_query, params)
+        
+        products = []
+        for row in result:
+            products.append({
+                "id": str(row.id),
+                "name": row.name,
+                "description": row.description,
+                "rating": float(row.rating) if row.rating else 0.0,
+                "review_count": row.review_count or 0,
+                "category_name": row.category_name,
+                "relevance_score": float(row.relevance_score),
+                "type": "product"
+            })
+            
+        return products
+
+    async def search_categories(
+        self, 
+        query: str, 
+        limit: int = 20
+    ) -> List[Dict[str, Any]]:
+        """
+        Search categories with prefix matching and fuzzy search.
+        """
+        if not query or len(query.strip()) < 2:
+            return []
+            
+        query = query.strip().lower()
+        
+        sql_query = text("""
+            SELECT 
+                c.id,
+                c.name,
+                c.description,
+                c.image_url,
+                COUNT(p.id) as product_count,
+                (
+                    -- Name matching (highest weight)
+                    CASE WHEN LOWER(c.name) = :query THEN :exact_weight
+                         WHEN LOWER(c.name) LIKE CONCAT(:query, '%') THEN :prefix_weight
+                         WHEN LOWER(c.name) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.7
+                         ELSE similarity(LOWER(c.name), :query) * :fuzzy_weight
+                    END +
+                    -- Description matching
+                    CASE WHEN LOWER(c.description) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.5
+                         ELSE similarity(LOWER(c.description), :query) * :fuzzy_weight * 0.5
+                    END +
+                    -- Boost for categories with more products
+                    LEAST(COUNT(p.id) / 10.0, 0.2)
+                ) as relevance_score
+            FROM categories c
+            LEFT JOIN products p ON c.id = p.category_id AND p.is_active = true
+            WHERE c.is_active = true
+            AND (
+                LOWER(c.name) LIKE CONCAT('%', :query, '%')
+                OR LOWER(c.description) LIKE CONCAT('%', :query, '%')
+                OR similarity(LOWER(c.name), :query) > :similarity_threshold
+                OR similarity(LOWER(c.description), :query) > :similarity_threshold
+            )
+            GROUP BY c.id, c.name, c.description, c.image_url
+            ORDER BY relevance_score DESC, product_count DESC
+            LIMIT :limit
+        """)
+        
+        result = await self.db.execute(sql_query, {
+            "query": query,
+            "similarity_threshold": self.similarity_threshold,
+            "limit": limit,
+            "exact_weight": self.weights["exact"],
+            "prefix_weight": self.weights["prefix"],
+            "fuzzy_weight": self.weights["fuzzy"]
+        })
+        
+        categories = []
+        for row in result:
+            categories.append({
+                "id": str(row.id),
+                "name": row.name,
+                "description": row.description,
+                "image_url": row.image_url,
+                "product_count": row.product_count,
+                "relevance_score": float(row.relevance_score),
+                "type": "category"
+            })
+            
+        return categories
 
     async def create_product(self, product_data: ProductCreate, supplier_id: UUID) -> ProductResponse:
         """Create a new product."""

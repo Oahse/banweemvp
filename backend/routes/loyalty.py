@@ -61,7 +61,7 @@ async def calculate_points(
     return Response.success(data=result)
 
 
-@router.post("/referral-bonus", response_model=ReferralBonusResponse)
+@router.post("/referral-bonus")
 async def process_referral_bonus(
     request: ReferralBonusRequest,
     current_user: User = Depends(get_current_user),
@@ -69,24 +69,26 @@ async def process_referral_bonus(
 ):
     """Process referral bonus for successful referrals"""
     loyalty_service = LoyaltyService(db)
-    return await loyalty_service.process_referral_bonus(
+    result = await loyalty_service.process_referral_bonus(
         referrer_id=request.referrer_id,
         referee_id=request.referee_id,
         subscription_id=request.subscription_id
     )
+    return Response.success(data=result)
 
 
-@router.get("/rewards", response_model=List[AvailableReward])
+@router.get("/rewards")
 async def get_available_rewards(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Get available rewards for current user"""
     loyalty_service = LoyaltyService(db)
-    return await loyalty_service.get_available_rewards(current_user.id)
+    rewards = await loyalty_service.get_available_rewards(current_user.id)
+    return Response.success(data=rewards)
 
 
-@router.post("/redeem", response_model=RedemptionResponse)
+@router.post("/redeem")
 async def redeem_points(
     request: RedemptionRequest,
     current_user: User = Depends(get_current_user),
@@ -98,14 +100,15 @@ async def redeem_points(
         raise HTTPException(status_code=403, detail="Cannot redeem points for another user")
     
     loyalty_service = LoyaltyService(db)
-    return await loyalty_service.redeem_points(
+    result = await loyalty_service.redeem_points(
         user_id=request.user_id,
         reward_id=request.reward_id,
         points_to_redeem=request.points_to_redeem
     )
+    return Response.success(data=result)
 
 
-@router.post("/calculate-discount", response_model=LoyaltyDiscountResponse)
+@router.post("/calculate-discount")
 async def calculate_loyalty_discount(
     request: LoyaltyDiscountRequest,
     current_user: User = Depends(get_current_user),
@@ -117,13 +120,14 @@ async def calculate_loyalty_discount(
         raise HTTPException(status_code=403, detail="Cannot calculate discount for another user")
     
     loyalty_service = LoyaltyService(db)
-    return await loyalty_service.calculate_loyalty_discount(
+    result = await loyalty_service.calculate_loyalty_discount(
         user_id=request.user_id,
         base_cost=request.base_cost
     )
+    return Response.success(data=result)
 
 
-@router.get("/offers", response_model=List[PersonalizedOffer])
+@router.get("/offers")
 async def get_personalized_offers(
     limit: int = Query(default=5, ge=1, le=20),
     current_user: User = Depends(get_current_user),
@@ -131,10 +135,11 @@ async def get_personalized_offers(
 ):
     """Get personalized offers for current user"""
     loyalty_service = LoyaltyService(db)
-    return await loyalty_service.get_personalized_offers(
+    offers = await loyalty_service.get_personalized_offers(
         user_id=current_user.id,
         limit=limit
     )
+    return Response.success(data=offers)
 
 
 @router.get("/history")
@@ -155,8 +160,7 @@ async def get_points_history(
     )
 
 
-# Admin-only endpoints
-@router.get("/analytics", response_model=LoyaltyAnalyticsResponse)
+@router.get("/analytics")
 async def get_loyalty_analytics(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -167,7 +171,8 @@ async def get_loyalty_analytics(
         raise HTTPException(status_code=403, detail="Admin access required")
     
     loyalty_service = LoyaltyService(db)
-    return await loyalty_service.get_loyalty_analytics()
+    analytics = await loyalty_service.get_loyalty_analytics()
+    return Response.success(data=analytics)
 
 
 @router.post("/admin/award-points")

@@ -35,7 +35,7 @@ async def create_order(
     """Create a new order."""
     try:
         order = await order_service.create_order(current_user.id, request, background_tasks)
-        return Response(success=True, data=order, message="Order created successfully")
+        return Response.success(data=order, message="Order created successfully")
     except APIException:
         raise
     except Exception as e:
@@ -66,7 +66,7 @@ async def checkout(
             background_tasks,
             idempotency_key
         )
-        return Response(success=True, data=order, message="Order placed successfully")
+        return Response.success(data=order, message="Order placed successfully")
     except APIException:
         raise
     except Exception as e:
@@ -89,7 +89,7 @@ async def get_orders(
         orders = await order_service.get_user_orders(
             current_user.id, page, limit, status_filter
         )
-        return Response(success=True, data=orders)
+        return Response.success(data=orders)
     except APIException:
         raise
     except Exception as e:
@@ -113,7 +113,7 @@ async def get_order(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Order not found"
             )
-        return Response(success=True, data=order)
+        return Response.success(data=order)
     except APIException:
         raise
     except Exception as e:
@@ -132,7 +132,7 @@ async def cancel_order(
     """Cancel an order."""
     try:
         order = await order_service.cancel_order(order_id, current_user.id)
-        return Response(success=True, data=order, message="Order cancelled successfully")
+        return Response.success(data=order, message="Order cancelled successfully")
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -149,7 +149,7 @@ async def get_order_tracking(
     """Get order tracking information (authenticated)."""
     try:
         tracking = await order_service.get_order_tracking(order_id, current_user.id)
-        return Response(success=True, data=tracking)
+        return Response.success(data=tracking)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -165,7 +165,7 @@ async def track_order_public(
     """Get order tracking information (public - no authentication required)."""
     try:
         tracking = await order_service.get_order_tracking_public(order_id)
-        return Response(success=True, data=tracking)
+        return Response.success(data=tracking)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -183,7 +183,7 @@ async def request_refund(
     """Request order refund."""
     try:
         result = await order_service.request_refund(order_id, current_user.id, request)
-        return Response(success=True, data=result, message="Refund request submitted")
+        return Response.success(data=result, message="Refund request submitted")
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -200,7 +200,7 @@ async def reorder(
     """Create new order from existing order."""
     try:
         order = await order_service.reorder(order_id, current_user.id)
-        return Response(success=True, data=order, message="Order recreated successfully")
+        return Response.success(data=order, message="Order recreated successfully")
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -236,7 +236,7 @@ async def get_order_invoice(
                     media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 )
         
-        return Response(success=True, data=invoice)
+        return Response.success(data=invoice)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -254,7 +254,7 @@ async def add_order_note(
     """Add note to order."""
     try:
         result = await order_service.add_order_note(order_id, current_user.id, request.get("note", ""))
-        return Response(success=True, data=result, message="Note added successfully")
+        return Response.success(data=result, message="Note added successfully")
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -271,7 +271,7 @@ async def get_order_notes(
     """Get order notes."""
     try:
         notes = await order_service.get_order_notes(order_id, current_user.id)
-        return Response(success=True, data=notes)
+        return Response.success(data=notes)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

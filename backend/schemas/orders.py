@@ -5,7 +5,7 @@ from uuid import UUID
 
 
 class OrderItemCreate(BaseModel):
-    variant_id: str
+    variant_id: UUID
     quantity: int
 
 
@@ -39,8 +39,8 @@ class OrderUpdate(BaseModel):
 
 
 class OrderItemResponse(BaseModel):
-    id: str
-    variant_id: str
+    id: UUID
+    variant_id: UUID
     quantity: int
     price_per_unit: float
     total_price: float
@@ -50,8 +50,8 @@ class OrderItemResponse(BaseModel):
 
 
 class OrderResponse(BaseModel):
-    id: str
-    user_id: str
+    id: UUID
+    user_id: UUID
     status: str
     total_amount: float
     currency: str
@@ -67,7 +67,7 @@ class OrderResponse(BaseModel):
 
 # Order Intent schemas
 class OrderIntentBase(BaseModel):
-    user_id: str
+    user_id: UUID
     total_amount: float
     currency: str = "USD"
     status: str = "pending"
@@ -83,7 +83,7 @@ class OrderIntentUpdate(BaseModel):
 
 
 class OrderIntentResponse(OrderIntentBase):
-    id: str
+    id: UUID
     created_at: datetime
     updated_at: Optional[datetime] = None
 

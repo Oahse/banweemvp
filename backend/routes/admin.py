@@ -54,7 +54,7 @@ async def get_admin_stats(
     try:
         admin_service = AdminService(db)
         stats = await admin_service.get_dashboard_stats()
-        return Response(success=True, data=stats)
+        return Response.success(data=stats)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -70,7 +70,7 @@ async def get_platform_overview(
     try:
         admin_service = AdminService(db)
         overview = await admin_service.get_platform_overview()
-        return Response(success=True, data=overview)
+        return Response.success(data=overview)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -95,7 +95,7 @@ async def get_all_orders(
     try:
         admin_service = AdminService(db)
         orders = await admin_service.get_all_orders(page, limit, order_status, q, date_from, date_to, min_price, max_price)
-        return Response(success=True, data=orders)
+        return Response.success(data=orders)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -117,7 +117,7 @@ async def get_order_by_id(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Order not found"
             )
-        return Response(success=True, data=order)
+        return Response.success(data=order)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -141,7 +141,7 @@ async def ship_order(
             request.carrier_name,
             background_tasks
         )
-        return Response(success=True, data=order, message="Order status updated to shipped and notification sent.")
+        return Response.success(data=order, message="Order status updated to shipped and notification sent.")
     except APIException:
         raise
     except Exception as e:
@@ -172,7 +172,7 @@ async def update_order_status(
             description=request.description
         )
         
-        return Response(success=True, data={
+        return Response.success(data={
             "id": str(order.id),
             "status": order.status,
             "tracking_number": order.tracking_number,
@@ -227,7 +227,7 @@ async def get_order_invoice_admin(
                     media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 )
         
-        return Response(success=True, data=invoice)
+        return Response.success(data=invoice)
     except APIException:
         raise
     except Exception as e:
@@ -252,7 +252,7 @@ async def get_all_users(
     try:
         admin_service = AdminService(db)
         users = await admin_service.get_all_users(page, limit, role, search, status, verified)
-        return Response(success=True, data=users)
+        return Response.success(data=users)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -270,7 +270,7 @@ async def create_user_admin(
     try:
         admin_service = AdminService(db)
         user = await admin_service.create_user(user_data, background_tasks)
-        return Response(success=True, data=user, message="User created successfully")
+        return Response.success(data=user, message="User created successfully")
     except APIException:
         raise
     except Exception as e:
@@ -294,7 +294,7 @@ async def get_user_by_id(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="User not found"
             )
-        return Response(success=True, data=user)
+        return Response.success(data=user)
     except APIException:
         raise
     except Exception as e:
@@ -314,7 +314,7 @@ async def update_user_status(
     try:
         admin_service = AdminService(db)
         user = await admin_service.update_user_status(user_id, active)
-        return Response(success=True, data=user, message="User status updated")
+        return Response.success(data=user, message="User status updated")
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -331,7 +331,7 @@ async def delete_user(
     try:
         admin_service = AdminService(db)
         await admin_service.delete_user(user_id)
-        return Response(success=True, message="User deleted successfully")
+        return Response.success(message="User deleted successfully")
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -348,7 +348,7 @@ async def reset_user_password(
     try:
         admin_service = AdminService(db)
         result = await admin_service.reset_user_password(user_id)
-        return Response(success=True, data=result, message="Password reset email sent successfully")
+        return Response.success(data=result, message="Password reset email sent successfully")
     except APIException:
         raise
     except Exception as e:
@@ -367,7 +367,7 @@ async def deactivate_user_account(
     try:
         admin_service = AdminService(db)
         result = await admin_service.deactivate_user(user_id)
-        return Response(success=True, data=result, message="User account deactivated successfully")
+        return Response.success(data=result, message="User account deactivated successfully")
     except APIException:
         raise
     except Exception as e:
@@ -386,7 +386,7 @@ async def activate_user_account(
     try:
         admin_service = AdminService(db)
         result = await admin_service.activate_user(user_id)
-        return Response(success=True, data=result, message="User account activated successfully")
+        return Response.success(data=result, message="User account activated successfully")
     except APIException:
         raise
     except Exception as e:
@@ -411,7 +411,7 @@ async def get_all_products_admin(
     try:
         admin_service = AdminService(db)
         products = await admin_service.get_all_products(page, limit, search, category, status, supplier)
-        return Response(success=True, data=products)
+        return Response.success(data=products)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -431,7 +431,7 @@ async def get_all_variants_admin(
     try:
         admin_service = AdminService(db)
         variants = await admin_service.get_all_variants(page, limit, search, product_id)
-        return Response(success=True, data=variants)
+        return Response.success(data=variants)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

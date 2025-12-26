@@ -8,6 +8,7 @@ from uuid import UUID
 
 from core.database import get_db
 from core.dependencies import get_current_user
+from core.utils.response import Response
 from models.user import User
 from services.payments import PaymentService
 from schemas.payments import (
@@ -21,7 +22,7 @@ from schemas.payments import (
 router = APIRouter(prefix="/payments", tags=["payments"])
 
 
-@router.get("/methods", response_model=List[PaymentMethodResponse])
+@router.get("/methods")
 async def get_payment_methods(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -29,10 +30,10 @@ async def get_payment_methods(
     """Get user's payment methods"""
     service = PaymentService(db)
     payment_methods = await service.get_user_payment_methods(current_user.id)
-    return [PaymentMethodResponse.from_orm(pm) for pm in payment_methods]
+    return Response.success(data=[PaymentMethodResponse.from_orm(pm) for pm in payment_methods])
 
 
-@router.post("/methods", response_model=PaymentMethodResponse)
+@router.post("/methods")
 async def create_payment_method(
     payment_method_data: PaymentMethodCreate,
     current_user: User = Depends(get_current_user),
@@ -45,7 +46,7 @@ async def create_payment_method(
         stripe_payment_method_id=payment_method_data.stripe_payment_method_id,
         is_default=payment_method_data.is_default
     )
-    return PaymentMethodResponse.from_orm(payment_method)
+    return Response.success(data=PaymentMethodResponse.from_orm(payment_method))
 
 
 @router.delete("/methods/{payment_method_id}")
@@ -67,7 +68,7 @@ async def delete_payment_method(
     return {"message": "Payment method deleted successfully"}
 
 
-@router.post("/intents", response_model=PaymentIntentResponse)
+@router.post("/intents")
 async def create_payment_intent(
     payment_intent_data: PaymentIntentCreate,
     current_user: User = Depends(get_current_user),
@@ -83,10 +84,10 @@ async def create_payment_intent(
         subscription_id=payment_intent_data.subscription_id,
         metadata=payment_intent_data.metadata
     )
-    return PaymentIntentResponse.from_orm(payment_intent)
+    return Response.success(data=PaymentIntentResponse.from_orm(payment_intent))
 
 
-@router.post("/intents/{payment_intent_id}/confirm", response_model=PaymentIntentResponse)
+@router.post("/intents/{payment_intent_id}/confirm")
 async def confirm_payment_intent(
     payment_intent_id: UUID,
     payment_method_id: str,
@@ -99,7 +100,7 @@ async def confirm_payment_intent(
         payment_intent_id=payment_intent_id,
         payment_method_id=payment_method_id
     )
-    return PaymentIntentResponse.from_orm(payment_intent)
+    return Response.success(data=PaymentIntentResponse.from_orm(payment_intent))
 
 
 @router.post("/process")
@@ -123,7 +124,7 @@ async def process_payment(
     return result
 
 
-@router.get("/transactions", response_model=dict)
+@router.get("/transactions")
 async def get_user_transactions(
     page: int = 1,
     limit: int = 20,
@@ -132,14 +133,15 @@ async def get_user_transactions(
 ):
     """Get user transaction history"""
     service = PaymentService(db)
-    return await service.get_user_transactions(
+    transactions = await service.get_user_transactions(
         user_id=current_user.id,
         page=page,
         limit=limit
     )
+    return Response.success(data=transactions)
 
 
-@router.post("/refunds/{payment_intent_id}", response_model=TransactionResponse)
+@router.post("/refunds/{payment_intent_id}")
 async def create_refund(
     payment_intent_id: UUID,
     amount: Optional[float] = None,
@@ -160,4 +162,4 @@ async def create_refund(
         amount=amount,
         reason=reason
     )
-    return TransactionResponse.from_orm(transaction)
+    return Response.success(data=TransactionResponse.from_orm(transaction))

@@ -27,6 +27,40 @@ async def get_current_authenticated_user(db: AsyncSession = Depends(get_db), tok
 # ==========================================================
 
 
+@router.get("/search")
+async def search_users(
+    q: str = Query(..., min_length=2, description="Search query (minimum 2 characters)"),
+    limit: int = Query(20, ge=1, le=100, description="Maximum number of results"),
+    role: Optional[str] = Query(None, regex="^(Customer|Supplier|Admin)$", description="Filter by user role"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Advanced search for users with prefix matching on name and email.
+    """
+    try:
+        user_service = UserService(db)
+        
+        users = await user_service.search_users(
+            query=q,
+            limit=limit,
+            role_filter=role
+        )
+        
+        return Response.success(
+            data={
+                "query": q,
+                "role_filter": role,
+                "users": users,
+                "count": len(users)
+            }
+        )
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to search users: {str(e)}"
+        )
+
+
 @router.get("/")
 async def list_users(
     page: int = Query(1, ge=1),
@@ -114,7 +148,7 @@ async def delete_user(user_id: UUID, db: AsyncSession = Depends(get_db)):
 # ==========================================================
 
 # Add response_model
-@router.get("/me/addresses", response_model=List[AddressResponse])
+@router.get("/me/addresses")
 async def list_my_addresses(
     current_user: User = Depends(get_current_authenticated_user),
     db: AsyncSession = Depends(get_db)
@@ -122,7 +156,7 @@ async def list_my_addresses(
     service = AddressService(db)
     addresses = await service.get_user_addresses(current_user.id)
     # Convert SQLAlchemy models to Pydantic models
-    return [AddressResponse.from_orm(address) for address in addresses]
+    return Response.success(data=[AddressResponse.from_orm(address) for address in addresses])
 
 
 @router.get("/{user_id}/addresses")

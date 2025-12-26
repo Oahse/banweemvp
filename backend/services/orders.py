@@ -22,7 +22,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from core.config import settings
 from core.kafka import get_kafka_producer_service
-import hashlib
+from services.event_service import event_service
 
 
 class OrderService:
@@ -232,8 +232,13 @@ class OrderService:
             
             # Send Kafka events with idempotency after successful transaction commit
             try:
-                await self._send_order_events_with_idempotency(order, user_id)
+                await self._send_order_events_with_idempotency(order, user_id, validated_cart_items)
             except Exception as kafka_error:
+                # Log Kafka errors but don't fail the order
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Failed to send order events for order {order.id}: {kafka_error}")
+                # Order is still successful even if events fail
                 
         except HTTPException:
             # Re-raise HTTP exceptions (validation errors, payment failures, etc.)
@@ -767,50 +772,83 @@ class OrderService:
         full_string = f"{cart_string}|{checkout_details}"
         return hashlib.md5(full_string.encode()).hexdigest()[:16]
 
-    async def _send_order_events_with_idempotency(self, order: Order, user_id: UUID):
+    async def _send_order_events_with_idempotency(self, order: Order, user_id: UUID, validated_cart_items: List[Dict[str, Any]]):
         """
-        Send Kafka events for order creation with idempotency keys
-        Prevents duplicate event processing
+        Send immutable Kafka events for order creation using new event system.
+        Events are versioned, validated, and idempotent.
         """
         try:
-            producer_service = await get_kafka_producer_service()
+            # Use correlation ID for event tracing
+            correlation_id = str(order.id)
             
-            # Generate unique event IDs for idempotency
-            email_event_id = f"email_order_confirmation_{order.id}_{datetime.utcnow().timestamp()}"
-            notification_event_id = f"notification_order_created_{order.id}_{datetime.utcnow().timestamp()}"
+            # Prepare order items for event
+            order_items = []
+            for item in validated_cart_items:
+                order_items.append({
+                    "product_id": item.get("product_id"),
+                    "variant_id": item["variant_id"],
+                    "quantity": item["quantity"],
+                    "price_per_unit": float(item["backend_price"]),
+                    "total_price": float(item["backend_total"]),
+                    "product_name": item.get("product_name", "")
+                })
             
-            # Send email confirmation with idempotency
-            await producer_service.send_message_with_deduplication(
-                settings.KAFKA_TOPIC_EMAIL, 
-                {
-                    "event_id": email_event_id,
-                    "service": "EmailService",
-                    "method": "send_order_confirmation",
-                    "args": [str(order.id)],
-                    "idempotency_key": f"email_{order.id}",
-                    "timestamp": datetime.utcnow().isoformat()
+            # Get shipping address for event
+            shipping_address = {}
+            if order.shipping_address:
+                shipping_address = {
+                    "street": order.shipping_address.street,
+                    "city": order.shipping_address.city,
+                    "state": order.shipping_address.state,
+                    "country": order.shipping_address.country,
+                    "postal_code": order.shipping_address.postal_code
                 }
+            
+            # Publish order.created event using new event system
+            await event_service.publish_order_created(
+                order_id=str(order.id),
+                user_id=str(user_id),
+                amount=float(order.total_amount),
+                currency="USD",  # You can make this configurable
+                items=order_items,
+                shipping_address=shipping_address,
+                payment_method="card",  # You can get this from payment method
+                correlation_id=correlation_id
             )
             
-            # Send notification with idempotency
-            await producer_service.send_message_with_deduplication(
-                settings.KAFKA_TOPIC_NOTIFICATION, 
-                {
-                    "event_id": notification_event_id,
-                    "service": "NotificationService",
-                    "method": "create_notification",
-                    "args": [],
-                    "kwargs": {
-                        "user_id": str(user_id),
-                        "message": f"Your order #{order.id} has been confirmed!",
-                        "type": "success",
-                        "related_id": str(order.id)
-                    },
-                    "idempotency_key": f"notification_order_{order.id}",
-                    "timestamp": datetime.utcnow().isoformat()
-                }
-            )
+            # If order is already confirmed (payment succeeded), also publish order.paid event
+            if order.status == "confirmed":
+                # Get payment information (you might need to adjust this based on your payment model)
+                payment_id = getattr(order, 'payment_id', str(uuid4()))
+                
+                await event_service.publish_order_paid(
+                    order_id=str(order.id),
+                    payment_id=payment_id,
+                    amount=float(order.total_amount),
+                    currency="USD",
+                    payment_method="card",
+                    correlation_id=correlation_id
+                )
             
+            # Publish inventory reservation events for each item
+            for item in validated_cart_items:
+                reservation_id = str(uuid4())
+                expires_at = (datetime.utcnow() + timedelta(minutes=15)).isoformat()
+                
+                # Note: Inventory reservation removed - implement as needed
+                    quantity=item["quantity"],
+                    order_id=str(order.id),
+                    reservation_id=reservation_id,
+                    expires_at=expires_at,
+                    correlation_id=correlation_id
+                )
+            
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info(f"Successfully published order events for order {order.id} using new event system")
             
         except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to publish order events using new event system: {e}")
             raise

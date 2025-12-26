@@ -37,7 +37,7 @@ router = APIRouter(prefix="/v1/blog", tags=["Blog"])
 
 # --- Blog Posts ---
 
-@router.post("/posts", response_model=BlogPostResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/posts")
 async def create_blog_post(
     post_data: BlogPostCreate,
     current_user: User = Depends(get_current_auth_user), # Any authenticated user can create posts (then approved by admin)
@@ -47,7 +47,7 @@ async def create_blog_post(
     try:
         blog_service = BlogService(db)
         post = await blog_service.create_blog_post(post_data, current_user.id)
-        return Response(success=True, data=post, message="Blog post created successfully")
+        return Response.success(data=post, message="Blog post created successfully", status_code=status.HTTP_201_CREATED)
     except APIException:
         raise
     except Exception as e:
@@ -57,7 +57,7 @@ async def create_blog_post(
         )
 
 
-@router.get("/posts", response_model=List[BlogPostResponse])
+@router.get("/posts")
 async def get_blog_posts(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
@@ -80,7 +80,7 @@ async def get_blog_posts(
             # Non-admins can only view published posts
             posts_data = await blog_service.get_blog_posts(page, limit, True, search, category_slug, tag_slug)
 
-        return Response(success=True, data=posts_data)
+        return Response.success(data=posts_data)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -88,7 +88,7 @@ async def get_blog_posts(
         )
 
 
-@router.get("/posts/{post_slug}", response_model=BlogPostResponse)
+@router.get("/posts/{post_slug}")
 async def get_blog_post(
     post_slug: str,
     db: AsyncSession = Depends(get_db),
@@ -111,7 +111,7 @@ async def get_blog_post(
                 message="Blog post not found"
             )
 
-        return Response(success=True, data=post)
+        return Response.success(data=post)
     except APIException:
         raise
     except Exception as e:
@@ -121,7 +121,7 @@ async def get_blog_post(
         )
 
 
-@router.put("/posts/{post_id}", response_model=BlogPostResponse)
+@router.put("/posts/{post_id}")
 async def update_blog_post(
     post_id: UUID,
     post_data: BlogPostUpdate,
@@ -133,7 +133,7 @@ async def update_blog_post(
         blog_service = BlogService(db)
         # The service layer will handle authorization logic
         post = await blog_service.update_blog_post(post_id, post_data, current_user.id)
-        return Response(success=True, data=post, message="Blog post updated successfully")
+        return Response.success(data=post, message="Blog post updated successfully")
     except APIException:
         raise
     except Exception as e:
@@ -143,7 +143,7 @@ async def update_blog_post(
         )
 
 
-@router.delete("/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/posts/{post_id}")
 async def delete_blog_post(
     post_id: UUID,
     current_user: User = Depends(get_current_auth_user),
@@ -154,7 +154,7 @@ async def delete_blog_post(
         blog_service = BlogService(db)
         is_admin = current_user.role.lower() in ["admin", "superadmin"]
         await blog_service.delete_blog_post(post_id, current_user.id, is_admin)
-        return Response(success=True, message="Blog post deleted successfully")
+        return Response.success(message="Blog post deleted successfully")
     except APIException:
         raise
     except Exception as e:
@@ -165,7 +165,7 @@ async def delete_blog_post(
 
 # --- Blog Categories ---
 
-@router.post("/categories", response_model=BlogCategoryResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/categories")
 async def create_blog_category(
     category_data: BlogCategoryCreate,
     current_user: User = Depends(require_admin), # Admin only
@@ -175,7 +175,7 @@ async def create_blog_category(
     try:
         blog_service = BlogService(db)
         category = await blog_service.create_blog_category(category_data)
-        return Response(success=True, data=category, message="Blog category created successfully")
+        return Response.success(data=category, message="Blog category created successfully", status_code=status.HTTP_201_CREATED)
     except APIException:
         raise
     except Exception as e:
@@ -184,20 +184,20 @@ async def create_blog_category(
             message=f"Failed to create blog category: {str(e)}"
         )
 
-@router.get("/categories", response_model=List[BlogCategoryResponse])
+@router.get("/categories")
 async def get_blog_categories(db: AsyncSession = Depends(get_db)):
     """Get all blog categories."""
     try:
         blog_service = BlogService(db)
         categories = await blog_service.get_blog_categories()
-        return Response(success=True, data=categories)
+        return Response.success(data=categories)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch blog categories: {str(e)}"
         )
 
-@router.get("/categories/{category_slug}", response_model=BlogCategoryResponse)
+@router.get("/categories/{category_slug}")
 async def get_blog_category(category_slug: str, db: AsyncSession = Depends(get_db)):
     """Get a specific blog category by slug."""
     try:
@@ -205,7 +205,7 @@ async def get_blog_category(category_slug: str, db: AsyncSession = Depends(get_d
         category = await blog_service.get_blog_category_by_slug(category_slug)
         if not category:
             raise APIException(status_code=status.HTTP_404_NOT_FOUND, message="Blog category not found")
-        return Response(success=True, data=category)
+        return Response.success(data=category)
     except APIException:
         raise
     except Exception as e:
@@ -214,7 +214,7 @@ async def get_blog_category(category_slug: str, db: AsyncSession = Depends(get_d
             message=f"Failed to fetch blog category: {str(e)}"
         )
 
-@router.put("/categories/{category_id}", response_model=BlogCategoryResponse)
+@router.put("/categories/{category_id}")
 async def update_blog_category(
     category_id: UUID,
     category_data: BlogCategoryUpdate,
@@ -225,7 +225,7 @@ async def update_blog_category(
     try:
         blog_service = BlogService(db)
         category = await blog_service.update_blog_category(category_id, category_data)
-        return Response(success=True, data=category, message="Blog category updated successfully")
+        return Response.success(data=category, message="Blog category updated successfully")
     except APIException:
         raise
     except Exception as e:
@@ -234,7 +234,7 @@ async def update_blog_category(
             message=f"Failed to update blog category: {str(e)}"
         )
 
-@router.delete("/categories/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/categories/{category_id}")
 async def delete_blog_category(
     category_id: UUID,
     current_user: User = Depends(require_admin),
@@ -244,7 +244,7 @@ async def delete_blog_category(
     try:
         blog_service = BlogService(db)
         await blog_service.delete_blog_category(category_id)
-        return Response(success=True, message="Blog category deleted successfully")
+        return Response.success(message="Blog category deleted successfully")
     except APIException:
         raise
     except Exception as e:
@@ -255,7 +255,7 @@ async def delete_blog_category(
 
 # --- Blog Tags ---
 
-@router.post("/tags", response_model=BlogTagResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/tags")
 async def create_blog_tag(
     tag_data: BlogTagCreate,
     current_user: User = Depends(require_admin), # Admin only
@@ -265,7 +265,7 @@ async def create_blog_tag(
     try:
         blog_service = BlogService(db)
         tag = await blog_service.create_blog_tag(tag_data)
-        return Response(success=True, data=tag, message="Blog tag created successfully")
+        return Response.success(data=tag, message="Blog tag created successfully", status_code=status.HTTP_201_CREATED)
     except APIException:
         raise
     except Exception as e:
@@ -274,20 +274,20 @@ async def create_blog_tag(
             message=f"Failed to create blog tag: {str(e)}"
         )
 
-@router.get("/tags", response_model=List[BlogTagResponse])
+@router.get("/tags")
 async def get_blog_tags(db: AsyncSession = Depends(get_db)):
     """Get all blog tags."""
     try:
         blog_service = BlogService(db)
         tags = await blog_service.get_blog_tags()
-        return Response(success=True, data=tags)
+        return Response.success(data=tags)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch blog tags: {str(e)}"
         )
 
-@router.get("/tags/{tag_slug}", response_model=BlogTagResponse)
+@router.get("/tags/{tag_slug}")
 async def get_blog_tag(tag_slug: str, db: AsyncSession = Depends(get_db)):
     """Get a specific blog tag by slug."""
     try:
@@ -295,7 +295,7 @@ async def get_blog_tag(tag_slug: str, db: AsyncSession = Depends(get_db)):
         tag = await blog_service.get_blog_tag_by_slug(tag_slug)
         if not tag:
             raise APIException(status_code=status.HTTP_404_NOT_FOUND, message="Blog tag not found")
-        return Response(success=True, data=tag)
+        return Response.success(data=tag)
     except APIException:
         raise
     except Exception as e:
@@ -304,7 +304,7 @@ async def get_blog_tag(tag_slug: str, db: AsyncSession = Depends(get_db)):
             message=f"Failed to fetch blog tag: {str(e)}"
         )
 
-@router.put("/tags/{tag_id}", response_model=BlogTagResponse)
+@router.put("/tags/{tag_id}")
 async def update_blog_tag(
     tag_id: UUID,
     tag_data: BlogTagUpdate,
@@ -315,7 +315,7 @@ async def update_blog_tag(
     try:
         blog_service = BlogService(db)
         tag = await blog_service.update_blog_tag(tag_id, tag_data)
-        return Response(success=True, data=tag, message="Blog tag updated successfully")
+        return Response.success(data=tag, message="Blog tag updated successfully")
     except APIException:
         raise
     except Exception as e:
@@ -324,7 +324,7 @@ async def update_blog_tag(
             message=f"Failed to update blog tag: {str(e)}"
         )
 
-@router.delete("/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/tags/{tag_id}")
 async def delete_blog_tag(
     tag_id: UUID,
     current_user: User = Depends(require_admin),
@@ -334,7 +334,7 @@ async def delete_blog_tag(
     try:
         blog_service = BlogService(db)
         await blog_service.delete_blog_tag(tag_id)
-        return Response(success=True, message="Blog tag deleted successfully")
+        return Response.success(message="Blog tag deleted successfully")
     except APIException:
         raise
     except Exception as e:
@@ -345,7 +345,7 @@ async def delete_blog_tag(
 
 # --- Comments ---
 
-@router.post("/posts/{post_id}/comments", response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/posts/{post_id}/comments")
 async def create_comment(
     post_id: UUID,
     comment_data: CommentCreate,
@@ -360,7 +360,7 @@ async def create_comment(
 
         blog_service = BlogService(db)
         comment = await blog_service.create_comment(comment_data, current_user.id)
-        return Response(success=True, data=comment, message="Comment added successfully")
+        return Response.success(data=comment, message="Comment added successfully", status_code=status.HTTP_201_CREATED)
     except APIException:
         raise
     except Exception as e:
@@ -369,7 +369,7 @@ async def create_comment(
             message=f"Failed to add comment: {str(e)}"
         )
 
-@router.get("/posts/{post_id}/comments", response_model=List[CommentResponse])
+@router.get("/posts/{post_id}/comments")
 async def get_comments_for_post(
     post_id: UUID,
     db: AsyncSession = Depends(get_db)
@@ -378,14 +378,14 @@ async def get_comments_for_post(
     try:
         blog_service = BlogService(db)
         comments = await blog_service.get_comments_for_post(post_id)
-        return Response(success=True, data=comments)
+        return Response.success(data=comments)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch comments: {str(e)}"
         )
 
-@router.put("/comments/{comment_id}", response_model=CommentResponse)
+@router.put("/comments/{comment_id}")
 async def update_comment(
     comment_id: UUID,
     comment_data: CommentUpdate,
@@ -397,7 +397,7 @@ async def update_comment(
         blog_service = BlogService(db)
         is_admin = current_user.role.lower() in ["admin", "superadmin"]
         comment = await blog_service.update_comment(comment_id, comment_data, current_user.id, is_admin)
-        return Response(success=True, data=comment, message="Comment updated successfully")
+        return Response.success(data=comment, message="Comment updated successfully")
     except APIException:
         raise
     except Exception as e:
@@ -406,7 +406,7 @@ async def update_comment(
             message=f"Failed to update comment: {str(e)}"
         )
 
-@router.delete("/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/comments/{comment_id}")
 async def delete_comment(
     comment_id: UUID,
     current_user: User = Depends(get_current_auth_user),
@@ -417,7 +417,7 @@ async def delete_comment(
         blog_service = BlogService(db)
         is_admin = current_user.role.lower() in ["admin", "superadmin"]
         await blog_service.delete_comment(comment_id, current_user.id, is_admin)
-        return Response(success=True, message="Comment deleted successfully")
+        return Response.success(message="Comment deleted successfully")
     except APIException:
         raise
     except Exception as e:

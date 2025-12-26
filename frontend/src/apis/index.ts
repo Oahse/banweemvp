@@ -9,6 +9,8 @@ export { apiClient, TokenManager } from './client';
 // Export legacy API classes for backwards compatibility
 export { default as AuthAPI } from './auth';
 export { default as ProductsAPI } from './products';
+export { default as UsersAPI } from './users';
+export { default as SearchAPI } from './search';
 export { default as OrdersAPI } from './orders';
 export { default as CartAPI } from './cart';
 export { default as AnalyticsAPI } from './analytics';
@@ -21,6 +23,8 @@ export { default as CategoriesAPI } from './categories';
 // Create a centralized API object for easy access
 import AuthAPI from './auth';
 import ProductsAPI from './products';
+import UsersAPI from './users';
+import SearchAPI from './search';
 import OrdersAPI from './orders';
 import CartAPI from './cart';
 import AnalyticsAPI from './analytics';
@@ -39,6 +43,8 @@ export const API = {
   // Legacy APIs (for backwards compatibility)
   auth: AuthAPI,
   products: ProductsAPI,
+  users: UsersAPI,
+  search: SearchAPI,
   orders: OrdersAPI,
   cart: CartAPI,
   analytics: AnalyticsAPI,

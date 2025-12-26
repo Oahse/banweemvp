@@ -31,7 +31,7 @@ async def create_review(
     try:
         review_service = ReviewService(db)
         review = await review_service.create_review(review_data, current_user.id)
-        return Response(success=True, data=review, message="Review created successfully")
+        return Response.success(data=review, message="Review created successfully")
     except APIException:
         raise
     except Exception as e:
@@ -55,7 +55,7 @@ async def get_review(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Review not found"
             )
-        return Response(success=True, data=review)
+        return Response.success(data=review)
     except APIException:
         raise
     except Exception as e:
@@ -82,7 +82,7 @@ async def get_reviews_for_product(
         reviews = await review_service.get_reviews_for_product(
             product_id, page, limit, min_rating, max_rating, sort_by
         )
-        return Response(success=True, data=reviews)
+        return Response.success(data=reviews)
     except APIException:
         raise
     except Exception as e:
@@ -103,7 +103,7 @@ async def update_review(
     try:
         review_service = ReviewService(db)
         review = await review_service.update_review(review_id, review_data, current_user.id)
-        return Response(success=True, data=review, message="Review updated successfully")
+        return Response.success(data=review, message="Review updated successfully")
     except APIException:
         raise
     except Exception as e:
@@ -123,7 +123,7 @@ async def delete_review(
     try:
         review_service = ReviewService(db)
         await review_service.delete_review(review_id, current_user.id)
-        return Response(success=True, message="Review deleted successfully")
+        return Response.success(message="Review deleted successfully")
     except APIException:
         raise
     except Exception as e:

@@ -8,6 +8,7 @@ from uuid import UUID
 
 from core.database import get_db
 from core.dependencies import get_current_user
+from core.utils.response import Response
 from models.user import User
 from models.notifications import Notification, NotificationPreference
 from services.notifications import NotificationService
@@ -21,7 +22,7 @@ from schemas.notifications import (
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
 
-@router.get("/", response_model=dict)
+@router.get("/")
 async def get_user_notifications(
     page: int = 1,
     limit: int = 20,
@@ -31,15 +32,16 @@ async def get_user_notifications(
 ):
     """Get user notifications with pagination"""
     service = NotificationService(db)
-    return await service.get_user_notifications(
+    notifications = await service.get_user_notifications(
         user_id=current_user.id,
         page=page,
         limit=limit,
         unread_only=unread_only
     )
+    return Response.success(data=notifications)
 
 
-@router.post("/", response_model=NotificationResponse)
+@router.post("/")
 async def create_notification(
     notification_data: NotificationCreate,
     current_user: User = Depends(get_current_user),
@@ -61,7 +63,7 @@ async def create_notification(
         metadata=notification_data.metadata
     )
     
-    return NotificationResponse.from_orm(notification)
+    return Response.success(data=NotificationResponse.from_orm(notification))
 
 
 @router.patch("/{notification_id}/read")
@@ -83,7 +85,7 @@ async def mark_notification_read(
     return {"message": "Notification marked as read"}
 
 
-@router.get("/preferences", response_model=NotificationPreferenceResponse)
+@router.get("/preferences")
 async def get_notification_preferences(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -91,10 +93,10 @@ async def get_notification_preferences(
     """Get user notification preferences"""
     service = NotificationService(db)
     preferences = await service.get_user_preferences(current_user.id)
-    return NotificationPreferenceResponse.from_orm(preferences)
+    return Response.success(data=NotificationPreferenceResponse.from_orm(preferences))
 
 
-@router.put("/preferences", response_model=NotificationPreferenceResponse)
+@router.put("/preferences")
 async def update_notification_preferences(
     preferences_data: NotificationPreferenceUpdate,
     current_user: User = Depends(get_current_user),
@@ -106,7 +108,7 @@ async def update_notification_preferences(
         user_id=current_user.id,
         preferences_data=preferences_data.dict(exclude_unset=True)
     )
-    return NotificationPreferenceResponse.from_orm(preferences)
+    return Response.success(data=NotificationPreferenceResponse.from_orm(preferences))
 
 
 @router.post("/send-multi-channel")

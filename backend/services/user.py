@@ -1,8 +1,8 @@
 from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, and_, func
+from sqlalchemy import select, update, delete, and_, func, text
 from sqlalchemy.orm import selectinload
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from uuid import UUID, uuid4
 from models.user import Address, User
 from models.orders import Order
@@ -14,12 +14,21 @@ from core.utils.messages.email import send_email
 import httpx
 from core.config import settings
 from core.utils.encryption import PasswordManager
+from services.event_service import event_service
 
 
 class UserService:
     def __init__(self, db: AsyncSession):
         self.db = db
         self.password_manager = PasswordManager()
+        
+        # Search configuration
+        self.similarity_threshold = 0.3
+        self.weights = {
+            "exact": 1.0,
+            "prefix": 0.8,
+            "fuzzy": 0.5
+        }
 
     async def create_user(self, user_data: UserCreate, background_tasks: BackgroundTasks) -> User:
         hashed_password = self.password_manager.hash_password(
@@ -45,6 +54,22 @@ class UserService:
         # Send verification email in the background
         background_tasks.add_task(
             self.send_verification_email, new_user, verification_token)
+
+        # Publish user.registered event using new event system
+        try:
+            await event_service.publish_user_registered(
+                user_id=str(new_user.id),
+                email=new_user.email,
+                username=f"{new_user.firstname} {new_user.lastname}",
+                registration_source="web",
+                email_verified=False,
+                correlation_id=str(new_user.id)
+            )
+        except Exception as e:
+            # Log error but don't fail user creation
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to publish user.registered event for user {new_user.id}: {e}")
 
         return new_user
 
@@ -95,6 +120,19 @@ class UserService:
 
         # Send welcome email in the background
         background_tasks.add_task(self.send_welcome_email, user)
+
+        # Publish user.verified event using new event system
+        try:
+            await event_service.publish_user_verified(
+                user_id=str(user.id),
+                email=user.email,
+                correlation_id=str(user.id)
+            )
+        except Exception as e:
+            # Log error but don't fail verification
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to publish user.verified event for user {user.id}: {e}")
 
     async def send_welcome_email(self, user: User):
         """Sends a welcome email to a new user."""
@@ -309,3 +347,98 @@ class AddressService:
         await self.db.delete(user)
         await self.db.commit()
         return True
+
+    async def search_users(
+        self, 
+        query: str, 
+        limit: int = 20,
+        role_filter: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Advanced search for users with prefix matching on name and email.
+        """
+        if not query or len(query.strip()) < 2:
+            return []
+            
+        query = query.strip().lower()
+        
+        # Build base conditions
+        base_conditions = ["u.active = true"]
+        params = {
+            "query": query,
+            "similarity_threshold": self.similarity_threshold,
+            "limit": limit,
+            "exact_weight": self.weights["exact"],
+            "prefix_weight": self.weights["prefix"],
+            "fuzzy_weight": self.weights["fuzzy"]
+        }
+        
+        if role_filter:
+            base_conditions.append("u.role = :role_filter")
+            params["role_filter"] = role_filter
+        
+        where_clause = " AND ".join(base_conditions)
+        
+        sql_query = text(f"""
+            SELECT 
+                u.id,
+                u.firstname,
+                u.lastname,
+                u.email,
+                u.role,
+                u.verified,
+                (
+                    -- First name matching
+                    CASE WHEN LOWER(u.firstname) = :query THEN :exact_weight
+                         WHEN LOWER(u.firstname) LIKE CONCAT(:query, '%') THEN :prefix_weight
+                         WHEN LOWER(u.firstname) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.7
+                         ELSE similarity(LOWER(u.firstname), :query) * :fuzzy_weight
+                    END +
+                    -- Last name matching
+                    CASE WHEN LOWER(u.lastname) = :query THEN :exact_weight
+                         WHEN LOWER(u.lastname) LIKE CONCAT(:query, '%') THEN :prefix_weight
+                         WHEN LOWER(u.lastname) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.7
+                         ELSE similarity(LOWER(u.lastname), :query) * :fuzzy_weight
+                    END +
+                    -- Email matching (lower weight)
+                    CASE WHEN LOWER(u.email) LIKE CONCAT(:query, '%') THEN :prefix_weight * 0.8
+                         WHEN LOWER(u.email) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.6
+                         ELSE similarity(LOWER(u.email), :query) * :fuzzy_weight * 0.8
+                    END +
+                    -- Full name matching (concatenated)
+                    CASE WHEN LOWER(CONCAT(u.firstname, ' ', u.lastname)) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.9
+                         ELSE similarity(LOWER(CONCAT(u.firstname, ' ', u.lastname)), :query) * :fuzzy_weight * 0.9
+                    END
+                ) as relevance_score
+            FROM users u
+            WHERE {where_clause}
+            AND (
+                LOWER(u.firstname) LIKE CONCAT('%', :query, '%')
+                OR LOWER(u.lastname) LIKE CONCAT('%', :query, '%')
+                OR LOWER(u.email) LIKE CONCAT('%', :query, '%')
+                OR LOWER(CONCAT(u.firstname, ' ', u.lastname)) LIKE CONCAT('%', :query, '%')
+                OR similarity(LOWER(u.firstname), :query) > :similarity_threshold
+                OR similarity(LOWER(u.lastname), :query) > :similarity_threshold
+                OR similarity(LOWER(u.email), :query) > :similarity_threshold
+            )
+            ORDER BY relevance_score DESC, u.verified DESC
+            LIMIT :limit
+        """)
+        
+        result = await self.db.execute(sql_query, params)
+        
+        users = []
+        for row in result:
+            users.append({
+                "id": str(row.id),
+                "firstname": row.firstname,
+                "lastname": row.lastname,
+                "full_name": f"{row.firstname} {row.lastname}",
+                "email": row.email,
+                "role": row.role,
+                "verified": row.verified,
+                "relevance_score": float(row.relevance_score),
+                "type": "user"
+            })
+            
+        return users

@@ -91,7 +91,7 @@ async def get_profile(
             "created_at": current_user.created_at.isoformat(),
             "updated_at": current_user.updated_at.isoformat() if current_user.updated_at else None
         }
-        return Response(success=True, data=user_data)
+        return Response.success(data=user_data)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -99,7 +99,7 @@ async def get_profile(
         )
 
 
-@router.get("/addresses", response_model=List[AddressResponse])
+@router.get("/addresses")
 async def get_addresses(
     current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
@@ -108,7 +108,7 @@ async def get_addresses(
     try:
         address_service = AddressService(db)
         addresses = await address_service.get_user_addresses(current_user.id)
-        return [AddressResponse.from_orm(address) for address in addresses]
+        return Response.success(data=[AddressResponse.from_orm(address) for address in addresses])
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -116,7 +116,7 @@ async def get_addresses(
         )
 
 
-@router.post("/addresses", response_model=APIResponse[AddressResponse])
+@router.post("/addresses")
 async def create_address(
     address_data: AddressCreate,
     current_user: User = Depends(get_current_auth_user),
@@ -129,7 +129,7 @@ async def create_address(
             user_id=current_user.id,
             **address_data.dict()
         )
-        return Response(success=True, data=address, message="Address created successfully")
+        return Response.success(data=address, message="Address created successfully")
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -137,7 +137,7 @@ async def create_address(
         )
 
 
-@router.put("/addresses/{address_id}", response_model=APIResponse[AddressResponse])
+@router.put("/addresses/{address_id}")
 async def update_address(
     address_id: UUID,
     address_data: AddressUpdate,
@@ -155,7 +155,7 @@ async def update_address(
         if not address:
             raise APIException(status_code=status.HTTP_404_NOT_FOUND,
                                message="Address not found or not owned by user")
-        return Response(success=True, data=address, message="Address updated successfully")
+        return Response.success(data=address, message="Address updated successfully")
     except APIException:
         raise
     except Exception as e:
@@ -165,7 +165,7 @@ async def update_address(
         )
 
 
-@router.delete("/addresses/{address_id}", response_model=APIResponse[dict])
+@router.delete("/addresses/{address_id}")
 async def delete_address(
     address_id: UUID,
     current_user: User = Depends(get_current_auth_user),
@@ -179,7 +179,7 @@ async def delete_address(
         if not deleted:
             raise APIException(status_code=status.HTTP_404_NOT_FOUND,
                                message="Address not found or not owned by user")
-        return Response(success=True, message="Address deleted successfully")
+        return Response.success(message="Address deleted successfully")
     except APIException:
         raise
     except Exception as e:

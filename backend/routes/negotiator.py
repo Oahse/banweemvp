@@ -75,7 +75,7 @@ class NegotiationTaskResponse(BaseModel):
     task_id: str
     message: str
 
-@router.post("/start", response_model=APIResponse[NegotiationTaskResponse], status_code=status.HTTP_202_ACCEPTED)
+@router.post("/start")
 async def start_negotiation(
     request: NegotiationStartRequest,
     current_user: User = Depends(get_current_auth_user), # Requires authentication
@@ -106,12 +106,13 @@ async def start_negotiation(
     )
 
     return Response.success(
-        NegotiationTaskResponse(negotiation_id=UUID(negotiation_data["negotiation_id"]), task_id="N/A", message=negotiation_data["message"]), # task_id will not be available from Kafka
-        message="Negotiation started successfully."
+        data=NegotiationTaskResponse(negotiation_id=UUID(negotiation_data["negotiation_id"]), task_id="N/A", message=negotiation_data["message"]), # task_id will not be available from Kafka
+        message="Negotiation started successfully.",
+        status_code=status.HTTP_202_ACCEPTED
     )
 
 
-@router.post("/step", response_model=APIResponse[NegotiationTaskResponse])
+@router.post("/step")
 async def step_negotiation(
     request: NegotiationStepRequest,
     current_user: User = Depends(get_current_auth_user), # Requires authentication
@@ -129,12 +130,12 @@ async def step_negotiation(
     )
 
     return Response.success(
-        NegotiationTaskResponse(negotiation_id=negotiation_state["negotiation_id"], task_id="N/A", message="Negotiation step dispatched."),
+        data=NegotiationTaskResponse(negotiation_id=negotiation_state["negotiation_id"], task_id="N/A", message="Negotiation step dispatched."),
         message="Negotiation step initiated asynchronously."
     )
 
 
-@router.get("/{negotiation_id}", response_model=APIResponse[NegotiationStateResponse])
+@router.get("/{negotiation_id}")
 async def get_negotiation_state(
     negotiation_id: UUID, # Use UUID type directly for path parameter
     current_user: User = Depends(get_current_auth_user), # Requires authentication
@@ -160,10 +161,10 @@ async def get_negotiation_state(
         product_variant_id=negotiation_state.get("product_variant_id"),
         quantity=negotiation_state.get("quantity")
     )
-    return Response.success(response_data, message="Negotiation state retrieved successfully.")
+    return Response.success(data=response_data, message="Negotiation state retrieved successfully.")
 
 
-@router.delete("/{negotiation_id}", status_code=status.HTTP_200_OK) # Changed to 200 OK as it returns a response
+@router.delete("/{negotiation_id}")
 async def delete_negotiation(
     negotiation_id: UUID, # Use UUID type directly for path parameter
     current_user: User = Depends(get_current_auth_user), # Requires authentication

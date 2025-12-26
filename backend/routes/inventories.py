@@ -20,7 +20,7 @@ router = APIRouter(prefix="/v1/inventory", tags=["Inventory Management"])
 
 
 # --- WarehouseLocation Endpoints ---
-@router.post("/locations", response_model=WarehouseLocationResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/locations")
 async def create_warehouse_location(
     location_data: WarehouseLocationCreate,
     current_user: User = Depends(require_admin_or_supplier),
@@ -29,14 +29,14 @@ async def create_warehouse_location(
     """Create a new warehouse location (Admin/Supplier access)."""
     try:
         location = await inventory_service.create_warehouse_location(location_data)
-        return Response(success=True, data=location, message="Warehouse location created successfully")
+        return Response.success(data=location, message="Warehouse location created successfully", status_code=status.HTTP_201_CREATED)
     except APIException:
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to create location: {e}")
 
 
-@router.get("/locations", response_model=List[WarehouseLocationResponse])
+@router.get("/locations")
 async def get_all_warehouse_locations(
     current_user: User = Depends(require_admin_or_supplier),
     inventory_service: InventoryService = Depends(get_inventory_service)
@@ -44,12 +44,12 @@ async def get_all_warehouse_locations(
     """Get all warehouse locations (Admin/Supplier access)."""
     try:
         locations = await inventory_service.get_warehouse_locations()
-        return Response(success=True, data=locations)
+        return Response.success(data=locations)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch locations: {e}")
 
 
-@router.get("/locations/{location_id}", response_model=WarehouseLocationResponse)
+@router.get("/locations/{location_id}")
 async def get_warehouse_location(
     location_id: UUID,
     current_user: User = Depends(require_admin_or_supplier),
@@ -60,14 +60,14 @@ async def get_warehouse_location(
         location = await inventory_service.get_warehouse_location_by_id(location_id)
         if not location:
             raise APIException(status_code=status.HTTP_404_NOT_FOUND, message="Warehouse location not found")
-        return Response(success=True, data=location)
+        return Response.success(data=location)
     except APIException:
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch location: {e}")
 
 
-@router.put("/locations/{location_id}", response_model=WarehouseLocationResponse)
+@router.put("/locations/{location_id}")
 async def update_warehouse_location(
     location_id: UUID,
     location_data: WarehouseLocationUpdate,
@@ -77,14 +77,14 @@ async def update_warehouse_location(
     """Update a warehouse location (Admin/Supplier access)."""
     try:
         location = await inventory_service.update_warehouse_location(location_id, location_data)
-        return Response(success=True, data=location, message="Warehouse location updated successfully")
+        return Response.success(data=location, message="Warehouse location updated successfully")
     except APIException:
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update location: {e}")
 
 
-@router.delete("/locations/{location_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/locations/{location_id}")
 async def delete_warehouse_location(
     location_id: UUID,
     current_user: User = Depends(require_admin_or_supplier),
@@ -93,7 +93,7 @@ async def delete_warehouse_location(
     """Delete a warehouse location (Admin/Supplier access)."""
     try:
         await inventory_service.delete_warehouse_location(location_id)
-        return Response(success=True, message="Warehouse location deleted successfully")
+        return Response.success(message="Warehouse location deleted successfully")
     except APIException:
         raise
     except Exception as e:
@@ -101,7 +101,7 @@ async def delete_warehouse_location(
 
 
 # --- Inventory Item Endpoints ---
-@router.post("/", response_model=InventoryResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/")
 async def create_inventory_item(
     inventory_data: InventoryCreate,
     current_user: User = Depends(require_admin_or_supplier),
@@ -110,14 +110,14 @@ async def create_inventory_item(
     """Create a new inventory item (Admin/Supplier access)."""
     try:
         item = await inventory_service.create_inventory_item(inventory_data)
-        return Response(success=True, data=item, message="Inventory item created successfully")
+        return Response.success(data=item, message="Inventory item created successfully", status_code=status.HTTP_201_CREATED)
     except APIException:
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to create inventory item: {e}")
 
 
-@router.get("/", response_model=List[InventoryResponse])
+@router.get("/")
 async def get_all_inventory_items(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
@@ -130,12 +130,12 @@ async def get_all_inventory_items(
     """Get all inventory items with filters (Admin/Supplier access)."""
     try:
         items = await inventory_service.get_all_inventory_items(page, limit, product_id, location_id, low_stock)
-        return Response(success=True, data=items)
+        return Response.success(data=items)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch inventory items: {e}")
 
 
-@router.get("/{inventory_id}", response_model=InventoryResponse)
+@router.get("/{inventory_id}")
 async def get_inventory_item(
     inventory_id: UUID,
     current_user: User = Depends(require_admin_or_supplier),
@@ -146,14 +146,14 @@ async def get_inventory_item(
         item = await inventory_service.get_inventory_item_by_id(inventory_id)
         if not item:
             raise APIException(status_code=status.HTTP_404_NOT_FOUND, message="Inventory item not found")
-        return Response(success=True, data=item)
+        return Response.success(data=item)
     except APIException:
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch inventory item: {e}")
 
 
-@router.put("/{inventory_id}", response_model=InventoryResponse)
+@router.put("/{inventory_id}")
 async def update_inventory_item(
     inventory_id: UUID,
     inventory_data: InventoryUpdate,
@@ -163,14 +163,14 @@ async def update_inventory_item(
     """Update an inventory item (Admin/Supplier access)."""
     try:
         item = await inventory_service.update_inventory_item(inventory_id, inventory_data)
-        return Response(success=True, data=item, message="Inventory item updated successfully")
+        return Response.success(data=item, message="Inventory item updated successfully")
     except APIException:
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update inventory item: {e}")
 
 
-@router.delete("/{inventory_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{inventory_id}")
 async def delete_inventory_item(
     inventory_id: UUID,
     current_user: User = Depends(require_admin_or_supplier),
@@ -179,7 +179,7 @@ async def delete_inventory_item(
     """Delete an inventory item (Admin/Supplier access)."""
     try:
         await inventory_service.delete_inventory_item(inventory_id)
-        return Response(success=True, message="Inventory item deleted successfully")
+        return Response.success(message="Inventory item deleted successfully")
     except APIException:
         raise
     except Exception as e:
@@ -187,7 +187,7 @@ async def delete_inventory_item(
 
 
 # --- Stock Adjustment Endpoints ---
-@router.post("/adjustments", response_model=InventoryResponse, status_code=status.HTTP_200_OK)
+@router.post("/adjustments")
 async def adjust_stock(
     adjustment_data: StockAdjustmentCreate,
     current_user: User = Depends(require_admin_or_supplier),
@@ -196,14 +196,14 @@ async def adjust_stock(
     """Adjust stock quantity for an inventory item (Admin/Supplier access)."""
     try:
         updated_inventory = await inventory_service.adjust_stock(adjustment_data, adjusted_by_user_id=current_user.id)
-        return Response(success=True, data=updated_inventory, message="Stock adjusted successfully")
+        return Response.success(data=updated_inventory, message="Stock adjusted successfully")
     except APIException:
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to adjust stock: {e}")
 
 
-@router.get("/{inventory_id}/adjustments", response_model=List[StockAdjustmentResponse])
+@router.get("/{inventory_id}/adjustments")
 async def get_stock_adjustments(
     inventory_id: UUID,
     current_user: User = Depends(require_admin_or_supplier),
@@ -212,7 +212,7 @@ async def get_stock_adjustments(
     """Get all stock adjustments for an inventory item (Admin/Supplier access)."""
     try:
         adjustments = await inventory_service.get_stock_adjustments_for_inventory(inventory_id)
-        return Response(success=True, data=adjustments)
+        return Response.success(data=adjustments)
     except APIException:
         raise
     except Exception as e:

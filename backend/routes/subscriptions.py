@@ -29,7 +29,7 @@ async def create_subscription(
     try:
         subscription_service = SubscriptionService(db)
         subscription = await subscription_service.create_subscription(subscription_data, current_user.id)
-        return Response(success=True, data=subscription, message="Subscription created successfully")
+        return Response.success(data=subscription, message="Subscription created successfully")
     except APIException:
         raise
     except Exception as e:
@@ -50,7 +50,7 @@ async def get_subscriptions(
     try:
         subscription_service = SubscriptionService(db)
         subscriptions = await subscription_service.get_user_subscriptions(current_user.id, page, limit)
-        return Response(success=True, data=subscriptions)
+        return Response.success(data=subscriptions)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -73,7 +73,7 @@ async def get_subscription(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Subscription not found"
             )
-        return Response(success=True, data=subscription)
+        return Response.success(data=subscription)
     except APIException:
         raise
     except Exception as e:
@@ -95,7 +95,7 @@ async def update_subscription(
     try:
         subscription_service = SubscriptionService(db)
         subscription = await subscription_service.update_subscription(subscription_id, subscription_data, current_user.id, background_tasks)
-        return Response(success=True, data=subscription, message="Subscription updated successfully")
+        return Response.success(data=subscription, message="Subscription updated successfully")
     except APIException:
         raise
     except Exception as e:
@@ -115,7 +115,7 @@ async def delete_subscription(
     try:
         subscription_service = SubscriptionService(db)
         await subscription_service.delete_subscription(subscription_id, current_user.id)
-        return Response(success=True, message="Subscription deleted successfully")
+        return Response.success(message="Subscription deleted successfully")
     except APIException:
         raise
     except Exception as e:

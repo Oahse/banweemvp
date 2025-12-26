@@ -21,8 +21,8 @@ from core.exceptions import (
     sqlalchemy_exception_handler,
     general_exception_handler
 )
-from core.kafka import consume_messages, get_kafka_producer_service 
-from routes.websockets.index import ws_router
+from core.kafka import consume_messages, get_kafka_producer_service, initialize_event_system, start_event_consumer 
+from routes.websocket import ws_router
 from routes.auth import router as auth_router
 from routes.user import router as user_router
 from routes.products import router as products_router
@@ -91,10 +91,25 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Database optimization warning: {e}")
 
-    # Start Kafka Producer
+    # Initialize new event system
+    try:
+        await initialize_event_system()
+        logger.info("Event system initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize event system: {e}")
+        # Continue without event system for backward compatibility
+    
+    # Start new event consumer
+    try:
+        await start_event_consumer()
+        logger.info("New event consumer started successfully")
+    except Exception as e:
+        logger.error(f"Failed to start new event consumer: {e}")
+
+    # Start Kafka Producer (legacy)
     kafka_producer_service = await get_kafka_producer_service()
 
-    # Start Kafka Consumer as a background task
+    # Start Kafka Consumer as a background task (legacy)
     consumer_task = asyncio.create_task(consume_messages())
 
     # Start WebSocket Kafka Consumer

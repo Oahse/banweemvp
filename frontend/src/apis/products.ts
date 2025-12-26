@@ -35,11 +35,29 @@ export class ProductsAPI {
   }
 
   /**
-   * Search products
+   * Search products (advanced search with fuzzy matching)
    */
   static async searchProducts(query, filters) {
-    const params = { q: query, ...filters };
-    return await this.getProducts(params);
+    const params = new URLSearchParams({ q: query });
+    
+    if (filters?.category_id) params.append('category_id', filters.category_id);
+    if (filters?.min_price !== undefined) params.append('min_price', filters.min_price.toString());
+    if (filters?.max_price !== undefined) params.append('max_price', filters.max_price.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+
+    return await apiClient.get(`/products/search?${params.toString()}`);
+  }
+
+  /**
+   * Search categories (advanced search with fuzzy matching)
+   */
+  static async searchCategories(query, limit = 20) {
+    const params = new URLSearchParams({
+      q: query,
+      limit: limit.toString()
+    });
+    
+    return await apiClient.get(`/products/categories/search?${params.toString()}`);
   }
 
   /**

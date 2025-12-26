@@ -22,6 +22,82 @@ router = APIRouter(prefix="/v1/products", tags=["Products"])
 # /products?sort_by=created_at&sort_order=desc&page=1&limit=12
 
 
+@router.get("/search")
+async def search_products(
+    q: str = Query(..., min_length=2, description="Search query (minimum 2 characters)"),
+    limit: int = Query(20, ge=1, le=100, description="Maximum number of results"),
+    category_id: Optional[UUID] = Query(None, description="Filter by category ID"),
+    min_price: Optional[float] = Query(None, ge=0, description="Minimum price filter"),
+    max_price: Optional[float] = Query(None, ge=0, description="Maximum price filter"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Advanced search for products with fuzzy matching and weighted ranking.
+    """
+    try:
+        product_service = ProductService(db)
+        
+        # Build filters
+        filters = {}
+        if category_id:
+            filters["category_id"] = category_id
+        if min_price is not None:
+            filters["min_price"] = min_price
+        if max_price is not None:
+            filters["max_price"] = max_price
+        
+        products = await product_service.search_products(
+            query=q,
+            limit=limit,
+            filters=filters if filters else None
+        )
+        
+        return Response.success(
+            data={
+                "query": q,
+                "filters": filters,
+                "products": products,
+                "count": len(products)
+            }
+        )
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to search products: {str(e)}"
+        )
+
+
+@router.get("/categories/search")
+async def search_categories(
+    q: str = Query(..., min_length=2, description="Search query (minimum 2 characters)"),
+    limit: int = Query(20, ge=1, le=50, description="Maximum number of results"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Advanced search for categories with prefix matching and fuzzy search.
+    """
+    try:
+        product_service = ProductService(db)
+        
+        categories = await product_service.search_categories(
+            query=q,
+            limit=limit
+        )
+        
+        return Response.success(
+            data={
+                "query": q,
+                "categories": categories,
+                "count": len(categories)
+            }
+        )
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to search categories: {str(e)}"
+        )
+
+
 @router.get("/home")
 async def get_home_data(
     db: AsyncSession = Depends(get_db)
@@ -54,8 +130,7 @@ async def get_home_data(
             sort_order="desc"
         )
         
-        return Response(
-            success=True,
+        return Response.success(
             data={
                 "categories": categories[:10] if categories else [],  # Limit to 10 for home page
                 "featured": featured,
@@ -119,8 +194,7 @@ async def get_products(
             )
             
             # Convert search results to match the expected format
-            return Response(
-                success=True, 
+            return Response.success( 
                 data={
                     "data": search_results,
                     "total": len(search_results),
@@ -156,7 +230,7 @@ async def get_products(
             )
             
             result["search_mode"] = "basic"
-            return Response(success=True, data=result)
+            return Response.success(data=result)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -185,8 +259,7 @@ async def get_categories(
                 limit=limit
             )
             
-            return Response(
-                success=True, 
+            return Response.success( 
                 data={
                     "categories": search_results,
                     "count": len(search_results),
@@ -210,8 +283,7 @@ async def get_categories(
             # Apply limit
             categories = categories[:limit]
             
-            return Response(
-                success=True, 
+            return Response.success( 
                 data={
                     "categories": categories,
                     "count": len(categories),
@@ -235,7 +307,7 @@ async def get_recommended_products(
     try:
         product_service = ProductService(db)
         products = await product_service.get_recommended_products(product_id, limit)
-        return Response(success=True, data=products)
+        return Response.success(data=products)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -252,7 +324,7 @@ async def get_product_variants(
     try:
         product_service = ProductService(db)
         variants = await product_service.get_product_variants(product_id)
-        return Response(success=True, data=variants)
+        return Response.success(data=variants)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -274,7 +346,7 @@ async def get_variant(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Product variant not found"
             )
-        return Response(success=True, data=variant)
+        return Response.success(data=variant)
     except APIException:
         raise
     except Exception as e:
@@ -298,7 +370,7 @@ async def get_variant_qr_code(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Product variant not found"
             )
-        return Response(success=True, data={"qr_code_url": qr_code_url})
+        return Response.success(data={"qr_code_url": qr_code_url})
     except APIException:
         raise
     except Exception as e:
@@ -322,7 +394,7 @@ async def get_variant_barcode(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Product variant not found"
             )
-        return Response(success=True, data={"barcode_url": barcode_url})
+        return Response.success(data={"barcode_url": barcode_url})
     except APIException:
         raise
     except Exception as e:

@@ -1,12 +1,13 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
+from uuid import UUID
 
 from schemas.product import ProductVariantResponse
 
 
 class SubscriptionBase(BaseModel):
-    user_id: Optional[str] = None
+    user_id: Optional[UUID] = None
     plan_id: str = Field(..., min_length=1)
     status: str = Field(..., min_length=1)
     price: Optional[float] = None
@@ -35,7 +36,7 @@ class SubscriptionUpdate(SubscriptionBase):
 
 
 class SubscriptionResponse(SubscriptionBase):
-    id: str
+    id: UUID
     created_at: datetime
     updated_at: datetime
     products: List[ProductVariantResponse] = []

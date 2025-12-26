@@ -8,7 +8,6 @@ from .promocode import Promocode
 from .shipping import ShippingMethod
 from .wishlist import Wishlist, WishlistItem
 from .notifications import Notification
-from .transaction_logs import SagaLog, RequestLog
 from .loyalty import LoyaltyAccount, PointsTransaction
 from .variant_tracking import VariantTrackingEntry, VariantPriceHistory, VariantAnalytics, VariantSubstitution
 
@@ -20,12 +19,7 @@ from .notifications import Notification, NotificationPreference, NotificationHis
 from .inventories import WarehouseLocation, Inventory, StockAdjustment, InventoryReservation
 from .admin import PricingConfig, SubscriptionCostHistory, SubscriptionAnalytics, PaymentAnalytics
 
-# Import settings and utils if they exist
-try:
-    from .settings import Settings
-except ImportError:
-    pass
-
+# Import utils if they exist
 try:
     from .utils import ModelUtils
 except ImportError:

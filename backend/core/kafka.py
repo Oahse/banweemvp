@@ -11,6 +11,9 @@ from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 from core.config import settings
 from sqlalchemy import select
 
+# Import new event system
+from core.events import EventProducer, EventConsumer, event_producer, event_consumer
+from core.events.handlers import OrderEventHandler, InventoryEventHandler, UserEventHandler
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -500,6 +503,143 @@ class KafkaProducer:
 kafka_producer_service = None
 
 async def get_kafka_producer_service() -> KafkaProducer:
+    global kafka_producer_service
+    if kafka_producer_service is None:
+        kafka_producer_service = KafkaProducer()
+        await kafka_producer_service.start()
+    return kafka_producer_service
+
+# Initialize event system
+async def initialize_event_system():
+    """Initialize the new event-driven architecture system"""
+    try:
+        # Start event producer
+        await event_producer.start()
+        logger.info("Event producer initialized")
+        
+        # Register event handlers
+        event_consumer.register_handler("order.order.created", OrderEventHandler())
+        event_consumer.register_handler("order.order.paid", OrderEventHandler())
+        event_consumer.register_handler("order.order.failed", OrderEventHandler())
+        event_consumer.register_handler("order.order.shipped", OrderEventHandler())
+        event_consumer.register_handler("order.order.delivered", OrderEventHandler())
+        event_consumer.register_handler("order.order.cancelled", OrderEventHandler())
+        
+        event_consumer.register_handler("inventory.stock.updated", InventoryEventHandler())
+        event_consumer.register_handler("inventory.stock.low", InventoryEventHandler())
+        
+        event_consumer.register_handler("user.user.registered", UserEventHandler())
+        event_consumer.register_handler("user.user.verified", UserEventHandler())
+        event_consumer.register_handler("user.profile.updated", UserEventHandler())
+        
+        # Create processed events table for idempotency
+        await event_consumer.create_processed_events_table()
+        
+        logger.info("Event system initialized successfully")
+        
+    except Exception as e:
+        logger.error(f"Failed to initialize event system: {e}")
+        raise
+
+
+async def start_event_consumer():
+    """Start the new event consumer system"""
+    try:
+        await event_consumer.start()
+        logger.info("New event consumer started")
+        
+        # Start consuming events in background
+        asyncio.create_task(event_consumer.consume_events())
+        
+    except Exception as e:
+        logger.error(f"Failed to start event consumer: {e}")
+        raise
+
+
+# Convenience functions for publishing events using new system
+async def publish_order_created_event(order_id: str, user_id: str, amount: float, **kwargs):
+    """Publish order created event using new event system"""
+    return await event_producer.publish_order_created(
+        order_id=order_id,
+        user_id=user_id,
+        amount=amount,
+        **kwargs
+    )
+
+
+async def publish_order_paid_event(order_id: str, payment_id: str, amount: float, **kwargs):
+    """Publish order paid event using new event system"""
+    return await event_producer.publish_order_paid(
+        order_id=order_id,
+        payment_id=payment_id,
+        amount=amount,
+        **kwargs
+    )
+
+
+# Note: Inventory reservation functions removed - implement as needed
+        quantity=quantity,
+        order_id=order_id,
+        reservation_id=reservation_id,
+        expires_at=expires_at,
+        **kwargs
+    )
+
+
+async def publish_user_registered_event(user_id: str, email: str, username: str, **kwargs):
+    """Publish user registered event using new event system"""
+    return await event_producer.publish_user_registered(
+        user_id=user_id,
+        email=email,
+        username=username,
+        **kwargs
+    )
+
+
+async def publish_payment_succeeded_event(payment_id: str, order_id: str, transaction_id: str, amount: float, **kwargs):
+    """Publish payment succeeded event using new event system"""
+    return await event_producer.publish_payment_succeeded(
+        payment_id=payment_id,
+        order_id=order_id,
+        transaction_id=transaction_id,
+        amount=amount,
+        **kwargs
+    )
+
+
+async def publish_payment_failed_event(payment_id: str, order_id: str, user_id: str, failure_reason: str, error_code: str, **kwargs):
+    """Publish payment failed event using new event system"""
+    return await event_producer.publish_payment_failed(
+        payment_id=payment_id,
+        order_id=order_id,
+        user_id=user_id,
+        failure_reason=failure_reason,
+        error_code=error_code,
+        **kwargs
+    )
+
+
+# Backward compatibility - keep existing functions but add deprecation warnings
+import warnings
+from datetime import timedelta
+
+def deprecated_function(func_name: str):
+    """Decorator to mark functions as deprecated"""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            warnings.warn(
+                f"{func_name} is deprecated. Use the new event system functions instead.",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+@deprecated_function("get_kafka_producer_service")
+async def get_kafka_producer_service() -> KafkaProducer:
+    """Deprecated: Use event_producer from core.events instead"""
     global kafka_producer_service
     if kafka_producer_service is None:
         kafka_producer_service = KafkaProducer()

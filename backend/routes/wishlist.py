@@ -46,7 +46,7 @@ async def create_default_wishlist(
                 "updated_at": default_wishlist.updated_at.isoformat() if default_wishlist.updated_at else None,
                 "items": []
             }
-            return Response(success=True, data=WishlistResponse.model_validate(wishlist_data))
+            return Response.success(data=WishlistResponse.model_validate(wishlist_data))
 
         # Create new default wishlist
         from schemas.wishlist import WishlistCreate
@@ -63,7 +63,7 @@ async def create_default_wishlist(
             "items": []
         }
 
-        return Response(success=True, data=WishlistResponse.model_validate(wishlist_data), code=status.HTTP_201_CREATED)
+        return Response.success(data=WishlistResponse.model_validate(wishlist_data), status_code=status.HTTP_201_CREATED)
     except APIException:
         raise
     except Exception as e:
@@ -152,7 +152,7 @@ async def get_wishlists(
                 except Exception as e2:
                     continue
 
-        return Response(success=True, data=serialized_wishlists)
+        return Response.success(data=serialized_wishlists)
     except APIException:
         raise
     except Exception as e:
@@ -193,7 +193,7 @@ async def create_wishlist(
             "items": []
         }
 
-        return Response(success=True, data=WishlistResponse.model_validate(wishlist_data), code=status.HTTP_201_CREATED)
+        return Response.success(data=WishlistResponse.model_validate(wishlist_data), status_code=status.HTTP_201_CREATED)
     except APIException:
         raise
     except Exception as e:
@@ -217,7 +217,7 @@ async def get_wishlist_by_id(
     if not wishlist:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, message="Wishlist not found")
-    return Response(success=True, data=WishlistResponse.from_orm(wishlist))
+    return Response.success(data=WishlistResponse.from_orm(wishlist))
 
 
 @router.put("/{user_id}/wishlists/{wishlist_id}")
@@ -233,7 +233,7 @@ async def update_wishlist(
     if not updated_wishlist:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, message="Wishlist not found")
-    return Response(success=True, data=WishlistResponse.from_orm(updated_wishlist))
+    return Response.success(data=WishlistResponse.from_orm(updated_wishlist))
 
 
 @router.delete("/{user_id}/wishlists/{wishlist_id}")
@@ -248,7 +248,7 @@ async def delete_wishlist(
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, message="Wishlist not found")
-    return Response(success=True, code=status.HTTP_204_NO_CONTENT)
+    return Response.success(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/{user_id}/wishlists/{wishlist_id}/items")
@@ -282,7 +282,7 @@ async def add_item_to_wishlist(
             "variant": item.variant.to_dict() if item.variant else None
         }
 
-        return Response(success=True, data=WishlistItemResponse.model_validate(item_data), code=status.HTTP_201_CREATED)
+        return Response.success(data=WishlistItemResponse.model_validate(item_data), status_code=status.HTTP_201_CREATED)
     except APIException:
         raise
     except Exception as e:
@@ -317,7 +317,7 @@ async def remove_item_from_wishlist(
                 status_code=status.HTTP_404_NOT_FOUND,
                 message="Wishlist item not found"
             )
-        return Response(success=True, data=None, message="Item removed successfully")
+        return Response.success(data=None, message="Item removed successfully")
     except APIException:
         raise
     except Exception as e:
@@ -361,7 +361,7 @@ async def set_default_wishlist(
             "items": []  # Simplified for this endpoint
         }
 
-        return Response(success=True, data=WishlistResponse.model_validate(wishlist_data))
+        return Response.success(data=WishlistResponse.model_validate(wishlist_data))
     except APIException:
         raise
     except Exception as e:
