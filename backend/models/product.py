@@ -154,6 +154,10 @@ class ProductVariant(BaseModel):
     base_price = Column(Float, nullable=False)
     sale_price = Column(Float, nullable=True)
 
+    # NEW FIELDS FOR BARCODE AND QR_CODE
+    barcode = Column(Text, nullable=True)
+    qr_code = Column(Text, nullable=True)
+
     # {"size": "1kg", "color": "red", etc.}
     attributes = Column(JSON, nullable=True)
     is_active = Column(Boolean, default=True)
@@ -198,6 +202,8 @@ class ProductVariant(BaseModel):
             "stock": self.inventory.quantity if self.inventory else 0, # GET STOCK FROM INVENTORY
             "attributes": self.attributes,
             "is_active": self.is_active,
+            "barcode": self.barcode,  # NEW
+            "qr_code": self.qr_code,  # NEW
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

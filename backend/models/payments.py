@@ -25,7 +25,7 @@ class PaymentMethod(BaseModel):
     stripe_payment_method_id = Column(String(255), nullable=True, unique=True)
     is_default = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
-    metadata = Column(JSON, default=dict)  # Additional payment method data
+    payment_method_metadata = Column(JSON, default=dict)  # Additional payment method data
 
     # Relationships
     user = relationship("User", back_populates="payment_methods")
@@ -43,7 +43,7 @@ class PaymentMethod(BaseModel):
             "stripe_payment_method_id": self.stripe_payment_method_id,
             "is_default": self.is_default,
             "is_active": self.is_active,
-            "metadata": self.metadata,
+            "payment_method_metadata": self.payment_method_metadata,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
@@ -91,8 +91,8 @@ class PaymentIntent(BaseModel):
     failure_reason = Column(Text, nullable=True)
     
     # Metadata for additional tracking
-    payment_metadata = Column(JSON, nullable=True)
-    
+    payment_intent_metadata = Column(JSON, nullable=True)
+
     # Relationships
     user = relationship("User", back_populates="payment_intents")
     order = relationship("Order", back_populates="payment_intents")
@@ -117,7 +117,7 @@ class PaymentIntent(BaseModel):
             "confirmed_at": self.confirmed_at.isoformat() if self.confirmed_at else None,
             "failed_at": self.failed_at.isoformat() if self.failed_at else None,
             "failure_reason": self.failure_reason,
-            "metadata": self.payment_metadata,
+            "metadata": self.payment_intent_metadata,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
@@ -145,7 +145,7 @@ class Transaction(BaseModel):
     failure_reason = Column(Text, nullable=True)
     
     # Additional transaction metadata
-    transaction_metadata = Column(JSON, default=dict)
+    transaction_details_metadata = Column(JSON, default=dict)
 
     # Relationships
     user = relationship("User", back_populates="transactions")
@@ -165,7 +165,7 @@ class Transaction(BaseModel):
             "transaction_type": self.transaction_type,
             "description": self.description,
             "failure_reason": self.failure_reason,
-            "metadata": self.transaction_metadata,
+            "metadata": self.transaction_details_metadata,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

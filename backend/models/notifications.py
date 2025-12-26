@@ -20,7 +20,7 @@ class Notification(BaseModel):
     # e.g., order_id, product_id, subscription_id
     related_id = Column(String(CHAR_LENGTH), nullable=True)
     # Additional context data
-    metadata = Column(JSON, default=dict)
+    notification_details_metadata = Column(JSON, default=dict)
 
     user = relationship("User", back_populates="notifications")
 
@@ -32,7 +32,7 @@ class Notification(BaseModel):
             "read": self.read,
             "type": self.type,
             "related_id": self.related_id,
-            "metadata": self.metadata,
+            "notification_details_metadata": self.notification_details_metadata,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
@@ -128,7 +128,7 @@ class NotificationHistory(BaseModel):
     error_message = Column(Text, nullable=True)
     
     # Metadata for additional tracking
-    notification_metadata = Column(JSON, default=dict)
+    history_metadata = Column(JSON, default=dict)
     
     user = relationship("User")
     notification = relationship("Notification")
@@ -145,7 +145,7 @@ class NotificationHistory(BaseModel):
             "status": self.status,
             "delivery_attempts": self.delivery_attempts,
             "error_message": self.error_message,
-            "metadata": self.notification_metadata,
+            "history_metadata": self.history_metadata,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
