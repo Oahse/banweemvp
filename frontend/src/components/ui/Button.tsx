@@ -1,10 +1,19 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../lib/utils';
 import { themeClasses } from '../../lib/theme';
 
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'success' | 'warning' | 'info';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'icon';
+  isLoading?: boolean;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
+  fullWidth?: boolean;
+  rounded?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+}
 
-
-export const Button = forwardRef(({
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   className,
   children,
   variant = 'primary',

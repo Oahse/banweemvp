@@ -35,7 +35,7 @@ export function ResponsiveTable<T>({
               <tr>
                 {columns.map((col, idx) => (
                   <th key={idx} className="py-3 px-4 text-left font-medium">
-                    <div className="w-20 h-4 bg-surface-hover rounded animate-pulse"></div>
+                    <div className="w-20 h-4 bg-surface-hover rounded animate-pulse" data-testid="desktop-skeleton-header-cell"></div>
                   </th>
                 ))}
               </tr>
@@ -45,7 +45,7 @@ export function ResponsiveTable<T>({
                 <tr key={index} className="border-t border-border-light">
                   {columns.map((_, colIdx) => (
                     <td key={colIdx} className="py-3 px-4">
-                      <div className="w-full h-4 bg-surface-hover rounded animate-pulse"></div>
+                      <div className="w-full h-4 bg-surface-hover rounded animate-pulse" data-testid="desktop-skeleton-data-cell"></div>
                     </td>
                   ))}
                 </tr>
@@ -57,7 +57,7 @@ export function ResponsiveTable<T>({
         {/* Mobile skeleton */}
         <div className="md:hidden space-y-3">
           {[...Array(5)].map((_, index) => (
-            <div key={index} className="bg-surface rounded-lg p-4 border border-border-light animate-pulse">
+            <div key={index} className="bg-surface rounded-lg p-4 border border-border-light animate-pulse" data-testid="mobile-skeleton-row">
               <div className="space-y-2">
                 <div className="w-3/4 h-4 bg-surface-hover rounded"></div>
                 <div className="w-1/2 h-3 bg-surface-hover rounded"></div>

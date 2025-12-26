@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [intendedDestination, setIntendedDestination] = useState(null);
 
   // Transform API user to local user format
-  const transformUser = (apiUser) => ({
+  const transformUser = (apiUser: any) => ({
     id: apiUser.id,
     created_at: apiUser.created_at,
     updated_at: apiUser.updated_at,

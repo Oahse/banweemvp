@@ -3,7 +3,7 @@ import React from 'react';
 export const CartSkeleton = () => {
   return (
     <div className="container mx-auto px-4 py-8 text-copy">
-      <div className="flex flex-col lg:flex-row gap-8 animate-pulse">
+      <div className="flex flex-col lg:flex-row gap-8 animate-pulse" data-testid="cart-skeleton-container">
         {/* Cart Items Skeleton */}
         <div className="lg:w-2/3">
           <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
@@ -17,7 +17,7 @@ export const CartSkeleton = () => {
               <div key={index} className="p-4 border-b border-border-light last:border-b-0">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                   <div className="col-span-6 flex items-center">
-                    <div className="w-20 h-20 rounded-md bg-gray-200 flex-shrink-0"></div>
+                    <div className="w-20 h-20 rounded-md bg-gray-200 flex-shrink-0" data-testid="cart-item-placeholder"></div>
                     <div className="ml-4 space-y-2 w-3/4">
                       <div className="h-4 bg-gray-200 rounded"></div>
                       <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -45,7 +45,7 @@ export const CartSkeleton = () => {
         {/* Order Summary Skeleton */}
         <div className="lg:w-1/3">
           <div className="bg-surface rounded-lg shadow-sm p-6 space-y-4">
-            <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
+            <div className="h-6 bg-gray-200 rounded w-1/2 mb-4" data-testid="summary-item-placeholder"></div>
             <div className="space-y-3">
               <div className="flex justify-between">
                 <div className="h-4 bg-gray-200 rounded w-1/3"></div>

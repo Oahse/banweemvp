@@ -60,6 +60,7 @@ export const Grid = forwardRef(({
         justifyStyles[justify],
         className
       )}
+      data-testid="grid-container"
       {...props}
     >
       {children}
@@ -143,6 +144,7 @@ export const GridItem = forwardRef(({
         rowStart && rowStartStyles[rowStart],
         className
       )}
+      data-testid="grid-item"
       {...props}
     >
       {children}
