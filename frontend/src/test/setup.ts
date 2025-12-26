@@ -1,10 +1,48 @@
-import { expect, afterEach, vi } from 'vitest';
+import { expect, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { server } from './mocks/server';
 
-// Cleanup after each test
+// Setup MSW server
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' });
+});
+
 afterEach(() => {
+  // Reset handlers after each test
+  server.resetHandlers();
+  // Cleanup React Testing Library
   cleanup();
+  // Clear all mocks
+  vi.clearAllMocks();
+  // Clear localStorage and sessionStorage
+  localStorage.clear();
+  sessionStorage.clear();
+});
+
+afterAll(() => {
+  server.close();
+});
+
+// Setup MSW server
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' });
+});
+
+afterEach(() => {
+  // Reset handlers after each test
+  server.resetHandlers();
+  // Cleanup React Testing Library
+  cleanup();
+  // Clear all mocks
+  vi.clearAllMocks();
+  // Clear localStorage and sessionStorage
+  localStorage.clear();
+  sessionStorage.clear();
+});
+
+afterAll(() => {
+  server.close();
 });
 
 // Mock window.matchMedia
