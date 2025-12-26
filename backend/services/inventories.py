@@ -7,6 +7,8 @@ from sqlalchemy.orm import selectinload, joinedload
 from typing import Optional, List, Dict, Any
 from uuid import UUID
 from datetime import datetime, timedelta
+import asyncio
+import logging
 
 from models.inventories import Inventory, WarehouseLocation, StockAdjustment, InventoryReservation
 from models.product import ProductVariant
@@ -423,7 +425,7 @@ class InventoryService:
         self,
         variant_id: UUID,
         quantity: int,
-        location_id: UUID,
+        location_id: Optional[UUID] = None,
         order_id: Optional[UUID] = None,
         user_id: Optional[UUID] = None
     ) -> Dict[str, Any]:
@@ -431,14 +433,37 @@ class InventoryService:
         Atomically decrement stock on purchase using SELECT ... FOR UPDATE
         """
         try:
-            # Get inventory with atomic lock
-            inventory = await Inventory.get_with_lock(self.db, variant_id)
+            # Get inventory with atomic lock - find by variant_id if location_id not provided
+            if location_id:
+                inventory = await self.db.execute(
+                    select(Inventory).where(
+                        and_(Inventory.variant_id == variant_id, Inventory.location_id == location_id)
+                    ).with_for_update()
+                )
+            else:
+                # Find first available inventory for this variant
+                inventory = await self.db.execute(
+                    select(Inventory).where(
+                        and_(Inventory.variant_id == variant_id, Inventory.quantity >= quantity)
+                    ).with_for_update().limit(1)
+                )
+            
+            inventory = inventory.scalar_one_or_none()
             
             if not inventory:
-                raise APIException(
-                    status_code=404,
-                    message=f"Inventory not found for variant {variant_id}"
-                )
+                return {
+                    "success": False,
+                    "message": f"Inventory not found for variant {variant_id}" + (f" at location {location_id}" if location_id else "")
+                }
+            
+            # Check if sufficient stock available
+            if inventory.quantity < quantity:
+                return {
+                    "success": False,
+                    "message": f"Insufficient stock. Available: {inventory.quantity}, Requested: {quantity}",
+                    "available_quantity": inventory.quantity,
+                    "requested_quantity": quantity
+                }
             
             # Perform atomic stock update
             adjustment = await inventory.atomic_update_stock(
@@ -455,12 +480,13 @@ class InventoryService:
             
             return {
                 "success": True,
-                "old_quantity": inventory.quantity_available + quantity,
-                "new_quantity": inventory.quantity_available,
+                "old_quantity": inventory.quantity + quantity,
+                "new_quantity": inventory.quantity,
                 "quantity_decremented": quantity,
                 "inventory_id": str(inventory.id),
-                "is_now_out_of_stock": inventory.quantity_available == 0,
-                "is_low_stock": inventory.quantity_available <= inventory.low_stock_threshold,
+                "location_id": str(inventory.location_id),
+                "is_now_out_of_stock": inventory.quantity == 0,
+                "is_low_stock": inventory.quantity <= inventory.low_stock_threshold,
                 "adjustment_id": str(adjustment.id)
             }
             
@@ -470,10 +496,10 @@ class InventoryService:
         except Exception as e:
             await self.db.rollback()
             logger.error(f"Failed to decrement stock atomically: {e}")
-            raise APIException(
-                status_code=500,
-                message=f"Failed to decrement stock: {str(e)}"
-            )
+            return {
+                "success": False,
+                "message": f"Failed to decrement stock: {str(e)}"
+            }
     
 
 
@@ -536,49 +562,109 @@ class InventoryService:
         variant_id: UUID,
         quantity: int,
         order_id: Optional[UUID] = None,
-        expiry_minutes: int = 15
+        expiry_minutes: int = 15,
+        user_id: Optional[UUID] = None
     ) -> Dict[str, Any]:
         """
-        Atomically reserve stock for an order using SELECT ... FOR UPDATE
+        Atomically reserve stock for an order with deadlock prevention and retry logic
         """
-        try:
-            # Get inventory with atomic lock
-            inventory = await Inventory.get_with_lock(self.db, variant_id)
-            
-            if not inventory:
-                raise APIException(
-                    status_code=404,
-                    message=f"Inventory not found for variant {variant_id}"
+        max_retries = 3
+        
+        for attempt in range(max_retries):
+            try:
+                # Get inventory with atomic lock (NOWAIT to prevent deadlocks)
+                inventory_query = select(Inventory).where(
+                    Inventory.variant_id == variant_id
+                ).with_for_update(nowait=True)
+                
+                result = await self.db.execute(inventory_query)
+                inventory = result.scalar_one_or_none()
+                
+                if not inventory:
+                    return {
+                        "success": False,
+                        "message": f"Inventory not found for variant {variant_id}",
+                        "error_code": "INVENTORY_NOT_FOUND"
+                    }
+                
+                # Check available stock (available - reserved)
+                available_stock = inventory.quantity_available - inventory.quantity_reserved
+                
+                if available_stock < quantity:
+                    return {
+                        "success": False,
+                        "message": f"Insufficient stock. Available: {available_stock}, Requested: {quantity}",
+                        "available_quantity": available_stock,
+                        "requested_quantity": quantity,
+                        "error_code": "INSUFFICIENT_STOCK"
+                    }
+                
+                # Create reservation record
+                expiry_time = datetime.utcnow() + timedelta(minutes=expiry_minutes)
+                
+                reservation = InventoryReservation(
+                    inventory_id=inventory.id,
+                    variant_id=variant_id,
+                    quantity=quantity,
+                    user_id=user_id,
+                    order_id=order_id,
+                    expires_at=expiry_time,
+                    status="active"
                 )
-            
-            # Perform atomic stock reservation
-            reservation = await inventory.atomic_reserve_stock(
-                db=self.db,
-                quantity=quantity,
-                order_id=order_id,
-                expiry_minutes=expiry_minutes
-            )
-            
-            await self.db.commit()
-            
-            logger.info(f"Atomically reserved stock for variant {variant_id}: {quantity} units")
-            
-            return {
-                "success": True,
-                "reservation": reservation.to_dict(),
-                "inventory": inventory.to_dict()
-            }
-            
-        except APIException:
-            await self.db.rollback()
-            raise
-        except Exception as e:
-            await self.db.rollback()
-            logger.error(f"Failed to reserve stock atomically: {e}")
-            raise APIException(
-                status_code=500,
-                message=f"Failed to reserve stock: {str(e)}"
-            )
+                
+                # Atomically update inventory reserved quantity
+                inventory.quantity_reserved += quantity
+                inventory.version += 1  # Optimistic locking
+                
+                self.db.add(reservation)
+                await self.db.flush()  # Get reservation ID
+                await self.db.refresh(reservation)
+                
+                logger.info(f"Reserved {quantity} units of variant {variant_id} for order {order_id}")
+                
+                return {
+                    "success": True,
+                    "reservation_id": str(reservation.id),
+                    "quantity_reserved": quantity,
+                    "expires_at": expiry_time.isoformat(),
+                    "available_after_reservation": available_stock - quantity,
+                    "inventory_id": str(inventory.id)
+                }
+                
+            except Exception as e:
+                error_str = str(e).lower()
+                
+                # Check if it's a lock-related error that we can retry
+                if any(keyword in error_str for keyword in ["could not obtain lock", "deadlock", "lock timeout"]):
+                    if attempt < max_retries - 1:
+                        # Wait with exponential backoff before retry
+                        wait_time = 0.1 * (2 ** attempt)
+                        logger.warning(f"Lock conflict on attempt {attempt + 1}, retrying in {wait_time}s: {e}")
+                        await asyncio.sleep(wait_time)
+                        continue
+                    else:
+                        logger.error(f"Failed to reserve stock after {max_retries} attempts due to lock conflicts")
+                        return {
+                            "success": False,
+                            "message": "Stock reservation temporarily unavailable due to high demand. Please try again.",
+                            "error_code": "LOCK_TIMEOUT",
+                            "retry_suggested": True
+                        }
+                else:
+                    # Non-retryable error
+                    logger.error(f"Failed to reserve stock for variant {variant_id}: {e}")
+                    return {
+                        "success": False,
+                        "message": f"Failed to reserve stock: {str(e)}",
+                        "error_code": "RESERVATION_ERROR"
+                    }
+        
+        # Should never reach here
+        return {
+            "success": False,
+            "message": "Stock reservation failed after all retry attempts",
+            "error_code": "MAX_RETRIES_EXCEEDED"
+        }
 
     async def confirm_stock_reservation(
         self,

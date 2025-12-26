@@ -402,13 +402,52 @@ class RefundService:
         return reason not in no_return_reasons
     
     async def _auto_approve_refund(self, refund: Refund):
-        """Automatically approve eligible refunds"""
+        """Automatically approve eligible refunds with inventory restoration"""
         refund.status = RefundStatus.APPROVED
         refund.auto_approved = True
         refund.approved_amount = refund.requested_amount
         refund.approved_at = datetime.now(timezone.utc)
         
+        # Restore inventory for refunded items
+        await self._restore_inventory_for_refund(refund)
+        
         logger.info(f"Auto-approved refund {refund.refund_number} for ${refund.requested_amount}")
+    
+    async def _restore_inventory_for_refund(self, refund: Refund):
+        """Restore inventory when refund is confirmed"""
+        try:
+            from services.inventories import InventoryService
+            
+            inventory_service = InventoryService(self.db)
+            
+            # Get refund items with order item details
+            refund_items = await self.db.execute(
+                select(RefundItem)
+                .options(selectinload(RefundItem.order_item))
+                .where(RefundItem.refund_id == refund.id)
+            )
+            refund_items = refund_items.scalars().all()
+            
+            for refund_item in refund_items:
+                try:
+                    # Restore inventory for each refunded item
+                    restore_result = await inventory_service.increment_stock_on_cancellation(
+                        variant_id=refund_item.order_item.variant_id,
+                        quantity=refund_item.quantity_to_refund,
+                        location_id=None,  # Will be determined by service
+                        order_id=refund.order_id,
+                        user_id=refund.user_id
+                    )
+                    
+                    logger.info(f"Restored {refund_item.quantity_to_refund} units of variant {refund_item.order_item.variant_id} for refund {refund.refund_number}")
+                    
+                except Exception as restore_error:
+                    logger.error(f"Failed to restore inventory for refund item {refund_item.id}: {restore_error}")
+                    # Continue with other items even if one fails
+                    
+        except Exception as e:
+            logger.error(f"Failed to restore inventory for refund {refund.id}: {e}")
+            # Don't fail the refund if inventory restoration fails
     
     async def _process_stripe_refund(self, refund: Refund):
         """Process refund through Stripe"""

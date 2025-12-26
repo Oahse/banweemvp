@@ -19,6 +19,26 @@ from services.inventories import InventoryService
 router = APIRouter(prefix="/inventory", tags=["Inventory Management"])
 
 
+# --- Public Stock Check Endpoint ---
+@router.get("/check-stock/{variant_id}")
+async def check_stock_availability(
+    variant_id: UUID,
+    quantity: int = Query(..., gt=0, description="Quantity to check"),
+    inventory_service: InventoryService = Depends(get_inventory_service)
+):
+    """Check stock availability for a product variant (Public endpoint)."""
+    try:
+        stock_check = await inventory_service.check_stock_availability(variant_id, quantity)
+        return Response.success(data=stock_check, message="Stock check completed")
+    except APIException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail=f"Failed to check stock: {e}"
+        )
+
+
 # --- WarehouseLocation Endpoints ---
 @router.post("/locations")
 async def create_warehouse_location(

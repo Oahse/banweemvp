@@ -197,24 +197,114 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
     if (!validateStep(3)) return;
 
     setProcessingPayment(true);
+    
     try {
-      const response = await OrdersAPI.checkout(formData);
-
-      if (response?.success && response?.data) {
-        toast.success('Order placed successfully! 🎉');
-        
-        // Clear saved form data
-        localStorage.removeItem('checkout_form_data');
-        
-        await clearCart();
-        onSuccess(response.data.id);
-      } else {
-        throw new Error('Failed to place order');
+      // Final validation before checkout
+      const finalValidation = await OrdersAPI.validateCheckout(formData);
+      
+      if (!finalValidation.data?.can_proceed) {
+        toast.error('Checkout validation failed. Please review your cart.');
+        setCurrentStep(1); // Go back to review cart
+        return;
       }
+      
+      // Generate idempotency key to prevent duplicate orders
+      const idempotencyKey = `checkout_${user?.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Add idempotency key and calculated total for validation
+      const checkoutData = {
+        ...formData,
+        idempotency_key: idempotencyKey,
+        frontend_calculated_total: orderSummary?.total || 0
+      };
+      
+      // Attempt checkout with retry logic for transient failures
+      let lastError = null;
+      const maxRetries = 3;
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          toast.loading(`Processing payment... (Attempt ${attempt}/${maxRetries})`, { 
+            id: 'checkout-loading',
+            duration: 60000 // 60 second timeout
+          });
+          
+          const response = await OrdersAPI.checkout(checkoutData);
+          
+          toast.dismiss('checkout-loading');
+          
+          if (response?.success && response?.data) {
+            // Clear form data from localStorage on success
+            localStorage.removeItem('checkout_form_data');
+            
+            // Clear cart
+            await clearCart();
+            
+            toast.success('Order placed successfully! 🎉');
+            onSuccess(response.data.id);
+            return;
+          } else {
+            throw new Error(response?.message || 'Checkout failed');
+          }
+          
+        } catch (error) {
+          lastError = error;
+          toast.dismiss('checkout-loading');
+          
+          // Check if it's a retryable error
+          const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
+          const isRetryable = 
+            errorMessage.includes('timeout') ||
+            errorMessage.includes('temporarily unavailable') ||
+            errorMessage.includes('high demand') ||
+            errorMessage.includes('Lock conflict') ||
+            error.response?.status === 408 || // Request timeout
+            error.response?.status === 429 || // Rate limit
+            error.response?.status === 503;   // Service unavailable
+          
+          if (!isRetryable || attempt === maxRetries) {
+            // Non-retryable error or final attempt
+            break;
+          }
+          
+          // Wait before retry with exponential backoff
+          const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          toast.loading(`Retrying in ${waitTime / 1000} seconds...`, { 
+            id: 'retry-wait',
+            duration: waitTime 
+          });
+          
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          toast.dismiss('retry-wait');
+        }
+      }
+      
+      // All retries failed - handle the error
+      const errorMessage = lastError?.response?.data?.detail || lastError?.message || 'Checkout failed';
+      
+      // Handle specific error types with appropriate user guidance
+      if (errorMessage.includes('Cart validation failed')) {
+        toast.error('Your cart has been updated. Please review and try again.');
+        setCurrentStep(1); // Go back to cart review
+      } else if (errorMessage.includes('Price mismatch') || errorMessage.includes('price')) {
+        toast.error('Prices have been updated. Please review your order.');
+        // Reload order summary
+        updateOrderSummary();
+      } else if (errorMessage.includes('Insufficient stock')) {
+        toast.error('Some items are no longer available. Please update your cart.');
+        setCurrentStep(1);
+      } else if (errorMessage.includes('Payment')) {
+        toast.error(`Payment failed: ${errorMessage}`);
+        setCurrentStep(3); // Stay on payment step
+      } else if (errorMessage.includes('high demand') || errorMessage.includes('temporarily unavailable')) {
+        toast.error('Service is experiencing high demand. Please try again in a moment.');
+      } else {
+        toast.error(`Checkout failed: ${errorMessage}`);
+      }
+      
     } catch (error) {
-      console.error('Checkout failed:', error);
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to place order';
-      toast.error(errorMessage);
+      console.error('Checkout error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setProcessingPayment(false);
     }

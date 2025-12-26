@@ -13,6 +13,13 @@ export class OrdersAPI {
   }
 
   /**
+   * Validate checkout before placing order
+   */
+  static async validateCheckout(checkoutData) {
+    return await apiClient.post('/orders/checkout/validate', checkoutData);
+  }
+
+  /**
    * Checkout - Place order from cart
    */
   static async checkout(checkoutData) {
@@ -76,13 +83,6 @@ export class OrdersAPI {
    */
   static async checkRefundEligibility(orderId) {
     return await apiClient.get(`/refunds/orders/${orderId}/eligibility`);
-  }
-
-  /**
-   * Validate checkout before placing order
-   */
-  static async validateCheckout(checkoutData) {
-    return await apiClient.post('/orders/checkout/validate', checkoutData);
   }
 
   /**

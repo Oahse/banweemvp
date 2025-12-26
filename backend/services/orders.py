@@ -125,7 +125,12 @@ class OrderService:
         
         if existing:
             # Return existing order
-        async def request_refund(
+            return await self._convert_order_to_response(existing)
+        
+        # If no existing order, delegate to the main place_order method
+        return await self.place_order(user_id, request, background_tasks, idempotency_key)
+    
+    async def request_refund(
         self, 
         order_id: UUID, 
         user_id: UUID, 
@@ -169,85 +174,130 @@ class OrderService:
         idempotency_key: Optional[str] = None
     ) -> OrderResponse:
         """
-        Place an order from the user's cart with comprehensive validation
+        Place an order from the user's cart with comprehensive validation and atomic operations
         ALWAYS validates cart before proceeding with checkout
         """
-        # STEP 1: MANDATORY CART VALIDATION - Never skip this step
-        cart_service = CartService(self.db)
+        # Generate idempotency key if not provided
+        if not idempotency_key:
+            cart_service = CartService(self.db)
+            cart = await cart_service.get_or_create_cart(user_id)
+            cart_hash = self._generate_cart_hash(cart, request)
+            idempotency_key = f"order_{user_id}_{cart_hash}"
         
-        # Always validate cart first - this is critical for data integrity
-        validation_result = await cart_service.validate_cart(user_id)
-        
-        if not validation_result.get("valid", False) or not validation_result.get("can_checkout", False):
-            # Cart validation failed - return detailed error
-            error_issues = [issue for issue in validation_result.get("issues", []) if issue.get("severity") == "error"]
-            if error_issues:
-                error_messages = [issue["message"] for issue in error_issues]
-                raise HTTPException(
-                    status_code=400, 
-                    detail={
-                        "message": "Cart validation failed. Please review and update your cart.",
-                        "issues": error_issues,
-                        "validation_summary": validation_result.get("summary", {}),
-                        "error_count": len(error_issues)
-                    }
-                )
-            else:
-                raise HTTPException(status_code=400, detail="Cart is empty or invalid")
-        
-        # Get validated cart
-        cart = validation_result["cart"]
-        
-        # Check if cart has items after validation
-        active_items = [item for item in cart.items if not getattr(item, 'saved_for_later', False)]
-        if not active_items:
-            raise HTTPException(status_code=400, detail="No items available for checkout after validation")
-        
-        # Log validation results for monitoring
-        validation_summary = validation_result.get("summary", {})
-        if validation_summary.get("price_updates", 0) > 0 or validation_summary.get("stock_adjustments", 0) > 0:
-            logger.info(f"Cart validation updated items for user {user_id}: {validation_summary}")
-        
-        # STEP 2: BACKEND PRICE VALIDATION - Never trust frontend prices
-        price_validation_result = await self._validate_and_recalculate_prices(cart)
-        if not price_validation_result["valid"]:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Price validation failed: {price_validation_result['message']}"
-            )
-        
-        # Use backend-calculated prices, not frontend prices
-        validated_cart_items = price_validation_result["validated_items"]
-        backend_calculated_total = price_validation_result["total_amount"]
-        price_updates = price_validation_result.get("price_updates", [])
-        
-        # If there are price updates, send notification to frontend via WebSocket
-        if price_updates:
-            await self._send_price_update_notification(user_id, price_updates)
-        
-        # STEP 3: VALIDATE CHECKOUT DEPENDENCIES
-        # Verify shipping address exists
-        shipping_address = await self.db.execute(
-            select(Address).where(
-                and_(Address.id == request.shipping_address_id, Address.user_id == user_id))
+        # Check for existing order with this idempotency key
+        existing_order = await self.db.execute(
+            select(Order).where(Order.idempotency_key == idempotency_key)
         )
-        shipping_address = shipping_address.scalar_one_or_none()
-        if not shipping_address:
-            raise HTTPException(status_code=404, detail="Shipping address not found")
+        existing = existing_order.scalar_one_or_none()
+        
+        if existing:
+            logger.info(f"Returning existing order for idempotency key: {idempotency_key}")
+            return await self._convert_order_to_response(existing)
+        
+        # Start atomic transaction for entire checkout process
+        async with self.db.begin():
+            try:
+                # STEP 1: MANDATORY CART VALIDATION - Never skip this step
+                cart_service = CartService(self.db)
+                
+                # Always validate cart first - this is critical for data integrity
+                validation_result = await cart_service.validate_cart(user_id)
+                
+                if not validation_result.get("valid", False) or not validation_result.get("can_checkout", False):
+                    # Cart validation failed - return detailed error
+                    error_issues = [issue for issue in validation_result.get("issues", []) if issue.get("severity") == "error"]
+                    if error_issues:
+                        error_messages = [issue["message"] for issue in error_issues]
+                        raise HTTPException(
+                            status_code=400, 
+                            detail={
+                                "message": "Cart validation failed. Please review and update your cart.",
+                                "issues": error_issues,
+                                "validation_summary": validation_result.get("summary", {}),
+                                "error_count": len(error_issues)
+                            }
+                        )
+                    else:
+                        raise HTTPException(status_code=400, detail="Cart is empty or invalid")
+                
+                # Get validated cart
+                cart = validation_result["cart"]
+                
+                # Check if cart has items after validation
+                active_items = [item for item in cart.items if not getattr(item, 'saved_for_later', False)]
+                if not active_items:
+                    raise HTTPException(status_code=400, detail="No items available for checkout after validation")
+                
+                # Log validation results for monitoring
+                validation_summary = validation_result.get("summary", {})
+                if validation_summary.get("price_updates", 0) > 0 or validation_summary.get("stock_adjustments", 0) > 0:
+                    logger.info(f"Cart validation updated items for user {user_id}: {validation_summary}")
+                
+                # STEP 2: BACKEND PRICE VALIDATION - Never trust frontend prices
+                price_validation_result = await self._validate_and_recalculate_prices(cart)
+                if not price_validation_result["valid"]:
+                    raise HTTPException(
+                        status_code=400, 
+                        detail=f"Price validation failed: {price_validation_result['message']}"
+                    )
+                
+                # Use backend-calculated prices, not frontend prices
+                validated_cart_items = price_validation_result["validated_items"]
+                backend_calculated_total = price_validation_result["total_amount"]
+                price_updates = price_validation_result.get("price_updates", [])
+                
+                # If there are price updates, send notification to frontend via WebSocket
+                if price_updates:
+                    await self._send_price_update_notification(user_id, price_updates)
+                
+                # STEP 3: ATOMIC INVENTORY RESERVATION
+                inventory_reservations = []
+                try:
+                    for item in active_items:
+                        reservation_result = await self.inventory_service.reserve_stock_for_order(
+                            variant_id=item.variant_id,
+                            quantity=item.quantity,
+                            user_id=user_id,
+                            expires_in_minutes=15  # 15 minute reservation
+                        )
+                        
+                        if not reservation_result.get("success", False):
+                            # Rollback all previous reservations
+                            for prev_reservation in inventory_reservations:
+                                await self.inventory_service.cancel_stock_reservation(
+                                    prev_reservation["reservation_id"]
+                                )
+                            
+                            raise HTTPException(
+                                status_code=400,
+                                detail=f"Insufficient stock for item {item.variant.product.name}: {reservation_result.get('message', 'Unknown error')}"
+                            )
+                        
+                        inventory_reservations.append(reservation_result)
+                
+                    # STEP 4: VALIDATE CHECKOUT DEPENDENCIES
+                    # Verify shipping address exists
+                    shipping_address = await self.db.execute(
+                        select(Address).where(
+                            and_(Address.id == request.shipping_address_id, Address.user_id == user_id))
+                    )
+                    shipping_address = shipping_address.scalar_one_or_none()
+                    if not shipping_address:
+                        raise HTTPException(status_code=404, detail="Shipping address not found")
 
-        # Verify shipping method exists and get its cost
-        shipping_method = await self.db.execute(
-            select(ShippingMethod).where(ShippingMethod.id == request.shipping_method_id)
-        )
-        shipping_method = shipping_method.scalar_one_or_none()
-        if not shipping_method:
-            raise HTTPException(status_code=404, detail="Shipping method not found")
+                    # Verify shipping method exists and get its cost
+                    shipping_method = await self.db.execute(
+                        select(ShippingMethod).where(ShippingMethod.id == request.shipping_method_id)
+                    )
+                    shipping_method = shipping_method.scalar_one_or_none()
+                    if not shipping_method:
+                        raise HTTPException(status_code=404, detail="Shipping method not found")
 
-        # Verify payment method exists
-        payment_method = await self.db.execute(
-            select(PaymentMethod).where(and_(PaymentMethod.id == request.payment_method_id, PaymentMethod.user_id == user_id))
-        )
-        payment_method = payment_method.scalar_one_or_none()
+                    # Verify payment method exists
+                    payment_method = await self.db.execute(
+                        select(PaymentMethod).where(and_(PaymentMethod.id == request.payment_method_id, PaymentMethod.user_id == user_id))
+                    )
+                    payment_method = payment_method.scalar_one_or_none()
         if not payment_method:
             raise HTTPException(status_code=404, detail="Payment method not found")
 
@@ -277,58 +327,99 @@ class OrderService:
                 self.db.add(order)
                 await self.db.flush()  # Get order ID without committing
 
-                # Create order items with validated backend prices
+                # Create order items with validated backend prices and atomic stock operations
                 for validated_item in validated_cart_items:
-                    # FINAL STOCK CHECK - Double-check stock availability using atomic method
-                    stock_check = await self.inventory_service.check_stock_availability(
-                        variant_id=validated_item["variant_id"],
-                        quantity=validated_item["quantity"]
-                    )
-                    
-                    if not stock_check["available"]:
-                        raise HTTPException(
-                            status_code=400, 
-                            detail=f"Stock validation failed: {stock_check['message']}"
+                    # Atomically check and decrement stock in single operation
+                    try:
+                        stock_result = await self.inventory_service.decrement_stock_on_purchase(
+                            variant_id=validated_item["variant_id"],
+                            quantity=validated_item["quantity"],
+                            location_id=None,  # Will be determined by service
+                            order_id=order.id,
+                            user_id=user_id
                         )
-                    
-                    order_item = OrderItem(
-                        order_id=order.id,
-                        variant_id=validated_item["variant_id"],
-                        quantity=validated_item["quantity"],
-                        price_per_unit=validated_item["backend_price"],  # Use backend price
-                        total_price=validated_item["backend_total"]     # Use backend total
-                    )
-                    self.db.add(order_item)
-                    
-                    # Atomically decrement stock using SELECT ... FOR UPDATE
-                    await self.inventory_service.decrement_stock_on_purchase(
-                        variant_id=validated_item["variant_id"],
-                        quantity=validated_item["quantity"],
-                        location_id=stock_check["location_id"],
-                        order_id=order.id,
-                        user_id=user_id
-                    )
+                        
+                        if not stock_result["success"]:
+                            raise HTTPException(
+                                status_code=400, 
+                                detail=f"Insufficient stock for variant {validated_item['variant_id']}: {stock_result.get('message', 'Stock unavailable')}"
+                            )
+                        
+                        order_item = OrderItem(
+                            order_id=order.id,
+                            variant_id=validated_item["variant_id"],
+                            quantity=validated_item["quantity"],
+                            price_per_unit=validated_item["backend_price"],  # Use backend price
+                            total_price=validated_item["backend_total"]     # Use backend total
+                        )
+                        self.db.add(order_item)
+                        
+                    except Exception as e:
+                        # If stock decrement fails, rollback will happen automatically
+                        logger.error(f"Stock decrement failed for variant {validated_item['variant_id']}: {e}")
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Stock unavailable for variant {validated_item['variant_id']}"
+                        )
 
                 # Process payment with backend-calculated amount and idempotency
                 payment_service = PaymentService(self.db)
                 payment_idempotency_key = f"payment_{order.id}_{idempotency_key}" if idempotency_key else None
                 
-                payment_result = await payment_service.process_payment_idempotent(
-                    user_id=user_id,
-                    order_id=order.id,
-                    amount=final_total["total_amount"],  # Use backend-calculated total
-                    payment_method_id=request.payment_method_id,
-                    idempotency_key=payment_idempotency_key,
-                    request_id=str(uuid4())
-                )
+                try:
+                    payment_result = await payment_service.process_payment_idempotent(
+                        user_id=user_id,
+                        order_id=order.id,
+                        amount=final_total["total_amount"],  # Use backend-calculated total
+                        payment_method_id=request.payment_method_id,
+                        idempotency_key=payment_idempotency_key,
+                        request_id=str(uuid4())
+                    )
 
-                if payment_result.get("status") != "succeeded":
-                    error_message = payment_result.get("error", "Payment processing failed")
-                    raise HTTPException(status_code=400, detail=f"Payment failed: {error_message}")
+                    if payment_result.get("status") != "succeeded":
+                        # Payment failed - update order status and restore inventory
+                        order.status = "payment_failed"
+                        order.failure_reason = payment_result.get("error", "Payment processing failed")
+                        
+                        # Restore inventory for all items
+                        for validated_item in validated_cart_items:
+                            try:
+                                await self.inventory_service.increment_stock_on_cancellation(
+                                    variant_id=validated_item["variant_id"],
+                                    quantity=validated_item["quantity"],
+                                    location_id=None,  # Will be determined by service
+                                    order_id=order.id,
+                                    user_id=user_id
+                                )
+                            except Exception as restore_error:
+                                logger.error(f"Failed to restore inventory for variant {validated_item['variant_id']}: {restore_error}")
+                        
+                        error_message = payment_result.get("error", "Payment processing failed")
+                        raise HTTPException(status_code=400, detail=f"Payment failed: {error_message}")
 
-                # Payment succeeded - update order status
-                order.status = "confirmed"
-                order.version += 1  # Optimistic locking increment
+                    # Payment succeeded - update order status
+                    order.status = "confirmed"
+                    order.version += 1  # Optimistic locking increment
+                    
+                except Exception as payment_error:
+                    # Payment processing failed - update order and restore inventory
+                    order.status = "payment_failed"
+                    order.failure_reason = str(payment_error)
+                    
+                    # Restore inventory for all items
+                    for validated_item in validated_cart_items:
+                        try:
+                            await self.inventory_service.increment_stock_on_cancellation(
+                                variant_id=validated_item["variant_id"],
+                                quantity=validated_item["quantity"],
+                                location_id=None,
+                                order_id=order.id,
+                                user_id=user_id
+                            )
+                        except Exception as restore_error:
+                            logger.error(f"Failed to restore inventory for variant {validated_item['variant_id']}: {restore_error}")
+                    
+                    raise
 
                 # Create initial tracking event
                 tracking_event = TrackingEvent(
@@ -867,12 +958,16 @@ class OrderService:
             else:
                 return f"Prices updated for {total_items} items in your cart."
 
-    def _generate_cart_hash(self, cart: Cart, request: CheckoutRequest) -> str:
+    def _generate_cart_hash(self, cart: Cart, request: CheckoutRequest, request_id: Optional[str] = None) -> str:
         """
         Generate deterministic hash for cart contents and checkout details
         Used for idempotency key generation
         """
-        # Create string representation of cart state
+        # If request_id provided, use it for better idempotency
+        if request_id:
+            return f"req_{request_id}"
+        
+        # Fallback to cart-based hash for backward compatibility
         cart_items = sorted([
             f"{item.variant_id}:{item.quantity}:{item.price_per_unit}"
             for item in cart.items if not item.saved_for_later
@@ -1001,3 +1096,82 @@ class OrderService:
                 status_code=500,
                 detail=f"Failed to process refund request: {str(e)}"
             )
+    async def _send_price_update_notification(self, user_id: UUID, price_updates: List[Dict]):
+        """Send real-time price update notification to frontend"""
+        try:
+            # Send WebSocket notification about price changes
+            notification_data = {
+                "type": "price_update",
+                "user_id": str(user_id),
+                "updates": price_updates,
+                "timestamp": datetime.utcnow().isoformat()
+            }
+            
+            # Send via Kafka for WebSocket delivery
+            kafka_service = get_kafka_producer_service()
+            if kafka_service:
+                await kafka_service.send_event(
+                    "price_update_notification",
+                    notification_data
+                )
+                
+        except Exception as e:
+            logger.error(f"Failed to send price update notification: {e}")
+
+    def _generate_cart_hash(self, cart, request: CheckoutRequest) -> str:
+        """Generate deterministic hash for cart state and checkout request"""
+        import hashlib
+        
+        # Create hash from cart items and checkout details
+        cart_data = {
+            "items": [
+                {
+                    "variant_id": str(item.variant_id),
+                    "quantity": item.quantity,
+                    "price": float(item.price_per_unit)
+                }
+                for item in cart.items if not getattr(item, 'saved_for_later', False)
+            ],
+            "shipping_address_id": str(request.shipping_address_id),
+            "shipping_method_id": str(request.shipping_method_id),
+            "payment_method_id": str(request.payment_method_id)
+        }
+        
+        # Sort items for consistent hashing
+        cart_data["items"].sort(key=lambda x: x["variant_id"])
+        
+        # Create hash
+        cart_str = str(cart_data)
+        return hashlib.md5(cart_str.encode()).hexdigest()[:16]
+
+    async def _convert_order_to_response(self, order: Order) -> OrderResponse:
+        """Convert Order model to OrderResponse"""
+        # Load order items if not already loaded
+        if not hasattr(order, 'items') or not order.items:
+            order_with_items = await self.db.execute(
+                select(Order).where(Order.id == order.id).options(
+                    selectinload(Order.items)
+                )
+            )
+            order = order_with_items.scalar_one()
+        
+        return OrderResponse(
+            id=order.id,
+            order_number=order.order_number,
+            status=order.order_status,
+            payment_status=order.payment_status,
+            fulfillment_status=order.fulfillment_status,
+            total_amount=order.total_amount,
+            currency=order.currency,
+            created_at=order.created_at,
+            items=[
+                OrderItemResponse(
+                    id=item.id,
+                    variant_id=item.variant_id,
+                    quantity=item.quantity,
+                    price_per_unit=item.price_per_unit,
+                    total_price=item.total_price
+                )
+                for item in order.items
+            ]
+        )

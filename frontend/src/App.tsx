@@ -155,7 +155,6 @@ export const App: React.FC = () => {
                       <CategoryProvider>
                       <FontLoader />
                       <OfflineIndicator />
-                      <SupportWidget />
                       <Toaster
                         position="top-right"
                         toastOptions={{
@@ -187,6 +186,7 @@ export const App: React.FC = () => {
                         }}
                       />
                       <BrowserRouter>
+                        <SupportWidget />
                         <Elements stripe={stripePromise}>
                           <Suspense fallback={<PageLoading />}>
                             <Routes>

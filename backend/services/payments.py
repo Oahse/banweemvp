@@ -307,7 +307,100 @@ class PaymentService:
             
             raise HTTPException(status_code=400, detail=f"Payment failed: {str(e)}")
 
-    async def process_payment(
+    async def process_payment_with_timeout_and_retry(
+        self,
+        user_id: UUID,
+        amount: float,
+        payment_method_id: UUID,
+        order_id: Optional[UUID] = None,
+        subscription_id: Optional[UUID] = None,
+        timeout_seconds: int = 45,
+        max_retries: int = 3
+    ) -> Dict[str, Any]:
+        """
+        Process payment with timeout, retry logic, and comprehensive error handling
+        """
+        import asyncio
+        
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"Payment attempt {attempt + 1}/{max_retries} for user {user_id}, amount {amount}")
+                
+                # Wrap payment processing with timeout
+                payment_task = self._process_payment_internal(
+                    user_id, amount, payment_method_id, order_id, subscription_id, commit=False
+                )
+                
+                payment_result = await asyncio.wait_for(payment_task, timeout=timeout_seconds)
+                
+                # If successful, commit the transaction
+                await self.db.commit()
+                
+                logger.info(f"Payment successful on attempt {attempt + 1} for user {user_id}")
+                return payment_result
+                
+            except asyncio.TimeoutError:
+                logger.error(f"Payment timeout on attempt {attempt + 1} after {timeout_seconds}s for user {user_id}")
+                await self.db.rollback()
+                
+                if attempt == max_retries - 1:
+                    # Final attempt failed
+                    raise HTTPException(
+                        status_code=408, 
+                        detail=f"Payment processing timed out after {max_retries} attempts. Please try again."
+                    )
+                
+                # Wait before retry (exponential backoff)
+                wait_time = 2 ** attempt
+                logger.info(f"Retrying payment in {wait_time} seconds...")
+                await asyncio.sleep(wait_time)
+                
+            except stripe.error.RateLimitError as e:
+                logger.error(f"Stripe rate limit on attempt {attempt + 1}: {e}")
+                await self.db.rollback()
+                
+                if attempt == max_retries - 1:
+                    raise HTTPException(status_code=429, detail="Payment service temporarily unavailable. Please try again later.")
+                
+                # Wait longer for rate limit
+                await asyncio.sleep(5 * (attempt + 1))
+                
+            except stripe.error.CardError as e:
+                # Card errors are not retryable
+                logger.error(f"Card error for user {user_id}: {e}")
+                await self.db.rollback()
+                
+                # Record payment failure
+                await self._record_payment_failure(
+                    user_id=user_id,
+                    order_id=order_id,
+                    error_code=e.code,
+                    error_message=str(e),
+                    failure_reason=self._categorize_stripe_error(e)
+                )
+                
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Payment failed: {e.user_message or str(e)}"
+                )
+                
+            except Exception as e:
+                logger.error(f"Payment error on attempt {attempt + 1} for user {user_id}: {e}")
+                await self.db.rollback()
+                
+                if attempt == max_retries - 1:
+                    raise HTTPException(
+                        status_code=500, 
+                        detail=f"Payment processing failed after {max_retries} attempts: {str(e)}"
+                    )
+                
+                # Wait before retry
+                await asyncio.sleep(2 ** attempt)
+        
+        # Should never reach here
+        raise HTTPException(status_code=500, detail="Payment processing failed unexpectedly")
+
+    async def _process_payment_internal(
         self,
         user_id: UUID,
         amount: float,
@@ -316,9 +409,9 @@ class PaymentService:
         subscription_id: Optional[UUID] = None,
         commit: bool = True
     ) -> Dict[str, Any]:
-        """Process a payment with optional transaction control"""
+        """Internal payment processing method"""
         try:
-            # Get payment method
+            # Get payment method with expiry validation
             result = await self.db.execute(
                 select(PaymentMethod).where(
                     and_(
@@ -332,6 +425,13 @@ class PaymentService:
             
             if not payment_method:
                 raise HTTPException(status_code=404, detail="Payment method not found")
+            
+            # Validate payment method expiry
+            if payment_method.expires_at and payment_method.expires_at < datetime.utcnow():
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Payment method has expired. Please update your payment information."
+                )
             
             # Create and confirm payment intent
             payment_intent = await self.create_payment_intent(
@@ -1330,3 +1430,66 @@ class PaymentService:
                 status_code=500,
                 detail="Failed to get failed payments"
             )
+    def _categorize_stripe_error(self, error) -> PaymentFailureReason:
+        """Categorize Stripe errors into failure reasons"""
+        if hasattr(error, 'code'):
+            error_code = error.code.lower()
+            
+            if error_code in ['insufficient_funds', 'balance_insufficient']:
+                return PaymentFailureReason.INSUFFICIENT_FUNDS
+            elif error_code in ['card_declined', 'generic_decline']:
+                return PaymentFailureReason.CARD_DECLINED
+            elif error_code in ['expired_card']:
+                return PaymentFailureReason.EXPIRED_CARD
+            elif error_code in ['incorrect_number', 'invalid_number', 'invalid_expiry_month', 'invalid_expiry_year', 'invalid_cvc']:
+                return PaymentFailureReason.INVALID_CARD
+            elif error_code in ['authentication_required', 'card_not_supported']:
+                return PaymentFailureReason.AUTHENTICATION_REQUIRED
+            elif error_code in ['processing_error']:
+                return PaymentFailureReason.PROCESSING_ERROR
+            elif error_code in ['rate_limit']:
+                return PaymentFailureReason.LIMIT_EXCEEDED
+        
+        # Check error message for additional context
+        error_message = str(error).lower()
+        if 'fraud' in error_message or 'suspicious' in error_message:
+            return PaymentFailureReason.FRAUD_SUSPECTED
+        elif 'network' in error_message or 'connection' in error_message:
+            return PaymentFailureReason.NETWORK_ERROR
+        
+        return PaymentFailureReason.UNKNOWN
+
+    async def _record_payment_failure(
+        self,
+        user_id: UUID,
+        order_id: Optional[UUID],
+        error_code: str,
+        error_message: str,
+        failure_reason: PaymentFailureReason
+    ):
+        """Record payment failure for analytics and recovery"""
+        try:
+            # Create failure record in database
+            failure_record = {
+                "user_id": str(user_id),
+                "order_id": str(order_id) if order_id else None,
+                "error_code": error_code,
+                "error_message": error_message,
+                "failure_reason": failure_reason.value,
+                "timestamp": datetime.utcnow().isoformat(),
+                "retry_count": 0
+            }
+            
+            # Store in database or send to analytics service
+            logger.error(f"Payment failure recorded: {failure_record}")
+            
+            # Send to Kafka for real-time monitoring
+            kafka_service = get_kafka_producer_service()
+            if kafka_service:
+                await kafka_service.send_event(
+                    "payment_failure",
+                    failure_record
+                )
+                
+        except Exception as e:
+            logger.error(f"Failed to record payment failure: {e}")

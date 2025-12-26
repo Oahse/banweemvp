@@ -390,21 +390,17 @@ export const Home = () => {
           </div>
 
           <div ref={categoriesContainerRef} className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
-            {homeLoading ? (
+            {(homeLoading || homeError) ? (
               // Loading skeleton for categories
               [...Array(5)].map((_, index) => (
                 <div key={index} className="flex-none w-40 h-40 bg-surface-hover rounded-lg animate-pulse"></div>
               ))
-            ) : homeError ? (
-              <p className="text-error">Error loading categories</p>
-            ) : categories.length > 0 ? (
+            ) : (
               categories.map((category) => (
                 <div key={category.id} className="flex-none w-40">
                   <CategoryCard category={category} />
                 </div>
               ))
-            ) : (
-              <p className="text-copy-light">No categories available</p>
             )}
           </div>
         </div>
@@ -427,26 +423,18 @@ export const Home = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {homeLoading ? (
+            {(homeLoading || homeError)? (
               // Loading skeleton
               [...Array(4)].map((_, index) => (
                 <ProductCard key={index} isLoading={true} />
               ))
-            ) : homeError ? (
-              <div className="col-span-full text-center text-error">
-                Error loading featured products: {homeError.message}
-              </div>
-            ) : featuredProducts.length > 0 ? (
+            ) : (
               featuredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                 />
               ))
-            ) : (
-              <div className="col-span-full text-center text-copy-light py-8">
-                No featured products available
-              </div>
             )}
           </div>
         </div>
@@ -517,18 +505,14 @@ export const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            {homeLoading ? (
+            {(homeLoading || homeError) ? (
               // Loading skeleton
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {[...Array(4)].map((_, index) => (
                   <ProductCard key={index} isLoading={true} />
                 ))}
               </div>
-            ) : homeError ? (
-              <div className="col-span-full text-center text-error">
-                Error loading popular products: {homeError.message}
-              </div>
-            ) : filteredPopularProducts.length > 0 ? (
+            ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {filteredPopularProducts.map((product, index) => (
                   <motion.div
@@ -547,62 +531,6 @@ export const Home = () => {
                   </motion.div>
                 ))}
               </div>
-            ) : (
-              <motion.div
-                className="text-center py-12"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-              >
-                <div className="max-w-md mx-auto">
-                  <motion.div
-                    className="w-16 h-16 mx-auto mb-4 bg-surface-hover rounded-full flex items-center justify-center"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.4, delay: 0.1, type: "spring", stiffness: 200 }}
-                  >
-                    <svg className="w-8 h-8 text-copy-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2M4 13h2m13-8l-4 4m0 0l-4-4m4 4V3" />
-                    </svg>
-                  </motion.div>
-                  <motion.h3
-                    className="text-lg font-medium text-main mb-2"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.2 }}
-                  >
-                    No products found
-                  </motion.h3>
-                  <motion.p
-                    className="text-copy-light mb-4"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.3 }}
-                  >
-                    {activeTab === 'all'
-                      ? "We couldn't find any products at the moment."
-                      : `We couldn't find any products in the "${FILTER_CATEGORIES[activeTab]?.name || activeTab}" category.`
-                    }
-                  </motion.p>
-                  {activeTab !== 'all' && (
-                    <motion.div
-                      className="space-y-2 text-sm text-copy-light"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.4 }}
-                    >
-                      <p>Try browsing:</p>
-                      <button
-                        onClick={() => setActiveTab('all')}
-                        className="inline-flex items-center text-primary hover:text-primary-dark hover:underline transition-colors duration-200"
-                      >
-                        All Products
-                        <ArrowRightIcon size={14} className="ml-1" />
-                      </button>
-                    </motion.div>
-                  )}
-                </div>
-              </motion.div>
             )}
           </motion.div>
         </div>
@@ -623,7 +551,7 @@ export const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {homeLoading ? (
+            {(homeLoading || homeError) ? (
               // Loading skeleton
               [...Array(2)].map((_, index) => (
                 <div key={index} className="flex flex-col md:flex-row bg-background rounded-lg overflow-hidden shadow-sm animate-pulse">
@@ -636,11 +564,7 @@ export const Home = () => {
                   </div>
                 </div>
               ))
-            ) : homeError ? (
-              <div className="col-span-full text-center text-error">
-                Error loading deals: {homeError.message}
-              </div>
-            ) : deals.length > 0 ? (
+            ) : (
               deals.map((product) => (
                 <div key={product.id} className="flex flex-col md:flex-row bg-background rounded-lg overflow-hidden shadow-sm">
                   <div className="md:w-1/3">
@@ -689,10 +613,6 @@ export const Home = () => {
                   </div>
                 </div>
               ))
-            ) : (
-              <div className="col-span-full text-center text-copy-light py-8">
-                No deals available at the moment
-              </div>
             )}
           </div>
         </div>

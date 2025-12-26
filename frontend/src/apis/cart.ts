@@ -50,6 +50,10 @@ export class CartAPI {
     });
   }
 
+  static async checkStock(variantId, quantity) {
+    return await apiClient.get(`/inventory/check-stock/${variantId}?quantity=${quantity}`);
+  }
+
   static async getCartItemCount(access_token) {
     return await apiClient.get('/cart/count', {
       headers: { 'Authorization': `Bearer ${access_token}` },

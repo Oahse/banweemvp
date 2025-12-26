@@ -26,6 +26,7 @@ export const Checkout = () => {
   const [checkoutMode, setCheckoutMode] = useState('express'); // 'express' or 'manual'
   const [loading, setLoading] = useState(false);
   const [priceUpdateReceived, setPriceUpdateReceived] = useState(false);
+  const [stockValidation, setStockValidation] = useState({ valid: true, issues: [] });
 
   // Manual checkout state
   const [addresses, setAddresses] = useState([]);
@@ -102,6 +103,62 @@ export const Checkout = () => {
       navigate('/cart');
     }
   }, [cart, cartLoading, navigate]);
+
+  // Real-time stock validation
+  useEffect(() => {
+    const validateStock = async () => {
+      if (!cart?.items || cart.items.length === 0) {
+        setStockValidation({ valid: true, issues: [] });
+        return;
+      }
+
+      try {
+        const stockChecks = await Promise.all(
+          cart.items.map(async (item) => {
+            try {
+              const response = await CartAPI.checkStock(item.variant_id, item.quantity);
+              return {
+                variant_id: item.variant_id,
+                available: response?.available || false,
+                current_stock: response?.current_stock || 0,
+                requested_quantity: item.quantity,
+                message: response?.message || 'Stock check failed'
+              };
+            } catch (error) {
+              return {
+                variant_id: item.variant_id,
+                available: false,
+                current_stock: 0,
+                requested_quantity: item.quantity,
+                message: 'Unable to check stock availability'
+              };
+            }
+          })
+        );
+
+        const stockIssues = stockChecks.filter(check => !check.available);
+        setStockValidation({
+          valid: stockIssues.length === 0,
+          issues: stockIssues
+        });
+
+        // Show toast for stock issues
+        if (stockIssues.length > 0) {
+          const itemCount = stockIssues.length;
+          toast.error(`${itemCount} item${itemCount > 1 ? 's' : ''} in your cart ${itemCount > 1 ? 'are' : 'is'} no longer available`);
+        }
+      } catch (error) {
+        console.error('Stock validation failed:', error);
+        setStockValidation({ valid: false, issues: [] });
+      }
+    };
+
+    // Validate stock when cart changes or every 30 seconds
+    validateStock();
+    const interval = setInterval(validateStock, 30000);
+
+    return () => clearInterval(interval);
+  }, [cart?.items]);
 
   // Fetch checkout data for manual mode
   useEffect(() => {
@@ -231,9 +288,17 @@ export const Checkout = () => {
 
   const validateCheckout = () => {
     const newErrors = {};
+    
+    // Validate required fields
     if (!checkoutData.shipping_address_id) newErrors.shipping_address_id = 'Please select a shipping address';
     if (!checkoutData.shipping_method_id) newErrors.shipping_method_id = 'Please select a shipping method';
     if (!checkoutData.payment_method_id) newErrors.payment_method_id = 'Please select a payment method';
+    
+    // Validate stock availability
+    if (!stockValidation.valid) {
+      newErrors.stock = 'Some items in your cart are no longer available';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -246,7 +311,43 @@ export const Checkout = () => {
 
     try {
       setProcessingPayment(true);
-      const response = await OrdersAPI.checkout(checkoutData);
+      
+      // Step 1: Validate checkout before payment
+      const validationResponse = await OrdersAPI.validateCheckout(checkoutData);
+      
+      if (!validationResponse?.success || !validationResponse?.data?.can_proceed) {
+        const issues = validationResponse?.data?.cart_validation?.issues || [];
+        const errorIssues = issues.filter(issue => issue.severity === 'error');
+        
+        if (errorIssues.length > 0) {
+          const errorMessages = errorIssues.map(issue => issue.message).join(', ');
+          toast.error(`Checkout validation failed: ${errorMessages}`);
+          return;
+        }
+        
+        toast.error('Unable to proceed with checkout. Please review your cart and try again.');
+        return;
+      }
+      
+      // Step 2: Check for price updates
+      const estimatedTotals = validationResponse.data.estimated_totals;
+      if (estimatedTotals && Math.abs(estimatedTotals.total_amount - total) > 0.01) {
+        const confirmed = window.confirm(
+          `The order total has changed from $${total.toFixed(2)} to $${estimatedTotals.total_amount.toFixed(2)}. Do you want to continue?`
+        );
+        if (!confirmed) {
+          return;
+        }
+      }
+      
+      // Step 3: Generate request ID for idempotency
+      const requestId = `checkout_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Step 4: Place order with idempotency key
+      const response = await OrdersAPI.checkout({
+        ...checkoutData,
+        request_id: requestId
+      });
 
       if (response?.success && response?.data) {
         toast.success('Order placed successfully!');
@@ -257,7 +358,19 @@ export const Checkout = () => {
       }
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message || 'Failed to place order. Please try again.';
-      toast.error(errorMessage);
+      
+      // Handle specific error types
+      if (errorMessage.includes('insufficient stock') || errorMessage.includes('Stock unavailable')) {
+        toast.error('Some items in your cart are no longer available. Please review your cart and try again.');
+        // Refresh cart to show updated availability
+        window.location.reload();
+      } else if (errorMessage.includes('Payment failed')) {
+        toast.error('Payment processing failed. Please check your payment method and try again.');
+      } else if (errorMessage.includes('timeout')) {
+        toast.error('Request timed out. Please try again.');
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setProcessingPayment(false);
     }
@@ -628,10 +741,42 @@ export const Checkout = () => {
                   </div>
                 </div>
 
+                {/* Stock Validation Warning */}
+                {!stockValidation.valid && stockValidation.issues.length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-red-800">
+                          Stock Issues Detected
+                        </h3>
+                        <div className="mt-2 text-sm text-red-700">
+                          <ul className="list-disc pl-5 space-y-1">
+                            {stockValidation.issues.map((issue, index) => (
+                              <li key={index}>
+                                Variant {issue.variant_id}: {issue.message}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Place Order Button */}
                 <Button
                   onClick={handlePlaceOrder}
-                  disabled={processingPayment || addresses.length === 0 || paymentMethods.length === 0}
+                  disabled={
+                    processingPayment || 
+                    addresses.length === 0 || 
+                    paymentMethods.length === 0 || 
+                    !stockValidation.valid
+                  }
                   className="w-full mt-6"
                 >
                   {processingPayment ? (
@@ -642,6 +787,8 @@ export const Checkout = () => {
                       </svg>
                       Processing...
                     </span>
+                  ) : !stockValidation.valid ? (
+                    'Items Unavailable'
                   ) : (
                     'Place Order'
                   )}
