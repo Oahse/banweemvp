@@ -13,15 +13,6 @@ ENV=${1:-dev}
 echo "🚀 Starting Banwee Application in Docker ($ENV mode)..."
 echo ""
 
-# Check if .env file exists
-if [ ! -f .env ]; then
-    echo "⚠️  .env file not found!"
-    echo "📝 Creating .env from .env.example..."
-    cp .env.example .env
-    echo "✅ .env file created. Please update it with your actual credentials."
-    echo ""
-fi
-
 if [ "$ENV" = "prod" ]; then
     # Production environment
     if [ ! -f docker-compose.prod.yml ]; then

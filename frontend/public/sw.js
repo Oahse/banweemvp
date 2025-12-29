@@ -16,10 +16,10 @@ const STATIC_ASSETS = [
 
 // API endpoints to cache
 const API_CACHE_PATTERNS = [
-  /\/api\/products/,
-  /\/api\/categories/,
-  /\/api\/blog/,
-  /\/api\/users\/profile/
+  /\/v1\/products/,
+  /\/v1\/categories/,
+  /\/v1\/blog/,
+  /\/v1\/users\/profile/
 ];
 
 // Cache strategies

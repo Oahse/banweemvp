@@ -16,7 +16,223 @@ from core.config import settings
 from core.utils.encryption import PasswordManager
 from services.event_service import event_service
 
+class AddressService:
 
+    """Service layer for managing user addresses."""
+
+
+
+    def __init__(self, db: AsyncSession):
+
+        self.db = db
+
+
+
+    # -----------------------------------------------------------
+
+    # CRUD OPERATIONS
+
+    # -----------------------------------------------------------
+
+
+
+    async def create_address(
+
+        self,
+
+        user_id: UUID,
+
+        street: Optional[str] = None,
+
+        city: Optional[str] = None,
+
+        state: Optional[str] = None,
+
+        country: Optional[str] = None,
+
+        post_code: Optional[str] = None,
+
+        kind: str = "Shipping",
+
+    ) -> Address:
+
+        """Create a new address for a user."""
+
+        address = Address(
+
+            user_id=user_id,
+
+            street=street,
+
+            city=city,
+
+            state=state,
+
+            country=country,
+
+            post_code=post_code,
+
+            kind=kind,
+
+        )
+
+        self.db.add(address)
+
+        await self.db.commit()
+
+        await self.db.refresh(address)
+
+        return address
+
+
+
+    async def get_address(self, address_id: UUID) -> Optional[Address]:
+
+        """Retrieve an address by ID."""
+
+        query = select(Address).where(Address.id == address_id)
+
+        result = await self.db.execute(query)
+
+        return result.scalars().first()
+
+
+
+    async def get_user_addresses(self, user_id: UUID) -> List[Address]:
+
+        """Fetch all addresses for a given user."""
+
+        query = (
+
+            select(Address)
+
+            .where(Address.user_id == user_id)
+
+            .options(selectinload(Address.user))
+
+            .order_by(Address.created_at.desc())
+
+        )
+
+        result = await self.db.execute(query)
+
+        return result.scalars().all()
+
+
+
+    async def update_address(self, address_id: UUID, user_id: UUID, **kwargs) -> Optional[Address]:
+
+        """Update address fields dynamically."""
+
+        query = update(Address)
+
+        query = query.where(and_(Address.id == address_id,
+
+                            Address.user_id == user_id))
+
+        query = query.values(**kwargs)
+
+        query = query.execution_options(synchronize_session="fetch")
+
+
+
+        await self.db.execute(query)
+
+        await self.db.commit()
+
+        return await self.get_address(address_id)
+
+
+
+    async def delete_address(self, address_id: UUID, user_id: UUID = None) -> bool:
+
+        """Delete an address by ID."""
+
+        if user_id:
+
+            result = await self.db.execute(delete(Address).where(and_(Address.id == address_id, Address.user_id == user_id)))
+
+        else:
+
+            result = await self.db.execute(delete(Address).where(Address.id == address_id))
+
+        await self.db.commit()
+
+        return result.rowcount > 0
+
+
+
+    # -----------------------------------------------------------
+
+    # CUSTOM LOGIC
+
+    # -----------------------------------------------------------
+
+
+
+    async def get_default_shipping(self, user_id: UUID) -> Optional[Address]:
+
+        """Get a user's default shipping address."""
+
+        # First, try to find an address marked as default
+
+        query = select(Address).where(
+
+            Address.user_id == user_id,
+
+            Address.is_default == True,
+
+            Address.kind == "Shipping"
+
+        )
+
+        result = await self.db.execute(query)
+
+        address = result.scalars().first()
+
+
+
+        if address:
+
+            return address
+
+
+
+        # If no default is set, return the most recent shipping address
+
+        query = select(Address).where(
+
+            Address.user_id == user_id,
+
+            Address.kind == "Shipping"
+
+        ).order_by(Address.created_at.desc())
+
+        result = await self.db.execute(query)
+
+        return result.scalars().first()
+
+
+
+    async def get_default_billing(self, user_id: UUID) -> Optional[Address]:
+
+        """Get a user's default billing address."""
+
+        query = select(Address).where(
+
+            Address.user_id == user_id,
+
+            Address.kind == "Billing"
+
+        ).order_by(Address.created_at.desc())
+
+        result = await self.db.execute(query)
+
+        return result.scalars().first()
+    
+    
+
+    
 class UserService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -134,132 +350,19 @@ class UserService:
             logger = logging.getLogger(__name__)
             logger.error(f"Failed to publish user.verified event for user {user.id}: {e}")
 
-    async def send_welcome_email(self, user: User):
-        """Sends a welcome email to a new user."""
-        context = {
-            "customer_name": user.firstname,
-            "company_name": "Banwee",
-        }
+        # Publish user.verified event using new event system
         try:
-            await send_email(
-                to_email=user.email,
-                mail_type='welcome',
-                context=context
+            await event_service.publish_user_verified(
+                user_id=str(user.id),
+                email=user.email,
+                correlation_id=str(user.id)
             )
-            print(f"Welcome email sent to {user.email} successfully.")
         except Exception as e:
-            print(f"Failed to send welcome email to {user.email}. Error: {e}")
+            # Log error but don't fail verification
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to publish user.verified event for user {user.id}: {e}")
 
-
-class AddressService:
-    """Service layer for managing user addresses."""
-
-    def __init__(self, db: AsyncSession):
-        self.db = db
-
-    # -----------------------------------------------------------
-    # CRUD OPERATIONS
-    # -----------------------------------------------------------
-
-    async def create_address(
-        self,
-        user_id: UUID,
-        street: Optional[str] = None,
-        city: Optional[str] = None,
-        state: Optional[str] = None,
-        country: Optional[str] = None,
-        post_code: Optional[str] = None,
-        kind: str = "Shipping",
-    ) -> Address:
-        """Create a new address for a user."""
-        address = Address(
-            user_id=user_id,
-            street=street,
-            city=city,
-            state=state,
-            country=country,
-            post_code=post_code,
-            kind=kind,
-        )
-        self.db.add(address)
-        await self.db.commit()
-        await self.db.refresh(address)
-        return address
-
-    async def get_address(self, address_id: UUID) -> Optional[Address]:
-        """Retrieve an address by ID."""
-        query = select(Address).where(Address.id == address_id)
-        result = await self.db.execute(query)
-        return result.scalars().first()
-
-    async def get_user_addresses(self, user_id: UUID) -> List[Address]:
-        """Fetch all addresses for a given user."""
-        query = (
-            select(Address)
-            .where(Address.user_id == user_id)
-            .options(selectinload(Address.user))
-            .order_by(Address.created_at.desc())
-        )
-        result = await self.db.execute(query)
-        return result.scalars().all()
-
-    async def update_address(self, address_id: UUID, user_id: UUID, **kwargs) -> Optional[Address]:
-        """Update address fields dynamically."""
-        query = update(Address)
-        query = query.where(and_(Address.id == address_id,
-                            Address.user_id == user_id))
-        query = query.values(**kwargs)
-        query = query.execution_options(synchronize_session="fetch")
-
-        await self.db.execute(query)
-        await self.db.commit()
-        return await self.get_address(address_id)
-
-    async def delete_address(self, address_id: UUID, user_id: UUID = None) -> bool:
-        """Delete an address by ID."""
-        if user_id:
-            result = await self.db.execute(delete(Address).where(and_(Address.id == address_id, Address.user_id == user_id)))
-        else:
-            result = await self.db.execute(delete(Address).where(Address.id == address_id))
-        await self.db.commit()
-        return result.rowcount > 0
-
-    # -----------------------------------------------------------
-    # CUSTOM LOGIC
-    # -----------------------------------------------------------
-
-    async def get_default_shipping(self, user_id: UUID) -> Optional[Address]:
-        """Get a user's default shipping address."""
-        # First, try to find an address marked as default
-        query = select(Address).where(
-            Address.user_id == user_id,
-            Address.is_default == True,
-            Address.kind == "Shipping"
-        )
-        result = await self.db.execute(query)
-        address = result.scalars().first()
-
-        if address:
-            return address
-
-        # If no default is set, return the most recent shipping address
-        query = select(Address).where(
-            Address.user_id == user_id,
-            Address.kind == "Shipping"
-        ).order_by(Address.created_at.desc())
-        result = await self.db.execute(query)
-        return result.scalars().first()
-
-    async def get_default_billing(self, user_id: UUID) -> Optional[Address]:
-        """Get a user's default billing address."""
-        query = select(Address).where(
-            Address.user_id == user_id,
-            Address.kind == "Billing"
-        ).order_by(Address.created_at.desc())
-        result = await self.db.execute(query)
-        return result.scalars().first()
-
-    # Add missing methods to UserService
     async def get_users(self, page: int = 1, limit: int = 10, role: Optional[str] = None) -> dict:
         """Get paginated list of users with order count"""
         offset = (page - 1) * limit
@@ -442,3 +545,9 @@ class AddressService:
             })
             
         return users
+
+    
+
+    
+
+

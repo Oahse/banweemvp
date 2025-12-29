@@ -31,6 +31,7 @@ from models.promocode import Promocode
 from models.shipping import ShippingMethod
 from models.wishlist import Wishlist, WishlistItem
 from models.notifications import Notification  # Added Notification import
+from models.inventories import WarehouseLocation, Inventory  # Added inventory imports
 
 # ---------------- Config ----------------
 FILTER_CATEGORIES = {
@@ -118,9 +119,9 @@ image_urls = [
 ]
 
 DEFAULT_NUM_CATEGORIES = len(FILTER_CATEGORIES)
-DEFAULT_NUM_USERS = 100
-DEFAULT_NUM_PRODUCTS = 200
-DEFAULT_VARIANTS_PER_PRODUCT = 3
+DEFAULT_NUM_USERS = 20
+DEFAULT_NUM_PRODUCTS = 40
+DEFAULT_VARIANTS_PER_PRODUCT = 2
 DEFAULT_BATCH_SIZE = 50
 
 # ---------------- DB Utilities ----------------
@@ -182,19 +183,42 @@ async def seed_sample_data(
             categories.append(cat)
             if len(categories) >= batch_size:
                 session.add_all(categories)
+                await session.flush() # Flush to get IDs
                 await session.commit()
-                for c in categories:
-                    await session.refresh(c)
+                session.expunge_all() # Free up memory
                 categories = []
         if categories:
             session.add_all(categories)
+            await session.flush() # Flush to get IDs
             await session.commit()
-            for c in categories:
-                await session.refresh(c)
+            session.expunge_all() # Free up memory
 
         result = await session.execute(select(Category))
         all_categories: List[Category] = result.scalars().all()
         print(f"🌱 Created {len(all_categories)} categories")
+
+        # -------- Warehouse Locations --------
+        warehouse_locations_batch = []
+        warehouse_data = [
+            {"name": "Main Warehouse", "address": "123 Storage St, Accra, Ghana", "description": "Primary warehouse for African products"},
+            {"name": "Lagos Distribution Center", "address": "456 Commerce Ave, Lagos, Nigeria", "description": "West Africa distribution hub"},
+            {"name": "Nairobi Hub", "address": "789 Trade Rd, Nairobi, Kenya", "description": "East Africa distribution center"},
+        ]
+        
+        for data in warehouse_data:
+            warehouse = WarehouseLocation(**data)
+            warehouse_locations_batch.append(warehouse)
+
+        if warehouse_locations_batch:
+            session.add_all(warehouse_locations_batch)
+            await session.flush()
+            await session.commit()
+            session.expunge_all()
+        
+        # Get the main warehouse for inventory
+        result = await session.execute(select(WarehouseLocation).where(WarehouseLocation.name == "Main Warehouse"))
+        main_warehouse = result.scalar_one()
+        print(f"🏭 Created {len(warehouse_locations_batch)} warehouse locations")
 
         # -------- Shipping Methods --------
         shipping_methods_batch = []
@@ -212,7 +236,9 @@ async def seed_sample_data(
 
         if shipping_methods_batch:
             session.add_all(shipping_methods_batch)
+            await session.flush()
             await session.commit()
+            session.expunge_all()
         print(f"🚚 Created {len(shipping_methods_batch)} shipping methods.")
 
         # -------- Users --------
@@ -271,24 +297,24 @@ async def seed_sample_data(
 
             if len(users) >= batch_size:
                 session.add_all(users)
+                await session.flush()
                 await session.commit()
-                for u in users:
-                    await session.refresh(u)
-                    if u.role == "Supplier":
-                        suppliers.append(u)
-                    if u.role == "Admin":
-                        admins.append(u)
-                users = []
+                users = [] # Clear the batch list
 
         if users:
             session.add_all(users)
+            await session.flush()
             await session.commit()
-            for u in users:
-                await session.refresh(u)
-                if u.role == "Supplier":
-                    suppliers.append(u)
-                if u.role == "Admin":
-                    admins.append(u)
+        
+        # After all users are committed, re-query suppliers and admins from the database
+        # to ensure they are attached to the current session.
+        result_suppliers = await session.execute(select(User).where(User.role == "Supplier"))
+        suppliers = result_suppliers.scalars().all()
+
+        result_admins = await session.execute(select(User).where(User.role == "Admin"))
+        admins = result_admins.scalars().all()
+
+        session.expunge_all() # Now it's safe to expunge all after collecting suppliers/admins
 
         # -------- Addresses --------
         addresses_batch = []
@@ -312,7 +338,9 @@ async def seed_sample_data(
 
         if addresses_batch:
             session.add_all(addresses_batch)
+            await session.flush()
             await session.commit()
+            session.expunge_all()
         print(f"🏠 Created {len(addresses_batch)} addresses.")
 
         # Clear session to ensure relationships are reloaded
@@ -343,7 +371,9 @@ async def seed_sample_data(
 
         if payment_methods_batch:
             session.add_all(payment_methods_batch)
+            await session.flush()
             await session.commit()
+            session.expunge_all()
         print(f"💳 Created {len(payment_methods_batch)} payment methods.")
 
         # -------- Promocodes --------
@@ -362,7 +392,9 @@ async def seed_sample_data(
 
         if promocodes_batch:
             session.add_all(promocodes_batch)
+            await session.flush()
             await session.commit()
+            session.expunge_all()
         print(f"🎟️ Created {len(promocodes_batch)} promocodes.")
 
         # -------- Products & Variants & Images --------
@@ -404,6 +436,7 @@ async def seed_sample_data(
 
             product = Product(
                 name=product_name,
+                slug=slug, # Add this line
                 description=f"High-quality {keyword.lower()} sourced directly from trusted suppliers in {origin_country}. Perfect for cooking, baking, and everyday use. Rich in nutrients and carefully processed to maintain freshness. Our {product_name.lower()} is {', '.join(dietary_tags)}, ensuring you get the best quality African products delivered fresh to your door.",
                 category_id=chosen_category.id,
                 supplier_id=chosen_supplier.id,
@@ -470,19 +503,71 @@ async def seed_sample_data(
 
             if len(all_products_with_variants) >= batch_size:
                 await session.commit()
-                for p in all_products_with_variants:
-                    await session.refresh(p)
+                session.expunge_all() # Free up memory after commit
                 all_products_with_variants = []
 
         # Remaining products
         if all_products_with_variants:
             await session.commit()
-            for p in all_products_with_variants:
-                await session.refresh(p)
+            session.expunge_all() # Free up memory after commit
 
         result = await session.execute(select(Product))
         total_products = len(result.scalars().all())
         print(f"📦 Created {total_products} products with variants and images.")
+
+        # -------- Inventory Records --------
+        inventory_batch = []
+        
+        # Get all variants to create inventory for
+        all_variants_result = await session.execute(select(ProductVariant))
+        all_variants_for_inventory = all_variants_result.scalars().all()
+        
+        for variant in all_variants_for_inventory:
+            # Generate realistic stock quantities
+            # 80% of products should be in stock, 20% out of stock
+            if random.random() < 0.8:  # 80% chance of being in stock
+                # Generate stock between 5 and 100 units
+                stock_quantity = random.randint(5, 100)
+            else:
+                # 20% chance of being out of stock
+                stock_quantity = 0
+            
+            inventory = Inventory(
+                variant_id=variant.id,
+                location_id=main_warehouse.id,
+                quantity_available=stock_quantity,
+                quantity_reserved=0,
+                quantity_committed=0,
+                low_stock_threshold=random.randint(5, 15),
+                reorder_point=random.randint(3, 10),
+                inventory_status="active",
+                quantity=stock_quantity  # Legacy field for backward compatibility
+            )
+            inventory_batch.append(inventory)
+            
+            # Batch commit for performance
+            if len(inventory_batch) >= batch_size:
+                session.add_all(inventory_batch)
+                await session.flush()
+                await session.commit()
+                session.expunge_all()
+                inventory_batch = []
+        
+        # Add remaining inventory records
+        if inventory_batch:
+            session.add_all(inventory_batch)
+            await session.flush()
+            await session.commit()
+            session.expunge_all()
+        
+        print(f"📊 Created inventory records for {len(all_variants_for_inventory)} product variants")
+        
+        # Print stock statistics
+        result = await session.execute(select(Inventory).where(Inventory.quantity_available > 0))
+        in_stock_count = len(result.scalars().all())
+        result = await session.execute(select(Inventory).where(Inventory.quantity_available == 0))
+        out_of_stock_count = len(result.scalars().all())
+        print(f"📈 Stock Status: {in_stock_count} variants in stock, {out_of_stock_count} variants out of stock")
 
         # -------- Orders, OrderItems, Transactions --------
         orders_batch = []
@@ -507,18 +592,43 @@ async def seed_sample_data(
                 chosen_payment_method = random.choice(user_payment_methods)
 
                 order_total = 0
+                order_uuid = uuid.uuid4()
+                order_number = f"ORD-{str(order_uuid)[:8].upper()}" # Generate a unique order number based on the order_uuid
+                
+                # Generate dummy address data
+                dummy_address = {
+                    "street": f"{random.randint(1, 999)} Seed St",
+                    "city": "Seed City",
+                    "state": "SD",
+                    "country": "Seedland",
+                    "post_code": "00000"
+                }
+
                 order = Order(
-                    id=uuid.uuid4(),
+                    id=order_uuid,
+                    order_number=order_number,
                     user_id=user.id,
-                    status=random.choice(["pending", "shipped", "delivered"]),
-                    shipping_address_id=user.addresses[0].id if user.addresses else None,
-                    shipping_method_id=chosen_shipping_method.id,
-                    payment_method_id=chosen_payment_method.id,
-                    total_amount=0,  # Will be updated after calculating items
-                    carrier_name=random.choice(
-                        ["DHL", "FedEx", "UPS"]) if chosen_shipping_method else None,
-                    tracking_number=str(
-                        uuid.uuid4()) if chosen_shipping_method else None,
+                    guest_email=user.email if random.random() < 0.2 else None, # 20% chance of guest email
+                    order_status=random.choice(["pending", "shipped", "delivered", "processing", "cancelled"]),
+                    payment_status=random.choice(["pending", "paid", "refunded", "failed"]),
+                    fulfillment_status=random.choice(["unfulfilled", "fulfilled", "partially_fulfilled"]),
+                    subtotal=0.0, # Will be updated
+                    tax_amount=round(random.uniform(5.0, 20.0), 2),
+                    shipping_amount=chosen_shipping_method.price,
+                    discount_amount=round(random.uniform(0.0, 15.0), 2) if random.random() < 0.3 else 0.0,
+                    total_amount=0.0, # Will be updated
+                    currency="USD",
+                    shipping_method=chosen_shipping_method.name,
+                    tracking_number=str(uuid.uuid4()) if random.random() < 0.7 else None,
+                    carrier=random.choice(["DHL", "FedEx", "UPS", "Local Delivery"]) if random.random() < 0.8 else None,
+                    billing_address=dummy_address,
+                    shipping_address=dummy_address,
+                    confirmed_at=func.now() if random.random() < 0.8 else None,
+                    shipped_at=func.now() if random.random() < 0.6 else None,
+                    delivered_at=func.now() if random.random() < 0.4 else None,
+                    cancelled_at=func.now() if random.random() < 0.1 else None,
+                    customer_notes="Please deliver carefully" if random.random() < 0.2 else None,
+                    internal_notes="Seeded order"
                 )
                 orders_batch.append(order)
                 await session.flush()
@@ -555,7 +665,9 @@ async def seed_sample_data(
             session.add_all(orders_batch)
             session.add_all(order_items_batch)
             session.add_all(transactions_batch)
+            await session.flush() # Flush to get IDs/relationships
             await session.commit()
+            session.expunge_all() # Free up memory
         print(
             f"🛒 Created {len(orders_batch)} orders with items and transactions.")
 
@@ -592,7 +704,9 @@ async def seed_sample_data(
 
         if wishlist_items_batch:
             session.add_all(wishlist_items_batch)
+            await session.flush()
             await session.commit()
+            session.expunge_all()
         print(
             f"❤️ Created {len(wishlist_items_batch)} wishlist items across various wishlists.")
 
@@ -610,7 +724,9 @@ async def seed_sample_data(
             blog_tags.append(tag)
         
         session.add_all(blog_tags)
+        await session.flush()
         await session.commit()
+        session.expunge_all()
         print(f"🏷️ Created {len(blog_tags)} blog tags.")
 
         # -------- Blog Posts --------
@@ -631,9 +747,9 @@ async def seed_sample_data(
 
         if blog_posts_batch:
             session.add_all(blog_posts_batch)
+            await session.flush()
             await session.commit()
-            for bp in blog_posts_batch:
-                await session.refresh(bp)
+            session.expunge_all()
         print(f"📝 Created {len(blog_posts_batch)} blog posts.")
 
         # -------- Blog Post Tags Associations --------
@@ -650,7 +766,9 @@ async def seed_sample_data(
         
         if blog_post_tags_batch:
             session.add_all(blog_post_tags_batch)
+            await session.flush()
             await session.commit()
+            session.expunge_all()
         print(f"🏷️ Created {len(blog_post_tags_batch)} blog post tag associations.")
 
         # -------- Subscriptions --------
@@ -671,9 +789,9 @@ async def seed_sample_data(
 
         if subscriptions_batch:
             session.add_all(subscriptions_batch)
+            await session.flush()
             await session.commit()
-            for s in subscriptions_batch:
-                await session.refresh(s)
+            session.expunge_all()
         print(f"💳 Created {len(subscriptions_batch)} subscriptions.")
 
         # -------- Reviews --------
@@ -741,9 +859,9 @@ async def seed_sample_data(
 
         if reviews_batch:
             session.add_all(reviews_batch)
+            await session.flush()
             await session.commit()
-            for r in reviews_batch:
-                await session.refresh(r)
+            session.expunge_all()
         print(f"⭐ Created {len(reviews_batch)} reviews.")
 
         # -------- Notifications --------
@@ -779,7 +897,9 @@ async def seed_sample_data(
 
         if notifications_batch:
             session.add_all(notifications_batch)
+            await session.flush()
             await session.commit()
+            session.expunge_all()
         print(f"🔔 Created {len(notifications_batch)} notifications.")
 
         # -------- Print plaintext passwords --------

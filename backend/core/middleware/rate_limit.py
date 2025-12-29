@@ -207,7 +207,7 @@ class RateLimitService(RedisService):
     ) -> Dict[str, any]:
         """Check if request is within rate limit using sliding window"""
         try:
-            limit = custom_limit or self.default_limits.get(endpoint_type, self.default_limits["api"])
+            limit = custom_limit or self.default_limits.get(endpoint_type, self.default_limits["api_general"])
             rate_limit_key = RedisKeyManager.rate_limit_key(identifier, endpoint_type)
             
             redis_client = await self._get_redis()
@@ -252,7 +252,7 @@ class RateLimitService(RedisService):
             }
             
         except Exception as e:
-            logger.error(f"Error checking rate limit for {identifier}: {e}")
+            logger.error(f"Error checking rate limit for {identifier}: {e}", exc_info=True)
             # On error, allow the request (fail open)
             return {
                 "allowed": True,

@@ -2,7 +2,15 @@ from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime, Integer
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, CHAR_LENGTH, GUID, Index
+from enum import Enum
 
+class UserRole(str, Enum):
+    GUEST = "guest"
+    ADMIN = "admin"
+    MANAGER = "manager"
+    SUPPORT = "support"
+    CUSTOMER = "customer"
+    SUPPLIER = "supplier"
 
 class User(BaseModel):
     """Optimized User model with hard delete only"""
@@ -26,7 +34,7 @@ class User(BaseModel):
     hashed_password = Column(String(CHAR_LENGTH), nullable=False)
     
     # Status fields as columns for fast filtering
-    role = Column(String(50), default="customer", nullable=False)
+    role = Column(String(50), default=UserRole.CUSTOMER, nullable=False)
     account_status = Column(String(50), default="active", nullable=False)
     verification_status = Column(String(50), default="unverified", nullable=False)
     
@@ -106,7 +114,7 @@ class User(BaseModel):
             "firstname": self.firstname,
             "lastname": self.lastname,
             "full_name": self.full_name,
-            "role": self.role,
+            "role": self.role.value,
             "account_status": self.account_status,
             "verification_status": self.verification_status,
             "verified": self.verified,  # Legacy field

@@ -2,12 +2,14 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
+import { useAuthenticatedAction } from '../hooks/useAuthenticatedAction';
 import { HeartIcon, ShoppingCartIcon, XCircleIcon, RefreshCwIcon, AlertCircleIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 export const Wishlist = () => {
   const { defaultWishlist, removeItem, fetchWishlists, loading, error } = useWishlist();
   const { addItem: addToCart } = useCart();
+  const { executeWithAuth } = useAuthenticatedAction();
 
   useEffect(() => {
     fetchWishlists();
@@ -17,20 +19,23 @@ export const Wishlist = () => {
     await removeItem(wishlistId, itemId);
   };
 
-  const handleAddToCart = (item) => {
-    addToCart({
-      id: item.product_id,
-      name: item.product?.name || "Product",
-      price: item.product.variants[0]?.sale_price || item.product.variants[0]?.base_price || 0,
-      image: item.product?.variants?.[0]?.images?.[0]?.url || "",
-      quantity: item.quantity,
-      variant: item.product.variants[0]?.name,
-    });
-    toast.success("Item added to cart!");
-    // Optionally remove from wishlist after adding to cart
-    if (defaultWishlist) {
-      handleRemoveItem(defaultWishlist.id, item.id);
-    }
+  const handleAddToCart = async (item) => {
+    await executeWithAuth(async () => {
+      await addToCart({
+        id: item.product_id,
+        name: item.product?.name || "Product",
+        price: item.product.variants[0]?.sale_price || item.product.variants[0]?.base_price || 0,
+        image: item.product?.variants?.[0]?.images?.[0]?.url || "",
+        quantity: item.quantity,
+        variant: item.product.variants[0]?.name,
+      });
+      toast.success("Item added to cart!");
+      // Optionally remove from wishlist after adding to cart
+      if (defaultWishlist) {
+        await handleRemoveItem(defaultWishlist.id, item.id);
+      }
+      return true;
+    }, 'cart');
   };
 
   const handleRetry = () => {

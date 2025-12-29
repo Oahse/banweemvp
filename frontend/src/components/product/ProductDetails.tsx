@@ -4,6 +4,7 @@ import { ShoppingCartIcon, HeartIcon, ShareIcon, MinusIcon, PlusIcon, CheckIcon,
 import Breadcrumbs from '../ui/Breadcrumbs';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
+import { useAuthenticatedAction } from '../../hooks/useAuthenticatedAction';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useApi } from '../../hooks/useApi';
@@ -42,6 +43,7 @@ export const ProductDetails = () => {
   const { id } = useParams();
   const { addItem } = useCart();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
+  const { executeWithAuth } = useAuthenticatedAction();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState(undefined);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -148,31 +150,33 @@ export const ProductDetails = () => {
   const handleAddToCart = async () => {
     if (!selectedVariant || !product) return;
     
-    try {
+    await executeWithAuth(async () => {
       await addItem({
         variant_id: String(selectedVariant.id),
         quantity: quantity,
       });
       toast.success(`Added to cart! ${product.name} - ${selectedVariant.name} has been added to your cart.`);
-    } catch (error) {
-      console.error('Failed to add to cart:', error);
-      toast.error('Failed to add item to cart');
-    }
+      return true;
+    }, 'cart');
   };
 
-  const handleAddToWishlist = () => {
+  const handleAddToWishlist = async () => {
     if (!product || !selectedVariant) return;
-    addToWishlist({
-      id: product.id,
-      name: product.name,
-      price: selectedVariant.sale_price || selectedVariant.base_price,
-      image: selectedVariant.images?.[0]?.url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-    });
-    if (!isInWishlist(product.id)) {
-      toast.success(`Added to wishlist! ${product.name} has been added to your wishlist.`);
-    } else {
-      toast(`Already in wishlist: ${product.name} is already in your wishlist.`);
-    }
+    
+    await executeWithAuth(async () => {
+      await addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: selectedVariant.sale_price || selectedVariant.base_price,
+        image: selectedVariant.images?.[0]?.url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      });
+      if (!isInWishlist(product.id)) {
+        toast.success(`Added to wishlist! ${product.name} has been added to your wishlist.`);
+      } else {
+        toast(`Already in wishlist: ${product.name} is already in your wishlist.`);
+      }
+      return true;
+    }, 'wishlist');
   };
 
   const isWishlisted = isInWishlist(product.id);
@@ -287,7 +291,7 @@ export const ProductDetails = () => {
               </div>
             ) : (
               <span className="text-2xl font-bold text-primary">
-                ${selectedVariant?.base_price.toFixed(2)}
+                ${selectedVariant?.base_price?.toFixed(2) || '0.00'}
               </span>
             )}
           </div>

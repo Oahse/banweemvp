@@ -28,7 +28,7 @@ import { ReviewsAPI } from '../apis';
 
 import ErrorMessage from '../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthenticatedAction } from '../hooks/useAuthenticatedAction';
 
 // Transform API product data with null checks
 const transformProduct = (product, averageRating, reviewCount) => {
@@ -90,7 +90,7 @@ export const ProductDetails = () => {
 
   const { addItem: addToCart, removeItem: removeFromCart, updateQuantity, cart } = useCart();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist, defaultWishlist } = useWishlist();
-  const { setRedirectPath } = useAuth();
+  const { executeWithAuth } = useAuthenticatedAction();
 
   // API calls
   const {
@@ -154,6 +154,8 @@ export const ProductDetails = () => {
         name: variant.name,
         base_price: variant.base_price,
         sale_price: variant.sale_price,
+        current_price: variant.current_price,
+        discount_percentage: variant.discount_percentage,
         stock: variant.stock,
         sku: variant.sku,
         attributes: variant.attributes,
@@ -351,21 +353,21 @@ export const ProductDetails = () => {
               </div>
 
               <div className="flex items-center space-x-4 mb-4">
-                {selectedVariant?.discount_percentage > 0 && selectedVariant?.sale_price ? (
+                {selectedVariant?.sale_price && selectedVariant.sale_price < selectedVariant.base_price ? (
                   <>
                     <span className="text-3xl font-bold text-primary">
-                      ${selectedVariant.current_price.toFixed(2)}
+                      ${selectedVariant.sale_price.toFixed(2)}
                     </span>
                     <span className="text-xl text-copy-light line-through">
                       ${selectedVariant.base_price.toFixed(2)}
                     </span>
                     <span className="bg-error-100 text-error-600 px-2 py-1 rounded text-sm font-medium">
-                      {selectedVariant.discount_percentage}% OFF
+                      {Math.round(((selectedVariant.base_price - selectedVariant.sale_price) / selectedVariant.base_price) * 100)}% OFF
                     </span>
                   </>
                 ) : (
                   <span className="text-3xl font-bold text-primary">
-                    ${selectedVariant?.current_price.toFixed(2) || product.price.toFixed(2)}
+                    ${(selectedVariant?.sale_price || selectedVariant?.base_price || product.price).toFixed(2)}
                   </span>
                 )}
               </div>
@@ -418,6 +420,8 @@ export const ProductDetails = () => {
                       name: originalVariant.name,
                       base_price: originalVariant.base_price,
                       sale_price: originalVariant.sale_price,
+                      current_price: originalVariant.current_price,
+                      discount_percentage: originalVariant.discount_percentage,
                       stock: originalVariant.stock,
                       sku: originalVariant.sku,
                       attributes: originalVariant.attributes,
@@ -510,11 +514,10 @@ export const ProductDetails = () => {
                   <button
                     onClick={async () => {
                       if (!selectedVariant) return;
-                      const success = await addToCart({ variant_id: String(selectedVariant.id), quantity: quantity });
-                      if (!success) {
-                        setRedirectPath(location.pathname);
-                        navigate('/login');
-                      }
+                      await executeWithAuth(async () => {
+                        await addToCart({ variant_id: String(selectedVariant.id), quantity: quantity });
+                        return true;
+                      }, 'cart');
                     }}
                     disabled={!selectedVariant || selectedVariant.stock <= 0}
                     className="w-full bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
@@ -528,28 +531,23 @@ export const ProductDetails = () => {
               {/* Wishlist Button */}
               <button
                 onClick={async () => {
-                  if (!defaultWishlist) {
-                    toast.error("No default wishlist found.");
-                    return;
-                  }
-                  if (isInWishlistState) {
-                    const wishlistItem = defaultWishlist.items?.find(
-                      item => item?.product_id === product.id && (selectedVariant ? item?.variant_id === selectedVariant.id : true)
-                    );
-                    if (wishlistItem) {
-                      const success = await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
-                      if (!success) {
-                        setRedirectPath(location.pathname);
-                        navigate('/login');
+                  await executeWithAuth(async () => {
+                    if (!defaultWishlist) {
+                      toast.error("No default wishlist found.");
+                      return false;
+                    }
+                    if (isInWishlistState) {
+                      const wishlistItem = defaultWishlist.items?.find(
+                        item => item?.product_id === product.id && (selectedVariant ? item?.variant_id === selectedVariant.id : true)
+                      );
+                      if (wishlistItem) {
+                        await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
                       }
+                    } else {
+                      await addToWishlist(product.id, selectedVariant?.id, quantity);
                     }
-                  } else {
-                    const success = await addToWishlist(product.id, selectedVariant?.id, quantity);
-                    if (!success) {
-                      setRedirectPath(location.pathname);
-                      navigate('/login');
-                    }
-                  }
+                    return true;
+                  }, 'wishlist');
                 }}
                 className={`px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center min-w-[60px] ${isInWishlistState
                   ? 'bg-error-100 text-error-600 hover:bg-error-200'

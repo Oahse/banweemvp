@@ -36,20 +36,7 @@ class EventProducer:
             self.producer = AIOKafkaProducer(
                 bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
                 value_serializer=self._serialize_event,
-                key_serializer=lambda k: k.encode('utf-8') if k else None,
-                # Delivery guarantees
-                acks='all',  # Wait for all replicas
-                retries=5,
-                retry_backoff_ms=100,
-                delivery_timeout_ms=30000,
-                request_timeout_ms=25000,
-                # Performance optimizations
-                batch_size=16384,
-                linger_ms=10,
-                compression_type='gzip',
-                # Idempotence
-                enable_idempotence=True,
-                max_in_flight_requests_per_connection=1
+                key_serializer=lambda k: k.encode('utf-8') if k else None
             )
             
             await self.producer.start()

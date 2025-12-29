@@ -422,6 +422,7 @@ class ProductService:
                 description=category.description,
                 image_url=category.image_url,
                 is_active=category.is_active,
+                product_count=product_count,
                 created_at=category.created_at.isoformat() if category.created_at else "",
                 updated_at=category.updated_at.isoformat() if category.updated_at else None
             ))
@@ -435,12 +436,21 @@ class ProductService:
         category = result.scalar_one_or_none()
 
         if category:
+            # Get product count for this category
+            product_count_query = select(func.count(Product.id)).where(
+                Product.category_id == category.id,
+                Product.is_active == True
+            )
+            product_count_result = await self.db.execute(product_count_query)
+            product_count = product_count_result.scalar()
+            
             return CategoryResponse(
                 id=category.id,
                 name=category.name,
                 description=category.description,
                 image_url=category.image_url,
                 is_active=category.is_active,
+                product_count=product_count,
                 created_at=category.created_at.isoformat() if category.created_at else "",
                 updated_at=category.updated_at.isoformat() if category.updated_at else None
             )

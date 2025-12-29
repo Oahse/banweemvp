@@ -634,7 +634,7 @@ POSTGRES_DB_URL=postgresql+asyncpg://banwee:banwee_password@postgres:5432/banwee
 REDIS_URL=redis://redis:6379/0
 
 # CORS (configured for Docker networking)
-BACKEND_CORS_ORIGINS=http://localhost:5173,http://0.0.0.0:5173,http://127.0.0.1:5173
+BACKEND_CORS_ORIGINS=http://localhost:5173,http://localhost:5173,http://127.0.0.1:5173
 ```
 
 **Frontend (`frontend/.env`):**
@@ -751,7 +751,7 @@ npm run build
 ```bash
 cd backend
 # Use a production ASGI server like gunicorn with uvicorn workers
-gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind localhost:8000
 # Deploy to: AWS EC2, DigitalOcean Droplet, Heroku, or any VPS
 ```
 

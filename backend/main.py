@@ -1,14 +1,14 @@
-from fastapi import FastAPI, HTTPException
+import asyncio
+import os
+from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.exc import SQLAlchemyError
+
 from core.database import AsyncSessionDB, initialize_db, db_manager, DatabaseOptimizer
-from services.notifications import NotificationService 
-import asyncio 
-import os
 # Import configuration and middleware
 from core.config import settings, validate_startup_environment, get_setup_instructions
 from core.middleware import SessionMiddleware, RateLimitMiddleware, CacheMiddleware, MaintenanceModeMiddleware
@@ -22,15 +22,13 @@ from core.exceptions import (
     general_exception_handler
 )
 from core.kafka import consume_messages, get_kafka_producer_service, initialize_event_system, start_event_consumer 
-from routes.websocket import ws_router
+from routes.websockets import ws_router
 from routes.auth import router as auth_router
 from routes.user import router as user_router
 from routes.products import router as products_router
 from routes.cart import router as cart_router
 from routes.orders import router as orders_router
 from routes.admin import router as admin_router
-# Import WebSocket Kafka consumer
-from services.websocket_kafka_consumer import start_websocket_kafka_consumer, stop_websocket_kafka_consumer
 from routes.social_auth import router as social_auth_router
 from routes.blog import router as blog_router
 from routes.subscriptions import router as subscription_router
@@ -43,6 +41,10 @@ from routes.health import router as health_router
 from routes.search import router as search_router
 from routes.inventories import router as inventory_router
 from routes.loyalty import router as loyalty_router
+
+from services.notifications import NotificationService 
+# Import WebSocket Kafka consumer
+from services.websockets import start_websocket_kafka_consumer, stop_websocket_kafka_consumer
 
 
 from contextlib import asynccontextmanager
@@ -163,12 +165,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Session middleware for session management
-app.add_middleware(
-    SessionMiddleware,
-    secret_key=settings.SECRET_KEY
-)
+ 
 
 # Trusted host middleware for security
 if hasattr(settings, 'ALLOWED_HOSTS'):
@@ -183,26 +180,28 @@ app.add_middleware(CacheMiddleware)
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(SessionMiddleware)
 
+# API v1 Router
+v1_router = APIRouter(prefix="/v1")
+v1_router.include_router(auth_router)
+v1_router.include_router(user_router)
+v1_router.include_router(products_router)
+v1_router.include_router(cart_router)
+v1_router.include_router(orders_router)
+v1_router.include_router(admin_router)
+v1_router.include_router(social_auth_router)
+v1_router.include_router(blog_router)
+v1_router.include_router(subscription_router)
+v1_router.include_router(review_router)
+v1_router.include_router(payment_router)
+v1_router.include_router(wishlist_router)
+v1_router.include_router(notification_router)
+v1_router.include_router(health_router)
+v1_router.include_router(search_router)
+v1_router.include_router(inventory_router)
+v1_router.include_router(loyalty_router)
 
-# Include all routers with API versioning v1
-app.include_router(auth_router, prefix="/v1")
-app.include_router(user_router, prefix="/v1")
-app.include_router(products_router, prefix="/v1")
-app.include_router(cart_router, prefix="/v1")
-app.include_router(orders_router, prefix="/v1")
-app.include_router(admin_router, prefix="/v1")
-app.include_router(social_auth_router, prefix="/v1")
-app.include_router(blog_router, prefix="/v1")
-app.include_router(subscription_router, prefix="/v1")
-app.include_router(review_router, prefix="/v1")
-app.include_router(payment_router, prefix="/v1")
-app.include_router(wishlist_router, prefix="/v1")
-app.include_router(notification_router, prefix="/v1")
-app.include_router(health_router, prefix="/v1")
-# app.include_router(negotiator_router, prefix="/v1")
-app.include_router(search_router, prefix="/v1")
-app.include_router(inventory_router, prefix="/v1")
-app.include_router(loyalty_router, prefix="/v1")
+# Include the v1 router into the main app
+app.include_router(v1_router)
 
 # Include WebSocket router
 app.include_router(ws_router)
@@ -233,19 +232,6 @@ async def read_root():
         "status": "Running",
         "version": "1.0.0",
         "description": "Discover premium organic products from Africa. Ethically sourced, sustainably produced, and delivered to your doorstep.",
-    }
-
-# Legacy health endpoint - redirects to new health router
-
-
-@app.get("/health")
-async def legacy_health_check():
-    """Legacy health check endpoint - use /health/ for detailed checks."""
-    return {
-        "status": "healthy",
-        "service": "Banwee API",
-        "version": "1.0.0",
-        "note": "Use /health/ endpoints for detailed health checks"
     }
 
 

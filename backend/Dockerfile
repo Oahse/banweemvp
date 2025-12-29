@@ -40,9 +40,6 @@ RUN chmod +x migrate.sh
 
 # Set Python path to include the /app directory, allowing Python to find modules
 ENV PYTHONPATH=/app
-# Explicitly set the PostgreSQL database URL for the backend application.
-# This uses the 'postgres' service name for inter-container communication within Docker.
-ENV POSTGRES_DB_URL=postgresql+asyncpg://banwee:banwee_password@postgres:5432/banwee_db
 
 # Explicitly set PATH to ensure executables like uvicorn are found
 ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"

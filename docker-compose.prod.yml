@@ -9,7 +9,7 @@ services:
     image: postgres:16-alpine
     container_name: banwee_postgres
     env_file:
-      - ./.dev.env
+      - ./.prod.env
     environment:
       # Performance optimizations
       POSTGRES_INITDB_ARGS: "--data-checksums --encoding=UTF8 --locale=C"
@@ -116,12 +116,9 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./.dev.env
+      - ./.prod.env
     environment:
       - PYTHONPATH=/app
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - REDIS_URL=redis://redis:6379/0
-      - POSTGRES_SERVER=postgres
     depends_on:
       postgres:
         condition: service_healthy
@@ -152,15 +149,7 @@ services:
     ports:
       - "5173:5173"
     env_file:
-      - ./.dev.env
-    environment:
-      - VITE_ENVIRONMENT=local
-      - VITE_API_BASE_URL_DEV=http://localhost:8000
-      - VITE_APP_URL_DEV=http://localhost:5173
-      - VITE_WS_URL_DEV=ws://localhost:8000/ws
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./.prod.env
     depends_on:
       - backend
     networks:

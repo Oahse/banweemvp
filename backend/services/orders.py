@@ -121,7 +121,7 @@ class OrderService:
         existing_order = await self.db.execute(
             select(Order).where(Order.idempotency_key == idempotency_key).with_for_update()
         )
-        existing = existing_order.scalar_one_or_none()
+        existing = await existing_order.scalar_one_or_none()
         
         if existing:
             # Return existing order
@@ -188,7 +188,7 @@ class OrderService:
         existing_order = await self.db.execute(
             select(Order).where(Order.idempotency_key == idempotency_key)
         )
-        existing = existing_order.scalar_one_or_none()
+        existing = await existing_order.scalar_one_or_none()
         
         if existing:
             logger.info(f"Returning existing order for idempotency key: {idempotency_key}")
@@ -298,7 +298,22 @@ class OrderService:
                         select(PaymentMethod).where(and_(PaymentMethod.id == request.payment_method_id, PaymentMethod.user_id == user_id))
                     )
                     payment_method = payment_method.scalar_one_or_none()
-        if not payment_method:
+                except HTTPException:
+                    # On any validation failure, release all inventory reservations
+                    for reservation in inventory_reservations:
+                        await self.inventory_service.cancel_stock_reservation(
+                            reservation["reservation_id"]
+                        )
+                    raise 
+            except HTTPException:
+                # Re-raise HTTP exceptions to be handled by outer transaction
+                raise
+        
+        # Initialize payment_method to None if not set, and handle validation
+        if not request.payment_method_id:
+            payment_method = None
+        
+        if payment_method is None: # This covers both cases: not provided, or provided but not found
             raise HTTPException(status_code=404, detail="Payment method not found")
 
         # STEP 4: CALCULATE FINAL TOTAL (backend calculation only)
@@ -1153,7 +1168,7 @@ class OrderService:
                     selectinload(Order.items)
                 )
             )
-            order = order_with_items.scalar_one()
+            order = await order_with_items.scalar_one()
         
         return OrderResponse(
             id=order.id,

@@ -28,7 +28,7 @@ export const Register = () => {
   const [loading, setLoading] = useState(false);
 
   // Auth context for registration and authentication status
-  const { register, isAuthenticated, isAdmin, isSupplier } = useAuth();
+  const { register, isAuthenticated, isAdmin, isSupplier, intendedDestination, setIntendedDestination } = useAuth();
   // React Router hooks for navigation and location
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,16 +42,39 @@ export const Register = () => {
     if (isAuthenticated) {
       // Determines the appropriate redirect path after successful login/registration
       const getRedirectPath = () => {
+        // First priority: intended destination (from protected route)
+        if (intendedDestination && (intendedDestination as any).path !== '/register') {
+          const destination = intendedDestination as any;
+          // If the action was to add to cart, redirect to cart page
+          if (destination.action === 'cart') {
+            return '/cart';
+          }
+          // If the action was to add to wishlist, redirect to wishlist page
+          if (destination.action === 'wishlist') {
+            return '/account/wishlist';
+          }
+          // Otherwise redirect to the original path
+          return destination.path;
+        }
+        
+        // Second priority: redirect query parameter
         const params = new URLSearchParams(location.search);
         const redirect = params.get('redirect');
         if (redirect) return redirect;
+        
+        // Third priority: role-based default
         if (isAdmin) return '/admin';
         if (isSupplier) return '/account/products';
         return '/';
       };
-      navigate(getRedirectPath());
+      const redirectPath = getRedirectPath();
+      navigate(redirectPath);
+      // Clear intended destination after navigation
+      if (intendedDestination) {
+        setIntendedDestination(null);
+      }
     }
-  }, [isAuthenticated, navigate, location.search, isAdmin, isSupplier]);
+  }, [isAuthenticated, navigate, location.search, isAdmin, isSupplier, intendedDestination, setIntendedDestination]);
 
   /**
    * Handles the form submission for user registration.

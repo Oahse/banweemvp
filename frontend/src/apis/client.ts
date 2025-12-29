@@ -5,10 +5,11 @@
 
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { config } from '../config/environment';
 
 // API Configuration
 export const API_CONFIG = {
-  baseURL: import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8000/v1',
+  baseURL: config.apiBaseUrl,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',

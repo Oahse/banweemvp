@@ -52,6 +52,7 @@ class CategoryResponse(BaseModel):
     description: Optional[str]
     image_url: Optional[str]
     is_active: bool
+    product_count: int = 0
     created_at: str
     updated_at: Optional[str]
 

@@ -33,7 +33,7 @@ class TestCheckoutIntegration:
     @pytest.fixture
     async def db_session(self):
         """Mock database session with transaction support"""
-        session = AsyncMock(spec=AsyncSession)
+        session = MagicMock(spec=AsyncSession)
         session.begin = AsyncMock()
         session.commit = AsyncMock()
         session.rollback = AsyncMock()
@@ -41,16 +41,7 @@ class TestCheckoutIntegration:
         session.refresh = AsyncMock()
         session.close = AsyncMock()
         
-        # Mock execute method for different query types
-        def mock_execute(query):
-            result = AsyncMock()
-            result.scalar_one_or_none = AsyncMock()
-            result.scalars = AsyncMock()
-            result.fetchall = AsyncMock()
-            result.rowcount = 1
-            return result
-        
-        session.execute = AsyncMock(side_effect=mock_execute)
+        session.execute = AsyncMock()
         return session
 
     @pytest.fixture
@@ -70,7 +61,7 @@ class TestCheckoutIntegration:
             id=uuid4(),
             product_id=uuid4(),
             name="Test Product",
-            price=Decimal("29.99"),
+            base_price=Decimal("29.99"),
             sku="TEST-001",
             is_active=True
         )
@@ -89,7 +80,7 @@ class TestCheckoutIntegration:
             cart_id=cart.id,
             variant_id=product_variant.id,
             quantity=2,
-            price_per_unit=product_variant.price,
+            price_per_unit=product_variant.current_price,
             saved_for_later=False
         )
         cart.items = [cart_item]
@@ -113,8 +104,7 @@ class TestCheckoutIntegration:
             variant_id=product_variant.id,
             location_id=uuid4(),
             quantity_available=100,
-            quantity_reserved=0,
-            quantity_sold=0
+            quantity_reserved=0
         )
 
     @pytest.fixture
@@ -168,6 +158,7 @@ class TestCheckoutIntegration:
         user_data,
         cart_with_items,
         checkout_request,
+        product_variant,
         mock_inventory,
         mock_payment_method,
         mock_shipping_method,
@@ -201,37 +192,45 @@ class TestCheckoutIntegration:
         
         # Mock inventory service
         mock_inventory_service_instance = AsyncMock()
-        mock_inventory_service_instance.reserve_inventory.return_value = True
-        mock_inventory_service_instance.adjust_stock.return_value = True
+        mock_inventory_service_instance.reserve_inventory.return_value = {"success": True, "reservation_id": uuid4()}
+        mock_inventory_service_instance.decrement_stock_on_purchase.return_value = {"success": True}
         mock_inventory_service.return_value = mock_inventory_service_instance
         
-        # Mock database queries
-        def setup_db_mocks():
-            # Mock address query
-            address_result = AsyncMock()
-            address_result.scalar_one_or_none.return_value = mock_address
+        # Mock database queries dynamically
+        def mock_db_execute_side_effect(query):
+            query_str = str(query).lower()
+            if "FROM address" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_address
+                return mock_result
+            elif "FROM shipping_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_shipping_method
+                return mock_result
+            elif "FROM payment_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_payment_method
+                return mock_result
+            elif "FROM order" in query_str and "idempotency_key" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = None # Assume no existing order for successful flow
+                return mock_result
+            elif "FROM product_variants" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = product_variant
+                return mock_result
+            elif "FROM inventory" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_inventory
+                return mock_result
             
-            # Mock shipping method query
-            shipping_result = AsyncMock()
-            shipping_result.scalar_one_or_none.return_value = mock_shipping_method
-            
-            # Mock payment method query
-            payment_result = AsyncMock()
-            payment_result.scalar_one_or_none.return_value = mock_payment_method
-            
-            # Mock inventory query
-            inventory_result = AsyncMock()
-            inventory_result.scalar_one_or_none.return_value = mock_inventory
-            
-            # Return different results based on query
-            db_session.execute.side_effect = [
-                address_result,      # shipping address query
-                shipping_result,     # shipping method query
-                payment_result,      # payment method query
-                inventory_result,    # inventory query
-            ]
-        
-        setup_db_mocks()
+            # Default fallback for unmocked queries
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = None
+            mock_result.scalars.return_value.all.return_value = []
+            return mock_result
+
+        db_session.execute.side_effect = mock_db_execute_side_effect
         
         # Mock Kafka producer
         mock_producer = AsyncMock()
@@ -251,7 +250,7 @@ class TestCheckoutIntegration:
         
         # Verify results
         assert result is not None
-        assert hasattr(result, 'id')
+        assert result.id is not None
         
         # Verify cart validation was called
         mock_cart_service.validate_cart.assert_called_once_with(user_id)
@@ -283,7 +282,12 @@ class TestCheckoutIntegration:
         db_session,
         user_data,
         cart_with_items,
-        checkout_request
+        checkout_request,
+        product_variant,
+        mock_inventory,
+        mock_address,
+        mock_shipping_method,
+        mock_payment_method
     ):
         """Test checkout flow when payment fails"""
         
@@ -307,6 +311,43 @@ class TestCheckoutIntegration:
             detail="Payment failed: insufficient funds"
         )
         mock_payment_service_class.return_value = mock_payment_service
+        
+        # Mock database queries dynamically
+        def mock_db_execute_side_effect(query):
+            query_str = str(query).lower()
+            if "FROM address" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_address
+                return mock_result
+            elif "FROM shipping_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_shipping_method
+                return mock_result
+            elif "FROM payment_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_payment_method
+                return mock_result
+            elif "FROM order" in query_str and "idempotency_key" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = None # No existing order for this flow
+                return mock_result
+            elif "FROM product_variants" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = product_variant
+                return mock_result
+            elif "FROM inventory" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_inventory
+                return mock_result
+            
+            # Default fallback for unmocked queries
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = None
+            mock_result.scalars.return_value.all.return_value = []
+            return mock_result
+
+        db_session.execute.side_effect = mock_db_execute_side_effect
+
         
         # Create order service
         order_service = OrderService(db_session)
@@ -332,7 +373,12 @@ class TestCheckoutIntegration:
         mock_cart_service_class,
         db_session,
         user_data,
-        checkout_request
+        checkout_request,
+        product_variant,
+        mock_inventory,
+        mock_address,
+        mock_shipping_method,
+        mock_payment_method
     ):
         """Test checkout flow with invalid cart"""
         
@@ -354,6 +400,44 @@ class TestCheckoutIntegration:
             "summary": {"total_items": 0, "total_amount": 0}
         }
         mock_cart_service_class.return_value = mock_cart_service
+        
+        # Mock database queries dynamically
+        def mock_db_execute_side_effect(query):
+            query_str = str(query).lower()
+            if "FROM address" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_address
+                return mock_result
+            elif "FROM shipping_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_shipping_method
+                return mock_result
+            elif "FROM payment_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_payment_method
+                return mock_result
+            elif "FROM order" in query_str and "idempotency_key" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = None # No existing order for this flow
+                return mock_result
+            elif "FROM product_variants" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = product_variant
+                return mock_result
+            elif "FROM inventory" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_inventory
+                return mock_result
+            
+            # Default fallback for unmocked queries
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = None
+            mock_result.scalars.return_value.all.return_value = []
+            return mock_result
+
+        db_session.execute.side_effect = mock_db_execute_side_effect
+
+
         
         # Create order service
         order_service = OrderService(db_session)
@@ -383,7 +467,12 @@ class TestCheckoutIntegration:
         db_session,
         user_data,
         cart_with_items,
-        checkout_request
+        checkout_request,
+        product_variant,
+        mock_inventory,
+        mock_address,
+        mock_shipping_method,
+        mock_payment_method
     ):
         """Test checkout flow when inventory is insufficient"""
         
@@ -407,6 +496,42 @@ class TestCheckoutIntegration:
             detail="Insufficient inventory for product"
         )
         mock_inventory_service.return_value = mock_inventory_service_instance
+        
+        # Mock database queries dynamically
+        def mock_db_execute_side_effect(query):
+            query_str = str(query).lower()
+            if "FROM address" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_address
+                return mock_result
+            elif "FROM shipping_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_shipping_method
+                return mock_result
+            elif "FROM payment_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_payment_method
+                return mock_result
+            elif "FROM order" in query_str and "idempotency_key" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = None # No existing order for this flow
+                return mock_result
+            elif "FROM product_variants" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = product_variant
+                return mock_result
+            elif "FROM inventory" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_inventory
+                return mock_result
+            
+            # Default fallback for unmocked queries
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = None
+            mock_result.scalars.return_value.all.return_value = []
+            return mock_result
+
+        db_session.execute.side_effect = mock_db_execute_side_effect
         
         # Create order service
         order_service = OrderService(db_session)
@@ -434,7 +559,12 @@ class TestCheckoutIntegration:
         db_session,
         user_data,
         cart_with_items,
-        checkout_request
+        checkout_request,
+        product_variant, # Added fixture
+        mock_inventory, # Added fixture
+        mock_address,
+        mock_shipping_method,
+        mock_payment_method
     ):
         """Test checkout idempotency - duplicate requests should return same order"""
         
@@ -448,14 +578,50 @@ class TestCheckoutIntegration:
             order_number="ORD-123456",
             order_status="confirmed",
             payment_status="paid",
-            total_amount=59.98,
-            idempotency_key=idempotency_key
+            total_amount=Decimal("59.98"), # Use Decimal consistent with price
+            idempotency_key=idempotency_key,
+            created_at=datetime.utcnow() # Add created_at
         )
+        existing_order.shipping_address = mock_address
+        existing_order.shipping_method = mock_shipping_method
+        existing_order.payment_method = mock_payment_method
+        existing_order.items = [] # Initialize items as empty list
         
-        # Mock database to return existing order
-        existing_order_result = AsyncMock()
-        existing_order_result.scalar_one_or_none.return_value = existing_order
-        db_session.execute.return_value = existing_order_result
+        # Mock database queries dynamically
+        def mock_db_execute_side_effect(query):
+            query_str = str(query).lower()
+            if "FROM address" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_address
+                return mock_result
+            elif "FROM shipping_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_shipping_method
+                return mock_result
+            elif "FROM payment_method" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_payment_method
+                return mock_result
+            elif "FROM order" in query_str and "idempotency_key" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = existing_order # Return existing order for this flow
+                return mock_result
+            elif "FROM product_variants" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = product_variant
+                return mock_result
+            elif "FROM inventory" in query_str:
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none.return_value = mock_inventory
+                return mock_result
+            
+            # Default fallback for unmocked queries
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = None
+            mock_result.scalars.return_value.all.return_value = []
+            return mock_result
+
+        db_session.execute.side_effect = mock_db_execute_side_effect
         
         # Create order service
         order_service = OrderService(db_session)

@@ -25,7 +25,7 @@ export const Login = ({ isInitialLoading = false }) => {
   const [loading, setLoading] = useState(false);
 
   // Auth context for login functionality and authentication status
-  const { login, isAuthenticated, isAdmin, isSupplier, redirectPath, setRedirectPath, intendedDestination } = useAuth();
+  const { login, isAuthenticated, isAdmin, isSupplier, redirectPath, setRedirectPath, intendedDestination, setIntendedDestination } = useAuth();
   // Custom hook for managing skeleton loading state
   const skeleton = useSkeleton(isInitialLoading, { showOnMount: false });
   // React Router hooks for navigation and location
@@ -40,7 +40,17 @@ export const Login = ({ isInitialLoading = false }) => {
   const getRedirectPath = useCallback((user: any) => {
     // First priority: intended destination (from protected route)
     if (intendedDestination && (intendedDestination as any).path !== '/login') {
-      return (intendedDestination as any).path;
+      const destination = intendedDestination as any;
+      // If the action was to add to cart, redirect to cart page
+      if (destination.action === 'cart') {
+        return '/cart';
+      }
+      // If the action was to add to wishlist, redirect to wishlist page
+      if (destination.action === 'wishlist') {
+        return '/account/wishlist';
+      }
+      // Otherwise redirect to the original path
+      return destination.path;
     }
     
     // Second priority: redirect query parameter
@@ -86,6 +96,10 @@ export const Login = ({ isInitialLoading = false }) => {
       // Navigate to intended destination or default path
       const path = getRedirectPath(user);
       navigate(path);
+      // Clear intended destination after navigation
+      if (intendedDestination) {
+        setIntendedDestination(null);
+      }
     } catch (error) {
       // Display error message if login fails
       toast.error('Login failed. Please check your email and password.');

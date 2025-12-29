@@ -412,16 +412,7 @@ class KafkaProducer:
     def __init__(self):
         self.producer = AIOKafkaProducer(
             bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
-            value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-            # Performance optimizations
-            batch_size=settings.KAFKA_BATCH_SIZE,
-            linger_ms=settings.KAFKA_LINGER_MS,
-            compression_type=settings.KAFKA_COMPRESSION_TYPE,
-            acks=settings.KAFKA_ACKS,
-            delivery_timeout_ms=settings.KAFKA_DELIVERY_TIMEOUT_MS,
-            request_timeout_ms=settings.KAFKA_REQUEST_TIMEOUT_MS,
-            retry_backoff_ms=settings.KAFKA_RETRY_BACKOFF_MS,
-            max_retries=settings.KAFKA_MAX_RETRIES
+            value_serializer=lambda v: json.dumps(v).encode('utf-8')
         )
 
     async def start(self):

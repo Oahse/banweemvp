@@ -4,7 +4,9 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
+from enum import Enum
 
+from models.user import UserRole
 
 class AddressBase(BaseModel):
     street: Optional[str]
@@ -31,14 +33,11 @@ class AddressResponse(AddressBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-
-
-
 class UserBase(BaseModel):
     email: EmailStr
     firstname: str
     lastname: str
-    role: Optional[str] = "Customer"
+    role: Optional[UserRole] = UserRole.CUSTOMER
 
 
 class UserCreate(UserBase):

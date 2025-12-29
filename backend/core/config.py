@@ -90,9 +90,12 @@ def parse_cors(value: str) -> List[str]:
     if not value:
         return [
             "http://localhost:5173",
-            "http://0.0.0.0:5173", 
             "http://127.0.0.1:5173",
+            "http://localhost:5173",
             "http://localhost:3000",
+            "http://www.banwee.com",
+            "https://www.banwee.com",
+            "https://banwee.com"
         ]
     
     if isinstance(value, str):
@@ -265,48 +268,39 @@ class Settings:
     
     def _load_environment(self):
         """Load environment variables from .env file"""
+        ENVIRONMENT = os.getenv('ENVIRONMENT', 'local')
+        env_file = '.dev.env' if ENVIRONMENT in ['local', 'dev'] else '.prod.env'
+        
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        ENV_PATH = os.path.join(BASE_DIR, '.env')
-        load_dotenv(ENV_PATH)
-    
+        ENV_PATH = os.path.join(BASE_DIR, env_file)
+        
+        if os.path.exists(ENV_PATH):
+            load_dotenv(ENV_PATH)
+        else:
+            # Fallback to .env for backward compatibility or other setups
+            fallback_path = os.path.join(BASE_DIR, '.env')
+            if os.path.exists(fallback_path):
+                load_dotenv(fallback_path)
+
     def _initialize_settings(self):
-        """Initialize all configuration settings with dynamic URL support"""
+        """Initialize all configuration settings."""
         
         # --- General Environment Settings ---
         self.DOMAIN: str = os.getenv('DOMAIN', 'localhost')
         self.ENVIRONMENT: Literal["local", "staging", "production"] = os.getenv('ENVIRONMENT', 'local')
         
-        # --- Dynamic URL Configuration ---
-        # Determine URLs based on environment
-        if self.ENVIRONMENT == 'local':
-            self.FRONTEND_URL: str = os.getenv('FRONTEND_URL_DEV', os.getenv('FRONTEND_URL', 'http://localhost:5173'))
-            self.BACKEND_URL: str = os.getenv('BACKEND_URL_DEV', os.getenv('BACKEND_URL', 'http://localhost:8000'))
-            cors_origins = os.getenv('BACKEND_CORS_ORIGINS_DEV', os.getenv('BACKEND_CORS_ORIGINS', 'http://localhost:5173,http://0.0.0.0:5173,http://127.0.0.1:5173'))
-        else:
-            self.FRONTEND_URL: str = os.getenv('FRONTEND_URL_PROD', os.getenv('FRONTEND_URL', 'https://www.banwee.com'))
-            self.BACKEND_URL: str = os.getenv('BACKEND_URL_PROD', os.getenv('BACKEND_URL', 'https://api.banwee.com'))
-            cors_origins = os.getenv('BACKEND_CORS_ORIGINS_PROD', os.getenv('BACKEND_CORS_ORIGINS', 'https://www.banwee.com,https://banwee.com'))
+        # --- URLs ---
+        self.FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+        self.BACKEND_URL: str = os.getenv('BACKEND_URL', 'http://localhost:8000')
+        cors_origins = os.getenv('BACKEND_CORS_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,http://0.0.0.0:5173')
         
-        # --- PostgreSQL Database Configuration (Optimized) ---
+        # --- PostgreSQL Database Configuration ---
         self.POSTGRES_USER: str = os.getenv('POSTGRES_USER', 'banwee')
         self.POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD', 'banwee_password')
-        
-        # Dynamic database server based on environment
-        if self.ENVIRONMENT == 'local':
-            self.POSTGRES_SERVER: str = os.getenv('POSTGRES_SERVER', 'localhost')
-            default_db_url = f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@localhost:5432/banwee_db"
-        else:
-            self.POSTGRES_SERVER: str = os.getenv('POSTGRES_SERVER', 'postgres')
-            default_db_url = f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@postgres:5432/banwee_db"
-        
+        self.POSTGRES_SERVER: str = os.getenv('POSTGRES_SERVER')
         self.POSTGRES_PORT: int = int(os.getenv('POSTGRES_PORT', 5432))
         self.POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'banwee_db')
-        
-        # Use environment-specific database URL or construct dynamically
-        if self.ENVIRONMENT == 'local':
-            self.POSTGRES_DB_URL: str = os.getenv('POSTGRES_DB_URL_DEV', os.getenv('POSTGRES_DB_URL', default_db_url))
-        else:
-            self.POSTGRES_DB_URL: str = os.getenv('POSTGRES_DB_URL_PROD', os.getenv('POSTGRES_DB_URL', default_db_url))
+        self.POSTGRES_DB_URL: str = os.getenv('POSTGRES_DB_URL')
         
         # Database connection pool settings
         self.DB_POOL_SIZE: int = int(os.getenv('DB_POOL_SIZE', 20))
@@ -322,21 +316,14 @@ class Settings:
         self.ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30))
         self.REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS', 7))
         
-        # --- Redis Configuration (Dynamic) ---
-        if self.ENVIRONMENT == 'local':
-            self.REDIS_URL: str = os.getenv('REDIS_URL_DEV', os.getenv('REDIS_URL', 'redis://localhost:6379/0'))
-        else:
-            self.REDIS_URL: str = os.getenv('REDIS_URL_PROD', os.getenv('REDIS_URL', 'redis://redis:6379/0'))
-        
-        self.REDIS_CART_TTL_GUEST: int = int(os.getenv('REDIS_CART_TTL_GUEST', '1800'))  # 30 minutes
-        self.REDIS_CART_TTL_USER: int = int(os.getenv('REDIS_CART_TTL_USER', '259200'))  # 3 days
+        # --- Redis Configuration ---
+        self.REDIS_URL: str = os.getenv('REDIS_URL')
+        self.REDIS_CART_TTL_GUEST: int = int(os.getenv('REDIS_CART_TTL_GUEST', '1800'))
+        self.REDIS_CART_TTL_USER: int = int(os.getenv('REDIS_CART_TTL_USER', '259200'))
         self.REDIS_CART_EXTEND_ON_ADD: bool = os.getenv('REDIS_CART_EXTEND_ON_ADD', 'true').lower() == 'true'
         
-        # --- Kafka Configuration (Dynamic) ---
-        if self.ENVIRONMENT == 'local':
-            self.KAFKA_BOOTSTRAP_SERVERS: str = os.getenv('KAFKA_BOOTSTRAP_SERVERS_DEV', os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092'))
-        else:
-            self.KAFKA_BOOTSTRAP_SERVERS: str = os.getenv('KAFKA_BOOTSTRAP_SERVERS_PROD', os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:29092'))
+        # --- Kafka Configuration ---
+        self.KAFKA_BOOTSTRAP_SERVERS: str = os.getenv('KAFKA_BOOTSTRAP_SERVERS')
         
         # Kafka Topics
         self.KAFKA_TOPIC_EMAIL: str = os.getenv('KAFKA_TOPIC_EMAIL', 'banwee-email-notifications')
@@ -370,15 +357,13 @@ class Settings:
         self.KAFKA_COMPRESSION_TYPE: str = os.getenv('KAFKA_COMPRESSION_TYPE', 'snappy')
         self.KAFKA_ACKS: str = os.getenv('KAFKA_ACKS', 'all')
         
-        # --- Email Configuration ---
-        self.MAILGUN_API_KEY: str = os.getenv('MAILGUN_API_KEY', '')
-        self.MAILGUN_DOMAIN: str = os.getenv('MAILGUN_DOMAIN', '')
-        self.MAILGUN_FROM_EMAIL: str = os.getenv('MAILGUN_FROM_EMAIL', 'Banwee <noreply@banwee.com>')
-        
         # --- CORS Configuration ---
         self.BACKEND_CORS_ORIGINS: List[str] = parse_cors(cors_origins)
         
-        # --- Social Media Integration ---
+        # ... (rest of the settings)
+        self.MAILGUN_API_KEY: str = os.getenv('MAILGUN_API_KEY', '')
+        self.MAILGUN_DOMAIN: str = os.getenv('MAILGUN_DOMAIN', '')
+        self.MAILGUN_FROM_EMAIL: str = os.getenv('MAILGUN_FROM_EMAIL', 'Banwee <noreply@banwee.com>')
         self.TELEGRAM_BOT_TOKEN: str = os.getenv('TELEGRAM_BOT_TOKEN', '')
         self.WHATSAPP_ACCESS_TOKEN: str = os.getenv('WHATSAPP_ACCESS_TOKEN', '')
         self.PHONE_NUMBER_ID: str = os.getenv('PHONE_NUMBER_ID', '')
@@ -386,14 +371,10 @@ class Settings:
         self.FACEBOOK_APP_SECRET: str = os.getenv('FACEBOOK_APP_SECRET')
         self.TIKTOK_CLIENT_KEY: str = os.getenv('TIKTOK_CLIENT_KEY')
         self.TIKTOK_CLIENT_SECRET: str = os.getenv('TIKTOK_CLIENT_SECRET')
-        
-        # --- Tax Service Configuration ---
         self.TAX_API_KEY: str = os.getenv('TAX_API_KEY', '')
         self.TAX_API_URL: str = os.getenv('TAX_API_URL', 'https://api.taxjar.com/v2')
         self.VAT_API_KEY: str = os.getenv('VAT_API_KEY', '')
         self.VAT_API_URL: str = os.getenv('VAT_API_URL', 'https://vatlayer.com/api')
-        
-        # --- Admin and Notification Settings ---
         self.ADMIN_USER_ID: str = os.getenv('ADMIN_USER_ID', 'your_admin_uuid_here')
         self.NOTIFICATION_CLEANUP_DAYS: int = int(os.getenv('NOTIFICATION_CLEANUP_DAYS', 30))
         self.NOTIFICATION_CLEANUP_INTERVAL_SECONDS: int = int(os.getenv('NOTIFICATION_CLEANUP_INTERVAL_SECONDS', 86400))

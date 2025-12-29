@@ -3,7 +3,7 @@ import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuthenticatedAction } from '../../hooks/useAuthenticatedAction';
 import { SkeletonCard } from '../ui/SkeletonCard';
 import { QRCodeDisplay } from './QRCodeDisplay';
 import { BarcodeDisplay } from './BarcodeDisplay';
@@ -76,9 +76,7 @@ export const ProductCard = ({
 }) => {
   const { addItem: addToCart, cart } = useCart();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
-  const { setRedirectPath } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { executeWithAuth } = useAuthenticatedAction();
 
   if (isLoading) { // <--- Add this check
     return <SkeletonCard viewMode={viewMode} animation={animation} />;
@@ -121,113 +119,62 @@ export const ProductCard = ({
   const { price, discountPrice } = getDisplayPrice();
 
       const handleAddToCart = async (e) => {
-
         e.preventDefault();
-
         e.stopPropagation();
-
     
-
         if (!product) {
-
           toast.error("Product data is not available.");
-
           return;
-
         }
 
         const variantToAdd = displayVariant || (product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
         if (!variantToAdd) {
-
           toast.error("This product has no variants available.");
-
           return;
-
         }
-
     
-
         if (isInCart) {
-
           toast.success('This item is already in your cart.');
-
         } else {
-
-                    try {
-                      await addToCart({
-                        variant_id: String(variantToAdd.id),
-                        quantity: 1,
-                      });
-                      toast.success('Item added to cart!');
-                    } catch (error) {
-                      // If user is not authenticated, redirect to login
-                      if (error instanceof Error && error.message.includes('authenticated')) {
-                        setRedirectPath(location.pathname);
-                        navigate('/login');
-                      } else {
-                        const errorMessage = error?.response?.data?.message || error?.message || 'Failed to add item to cart';
-                        toast.error(errorMessage);
-                      }
-                    }
-
-                  }
-
-                };
+          await executeWithAuth(async () => {
+            await addToCart({
+              variant_id: String(variantToAdd.id),
+              quantity: 1,
+            });
+            toast.success('Item added to cart!');
+            return true;
+          }, 'cart');
+        }
+      };
 
     
 
       const handleAddToWishlist = async (e) => {
-
         e.preventDefault();
-
         e.stopPropagation();
-
     
-
         if (!product) {
-
           toast.error("Product data is not available.");
-
           return;
-
         }
-
 
         const variantToAdd = displayVariant || (product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
 
-
         if (!variantToAdd) {
-
           toast.error("This product has no variants available.");
-
           return;
-
         }
-
     
-
         const isProductInWishlist = isInWishlist(product.id, displayVariant?.id);
-
     
-
         if (isProductInWishlist) {
-
           toast.success('This item is already in your wishlist.');
-
         } else {
-
-          const success = await addToWishlist(product.id, displayVariant?.id);
-
-          if (!success) {
-
-            setRedirectPath(location.pathname);
-
-            navigate('/login');
-
-          }
-
+          await executeWithAuth(async () => {
+            await addToWishlist(product.id, displayVariant?.id);
+            return true;
+          }, 'wishlist');
         }
-
       };
 
   return (

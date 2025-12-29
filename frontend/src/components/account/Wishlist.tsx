@@ -1,6 +1,7 @@
 import React from 'react';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useCart } from '../../contexts/CartContext';
+import { useAuthenticatedAction } from '../../hooks/useAuthenticatedAction';
 import { ShoppingCartIcon, TrashIcon, HeartIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
@@ -8,15 +9,16 @@ import { toast } from 'react-hot-toast';
 export const Wishlist = () => {
   const { defaultWishlist, removeItem, clearWishlist } = useWishlist();
   const { addItem } = useCart();
+  const { executeWithAuth } = useAuthenticatedAction();
 
   const items = defaultWishlist?.items || [];
 
   const handleAddToCart = async (item) => {
-    try {
+    await executeWithAuth(async () => {
       const variant = item.product?.variants?.[0];
       if (!variant) {
         toast.error('Product variant not found');
-        return;
+        return false;
       }
 
       await addItem({
@@ -24,10 +26,8 @@ export const Wishlist = () => {
         quantity: 1,
       });
       toast.success(`${item.product?.name || 'Item'} added to cart`);
-    } catch (error) {
-      console.error('Failed to add to cart:', error);
-      toast.error('Failed to add item to cart');
-    }
+      return true;
+    }, 'cart');
   };
 
   const handleRemoveFromWishlist = async (item) => {

@@ -133,7 +133,6 @@ class DatabaseOptimizer:
         return create_async_engine(
             database_uri,
             # Connection pool settings for high performance
-            poolclass=QueuePool,
             pool_size=pool_size,  # Number of connections to maintain in pool
             max_overflow=max_overflow,  # Additional connections beyond pool_size
             pool_pre_ping=True,  # Validate connections before use
@@ -147,7 +146,6 @@ class DatabaseOptimizer:
                 "server_settings": {
                     "application_name": "banwee_backend",
                     "jit": "off",  # Disable JIT for faster startup
-                    "shared_preload_libraries": "pg_stat_statements",  # Enable query statistics
                 }
             }
         )

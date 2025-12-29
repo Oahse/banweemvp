@@ -60,7 +60,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const addItem = async (item: AddToCartRequest): Promise<boolean> => {
     const token = TokenManager.getToken();
     if (!token) {
-      throw new Error('User must be authenticated to add items to cart');
+      // Return false instead of throwing error - let useAuthenticatedAction handle the redirect
+      return false;
     }
 
     try {
@@ -81,7 +82,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const removeItem = async (itemId: string): Promise<void> => {
     const token = TokenManager.getToken();
     if (!token) {
-      throw new Error('User must be authenticated to remove items from cart');
+      // Return early instead of throwing error - let useAuthenticatedAction handle the redirect
+      return;
     }
 
     try {
@@ -101,7 +103,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const updateQuantity = async (itemId: string, quantity: number): Promise<void> => {
     const token = TokenManager.getToken();
     if (!token) {
-      throw new Error('User must be authenticated to update cart items');
+      // Return early instead of throwing error - let useAuthenticatedAction handle the redirect
+      return;
     }
 
     try {
@@ -121,7 +124,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const clearCart = async () => {
     const token = TokenManager.getToken();
     if (!token) {
-      throw new Error('User must be authenticated to clear cart');
+      // Return early instead of throwing error - let useAuthenticatedAction handle the redirect
+      return;
     }
 
     try {
