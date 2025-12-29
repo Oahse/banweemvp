@@ -306,14 +306,14 @@ async def get_user_by_id(
 @router.put("/users/{user_id}/status")
 async def update_user_status(
     user_id: str,
-    active: bool,
+    is_active: bool,
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
     """Update user status (admin only)."""
     try:
         admin_service = AdminService(db)
-        user = await admin_service.update_user_status(user_id, active)
+        user = await admin_service.update_user_status(user_id, is_active)
         return Response.success(data=user, message="User status updated")
     except Exception as e:
         raise APIException(

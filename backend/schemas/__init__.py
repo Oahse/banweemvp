@@ -4,7 +4,6 @@ from . import product
 from . import orders  # Updated to consolidated orders
 from . import cart
 from . import review
-from . import blog
 from . import subscriptions  # Updated to consolidated subscriptions
 from . import payments  # Updated to consolidated payments
 from . import shipping

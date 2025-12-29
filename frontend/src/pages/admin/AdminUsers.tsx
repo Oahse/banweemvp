@@ -203,7 +203,7 @@ export const AdminUsers = () => {
                       </span>
                     </td>
                     <td className="py-3 px-4">
-                      {user.active ? (
+                      {user.is_active ? (
                         <div className="flex items-center text-success">
                           <CheckCircleIcon size={16} className="mr-1" />
                           <span>Active</span>
@@ -243,7 +243,7 @@ export const AdminUsers = () => {
                               Reset Password
                             </button>
                             <button className="w-full text-left px-4 py-2 text-sm text-copy hover:bg-surface-hover">
-                              {user.active ? 'Deactivate' : 'Activate'}
+                              {user.is_active ? 'Deactivate' : 'Activate'}
                             </button>
                           </div>
                         </div>

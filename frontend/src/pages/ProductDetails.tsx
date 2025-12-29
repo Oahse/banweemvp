@@ -22,6 +22,7 @@ import { BarcodeModal } from '../components/product/BarcodeModal';
 import { ProductCard } from '../components/product/ProductCard';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import { useLocale } from '../contexts/LocaleContext';
 import { useApi } from '../hooks/useApi';
 import { ProductsAPI } from '../apis';
 import { ReviewsAPI } from '../apis';
@@ -91,6 +92,7 @@ export const ProductDetails = () => {
   const { addItem: addToCart, removeItem: removeFromCart, updateQuantity, cart } = useCart();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist, defaultWishlist } = useWishlist();
   const { executeWithAuth } = useAuthenticatedAction();
+  const { formatCurrency } = useLocale();
 
   // API calls
   const {
@@ -356,10 +358,10 @@ export const ProductDetails = () => {
                 {selectedVariant?.sale_price && selectedVariant.sale_price < selectedVariant.base_price ? (
                   <>
                     <span className="text-3xl font-bold text-primary">
-                      ${selectedVariant.sale_price.toFixed(2)}
+                      {formatCurrency(selectedVariant.sale_price)}
                     </span>
                     <span className="text-xl text-copy-light line-through">
-                      ${selectedVariant.base_price.toFixed(2)}
+                      {formatCurrency(selectedVariant.base_price)}
                     </span>
                     <span className="bg-error-100 text-error-600 px-2 py-1 rounded text-sm font-medium">
                       {Math.round(((selectedVariant.base_price - selectedVariant.sale_price) / selectedVariant.base_price) * 100)}% OFF
@@ -367,7 +369,7 @@ export const ProductDetails = () => {
                   </>
                 ) : (
                   <span className="text-3xl font-bold text-primary">
-                    ${(selectedVariant?.sale_price || selectedVariant?.base_price || product.price).toFixed(2)}
+                    {formatCurrency(selectedVariant?.sale_price || selectedVariant?.base_price || product.price)}
                   </span>
                 )}
               </div>
@@ -826,6 +828,7 @@ export const ProductDetails = () => {
                     category: relatedProduct.category?.name,
                     isNew: false,
                     isFeatured: false,
+                    variants: relatedProduct.variants || [], // Add missing variants field
                   };
 
                   return (

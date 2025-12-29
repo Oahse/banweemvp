@@ -466,7 +466,7 @@ class UserService:
         query = query.strip().lower()
         
         # Build base conditions
-        base_conditions = ["u.active = true"]
+        base_conditions = ["u.is_active = true"]
         params = {
             "query": query,
             "similarity_threshold": self.similarity_threshold,

@@ -149,7 +149,7 @@ class SearchService:
                     END
                 ) as relevance_score
             FROM users u
-            WHERE u.active = true
+            WHERE u.is_active = true
             AND (
                 LOWER(u.firstname) LIKE :fuzzy_query
                 OR LOWER(u.lastname) LIKE :fuzzy_query
@@ -395,7 +395,7 @@ class SearchService:
         query = query.strip().lower()
         
         # Build base conditions
-        base_conditions = ["u.active = true"]
+        base_conditions = ["u.is_active = true"]
         params = {
             "query": query,
             "similarity_threshold": self.similarity_threshold,

@@ -130,10 +130,8 @@ export const AdminComments = () => {
               {comments.map((comment) => (
                 <tr key={comment.id}>
                   <td>
-                    {/* Assuming comment.blog_post_id can be used to link to the post */}
-                    <Link to={`/blog/posts/${comment.blog_post_id}`} className="link link-hover">
-                      {comment.blog_post_id} {/* Placeholder for actual post title */}
-                    </Link>
+                    {/* Post reference removed */}
+                    {comment.post_id || 'N/A'}
                   </td>
                   <td>{comment.author?.full_name || comment.author?.firstname || 'N/A'}</td>
                   <td>{comment.content.substring(0, 100)}...</td>

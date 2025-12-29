@@ -17,13 +17,13 @@ class User(BaseModel):
     __tablename__ = "users"
     __table_args__ = (
         # Optimized indexes for common queries
-        Index('idx_users_email_active', 'email', 'active'),
+        Index('idx_users_email_is_active', 'email', 'is_active'),
         Index('idx_users_role_verified', 'role', 'verified'),
         Index('idx_users_country_language', 'country', 'language'),
         Index('idx_users_last_login', 'last_login'),
         Index('idx_users_stripe_customer', 'stripe_customer_id'),
         # Partial index for active users only
-        Index('idx_users_active_only', 'email', 'role', postgresql_where='active = true'),
+        Index('idx_users_is_active_only', 'email', 'role', postgresql_where='is_active = true'),
         {'extend_existing': True}
     )
 
@@ -40,7 +40,7 @@ class User(BaseModel):
     
     # Legacy fields (keep for backward compatibility)
     verified = Column(Boolean, default=False)
-    active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=True)
     
     # Contact information
     phone = Column(String(20), nullable=True)
@@ -80,7 +80,6 @@ class User(BaseModel):
     orders = relationship("Order", back_populates="user", lazy="select")  # Don't eager load orders
     reviews = relationship("Review", back_populates="user", lazy="select")
     wishlists = relationship("Wishlist", back_populates="user", lazy="select")
-    blog_posts = relationship("BlogPost", back_populates="author", lazy="select")
     subscriptions = relationship("Subscription", back_populates="user", lazy="select")
     payment_methods = relationship("PaymentMethod", back_populates="user", lazy="select")
     transactions = relationship("Transaction", back_populates="user", lazy="select")
@@ -104,7 +103,12 @@ class User(BaseModel):
     @property
     def is_active_verified(self) -> bool:
         """Check if user is both active and verified"""
-        return self.active and self.verified
+        return self.is_active and self.verified
+
+    @property
+    def active(self) -> bool:
+        """Backward compatibility property for is_active field"""
+        return self.is_active
 
     def to_dict(self) -> dict:
         """Convert user to dictionary for API responses"""
@@ -118,7 +122,8 @@ class User(BaseModel):
             "account_status": self.account_status,
             "verification_status": self.verification_status,
             "verified": self.verified,  # Legacy field
-            "active": self.active,  # Legacy field
+            "is_active": self.is_active,  # Primary field
+            "is_active": self.is_active,  # Legacy compatibility
             "phone": self.phone,
             "phone_verified": self.phone_verified,
             "avatar_url": self.avatar_url,

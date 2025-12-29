@@ -18,7 +18,6 @@ const STATIC_ASSETS = [
 const API_CACHE_PATTERNS = [
   /\/v1\/products/,
   /\/v1\/categories/,
-  /\/v1\/blog/,
   /\/v1\/users\/profile/
 ];
 

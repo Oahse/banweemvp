@@ -34,7 +34,7 @@ describe('Fast-check Configuration', () => {
       email: fc.emailAddress(),
       name: fc.string({ minLength: 1, maxLength: 100 }),
       age: fc.integer({ min: 18, max: 100 }),
-      active: fc.boolean(),
+      is_active: fc.boolean(),
     });
 
     fc.assert(

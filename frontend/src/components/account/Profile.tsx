@@ -381,11 +381,11 @@ export const Profile = () => {
           <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
             <span className="text-copy-light">Account Status</span>
             <span className={`px-2 py-1 text-xs rounded-full ${
-              user.active 
+              user.is_active 
                 ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
                 : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'
             }`}>
-              {user.active ? 'Active' : 'Inactive'}
+              {user.is_active ? 'Active' : 'Inactive'}
             </span>
           </div>
           <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">

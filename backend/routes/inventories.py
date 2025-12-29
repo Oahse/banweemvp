@@ -28,8 +28,21 @@ async def check_stock_availability(
 ):
     """Check stock availability for a product variant (Public endpoint)."""
     try:
+        # Validate variant_id format
+        if not variant_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid variant ID provided"
+            )
+        
         stock_check = await inventory_service.check_stock_availability(variant_id, quantity)
         return Response.success(data=stock_check, message="Stock check completed")
+    except ValueError as e:
+        # Handle invalid UUID format
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid variant ID format"
+        )
     except APIException:
         raise
     except Exception as e:

@@ -31,6 +31,11 @@ async def get_payment_methods(
     """Get user's payment methods"""
     service = PaymentService(db)
     payment_methods = await service.get_user_payment_methods(current_user.id)
+    
+    # Always return an array, even if empty
+    if not payment_methods:
+        payment_methods = []
+    
     return Response.success(data=[PaymentMethodResponse.from_orm(pm) for pm in payment_methods])
 
 

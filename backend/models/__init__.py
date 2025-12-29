@@ -2,7 +2,6 @@
 from .user import User, Address
 from .product import Product, ProductVariant, ProductImage, Category
 from .cart import Cart, CartItem
-from .blog import BlogPost
 from .review import Review
 from .promocode import Promocode
 from .shipping import ShippingMethod
@@ -71,7 +70,6 @@ __all__ = [
     "PaymentAnalytics",
 
     # Content models
-    "BlogPost",
     "Review",
 
     # Commerce models

@@ -607,19 +607,6 @@ class APIClient {
     return this.post('/promocodes/validate', { code, order_total: orderTotal });
   }
 
-  // Blog methods
-  async getBlogPosts(page = 1, limit = 10) {
-    return this.get(`/blog/posts?page=${page}&limit=${limit}`);
-  }
-
-  async getBlogPost(id) {
-    return this.get(`/blog/posts/${id}`);
-  }
-
-  async getFeaturedBlogPosts(limit = 5) {
-    return this.get(`/blog/posts/featured?limit=${limit}`);
-  }
-
   // Negotiation methods
   async startNegotiation(buyerConfig, sellerConfig) {
     return this.post('/negotiate/start', {

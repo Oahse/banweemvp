@@ -2,27 +2,87 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { useLocale } from '../contexts/LocaleContext';
 import { motion } from 'framer-motion';
 import { CartSkeleton } from '../components/ui/CartSkeleton';
+import { toast } from 'react-hot-toast';
+import { validation } from '../lib/validation';
 
 export const Cart = () => {
   const { cart, removeItem, updateQuantity, clearCart, loading } = useCart();
+  const { formatCurrency } = useLocale();
   const [couponCode, setCouponCode] = useState('');
 
-  const handleQuantityChange = (id, quantity) => {
-    if (quantity >= 1) {
-      updateQuantity(String(id), quantity);
+  const handleQuantityChange = (id: string, quantity: number) => {
+    // Enhanced validation using validation utility
+    const quantityValidation = validation.quantity(quantity);
+    if (!quantityValidation.valid) {
+      toast.error(quantityValidation.message);
+      return;
     }
+
+    // Find the item to check stock limits
+    const item = items.find(item => item.id === id);
+    if (!item) {
+      toast.error('Item not found in cart');
+      return;
+    }
+
+    // Check stock availability if variant data is available
+    const maxStock = item.variant?.stock || 999; // Default to 999 if stock not available
+    const stockValidation = validation.quantity(quantity, maxStock);
+    if (!stockValidation.valid) {
+      toast.error(stockValidation.message);
+      return;
+    }
+
+    updateQuantity(String(id), quantity);
   };
 
-  const handleRemoveItem = (id) => {
+  const handleRemoveItem = (id: string) => {
+    if (!id) {
+      toast.error('Invalid item ID');
+      return;
+    }
+    
+    // Confirm removal for expensive items
+    const item = items.find(item => item.id === id);
+    if (item && item.total_price > 100) {
+      if (!window.confirm(`Are you sure you want to remove "${item.variant?.product_name || 'this item'}" from your cart?`)) {
+        return;
+      }
+    }
+    
     removeItem(String(id));
   };
 
-  const handleApplyCoupon = (e) => {
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock coupon application logic
-    alert(`Coupon ${couponCode} applied!`);
+    
+    const couponValidation = validation.couponCode(couponCode);
+    if (!couponValidation.valid) {
+      toast.error(couponValidation.message);
+      return;
+    }
+
+    try {
+      // TODO: Replace with actual API call
+      // await CartAPI.applyPromocode(couponCode.trim().toUpperCase(), access_token);
+      
+      // Mock coupon application logic for now
+      const validCoupons = ['SAVE10', 'WELCOME5', 'FREESHIP'];
+      const normalizedCode = couponCode.trim().toUpperCase();
+      
+      if (validCoupons.includes(normalizedCode)) {
+        toast.success(`Coupon ${normalizedCode} applied successfully!`);
+        setCouponCode('');
+      } else {
+        toast.error('Invalid coupon code. Please check and try again.');
+      }
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to apply coupon. Please try again.';
+      toast.error(errorMessage);
+    }
   };
 
   const items = cart?.items || [];
@@ -79,17 +139,29 @@ export const Cart = () => {
                       <div className="col-span-6 flex items-center">
                         <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
                           {(() => {
-                            // Get primary image from variant images array (same logic as ProductCard)
+                            // Get image URL from cart item data
                             let imageUrl = null;
+                            
+                            // First try to get from variant images array (if available)
                             if (item.variant?.images && item.variant.images.length > 0) {
                               const primaryImage = item.variant.images.find(img => img.is_primary);
                               imageUrl = primaryImage?.url || item.variant.images[0]?.url;
                             }
                             
+                            // Fallback to direct image_url from cart item (if available)
+                            if (!imageUrl && (item as any).image_url) {
+                              imageUrl = (item as any).image_url;
+                            }
+                            
+                            // Fallback to variant primary_image if available
+                            if (!imageUrl && item.variant?.primary_image?.url) {
+                              imageUrl = item.variant.primary_image.url;
+                            }
+                            
                             return imageUrl ? (
                               <img 
                                 src={imageUrl} 
-                                alt={item.variant.product_name || item.variant.product?.name || item.variant.name} 
+                                alt={item.variant.product_name || (item.variant as any).product?.name || item.variant.name} 
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect width="80" height="80" fill="%23f3f4f6"/%3E%3Cpath d="M40 25c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zm0 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z" fill="%239ca3af"/%3E%3Cpath d="M55 20H25c-2.8 0-5 2.2-5 5v30c0 2.8 2.2 5 5 5h30c2.8 0 5-2.2 5-5V25c0-2.8-2.2-5-5-5zm0 35H25V25h30v30z" fill="%239ca3af"/%3E%3C/svg%3E';
@@ -111,8 +183,8 @@ export const Cart = () => {
                             to={`/products/${item.variant.product_id}`}
                             className="font-medium text-copy hover:text-primary">
                             <div>
-                              {(item.variant.product_name || item.variant.product?.name) && (
-                                <div className="font-medium">{item.variant.product_name || item.variant.product?.name}</div>
+                              {(item.variant.product_name || (item.variant as any).product?.name) && (
+                                <div className="font-medium">{item.variant.product_name || (item.variant as any).product?.name}</div>
                               )}
                               <div className="text-sm text-copy-light">{item.variant.name}</div>
                             </div>
@@ -127,7 +199,7 @@ export const Cart = () => {
                       </div>
                       <div className="col-span-2 text-center">
                         <span className="md:hidden font-medium text-copy">Price: </span>
-                        <span className="font-medium text-primary">${item.price_per_unit.toFixed(2)}</span>
+                        <span className="font-medium text-primary">{formatCurrency(item.price_per_unit)}</span>
                       </div>
                       <div className="col-span-2 flex justify-center">
                         <div className="flex items-center border border-border rounded-md">
@@ -155,7 +227,7 @@ export const Cart = () => {
                       </div>
                       <div className="col-span-2 text-center">
                         <span className="md:hidden font-medium text-copy">Subtotal: </span>
-                        <span className="font-medium text-copy">${item.total_price.toFixed(2)}</span>
+                        <span className="font-medium text-copy">{formatCurrency(item.total_price)}</span>
                       </div>
                     </div>
                   </div>
@@ -185,21 +257,21 @@ export const Cart = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-copy-light">Subtotal</span>
-                  <span className="font-medium text-copy">${subtotal.toFixed(2)}</span>
+                  <span className="font-medium text-copy">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-copy-light">Shipping</span>
                   <span className="font-medium text-copy">
-                    {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? 'Free' : formatCurrency(shipping)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-copy-light">Tax</span>
-                  <span className="font-medium text-copy">${tax.toFixed(2)}</span>
+                  <span className="font-medium text-copy">{formatCurrency(tax)}</span>
                 </div>
                 <div className="border-t border-border-light pt-3 flex justify-between">
                   <span className="text-lg font-semibold text-copy">Total</span>
-                  <span className="text-lg font-bold text-primary">${total.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-primary">{formatCurrency(total)}</span>
                 </div>
               </div>
               <form onSubmit={handleApplyCoupon} className="mb-6">

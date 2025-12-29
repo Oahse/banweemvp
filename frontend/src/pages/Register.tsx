@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import { Input } from '../components/forms/Input';
 import { Checkbox } from '../components/forms/Checkbox';
 import SocialAuth from '../components/auth/SocialAuth';
+import { validation } from '../lib/validation';
 
 /**
  * Register component for user account creation.
@@ -78,35 +79,59 @@ export const Register = () => {
 
   /**
    * Handles the form submission for user registration.
-   * Performs client-side validation before attempting to register the user
+   * Performs comprehensive client-side validation before attempting to register the user
    * via the authentication context.
    */
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
 
-    // Client-side validation checks
-    if (!name || !email || !password || !confirmPassword) {
-      toast.error('Please fill in all fields');
+    // Comprehensive client-side validation using validation utility
+    const nameValidation = validation.name(name);
+    if (!nameValidation.valid) {
+      toast.error(nameValidation.message);
       return;
     }
+
+    const emailValidation = validation.email(email);
+    if (!emailValidation.valid) {
+      toast.error(emailValidation.message);
+      return;
+    }
+
+    const passwordValidation = validation.password(password);
+    if (!passwordValidation.valid) {
+      toast.error(passwordValidation.message);
+      return;
+    }
+
+    // Check password confirmation
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
+
+    // Check terms acceptance
     if (!acceptTerms) {
       toast.error('Please accept the Terms of Service and Privacy Policy');
+      return;
+    }
+
+    // Validate user type selection
+    if (!userType) {
+      toast.error('Please select an account type');
       return;
     }
 
     try {
       setLoading(true); // Show loading indicator
       // Attempt to register the user through the AuthContext
-      await register(name, email, password, userType);
+      await register(name.trim(), email.toLowerCase().trim(), password, userType);
       toast.success('Registration successful! Welcome to Banwee Organics.');
       // Navigation to dashboard/home is handled by the useEffect hook based on authentication status
     } catch (error) {
-      // Display error message if registration fails
-      toast.error('Registration failed. Please try again with different credentials.');
+      // Display specific error message if available
+      const errorMessage = error?.response?.data?.message || error?.message || 'Registration failed. Please try again with different credentials.';
+      toast.error(errorMessage);
       setLoading(false); // Hide loading indicator
     }
   };

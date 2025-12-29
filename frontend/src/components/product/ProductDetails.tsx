@@ -645,6 +645,7 @@ export const ProductDetails = () => {
                     category: relatedProduct.category?.name || 'General',
                     isNew: false,
                     isFeatured: false,
+                    variants: relatedProduct.variants || [], // Add missing variants field
                   }}
                   addToCart={() => {
                     const variant = relatedProduct.variants?.[0];

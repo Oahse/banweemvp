@@ -221,9 +221,9 @@ export const AdminUserDetail = () => {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-copy-light mb-2">Account Status</p>
-                <div className={`flex items-center ${user.active ? 'text-success' : 'text-error'}`}>
-                  {user.active ? <CheckCircleIcon size={20} className="mr-2" /> : <XCircleIcon size={20} className="mr-2" />}
-                  <span className="font-medium">{user.active ? 'Active' : 'Inactive'}</span>
+                <div className={`flex items-center ${user.is_active ? 'text-success' : 'text-error'}`}>
+                  {user.is_active ? <CheckCircleIcon size={20} className="mr-2" /> : <XCircleIcon size={20} className="mr-2" />}
+                  <span className="font-medium">{user.is_active ? 'Active' : 'Inactive'}</span>
                 </div>
               </div>
               <div>
@@ -268,15 +268,15 @@ export const AdminUserDetail = () => {
                 {actionLoading ? 'Sending...' : 'Reset Password'}
               </button>
               <button 
-                onClick={() => openConfirmModal(user.active ? 'deactivate' : 'activate')}
+                onClick={() => openConfirmModal(user.is_active ? 'deactivate' : 'activate')}
                 disabled={actionLoading}
                 className={`w-full px-4 py-2 border rounded-md text-copy disabled:opacity-50 disabled:cursor-not-allowed ${
-                  user.active 
+                  user.is_active 
                     ? 'border-error text-error hover:bg-error/10' 
                     : 'border-success text-success hover:bg-success/10'
                 }`}
               >
-                {user.active ? 'Deactivate Account' : 'Activate Account'}
+                {user.is_active ? 'Deactivate Account' : 'Activate Account'}
               </button>
               <button 
                 onClick={handleSendEmail}

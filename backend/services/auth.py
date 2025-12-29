@@ -165,6 +165,8 @@ class AuthService:
     async def get_user_by_id(self, user_id: str) -> Optional[User]:
         """Get user by ID."""
         result = await self.db.execute(select(User).where(User.id == user_id))
+        return result.scalar_one_or_none()
+
     async def get_user_by_email(self, email: str) -> Optional[User]:
         """Get user by email."""
         result = await self.db.execute(select(User).where(User.email == email))
@@ -287,7 +289,17 @@ class AuthService:
             token_type="bearer",
             refresh_token=refresh_token,
             expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-            user=UserResponse.from_orm(user)
+            user=UserResponse(
+                id=user.id,
+                email=user.email,
+                firstname=user.firstname,
+                lastname=user.lastname,
+                phone=user.phone,
+                role=user.role,
+                verified=user.verified,
+                is_active=user.is_active,
+                created_at=user.created_at
+            )
         )
         
         return auth_response

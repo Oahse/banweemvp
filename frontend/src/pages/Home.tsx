@@ -4,11 +4,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRightIcon, TruckIcon, BadgeCheckIcon, ShieldIcon, HeadphonesIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { ProductCard } from '../components/product/ProductCard';
 import { CategoryCard } from '../components/category/CategoryCard';
+import { useLocale } from '../contexts/LocaleContext';
 import { useApi } from '../hooks/useApi';
 import { ProductsAPI } from '../apis/products';
 
 // Filter categories configuration system
-const FILTER_CATEGORIES = {
+const FILTER_CATEGORIES: Record<string, {
+  id: string;
+  name: string;
+  keywords: string[];
+  exactMatches: string[];
+}> = {
   'cereal-crops': {
     id: 'cereal-crops',
     name: 'Cereal Crops',
@@ -36,7 +42,7 @@ const FILTER_CATEGORIES = {
 };
 
 // Flexible product matching function with case-insensitive keyword matching
-const matchesCategory = (product, filterKey) => {
+const matchesCategory = (product: any, filterKey: string): boolean => {
   const category = FILTER_CATEGORIES[filterKey];
   if (!category) return false;
 
@@ -48,14 +54,14 @@ const matchesCategory = (product, filterKey) => {
   const productCategory = product.category.toLowerCase().trim();
 
   // Check exact matches first (case-insensitive)
-  if (category.exactMatches?.some(match =>
+  if (category.exactMatches?.some((match: string) =>
     productCategory === match.toLowerCase()
   )) {
     return true;
   }
 
   // Check keyword matches (case-insensitive)
-  return category.keywords.some(keyword =>
+  return category.keywords.some((keyword: string) =>
     productCategory.includes(keyword.toLowerCase())
   );
 };
@@ -94,14 +100,15 @@ const heroSlides = [
 export const Home = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { formatCurrency } = useLocale();
 
   // Single API call for all home page data
   const { data: homeData, loading: homeLoading, error: homeError, execute } = useApi();
 
-  const [categories, setCategories] = useState([]);
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [popularProducts, setPopularProducts] = useState([]);
-  const [deals, setDeals] = useState([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [popularProducts, setPopularProducts] = useState<any[]>([]);
+  const [deals, setDeals] = useState<any[]>([]);
 
   // Fetch home data on mount
   useEffect(() => {
@@ -113,22 +120,26 @@ export const Home = () => {
       const { categories: categoriesData, featured, popular, deals: dealsData } = homeData.data;
 
       // Helper function to convert API products to demo format
-      const convertProduct = (product) => ({
-        id: String(product.id),
-        name: product.name,
-        price: product.variants?.[0]?.base_price || 0,
-        discountPrice: product.variants?.[0]?.sale_price || null,
-        rating: product.rating || 0,
-        reviewCount: product.review_count || 0,
-        image: product.variants?.[0]?.images?.[0]?.url,
-        category: product.category?.name,
-        isNew: false,
-        isFeatured: product.featured,
-        variants: product.variants,
-      });
+      const convertProduct = (product: any) => {
+        const converted = {
+          id: String(product.id),
+          name: product.name,
+          price: product.variants?.[0]?.base_price || 0,
+          discountPrice: product.variants?.[0]?.sale_price || null,
+          rating: product.rating || 0,
+          reviewCount: product.review_count || 0,
+          image: product.variants?.[0]?.images?.[0]?.url,
+          category: product.category?.name,
+          isNew: false,
+          isFeatured: product.featured,
+          variants: product.variants || [], // Ensure variants is always an array
+        };
+        
+        return converted;
+      };
 
       // Helper function to convert API categories to demo format
-      const convertCategory = (category) => ({
+      const convertCategory = (category: any) => ({
         id: category.id,
         name: category.name,
         image: category.image_url || getCategoryImage(category.name),
@@ -169,9 +180,9 @@ export const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [homeData]);
 
-  const categoriesContainerRef = React.useRef(null);
+  const categoriesContainerRef = React.useRef<HTMLDivElement>(null);
 
-  const scrollCategories = (direction) => {
+  const scrollCategories = (direction: 'left' | 'right') => {
     if (categoriesContainerRef.current) {
       const scrollAmount = direction === 'left' ? -300 : 300;
       categoriesContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
@@ -188,7 +199,7 @@ export const Home = () => {
   };
 
   // Function to get appropriate demo images for categories
-  const getCategoryImage = (categoryName) => {
+  const getCategoryImage = (categoryName: string) => {
     if (!categoryName) return 'https://source.unsplash.com/400x400/?nature,product';
     const name = categoryName.toLowerCase();
 
@@ -225,7 +236,7 @@ export const Home = () => {
 
   const filteredPopularProducts = getFilteredPopularProducts();
 
-  const handleDragEnd = (event, info) => {
+  const handleDragEnd = (info: any) => {
     const offset = info.offset.x;
     const velocity = info.velocity.x;
 
@@ -244,7 +255,7 @@ export const Home = () => {
           className="relative h-[60vh] md:h-[70vh] w-full"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
-          onDragEnd={handleDragEnd}
+          onDragEnd={(_, info) => handleDragEnd(info)}
         >
           <AnimatePresence initial={false}>
             <motion.div
@@ -423,18 +434,24 @@ export const Home = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {(homeLoading || homeError)? (
+            {(homeLoading || homeError) ? (
               // Loading skeleton
               [...Array(4)].map((_, index) => (
-                <ProductCard key={index} isLoading={true} />
+                <ProductCard key={index} isLoading={true} product={{} as any} selectedVariant={null} className="" />
               ))
-            ) : (
+            ) : featuredProducts.length > 0 ? (
               featuredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
+                  selectedVariant={null}
+                  className=""
                 />
               ))
+            ) : (
+              <div className="col-span-full text-center py-8 text-copy-light">
+                No featured products available
+              </div>
             )}
           </div>
         </div>
@@ -509,10 +526,10 @@ export const Home = () => {
               // Loading skeleton
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {[...Array(4)].map((_, index) => (
-                  <ProductCard key={index} isLoading={true} />
+                  <ProductCard key={index} isLoading={true} product={{} as any} selectedVariant={null} className="" />
                 ))}
               </div>
-            ) : (
+            ) : filteredPopularProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {filteredPopularProducts.map((product, index) => (
                   <motion.div
@@ -527,9 +544,15 @@ export const Home = () => {
                   >
                     <ProductCard
                       product={product}
+                      selectedVariant={null}
+                      className=""
                     />
                   </motion.div>
                 ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-copy-light">
+                No products found for the selected category
               </div>
             )}
           </motion.div>
@@ -599,9 +622,9 @@ export const Home = () => {
                       <span className="text-sm text-copy-light">({product.reviewCount})</span>
                     </div>
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="text-xl font-bold text-primary">${product.discountPrice || product.price}</span>
+                      <span className="text-xl font-bold text-primary">{formatCurrency(product.discountPrice || product.price)}</span>
                       {product.discountPrice && (
-                        <span className="text-sm text-copy-light line-through">${product.price}</span>
+                        <span className="text-sm text-copy-light line-through">{formatCurrency(product.price)}</span>
                       )}
                     </div>
                     <Link

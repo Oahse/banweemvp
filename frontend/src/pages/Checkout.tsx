@@ -1,18 +1,14 @@
 /**
- * Unified Checkout Page
- * Combines express checkout and manual checkout for optimal UX
+ * Express Checkout Page - Simplified one-click checkout
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useWebSocket } from '../hooks/useWebSocket';
-import { OrdersAPI } from '../apis/orders';
 import { AuthAPI } from '../apis/auth';
 import { CartAPI } from '../apis/cart';
 import { toast } from 'react-hot-toast';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
 import ExpressCheckout from '../components/checkout/ExpressCheckout';
 import SmartCheckoutForm from '../components/checkout/SmartCheckoutForm';
 
@@ -23,32 +19,9 @@ export const Checkout = () => {
   const { isConnected } = useWebSocket();
 
   // UI state
-  const [checkoutMode, setCheckoutMode] = useState('express'); // 'express' or 'manual'
   const [loading, setLoading] = useState(false);
   const [priceUpdateReceived, setPriceUpdateReceived] = useState(false);
   const [stockValidation, setStockValidation] = useState({ valid: true, issues: [] });
-
-  // Manual checkout state
-  const [addresses, setAddresses] = useState([]);
-  const [shippingMethods, setShippingMethods] = useState([]);
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [checkoutData, setCheckoutData] = useState({
-    shipping_address_id: '',
-    shipping_method_id: '',
-    payment_method_id: '',
-    notes: ''
-  });
-  const [showAddressForm, setShowAddressForm] = useState(false);
-  const [newAddress, setNewAddress] = useState({
-    street: '',
-    city: '',
-    state: '',
-    country: '',
-    post_code: '',
-    kind: 'Shipping'
-  });
-  const [errors, setErrors] = useState({});
-  const [processingPayment, setProcessingPayment] = useState(false);
 
   // Listen for price updates via WebSocket
   useEffect(() => {
@@ -116,9 +89,21 @@ export const Checkout = () => {
         const stockChecks = await Promise.all(
           cart.items.map(async (item) => {
             try {
-              const response = await CartAPI.checkStock(item.variant_id, item.quantity);
+              // Guard against undefined variant_id
+              if (!item.variant_id || !item.variant?.id) {
+                return {
+                  variant_id: item.variant_id || 'unknown',
+                  available: false,
+                  current_stock: 0,
+                  requested_quantity: item.quantity,
+                  message: 'Invalid product variant'
+                };
+              }
+
+              const variantId = item.variant_id || item.variant?.id;
+              const response = await CartAPI.checkStock(variantId, item.quantity);
               return {
-                variant_id: item.variant_id,
+                variant_id: variantId,
                 available: response?.available || false,
                 current_stock: response?.current_stock || 0,
                 requested_quantity: item.quantity,
@@ -126,7 +111,7 @@ export const Checkout = () => {
               };
             } catch (error) {
               return {
-                variant_id: item.variant_id,
+                variant_id: item.variant_id || item.variant?.id || 'unknown',
                 available: false,
                 current_stock: 0,
                 requested_quantity: item.quantity,
@@ -160,62 +145,19 @@ export const Checkout = () => {
     return () => clearInterval(interval);
   }, [cart?.items]);
 
-  // Fetch checkout data for manual mode
+  // Fetch checkout data for express mode
   useEffect(() => {
     const fetchCheckoutData = async () => {
-      if (!isAuthenticated || checkoutMode !== 'manual') return;
+      if (!isAuthenticated) return;
 
       try {
         setLoading(true);
-
-        // Fetch addresses
-        const addressResponse = await AuthAPI.getAddresses();
-        const addressList = Array.isArray(addressResponse) ? addressResponse : (addressResponse?.data || []);
-        setAddresses(addressList);
-        if (addressList.length > 0 && !checkoutData.shipping_address_id) {
-          setCheckoutData(prev => ({
-            ...prev,
-            shipping_address_id: addressList[0].id
-          }));
-        }
-
-        // Fetch shipping methods
-        const shippingResponse = await CartAPI.getShippingOptions({});
-        const shippingList = Array.isArray(shippingResponse) ? shippingResponse : (shippingResponse?.data || []);
-        setShippingMethods(shippingList);
-        if (shippingList.length > 0 && !checkoutData.shipping_method_id) {
-          setCheckoutData(prev => ({
-            ...prev,
-            shipping_method_id: shippingList[0].id
-          }));
-        }
-
-        // Fetch payment methods
-        const paymentResponse = await AuthAPI.getPaymentMethods();
-        const paymentList = Array.isArray(paymentResponse) ? paymentResponse : (paymentResponse?.data || []);
-        setPaymentMethods(paymentList);
-        if (paymentList.length > 0 && !checkoutData.payment_method_id) {
-          try {
-            const defaultPaymentMethod = await AuthAPI.getDefaultPaymentMethod();
-            const defaultMethod = defaultPaymentMethod?.data || defaultPaymentMethod;
-            if (defaultMethod?.id) {
-              setCheckoutData(prev => ({
-                ...prev,
-                payment_method_id: defaultMethod.id
-              }));
-            } else {
-              setCheckoutData(prev => ({
-                ...prev,
-                payment_method_id: paymentList[0].id
-              }));
-            }
-          } catch (error) {
-            setCheckoutData(prev => ({
-              ...prev,
-              payment_method_id: paymentList[0].id
-            }));
-          }
-        }
+        // Pre-load data needed for express checkout
+        await Promise.all([
+          AuthAPI.getAddresses(),
+          AuthAPI.getPaymentMethods(),
+          CartAPI.getShippingOptions({})
+        ]);
       } catch (error) {
         const errorMessage = error?.response?.data?.message || error?.message || 'Failed to load checkout information';
         toast.error(errorMessage);
@@ -225,7 +167,7 @@ export const Checkout = () => {
     };
 
     fetchCheckoutData();
-  }, [isAuthenticated, checkoutMode]);
+  }, [isAuthenticated]);
 
   // Express checkout handlers
   const handleExpressSuccess = (orderId: string) => {
@@ -233,154 +175,12 @@ export const Checkout = () => {
   };
 
   const handleExpressFallback = () => {
-    setCheckoutMode('manual');
+    toast.error('Express checkout failed. Please try again or contact support.');
   };
 
   const handleSmartCheckoutSuccess = (orderId: string) => {
     navigate(`/account/orders/${orderId}`);
   };
-
-  // Manual checkout handlers
-  const validateAddressForm = () => {
-    const newErrors = {};
-    if (!newAddress.street.trim()) newErrors.street = 'Street address is required';
-    if (!newAddress.city.trim()) newErrors.city = 'City is required';
-    if (!newAddress.state.trim()) newErrors.state = 'State is required';
-    if (!newAddress.country.trim()) newErrors.country = 'Country is required';
-    if (!newAddress.post_code.trim()) newErrors.post_code = 'Postal code is required';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleAddAddress = async (e) => {
-    e.preventDefault();
-    if (!validateAddressForm()) return;
-
-    try {
-      setLoading(true);
-      const response = await AuthAPI.createAddress(newAddress);
-      
-      if (response?.data) {
-        setAddresses(prev => [...prev, response.data]);
-        setCheckoutData(prev => ({
-          ...prev,
-          shipping_address_id: response.data.id
-        }));
-        setShowAddressForm(false);
-        setNewAddress({
-          street: '',
-          city: '',
-          state: '',
-          country: '',
-          post_code: '',
-          kind: 'Shipping'
-        });
-        setErrors({});
-        toast.success('Address added successfully');
-      }
-    } catch (error) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to add address';
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const validateCheckout = () => {
-    const newErrors = {};
-    
-    // Validate required fields
-    if (!checkoutData.shipping_address_id) newErrors.shipping_address_id = 'Please select a shipping address';
-    if (!checkoutData.shipping_method_id) newErrors.shipping_method_id = 'Please select a shipping method';
-    if (!checkoutData.payment_method_id) newErrors.payment_method_id = 'Please select a payment method';
-    
-    // Validate stock availability
-    if (!stockValidation.valid) {
-      newErrors.stock = 'Some items in your cart are no longer available';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handlePlaceOrder = async () => {
-    if (!validateCheckout()) {
-      toast.error('Please complete all required fields');
-      return;
-    }
-
-    try {
-      setProcessingPayment(true);
-      
-      // Step 1: Validate checkout before payment
-      const validationResponse = await OrdersAPI.validateCheckout(checkoutData);
-      
-      if (!validationResponse?.success || !validationResponse?.data?.can_proceed) {
-        const issues = validationResponse?.data?.cart_validation?.issues || [];
-        const errorIssues = issues.filter(issue => issue.severity === 'error');
-        
-        if (errorIssues.length > 0) {
-          const errorMessages = errorIssues.map(issue => issue.message).join(', ');
-          toast.error(`Checkout validation failed: ${errorMessages}`);
-          return;
-        }
-        
-        toast.error('Unable to proceed with checkout. Please review your cart and try again.');
-        return;
-      }
-      
-      // Step 2: Check for price updates
-      const estimatedTotals = validationResponse.data.estimated_totals;
-      if (estimatedTotals && Math.abs(estimatedTotals.total_amount - total) > 0.01) {
-        const confirmed = window.confirm(
-          `The order total has changed from $${total.toFixed(2)} to $${estimatedTotals.total_amount.toFixed(2)}. Do you want to continue?`
-        );
-        if (!confirmed) {
-          return;
-        }
-      }
-      
-      // Step 3: Generate request ID for idempotency
-      const requestId = `checkout_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      // Step 4: Place order with idempotency key
-      const response = await OrdersAPI.checkout({
-        ...checkoutData,
-        request_id: requestId
-      });
-
-      if (response?.success && response?.data) {
-        toast.success('Order placed successfully!');
-        await clearCart();
-        navigate(`/account/orders/${response.data.id}`);
-      } else {
-        throw new Error('Failed to place order');
-      }
-    } catch (error) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to place order. Please try again.';
-      
-      // Handle specific error types
-      if (errorMessage.includes('insufficient stock') || errorMessage.includes('Stock unavailable')) {
-        toast.error('Some items in your cart are no longer available. Please review your cart and try again.');
-        // Refresh cart to show updated availability
-        window.location.reload();
-      } else if (errorMessage.includes('Payment failed')) {
-        toast.error('Payment processing failed. Please check your payment method and try again.');
-      } else if (errorMessage.includes('timeout')) {
-        toast.error('Request timed out. Please try again.');
-      } else {
-        toast.error(errorMessage);
-      }
-    } finally {
-      setProcessingPayment(false);
-    }
-  };
-
-  // Calculate totals for manual checkout
-  const subtotal = cart?.subtotal || 0;
-  const tax = cart?.tax_amount || 0;
-  const shippingCost = shippingMethods.find(m => m.id === checkoutData.shipping_method_id)?.price || 0;
-  const total = subtotal + tax + shippingCost;
 
   if (loading || cartLoading) {
     return (
@@ -397,409 +197,60 @@ export const Checkout = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Express Checkout</h1>
           <p className="mt-2 text-gray-600">
-            Complete your purchase quickly and securely
+            Complete your purchase quickly and securely with one-click checkout
           </p>
         </div>
 
-        {/* Checkout Mode Toggle */}
-        <div className="mb-8 bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-center space-x-4">
-            <button
-              onClick={() => setCheckoutMode('express')}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                checkoutMode === 'express'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              🚀 Express Checkout
-            </button>
-            <button
-              onClick={() => setCheckoutMode('manual')}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                checkoutMode === 'manual'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              ⚙️ Manual Checkout
-            </button>
+        {/* Stock Validation Warning */}
+        {!stockValidation.valid && stockValidation.issues.length > 0 && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Stock Issues Detected
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <ul className="list-disc pl-5 space-y-1">
+                    {stockValidation.issues.map((issue, index) => (
+                      <li key={index}>
+                        {issue.message}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={() => navigate('/cart')}
+                    className="bg-red-600 text-white px-4 py-2 rounded-md text-sm hover:bg-red-700"
+                  >
+                    Review Cart
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-center text-sm text-gray-500 mt-2">
-            {checkoutMode === 'express' 
-              ? 'Quick checkout with saved payment methods and addresses'
-              : 'Full control over shipping, payment, and order details'
-            }
-          </p>
-        </div>
+        )}
 
-        {/* Express Checkout Mode */}
-        {checkoutMode === 'express' && (
+        {/* Express Checkout */}
+        {stockValidation.valid && (
           <>
             <ExpressCheckout
               onSuccess={handleExpressSuccess}
               onFallback={handleExpressFallback}
             />
+            
+            {/* Smart Checkout Form as fallback */}
             <SmartCheckoutForm
               onSuccess={handleSmartCheckoutSuccess}
             />
           </>
-        )}
-
-        {/* Manual Checkout Mode */}
-        {checkoutMode === 'manual' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Forms */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Shipping Address Section */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900">Shipping Address</h2>
-                  <button
-                    onClick={() => setShowAddressForm(!showAddressForm)}
-                    className="text-green-600 hover:text-green-700 text-sm font-medium"
-                  >
-                    {showAddressForm ? 'Cancel' : '+ Add New Address'}
-                  </button>
-                </div>
-
-                {errors.shipping_address_id && (
-                  <p className="text-red-500 text-sm mb-4">{errors.shipping_address_id}</p>
-                )}
-
-                {showAddressForm ? (
-                  <form onSubmit={handleAddAddress} className="space-y-4">
-                    <Input
-                      label="Street Address"
-                      value={newAddress.street}
-                      onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
-                      error={errors.street}
-                      required
-                    />
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input
-                        label="City"
-                        value={newAddress.city}
-                        onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-                        error={errors.city}
-                        required
-                      />
-                      <Input
-                        label="State"
-                        value={newAddress.state}
-                        onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
-                        error={errors.state}
-                        required
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input
-                        label="Country"
-                        value={newAddress.country}
-                        onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
-                        error={errors.country}
-                        required
-                      />
-                      <Input
-                        label="Postal Code"
-                        value={newAddress.post_code}
-                        onChange={(e) => setNewAddress({ ...newAddress, post_code: e.target.value })}
-                        error={errors.post_code}
-                        required
-                      />
-                    </div>
-                    <Button type="submit" disabled={loading}>
-                      {loading ? 'Adding...' : 'Add Address'}
-                    </Button>
-                  </form>
-                ) : (
-                  <div className="space-y-3">
-                    {addresses.length === 0 ? (
-                      <p className="text-gray-500 text-sm">No addresses found. Please add a shipping address.</p>
-                    ) : (
-                      addresses.map((address) => (
-                        <label
-                          key={address.id}
-                          className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
-                            checkoutData.shipping_address_id === address.id
-                              ? 'border-green-600 bg-green-50'
-                              : 'border-gray-300 hover:border-green-400'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="shipping_address"
-                            value={address.id}
-                            checked={checkoutData.shipping_address_id === address.id}
-                            onChange={(e) => setCheckoutData({ ...checkoutData, shipping_address_id: e.target.value })}
-                            className="mr-3"
-                          />
-                          <span className="text-gray-900">
-                            {address.street}, {address.city}, {address.state} {address.post_code}, {address.country}
-                          </span>
-                        </label>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Shipping Method Section */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Shipping Method</h2>
-                
-                {errors.shipping_method_id && (
-                  <p className="text-red-500 text-sm mb-4">{errors.shipping_method_id}</p>
-                )}
-
-                <div className="space-y-3">
-                  {shippingMethods.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No shipping methods available.</p>
-                  ) : (
-                    shippingMethods.map((method) => (
-                      <label
-                        key={method.id}
-                        className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
-                          checkoutData.shipping_method_id === method.id
-                            ? 'border-green-600 bg-green-50'
-                            : 'border-gray-300 hover:border-green-400'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="shipping_method"
-                          value={method.id}
-                          checked={checkoutData.shipping_method_id === method.id}
-                          onChange={(e) => setCheckoutData({ ...checkoutData, shipping_method_id: e.target.value })}
-                          className="mr-3"
-                        />
-                        <div className="inline-block">
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium text-gray-900">{method.name}</span>
-                            <span className="ml-4 text-gray-900">${method.price.toFixed(2)}</span>
-                          </div>
-                          {method.description && (
-                            <p className="text-sm text-gray-500 mt-1">{method.description}</p>
-                          )}
-                          {method.estimated_days && (
-                            <p className="text-sm text-gray-500">Estimated delivery: {method.estimated_days} days</p>
-                          )}
-                        </div>
-                      </label>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Payment Method Section */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Method</h2>
-                
-                {errors.payment_method_id && (
-                  <p className="text-red-500 text-sm mb-4">{errors.payment_method_id}</p>
-                )}
-
-                <div className="space-y-3">
-                  {paymentMethods.length === 0 ? (
-                    <div>
-                      <p className="text-gray-500 text-sm mb-3">No payment methods found.</p>
-                      <Button
-                        onClick={() => navigate('/account/payment-methods')}
-                        variant="outline"
-                      >
-                        Add Payment Method
-                      </Button>
-                    </div>
-                  ) : (
-                    paymentMethods.map((method) => (
-                      <label
-                        key={method.id}
-                        className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
-                          checkoutData.payment_method_id === method.id
-                            ? 'border-green-600 bg-green-50'
-                            : 'border-gray-300 hover:border-green-400'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="payment_method"
-                          value={method.id}
-                          checked={checkoutData.payment_method_id === method.id}
-                          onChange={(e) => setCheckoutData({ ...checkoutData, payment_method_id: e.target.value })}
-                          className="mr-3"
-                        />
-                        <span className="text-gray-900">
-                          {method.type} {method.last_four ? `****${method.last_four}` : ''}
-                        </span>
-                      </label>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Order Notes */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Notes (Optional)</h2>
-                <textarea
-                  value={checkoutData.notes}
-                  onChange={(e) => setCheckoutData({ ...checkoutData, notes: e.target.value })}
-                  placeholder="Add any special instructions for your order..."
-                  rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* Right Column - Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow p-6 sticky top-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900">Order Summary</h2>
-                  {priceUpdateReceived && (
-                    <div className="flex items-center text-green-600 text-sm">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Prices Updated
-                    </div>
-                  )}
-                  {!isConnected && (
-                    <div className="flex items-center text-yellow-600 text-sm">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                      Offline
-                    </div>
-                  )}
-                </div>
-
-                {/* Cart Items */}
-                <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
-                  {cart?.items?.map((item) => (
-                    <div key={item.id} className="flex gap-3">
-                      <div className="w-16 h-16 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
-                        {(() => {
-                          let imageUrl = null;
-                          if (item.variant?.images && item.variant.images.length > 0) {
-                            const primaryImage = item.variant.images.find(img => img.is_primary);
-                            imageUrl = primaryImage?.url || item.variant.images[0]?.url;
-                          }
-                          
-                          return imageUrl ? (
-                            <img
-                              src={imageUrl}
-                              alt={item.variant.product_name || item.variant.name || 'Product'}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f3f4f6"/%3E%3Cpath d="M32 20c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%239ca3af"/%3E%3Cpath d="M44 16H20c-2.2 0-4 1.8-4 4v24c0 2.2 1.8 4 4 4h24c2.2 0 4-1.8 4-4V20c0-2.2-1.8-4-4-4zm0 28H20V20h24v24z" fill="%239ca3af"/%3E%3C/svg%3E';
-                                e.currentTarget.onerror = null;
-                              }}
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                          );
-                        })()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {item.variant?.product_name || item.product?.name || 'Product'}
-                        </p>
-                        <p className="text-sm text-gray-500">{item.variant?.name || 'Default'}</p>
-                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                      </div>
-                      <p className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                        ${(item.price_per_unit * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Totals */}
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="text-gray-900">${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Shipping</span>
-                    <span className="text-gray-900">${shippingCost.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tax</span>
-                    <span className="text-gray-900">${tax.toFixed(2)}</span>
-                  </div>
-                  <div className="border-t pt-2 flex justify-between font-semibold text-lg">
-                    <span className="text-gray-900">Total</span>
-                    <span className="text-gray-900">${total.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* Stock Validation Warning */}
-                {!stockValidation.valid && stockValidation.issues.length > 0 && (
-                  <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-                    <div className="flex">
-                      <div className="flex-shrink-0">
-                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="text-sm font-medium text-red-800">
-                          Stock Issues Detected
-                        </h3>
-                        <div className="mt-2 text-sm text-red-700">
-                          <ul className="list-disc pl-5 space-y-1">
-                            {stockValidation.issues.map((issue, index) => (
-                              <li key={index}>
-                                Variant {issue.variant_id}: {issue.message}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Place Order Button */}
-                <Button
-                  onClick={handlePlaceOrder}
-                  disabled={
-                    processingPayment || 
-                    addresses.length === 0 || 
-                    paymentMethods.length === 0 || 
-                    !stockValidation.valid
-                  }
-                  className="w-full mt-6"
-                >
-                  {processingPayment ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : !stockValidation.valid ? (
-                    'Items Unavailable'
-                  ) : (
-                    'Place Order'
-                  )}
-                </Button>
-
-                <p className="text-xs text-gray-500 text-center mt-4">
-                  By placing your order, you agree to our terms and conditions
-                </p>
-              </div>
-            </div>
-          </div>
         )}
 
         {/* Price update indicator */}
@@ -808,6 +259,18 @@ export const Checkout = () => {
             <div className="flex items-center space-x-2">
               <div className="animate-pulse w-2 h-2 bg-white rounded-full"></div>
               <span className="text-sm">Prices updated</span>
+            </div>
+          </div>
+        )}
+
+        {/* Connection status indicator */}
+        {!isConnected && (
+          <div className="fixed bottom-4 left-4 bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-lg">
+            <div className="flex items-center space-x-2">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm">Offline Mode</span>
             </div>
           </div>
         )}

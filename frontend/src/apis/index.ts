@@ -16,7 +16,6 @@ export { default as CartAPI } from './cart';
 export { default as AnalyticsAPI } from './analytics';
 export { default as AdminAPI } from './admin';
 export { default as ReviewsAPI } from './reviews';
-export { default as BlogAPI } from './blog';
 export { default as SubscriptionAPI } from './subscription';
 export { default as CategoriesAPI } from './categories';
 
@@ -30,7 +29,6 @@ import CartAPI from './cart';
 import AnalyticsAPI from './analytics';
 import AdminAPI from './admin';
 import ReviewsAPI from './reviews';
-import BlogAPI from './blog';
 import SubscriptionAPI from './subscription';
 import CategoriesAPI from './categories';
 import { apiClient } from './client';
@@ -50,7 +48,6 @@ export const API = {
   analytics: AnalyticsAPI,
   admin: AdminAPI,
   reviews: ReviewsAPI,
-  blog: BlogAPI,
   subscription: SubscriptionAPI,
   categories: CategoriesAPI,
 };

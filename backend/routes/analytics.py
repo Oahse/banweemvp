@@ -8,15 +8,32 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 from uuid import UUID
+import logging
 
 from core.database import get_db
-from core.auth import get_current_auth_user, get_current_admin_user
-from core.response import Response
+from core.utils.response import Response
 from models.user import User
 from models.analytics import EventType, TrafficSource
 from services.analytics import AnalyticsService
 from core.exceptions import APIException
+from services.auth import AuthService
+from fastapi.security import OAuth2PasswordBearer
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
+    return await AuthService.get_current_user(token, db)
+
+def require_admin(current_user: User = Depends(get_current_auth_user)):
+    """Require admin role."""
+    if current_user.role not in ["Admin", "SuperAdmin"]:
+        raise APIException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            message="Admin access required"
+        )
+    return current_user
+
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 
@@ -293,6 +310,39 @@ async def get_dashboard_data(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to retrieve dashboard data: {str(e)}"
+        )
+
+
+@router.get("/sales-trend")
+async def get_sales_trend(
+    days: int = Query(30, description="Number of days to analyze"),
+    current_user: User = Depends(get_current_admin_user),
+    analytics_service: AnalyticsService = Depends(get_analytics_service)
+):
+    """
+    Get sales trend data over specified number of days
+    
+    Returns daily sales data for trend analysis.
+    Requires admin access.
+    """
+    try:
+        end_date = datetime.now(timezone.utc)
+        start_date = end_date - timedelta(days=days)
+        
+        trend_data = await analytics_service.get_sales_trend_data(
+            start_date=start_date,
+            end_date=end_date
+        )
+        
+        return Response.success(
+            data=trend_data,
+            message="Sales trend data retrieved successfully"
+        )
+        
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to retrieve sales trend data: {str(e)}"
         )
 
 

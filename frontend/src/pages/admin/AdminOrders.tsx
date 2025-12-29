@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { SearchIcon, FilterIcon, ChevronDownIcon, EyeIcon, PrinterIcon, MoreHorizontalIcon, CalendarIcon, DownloadIcon } from 'lucide-react';
 import { usePaginatedApi } from '../../hooks/useApi';
+import { useLocale } from '../../contexts/LocaleContext';
 import { AdminAPI, OrdersAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';
@@ -17,6 +18,7 @@ export const AdminOrders = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const { formatCurrency } = useLocale();
   const [isExporting, setIsExporting] = useState(false);
 
   // Close export menu when clicking outside
@@ -343,7 +345,7 @@ export const AdminOrders = () => {
                     </td>
                     <td className="py-3 px-4 text-center">{order.items?.length || 0}</td>
                     <td className="py-3 px-4 font-medium text-main">
-                      ${(order.total_amount || 0).toFixed(2)}
+                      {formatCurrency(order.total_amount || 0)}
                     </td>
                   <td className="py-3 px-4 text-right">
                     <div className="flex items-center justify-end space-x-2">
@@ -441,7 +443,7 @@ export const AdminOrders = () => {
                     <div className="flex justify-between items-center pt-2 border-t border-border-light">
                       <div>
                         <p className="text-xs text-copy-light">Total</p>
-                        <p className="text-sm font-semibold text-main">${(order.total_amount || 0).toFixed(2)}</p>
+                        <p className="text-sm font-semibold text-main">{formatCurrency(order.total_amount || 0)}</p>
                       </div>
                       <div>
                         <p className="text-xs text-copy-light">Items</p>

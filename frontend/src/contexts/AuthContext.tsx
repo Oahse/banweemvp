@@ -22,10 +22,12 @@ export const AuthProvider = ({ children }) => {
     full_name: apiUser.full_name || `${apiUser.firstname} ${apiUser.lastname}`,
     role: apiUser.role,
     verified: apiUser.verified || false,
-    active: apiUser.active ?? true,
+    is_active: apiUser.is_active ?? true,
     phone: apiUser.phone,
     avatar_url: apiUser.avatar_url,
     preferences: apiUser.preferences || {},
+    // Legacy compatibility
+    active: apiUser.is_active ?? true,
   });
 
   // Check authentication on mount

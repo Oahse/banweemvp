@@ -21,15 +21,31 @@ export interface User {
   lastname: string;
   full_name?: string;
   phone?: string;
-  role: 'customer' | 'admin' | 'supplier';
+  phone_verified?: boolean;
+  role: 'guest' | 'admin' | 'manager' | 'support' | 'customer' | 'supplier';
+  account_status?: string;
+  verification_status?: string;
+  verified: boolean;
   is_active: boolean;
-  is_verified: boolean;
+  avatar_url?: string;
+  country?: string;
+  language?: string;
+  timezone?: string;
+  last_login?: string;
+  last_activity_at?: string;
+  login_count?: number;
+  failed_login_attempts?: number;
+  locked_until?: string;
+  stripe_customer_id?: string;
+  preferences?: Record<string, any>;
+  age?: string;
+  gender?: string;
   created_at: string;
   updated_at?: string;
-  last_login?: string;
+  // Legacy fields for backward compatibility
+  is_verified?: boolean;
   profile_image?: string;
   date_of_birth?: string;
-  gender?: string;
   language_preference?: string;
   currency_preference?: string;
 }
@@ -37,10 +53,15 @@ export interface User {
 // Product Types
 export interface ProductImage {
   id: string;
+  variant_id: string;
   url: string;
   alt_text?: string;
   is_primary: boolean;
-  display_order: number;
+  sort_order: number;
+  format?: string;
+  created_at?: string;
+  // Legacy field for backward compatibility
+  display_order?: number;
 }
 
 export interface ProductVariant {
@@ -49,42 +70,78 @@ export interface ProductVariant {
   sku: string;
   name: string;
   base_price: number;
-  sale_price?: number;
-  stock: number;
+  sale_price?: number | null;
+  current_price?: number;
+  discount_percentage?: number;
+  stock?: number;
+  attributes?: Record<string, any>;
+  is_active: boolean;
+  barcode?: string;
+  qr_code?: string;
   images: ProductImage[];
+  primary_image?: ProductImage;
   product_name?: string;
   product_description?: string;
-  attributes?: Record<string, any>;
-  barcode?: string;  // Base64 encoded barcode image
-  qr_code?: string;  // Base64 encoded QR code image
-}
-
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  category_id?: string;
-  brand_id?: string;
-  is_active: boolean;
   created_at: string;
   updated_at?: string;
-  variants: ProductVariant[];
-  images: ProductImage[];
-  average_rating?: number;
-  review_count?: number;
-  category?: Category;
-  brand?: Brand;
 }
 
 export interface Category {
   id: string;
   name: string;
-  slug: string;
   description?: string;
-  parent_id?: string;
   image_url?: string;
   is_active: boolean;
-  display_order: number;
+  created_at: string;
+  updated_at?: string;
+  // Legacy fields for backward compatibility
+  slug?: string;
+  parent_id?: string;
+  display_order?: number;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  short_description?: string;
+  category_id?: string;
+  supplier_id?: string;
+  product_status?: string;
+  availability_status?: string;
+  min_price?: number;
+  max_price?: number;
+  rating_average?: number;
+  rating_count?: number;
+  review_count?: number;
+  is_featured?: boolean;
+  is_bestseller?: boolean;
+  specifications?: Record<string, any>;
+  dietary_tags?: Record<string, any>;
+  tags?: string[];
+  keywords?: string[];
+  published_at?: string;
+  view_count?: number;
+  purchase_count?: number;
+  origin?: string;
+  price_range?: { min: number; max: number };
+  in_stock?: boolean;
+  variants: ProductVariant[];
+  images?: ProductImage[];
+  category?: Category;
+  supplier?: User;
+  created_at: string;
+  updated_at?: string;
+  // Legacy fields for backward compatibility
+  brand_id?: string;
+  brand?: Brand;
+  is_active?: boolean;
+  average_rating?: number;
+  price?: number;
+  discountPrice?: number | null;
+  featured?: boolean;
+  rating?: number;
 }
 
 export interface Brand {
@@ -99,20 +156,34 @@ export interface Brand {
 // Cart Types
 export interface CartItem {
   id: string;
+  cart_id: string;
+  variant_id: string;
   variant: ProductVariant;
   quantity: number;
   price_per_unit: number;
   total_price: number;
+  saved_for_later?: boolean;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface Cart {
   id: string;
   user_id: string;
+  session_id?: string;
+  promocode_id?: string;
+  discount_amount?: number;
   items: CartItem[];
-  total_items: number;
-  total_amount: number;
   created_at: string;
   updated_at?: string;
+  // Computed properties
+  subtotal?: number;
+  tax_amount?: number;
+  shipping_amount?: number;
+  total_amount?: number;
+  item_count?: number;
+  // Legacy fields for backward compatibility
+  total_items?: number;
 }
 
 export interface AddToCartRequest {
@@ -123,13 +194,15 @@ export interface AddToCartRequest {
 // Wishlist Types
 export interface WishlistItem {
   id: string;
-  product_id: string;
-  product?: Product;
-  variant_id?: string;
-  variant?: ProductVariant;
-  quantity: number;
   wishlist_id: string;
-  added_at: string;
+  product_id: string;
+  variant_id?: string;
+  quantity: number;
+  product?: Product;
+  variant?: ProductVariant;
+  created_at: string;
+  // Computed property
+  added_at?: string;
 }
 
 export interface Wishlist {
@@ -137,6 +210,7 @@ export interface Wishlist {
   user_id: string;
   name: string;
   is_default?: boolean;
+  is_public?: boolean;
   items: WishlistItem[];
   created_at: string;
   updated_at?: string;
@@ -151,36 +225,65 @@ export interface OrderItem {
   quantity: number;
   price_per_unit: number;
   total_price: number;
+  created_at: string;
 }
 
-export interface ShippingAddress {
+export interface Address {
   id?: string;
+  user_id?: string;
   street: string;
   city: string;
   state: string;
-  postal_code: string;
   country: string;
+  post_code: string;
+  kind?: string;
+  is_default?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  // Legacy fields for backward compatibility
+  postal_code?: string;
   phone?: string;
 }
 
 export interface Order {
   id: string;
-  user_id: string;
   order_number: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  items: OrderItem[];
+  user_id: string;
+  guest_email?: string;
+  order_status: string;
+  payment_status: string;
+  fulfillment_status: string;
   subtotal: number;
-  tax: number;
-  shipping_cost: number;
+  tax_amount: number;
+  shipping_amount: number;
+  discount_amount: number;
   total_amount: number;
-  shipping_address: ShippingAddress;
-  payment_method?: string;
-  payment_status: 'pending' | 'completed' | 'failed' | 'refunded';
+  currency: string;
+  shipping_method?: string;
   tracking_number?: string;
-  notes?: string;
+  carrier?: string;
+  billing_address: Record<string, any>;
+  shipping_address: Record<string, any>;
+  confirmed_at?: string;
+  shipped_at?: string;
+  delivered_at?: string;
+  cancelled_at?: string;
+  customer_notes?: string;
+  internal_notes?: string;
+  source: string;
+  items: OrderItem[];
   created_at: string;
   updated_at?: string;
+  // Legacy fields for backward compatibility
+  status?: string;
+  tax?: number;
+  shipping_cost?: number;
+  payment_method?: string;
+  notes?: string;
 }
+
+// Legacy type for backward compatibility
+export interface ShippingAddress extends Address {}
 
 // Review Types
 export interface Review {
@@ -303,10 +406,12 @@ export interface AddressFormData {
   street: string;
   city: string;
   state: string;
-  postal_code: string;
+  post_code: string;
   country: string;
   phone?: string;
   is_default?: boolean;
+  // Legacy field for backward compatibility
+  postal_code?: string;
 }
 
 // Context Types
@@ -323,18 +428,25 @@ export interface AuthContextType {
 export interface CartContextType {
   cart: Cart | null;
   isLoading: boolean;
-  addToCart: (variantId: string, quantity: number) => Promise<void>;
+  loading?: boolean;
+  addItem: (request: AddToCartRequest) => Promise<void>;
+  addToCart?: (variantId: string, quantity: number) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
-  removeFromCart: (itemId: string) => Promise<void>;
+  removeItem: (itemId: string) => Promise<void>;
+  removeFromCart?: (itemId: string) => Promise<void>;
   clearCart: () => Promise<void>;
   refreshCart: () => Promise<void>;
 }
 
 export interface WishlistContextType {
   wishlists: Wishlist[];
+  defaultWishlist?: Wishlist | null;
   isLoading: boolean;
-  addToWishlist: (productId: string, wishlistId?: string) => Promise<void>;
-  removeFromWishlist: (itemId: string) => Promise<void>;
+  addItem: (productId: string, variantId?: string, quantity?: number) => Promise<void>;
+  addToWishlist?: (productId: string, wishlistId?: string) => Promise<void>;
+  removeItem: (wishlistId: string, itemId: string) => Promise<void>;
+  removeFromWishlist?: (itemId: string) => Promise<void>;
+  isInWishlist: (productId: string, variantId?: string) => boolean;
   refreshWishlists: () => Promise<void>;
 }
 

@@ -86,16 +86,6 @@ export const OptimizedRoutes = {
     <PageSkeleton />
   ),
   
-  Blog: withSuspense(
-    createLazyRoute(() => import('./pages/Blog').then(m => ({ default: m.Blog })), false),
-    <PageSkeleton />
-  ),
-  
-  BlogPost: withSuspense(
-    createLazyRoute(() => import('./pages/BlogPost').then(m => ({ default: m.BlogPost })), false),
-    <PageSkeleton />
-  ),
-  
   ForgotPassword: withSuspense(
     createLazyRoute(() => import('./pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })), false),
     <PageSkeleton />

@@ -842,7 +842,7 @@ class OrderService:
             tax_amount = subtotal * tax_rate
             
             # Apply any discounts (from promocodes, etc.)
-            discount_amount = 0.0  # TODO: Implement discount calculation
+            discount_amount = await self._calculate_discount_amount(cart_items, subtotal)
             
             # Calculate final total
             total_amount = subtotal + shipping_cost + tax_amount - discount_amount
@@ -859,21 +859,95 @@ class OrderService:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to calculate order total: {str(e)}")
 
+    async def _calculate_discount_amount(self, cart_items: List, subtotal: float) -> float:
+        """Calculate discount amount from applied promocodes and loyalty points"""
+        try:
+            discount_amount = 0.0
+            
+            # Check if any cart items have promocodes applied
+            for item in cart_items:
+                if hasattr(item, 'promocode') and item.promocode:
+                    # Get promocode details
+                    from models.promocode import Promocode
+                    result = await self.db.execute(
+                        select(Promocode).where(
+                            and_(
+                                Promocode.code == item.promocode,
+                                Promocode.is_active == True,
+                                Promocode.valid_from <= datetime.utcnow(),
+                                Promocode.valid_until >= datetime.utcnow()
+                            )
+                        )
+                    )
+                    promocode = result.scalar_one_or_none()
+                    
+                    if promocode:
+                        if promocode.discount_type == "percentage":
+                            item_discount = (item.total_price * promocode.discount_value) / 100
+                            # Apply maximum discount limit if set
+                            if promocode.max_discount_amount:
+                                item_discount = min(item_discount, promocode.max_discount_amount)
+                            discount_amount += item_discount
+                        elif promocode.discount_type == "fixed":
+                            discount_amount += min(promocode.discount_value, item.total_price)
+            
+            # Apply cart-level promocodes (if any)
+            # This would be implemented based on your cart structure
+            
+            return discount_amount
+            
+        except Exception as e:
+            logger.error(f"Error calculating discount amount: {e}")
+            return 0.0
+
     async def _get_tax_rate(self, shipping_address) -> float:
         """
         Get tax rate based on shipping address
-        This should be implemented based on your tax requirements
         """
-        # Default tax rate - implement proper tax calculation based on address
-        default_tax_rate = 0.08  # 8%
-        
-        # TODO: Implement proper tax calculation based on:
-        # - shipping_address.state
-        # - shipping_address.country
-        # - Local tax regulations
-        # - Tax service integration
-        
-        return default_tax_rate
+        try:
+            # Default tax rate
+            default_tax_rate = 0.08  # 8%
+            
+            if not shipping_address:
+                return default_tax_rate
+            
+            # Get state/country from address
+            state = getattr(shipping_address, 'state', None) or shipping_address.get('state', '')
+            country = getattr(shipping_address, 'country', None) or shipping_address.get('country', 'US')
+            
+            # US state tax rates (simplified)
+            us_state_tax_rates = {
+                'CA': 0.0725,  # California
+                'NY': 0.08,    # New York
+                'TX': 0.0625,  # Texas
+                'FL': 0.06,    # Florida
+                'WA': 0.065,   # Washington
+                'OR': 0.0,     # Oregon (no sales tax)
+                'NH': 0.0,     # New Hampshire (no sales tax)
+                'MT': 0.0,     # Montana (no sales tax)
+                'DE': 0.0,     # Delaware (no sales tax)
+                'AK': 0.0,     # Alaska (no state sales tax)
+            }
+            
+            # International tax rates (simplified)
+            international_tax_rates = {
+                'CA': 0.13,    # Canada (HST/GST average)
+                'GB': 0.20,    # UK (VAT)
+                'DE': 0.19,    # Germany (VAT)
+                'FR': 0.20,    # France (VAT)
+                'AU': 0.10,    # Australia (GST)
+            }
+            
+            if country == 'US' and state:
+                return us_state_tax_rates.get(state.upper(), default_tax_rate)
+            elif country != 'US':
+                return international_tax_rates.get(country.upper(), 0.0)
+            
+            return default_tax_rate
+            
+        except Exception as e:
+            logger.error(f"Error calculating tax rate: {e}")
+            return 0.08  # Default 8% tax rate
     async def _send_price_update_notification(self, user_id: UUID, price_updates: List[Dict]) -> None:
         """
         Send real-time price update notification to frontend via WebSocket

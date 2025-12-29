@@ -640,3 +640,72 @@ class AnalyticsService:
                 
         except Exception as e:
             logger.error(f"Failed to update conversion funnel: {e}")
+
+    async def get_sales_trend_data(
+        self,
+        start_date: datetime,
+        end_date: datetime
+    ) -> Dict[str, Any]:
+        """Get sales trend data over the specified period"""
+        try:
+            # Get daily sales data
+            daily_sales = await self.db.execute(
+                select(
+                    func.date(Order.created_at).label('date'),
+                    func.count(Order.id).label('order_count'),
+                    func.sum(Order.total_amount).label('revenue'),
+                    func.avg(Order.total_amount).label('avg_order_value')
+                ).where(
+                    and_(
+                        Order.created_at >= start_date,
+                        Order.created_at <= end_date,
+                        Order.status.in_(['confirmed', 'shipped', 'delivered', 'completed'])
+                    )
+                ).group_by(func.date(Order.created_at)).order_by(func.date(Order.created_at))
+            )
+            
+            trend_data = []
+            total_revenue = 0
+            total_orders = 0
+            
+            for row in daily_sales:
+                daily_revenue = float(row.revenue or 0)
+                daily_orders = row.order_count or 0
+                
+                trend_data.append({
+                    "date": row.date.isoformat() if row.date else None,
+                    "order_count": daily_orders,
+                    "revenue": daily_revenue,
+                    "avg_order_value": float(row.avg_order_value or 0)
+                })
+                
+                total_revenue += daily_revenue
+                total_orders += daily_orders
+            
+            # Calculate growth rate if we have data
+            growth_rate = 0.0
+            if len(trend_data) > 1:
+                first_day_revenue = trend_data[0]["revenue"]
+                last_day_revenue = trend_data[-1]["revenue"]
+                if first_day_revenue > 0:
+                    growth_rate = ((last_day_revenue - first_day_revenue) / first_day_revenue) * 100
+            
+            return {
+                "period": {
+                    "start_date": start_date.isoformat(),
+                    "end_date": end_date.isoformat(),
+                    "days": len(trend_data)
+                },
+                "summary": {
+                    "total_revenue": total_revenue,
+                    "total_orders": total_orders,
+                    "avg_daily_revenue": total_revenue / len(trend_data) if trend_data else 0,
+                    "avg_daily_orders": total_orders / len(trend_data) if trend_data else 0,
+                    "growth_rate": round(growth_rate, 2)
+                },
+                "daily_data": trend_data
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to get sales trend data: {e}")
+            raise HTTPException(status_code=500, detail="Failed to retrieve sales trend data")

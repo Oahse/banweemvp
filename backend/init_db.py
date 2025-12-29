@@ -23,7 +23,6 @@ from core.database import Base
 from models.user import User, Address
 from models.product import Product, ProductVariant, ProductImage, Category
 from models.orders import Order, OrderItem
-from models.blog import BlogPost
 from models.subscriptions import Subscription
 from models.review import Review
 from models.payments import PaymentMethod, Transaction
@@ -262,7 +261,7 @@ async def seed_sample_data(
                 hashed_password=hashed,
                 role=role,
                 verified=True,
-                active=True,
+                is_active=True,
                 last_login=func.now()
             )
             users.append(user)
@@ -289,7 +288,7 @@ async def seed_sample_data(
                 hashed_password=hashed,
                 role=role,
                 verified=True,
-                active=True,
+                is_active=True,
                 last_login=func.now()
             )
             users.append(user)
@@ -709,67 +708,6 @@ async def seed_sample_data(
             session.expunge_all()
         print(
             f"❤️ Created {len(wishlist_items_batch)} wishlist items across various wishlists.")
-
-        # -------- Blog Tags --------
-        from models.blog import BlogTag, BlogPostTag
-        
-        tag_names = ["organic", "farming", "sustainability", "health", "recipes", "nutrition", "eco-friendly"]
-        blog_tags = []
-        for tag_name in tag_names:
-            tag = BlogTag(
-                id=uuid.uuid4(),
-                name=tag_name,
-                slug=tag_name.lower().replace(" ", "-")
-            )
-            blog_tags.append(tag)
-        
-        session.add_all(blog_tags)
-        await session.flush()
-        await session.commit()
-        session.expunge_all()
-        print(f"🏷️ Created {len(blog_tags)} blog tags.")
-
-        # -------- Blog Posts --------
-        blog_posts_batch = []
-        for i in range(1, 11):  # Create 10 dummy blog posts
-            chosen_admin = random.choice(admins)
-            title = f"Blog Post Title {i}"
-            post = BlogPost(
-                id=uuid.uuid4(),
-                title=title,
-                slug=title.lower().replace(" ", "-").replace("#", ""),
-                content=f"This is the content for blog post number {i}. It discusses various organic farming techniques and sustainable practices.",
-                author_id=chosen_admin.id,
-                image_url=random.choice(image_urls),
-                is_published=True,
-            )
-            blog_posts_batch.append(post)
-
-        if blog_posts_batch:
-            session.add_all(blog_posts_batch)
-            await session.flush()
-            await session.commit()
-            session.expunge_all()
-        print(f"📝 Created {len(blog_posts_batch)} blog posts.")
-
-        # -------- Blog Post Tags Associations --------
-        blog_post_tags_batch = []
-        for post in blog_posts_batch:
-            # Assign 1-3 random tags to each post
-            selected_tags = random.sample(blog_tags, k=random.randint(1, 3))
-            for tag in selected_tags:
-                blog_post_tag = BlogPostTag(
-                    blog_post_id=post.id,
-                    blog_tag_id=tag.id
-                )
-                blog_post_tags_batch.append(blog_post_tag)
-        
-        if blog_post_tags_batch:
-            session.add_all(blog_post_tags_batch)
-            await session.flush()
-            await session.commit()
-            session.expunge_all()
-        print(f"🏷️ Created {len(blog_post_tags_batch)} blog post tag associations.")
 
         # -------- Subscriptions --------
         subscriptions_batch = []

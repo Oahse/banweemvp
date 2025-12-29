@@ -51,6 +51,11 @@ export class CartAPI {
   }
 
   static async checkStock(variantId, quantity) {
+    // Guard against undefined/null variantId
+    if (!variantId || variantId === 'undefined' || variantId === 'null') {
+      throw new Error('Invalid variant ID provided');
+    }
+    
     return await apiClient.get(`/inventory/check-stock/${variantId}?quantity=${quantity}`);
   }
 

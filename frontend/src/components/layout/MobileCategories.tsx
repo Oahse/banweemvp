@@ -30,8 +30,7 @@ export const MobileCategories = ({
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
-    { name: 'FAQ', path: '/faq' },
-    { name: 'Blog', path: '/blog' }
+    { name: 'FAQ', path: '/faq' }
   ];
 
   if (!isOpen) return null;

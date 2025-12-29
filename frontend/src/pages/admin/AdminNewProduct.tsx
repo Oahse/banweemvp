@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, PlusIcon, XIcon, UploadIcon, ChevronDownIcon } from 'lucide-react';
 import { ProductsAPI, CategoriesAPI } from '../../apis';
+import { useLocale } from '../../contexts/LocaleContext';
+import { validatePriceInput, validateSalePrice, formatPriceForInput } from '../../lib/price-utils';
 import { toast } from 'react-hot-toast';
 import { uploadMultipleFiles } from '../../lib/github';
 

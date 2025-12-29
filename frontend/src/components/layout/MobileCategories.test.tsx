@@ -112,7 +112,6 @@ describe('MobileCategories Component', () => {
     render(<MobileCategories isOpen={true} onClose={mockOnClose} />);
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
     expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute('href', '/about');
-    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute('href', '/blog');
   });
 
   it('renders support center info', () => {

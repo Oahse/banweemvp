@@ -22,7 +22,7 @@ class UserResponse(BaseModel):
     phone: Optional[str]
     role: str
     verified: bool
-    active: bool
+    is_active: bool
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

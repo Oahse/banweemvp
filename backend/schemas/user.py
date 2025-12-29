@@ -54,7 +54,7 @@ class UserUpdate(BaseModel):
     country: Optional[str] = None
     language: Optional[str] = None
     timezone: Optional[str] = None
-    active: Optional[bool] = None
+    is_active: Optional[bool] = None
 
 
 class UserResponse(BaseModel):
@@ -66,7 +66,7 @@ class UserResponse(BaseModel):
     phone: Optional[str] = None
     role: str
     verified: bool
-    active: bool
+    is_active: bool
     age: Optional[int] = None
     gender: Optional[str] = None
     country: Optional[str] = None

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useAuthenticatedAction } from '../../hooks/useAuthenticatedAction';
+import { useLocale } from '../../contexts/LocaleContext';
 import { SkeletonCard } from '../ui/SkeletonCard';
 import { QRCodeDisplay } from './QRCodeDisplay';
 import { BarcodeDisplay } from './BarcodeDisplay';
@@ -77,6 +78,7 @@ export const ProductCard = ({
   const { addItem: addToCart, cart } = useCart();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
   const { executeWithAuth } = useAuthenticatedAction();
+  const { formatCurrency } = useLocale();
 
   if (isLoading) { // <--- Add this check
     return <SkeletonCard viewMode={viewMode} animation={animation} />;
@@ -88,13 +90,13 @@ export const ProductCard = ({
   }
 
   // Get the display variant (selected variant or first variant or fallback to product)
-  const displayVariant = selectedVariant || (product.variants && product.variants[0]);
+  const displayVariant = selectedVariant || (product.variants && Array.isArray(product.variants) && product.variants.length > 0 ? product.variants[0] : null);
 
   const isInCart = cart?.items.some(item => item.variant.id === displayVariant?.id) || false;
 
   // Get the primary image from variant or fallback to product image
   const getPrimaryImage = () => {
-    if (displayVariant && displayVariant.images.length > 0) {
+    if (displayVariant && displayVariant.images && Array.isArray(displayVariant.images) && displayVariant.images.length > 0) {
       const primaryImage = displayVariant.images.find(img => img.is_primary);
       return primaryImage?.url || displayVariant.images[0]?.url;
     }
@@ -105,18 +107,26 @@ export const ProductCard = ({
   const getDisplayPrice = () => {
     if (displayVariant) {
       return {
-        price: displayVariant.base_price,
-        discountPrice: displayVariant.sale_price || null
+        basePrice: displayVariant.base_price,
+        salePrice: displayVariant.sale_price || null,
+        currentPrice: displayVariant.sale_price || displayVariant.base_price,
+        discountPercentage: displayVariant.sale_price 
+          ? Math.round(((displayVariant.base_price - displayVariant.sale_price) / displayVariant.base_price) * 100)
+          : 0
       };
     }
     return {
-      price: product.price,
-      discountPrice: product.discountPrice
+      basePrice: product.price,
+      salePrice: product.discountPrice,
+      currentPrice: product.discountPrice || product.price,
+      discountPercentage: product.discountPrice 
+        ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+        : 0
     };
   };
 
   const displayImage = getPrimaryImage();
-  const { price, discountPrice } = getDisplayPrice();
+  const { basePrice, salePrice, currentPrice, discountPercentage } = getDisplayPrice();
 
       const handleAddToCart = async (e) => {
         e.preventDefault();
@@ -127,9 +137,16 @@ export const ProductCard = ({
           return;
         }
 
-        const variantToAdd = displayVariant || (product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
-        if (!variantToAdd) {
-          toast.error("This product has no variants available.");
+        // Check if we have a valid variant to add
+        if (!displayVariant) {
+          // More specific error message
+          if (!product.variants || !Array.isArray(product.variants)) {
+            toast.error("Product variants are not loaded yet. Please try again.");
+          } else if (product.variants.length === 0) {
+            toast.error("This product has no variants available.");
+          } else {
+            toast.error("Unable to select a variant for this product.");
+          }
           return;
         }
     
@@ -138,7 +155,7 @@ export const ProductCard = ({
         } else {
           await executeWithAuth(async () => {
             await addToCart({
-              variant_id: String(variantToAdd.id),
+              variant_id: String(displayVariant.id),
               quantity: 1,
             });
             toast.success('Item added to cart!');
@@ -158,9 +175,8 @@ export const ProductCard = ({
           return;
         }
 
-        const variantToAdd = displayVariant || (product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
-
-        if (!variantToAdd) {
+        // Check if we have a valid variant to add
+        if (!displayVariant) {
           toast.error("This product has no variants available.");
           return;
         }
@@ -204,7 +220,7 @@ export const ProductCard = ({
             New
           </span>
         )}
-        {discountPrice && (
+        {salePrice && (
           <span className="absolute top-2 right-2 bg-error text-white text-xs font-medium px-2 py-1 rounded-full">
             Sale
           </span>
@@ -270,16 +286,22 @@ export const ProductCard = ({
         </div>
         <div className={cn('flex items-center justify-between', viewMode === 'list' && 'flex-grow md:flex-row-reverse md:justify-start md:space-x-4 md:space-x-reverse')}>
           <div>
-            {displayVariant?.discount_percentage > 0 && displayVariant?.sale_price ? (
+            {salePrice && discountPercentage > 0 ? (
               <div className="flex items-center">
-                <span className="font-bold text-primary mr-2 text-sm sm:text-base">${displayVariant.current_price.toFixed(2)}</span>
-                <span className="text-xs text-copy-lighter line-through">${displayVariant.base_price.toFixed(2)}</span>
+                <span className="font-bold text-primary mr-2 text-sm sm:text-base">
+                  {formatCurrency(currentPrice)}
+                </span>
+                <span className="text-xs text-copy-lighter line-through">
+                  {formatCurrency(basePrice)}
+                </span>
                 <span className="bg-error text-white text-xs font-medium px-2 py-1 rounded-full ml-2">
-                  -{displayVariant.discount_percentage}%
+                  -{discountPercentage}%
                 </span>
               </div>
             ) : (
-              <span className="font-bold text-primary text-sm sm:text-base">${displayVariant?.current_price.toFixed(2)}</span>
+              <span className="font-bold text-primary text-sm sm:text-base">
+                {formatCurrency(currentPrice)}
+              </span>
             )}
             {displayVariant && (
               <div className="text-xs text-copy-lighter mt-1">

@@ -374,11 +374,11 @@ const UserManagement = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.active 
+                        user.is_active 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-red-100 text-red-800'
                       }`}>
-                        {user.active ? 'Active' : 'Inactive'}
+                        {user.is_active ? 'Active' : 'Inactive'}
                       </span>
                       {user.verified && (
                         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">

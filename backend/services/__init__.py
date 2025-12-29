@@ -2,7 +2,6 @@
 
 # Core services
 from .auth import AuthService
-from .blog import BlogService
 from .cart import CartService
 from .email import EmailService
 from .loyalty import LoyaltyService
@@ -32,7 +31,6 @@ from .jinja_template import JinjaTemplateService
 __all__ = [
     # Core services
     "AuthService",
-    "BlogService", 
     "CartService",
     "EmailService",
     "LoyaltyService",

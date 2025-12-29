@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Input } from '../components/forms/Input';
 import { toast } from 'react-hot-toast';
+import { validation } from '../lib/validation';
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -9,18 +10,31 @@ export const ForgotPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email) {
-      toast.error('Please enter your email address.');
+    
+    // Enhanced validation using validation utility
+    const emailValidation = validation.email(email);
+    if (!emailValidation.valid) {
+      toast.error(emailValidation.message);
       return;
     }
 
     setLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setLoading(false);
-
-    toast.success(`Password reset link sent! If an account with ${email} exists, you will receive a password reset link.`);
-    setEmail('');
+    
+    try {
+      // TODO: Replace with actual API call
+      // await AuthAPI.forgotPassword(email.toLowerCase().trim());
+      
+      // Simulate API call for now
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success(`Password reset link sent! If an account with ${email} exists, you will receive a password reset link.`);
+      setEmail('');
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to send reset link. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

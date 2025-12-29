@@ -22,25 +22,31 @@ from core.exceptions import (
     general_exception_handler
 )
 from core.kafka import consume_messages, get_kafka_producer_service, initialize_event_system, start_event_consumer 
-from routes.websockets import ws_router
-from routes.auth import router as auth_router
-from routes.user import router as user_router
-from routes.products import router as products_router
-from routes.cart import router as cart_router
-from routes.orders import router as orders_router
-from routes.admin import router as admin_router
-from routes.social_auth import router as social_auth_router
-from routes.blog import router as blog_router
-from routes.subscriptions import router as subscription_router
-from routes.review import router as review_router
-from routes.payments import router as payment_router
-from routes.wishlist import router as wishlist_router
-from routes.notifications import router as notification_router
-from routes.health import router as health_router
-# from routes.negotiator import router as negotiator_router
-from routes.search import router as search_router
-from routes.inventories import router as inventory_router
-from routes.loyalty import router as loyalty_router
+
+# Import all routers from routes package
+from routes import (
+    admin_router,
+    analytics_router,
+    auth_router,
+    cart_router,
+    health_router,
+    inventories_router,
+    loyalty_router,
+    negotiator_router,
+    notifications_router,
+    orders_router,
+    payments_router,
+    products_router,
+    refunds_router,
+    review_router,
+    search_router,
+    social_auth_router,
+    subscriptions_router,
+    user_router,
+    webhooks_router,
+    websockets_router,
+    wishlist_router,
+)
 
 from services.notifications import NotificationService 
 # Import WebSocket Kafka consumer
@@ -189,22 +195,25 @@ v1_router.include_router(cart_router)
 v1_router.include_router(orders_router)
 v1_router.include_router(admin_router)
 v1_router.include_router(social_auth_router)
-v1_router.include_router(blog_router)
-v1_router.include_router(subscription_router)
+v1_router.include_router(subscriptions_router)
 v1_router.include_router(review_router)
-v1_router.include_router(payment_router)
+v1_router.include_router(payments_router)
 v1_router.include_router(wishlist_router)
-v1_router.include_router(notification_router)
+v1_router.include_router(notifications_router)
 v1_router.include_router(health_router)
 v1_router.include_router(search_router)
-v1_router.include_router(inventory_router)
+v1_router.include_router(inventories_router)
 v1_router.include_router(loyalty_router)
+v1_router.include_router(analytics_router)
+v1_router.include_router(negotiator_router)
+v1_router.include_router(refunds_router)
+v1_router.include_router(webhooks_router)
 
 # Include the v1 router into the main app
 app.include_router(v1_router)
 
 # Include WebSocket router
-app.include_router(ws_router)
+app.include_router(websockets_router)
 
 async def run_notification_cleanup():
     # Wait a bit for database initialization to complete

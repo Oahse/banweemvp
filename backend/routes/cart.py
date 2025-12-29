@@ -72,12 +72,35 @@ async def update_cart_item(
 ):
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(req) if not current_user else None
-        cart = await cart_service.update_cart_item_quantity(
-            user_id=current_user.id if current_user else None,
-            item_id=item_id,
-            quantity=request.quantity,
-            session_id=session_id
+        
+        # Get current cart to find the variant_id for this item_id
+        from core.redis import RedisKeyManager
+        cart_key = RedisKeyManager.cart_key(str(current_user.id))
+        cart_data = await cart_service.get_hash(cart_key)
+        
+        if not cart_data or "items" not in cart_data:
+            raise HTTPException(status_code=400, detail="Cart is empty")
+        
+        # Parse items if it's a string
+        if isinstance(cart_data.get("items"), str):
+            import json
+            cart_data["items"] = json.loads(cart_data["items"])
+        
+        # Find the variant_id for this item_id
+        target_variant_id = None
+        for variant_key, item in cart_data["items"].items():
+            if item.get("id") == str(item_id):
+                target_variant_id = UUID(variant_key)
+                break
+        
+        if not target_variant_id:
+            raise HTTPException(status_code=404, detail="Item not found in cart")
+        
+        # Use the existing update_cart_item method
+        cart = await cart_service.update_cart_item(
+            user_id=current_user.id,
+            variant_id=target_variant_id,
+            request=request
         )
         return Response(success=True, data=cart, message="Cart item quantity updated")
     except HTTPException as e:
@@ -97,10 +120,9 @@ async def remove_from_cart(
     try:
         cart_service = CartService(db)
         session_id = get_session_id(req) if not current_user else None
-        cart = await cart_service.remove_from_cart(
+        cart = await cart_service.remove_from_cart_by_item_id(
             user_id=current_user.id if current_user else None,
-            item_id=item_id,
-            session_id=session_id
+            item_id=item_id
         )
         return Response(success=True, data=cart, message="Item removed from cart")
     except HTTPException as e:
