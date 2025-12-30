@@ -9,7 +9,7 @@ from .wishlist import Wishlist, WishlistItem
 from .notifications import Notification, NotificationPreference, NotificationHistory
 from .loyalty import LoyaltyAccount, PointsTransaction
 from .variant_tracking import VariantTrackingEntry, VariantPriceHistory, VariantAnalytics, VariantSubstitution
-from .analytics import UserSession, AnalyticsEvent, ConversionFunnel, UserAnalytics 
+from .analytics import UserSession, AnalyticsEvent, ConversionFunnel, CustomerLifecycleMetrics 
 
 # Consolidated models - single source of truth
 from .orders import Order, OrderItem, TrackingEvent
@@ -93,5 +93,5 @@ __all__ = [
     "UserSession",
     "AnalyticsEvent",
     "ConversionFunnel",
-    "UserAnalytics",
+    "CustomerLifecycleMetrics",
 ]
