@@ -207,19 +207,20 @@ class AuthService:
             jti = payload.get("jti")
             
             if jti:
-                # Blacklist the refresh token's JTI in Redis
-                # The token's expiration is in the payload, use it for Redis TTL
                 expiration_timestamp = payload.get("exp")
                 if expiration_timestamp:
+                    # Blacklist the refresh token's JTI in Redis
                     return await self._blacklist_token_in_redis(jti, expiration_timestamp)
-        return False
+                # If expiration_timestamp is None, implicitly return False by falling through
+            # If jti is None, implicitly return False by falling through
+            return False # Moved this return here, explicitly handles cases where jti or expiration_timestamp is None
             
-    except HTTPException:
-        return False
-    except Exception as e:
-        # Log the error
-        print(f"Error revoking refresh token: {e}")
-        return False
+        except HTTPException:
+            return False
+        except Exception as e:
+            # Log the error
+            print(f"Error revoking refresh token: {e}")
+            return False
 
     async def get_user_by_id(self, user_id: str) -> Optional[User]:
         """Get user by ID."""
