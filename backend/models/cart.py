@@ -53,8 +53,8 @@ class CartItem(BaseModel):
             raise ValueError("Quantity must be a positive integer.")
         return quantity
 
-# Trigger to automatically update the `updated_at` timestamp on the `carts` table
-update_cart_updated_at_trigger = DDL("""
+# DDL statement for the function
+update_cart_updated_at_function = DDL("""
 CREATE OR REPLACE FUNCTION update_cart_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -64,13 +64,18 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+""")
 
+# DDL statement for the trigger
+update_cart_updated_at_trigger_ddl = DDL("""
 CREATE TRIGGER trigger_update_cart_updated_at
 AFTER INSERT OR UPDATE OR DELETE ON cart_items
 FOR EACH ROW
 EXECUTE FUNCTION update_cart_updated_at();
 """)
 
-# Associate the trigger with the CartItem table
-event.listen(CartItem.__table__, 'after_create', update_cart_updated_at_trigger)
+# Associate the function DDL with the CartItem table's creation
+event.listen(CartItem.__table__, 'after_create', update_cart_updated_at_function)
+# Associate the trigger DDL with the CartItem table's creation
+event.listen(CartItem.__table__, 'after_create', update_cart_updated_at_trigger_ddl)
 
