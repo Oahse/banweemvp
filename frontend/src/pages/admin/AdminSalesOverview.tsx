@@ -29,7 +29,6 @@ import {
 import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import AnalyticsAPI from '../../apis/analytics';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { SkeletonDashboard } from '../../components/ui/SkeletonDashboard';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -760,7 +759,10 @@ export const AdminSalesOverview = () => {
           <div className="h-96">
             {loading ? (
               <div className="h-full flex items-center justify-center">
-                <LoadingSpinner text="Loading chart data..." />
+                <div className="flex items-center space-x-2">
+                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-copy-lighter">Loading chart data...</span>
+                </div>
               </div>
             ) : (
               renderChart()

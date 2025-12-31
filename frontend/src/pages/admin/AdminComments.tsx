@@ -151,14 +151,22 @@ export const AdminComments = () => {
                       onClick={() => handleToggleApproved(comment)}
                       disabled={loadingAction === comment.id}
                     >
-                      {loadingAction === comment.id ? <LoadingSpinner size="sm" /> : (comment.is_approved ? 'Unapprove' : 'Approve')}
+                      {loadingAction === comment.id ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        comment.is_approved ? 'Unapprove' : 'Approve'
+                      )}
                     </button>
                     <button
                       className="btn btn-sm btn-error"
                       onClick={() => handleDeleteComment(comment.id)}
                       disabled={loadingAction === comment.id}
                     >
-                      {loadingAction === comment.id ? <LoadingSpinner size="sm" /> : 'Delete'}
+                      {loadingAction === comment.id ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        'Delete'
+                      )}
                     </button>
                   </td>
                 </tr>

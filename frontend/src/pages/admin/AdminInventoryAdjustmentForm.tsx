@@ -115,13 +115,13 @@ export const AdminInventoryAdjustmentForm = () => {
 
   useEffect(() => {
     if (productsError) {
-      console.error('Products error:', productsError);
+      toast.error('Failed to load products');
     }
   }, [productsError]);
 
   useEffect(() => {
     if (locationsError) {
-      console.error('Locations error:', locationsError);
+      toast.error('Failed to load warehouse locations');
     }
   }, [locationsError]);
 
@@ -350,7 +350,7 @@ export const AdminInventoryAdjustmentForm = () => {
           >
             {submitting ? (
               <>
-                <LoadingSpinner size="sm" className="mr-2" text="" />
+                <div className="inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 Processing...
               </>
             ) : (

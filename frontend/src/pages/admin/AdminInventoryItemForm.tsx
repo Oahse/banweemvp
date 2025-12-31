@@ -111,7 +111,14 @@ export const AdminInventoryItemForm = () => {
             className="btn btn-primary"
             disabled={submitting}
           >
-            {submitting ? <LoadingSpinner size="sm" /> : 'Update Inventory'}
+            {submitting ? (
+              <div className="inline-flex items-center">
+                <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Updating...
+              </div>
+            ) : (
+              'Update Inventory'
+            )}
           </button>
         </div>
       </form>

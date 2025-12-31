@@ -171,7 +171,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
  
-
 # Trusted host middleware for security
 if hasattr(settings, 'ALLOWED_HOSTS'):
     app.add_middleware(
