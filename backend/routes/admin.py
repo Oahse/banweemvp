@@ -250,12 +250,21 @@ async def get_all_users(
     """Get all users (admin only)."""
     try:
         admin_service = AdminService(db)
-        users = await admin_service.get_all_users(page, limit, role, search, status, verified)
+        users = await admin_service.get_all_users(
+            page=page, 
+            limit=limit, 
+            role_filter=role, 
+            search=search, 
+            status=status, 
+            verified=verified
+        )
         return Response.success(data=users)
     except Exception as e:
+        import logging
+        logging.error(f"Failed to fetch users: {str(e)}")
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Failed to fetch users"
+            message=f"Failed to fetch users: {str(e)}"
         )
 
 @router.post("/users")
@@ -407,11 +416,16 @@ async def get_all_products_admin(
     db: AsyncSession = Depends(get_db)
 ):
     """Get all products (admin only)."""
+    print(f"DEBUG: Route handler called with page={page}, limit={limit}")
     try:
         admin_service = AdminService(db)
         products = await admin_service.get_all_products(page, limit, search, category, status, supplier)
+        print(f"DEBUG: AdminService returned: {type(products)}")
         return Response.success(data=products)
     except Exception as e:
+        print(f"DEBUG: Exception in route handler: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message="Failed to fetch products"
@@ -463,18 +477,36 @@ async def export_orders(
     try:
         admin_service = AdminService(db)
         
-        orders_data = await admin_service.get_all_orders(
-            page=1, 
-            limit=10000,
-            order_status=order_status,
-            q=q,
-            date_from=date_from,
-            date_to=date_to,
-            min_price=min_price,
-            max_price=max_price
-        )
+        # Fetch all orders using pagination to avoid limit restrictions
+        all_orders = []
+        page = 1
+        limit = 100
         
-        orders = orders_data.get('data', [])
+        while True:
+            orders_data = await admin_service.get_all_orders(
+                page=page, 
+                limit=limit,
+                order_status=order_status,
+                q=q,
+                date_from=date_from,
+                date_to=date_to,
+                min_price=min_price,
+                max_price=max_price
+            )
+            
+            orders_batch = orders_data.get('data', [])
+            if not orders_batch:
+                break
+                
+            all_orders.extend(orders_batch)
+            
+            # If we got less than the limit, we've reached the end
+            if len(orders_batch) < limit:
+                break
+                
+            page += 1
+        
+        orders = all_orders
         
         export_service = ExportService()
         

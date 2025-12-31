@@ -6,6 +6,7 @@ import { AdminAPI } from '../../apis';
 import { useCategories } from '../../contexts/CategoryContext';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
+import { PLACEHOLDER_IMAGES } from '../../utils/placeholderImage';
 
 export const AdminProducts = () => {
   const navigate = useNavigate();
@@ -150,17 +151,27 @@ export const AdminProducts = () => {
               label: 'Product',
               mobileLabel: 'Product',
               render: (product) => {
-                const primaryVariant = product.variants?.[0];
+                const primaryVariant = product.primary_variant || product.variants?.[0];
+                const imageUrl = primaryVariant?.primary_image?.url || 
+                               primaryVariant?.images?.[0]?.url || 
+                               PLACEHOLDER_IMAGES.small;
                 return (
                   <div className="flex items-center">
                     <img 
-                      src={primaryVariant?.images?.[0]?.url || 'https://via.placeholder.com/100'} 
+                      src={imageUrl} 
                       alt={product.name} 
-                      className="w-10 h-10 rounded-md object-cover mr-3" 
+                      className="w-12 h-12 rounded-md object-cover mr-3 border border-border-light" 
+                      onError={(e) => {
+                        e.currentTarget.src = PLACEHOLDER_IMAGES.small;
+                      }}
                     />
                     <div>
                       <p className="font-medium text-main">{product.name}</p>
-                      <p className="text-xs text-copy-light">ID: {product.id}</p>
+                      <p className="text-xs text-copy-light">
+                        {product.short_description && product.short_description.length > 50 
+                          ? `${product.short_description.substring(0, 50)}...` 
+                          : product.short_description || `ID: ${product.id.substring(0, 8)}...`}
+                      </p>
                     </div>
                   </div>
                 );
@@ -170,35 +181,57 @@ export const AdminProducts = () => {
               key: 'sku',
               label: 'SKU',
               hideOnMobile: true,
-              render: (product) => (
-                <span className="text-copy-light">{product.variants?.[0]?.sku || 'N/A'}</span>
-              ),
+              render: (product) => {
+                const primaryVariant = product.primary_variant || product.variants?.[0];
+                return (
+                  <span className="text-copy-light font-mono text-sm">
+                    {primaryVariant?.sku || 'N/A'}
+                  </span>
+                );
+              },
             },
             {
               key: 'category',
               label: 'Category',
               render: (product) => (
-                <span className="text-copy-light">{product.category?.name || 'Uncategorized'}</span>
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-surface-hover text-copy">
+                  {product.category?.name || 'Uncategorized'}
+                </span>
               ),
             },
             {
               key: 'price',
               label: 'Price',
               render: (product) => {
-                const primaryVariant = product.variants?.[0];
-                return primaryVariant?.sale_price ? (
-                  <div>
-                    <span className="font-medium text-main">
-                      ${primaryVariant.sale_price.toFixed(2)}
-                    </span>
-                    <span className="text-xs text-copy-light line-through ml-2">
-                      ${primaryVariant.base_price.toFixed(2)}
-                    </span>
+                const primaryVariant = product.primary_variant || product.variants?.[0];
+                if (!primaryVariant) {
+                  return <span className="text-copy-light">N/A</span>;
+                }
+                
+                const hasDiscount = primaryVariant.sale_price && primaryVariant.sale_price < primaryVariant.base_price;
+                
+                return (
+                  <div className="text-right">
+                    {hasDiscount ? (
+                      <div>
+                        <span className="font-medium text-success">
+                          ${primaryVariant.sale_price.toFixed(2)}
+                        </span>
+                        <div className="text-xs text-copy-light line-through">
+                          ${primaryVariant.base_price.toFixed(2)}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="font-medium text-main">
+                        ${primaryVariant.base_price?.toFixed(2) || '0.00'}
+                      </span>
+                    )}
+                    {product.min_price !== product.max_price && (
+                      <div className="text-xs text-copy-light">
+                        ${product.min_price?.toFixed(2)} - ${product.max_price?.toFixed(2)}
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <span className="font-medium text-main">
-                    ${primaryVariant?.base_price?.toFixed(2) || '0.00'}
-                  </span>
                 );
               },
             },
@@ -206,26 +239,55 @@ export const AdminProducts = () => {
               key: 'stock',
               label: 'Stock',
               render: (product) => {
-                const totalStock = Array.isArray(product.variants)
-                  ? product.variants.reduce((sum: number, variant: any) => sum + (variant.stock || 0), 0)
-                  : 0;
-                return <span className="text-copy-light">{totalStock}</span>;
+                const totalStock = product.total_stock || 0;
+                return (
+                  <div className="text-center">
+                    <span className={`font-medium ${
+                      totalStock === 0 ? 'text-error' : 
+                      totalStock <= 10 ? 'text-warning' : 
+                      'text-success'
+                    }`}>
+                      {totalStock}
+                    </span>
+                    <div className="text-xs text-copy-light">units</div>
+                  </div>
+                );
               },
             },
             {
               key: 'status',
               label: 'Status',
               render: (product) => {
-                const totalStock = Array.isArray(product.variants)
-                  ? product.variants.reduce((sum: number, variant: any) => sum + (variant.stock || 0), 0)
-                  : 0;
-                const status = totalStock === 0 ? 'Out of Stock' : totalStock < 10 ? 'Low Stock' : 'Active';
+                const stockStatus = product.stock_status || 'unknown';
+                const isActive = product.is_active && product.product_status === 'active';
+                
+                let status, colorClass;
+                
+                if (!isActive) {
+                  status = 'Inactive';
+                  colorClass = 'bg-gray-100 text-gray-600';
+                } else {
+                  switch (stockStatus) {
+                    case 'in_stock':
+                      status = 'In Stock';
+                      colorClass = 'bg-success/10 text-success';
+                      break;
+                    case 'low_stock':
+                      status = 'Low Stock';
+                      colorClass = 'bg-warning/10 text-warning';
+                      break;
+                    case 'out_of_stock':
+                      status = 'Out of Stock';
+                      colorClass = 'bg-error/10 text-error';
+                      break;
+                    default:
+                      status = 'Unknown';
+                      colorClass = 'bg-gray-100 text-gray-600';
+                  }
+                }
+                
                 return (
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    status === 'Active' ? 'bg-success/10 text-success' :
-                    status === 'Low Stock' ? 'bg-warning/10 text-warning' :
-                    'bg-error/10 text-error'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>
                     {status}
                   </span>
                 );
@@ -236,13 +298,15 @@ export const AdminProducts = () => {
               label: 'Variants',
               hideOnMobile: true,
               render: (product) => (
-                <Link 
-                  to={`/admin/products/${product.id}/variants`} 
-                  className="text-primary hover:underline"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {product.variants?.length || 0}
-                </Link>
+                <div className="text-center">
+                  <Link 
+                    to={`/admin/products/${product.id}/variants`} 
+                    className="inline-flex items-center px-2 py-1 text-xs bg-primary/10 text-primary rounded-md hover:bg-primary/20 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {product.variants?.length || 0} variant{(product.variants?.length || 0) !== 1 ? 's' : ''}
+                  </Link>
+                </div>
               ),
             },
             {
@@ -291,7 +355,7 @@ export const AdminProducts = () => {
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover"
             >
               Previous
             </button>
@@ -301,7 +365,7 @@ export const AdminProducts = () => {
                 <button
                   key={pageNum + 1}
                   onClick={() => goToPage(pageNum + 1)}
-                  className={`px-3 py-1 text-sm rounded-md ${
+                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
                     currentPage === pageNum + 1
                       ? 'bg-primary text-white'
                       : 'border border-border text-copy hover:bg-surface-hover'
@@ -315,7 +379,7 @@ export const AdminProducts = () => {
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover"
             >
               Next
             </button>

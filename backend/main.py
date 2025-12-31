@@ -228,10 +228,6 @@ async def run_notification_cleanup():
         # Run every X seconds
         await asyncio.sleep(settings.NOTIFICATION_CLEANUP_INTERVAL_SECONDS)
 
-
-
-
-
 @app.get("/")
 async def read_root():
     return {
@@ -240,7 +236,6 @@ async def read_root():
         "version": "1.0.0",
         "description": "Discover premium organic products from Africa. Ethically sourced, sustainably produced, and delivered to your doorstep.",
     }
-
 
 # Register exception handlers
 app.add_exception_handler(APIException, api_exception_handler)

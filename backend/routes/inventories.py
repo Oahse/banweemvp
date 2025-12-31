@@ -196,6 +196,13 @@ async def delete_warehouse_location(
 
 
 # --- Inventory Item Endpoints ---
+# --- Inventory CRUD Endpoints ---
+@router.get("/test")
+async def test_endpoint():
+    """Simple test endpoint"""
+    return {"message": "Hello World", "status": "working"}
+
+
 @router.post("/")
 async def create_inventory_item(
     inventory_data: InventoryCreate,
@@ -224,8 +231,16 @@ async def get_all_inventory_items(
 ):
     """Get all inventory items with filters (Admin/Supplier access)."""
     try:
-        items = await inventory_service.get_all_inventory_items(page, limit, product_id, location_id, low_stock)
+        items = await inventory_service.get_all_inventory_items(
+            page=page,
+            limit=limit,
+            product_id=product_id,
+            location_id=location_id,
+            low_stock=low_stock
+        )
         return Response.success(data=items)
+    except APIException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch inventory items: {e}")
 
@@ -312,3 +327,22 @@ async def get_stock_adjustments(
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch stock adjustments: {e}")
+
+
+@router.get("/adjustments/all")
+async def get_all_stock_adjustments(
+    current_user: User = Depends(require_admin_or_supplier),
+    inventory_service: InventoryService = Depends(get_inventory_service)
+):
+    """Get all stock adjustments across all inventory items (Admin/Supplier access)."""
+    try:
+        adjustments = await inventory_service.get_all_stock_adjustments()
+        return Response.success(data=adjustments)
+    except APIException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch all stock adjustments: {e}")
+
+
+# --- Warehouse Location Endpoints ---
+# (Already defined above, removing duplicates)

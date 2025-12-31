@@ -356,24 +356,6 @@ export interface DashboardStats {
   revenue_trend?: Array<{ date: string; amount: number }>;
 }
 
-// System Settings Types
-export interface SystemSetting {
-  id: string;
-  key: string;
-  value: string;
-  value_type: 'string' | 'integer' | 'float' | 'boolean' | 'uuid';
-  description?: string;
-  created_at: string;
-  updated_at?: string;
-}
-
-export interface SystemSettingUpdate {
-  value?: string;
-  value_type?: 'string' | 'integer' | 'float' | 'boolean' | 'uuid';
-  description?: string;
-}
-
-
 // Filter Types
 export interface ProductFilters {
   search?: string;
@@ -517,5 +499,106 @@ export interface ActivityLog {
   action_type: string;
   description: string;
   metadata?: Record<string, any>;
+  created_at: string;
+}
+
+// Inventory Types
+export interface WarehouseLocation {
+  id: string;
+  name: string;
+  address?: string;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface WarehouseLocationResponse extends WarehouseLocation {
+  data?: WarehouseLocation[];
+}
+
+export interface WarehouseLocationCreate {
+  name: string;
+  address?: string;
+  description?: string;
+}
+
+export interface WarehouseLocationUpdate {
+  name?: string;
+  address?: string;
+  description?: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  variant_id: string;
+  location_id: string;
+  quantity: number;
+  quantity_available: number;
+  low_stock_threshold: number;
+  reorder_point: number;
+  inventory_status: string;
+  last_restocked_at?: string;
+  last_sold_at?: string;
+  version: number;
+  variant?: ProductVariant;
+  location?: WarehouseLocation;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface InventoryResponse extends InventoryItem {}
+
+export interface InventoryCreate {
+  variant_id: string;
+  location_id: string;
+  quantity: number;
+  quantity_available?: number;
+  low_stock_threshold?: number;
+  reorder_point?: number;
+  inventory_status?: string;
+}
+
+export interface InventoryUpdate {
+  location_id?: string;
+  quantity?: number;
+  quantity_available?: number;
+  low_stock_threshold?: number;
+  reorder_point?: number;
+  inventory_status?: string;
+}
+
+export interface StockAdjustment {
+  id: string;
+  inventory_id: string;
+  variant_id: string;
+  quantity_change: number;
+  reason: string;
+  notes?: string;
+  adjusted_by_user_id?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface StockAdjustmentCreate {
+  variant_id: string;
+  location_id?: string;
+  quantity_change: number;
+  reason: string;
+  notes?: string;
+  product_id?: string; // For form selection
+}
+
+export interface StockAdjustmentResponse extends StockAdjustment {}
+
+export interface InventoryAdjustment {
+  id: string;
+  inventory_item_id: string;
+  adjustment_type: 'increase' | 'decrease' | 'set';
+  quantity_change: number;
+  new_quantity: number;
+  reason?: string;
+  notes?: string;
+  created_by?: string;
   created_at: string;
 }

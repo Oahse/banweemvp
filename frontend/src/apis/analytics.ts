@@ -17,7 +17,7 @@ export class AnalyticsAPI {
     product_id?: string;
     revenue?: number;
   }) {
-    return await apiClient.post('/analytics/track', eventData);
+    return await apiClient.post('/analytics/track', eventData, {});
   }
 
   /**
@@ -37,7 +37,7 @@ export class AnalyticsAPI {
     if (params?.days) queryParams.append('days', params.days.toString());
 
     const url = `/analytics/conversion-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return await apiClient.get(url);
+    return await apiClient.get(url, {});
   }
 
   /**
@@ -55,7 +55,7 @@ export class AnalyticsAPI {
     if (params?.days) queryParams.append('days', params.days.toString());
 
     const url = `/analytics/cart-abandonment${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return await apiClient.get(url);
+    return await apiClient.get(url, {});
   }
 
   /**
@@ -73,7 +73,7 @@ export class AnalyticsAPI {
     if (params?.days) queryParams.append('days', params.days.toString());
 
     const url = `/analytics/time-to-purchase${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return await apiClient.get(url);
+    return await apiClient.get(url, {});
   }
 
   /**
@@ -91,7 +91,7 @@ export class AnalyticsAPI {
     if (params?.days) queryParams.append('days', params.days.toString());
 
     const url = `/analytics/refund-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return await apiClient.get(url);
+    return await apiClient.get(url, {});
   }
 
   /**
@@ -109,7 +109,7 @@ export class AnalyticsAPI {
     if (params?.days) queryParams.append('days', params.days.toString());
 
     const url = `/analytics/repeat-customers${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return await apiClient.get(url);
+    return await apiClient.get(url, {});
   }
 
   /**
@@ -127,7 +127,33 @@ export class AnalyticsAPI {
     if (params?.days) queryParams.append('days', params.days.toString());
 
     const url = `/analytics/dashboard${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return await apiClient.get(url);
+    return await apiClient.get(url, {});
+  }
+
+  /**
+   * Get sales overview data for dashboard
+   */
+  static async getSalesOverview(params?: {
+    start_date?: string;
+    end_date?: string;
+    days?: number;
+    granularity?: 'daily' | 'weekly' | 'monthly';
+    categories?: string[];
+    regions?: string[];
+    sales_channels?: string[];
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.start_date) queryParams.append('start_date', params.start_date);
+    if (params?.end_date) queryParams.append('end_date', params.end_date);
+    if (params?.days) queryParams.append('days', params.days.toString());
+    if (params?.granularity) queryParams.append('granularity', params.granularity);
+    if (params?.categories?.length) queryParams.append('categories', params.categories.join(','));
+    if (params?.regions?.length) queryParams.append('regions', params.regions.join(','));
+    if (params?.sales_channels?.length) queryParams.append('sales_channels', params.sales_channels.join(','));
+
+    const url = `/analytics/sales-overview${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url, {});
   }
 
   /**
@@ -147,7 +173,29 @@ export class AnalyticsAPI {
     if (params?.compare_previous !== undefined) queryParams.append('compare_previous', params.compare_previous.toString());
 
     const url = `/analytics/kpis${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return await apiClient.get(url);
+    return await apiClient.get(url, {});
+  }
+
+  /**
+   * Get recent activity (placeholder - uses admin stats for now)
+   */
+  static async getRecentActivity(params?: {
+    limit?: number;
+  }) {
+    // For now, return empty data since this endpoint doesn't exist
+    return { data: [] };
+  }
+
+  /**
+   * Export analytics data (placeholder)
+   */
+  static async exportAnalytics(params: {
+    type: string;
+    format: string;
+    filters?: any;
+  }) {
+    // For now, just show a message since this endpoint doesn't exist
+    throw new Error('Export functionality not yet implemented');
   }
 }
 

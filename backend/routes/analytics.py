@@ -346,6 +346,58 @@ async def get_sales_trend(
         )
 
 
+@router.get("/sales-overview")
+async def get_sales_overview(
+    start_date: Optional[datetime] = Query(None, description="Start date (ISO format)"),
+    end_date: Optional[datetime] = Query(None, description="End date (ISO format)"),
+    days: Optional[int] = Query(30, description="Number of days back from today"),
+    granularity: str = Query("daily", description="Data granularity: daily, weekly, monthly"),
+    categories: Optional[str] = Query(None, description="Comma-separated category IDs"),
+    regions: Optional[str] = Query(None, description="Comma-separated region IDs"),
+    sales_channels: Optional[str] = Query("online,instore", description="Comma-separated sales channels"),
+    current_user: User = Depends(require_admin),
+    analytics_service: AnalyticsService = Depends(get_analytics_service)
+):
+    """
+    Get comprehensive sales overview data for dashboard
+    
+    Returns sales metrics, chart data, and performance indicators
+    optimized for the sales overview dashboard.
+    """
+    try:
+        # Set default date range if not provided
+        if not end_date:
+            end_date = datetime.now(timezone.utc)
+        if not start_date:
+            start_date = end_date - timedelta(days=days)
+        
+        # Parse filter parameters
+        category_list = categories.split(',') if categories else []
+        region_list = regions.split(',') if regions else []
+        channel_list = sales_channels.split(',') if sales_channels else ['online', 'instore']
+        
+        # Get sales overview data
+        overview_data = await analytics_service.get_sales_overview_data(
+            start_date=start_date,
+            end_date=end_date,
+            granularity=granularity,
+            categories=category_list,
+            regions=region_list,
+            sales_channels=channel_list
+        )
+        
+        return Response.success(
+            data=overview_data,
+            message="Sales overview data retrieved successfully"
+        )
+        
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to retrieve sales overview data: {str(e)}"
+        )
+
+
 @router.get("/kpis")
 async def get_key_performance_indicators(
     start_date: Optional[datetime] = Query(None, description="Start date (ISO format)"),

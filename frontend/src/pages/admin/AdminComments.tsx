@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';
 import { CommentResponse } from '../../types';
 import { Link } from 'react-router-dom';
+import { SkeletonTable } from '../../components/ui/SkeletonTable';
 
 export const AdminComments = () => {
   const [comments, setComments] = useState<CommentResponse[]>([]);
@@ -84,7 +84,15 @@ export const AdminComments = () => {
   }, [loadComments]);
 
   if (loading && !fetchedComments) {
-    return <LoadingSpinner />;
+    return (
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-main mb-2">Comments Management</h1>
+          <p className="text-copy-lighter">Moderate and manage user comments.</p>
+        </div>
+        <SkeletonTable rows={5} columns={4} />
+      </div>
+    );
   }
 
   if (error) {

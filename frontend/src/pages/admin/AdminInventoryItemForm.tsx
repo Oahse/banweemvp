@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';
 import { InventoryUpdate, InventoryResponse } from '../../types';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Input } from '../../components/forms/Input';
+import { SkeletonForm } from '../../components/ui/SkeletonForm';
 
 export const AdminInventoryItemForm = () => {
   const { inventoryId } = useParams<{ inventoryId: string }>(); // inventoryId is required for editing
@@ -63,7 +63,7 @@ export const AdminInventoryItemForm = () => {
   }, [inventoryId, formData, navigate, submitInventoryItem]);
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <SkeletonForm fields={3} />;
   }
 
   if (error) {

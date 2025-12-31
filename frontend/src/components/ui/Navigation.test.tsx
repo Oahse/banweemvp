@@ -32,7 +32,6 @@ describe('Navigation Component', () => {
       icon: <SettingsIcon data-testid="settings-icon" />,
       children: [
         { label: 'Users', href: '/admin/users' },
-        { label: 'Settings', href: '/admin/settings' },
       ],
     },
     { label: 'External', href: 'https://example.com', external: true },

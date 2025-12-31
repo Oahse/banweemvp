@@ -18,7 +18,7 @@ describe('AdminLayout - Logo Navigation Property Tests', () => {
   it('Property 44: Logo navigation - logo link should always point to /admin', () => {
     fc.assert(
       fc.property(
-        fc.constantFrom('/admin/analytics', '/admin/users', '/admin/products', '/admin/orders', '/admin/settings'),
+        fc.constantFrom('/admin/analytics', '/admin/users', '/admin/products', '/admin/orders'),
         (currentRoute) => {
           // Property: Regardless of current route, logo should link to /admin
           const expectedLogoHref = '/admin';
@@ -79,7 +79,6 @@ describe('AdminLayout - Logo Navigation Property Tests', () => {
       '/admin/orders': 'Orders',
       '/admin/products': 'Products',
       '/admin/users': 'Users',
-      '/admin/settings': 'Settings',
       '/admin/notifications': 'Notifications',
     };
 

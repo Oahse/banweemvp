@@ -1,118 +1,236 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';
-import { StockAdjustmentCreate, Product, WarehouseLocationResponse, InventoryResponse } from '../../types';
+import { StockAdjustmentCreate, Product, WarehouseLocationResponse } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '../../components/forms/Input';
 import { Select } from '../../components/forms/Select';
 import { Textarea } from '../../components/forms/Textarea';
+import { SkeletonForm } from '../../components/ui/SkeletonForm';
+import { useAuth } from '../../contexts/AuthContext';
+
+interface ProductVariant {
+  id: string;
+  product_id: string;
+  name: string;
+  sku: string;
+  base_price: number;
+  sale_price?: number;
+  is_active: boolean;
+}
 
 export const AdminInventoryAdjustmentForm = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
   const [formData, setFormData] = useState<StockAdjustmentCreate>({
-    variant_id: undefined,
-    location_id: undefined,
+    variant_id: '',
+    location_id: '',
     quantity_change: 0,
     reason: '',
     notes: '',
+    product_id: '',
   });
   const [submitting, setSubmitting] = useState(false);
-
   const [products, setProducts] = useState<Product[]>([]);
   const [locations, setLocations] = useState<WarehouseLocationResponse[]>([]);
-  const [productVariants, setProductVariants] = useState<InventoryResponse['variant'][]>([]);
+  const [productVariants, setProductVariants] = useState<ProductVariant[]>([]);
 
   // API hooks
   const { data: fetchedProducts, loading: loadingProducts, error: productsError, execute: fetchProducts } = useApi<{ data: Product[] }>();
-  const { data: fetchedLocations, loading: loadingLocations, error: locationsError, execute: fetchLocations } = useApi<WarehouseLocationResponse[]>();
-  const { data: fetchedVariants, loading: loadingVariants, error: variantsError, execute: fetchVariants } = useApi<InventoryResponse['variant'][]>();
-  const { execute: submitAdjustment } = useApi<InventoryResponse>();
+  const { data: fetchedLocations, loading: loadingLocations, error: locationsError, execute: fetchLocations } = useApi<any>();
+  const { data: fetchedVariants, loading: loadingVariants, error: variantsError, execute: fetchVariants } = useApi<any>();
+  const { execute: submitAdjustment } = useApi();
 
+  // Function to fetch all products by making multiple paginated requests
+  const fetchAllProducts = useCallback(async () => {
+    try {
+      let allProducts: Product[] = [];
+      let page = 1;
+      let hasMore = true;
+      
+      while (hasMore) {
+        const response = await AdminAPI.getAllProducts({ limit: 100, page });
+        // The response structure is { data: { data: [...products...], pagination: {...} } }
+        const productsData = response.data?.data || response.data || [];
+        
+        // Ensure we have an array
+        if (Array.isArray(productsData)) {
+          allProducts = [...allProducts, ...productsData];
+          // If we got less than 100 products, we've reached the end
+          hasMore = productsData.length === 100;
+        } else {
+          // If it's not an array, we might have a different response structure
+          console.warn('Unexpected response structure:', response);
+          hasMore = false;
+        }
+        
+        page++;
+      }
+      
+      return { data: allProducts };
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
+  }, []);
 
   useEffect(() => {
-    fetchProducts(() => AdminAPI.getAllProducts({ limit: 9999 }));
+    fetchProducts(fetchAllProducts);
     fetchLocations(AdminAPI.getWarehouseLocations);
-  }, [fetchProducts, fetchLocations]);
+  }, [fetchProducts, fetchLocations, fetchAllProducts]);
 
   useEffect(() => {
     if (fetchedProducts) {
-      setProducts(fetchedProducts.data);
+      setProducts(fetchedProducts.data || []);
     }
   }, [fetchedProducts]);
 
   useEffect(() => {
     if (fetchedLocations) {
-      setLocations(fetchedLocations.data);
+      // Handle both direct array and wrapped response formats
+      const locationsData = Array.isArray(fetchedLocations) ? fetchedLocations : fetchedLocations.data;
+      setLocations(locationsData || []);
     }
   }, [fetchedLocations]);
 
   // Fetch variants when a product is selected
   useEffect(() => {
     if (formData.product_id) {
-        // Find the product based on the selected variant's product_id
-        // This is a simplification; ideally, we'd fetch variants directly for the selected product.
-        // For now, let's assume we fetch all variants and filter.
-        // AdminAPI.getAllVariants should ideally return variants with product_id.
-        // Let's call AdminAPI.getAllVariants and then filter by product_id in the frontend
-        fetchVariants(() => AdminAPI.getAllVariants({ product_id: formData.product_id }));
+      fetchVariants(() => AdminAPI.getAllVariants({ product_id: formData.product_id }));
     } else {
-        setProductVariants([]);
+      setProductVariants([]);
     }
   }, [formData.product_id, fetchVariants]);
 
   useEffect(() => {
     if (fetchedVariants) {
-        setProductVariants(fetchedVariants.data);
+      // Handle the same nested structure as products: response.data.data
+      const variantsData = fetchedVariants.data?.data || fetchedVariants.data || [];
+      setProductVariants(Array.isArray(variantsData) ? variantsData : []);
     }
   }, [fetchedVariants]);
 
+  useEffect(() => {
+    if (productsError) {
+      console.error('Products error:', productsError);
+    }
+  }, [productsError]);
+
+  useEffect(() => {
+    if (locationsError) {
+      console.error('Locations error:', locationsError);
+    }
+  }, [locationsError]);
+
+  useEffect(() => {
+    if (variantsError) {
+      toast.error('Failed to load product variants');
+    }
+  }, [variantsError]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value === '' ? undefined : value, // Convert empty strings to undefined for UUIDs
-    }));
+    
+    // Handle numeric inputs
+    if (name === 'quantity_change') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: parseInt(value) || 0,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+
+    // Reset variant selection when product changes
+    if (name === 'product_id') {
+      setFormData(prev => ({
+        ...prev,
+        variant_id: '',
+      }));
+    }
   }, []);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    
     try {
-      if (!formData.variant_id || !formData.location_id || formData.quantity_change === 0 || !formData.reason) {
-        toast.error('Please fill all required fields.');
+      // Validation
+      if (!formData.variant_id) {
+        toast.error('Please select a product variant.');
         return;
       }
-      await submitAdjustment(() => AdminAPI.adjustStock(formData));
+      if (!formData.location_id) {
+        toast.error('Please select a location.');
+        return;
+      }
+      if (formData.quantity_change === 0) {
+        toast.error('Please enter a quantity change (positive or negative).');
+        return;
+      }
+      if (!formData.reason.trim()) {
+        toast.error('Please provide a reason for the adjustment.');
+        return;
+      }
+
+      // Create adjustment data without product_id (backend doesn't need it)
+      const adjustmentData = {
+        variant_id: formData.variant_id,
+        location_id: formData.location_id,
+        quantity_change: formData.quantity_change,
+        reason: formData.reason.trim(),
+        notes: formData.notes?.trim() || undefined,
+      };
+
+      await submitAdjustment(() => AdminAPI.adjustStock(adjustmentData));
       toast.success('Stock adjusted successfully!');
       navigate('/admin/inventory');
     } catch (err: any) {
+      console.error('Stock adjustment error:', err);
       toast.error(`Failed to adjust stock: ${err.message || 'Unknown error'}`);
     } finally {
       setSubmitting(false);
     }
   }, [formData, navigate, submitAdjustment]);
 
-  const productOptions = products.map(p => ({ value: p.id, label: p.name }));
-  const locationOptions = locations.map(l => ({ value: l.id, label: l.name }));
-  const variantOptions = productVariants
-    .filter(v => v.product_id === formData.product_id) // Filter variants by selected product
-    .map(v => ({ value: v.id, label: v.name }));
+  const productOptions = Array.isArray(products) ? products.map(p => ({ value: p.id, label: p.name })) : [];
+  const locationOptions = Array.isArray(locations) ? locations.map(l => ({ value: l.id, label: l.name })) : [];
+  const variantOptions = Array.isArray(productVariants) ? productVariants.map(v => ({ 
+    value: v.id, 
+    label: `${v.name} (${v.sku})` 
+  })) : [];
 
-
-  if (loadingProducts || loadingLocations || loadingVariants) {
-    return <LoadingSpinner />;
-  }
-
-  if (productsError || locationsError || variantsError) {
+  if (loadingProducts || loadingLocations) {
     return (
       <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-main mb-2">Adjust Inventory Stock</h1>
+          <p className="text-copy-lighter">Make adjustments to product inventory levels across different warehouse locations.</p>
+        </div>
+        <SkeletonForm fields={6} layout="grid" />
+      </div>
+    );
+  }
+
+  if (productsError || locationsError) {
+    return (
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-main mb-2">Adjust Inventory Stock</h1>
+          <p className="text-copy-lighter">Make adjustments to product inventory levels across different warehouse locations.</p>
+        </div>
         <ErrorMessage
-          error={productsError || locationsError || variantsError}
-          onRetry={() => { fetchProducts(() => AdminAPI.getAllProducts({ limit: 9999 })); fetchLocations(AdminAPI.getWarehouseLocations); }}
+          error={productsError || locationsError}
+          onRetry={() => { 
+            fetchProducts(fetchAllProducts); 
+            fetchLocations(AdminAPI.getWarehouseLocations); 
+          }}
           onDismiss={() => {}}
         />
       </div>
@@ -121,62 +239,105 @@ export const AdminInventoryAdjustmentForm = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-main mb-6">Adjust Inventory Stock</h1>
-      <form onSubmit={handleSubmit} className="bg-surface rounded-lg shadow-sm p-6 border border-border-light">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-main mb-2">Adjust Inventory Stock</h1>
+        <p className="text-copy-lighter">Make adjustments to product inventory levels across different warehouse locations.</p>
+      </div>
+      
+      {/* Show helpful message if no data is available */}
+      {!loadingProducts && !loadingLocations && products.length === 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <p className="text-yellow-800">
+            No products found. Please ensure you have products created before making inventory adjustments.
+          </p>
+        </div>
+      )}
+      
+      {!loadingProducts && !loadingLocations && locations.length === 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <p className="text-yellow-800">
+            No warehouse locations found. Please create warehouse locations before making inventory adjustments.
+          </p>
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit} className="bg-surface rounded-lg shadow-sm p-6 border border-border-light max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="md:col-span-2">
+            <Select
+              label="Product *"
+              name="product_id"
+              value={formData.product_id}
+              onChange={handleChange}
+              options={[{ value: '', label: 'Select a product...' }, ...productOptions]}
+              required
+            />
+          </div>
+          
           <Select
-            label="Product"
-            name="product_id"
-            value={formData.product_id || ''}
-            onChange={handleChange}
-            options={[{ value: '', label: 'Select Product' }, ...productOptions]}
-            required
-          />
-          <Select
-            label="Product Variant"
+            label="Product Variant *"
             name="variant_id"
-            value={formData.variant_id || ''}
+            value={formData.variant_id}
             onChange={handleChange}
-            options={[{ value: '', label: 'Select Variant' }, ...variantOptions]}
-            disabled={!formData.product_id || variantOptions.length === 0}
+            options={[
+              { 
+                value: '', 
+                label: formData.product_id ? 
+                  (loadingVariants ? 'Loading variants...' : 
+                   (variantOptions.length > 0 ? 'Select a variant...' : 'No variants found')) : 
+                  'Select a product first' 
+              }, 
+              ...variantOptions
+            ]}
+            disabled={!formData.product_id || loadingVariants}
             required
           />
+          
           <Select
-            label="Location"
+            label="Warehouse Location *"
             name="location_id"
-            value={formData.location_id || ''}
+            value={formData.location_id}
             onChange={handleChange}
-            options={[{ value: '', label: 'Select Location' }, ...locationOptions]}
+            options={[{ value: '', label: 'Select a location...' }, ...locationOptions]}
             required
           />
+          
           <Input
-            label="Quantity Change"
+            label="Quantity Change *"
             name="quantity_change"
             type="number"
             value={formData.quantity_change}
             onChange={handleChange}
+            placeholder="Enter positive or negative number"
+            helperText="Use positive numbers to increase stock, negative to decrease"
             required
           />
+          
           <Input
-            label="Reason for Adjustment"
+            label="Reason for Adjustment *"
             name="reason"
             value={formData.reason}
             onChange={handleChange}
+            placeholder="e.g., Damaged goods, Restock, Inventory correction"
             required
           />
-          <Textarea
-            label="Notes"
-            name="notes"
-            value={formData.notes || ''}
-            onChange={handleChange}
-            rows={3}
-          />
+          
+          <div className="md:col-span-2">
+            <Textarea
+              label="Additional Notes"
+              name="notes"
+              value={formData.notes || ''}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Optional additional details about this adjustment..."
+            />
+          </div>
         </div>
 
-        <div className="mt-6 text-right">
+        <div className="flex items-center justify-between pt-6 border-t border-border-light">
           <button
             type="button"
-            className="btn btn-secondary mr-2"
+            className="px-4 py-2 text-copy-lighter hover:text-copy border border-border rounded-md hover:bg-surface-hover transition-colors"
             onClick={() => navigate('/admin/inventory')}
             disabled={submitting}
           >
@@ -184,10 +345,17 @@ export const AdminInventoryAdjustmentForm = () => {
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
-            disabled={submitting}
+            className="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+            disabled={submitting || products.length === 0 || locations.length === 0}
           >
-            {submitting ? <LoadingSpinner size="sm" /> : 'Submit Adjustment'}
+            {submitting ? (
+              <>
+                <LoadingSpinner size="sm" className="mr-2" text="" />
+                Processing...
+              </>
+            ) : (
+              'Submit Adjustment'
+            )}
           </button>
         </div>
       </form>

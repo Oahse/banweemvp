@@ -1,3 +1,12 @@
+import React from 'react';
+
+interface LoadingSpinnerProps {
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  className?: string;
+  text?: string;
+  fullScreen?: boolean;
+}
+
 /**
  * Reusable Loading Spinner component
  * @param {Object} props
@@ -6,7 +15,7 @@
  * @param {string} props.text - Optional loading text
  * @param {boolean} props.fullScreen - Whether to display as full screen overlay
  */
-export const LoadingSpinner = ({
+export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'md',
   className = '',
   text,

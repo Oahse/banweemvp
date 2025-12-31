@@ -8,7 +8,6 @@ import {
   PackageIcon,
   ShoppingCartIcon,
   BarChart3Icon,
-  SettingsIcon,
   BellIcon,
   MenuIcon,
   LogOutIcon,
@@ -18,10 +17,10 @@ import {
   FolderIcon,
   HashIcon,
   MessageSquareIcon,
-  ActivityIcon,
   BoxesIcon,
   MapPinIcon,
-  ArrowUpDownIcon
+  ArrowUpDownIcon,
+  TrendingUpIcon
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -45,14 +44,13 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   const menuItems = [
     { title: 'Dashboard', path: '/admin', icon: <LayoutDashboardIcon size={20} /> },
+    { title: 'Sales Overview', path: '/admin/sales-overview', icon: <TrendingUpIcon size={20} /> },
     { title: 'Analytics', path: '/admin/analytics', icon: <BarChart3Icon size={20} /> },
     { title: 'Orders', path: '/admin/orders', icon: <ShoppingCartIcon size={20} /> },
     { title: 'Products', path: '/admin/products', icon: <PackageIcon size={20} /> },
     { title: 'Variants', path: '/admin/variants', icon: <TagIcon size={20} /> },
     { title: 'Users', path: '/admin/users', icon: <UsersIcon size={20} /> },
     { title: 'Notifications', path: '/admin/notifications', icon: <BellIcon size={20} /> },
-    { title: 'Settings', path: '/admin/settings', icon: <SettingsIcon size={20} /> },
-    { title: 'Activity Logs', path: '/admin/activity-logs', icon: <ActivityIcon size={20} /> },
     { title: 'Inventory', path: '/admin/inventory', icon: <BoxesIcon size={20} /> },
     { title: 'Locations', path: '/admin/inventory/locations', icon: <MapPinIcon size={20} /> },
     { title: 'Adjustments', path: '/admin/inventory/adjustments', icon: <ArrowUpDownIcon size={20} /> },
@@ -86,7 +84,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-30 h-full w-64 bg-surface border-r border-border-light transition-transform duration-300 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        className={`fixed top-0 left-0 z-30 h-full w-64 bg-surface border-r border-border-light transition-transform duration-300 transform flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
           }`}>
         <div className="p-4 border-b border-border-light">
           <Link 
@@ -98,7 +96,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             <span className="text-xl font-semibold text-main">Admin</span>
           </Link>
         </div>
-        <div className="py-4">
+        <div className="py-4 flex-1 overflow-y-auto">
           <nav>
             <ul className="space-y-1">
               {menuItems.map((item) => (
@@ -118,7 +116,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             </ul>
           </nav>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border-light">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border-light bg-surface">
           <button
             onClick={handleLogout}
             className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">

@@ -1,6 +1,13 @@
 import React from 'react';
 
-export const Textarea = ({
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  error?: string;
+  id?: string;
+  className?: string;
+}
+
+export const Textarea: React.FC<TextareaProps> = ({
   label,
   error,
   id,

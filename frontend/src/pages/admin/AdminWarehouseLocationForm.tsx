@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';
 import { WarehouseLocationCreate, WarehouseLocationUpdate, WarehouseLocationResponse } from '../../types';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Input } from '../../components/forms/Input';
 import { Textarea } from '../../components/forms/Textarea';
+import { SkeletonForm } from '../../components/ui/SkeletonForm';
 
 export const AdminWarehouseLocationForm = () => {
   const { locationId } = useParams<{ locationId?: string }>();
@@ -72,7 +72,7 @@ export const AdminWarehouseLocationForm = () => {
   }, [isEditMode, locationId, formData, navigate, submitLocation]);
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <SkeletonForm fields={4} />;
   }
 
   if (error) {
@@ -85,14 +85,21 @@ export const AdminWarehouseLocationForm = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-main mb-6">{isEditMode ? 'Edit' : 'Create'} Warehouse Location</h1>
-      <form onSubmit={handleSubmit} className="bg-surface rounded-lg shadow-sm p-6 border border-border-light">
-        <div className="grid grid-cols-1 gap-4 mb-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-main mb-2">{isEditMode ? 'Edit' : 'Create'} Warehouse Location</h1>
+        <p className="text-copy-lighter">
+          {isEditMode ? 'Update the warehouse location details below.' : 'Add a new warehouse location to manage inventory across different sites.'}
+        </p>
+      </div>
+      
+      <form onSubmit={handleSubmit} className="bg-surface rounded-lg shadow-sm p-6 border border-border-light max-w-2xl">
+        <div className="space-y-6 mb-6">
           <Input
-            label="Location Name"
+            label="Location Name *"
             name="name"
             value={formData.name}
             onChange={handleChange}
+            placeholder="e.g., Main Warehouse, Distribution Center"
             required
           />
           <Input
@@ -100,6 +107,7 @@ export const AdminWarehouseLocationForm = () => {
             name="address"
             value={formData.address || ''}
             onChange={handleChange}
+            placeholder="Full address of the warehouse location"
           />
           <Textarea
             label="Description"
@@ -107,13 +115,14 @@ export const AdminWarehouseLocationForm = () => {
             value={formData.description || ''}
             onChange={handleChange}
             rows={4}
+            placeholder="Optional description of the warehouse location, its purpose, or special notes..."
           />
         </div>
 
-        <div className="mt-6 text-right">
+        <div className="flex items-center justify-between pt-6 border-t border-border-light">
           <button
             type="button"
-            className="btn btn-secondary mr-2"
+            className="px-4 py-2 text-copy-lighter hover:text-copy border border-border rounded-md hover:bg-surface-hover transition-colors"
             onClick={() => navigate('/admin/inventory/locations')}
             disabled={submitting}
           >
@@ -121,10 +130,17 @@ export const AdminWarehouseLocationForm = () => {
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
+            className="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
             disabled={submitting}
           >
-            {submitting ? <LoadingSpinner size="sm" /> : (isEditMode ? 'Update Location' : 'Create Location')}
+            {submitting ? (
+              <>
+                <LoadingSpinner size="sm" className="mr-2" />
+                {isEditMode ? 'Updating...' : 'Creating...'}
+              </>
+            ) : (
+              isEditMode ? 'Update Location' : 'Create Location'
+            )}
           </button>
         </div>
       </form>

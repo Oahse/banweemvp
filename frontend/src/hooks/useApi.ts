@@ -85,21 +85,31 @@ export const usePaginatedApi = <T = any>(
         } 
         // Check if result.data is an object with nested arrays (common backend pattern)
         else if (typeof result.data === 'object') {
-          // Look for common array property names
-          const possibleArrayKeys = ['orders', 'users', 'products', 'variants', 'items', 'results', 'data'];
-          for (const key of possibleArrayKeys) {
-            if (Array.isArray(result.data[key])) {
-              dataArray = result.data[key];
-              break;
-            }
-          }
-          
-          // If no array found in nested properties, check if data itself should be treated as single item
-          if (dataArray.length === 0 && Object.keys(result.data).length > 0) {
-            // Check for pagination info in the data object
+          // First check if result.data.data exists (nested data structure)
+          if (Array.isArray(result.data.data)) {
+            dataArray = result.data.data;
+            // Also extract pagination info from this level
             if (result.data.total !== undefined) {
               setTotal(result.data.total);
-              setTotalPages(result.data.total_pages || result.data.pages || Math.ceil(result.data.total / limit));
+              setTotalPages(result.data.pages || Math.ceil(result.data.total / limit));
+            }
+          } else {
+            // Look for common array property names
+            const possibleArrayKeys = ['orders', 'users', 'products', 'variants', 'items', 'results'];
+            for (const key of possibleArrayKeys) {
+              if (Array.isArray(result.data[key])) {
+                dataArray = result.data[key];
+                break;
+              }
+            }
+            
+            // If no array found in nested properties, check if data itself should be treated as single item
+            if (dataArray.length === 0 && Object.keys(result.data).length > 0) {
+              // Check for pagination info in the data object
+              if (result.data.total !== undefined) {
+                setTotal(result.data.total);
+                setTotalPages(result.data.total_pages || result.data.pages || Math.ceil(result.data.total / limit));
+              }
             }
           }
         }

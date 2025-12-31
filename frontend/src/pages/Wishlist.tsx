@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuthenticatedAction } from '../hooks/useAuthenticatedAction';
 import { HeartIcon, ShoppingCartIcon, XCircleIcon, RefreshCwIcon, AlertCircleIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { PLACEHOLDER_IMAGES } from '../utils/placeholderImage';
 
 export const Wishlist = () => {
   const { defaultWishlist, removeItem, fetchWishlists, loading, error } = useWishlist();
@@ -107,7 +108,7 @@ export const Wishlist = () => {
           <div key={item.id} className="bg-surface rounded-lg shadow-sm overflow-hidden flex flex-col">
             <Link to={`/product/${item.product_id}`} className="block relative h-48 overflow-hidden">
               <img
-                src={item.product?.variants?.[0]?.images?.[0]?.url || "https://via.placeholder.com/150"}
+                src={item.product?.variants?.[0]?.images?.[0]?.url || PLACEHOLDER_IMAGES.medium}
                 alt={item.product?.name || "Product Image"}
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />

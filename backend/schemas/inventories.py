@@ -51,6 +51,12 @@ class InventoryResponse(InventoryBase):
     id: UUID
     created_at: datetime
     updated_at: Optional[datetime] = None
+    quantity_available: Optional[int] = None
+    reorder_point: Optional[int] = None
+    inventory_status: Optional[str] = None
+    last_restocked_at: Optional[datetime] = None
+    last_sold_at: Optional[datetime] = None
+    version: Optional[int] = None
     location: Optional[WarehouseLocationResponse] = None
 
     model_config = ConfigDict(from_attributes=True)

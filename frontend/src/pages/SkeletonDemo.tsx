@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PLACEHOLDER_IMAGES } from '../utils/placeholderImage';
 import {
   Skeleton,
   SkeletonCard,
@@ -139,7 +140,7 @@ export const SkeletonDemo = () => {
             ) : (
               <>
                 <div className="bg-surface border border-border rounded-lg p-4 space-y-4">
-                  <img src="https://via.placeholder.com/300x200" alt="Product" className="w-full h-48 object-cover rounded" />
+                  <img src={PLACEHOLDER_IMAGES.large} alt="Product" className="w-full h-48 object-cover rounded" />
                   <div>
                     <h3 className="font-semibold text-copy">Product Name</h3>
                     <p className="text-copy-light">Product description goes here</p>

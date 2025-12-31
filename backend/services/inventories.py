@@ -7,16 +7,13 @@ from sqlalchemy.orm import selectinload, joinedload
 from typing import Optional, List, Dict, Any
 from uuid import UUID
 from datetime import datetime, timedelta
-import asyncio
-import logging
-
 from models.inventories import Inventory, WarehouseLocation, StockAdjustment
-from models.product import ProductVariant
+from models.product import ProductVariant, Product, ProductImage
 from models.user import User
 from schemas.inventories import (
-    WarehouseLocationCreate, WarehouseLocationUpdate,
-    InventoryCreate, InventoryUpdate,
-    StockAdjustmentCreate
+    WarehouseLocationCreate, WarehouseLocationUpdate, WarehouseLocationResponse,
+    InventoryCreate, InventoryUpdate, InventoryResponse,
+    StockAdjustmentCreate, StockAdjustmentResponse
 )
 from core.exceptions import APIException
 import asyncio
@@ -33,23 +30,32 @@ class InventoryService:
         self.lock_service = lock_service
 
     # --- WarehouseLocation CRUD ---
-    async def create_warehouse_location(self, location_data: WarehouseLocationCreate) -> WarehouseLocation:
+    async def create_warehouse_location(self, location_data: WarehouseLocationCreate) -> WarehouseLocationResponse:
         new_location = WarehouseLocation(**location_data.model_dump())
         self.db.add(new_location)
         await self.db.commit()
         await self.db.refresh(new_location)
-        return new_location
+        return WarehouseLocationResponse.model_validate(new_location)
 
-    async def get_warehouse_locations(self) -> List[WarehouseLocation]:
+    async def get_warehouse_locations(self) -> List[WarehouseLocationResponse]:
         result = await self.db.execute(select(WarehouseLocation).order_by(WarehouseLocation.name))
-        return result.scalars().all()
+        locations = result.scalars().all()
+        return [WarehouseLocationResponse.model_validate(location) for location in locations]
 
-    async def get_warehouse_location_by_id(self, location_id: UUID) -> Optional[WarehouseLocation]:
+    async def get_warehouse_location_by_id(self, location_id: UUID) -> Optional[WarehouseLocationResponse]:
+        result = await self.db.execute(select(WarehouseLocation).filter(WarehouseLocation.id == location_id))
+        location = result.scalars().first()
+        if location:
+            return WarehouseLocationResponse.model_validate(location)
+        return None
+
+    async def get_warehouse_location_model_by_id(self, location_id: UUID) -> Optional[WarehouseLocation]:
+        """Get the raw SQLAlchemy model for internal operations"""
         result = await self.db.execute(select(WarehouseLocation).filter(WarehouseLocation.id == location_id))
         return result.scalars().first()
 
-    async def update_warehouse_location(self, location_id: UUID, location_data: WarehouseLocationUpdate) -> WarehouseLocation:
-        location = await self.get_warehouse_location_by_id(location_id)
+    async def update_warehouse_location(self, location_id: UUID, location_data: WarehouseLocationUpdate) -> WarehouseLocationResponse:
+        location = await self.get_warehouse_location_model_by_id(location_id)
         if not location:
             raise APIException(status_code=404, message="Warehouse location not found")
         
@@ -59,10 +65,13 @@ class InventoryService:
         location.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(location)
-        return location
+        return WarehouseLocationResponse.model_validate(location)
+        await self.db.commit()
+        await self.db.refresh(location)
+        return WarehouseLocationResponse.model_validate(location)
 
     async def delete_warehouse_location(self, location_id: UUID):
-        location = await self.get_warehouse_location_by_id(location_id)
+        location = await self.get_warehouse_location_model_by_id(location_id)
         if not location:
             raise APIException(status_code=404, message="Warehouse location not found")
         
@@ -93,6 +102,7 @@ class InventoryService:
         offset = (page - 1) * limit
         query = select(Inventory).options(
             joinedload(Inventory.variant).joinedload(ProductVariant.product),
+            joinedload(Inventory.variant).joinedload(ProductVariant.images),
             joinedload(Inventory.location)
         )
         count_query = select(func.count(Inventory.id))
@@ -117,15 +127,87 @@ class InventoryService:
         total = await self.db.scalar(count_query)
         items = (await self.db.execute(query)).scalars().all()
 
+        # Convert to dictionaries with complete variant and product information
+        items_data = []
+        for item in items:
+            # Get variant data with product and images
+            variant_data = None
+            if item.variant:
+                # Get primary image
+                primary_image = None
+                if item.variant.images:
+                    primary_image = next(
+                        (img for img in item.variant.images if img.is_primary),
+                        item.variant.images[0] if item.variant.images else None
+                    )
+                
+                variant_data = {
+                    "id": str(item.variant.id),
+                    "name": item.variant.name,
+                    "sku": item.variant.sku,
+                    "base_price": item.variant.base_price,
+                    "sale_price": item.variant.sale_price,
+                    "is_active": item.variant.is_active,
+                    "product": {
+                        "id": str(item.variant.product.id),
+                        "name": item.variant.product.name,
+                        "slug": item.variant.product.slug,
+                        "description": item.variant.product.description,
+                        "is_active": item.variant.product.is_active
+                    } if item.variant.product else None,
+                    "primary_image": {
+                        "id": str(primary_image.id),
+                        "url": primary_image.url,
+                        "alt_text": primary_image.alt_text,
+                        "is_primary": primary_image.is_primary
+                    } if primary_image else None,
+                    "images": [
+                        {
+                            "id": str(img.id),
+                            "url": img.url,
+                            "alt_text": img.alt_text,
+                            "is_primary": img.is_primary,
+                            "sort_order": img.sort_order
+                        }
+                        for img in item.variant.images
+                    ] if item.variant.images else []
+                }
+
+            item_dict = {
+                "id": str(item.id),
+                "variant_id": str(item.variant_id),
+                "location_id": str(item.location_id),
+                "quantity": item.quantity,
+                "quantity_available": item.quantity_available,
+                "low_stock_threshold": item.low_stock_threshold,
+                "reorder_point": item.reorder_point,
+                "inventory_status": item.inventory_status,
+                "last_restocked_at": item.last_restocked_at.isoformat() if item.last_restocked_at else None,
+                "last_sold_at": item.last_sold_at.isoformat() if item.last_sold_at else None,
+                "version": item.version,
+                "created_at": item.created_at.isoformat(),
+                "updated_at": item.updated_at.isoformat() if item.updated_at else None,
+                "variant": variant_data,
+                "location": {
+                    "id": str(item.location.id),
+                    "name": item.location.name,
+                    "address": item.location.address,
+                    "description": item.location.description,
+                    "created_at": item.location.created_at.isoformat(),
+                    "updated_at": item.location.updated_at.isoformat() if item.location.updated_at else None
+                } if item.location else None
+            }
+            items_data.append(item_dict)
+
         return {
-            "data": items,
+            "data": items_data,
             "total": total,
             "page": page,
             "limit": limit,
             "pages": (total + limit - 1) // limit
         }
 
-    async def create_inventory_item(self, inventory_data: InventoryCreate) -> Inventory:
+    async def create_inventory_item(self, inventory_data: InventoryCreate) -> InventoryResponse:
         existing_inventory = await self.get_inventory_item_by_variant_id(inventory_data.variant_id)
         if existing_inventory:
             raise APIException(status_code=400, message="Inventory for this variant already exists.")
@@ -138,9 +220,9 @@ class InventoryService:
         self.db.add(new_inventory)
         await self.db.commit()
         await self.db.refresh(new_inventory)
-        return new_inventory
+        return InventoryResponse.model_validate(new_inventory)
 
-    async def update_inventory_item(self, inventory_id: UUID, inventory_data: InventoryUpdate) -> Inventory:
+    async def update_inventory_item(self, inventory_id: UUID, inventory_data: InventoryUpdate) -> InventoryResponse:
         inventory_item = await self.get_inventory_item_by_id(inventory_id)
         if not inventory_item:
             raise APIException(status_code=404, message="Inventory item not found")
@@ -151,7 +233,7 @@ class InventoryService:
         inventory_item.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(inventory_item)
-        return inventory_item
+        return InventoryResponse.model_validate(inventory_item)
 
     async def delete_inventory_item(self, inventory_id: UUID):
         inventory_item = await self.get_inventory_item_by_id(inventory_id)
@@ -186,14 +268,25 @@ class InventoryService:
                 message=f"Failed to adjust stock: {str(e)}"
             )
 
-    async def get_stock_adjustments_for_inventory(self, inventory_id: UUID) -> List[StockAdjustment]:
+    async def get_stock_adjustments_for_inventory(self, inventory_id: UUID) -> List[StockAdjustmentResponse]:
         result = await self.db.execute(
             select(StockAdjustment)
             .filter(StockAdjustment.inventory_id == inventory_id)
             .order_by(StockAdjustment.created_at.desc())
             .options(joinedload(StockAdjustment.adjusted_by))
         )
-        return result.scalars().all()
+        adjustments = result.scalars().all()
+        return [StockAdjustmentResponse.model_validate(adjustment) for adjustment in adjustments]
+
+    async def get_all_stock_adjustments(self) -> List[StockAdjustmentResponse]:
+        """Get all stock adjustments across all inventory items"""
+        result = await self.db.execute(
+            select(StockAdjustment)
+            .order_by(StockAdjustment.created_at.desc())
+            .options(joinedload(StockAdjustment.adjusted_by))
+        )
+        adjustments = result.scalars().all()
+        return [StockAdjustmentResponse.model_validate(adjustment) for adjustment in adjustments]
 
     async def check_low_stock(self, inventory_id: UUID) -> bool:
         inventory_item = await self.get_inventory_item_by_id(inventory_id)

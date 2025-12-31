@@ -1,7 +1,20 @@
 import React from 'react';
 import { ChevronDownIcon } from 'lucide-react';
 
-export const Select = ({
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string;
+  error?: string;
+  id?: string;
+  className?: string;
+  options: SelectOption[];
+}
+
+export const Select: React.FC<SelectProps> = ({
   label,
   error,
   id,

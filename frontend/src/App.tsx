@@ -19,7 +19,6 @@ import { LocaleProvider } from './contexts/LocaleContext';
 import { ProtectedRoute } from './components/routing/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { OfflineIndicator } from './components/common/OfflineIndicator';
-import { AdminSettings } from './pages/admin/AdminSettings';
 import SupportWidget from './components/support/SupportWidget';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
@@ -75,6 +74,9 @@ const AdminOrders = lazy(() =>
 const AdminAnalytics = lazy(() =>
   import('./pages/admin/AdminAnalytics').then((module) => ({ default: module.AdminAnalytics }))
 );
+const AdminSalesOverview = lazy(() =>
+  import('./pages/admin/AdminSalesOverview').then((module) => ({ default: module.AdminSalesOverview }))
+);
 const AdminNotifications = lazy(() =>
   import('./pages/admin/AdminNotifications').then((module) => ({ default: module.AdminNotifications }))
 );
@@ -100,7 +102,6 @@ const AdminNewProduct = lazy(() =>
   import('./pages/admin/AdminNewProduct').then((module) => ({ default: module.AdminNewProduct }))
 );
 
-const AdminActivityLogs = lazy(() => import('./pages/admin/AdminActivityLogs').then((module) => ({ default: module.AdminActivityLogs })));
 // New Inventory Admin Pages
 const AdminInventory = lazy(() => import('./pages/admin/AdminInventory').then((module) => ({ default: module.AdminInventory })));
 const AdminWarehouseLocations = lazy(() => import('./pages/admin/AdminWarehouseLocations').then((module) => ({ default: module.AdminWarehouseLocations })));
@@ -135,7 +136,7 @@ const PageLoading: React.FC = () => (
 export const App: React.FC = () => {
   return (
     <ErrorBoundary>
-      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ''}>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'placeholder_google_client_id'}>
         <AuthProvider>
           <ThemeProvider>
             <LocaleProvider>
@@ -176,7 +177,12 @@ export const App: React.FC = () => {
                           },
                         }}
                       />
-                      <BrowserRouter>
+                      <BrowserRouter
+                        future={{
+                          v7_startTransition: true,
+                          v7_relativeSplatPath: true,
+                        }}
+                      >
                         <SupportWidget />
                         <Elements stripe={stripePromise}>
                           <Suspense fallback={<PageLoading />}>
@@ -293,21 +299,21 @@ export const App: React.FC = () => {
                                 }
                               />
                               <Route
-                                path="/admin/notifications"
+                                path="/admin/sales-overview"
                                 element={
-                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
+                                  <ProtectedRoute requiredRole={['Admin']}>
                                     <AdminLayout>
-                                      <AdminNotifications />
+                                      <AdminSalesOverview />
                                     </AdminLayout>
                                   </ProtectedRoute>
                                 }
                               />
                               <Route
-                                path="/admin/settings"
+                                path="/admin/notifications"
                                 element={
-                                  <ProtectedRoute requiredRole={['Admin']}>
+                                  <ProtectedRoute requiredRole={['Admin', 'Supplier']}>
                                     <AdminLayout>
-                                      <AdminSettings />
+                                      <AdminNotifications />
                                     </AdminLayout>
                                   </ProtectedRoute>
                                 }

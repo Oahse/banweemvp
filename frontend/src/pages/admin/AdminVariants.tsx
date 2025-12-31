@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { SearchIcon, FilterIcon, EditIcon, TrashIcon, MoreHorizontalIcon, PlusIcon, EyeIcon } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { SearchIcon, FilterIcon, EditIcon, TrashIcon, PlusIcon, EyeIcon } from 'lucide-react';
 import { usePaginatedApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
+import { PLACEHOLDER_IMAGES } from '../../utils/placeholderImage';
 
 export const AdminVariants = () => {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState('');
   const [showMoreFilters, setShowMoreFilters] = useState(false);
@@ -121,19 +121,27 @@ export const AdminVariants = () => {
               key: 'variant',
               label: 'Variant',
               mobileLabel: 'Variant',
-              render: (variant) => (
-                <div className="flex items-center">
-                  <img 
-                    src={variant.primary_image?.url || 'https://via.placeholder.com/100'} 
-                    alt={variant.name} 
-                    className="w-10 h-10 rounded-md object-cover mr-3" 
-                  />
-                  <div>
-                    <p className="font-medium text-main">{variant.name}</p>
-                    <p className="text-xs text-copy-light">SKU: {variant.sku}</p>
+              render: (variant) => {
+                const imageUrl = variant.primary_image?.url || 
+                               variant.images?.[0]?.url || 
+                               PLACEHOLDER_IMAGES.small;
+                return (
+                  <div className="flex items-center">
+                    <img 
+                      src={imageUrl} 
+                      alt={variant.name} 
+                      className="w-10 h-10 rounded-md object-cover mr-3" 
+                      onError={(e) => {
+                        e.currentTarget.src = PLACEHOLDER_IMAGES.small;
+                      }}
+                    />
+                    <div>
+                      <p className="font-medium text-main">{variant.name}</p>
+                      <p className="text-xs text-copy-light">SKU: {variant.sku}</p>
+                    </div>
                   </div>
-                </div>
-              ),
+                );
+              },
             },
             {
               key: 'product',

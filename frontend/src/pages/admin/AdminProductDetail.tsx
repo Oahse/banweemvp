@@ -6,6 +6,7 @@ import { ProductsAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { BarcodeDisplay } from '../../components/product/BarcodeDisplay';
 import { toast } from 'react-hot-toast';
+import { PLACEHOLDER_IMAGES } from '../../utils/placeholderImage';
 
 export const AdminProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -159,7 +160,7 @@ export const AdminProductDetail = () => {
                 <div key={variant.id} className="flex items-center justify-between p-4 border border-border-light rounded-md">
                   <div className="flex items-center space-x-4">
                     <img
-                      src={variant.images?.[0]?.url || 'https://via.placeholder.com/100'}
+                      src={variant.images?.[0]?.url || PLACEHOLDER_IMAGES.small}
                       alt={variant.name}
                       className="w-16 h-16 rounded-md object-cover"
                     />

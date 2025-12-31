@@ -63,9 +63,17 @@ const OrderRow = ({ order }: OrderRowProps) => {
     return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
   };
 
-  const customerName = order.user 
-    ? `${order.user.firstname || ''} ${order.user.lastname || ''}`.trim() || 'N/A'
-    : order.customer || 'N/A';
+  // Extract customer information from order
+  const customer = order.user || order.customer;
+  const customerName = customer 
+    ? (typeof customer === 'string' 
+        ? customer 
+        : `${customer.firstname || customer.first_name || ''} ${customer.lastname || customer.last_name || ''}`.trim() || customer.email || customer.name || 'Unknown Customer'
+      )
+    : 'Guest Customer';
+  
+  const customerId = customer && typeof customer === 'object' ? customer.id : null;
+  const truncatedName = customerName.length > 20 ? `${customerName.substring(0, 20)}...` : customerName;
 
   const orderDate = order.date || (order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A');
   const orderTotal = order.total || order.total_amount || 0;
@@ -82,7 +90,17 @@ const OrderRow = ({ order }: OrderRowProps) => {
         </Link>
       </td>
       <td className="text-gray-900 dark:text-white py-3 px-2">
-        {customerName}
+        {customerId ? (
+          <Link 
+            to={`/admin/users/${customerId}`} 
+            className="text-primary hover:underline cursor-pointer"
+            title={customerName}
+          >
+            {truncatedName}
+          </Link>
+        ) : (
+          <span title={customerName}>{truncatedName}</span>
+        )}
       </td>
       <td className={`${themeClasses.text.muted} py-3 px-2 text-sm`}>
         {orderDate}
@@ -185,8 +203,8 @@ export const AdminDashboard = () => {
   const stats = [
     {
       title: 'Total Revenue',
-      value: statsData?.total_revenue 
-        ? `$${statsData.total_revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      value: statsData?.revenue?.total_revenue 
+        ? `$${statsData.revenue.total_revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
         : '$0.00',
       change: formatChange(statsData?.revenue_change),
       increasing: (statsData?.revenue_change || 0) >= 0,
@@ -195,7 +213,7 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Total Orders',
-      value: statsData?.total_orders?.toLocaleString() || '0',
+      value: statsData?.overview?.total_orders?.toLocaleString() || '0',
       change: formatChange(statsData?.orders_change),
       increasing: (statsData?.orders_change || 0) >= 0,
       icon: <ShoppingCartIcon size={20} />,
@@ -203,7 +221,7 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Total Customers',
-      value: statsData?.total_customers?.toLocaleString() || '0',
+      value: statsData?.overview?.total_users?.toLocaleString() || '0',
       change: formatChange(statsData?.customers_change),
       increasing: (statsData?.customers_change || 0) >= 0,
       icon: <UsersIcon size={20} />,
@@ -211,7 +229,7 @@ export const AdminDashboard = () => {
     },
     {
       title: 'Total Products',
-      value: statsData?.total_products?.toLocaleString() || '0',
+      value: statsData?.overview?.total_products?.toLocaleString() || '0',
       change: formatChange(statsData?.products_change),
       increasing: (statsData?.products_change || 0) >= 0,
       icon: <PackageIcon size={20} />,
