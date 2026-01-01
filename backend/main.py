@@ -5,13 +5,12 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.exc import SQLAlchemyError
 
 from core.database import AsyncSessionDB, initialize_db, db_manager, DatabaseOptimizer
 # Import configuration and middleware
 from core.config import settings, validate_startup_environment, get_setup_instructions
-from core.middleware import RateLimitMiddleware, CacheMiddleware, MaintenanceModeMiddleware, SessionMiddleware
+from core.middleware import RateLimitMiddleware
 # Import exceptions and handlers
 from core.exceptions import (
     APIException,
@@ -195,9 +194,8 @@ if hasattr(settings, 'ALLOWED_HOSTS'):
     )
 
 # Middleware Stack (order matters - last added is executed first)
-app.add_middleware(MaintenanceModeMiddleware)
-app.add_middleware(SessionMiddleware)
-app.add_middleware(CacheMiddleware)
+# app.add_middleware(MaintenanceModeMiddleware)
+# app.add_middleware(CacheMiddleware)
 app.add_middleware(RateLimitMiddleware)
 
 # API v1 Router
