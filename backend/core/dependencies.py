@@ -277,7 +277,8 @@ async def get_current_auth_user(
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     """Get current authenticated user"""
     try:
-        user = await AuthService.get_current_user(token, db)
+        auth_service = AuthService(db)
+    user = await auth_service.get_current_user(token)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

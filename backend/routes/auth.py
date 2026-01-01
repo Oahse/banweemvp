@@ -6,7 +6,7 @@ from core.database import get_db
 from core.utils.response import Response
 from core.exceptions import APIException
 from core.config import settings
-from schemas.auth import UserCreate, UserLogin
+from schemas.auth import UserCreate, UserLogin, RefreshTokenRequest
 from schemas.user import AddressCreate, AddressUpdate, AddressResponse
 from schemas.response import APIResponse
 from services.auth import AuthService
@@ -19,7 +19,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
-    return await AuthService.get_current_user(token, db)
+    auth_service = AuthService(db)
+    return await auth_service.get_current_user(token)
 
 
 @router.post("/register")
@@ -61,13 +62,13 @@ async def login(
 
 @router.post("/refresh")
 async def refresh_token(
-    refresh_token: str,
+    request: RefreshTokenRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """Refresh access token using refresh token."""
     try:
         auth_service = AuthService(db)
-        token_data = await auth_service.refresh_access_token(refresh_token)
+        token_data = await auth_service.refresh_access_token(request.refresh_token)
         return Response.success(data=token_data, message="Token refreshed successfully")
     except Exception as e:
         raise APIException(
@@ -327,6 +328,42 @@ async def update_profile(
         )
 
 
+@router.post("/extend-session")
+async def extend_session(
+    current_user: User = Depends(get_current_auth_user),
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db)
+):
+    """Extend the current user session."""
+    try:
+        auth_service = AuthService(db)
+        token_data = await auth_service.extend_session(token)
+        return Response.success(data=token_data, message="Session extended successfully")
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            message=f"Failed to extend session - {str(e)}"
+        )
+
+
+@router.get("/session-info")
+async def get_session_info(
+    current_user: User = Depends(get_current_auth_user),
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get current session information."""
+    try:
+        auth_service = AuthService(db)
+        session_info = await auth_service.get_session_info(token)
+        return Response.success(data=session_info)
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            message=f"Failed to get session info - {str(e)}"
+        )
+
+
 @router.put("/change-password")
 async def change_password(
     current_password: str,
@@ -359,61 +396,3 @@ async def change_password(
         )
 
 
-@router.post("/refresh")
-async def refresh_token(
-    refresh_token: str,
-    db: AsyncSession = Depends(get_db)
-):
-    """Refresh access token using refresh token."""
-    try:
-        auth_service = AuthService(db)
-
-        # Verify refresh token
-        try:
-            from jose import jwt, JWTError
-            payload = jwt.decode(refresh_token, settings.SECRET_KEY, algorithms=[
-                                 settings.ALGORITHM])
-            email: str = payload.get("sub")
-            token_type: str = payload.get("type")
-
-            if email is None or token_type != "refresh":
-                raise APIException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    message="Invalid refresh token"
-                )
-        except JWTError:
-            raise APIException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                message="Invalid refresh token"
-            )
-
-        # Get user and create new tokens
-        user = await auth_service.get_user_by_email(email)
-        if not user:
-            raise APIException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                message="User not found"
-            )
-
-        # Create new access token
-        from datetime import timedelta
-        access_token_expires = timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = auth_service.create_access_token(
-            data={"sub": user.email}, expires_delta=access_token_expires
-        )
-
-        response_data = {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
-        }
-
-        return Response(success=True, data=response_data, message="Token refreshed successfully")
-    except APIException:
-        raise
-    except Exception as e:
-        raise APIException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            message="Failed to refresh token"
-        )

@@ -19,8 +19,9 @@ router = APIRouter(prefix="/users", tags=["Users & Addresses"])
 # Dependency to get current authenticated user
 
 
-async def get_current_authenticated_user(db: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
-    return await AuthService.get_current_user(token, db)
+async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
+    auth_service = AuthService(db)
+    return await auth_service.get_current_user(token)
 
 # ==========================================================
 # USER ENDPOINTS
