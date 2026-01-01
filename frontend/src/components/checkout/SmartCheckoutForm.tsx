@@ -240,6 +240,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
     if (!validateStep(3)) return;
 
     setProcessingPayment(true);
+    setIsProcessingStripePayment(true); // Indicate Stripe processing is active
     
     try {
       // Final validation before checkout
@@ -248,6 +249,48 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       if (!finalValidation.data?.can_proceed) {
         toast.error('Checkout validation failed. Please review your cart.');
         setCurrentStep(1); // Go back to review cart
+        setIsProcessingStripePayment(false);
+        return;
+      }
+      
+      let finalPaymentMethodId = formData.payment_method_id;
+
+      // Handle new card payment via Stripe
+      if (showNewCardForm && stripe && elements && clientSecret) {
+        const { error: submitError } = await elements.submit();
+        if (submitError) {
+          toast.error(submitError.message || 'Failed to submit payment details.');
+          setIsProcessingStripePayment(false);
+          return;
+        }
+
+        const { paymentIntent, error: confirmError } = await stripe.confirmPayment({
+          elements,
+          clientSecret,
+          confirmParams: {
+            return_url: `${window.location.origin}/checkout`, // URL to redirect after successful payment
+          },
+          redirect: 'if_required'
+        });
+        
+        if (confirmError) {
+          toast.error(confirmError.message || 'Payment confirmation failed.');
+          setIsProcessingStripePayment(false);
+          return;
+        }
+
+        if (paymentIntent?.status === 'succeeded' && paymentIntent.payment_method) {
+          finalPaymentMethodId = paymentIntent.payment_method as string;
+          // Optionally, save the new payment method to user's profile
+          // await AuthAPI.addPaymentMethod({ payment_method_id: finalPaymentMethodId });
+        } else {
+          toast.error('Payment not successful. Please try again.');
+          setIsProcessingStripePayment(false);
+          return;
+        }
+      } else if (!finalPaymentMethodId) {
+        toast.error('Please select a payment method or add a new card.');
+        setIsProcessingStripePayment(false);
         return;
       }
       
@@ -257,6 +300,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       // Add idempotency key and calculated total for validation
       const checkoutData = {
         ...formData,
+        payment_method_id: finalPaymentMethodId, // Use the new payment method ID if applicable
         idempotency_key: idempotencyKey,
         frontend_calculated_total: orderSummary?.total || 0
       };
@@ -267,7 +311,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          toast.loading(`Processing payment... (Attempt ${attempt}/${maxRetries})`, { 
+          toast.loading(`Processing order... (Attempt ${attempt}/${maxRetries})`, { 
             id: 'checkout-loading',
             duration: 60000 // 60 second timeout
           });
@@ -350,6 +394,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setProcessingPayment(false);
+      setIsProcessingStripePayment(false); // Reset Stripe processing state
     }
   };
 

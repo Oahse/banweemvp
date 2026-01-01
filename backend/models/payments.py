@@ -3,10 +3,39 @@ Consolidated payment models
 Includes: PaymentMethod, PaymentIntent, Transaction
 """
 from sqlalchemy import Column, String, Boolean, ForeignKey, Float, Text, Integer, DateTime, Index
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.dialects.postgresql import UUID, JSONB, ENUM as PG_ENUM
 from sqlalchemy.orm import relationship
 from core.database import BaseModel, GUID
 from typing import Dict, Any
+from enum import Enum
+
+# Enums for Payment Method fields
+class PaymentType(str, Enum):
+    CARD = "card"
+    BANK_ACCOUNT = "bank_account"
+    MOBILE_MONEY = "mobile_money"
+    OTHER = "other" # Generic for future expansion
+
+class PaymentProvider(str, Enum):
+    STRIPE = "stripe"
+    PAYPAL = "paypal"
+    MOMO = "momo" # Mobile Money provider (e.g., M-Pesa, MTN Mobile Money)
+    GOOGLE_PAY = "google_pay"
+    APPLE_PAY = "apple_pay"
+    BANK_TRANSFER = "bank_transfer"
+    UNKNOWN = "unknown" # For methods where provider isn't explicitly known
+
+class CardBrand(str, Enum):
+    VISA = "visa"
+    VERVE = "verve"
+    MASTERCARD = "mastercard"
+    AMEX = "amex"
+    DISCOVER = "discover"
+    JCB = "jcb"
+    DINERS_CLUB = "diners_club"
+    UNIONPAY = "unionpay"
+    UNKNOWN = "unknown"
+    OTHER = "other" # For less common or newly introduced card brands
 
 
 class PaymentMethod(BaseModel):
@@ -27,13 +56,13 @@ class PaymentMethod(BaseModel):
     )
 
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
-    # card, bank_account, mobile_money
-    type = Column(String(50), nullable=False)
-    provider = Column(String(50), nullable=False)  # stripe, paypal, momo
+    # Use PG_ENUM for type to map to PostgreSQL enum type
+    type = Column(PG_ENUM(PaymentType, name="payment_type"), nullable=False)
+    provider = Column(PG_ENUM(PaymentProvider, name="payment_provider"), nullable=False)  # stripe, paypal, momo
     last_four = Column(String(4), nullable=True)
     expiry_month = Column(Integer, nullable=True)
     expiry_year = Column(Integer, nullable=True)
-    brand = Column(String(50), nullable=True)  # visa, mastercard, etc.
+    brand = Column(PG_ENUM(CardBrand, name="card_brand"), nullable=True)  # visa, mastercard, etc.
     stripe_payment_method_id = Column(String(255), nullable=True, unique=True)
     is_default = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
@@ -47,12 +76,12 @@ class PaymentMethod(BaseModel):
         return {
             "id": str(self.id),
             "user_id": str(self.user_id),
-            "type": self.type,
-            "provider": self.provider,
+            "type": self.type.value,
+            "provider": self.provider.value,
             "last_four": self.last_four,
             "expiry_month": self.expiry_month,
             "expiry_year": self.expiry_year,
-            "brand": self.brand,
+            "brand": self.brand.value if self.brand else None,
             "stripe_payment_method_id": self.stripe_payment_method_id,
             "is_default": self.is_default,
             "is_active": self.is_active,
