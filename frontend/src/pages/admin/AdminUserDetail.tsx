@@ -5,6 +5,7 @@ import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import toast from 'react-hot-toast';
+import { AdminUserAddresses } from '../../components/admin/AdminUserAddresses';
 
 export const AdminUserDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -194,6 +195,12 @@ export const AdminUserDetail = () => {
               </div>
             </div>
           </div>
+
+          {/* User Addresses */}
+          <div className="bg-surface rounded-lg p-6 border border-border-light">
+            <AdminUserAddresses userId={user.id} />
+          </div>
+
 
           {/* Recent Orders */}
           <div className="bg-surface rounded-lg p-6 border border-border-light">

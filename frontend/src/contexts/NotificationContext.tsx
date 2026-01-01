@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import {
   notificationService,
   browserNotificationService 
@@ -21,7 +21,7 @@ export const NotificationProvider = ({ children }) => {
   const { user } = useAuth();
 
   // Fetch notifications from backend
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -37,7 +37,7 @@ export const NotificationProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     // Fetch notifications when user is logged in
@@ -55,11 +55,11 @@ export const NotificationProvider = ({ children }) => {
       setNotifications(notificationService.getAll());
       return unsubscribe;
     }
-  }, [user]);
+  }, [user, fetchNotifications]); // Added fetchNotifications to dependencies
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const addNotification = (notification) => {
+  const addNotification = useCallback((notification) => {
     const id = notificationService.add(notification);
     
     // Show browser notification if enabled and permission granted
@@ -71,13 +71,13 @@ export const NotificationProvider = ({ children }) => {
     }
     
     return id;
-  };
+  }, [preferences.globalEnabled]); // Added preferences.globalEnabled to dependencies
 
-  const removeNotification = (id) => {
+  const removeNotification = useCallback((id) => {
     notificationService.remove(id);
-  };
+  }, []);
 
-  const markAsRead = async (id) => {
+  const markAsRead = useCallback(async (id) => {
     if (!user) {
       // Local notification
       notificationService.markAsRead(id);
@@ -94,9 +94,9 @@ export const NotificationProvider = ({ children }) => {
       console.error('Failed to mark notification as read:', error);
       toast.error('Failed to mark notification as read');
     }
-  };
+  }, [user]);
 
-  const markAllAsRead = async () => {
+  const markAllAsRead = useCallback(async () => {
     if (!user) {
       // Local notifications
       notificationService.markAllAsRead();
@@ -112,37 +112,37 @@ export const NotificationProvider = ({ children }) => {
       console.error('Failed to mark all as read:', error);
       toast.error('Failed to mark all as read');
     }
-  };
+  }, [user]);
 
-  const clearAll = () => {
+  const clearAll = useCallback(() => {
     notificationService.clear();
-  };
+  }, []);
 
-  const updatePreferences = (newPreferences) => {
+  const updatePreferences = useCallback((newPreferences) => {
     notificationService.updatePreferences(newPreferences);
     setPreferences(notificationService.getPreferences());
-  };
+  }, []);
 
-  const requestBrowserPermission = async () => {
+  const requestBrowserPermission = useCallback(async () => {
     return await browserNotificationService.requestPermission();
-  };
+  }, []);
 
   // Convenience methods
-  const success = (title, message) => {
+  const success = useCallback((title, message) => {
     return addNotification({ type: 'success', title, message });
-  };
+  }, [addNotification]);
 
-  const error = (title, message) => {
+  const error = useCallback((title, message) => {
     return addNotification({ type: 'error', title, message, persistent: true });
-  };
+  }, [addNotification]);
 
-  const warning = (title, message) => {
+  const warning = useCallback((title, message) => {
     return addNotification({ type: 'warning', title, message });
-  };
+  }, [addNotification]);
 
-  const info = (title, message) => {
+  const info = useCallback((title, message) => {
     return addNotification({ type: 'info', title, message });
-  };
+  }, [addNotification]);
 
   const value = {
     notifications,

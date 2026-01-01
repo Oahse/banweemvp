@@ -138,8 +138,11 @@ class InventoryService:
                 if item.variant.images:
                     primary_image = next(
                         (img for img in item.variant.images if img.is_primary),
-                        item.variant.images[0] if item.variant.images else None
+                        None # Default to None if no primary or no images
                     )
+                    # If still None, and images exist, take the first one
+                    if not primary_image and item.variant.images:
+                        primary_image = item.variant.images[0]
                 
                 variant_data = {
                     "id": str(item.variant.id),
@@ -703,21 +706,11 @@ class InventoryService:
         Uses unified logging system with settings check
         """
         try:
-            # Check if inventory logging is enabled
-            if hasattr(self, 'unified_logger') and await self.settings_service.is_inventory_logging_enabled():
-                await self.unified_logger.log_inventory_event(
-                    action=action,
-                    resource_id=inventory_id,
-                    details={
-                        "variant_id": variant_id,
-                        "old_quantity": old_quantity,
-                        "new_quantity": new_quantity,
-                        "quantity_change": quantity_change,
-                        "reason": reason,
-                        "order_id": order_id,
-                        "user_id": user_id
-                    }
-                )
+            logger.info(
+                f"Inventory Change: Action={action}, InventoryID={inventory_id}, VariantID={variant_id}, "
+                f"OldQuantity={old_quantity}, NewQuantity={new_quantity}, Change={quantity_change}, "
+                f"Reason={reason}, OrderID={order_id}, UserID={user_id}"
+            )
         except Exception as e:
             logger.error(f"Failed to log inventory change: {e}")
             # Don't raise exception as logging failures shouldn't break inventory operations

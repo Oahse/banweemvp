@@ -20,12 +20,7 @@ const TrackingMap = ({
   useEffect(() => {
     // Initialize map with current location and delivery address
     // Integration with mapping library (e.g., Google Maps, Mapbox) to be implemented
-    const mapConfig = {
-      currentLocation,
-      deliveryAddress,
-      route,
-      carrier
-    });
+
   }, [currentLocation, deliveryAddress, route, carrier]);
 
   const formatAddress = (address) => {

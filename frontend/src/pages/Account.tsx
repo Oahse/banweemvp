@@ -24,9 +24,7 @@ const OrderDetail = lazy(() => import('../components/account/OrderDetail'));
 const TrackOrder = lazy(() => import('../components/account/TrackOrder'));
 const Wishlist = lazy(() => import('../components/account/Wishlist'));
 const Addresses = lazy(() => import('../components/account/Addresses'));
-const ThemeSettings = lazy(() =>
-  import('../components/account/ThemeSettings').then(module => ({ default: module.ThemeSettings }))
-);
+
 const NotificationSettings = lazy(() =>
   import('../components/account/NotificationSettings').then(module => ({ default: module.NotificationSettings }))
 );
@@ -68,7 +66,7 @@ export const Account = () => {
     { path: '/account/addresses', label: 'Addresses', icon: <MapPinIcon size={20} /> },
     { path: '/account/payment-methods', label: 'Payment Methods', icon: <CreditCardIcon size={20} /> },
     { path: '/account/notifications', label: 'Notifications', icon: <BellIcon size={20} /> },
-    { path: '/account/theme', label: 'Theme Settings', icon: <PaletteIcon size={20} /> }
+
   ];
 
   if (isSupplier) {
@@ -172,7 +170,7 @@ export const Account = () => {
               <Route path="/payment-methods" element={<PaymentMethods />} />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/notification-settings" element={<NotificationSettings />} />
-              <Route path="/theme" element={<ThemeSettings />} />
+
               <Route path="*" element={<Dashboard />} />
             </Routes>
           </Suspense>

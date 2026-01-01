@@ -27,6 +27,8 @@ class AddressUpdate(AddressBase):
 
 class AddressResponse(AddressBase):
     id: UUID
+    user_id: UUID
+    is_default: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
 

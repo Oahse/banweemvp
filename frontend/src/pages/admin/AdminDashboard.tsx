@@ -3,7 +3,7 @@ import { ShoppingCartIcon, UsersIcon, DollarSignIcon, ArrowUpIcon, ArrowDownIcon
 import { Link } from 'react-router-dom';
 import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
-import { SalesOverview } from '../../components/admin/sales/SalesOverview';
+
 import { SalesFilters, SalesData, SalesMetrics } from '../../components/admin/sales/types';
 import AnalyticsAPI from '../../apis/analytics';
 import { themeClasses } from '../../lib/theme';
@@ -361,18 +361,7 @@ export const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Sales Overview */}
-      <SalesOverview
-        salesData={salesData || undefined}
-        loading={salesLoading}
-        error={salesError}
-        onFiltersChange={handleSalesFiltersChange}
-        onRefresh={fetchSales}
-        availableCategories={availableCategories}
-        availableRegions={availableRegions}
-        title="Sales Overview"
-        subtitle="A quick overview of your sales performance"
-      />
+
 
       {/* Recent Orders and Top Products */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

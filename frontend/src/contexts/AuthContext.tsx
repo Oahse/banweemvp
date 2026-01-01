@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext, useContext } from 'react';
+import React, { useEffect, useState, createContext, useContext, useCallback } from 'react';
 import { TokenManager, AuthAPI } from '../apis';
 import { toast } from 'react-hot-toast';
 
@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [intendedDestination, setIntendedDestination] = useState(null);
 
   // Transform API user to local user format
-  const transformUser = (apiUser: any): User => ({
+  const transformUser = useCallback((apiUser: any): User => ({
     id: apiUser.id,
     created_at: apiUser.created_at,
     updated_at: apiUser.updated_at,
@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     preferences: apiUser.preferences || {},
     // Legacy compatibility
     active: apiUser.is_active ?? true,
-  });
+  }), []);
 
   // Check authentication on mount
   useEffect(() => {
@@ -95,9 +95,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
     };
     checkAuth();
-  }, []);
+  }, [transformUser]); // Add transformUser to dependency array
 
-  const login = async (email: string, password: string): Promise<User> => {
+  const login = useCallback(async (email: string, password: string): Promise<User> => {
     setIsLoading(true);
     try {
       console.log('AuthContext: Attempting login...');
@@ -122,9 +122,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [transformUser]);
 
-  const register = async (firstname: string, lastname: string, email: string, password: string, phone?: string): Promise<void> => {
+  const register = useCallback(async (firstname: string, lastname: string, email: string, password: string, phone?: string): Promise<void> => {
     setIsLoading(true);
     try {
       const response = await AuthAPI.register({ firstname, lastname, email, password, phone });
@@ -144,9 +144,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [transformUser]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await AuthAPI.logout();
     } catch (error) {
@@ -157,9 +157,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(false);
       toast.success('Logged out successfully');
     }
-  };
+  }, []);
 
-  const verifyEmail = async (code) => {
+  const verifyEmail = useCallback(async (code) => {
     try {
       await AuthAPI.verifyEmail(code);
       if (user) setUser({ ...user, verified: true });
@@ -170,9 +170,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       toast.error(errorMessage);
       throw error;
     }
-  };
+  }, [user]);
 
-  const updateUserPreferences = async (preferences: Record<string, any>): Promise<void> => {
+  const updateUserPreferences = useCallback(async (preferences: Record<string, any>): Promise<void> => {
     if (!user) return;
 
     try {
@@ -193,24 +193,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       toast.error(errorMessage);
       throw error;
     }
-  };
+  }, [user, transformUser]);
 
-  const updateUser = (updatedUserData: any): void => {
+  const updateUser = useCallback((updatedUserData: any): void => {
     if (!user) return;
 
     // Update user state with new data
     const transformedUser = transformUser(updatedUserData);
     setUser(transformedUser);
     TokenManager.setUser(transformedUser);
-  };
+  }, [user, transformUser]);
 
-  const setIntendedDestinationWithAction = (path: string, action: string | null = null): void => {
+  const setIntendedDestinationWithAction = useCallback((path: string, action: string | null = null): void => {
     // Don't store login page as intended destination
     if (path === '/login' || path === '/register') {
       return;
     }
     setIntendedDestination({ path, action });
-  };
+  }, []);
 
   // Derived roles
   const isAdmin = user?.role === 'Admin';

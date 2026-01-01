@@ -87,7 +87,25 @@ export const AdminOrderDetail = () => {
 
       <div className="mt-6 bg-white shadow-sm rounded-lg p-4">
         <h2 className="text-xl font-bold mb-4">Payment Details</h2>
-        <p><strong>Payment Method ID:</strong> {order.payment_method_id || 'Not available'}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p><strong>Payment Status:</strong> {order.payment_status || 'N/A'}</p>
+            <p><strong>Total Paid:</strong> {order.currency} {order.total_amount?.toFixed(2)}</p>
+            <p><strong>Payment Method ID:</strong> {order.payment_method_id || 'N/A'}</p>
+          </div>
+          <div>
+            <h3><strong>Billing Address:</strong></h3>
+            {order.billing_address ? (
+              <>
+                <p>{order.billing_address.street}</p>
+                <p>{order.billing_address.city}, {order.billing_address.state} {order.billing_address.post_code}</p>
+                <p>{order.billing_address.country}</p>
+              </>
+            ) : (
+              <p>Not available</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {order.tracking_events && order.tracking_events.length > 0 && (

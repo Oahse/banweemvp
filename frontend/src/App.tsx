@@ -155,25 +155,28 @@ export const App: React.FC = () => {
                         position="top-right"
                         toastOptions={{
                           success: {
+                            duration: 3000,
                             style: {
                               background: 'var(--color-success)',
                               color: 'var(--color-copy-inverse)',
                             },
                           },
                           error: {
-                            duration: Infinity,
+                            duration: 5000,
                             style: {
                               background: 'var(--color-error)',
                               color: 'var(--color-copy-inverse)',
                             }
                           },
                           loading: {
+                            duration: Infinity, // Loading toasts should remain until dismissed by toast.success or toast.error
                             style: {
                               background: 'var(--color-surface-elevated)',
                               color: 'var(--color-copy)',
                             },
                           },
                           blank: {
+                            duration: 2000,
                             style: {
                               background: 'var(--color-surface)',
                               color: 'var(--color-copy)',

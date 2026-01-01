@@ -1,6 +1,7 @@
 # Consolidated notification routes
 # This file includes all notification-related routes
 
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
@@ -8,6 +9,7 @@ from uuid import UUID
 
 from core.database import get_db
 from core.dependencies import get_current_user
+from core.exceptions import APIException
 from core.utils.response import Response
 from models.user import User
 from models.notifications import Notification, NotificationPreference
@@ -16,29 +18,43 @@ from schemas.notifications import (
     NotificationResponse,
     NotificationPreferenceResponse,
     NotificationPreferenceUpdate,
-    NotificationCreate
+    NotificationCreate,
+    NotificationListResponse
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
 
-@router.get("/")
+@router.get("/", response_model=Response[NotificationListResponse])
 async def get_user_notifications(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
     page: int = 1,
     limit: int = 20,
-    unread_only: bool = False,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    unread_only: bool = False
 ):
     """Get user notifications with pagination"""
-    service = NotificationService(db)
-    notifications = await service.get_user_notifications(
-        user_id=current_user.id,
-        page=page,
-        limit=limit,
-        unread_only=unread_only
-    )
-    return Response.success(data=notifications)
+    logger.info(f"API Call: get_user_notifications for user {current_user.id}")
+    try:
+        service = NotificationService(db)
+        notifications = await service.get_user_notifications(
+            user_id=current_user.id,
+            page=page,
+            limit=limit,
+            unread_only=unread_only
+        )
+        logger.info(f"API Call Success: get_user_notifications for user {current_user.id}")
+        return Response.success(data=notifications)
+    except APIException as e:
+        logger.error(f"API Exception in get_user_notifications for user {current_user.id}: {e.message}", exc_info=True)
+        raise e
+    except Exception as e:
+        logger.error(f"Unexpected error in get_user_notifications for user {current_user.id}: {e}", exc_info=True)
+        raise APIException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                           message="An unexpected error occurred while fetching notifications.")
 
 
 @router.post("/")

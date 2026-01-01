@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 
 class NotificationBase(BaseModel):
@@ -56,5 +56,19 @@ class NotificationPreferenceResponse(NotificationPreferenceBase):
     user_id: str
     created_at: datetime
     updated_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PaginationMeta(BaseModel):
+    page: int
+    limit: int
+    total: int
+    pages: int
+
+
+class NotificationListResponse(BaseModel):
+    notifications: List[NotificationResponse]
+    pagination: PaginationMeta
 
     model_config = ConfigDict(from_attributes=True)

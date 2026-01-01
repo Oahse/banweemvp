@@ -292,34 +292,41 @@ class NotificationService:
         unread_only: bool = False
     ) -> Dict[str, Any]:
         """Get user notifications with pagination"""
-        offset = (page - 1) * limit
-        
-        query = select(Notification).where(Notification.user_id == user_id)
-        
-        if unread_only:
-            query = query.where(Notification.read == False)
-        
-        query = query.order_by(Notification.created_at.desc()).offset(offset).limit(limit)
-        
-        result = await self.db.execute(query)
-        notifications = result.scalars().all()
-        
-        # Get total count
-        count_query = select(func.count(Notification.id)).where(Notification.user_id == user_id)
-        if unread_only:
-            count_query = count_query.where(Notification.read == False)
-        
-        total = await self.db.scalar(count_query)
-        
-        return {
-            "notifications": [notification.to_dict() for notification in notifications],
-            "pagination": {
-                "page": page,
-                "limit": limit,
-                "total": total,
-                "pages": (total + limit - 1) // limit
+        logger.info(f"Attempting to fetch notifications for user {user_id}, page={page}, limit={limit}, unread_only={unread_only}")
+        try:
+            offset = (page - 1) * limit
+            
+            query = select(Notification).where(Notification.user_id == user_id)
+            
+            if unread_only:
+                query = query.where(Notification.read == False)
+            
+            query = query.order_by(Notification.created_at.desc()).offset(offset).limit(limit)
+            
+            result = await self.db.execute(query)
+            notifications = result.scalars().all()
+            
+            # Get total count
+            count_query = select(func.count(Notification.id)).where(Notification.user_id == user_id)
+            if unread_only:
+                count_query = count_query.where(Notification.read == False)
+            
+            total = await self.db.scalar(count_query)
+            
+            response_data = {
+                "notifications": [notification.to_dict() for notification in notifications],
+                "pagination": {
+                    "page": page,
+                    "limit": limit,
+                    "total": total,
+                    "pages": (total + limit - 1) // limit
+                }
             }
-        }
+            logger.info(f"Successfully fetched {len(notifications)} notifications for user {user_id}")
+            return response_data
+        except Exception as e:
+            logger.error(f"Error fetching notifications for user {user_id}: {e}", exc_info=True)
+            raise APIException(status_code=500, message="Failed to fetch notifications due to an internal server error.")
 
     async def mark_notification_read(self, notification_id: UUID, user_id: UUID) -> bool:
         """Mark a notification as read"""

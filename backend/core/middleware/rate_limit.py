@@ -321,11 +321,14 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                         if coupon_code:
                             abuse_result = await self.security_service.detect_coupon_abuse(identifier, coupon_code)
                             if abuse_result.get("blocked"):
-                            content={
-                                "success": False,
-                                "message": abuse_result["message"],
-                                "errors": [abuse_result["reason"].upper()]
-                            }
+                                return JSONResponse(
+                                    status_code=429,
+                                    content={
+                                        "success": False,
+                                        "message": abuse_result["message"],
+                                        "errors": [abuse_result["reason"].upper()]
+                                    }
+                                )
             except Exception as e:
                 logger.error(f"Error checking coupon abuse: {e}")
         

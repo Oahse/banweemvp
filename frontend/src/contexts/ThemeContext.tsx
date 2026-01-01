@@ -1,19 +1,13 @@
 import React, { useEffect, useState, createContext, useCallback, useContext } from 'react';
-import { useAuth } from './AuthContext';
+
 import { themeUtils, defaultTheme } from '../lib/theme';
 
 export const ThemeContext = createContext(undefined);
 
 export const ThemeProvider = ({ children }) => {
-  const { user, updateUserPreferences } = useAuth();
 
-  // Initialize theme from user preferences, localStorage, or default
-  const [theme, setThemeState] = useState(() => {
-    if (user?.preferences?.theme) {
-      return user.preferences.theme;
-    }
-    return themeUtils.loadThemePreference();
-  });
+
+  const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>('system');
 
   const [currentTheme, setCurrentTheme] = useState(() =>
     themeUtils.getEffectiveTheme(theme)
@@ -28,8 +22,7 @@ export const ThemeProvider = ({ children }) => {
       const effectiveTheme = themeUtils.getEffectiveTheme(newTheme);
       setCurrentTheme(effectiveTheme);
 
-      // Save to localStorage
-      themeUtils.saveThemePreference(newTheme);
+
 
       // Dispatch custom event for other components to listen
       window.dispatchEvent(
@@ -56,25 +49,10 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [theme, applyTheme]);
 
-  // ✅ Sync with user preferences
-  useEffect(() => {
-    if (user?.preferences?.theme && user.preferences.theme !== theme) {
-      setThemeState(user.preferences.theme);
-    }
-  }, [user?.preferences?.theme, theme]);
 
-  // ✅ Update theme preference
-  const setTheme = async (newTheme) => {
+
+  const setTheme = (newTheme: 'light' | 'dark' | 'system') => {
     setThemeState(newTheme);
-
-    // Update user preferences if authenticated
-    if (user) {
-      try {
-        await updateUserPreferences({ theme: newTheme });
-      } catch (error) {
-        console.error('Failed to update theme preference:', error);
-      }
-    }
   };
 
   // ✅ Update theme configuration (colors, spacing, etc.)

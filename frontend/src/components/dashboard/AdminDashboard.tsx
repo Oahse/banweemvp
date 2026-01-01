@@ -223,32 +223,7 @@ export const AdminDashboard = () => {
         },
         layout: { x: 0, y: 0, w: 3, h: 3 }
       },
-      {
-        id: 'total-orders',
-        type: 'metric',
-        title: 'Total Orders',
-        component: MetricWidget,
-        props: {
-          title: 'Total Orders',
-          value: loading ? '...' : (stats.total_orders || 0).toLocaleString(),
-          label: 'This Month',
-          change: stats.orders_change || 0
-        },
-        layout: { x: 3, y: 0, w: 3, h: 3 }
-      },
-      {
-        id: 'revenue',
-        type: 'metric',
-        title: 'Revenue',
-        component: MetricWidget,
-        props: {
-          title: 'Revenue',
-          value: loading ? '...' : `$${(stats.total_revenue || 0).toLocaleString()}`,
-          label: 'This Month',
-          change: stats.revenue_change || 0
-        },
-        layout: { x: 6, y: 0, w: 3, h: 3 }
-      },
+
       {
         id: 'total-products',
         type: 'metric',

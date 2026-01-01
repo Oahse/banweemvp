@@ -67,9 +67,9 @@ export const VerificationManager = ({
     try {
       await onResendEmailCode();
       setEmailCodeSent(true);
-      setEmailError('');
     } catch (error) {
-  };
+      setEmailError(error.message || 'Failed to resend email code. Please try again.');
+    }
 
   const handleResendPhoneCode = async () => {
     try {
@@ -77,7 +77,8 @@ export const VerificationManager = ({
       setPhoneCodeSent(true);
       setPhoneError('');
     } catch (error) {
-  };
+      setPhoneError(error.message || 'Failed to resend phone code. Please try again.');
+    }
 
   return (
     <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">

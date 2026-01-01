@@ -307,6 +307,34 @@ export class AdminAPI {
   }
 
   /**
+   * Get addresses for a specific user
+   */
+  static async getAddressesByUser(userId: string) {
+    return await apiClient.get(`/admin/users/${userId}/addresses`, {});
+  }
+
+  /**
+   * Create a new address for a specific user
+   */
+  static async createAddressForUser(userId: string, addressData: any) {
+    return await apiClient.post(`/admin/users/${userId}/addresses`, addressData, {});
+  }
+
+  /**
+   * Update an address for a specific user
+   */
+  static async updateAddressForUser(userId: string, addressId: string, addressData: any) {
+    return await apiClient.put(`/admin/users/${userId}/addresses/${addressId}`, addressData, {});
+  }
+
+  /**
+   * Delete an address for a specific user
+   */
+  static async deleteAddressForUser(userId: string, addressId: string) {
+    return await apiClient.delete(`/admin/users/${userId}/addresses/${addressId}`, {});
+  }
+
+  /**
    * Reset user password (admin action)
    */
   static async resetUserPassword(userId: string) {

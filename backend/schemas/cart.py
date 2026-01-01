@@ -6,8 +6,8 @@ from schemas.product import ProductVariantResponse
 
 
 class AddToCartRequest(BaseModel):
-    variant_id: str
-    quantity: int
+    variant_id: UUID
+    quantity: int = 1
 
 
 class ApplyPromocodeRequest(BaseModel):
