@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, update
 from fastapi import HTTPException, Depends, status, BackgroundTasks
-from fastapi.security import OAuth2PasswordBearer
+
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
@@ -16,7 +16,7 @@ from core.database import get_db
 from core.utils.messages.email import send_email
 from core.utils.encryption import PasswordManager
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/token")
+
 
 
 class AuthService:
