@@ -51,7 +51,7 @@ async def add_to_cart(
         session_id = get_session_id(req) if not current_user else None
         cart = await cart_service.add_to_cart(
             user_id=current_user.id if current_user else None,
-            variant_id=UUID(request.variant_id),
+            variant_id=request.variant_id,
             quantity=request.quantity,
             session_id=session_id
         )

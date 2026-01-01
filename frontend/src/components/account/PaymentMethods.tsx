@@ -210,7 +210,7 @@ export const PaymentMethods = () => {
 
   // Display error message if fetching payment methods failed
   if (error) {
-    return <div className="p-6 text-center text-red-500">Error: {error.message}</div>
+    return <div className="p-6 text-center text-error">Error: {error.message}</div>
   }
 
   return (
@@ -264,7 +264,7 @@ export const PaymentMethods = () => {
                     {/* Delete button */}
                     <button 
                       onClick={() => handleDeleteCard(method.id)} 
-                      className="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 p-1" 
+                      className="text-copy-lighter hover:text-error dark:text-copy-lighter dark:hover:text-error p-1" 
                       disabled={method.is_default}
                       title={method.is_default ? "Cannot delete default payment method" : "Delete payment method"}
                     >

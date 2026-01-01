@@ -484,17 +484,6 @@ class APIClient {
   }
 
   // Category methods
-  async getCategories() {
-    return this.get('/categories');
-  }
-
-  async getCategory(id) {
-    return this.get(`/categories/${id}`);
-  }
-
-  async getCategoryProducts(id, page = 1, limit = 20) {
-    return this.get(`/categories/${id}/products?page=${page}&limit=${limit}`);
-  }
 
   // Cart methods
   async getCart() {

@@ -91,7 +91,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
             aria-label="Navigate to admin home page"
           >
-            <img src="/banwe_logo_green.png" alt="Banwee Logo" className="h-8 mr-2" />
+            <img src="/banwee_logo_green.png" alt="Banwee Logo" className="h-8 mr-2" />
             <span className="text-xl font-semibold text-main">Admin</span>
           </Link>
         </div>

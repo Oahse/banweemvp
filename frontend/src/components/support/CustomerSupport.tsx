@@ -183,12 +183,12 @@ Please help me with my inquiry. Thank you!`;
   ];
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg p-6 ${className}`}>
+    <div className={`bg-surface rounded-lg shadow-lg p-6 ${className}`}>
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-copy mb-2">
           Need Help? We're Here! 🚀
         </h2>
-        <p className="text-gray-600">
+        <p className="text-copy-light">
           Get instant support via WhatsApp with our customer service team
         </p>
       </div>
@@ -197,29 +197,32 @@ Please help me with my inquiry. Thank you!`;
         {supportOptions.map((option) => (
           <div
             key={option.id}
-            className="border border-gray-200 rounded-lg p-4 hover:border-green-500 hover:shadow-md transition-all cursor-pointer"
+            className="border border-border rounded-lg p-4 hover:border-primary hover:shadow-md transition-all cursor-pointer"
             onClick={option.action}
           >
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                {option.icon}
+                {/* Icons will be updated manually if necessary based on their colors */}
+                {option.id === 'whatsapp-urgent' && <MessageCircle className="w-6 h-6 text-primary" />}
+                {option.id === 'whatsapp-order' && <ShoppingBag className="w-6 h-6 text-info" />}
+                {option.id === 'whatsapp-general' && <User className="w-6 h-6 text-secondary" />}
               </div>
               
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-copy">
                     {option.title}
                   </h3>
-                  <span className="text-sm text-green-600 font-medium">
+                  <span className="text-sm text-primary font-medium">
                     {option.responseTime}
                   </span>
                 </div>
                 
-                <p className="text-gray-600 mb-2">
+                <p className="text-copy-light mb-2">
                   {option.description}
                 </p>
                 
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                <div className="flex items-center space-x-4 text-sm text-copy-muted">
                   <div className="flex items-center space-x-1">
                     <Clock className="w-4 h-4" />
                     <span>{option.availability}</span>
@@ -232,8 +235,8 @@ Please help me with my inquiry. Thank you!`;
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">
+      <div className="mt-6 pt-6 border-t border-border">
+        <h3 className="text-lg font-semibold text-copy mb-3">
           Quick Actions
         </h3>
         
@@ -241,7 +244,7 @@ Please help me with my inquiry. Thank you!`;
           <button
             onClick={() => openWhatsApp('urgent')}
             disabled={isLoading}
-            className="flex items-center justify-center space-x-2 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+            className="flex items-center justify-center space-x-2 bg-primary text-copy-inverse px-4 py-3 rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
             <MessageCircle className="w-5 h-5" />
             <span>Chat Now</span>
@@ -249,7 +252,7 @@ Please help me with my inquiry. Thank you!`;
           
           <button
             onClick={() => window.open(`tel:${WHATSAPP_BUSINESS_NUMBER}`, '_self')}
-            className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center justify-center space-x-2 bg-info text-copy-inverse px-4 py-3 rounded-lg hover:bg-info-dark transition-colors"
           >
             <Phone className="w-5 h-5" />
             <span>Call Us</span>
@@ -258,11 +261,11 @@ Please help me with my inquiry. Thank you!`;
       </div>
 
       {/* Support Info */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h4 className="font-semibold text-gray-900 mb-2">
+      <div className="mt-6 p-4 bg-background rounded-lg">
+        <h4 className="font-semibold text-copy mb-2">
           💡 For Faster Support:
         </h4>
-        <ul className="text-sm text-gray-600 space-y-1">
+        <ul className="text-sm text-copy-light space-y-1">
           <li>• Have your order number ready</li>
           <li>• Describe your issue clearly</li>
           <li>• Include screenshots if helpful</li>
@@ -273,9 +276,9 @@ Please help me with my inquiry. Thank you!`;
       {/* Loading State */}
       {isLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Opening WhatsApp...</p>
+          <div className="bg-surface rounded-lg p-6 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-copy-light">Opening WhatsApp...</p>
           </div>
         </div>
       )}

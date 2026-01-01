@@ -28,6 +28,9 @@
     --color-info: #3b82f6;
     --color-info-light: #60a5fa;
     --color-info-dark: #2563eb;
+    --color-purple: #8b5cf6;
+    --color-purple-light: #a78bfa;
+    --color-purple-dark: #7c3aed;
     
     /* Surface Colors */
     --color-background: #f8fafc;
@@ -86,6 +89,9 @@
     --color-info: #3b82f6;
     --color-info-light: #60a5fa;
     --color-info-dark: #2563eb;
+    --color-purple: #8b5cf6;
+    --color-purple-light: #a78bfa;
+    --color-purple-dark: #7c3aed;
     
     /* Surface Colors - Dark mode */
     --color-background: #0f172a;

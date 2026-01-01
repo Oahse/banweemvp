@@ -28,7 +28,7 @@ class SubscriptionService:
         self,
         user_id: UUID,
         plan_id: str,
-        variant_ids: List[UUID],
+        product_variant_ids: List[UUID],
         delivery_type: str = "standard",
         delivery_address_id: Optional[UUID] = None,
         payment_method_id: Optional[UUID] = None
@@ -37,11 +37,11 @@ class SubscriptionService:
         
         # Validate variants exist
         variant_result = await self.db.execute(
-            select(ProductVariant).where(ProductVariant.id.in_(variant_ids))
+            select(ProductVariant).where(ProductVariant.id.in_(product_variant_ids))
         )
         variants = variant_result.scalars().all()
         
-        if len(variants) != len(variant_ids):
+        if len(variants) != len(product_variant_ids):
             raise HTTPException(status_code=400, detail="Some variants not found")
         
         # Calculate subscription cost
@@ -53,7 +53,7 @@ class SubscriptionService:
             plan_id=plan_id,
             status="active",
             price=cost_breakdown["total_amount"],
-            variant_ids=[str(vid) for vid in variant_ids],
+            variant_ids=[str(vid) for vid in product_variant_ids],
             cost_breakdown=cost_breakdown,
             delivery_type=delivery_type,
             delivery_address_id=delivery_address_id,
@@ -61,6 +61,10 @@ class SubscriptionService:
             current_period_end=datetime.utcnow() + timedelta(days=30),  # Monthly by default
             next_billing_date=datetime.utcnow() + timedelta(days=30)
         )
+        
+        # Add products to the many-to-many relationship
+        for variant in variants:
+            subscription.products.append(variant)
         
         self.db.add(subscription)
         await self.db.commit()
@@ -236,7 +240,7 @@ class SubscriptionService:
     ) -> List[Subscription]:
         """Get all subscriptions for a user"""
         query = select(Subscription).where(Subscription.user_id == user_id).options(
-            selectinload(Subscription.products)
+            selectinload(Subscription.products).selectinload(ProductVariant.inventory)
         )
         
         if status_filter:
@@ -271,7 +275,7 @@ class SubscriptionService:
         self,
         subscription_id: UUID,
         user_id: UUID,
-        variant_ids: Optional[List[UUID]] = None,
+        product_variant_ids: Optional[List[UUID]] = None,
         delivery_type: Optional[str] = None,
         delivery_address_id: Optional[UUID] = None
     ) -> Subscription:
@@ -285,17 +289,22 @@ class SubscriptionService:
             raise HTTPException(status_code=400, detail="Cannot update inactive subscription")
         
         # Update fields if provided
-        if variant_ids is not None:
+        if product_variant_ids is not None:
             # Validate variants
             variant_result = await self.db.execute(
-                select(ProductVariant).where(ProductVariant.id.in_(variant_ids))
+                select(ProductVariant).where(ProductVariant.id.in_(product_variant_ids))
             )
             variants = variant_result.scalars().all()
             
-            if len(variants) != len(variant_ids):
+            if len(variants) != len(product_variant_ids):
                 raise HTTPException(status_code=400, detail="Some variants not found")
             
-            subscription.variant_ids = [str(vid) for vid in variant_ids]
+            subscription.variant_ids = [str(vid) for vid in product_variant_ids]
+            
+            # Update many-to-many relationship
+            subscription.products.clear()
+            for variant in variants:
+                subscription.products.append(variant)
             
             # Recalculate cost
             cost_breakdown = await self._calculate_subscription_cost(
@@ -309,7 +318,7 @@ class SubscriptionService:
             subscription.delivery_type = delivery_type
             
             # Recalculate cost if delivery type changed
-            if variant_ids is None:  # Only recalculate if we didn't already do it above
+            if product_variant_ids is None:  # Only recalculate if we didn't already do it above
                 current_variants = await self._get_subscription_variants(subscription)
                 cost_breakdown = await self._calculate_subscription_cost(current_variants, delivery_type)
                 subscription.cost_breakdown = cost_breakdown

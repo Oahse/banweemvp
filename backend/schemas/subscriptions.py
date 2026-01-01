@@ -20,7 +20,7 @@ class SubscriptionBase(BaseModel):
 
 
 class SubscriptionCreate(SubscriptionBase):
-    pass
+    product_variant_ids: Optional[List[UUID]] = None
 
 
 class SubscriptionUpdate(SubscriptionBase):
@@ -33,6 +33,7 @@ class SubscriptionUpdate(SubscriptionBase):
     current_period_start: Optional[datetime] = None
     current_period_end: Optional[datetime] = None
     cancelled_at: Optional[datetime] = None
+    product_variant_ids: Optional[List[UUID]] = None
 
 
 class SubscriptionResponse(SubscriptionBase):

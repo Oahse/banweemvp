@@ -28,27 +28,27 @@ export const ExpressCheckout: React.FC<ExpressCheckoutProps> = ({
   }
 
   return (
-    <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-6 mb-6">
+    <div className="bg-gradient-to-r from-success/10 to-primary/10 border border-success/30 rounded-lg p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-            <span className="text-green-600 font-bold text-sm">⚡</span>
+          <div className="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
+            <span className="text-success font-bold text-sm">⚡</span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Express Checkout</h3>
-          <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+          <h3 className="text-lg font-semibold text-copy">Express Checkout</h3>
+          <span className="bg-success/20 text-success text-xs font-medium px-2 py-1 rounded-full">
             One-Click
           </span>
           {expressData.stockValidated && (
-            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+            <span className="bg-primary/20 text-primary text-xs font-medium px-2 py-1 rounded-full">
               ✓ Stock Verified
             </span>
           )}
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-copy">
             ${expressData.total.toFixed(2)}
           </div>
-          <div className="text-sm text-gray-600">Total</div>
+          <div className="text-sm text-copy-light">Total</div>
         </div>
       </div>
 
@@ -56,10 +56,10 @@ export const ExpressCheckout: React.FC<ExpressCheckoutProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Shipping Address */}
         <div className="flex items-start space-x-3">
-          <MapPin className="w-5 h-5 text-gray-400 mt-1" />
+          <MapPin className="w-5 h-5 text-copy-lighter mt-1" />
           <div>
-            <div className="text-sm font-medium text-gray-900">Ship to</div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm font-medium text-copy">Ship to</div>
+            <div className="text-sm text-copy-light">
               {expressData.address.street}<br />
               {expressData.address.city}, {expressData.address.state} {expressData.address.post_code}
             </div>
@@ -68,10 +68,10 @@ export const ExpressCheckout: React.FC<ExpressCheckoutProps> = ({
 
         {/* Shipping Method */}
         <div className="flex items-start space-x-3">
-          <Truck className="w-5 h-5 text-gray-400 mt-1" />
+          <Truck className="w-5 h-5 text-copy-lighter mt-1" />
           <div>
-            <div className="text-sm font-medium text-gray-900">Shipping</div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm font-medium text-copy">Shipping</div>
+            <div className="text-sm text-copy-light">
               {expressData.shipping.name}<br />
               ${expressData.shipping.price.toFixed(2)}
             </div>
@@ -80,10 +80,10 @@ export const ExpressCheckout: React.FC<ExpressCheckoutProps> = ({
 
         {/* Payment Method */}
         <div className="flex items-start space-x-3">
-          <CreditCard className="w-5 h-5 text-gray-400 mt-1" />
+          <CreditCard className="w-5 h-5 text-copy-lighter mt-1" />
           <div>
-            <div className="text-sm font-medium text-gray-900">Payment</div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm font-medium text-copy">Payment</div>
+            <div className="text-sm text-copy-light">
               {expressData.payment.brand?.toUpperCase()} •••• {expressData.payment.last_four}
             </div>
           </div>
@@ -94,7 +94,7 @@ export const ExpressCheckout: React.FC<ExpressCheckoutProps> = ({
       <div className="flex items-center justify-between">
         <button
           onClick={onFallback}
-          className="text-sm text-gray-600 hover:text-gray-800 underline"
+          className="text-sm text-copy-light hover:text-copy underline"
         >
           Use regular checkout instead
         </button>
@@ -102,14 +102,14 @@ export const ExpressCheckout: React.FC<ExpressCheckoutProps> = ({
         <Button
           onClick={handleExpressCheckout}
           isLoading={loading}
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg font-semibold"
+          className="bg-success hover:bg-success-dark text-copy-inverse px-8 py-3 text-lg font-semibold"
           size="lg"
         >
           {loading ? 'Processing...' : `Complete Order - $${expressData.total.toFixed(2)}`}
         </Button>
       </div>
 
-      <div className="mt-4 text-xs text-gray-500 text-center">
+      <div className="mt-4 text-xs text-copy-muted text-center">
         By clicking "Complete Order", you agree to our terms and authorize payment using your saved payment method.
       </div>
     </div>

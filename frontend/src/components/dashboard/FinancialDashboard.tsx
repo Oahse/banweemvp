@@ -93,10 +93,10 @@ const ExpenseBreakdownWidget = () => {
       backgroundColor: [
         'var(--color-error)',
         'var(--color-warning)',
-        '#8b5cf6',
-        '#06b6d4',
+        'var(--color-purple)',
+        'var(--color-info-light)',
         'var(--color-success)',
-        '#6b7280'
+        'var(--color-copy-lighter)'
       ]
     }]
   };

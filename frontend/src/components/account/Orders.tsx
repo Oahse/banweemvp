@@ -33,20 +33,20 @@ export const Orders = ({
       case 'delivered':
       case 'confirmed':
       case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        return 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light';
       case 'shipped':
       case 'out_for_delivery':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+        return 'bg-info-light text-info-dark dark:bg-info-dark dark:text-info-light';
       case 'processing':
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'bg-warning-light text-warning-dark dark:bg-warning-dark dark:text-warning-light';
       case 'cancelled':
       case 'payment_failed':
       case 'failed':
       case 'refunded':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        return 'bg-error-light text-error-dark dark:bg-error-dark dark:text-error-light';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        return 'bg-surface-hover text-copy-light dark:bg-surface-active dark:text-copy-lighter';
     }
   };
 
@@ -63,7 +63,7 @@ export const Orders = ({
 
   if (error) {
     return (
-      <div className="text-red-500 text-center p-8">
+      <div className="text-error text-center p-8">
         <p>Error fetching orders: {error.message}</p>
       </div>
     );

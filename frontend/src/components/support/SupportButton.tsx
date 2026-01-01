@@ -43,24 +43,24 @@ const SupportButton: React.FC<SupportButtonProps> = ({
         {!isOpen ? (
           <button
             onClick={() => setIsOpen(true)}
-            className="bg-green-600 hover:bg-green-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 group"
+            className="bg-primary hover:bg-primary-dark text-copy-inverse rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 group"
             aria-label="Customer Support"
           >
             <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
             
             {/* Pulse animation */}
-            <div className="absolute inset-0 rounded-full bg-green-600 animate-ping opacity-20"></div>
+            <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-20"></div>
             
             {/* Tooltip */}
-            <div className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            <div className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-copy text-copy-inverse text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               Need Help? Chat with us!
-              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-copy"></div>
             </div>
           </button>
         ) : (
           <button
             onClick={() => setIsOpen(false)}
-            className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-surface-elevated hover:bg-surface-hover text-copy rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300"
             aria-label="Close Support"
           >
             <X className="w-6 h-6" />
@@ -72,7 +72,7 @@ const SupportButton: React.FC<SupportButtonProps> = ({
       <div className={`fixed ${position === 'bottom-right' ? 'bottom-6 right-20' : 'bottom-6 left-20'} z-30`}>
         <button
           onClick={openWhatsAppDirect}
-          className="bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300 opacity-80 hover:opacity-100"
+          className="bg-primary hover:bg-primary-dark text-copy-inverse rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300 opacity-80 hover:opacity-100"
           title="Quick WhatsApp Support"
         >
           <Headphones className="w-5 h-5" />
@@ -90,11 +90,11 @@ const SupportButton: React.FC<SupportButtonProps> = ({
           
           {/* Modal */}
           <div className="flex items-center justify-center min-h-screen p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="relative bg-surface rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
               {/* Close button */}
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
+                className="absolute top-4 right-4 text-copy-light hover:text-copy z-10"
               >
                 <X className="w-6 h-6" />
               </button>

@@ -117,10 +117,10 @@ export const InteractiveChart = ({
         enabled: showTooltips,
         mode: 'index',
         intersect: false,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: 'white',
-        bodyColor: 'white',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'var(--color-surface-elevated)',
+        titleColor: 'var(--color-copy)',
+        bodyColor: 'var(--color-copy-light)',
+        borderColor: 'var(--color-border)',
         borderWidth: 1,
         cornerRadius: 8,
         displayColors: true,
@@ -146,7 +146,7 @@ export const InteractiveChart = ({
         display: true,
         grid: {
           display: true,
-          color: 'rgba(0, 0, 0, 0.1)',
+          color: 'var(--color-border-light)',
         },
         ticks: {
           color: 'var(--color-copy-light)',
@@ -156,7 +156,7 @@ export const InteractiveChart = ({
         display: true,
         grid: {
           display: true,
-          color: 'rgba(0, 0, 0, 0.1)',
+          color: 'var(--color-border-light)',
         },
         ticks: {
           color: 'var(--color-copy-light)',
@@ -252,7 +252,7 @@ export const InteractiveChart = ({
           datasets: currentData.datasets.map(dataset => ({
             ...dataset,
             fill: true,
-            backgroundColor: dataset.backgroundColor || 'rgba(75, 192, 192, 0.2)',
+            backgroundColor: dataset.backgroundColor || 'var(--color-primary-light)',
           }))
         };
         return <Line {...commonProps} data={areaData} />;

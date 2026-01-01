@@ -78,9 +78,9 @@ export const BusinessDashboard: React.FC = () => {
   };
 
   const getChangeColor = (change: number): string => {
-    if (change > 0) return 'text-green-600';
-    if (change < 0) return 'text-red-600';
-    return 'text-gray-600';
+    if (change > 0) return 'text-success';
+    if (change < 0) return 'text-error';
+    return 'text-copy-light';
   };
 
   const getChangeIcon = (change: number) => {
@@ -111,11 +111,11 @@ export const BusinessDashboard: React.FC = () => {
   if (error) {
     return (
       <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
-          <ExclamationTriangleIcon className="w-5 h-5 text-red-600 mr-3" />
+        <div className="bg-error-light border border-error-light rounded-lg p-4 flex items-center">
+          <ExclamationTriangleIcon className="w-5 h-5 text-error mr-3" />
           <div>
-            <h3 className="text-red-800 font-medium">Error Loading Dashboard</h3>
-            <p className="text-red-600 text-sm">{error}</p>
+            <h3 className="text-error-dark font-medium">Error Loading Dashboard</h3>
+            <p className="text-error text-sm">{error}</p>
           </div>
         </div>
       </div>

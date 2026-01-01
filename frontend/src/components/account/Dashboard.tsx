@@ -79,8 +79,8 @@ export const Dashboard = ({
           </Link>
           <Link to="/account/wishlist" className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
             <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mr-3">
-                <HeartIcon size={20} className="text-red-600 dark:text-red-300" />
+              <div className="w-10 h-10 rounded-full bg-error-light dark:bg-error-dark flex items-center justify-center mr-3">
+                <HeartIcon size={20} className="text-error dark:text-error-light" />
               </div>
               <div>
                 <h3 className="font-medium text-main dark:text-white">
@@ -94,8 +94,8 @@ export const Dashboard = ({
           </Link>
           <Link to="/account/addresses" className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
             <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
-                <MapPinIcon size={20} className="text-green-600 dark:text-green-300" />
+              <div className="w-10 h-10 rounded-full bg-success-light dark:bg-success-dark flex items-center justify-center mr-3">
+                <MapPinIcon size={20} className="text-success dark:text-success-light" />
               </div>
               <div>
                 <h3 className="font-medium text-main dark:text-white">
@@ -163,7 +163,7 @@ export const Dashboard = ({
                       {new Date(order.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-1 text-xs rounded-full ${order.status === 'Delivered' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'}`}>
+                      <span className={`px-2 py-1 text-xs rounded-full ${order.status === 'Delivered' ? 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light' : 'bg-info-light text-info-dark dark:bg-info-dark dark:text-info-light'}`}>
                         {order.status}
                       </span>
                     </td>

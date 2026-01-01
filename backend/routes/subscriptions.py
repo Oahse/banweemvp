@@ -35,7 +35,20 @@ async def create_subscription(
     """Create a new subscription."""
     try:
         subscription_service = SubscriptionService(db)
-        subscription = await subscription_service.create_subscription(subscription_data, current_user.id)
+        
+        # Extract product_variant_ids and other data
+        product_variant_ids = subscription_data.product_variant_ids
+        
+        # Pass data directly to the service method
+        subscription = await subscription_service.create_subscription(
+            user_id=current_user.id,
+            plan_id=subscription_data.plan_id,
+            product_variant_ids=product_variant_ids,
+            # Add other fields from subscription_data as needed, e.g., delivery_type, delivery_address_id
+            # For now, assuming these are simple and can be directly passed or defaulted
+            delivery_type=subscription_data.delivery_type if hasattr(subscription_data, 'delivery_type') else "standard",
+            delivery_address_id=subscription_data.delivery_address_id if hasattr(subscription_data, 'delivery_address_id') else None
+        )
         return Response.success(data=subscription, message="Subscription created successfully")
     except APIException:
         raise
@@ -125,32 +138,7 @@ async def remove_products_from_subscription(
         )
 
 
-@router.get("/{subscription_id}")
-async def get_subscription(
-    subscription_id: UUID,
-    current_user: User = Depends(get_current_auth_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Get a specific subscription."""
-    try:
-        subscription_service = SubscriptionService(db)
-        subscription = await subscription_service.get_subscription(subscription_id, current_user.id)
-        return Response.success(data=subscription.to_dict(include_products=True))
-    except APIException:
-        raise
-    except Exception as e:
-        raise APIException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to get subscription: {str(e)}"
-        )
-        subscription_service = SubscriptionService(db)
-        subscriptions = await subscription_service.get_user_subscriptions(current_user.id, page, limit)
-        return Response.success(data=subscriptions)
-    except Exception as e:
-        raise APIException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to fetch subscriptions: {str(e)}"
-        )
+
 
 
 @router.get("/{subscription_id}")
@@ -189,7 +177,20 @@ async def update_subscription(
     """Update a subscription."""
     try:
         subscription_service = SubscriptionService(db)
-        subscription = await subscription_service.update_subscription(subscription_id, subscription_data, current_user.id, background_tasks)
+        
+        # Extract product_variant_ids and other data
+        product_variant_ids = subscription_data.product_variant_ids
+        
+        # Pass data directly to the service method
+        subscription = await subscription_service.update_subscription(
+            subscription_id=subscription_id,
+            user_id=current_user.id,
+            product_variant_ids=product_variant_ids,
+            # Pass other updateable fields from subscription_data
+            delivery_type=subscription_data.delivery_type if hasattr(subscription_data, 'delivery_type') else None,
+            delivery_address_id=subscription_data.delivery_address_id if hasattr(subscription_data, 'delivery_address_id') else None
+            # Add other fields here as needed
+        )
         return Response.success(data=subscription, message="Subscription updated successfully")
     except APIException:
         raise
@@ -209,14 +210,14 @@ async def delete_subscription(
     """Delete a subscription."""
     try:
         subscription_service = SubscriptionService(db)
-        await subscription_service.delete_subscription(subscription_id, current_user.id)
-        return Response.success(message="Subscription deleted successfully")
+        await subscription_service.cancel_subscription(subscription_id, current_user.id)
+        return Response.success(message="Subscription cancelled successfully")
     except APIException:
         raise
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to delete subscription: {str(e)}"
+            message=f"Failed to cancel subscription: {str(e)}"
         )
 
 
@@ -229,7 +230,7 @@ async def process_subscription_shipment(
     """Manually trigger shipment processing for a subscription."""
     try:
         subscription_service = SubscriptionService(db)
-        subscription = await subscription_service.get_subscription(subscription_id, current_user.id)
+        subscription = await subscription_service.get_subscription_by_id(subscription_id, current_user.id)
         
         if not subscription:
             raise APIException(

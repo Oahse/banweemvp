@@ -44,7 +44,7 @@ export const OrderDetail = () => {
       case 'delivered':
       case 'confirmed':
       case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        return 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light';
       case 'shipped':
       case 'out_for_delivery':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
@@ -55,7 +55,7 @@ export const OrderDetail = () => {
       case 'payment_failed':
       case 'failed':
       case 'refunded':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        return 'bg-error-light text-error-dark dark:bg-error-dark dark:text-error-light';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     }
@@ -87,7 +87,7 @@ export const OrderDetail = () => {
     <div className="p-6">
       <button
         onClick={() => navigate('/account/orders')}
-        className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-6"
+        className="flex items-center text-copy-light hover:text-copy mb-6"
       >
         <ArrowLeftIcon size={20} className="mr-2" />
         Back to Orders
@@ -113,14 +113,14 @@ export const OrderDetail = () => {
             <div className="flex gap-2">
               <Link
                 to={`/track-order/${order.id}`}
-                className="flex items-center px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="flex items-center px-4 py-2 text-sm border border-border rounded hover:bg-surface-hover"
               >
                 <MapPinIcon size={16} className="mr-2" />
                 Track Order
               </Link>
               <button
                 onClick={handleDownloadInvoice}
-                className="flex items-center px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="flex items-center px-4 py-2 text-sm border border-border rounded hover:bg-surface-hover"
               >
                 <DownloadIcon size={16} className="mr-2" />
                 Download Invoice

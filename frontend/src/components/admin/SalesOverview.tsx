@@ -39,7 +39,15 @@ interface SalesData {
   customers: number;
 }
 
-const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+import { CHART_COLORS } from './sales/utils';
+
+const COLORS = [
+  CHART_COLORS.primary,
+  CHART_COLORS.secondary, 
+  CHART_COLORS.accent,
+  CHART_COLORS.danger,
+  CHART_COLORS.purple
+];
 
 export const SalesOverview: React.FC<SalesOverviewProps> = ({ 
   timeRange = '30d', 

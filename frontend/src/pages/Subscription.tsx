@@ -1,9 +1,32 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { ChevronRightIcon, CheckIcon } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext'; // Added useAuth
+import { useSubscription } from '../contexts/SubscriptionContext'; // Added useSubscription
 
 export const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState('monthly');
+  const { isAuthenticated } = useAuth();
+  const { activeSubscription, loading: subscriptionLoading } = useSubscription();
+  const navigate = useNavigate();
+
+  // Redirect if user is authenticated and has an active subscription
+  useEffect(() => {
+    if (isAuthenticated && activeSubscription && !subscriptionLoading) {
+      navigate(`/subscription/${activeSubscription.id}/manage`);
+    }
+  }, [isAuthenticated, activeSubscription, subscriptionLoading, navigate]);
+
+  if (isAuthenticated && subscriptionLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-copy">
+        <div className="flex items-center justify-center h-64">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="ml-4 text-copy-light">Checking for active subscription...</p>
+        </div>
+      </div>
+    );
+  }
   const plans = {
     monthly: {
       price: 39.99,

@@ -9,11 +9,11 @@ from enum import Enum
 from models.user import UserRole
 
 class AddressBase(BaseModel):
-    street: Optional[str]
-    city: Optional[str]
-    state: Optional[str]
-    country: Optional[str]
-    post_code: Optional[str]
+    street: str
+    city: str
+    state: str
+    country: str
+    post_code: str
     kind: str = "Shipping"
 
 
@@ -22,7 +22,12 @@ class AddressCreate(AddressBase):
 
 
 class AddressUpdate(AddressBase):
-    pass
+    street: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    post_code: Optional[str] = None
+    kind: Optional[str] = None
 
 
 class AddressResponse(AddressBase):

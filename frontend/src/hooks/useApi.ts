@@ -95,7 +95,7 @@ export const usePaginatedApi = <T = any>(
             }
           } else {
             // Look for common array property names
-            const possibleArrayKeys = ['orders', 'users', 'products', 'variants', 'items', 'results'];
+            const possibleArrayKeys = ['orders', 'users', 'products', 'variants', 'items', 'results', 'addresses'];
             for (const key of possibleArrayKeys) {
               if (Array.isArray(result.data[key])) {
                 dataArray = result.data[key];

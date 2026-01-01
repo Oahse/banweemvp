@@ -24,6 +24,7 @@ const OrderDetail = lazy(() => import('../components/account/OrderDetail'));
 const TrackOrder = lazy(() => import('../components/account/TrackOrder'));
 const Wishlist = lazy(() => import('../components/account/Wishlist'));
 const Addresses = lazy(() => import('../components/account/Addresses'));
+const MySubscriptions = lazy(() => import('../components/account/MySubscriptions').then(module => ({ default: module.MySubscriptions })));
 
 const NotificationSettings = lazy(() =>
   import('../components/account/NotificationSettings').then(module => ({ default: module.NotificationSettings }))
@@ -65,6 +66,7 @@ export const Account = () => {
     { path: '/account/wishlist', label: 'Wishlist', icon: <HeartIcon size={20} /> },
     { path: '/account/addresses', label: 'Addresses', icon: <MapPinIcon size={20} /> },
     { path: '/account/payment-methods', label: 'Payment Methods', icon: <CreditCardIcon size={20} /> },
+    { path: '/account/subscriptions', label: 'My Subscriptions', icon: <PackageIcon size={20} /> }, // Added this line
     { path: '/account/notifications', label: 'Notifications', icon: <BellIcon size={20} /> },
 
   ];
@@ -168,6 +170,7 @@ export const Account = () => {
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/addresses" element={<Addresses />} />
               <Route path="/payment-methods" element={<PaymentMethods />} />
+              <Route path="/subscriptions" element={<MySubscriptions />} />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/notification-settings" element={<NotificationSettings />} />
 

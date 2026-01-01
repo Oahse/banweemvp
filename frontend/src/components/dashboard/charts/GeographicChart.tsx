@@ -39,6 +39,18 @@ L.Icon.Default.mergeOptions({
  * @property {string} [className]
  */
 
+// Create theme-aware color scale
+const getThemeColorScale = () => {
+  // Use CSS variables for theme-aware colors
+  return [
+    'rgba(var(--color-error-rgb, 239, 68, 68), 0.2)',
+    'rgba(var(--color-error-rgb, 239, 68, 68), 0.4)', 
+    'rgba(var(--color-error-rgb, 239, 68, 68), 0.6)',
+    'rgba(var(--color-error-rgb, 239, 68, 68), 0.8)',
+    'var(--color-error)'
+  ];
+};
+
 export const GeographicChart = ({
   data,
   title,
@@ -46,7 +58,7 @@ export const GeographicChart = ({
   viewMode = 'map',
   showPercentages = true,
   showTooltips = true,
-  colorScale = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15'],
+  colorScale = getThemeColorScale(),
   onCountryClick,
   onViewModeChange,
   loading = false,

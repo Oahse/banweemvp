@@ -30,7 +30,7 @@ export const OrderItemDetails = ({ productId, quantity, price }) => {
   }
 
   if (error) {
-    return <div className="text-red-500 text-sm">Error loading product</div>;
+    return <div className="text-error text-sm">Error loading product</div>;
   }
 
   if (!product) {

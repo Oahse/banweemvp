@@ -1,11 +1,11 @@
 // frontend/src/components/admin/sales/utils.ts
 
 export const CHART_COLORS = {
-  primary: '#3B82F6',
-  secondary: '#10B981',
-  accent: '#F59E0B',
-  danger: '#EF4444',
-  purple: '#8B5CF6'
+  primary: 'var(--color-info)',
+  secondary: 'var(--color-success)',
+  accent: 'var(--color-warning)',
+  danger: 'var(--color-error)',
+  purple: 'var(--color-purple)'
 };
 
 export const formatCurrency = (value: number) => {

@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from core.config import settings
 import pickle
 import hashlib
+from uuid import UUID
 
 logger = logging.getLogger(__name__)
 
@@ -66,12 +67,24 @@ class RedisService:
     
     def _serialize_data(self, data: Any) -> str:
         """Serialize data for Redis storage"""
+        def json_default(o):
+            if isinstance(o, UUID):
+                return str(o)
+            if isinstance(o, datetime):
+                return o.isoformat()
+            raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
+
         if isinstance(data, (dict, list)):
-            return json.dumps(data, default=str)
+            return json.dumps(data, default=json_default)
         elif isinstance(data, (int, float, str, bool)):
             return str(data)
+        elif isinstance(data, UUID):
+            return str(data)
+        elif isinstance(data, datetime):
+            return data.isoformat()
         else:
-            # Use pickle for complex objects
+            # For any other complex, non-JSON-serializable objects, fall back to pickle
+            logger.warning(f"Serializing complex object with pickle: {type(data)}")
             return pickle.dumps(data).hex()
     
     def _deserialize_data(self, data: str, data_type: str = "json") -> Any:
@@ -81,14 +94,40 @@ class RedisService:
         
         try:
             if data_type == "json":
-                return json.loads(data)
+                # Attempt to parse JSON
+                parsed_data = json.loads(data)
+                
+                # Recursively convert UUID strings back to UUID objects in dicts/lists
+                return self._convert_uuids_in_data(parsed_data)
             elif data_type == "pickle":
                 return pickle.loads(bytes.fromhex(data))
             else:
                 return data
-        except (json.JSONDecodeError, ValueError) as e:
+        except json.JSONDecodeError:
+            # If JSON decoding fails, it might be a simple string (e.g., a direct UUID string)
+            # Or it might be a pickled item that wasn't marked as such
+            try:
+                # Try to convert to UUID if it's a UUID string
+                return UUID(data)
+            except ValueError:
+                return data
+        except ValueError as e: # For bytes.fromhex errors etc.
             logger.error(f"Failed to deserialize Redis data: {e}")
             return None
+
+    def _convert_uuids_in_data(self, data: Any) -> Any:
+        """Helper to recursively convert UUID strings to UUID objects"""
+        if isinstance(data, dict):
+            return {k: self._convert_uuids_in_data(v) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [self._convert_uuids_in_data(elem) for elem in data]
+        elif isinstance(data, str):
+            try:
+                # Attempt to convert string to UUID object
+                return UUID(data)
+            except ValueError:
+                return data
+        return data
     
     async def set_with_expiry(
         self, 

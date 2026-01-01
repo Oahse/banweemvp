@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="frontend/public/banwe_logo_green.png" alt="Banwee Logo" width="200"/>
+  <img src="frontend/public/banwee_logo_green.png" alt="Banwee Logo" width="200"/>
   
   # Banwee E-commerce Platform
 

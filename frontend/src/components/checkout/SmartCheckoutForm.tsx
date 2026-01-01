@@ -408,8 +408,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600">Loading checkout options...</span>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="ml-3 text-copy-light">Loading checkout options...</span>
       </div>
     );
   }
@@ -423,8 +423,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <div key={step.number} className="flex items-center">
               <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
                 currentStep >= step.number
-                  ? 'bg-blue-600 border-blue-600 text-white'
-                  : 'border-gray-300 text-gray-400'
+                  ? 'bg-primary border-primary text-copy-inverse'
+                  : 'border text-copy-lighter'
               }`}>
                 {currentStep > step.number ? (
                   <CheckCircle className="w-6 h-6" />
@@ -434,19 +434,19 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
               </div>
               <div className="ml-3">
                 <div className={`text-sm font-medium ${
-                  currentStep >= step.number ? 'text-blue-600' : 'text-gray-400'
+                  currentStep >= step.number ? 'text-primary' : 'text-copy-lighter'
                 }`}>
                   Step {step.number}
                 </div>
                 <div className={`text-xs ${
-                  currentStep >= step.number ? 'text-gray-900' : 'text-gray-400'
+                  currentStep >= step.number ? 'text-copy' : 'text-copy-lighter'
                 }`}>
                   {step.title}
                 </div>
               </div>
               {index < steps.length - 1 && (
                 <div className={`flex-1 h-0.5 mx-4 ${
-                  currentStep > step.number ? 'bg-blue-600' : 'bg-gray-200'
+                  currentStep > step.number ? 'bg-primary' : 'bg-border-light'
                 }`} />
               )}
             </div>
@@ -468,8 +468,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                       key={address.id}
                       className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
                         formData.shipping_address_id === address.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-primary bg-primary/10'
+                          : 'border hover:border-strong'
                       }`}
                     >
                       <input
@@ -482,18 +482,18 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                       />
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-copy">
                             {address.street}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-copy-light">
                             {address.city}, {address.state} {address.post_code}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-copy-light">
                             {address.country}
                           </div>
                         </div>
                         {address.is_default && (
-                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
+                          <span className="bg-success/20 text-success text-xs font-medium px-2 py-1 rounded">
                             Default
                           </span>
                         )}
@@ -502,7 +502,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   ))}
                   
                   {addresses.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-copy-muted">
                       <p>No addresses found. Please add an address to continue.</p>
                       <Button
                         onClick={() => {/* Navigate to add address */}}
@@ -516,7 +516,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 </div>
                 
                 {validationErrors.shipping_address_id && (
-                  <div className="mt-2 text-sm text-red-600 flex items-center">
+                  <div className="mt-2 text-sm text-error flex items-center">
                     <AlertTriangle className="w-4 h-4 mr-1" />
                     {validationErrors.shipping_address_id}
                   </div>
@@ -534,8 +534,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                       key={method.id}
                       className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
                         formData.shipping_method_id === method.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-primary bg-primary/10'
+                          : 'border hover:border-strong'
                       }`}
                     >
                       <input
@@ -548,14 +548,14 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                       />
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-copy">
                             {method.name}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-copy-light">
                             {method.estimated_days} business days
                           </div>
                         </div>
-                        <div className="text-lg font-semibold text-gray-900">
+                        <div className="text-lg font-semibold text-copy">
                           {formatCurrency(method.price)}
                         </div>
                       </div>
@@ -564,7 +564,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 </div>
                 
                 {validationErrors.shipping_method_id && (
-                  <div className="mt-2 text-sm text-red-600 flex items-center">
+                  <div className="mt-2 text-sm text-error flex items-center">
                     <AlertTriangle className="w-4 h-4 mr-1" />
                     {validationErrors.shipping_method_id}
                   </div>
@@ -582,8 +582,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                       key={method.id}
                       className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
                         formData.payment_method_id === method.id && !showNewCardForm
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-primary bg-primary/10'
+                          : 'border hover:border-strong'
                       }`}
                     >
                       <input
@@ -599,20 +599,20 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                       />
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-6 bg-gray-100 rounded flex items-center justify-center text-xs font-bold">
+                          <div className="w-8 h-6 bg-surface-active rounded flex items-center justify-center text-xs font-bold">
                             {method.brand?.toUpperCase()}
                           </div>
                           <div>
-                            <div className="font-medium text-gray-900">
+                            <div className="font-medium text-copy">
                               •••• •••• •••• {method.last_four}
                             </div>
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-copy-light">
                               Expires {method.expiry_month}/{method.expiry_year}
                             </div>
                           </div>
                         </div>
                         {method.is_default && (
-                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
+                          <span className="bg-success/20 text-success text-xs font-medium px-2 py-1 rounded">
                             Default
                           </span>
                         )}
@@ -624,8 +624,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   <label
                     className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
                       showNewCardForm
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-primary bg-primary/10'
+                        : 'border hover:border-strong'
                     }`}
                   >
                     <input
@@ -643,22 +643,22 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                       className="sr-only"
                     />
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-6 bg-gray-100 rounded flex items-center justify-center text-xs font-bold">
+                      <div className="w-8 h-6 bg-surface-active rounded flex items-center justify-center text-xs font-bold">
                         NEW
                       </div>
-                      <div className="font-medium text-gray-900">Use a new card</div>
+                      <div className="font-medium text-copy">Use a new card</div>
                     </div>
                   </label>
 
                   {/* Stripe Payment Element for new card input */}
                   {showNewCardForm && clientSecret && (
-                    <div className="mt-4 p-4 border border-gray-200 rounded-lg">
+                    <div className="mt-4 p-4 border rounded-lg">
                       <PaymentElement options={{ layout: "tabs" }} />
                     </div>
                   )}
 
                   {(paymentMethods.length === 0 && !showNewCardForm) && (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-copy-muted">
                       <p>No payment methods found. Please add a payment method to continue.</p>
                       <Button
                         onClick={() => {
@@ -678,7 +678,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 </div>
                 
                 {validationErrors.payment_method_id && (
-                  <div className="mt-2 text-sm text-red-600 flex items-center">
+                  <div className="mt-2 text-sm text-error flex items-center">
                     <AlertTriangle className="w-4 h-4 mr-1" />
                     {validationErrors.payment_method_id}
                   </div>
@@ -694,17 +694,17 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 {/* Order items */}
                 <div className="space-y-4 mb-6">
                   {cart?.items?.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                    <div key={item.id} className="flex items-center space-x-4 p-4 bg-surface-hover rounded-lg">
                       <img
                         src={item.product?.image_url || '/placeholder-product.jpg'}
                         alt={item.product?.name}
                         className="w-16 h-16 object-cover rounded"
                       />
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">{item.product?.name}</div>
-                        <div className="text-sm text-gray-600">Quantity: {item.quantity}</div>
+                        <div className="font-medium text-copy">{item.product?.name}</div>
+                        <div className="text-sm text-copy-light">Quantity: {item.quantity}</div>
                       </div>
-                      <div className="text-lg font-semibold text-gray-900">
+                      <div className="text-lg font-semibold text-copy">
                         {formatCurrency(item.quantity * item.price_per_unit)}
                       </div>
                     </div>
@@ -713,14 +713,14 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
                 {/* Order notes */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-copy mb-2">
                     Order Notes (Optional)
                   </label>
                   <textarea
                     value={formData.notes}
                     onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                     placeholder="Any special instructions for your order..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                     rows={3}
                   />
                 </div>
@@ -750,7 +750,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 <Button
                   onClick={handleSubmit}
                   isLoading={processingPayment}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-success hover:bg-success-dark"
                   size="lg"
                 >
                   {processingPayment ? 'Processing...' : `Place Order - ${formatCurrency(orderSummary?.total || 0)}`}
@@ -790,8 +790,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
             {/* Real-time validation status */}
             {realTimeValidation && Object.keys(realTimeValidation).length > 0 && (
-              <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center text-sm text-green-800">
+              <div className="mt-6 p-3 bg-success/10 border border-success/30 rounded-lg">
+                <div className="flex items-center text-sm text-success">
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Order validated and ready to place
                 </div>

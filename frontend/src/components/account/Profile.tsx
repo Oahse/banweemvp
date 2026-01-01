@@ -116,7 +116,7 @@ export const Profile = () => {
               <div className="flex items-center mt-2">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                   user.verified 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+                    ? 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light'
                     : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
                 }`}>
                   {user.verified ? '✓ Verified' : '⚠ Unverified'}
@@ -382,8 +382,8 @@ export const Profile = () => {
             <span className="text-copy-light">Account Status</span>
             <span className={`px-2 py-1 text-xs rounded-full ${
               user.is_active 
-                ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
-                : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'
+                ? 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light'
+                : 'bg-error-light text-error-dark dark:bg-error-dark dark:text-error-light'
             }`}>
               {user.is_active ? 'Active' : 'Inactive'}
             </span>
@@ -392,7 +392,7 @@ export const Profile = () => {
             <span className="text-copy-light">Email Verification</span>
             <span className={`px-2 py-1 text-xs rounded-full ${
               user.verified 
-                ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+                ? 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light'
                 : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
             }`}>
               {user.verified ? 'Verified' : 'Not Verified'}

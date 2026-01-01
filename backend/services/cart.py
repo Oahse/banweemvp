@@ -1050,7 +1050,7 @@ class CartService(RedisService):
                 # Get the variant details to create ProductVariantResponse
                 variant_id = item_data.get("variant_id")
                 if variant_id:
-                    variant = await self._get_variant_with_product(UUID(variant_id))
+                    variant = await self._get_variant_with_product(UUID(str(variant_id)))
                     if variant:
                         from schemas.product import ProductVariantResponse, ProductImageResponse
                         
@@ -1108,7 +1108,7 @@ class CartService(RedisService):
                         )
                         
                         items.append(CartItemResponse(
-                            id=UUID(item_data.get("id", str(uuid4()))),
+                            id=UUID(str(item_data.get("id", str(uuid4())))),
                             variant=variant_response,
                             quantity=item_data.get("quantity", 0),
                             price_per_unit=item_data.get("price_per_unit", 0.0),

@@ -20,11 +20,11 @@ export const QRCodeModal = ({
     canvas.width = size;
     canvas.height = size;
 
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = 'var(--color-surface)';
     ctx.fillRect(0, 0, size, size);
 
     const moduleSize = size / 25;
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = 'var(--color-copy)';
 
     const hash = text.split('').reduce((a, b) => {
       a = ((a << 5) - a) + b.charCodeAt(0);
@@ -48,11 +48,11 @@ export const QRCodeModal = ({
     ];
 
     positions.forEach(([x, y]) => {
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = 'var(--color-copy)';
       ctx.fillRect(x, y, markerSize, markerSize);
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = 'var(--color-surface)';
       ctx.fillRect(x + moduleSize, y + moduleSize, markerSize - 2 * moduleSize, markerSize - 2 * moduleSize);
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = 'var(--color-copy)';
       ctx.fillRect(x + 2 * moduleSize, y + 2 * moduleSize, markerSize - 4 * moduleSize, markerSize - 4 * moduleSize);
     });
   };
@@ -120,28 +120,28 @@ export const QRCodeModal = ({
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
-        className={`bg-white rounded-lg p-6 max-w-sm w-full ${className}`}
+        className={`bg-surface rounded-lg p-6 max-w-sm w-full border border-border ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <QrCodeIcon size={24} className="text-primary" />
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <h3 className="text-lg font-semibold text-copy">{title}</h3>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-copy-lighter hover:text-copy transition-colors"
           >
             <XIcon size={20} />
           </button>
         </div>
 
         {description && (
-          <p className="text-gray-600 text-sm mb-4">{description}</p>
+          <p className="text-copy-light text-sm mb-4">{description}</p>
         )}
 
         <div className="flex justify-center mb-4">
-          <div className="p-4 bg-white border-2 border-gray-200 rounded-lg">
+          <div className="p-4 bg-surface border-2 border-border rounded-lg">
             <canvas
               ref={canvasRef}
               className="block"
@@ -151,8 +151,8 @@ export const QRCodeModal = ({
         </div>
 
         <div className="mb-4">
-          <p className="text-xs text-gray-500 mb-1">Data:</p>
-          <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded break-all">
+          <p className="text-xs text-copy-lighter mb-1">Data:</p>
+          <p className="text-sm text-copy-light bg-surface-hover p-2 rounded break-all">
             {data}
           </p>
         </div>
@@ -167,7 +167,7 @@ export const QRCodeModal = ({
           </button>
           <button
             onClick={handleShare}
-            className="flex-1 flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
+            className="flex-1 flex items-center justify-center space-x-2 bg-surface-hover text-copy px-4 py-2 rounded-md hover:bg-surface-active transition-colors"
           >
             <ShareIcon size={16} />
             <span>Share</span>

@@ -125,15 +125,51 @@ export const SubscriptionManagement = () => {
     return (product.variants || []).filter(v => !subscriptionVariantIds.includes(v.id));
   };
 
-  if (!subscription) {
+  if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        {/* Skeleton for Subscription Header */}
+        <div className="bg-surface rounded-lg shadow-md p-6 mb-8 animate-pulse">
+          <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
+          <div className="flex items-center space-x-4">
+            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+          </div>
+        </div>
+
+        {/* Skeleton for Current Products */}
+        <div className="mb-8">
+          <div className="h-6 bg-gray-300 rounded w-1/2 mb-6 animate-pulse"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, i) => ( // Show 3 skeleton cards
+              <div key={i} className="bg-surface rounded-lg shadow-md p-4 animate-pulse">
+                <div className="h-48 bg-gray-300 rounded mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Skeleton for Add Products Section */}
+        <div className="bg-surface rounded-lg shadow-md p-6 animate-pulse">
+          <div className="h-6 bg-gray-300 rounded w-2/3 mb-6"></div>
+          <div className="h-10 bg-gray-300 rounded mb-6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, i) => ( // Show 3 skeleton cards
+              <div key={i} className="bg-surface rounded-lg shadow-md p-4 animate-pulse">
+                <div className="h-48 bg-gray-300 rounded mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
+
 
   return (
     <div className="container mx-auto px-4 py-8 text-copy">
@@ -186,17 +222,16 @@ export const SubscriptionManagement = () => {
           <h2 className="text-xl font-bold text-copy mb-4">Current Products in Your Subscription</h2>
           {subscription.products && subscription.products.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {subscription.products.map((product) => (
-                <div key={product.id} className="relative">
+              {subscription.products.map((variantInSubscription) => (
+                <div key={variantInSubscription.id} className="relative">
                   <ProductCard 
                     product={{
-                      id: product.product_id,
-                      name: product.name,
-                      price: product.current_price,
-                      image: product.primary_image?.url || '/placeholder-product.jpg',
-                      variants: [product]
+                      id: variantInSubscription.product_id, // Use the product_id from the variant
+                      name: variantInSubscription.product_name || variantInSubscription.name, // Use product name or variant name
+                      image: variantInSubscription.primary_image?.url || '/placeholder-product.jpg',
+                      variants: [], // ProductCard will use selectedVariant for price, etc.
                     }}
-                    selectedVariant={product}
+                    selectedVariant={variantInSubscription}
                     viewMode="grid"
                   />
                   <Button
@@ -263,14 +298,8 @@ export const SubscriptionManagement = () => {
                 return availableVariants.map((variant) => (
                   <div key={variant.id} className="relative">
                     <ProductCard 
-                      product={{
-                        id: product.id,
-                        name: product.name,
-                        price: variant.current_price,
-                        image: variant.primary_image?.url || product.image || '/placeholder-product.jpg',
-                        variants: [variant]
-                      }}
-                      selectedVariant={variant}
+                      product={product} // Pass the full product object
+                      selectedVariant={variant} // Pass the specific variant as selected
                       viewMode="grid"
                     />
                     <Button

@@ -39,6 +39,7 @@ export const Addresses = () => {
     }
   }, [addresses]);
 
+
   /**
    * Handles changes to form input fields.
    * Updates the formData state based on input name and value.
@@ -154,7 +155,7 @@ export const Addresses = () => {
   // Display error message if fetching addresses failed
   if (error) {
     const errorMessage = typeof error.message === 'object' ? JSON.stringify(error.message) : error.message;
-    return <div className="p-6 text-center text-red-500">Error: {errorMessage}</div>;
+    return <div className="p-6 text-center text-error">Error: {errorMessage}</div>;
   }
 
   return (
@@ -203,7 +204,7 @@ export const Addresses = () => {
                     <PencilIcon size={14} className="mr-1" />
                     Edit
                   </button>
-                  <button onClick={() => handleDeleteAddress(address.id)} className="flex items-center text-sm text-gray-600 hover:text-red-500 dark:text-gray-300 mr-4">
+                  <button onClick={() => handleDeleteAddress(address.id)} className="flex items-center text-sm text-copy-light hover:text-error dark:text-copy-lighter mr-4">
                     <TrashIcon size={14} className="mr-1" />
                     Delete
                   </button>

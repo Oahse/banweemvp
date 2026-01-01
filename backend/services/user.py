@@ -108,8 +108,6 @@ class AddressService:
 
             .where(Address.user_id == user_id)
 
-            .options(selectinload(Address.user))
-
             .order_by(Address.created_at.desc())
 
         )

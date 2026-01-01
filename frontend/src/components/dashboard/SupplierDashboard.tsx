@@ -421,7 +421,7 @@ export const SupplierDashboard = () => {
             datasets: [{
               label: 'Sales',
               data: [45, 32, 28, 19, 15],
-              backgroundColor: ['var(--color-info)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-error)', '#8b5cf6']
+              backgroundColor: ['var(--color-info)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-error)', 'var(--color-purple)']
             }]
           }
         },

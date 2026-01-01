@@ -12,32 +12,32 @@ interface RefundStatusProps {
 export const RefundStatus: React.FC<RefundStatusProps> = ({ refund }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'requested': return 'bg-yellow-100 text-yellow-800';
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'processing': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      case 'cancelled': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'requested': return 'bg-warning-light text-warning-dark dark:bg-warning-dark dark:text-warning-light';
+      case 'approved': return 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light';
+      case 'processing': return 'bg-info-light text-info-dark dark:bg-info-dark dark:text-info-light';
+      case 'completed': return 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light';
+      case 'rejected': return 'bg-error-light text-error-dark dark:bg-error-dark dark:text-error-light';
+      case 'cancelled': return 'bg-surface-hover text-copy-light dark:bg-surface-active dark:text-copy-lighter';
+      default: return 'bg-surface-hover text-copy-light dark:bg-surface-active dark:text-copy-lighter';
     }
   };
 
   const getStatusIcon = (status: string, completed: boolean) => {
     if (completed) {
-      return <CheckCircleIcon className="w-5 h-5 text-green-600" />;
+      return <CheckCircleIcon className="w-5 h-5 text-success" />;
     }
     if (status === 'rejected' || status === 'cancelled') {
-      return <XCircleIcon className="w-5 h-5 text-red-600" />;
+      return <XCircleIcon className="w-5 h-5 text-error" />;
     }
-    return <ClockIcon className="w-5 h-5 text-gray-400" />;
+    return <ClockIcon className="w-5 h-5 text-copy-lighter" />;
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="bg-surface rounded-lg shadow-sm border-border border p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold">Refund #{refund.refund_number}</h3>
-          <p className="text-sm text-gray-600">
+          <h3 className="text-lg font-semibold text-copy">Refund #{refund.refund_number}</h3>
+          <p className="text-sm text-copy-light">
             Requested on {format(new Date(refund.requested_at), 'MMM dd, yyyy')}
           </p>
         </div>
@@ -52,10 +52,10 @@ export const RefundStatus: React.FC<RefundStatusProps> = ({ refund }) => {
           <div key={index} className="flex items-start space-x-3">
             {getStatusIcon(step.status, step.completed)}
             <div className="flex-1">
-              <div className="font-medium text-gray-900">{step.title}</div>
-              <div className="text-sm text-gray-600">{step.description}</div>
+              <div className="font-medium text-copy">{step.title}</div>
+              <div className="text-sm text-copy-light">{step.description}</div>
               {step.timestamp && (
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-copy-lighter mt-1">
                   {format(new Date(step.timestamp), 'MMM dd, yyyy at h:mm a')}
                 </div>
               )}
@@ -65,10 +65,10 @@ export const RefundStatus: React.FC<RefundStatusProps> = ({ refund }) => {
       </div>
 
       {/* Refund amount */}
-      <div className="mt-6 pt-6 border-t">
+      <div className="mt-6 pt-6 border-t border-border">
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">Refund Amount</span>
-          <span className="text-xl font-bold text-green-600">
+          <span className="text-copy-light">Refund Amount</span>
+          <span className="text-xl font-bold text-success">
             ${refund.processed_amount || refund.approved_amount || refund.requested_amount}
           </span>
         </div>

@@ -32,27 +32,21 @@ export const Footer = () => {
   return (
     <footer className="bg-surface pt-12 pb-16 md:pb-10 border-t border-border-light mt-12 text-copy">
       <div className="container mx-auto px-4 max-w-[1400px]">
-        {/* Newsletter */}
+        {/* Subscriptions */}
         <div className="bg-background rounded-lg p-6 md:p-10 mb-12">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="mb-6 md:mb-0 md:mr-8">
-              <h3 className="text-2xl font-bold text-main mb-3">Subscribe to our Newsletter</h3>
-              <p className="text-copy-light">Get the latest updates on new products and upcoming sales</p>
+              <h3 className="text-2xl font-bold text-main mb-3">Manage Your Subscriptions</h3>
+              <p className="text-copy-light">Explore, set up, and manage your recurring orders and subscriptions.</p>
             </div>
-            <div className="flex-shrink-0 w-full md:w-auto md:min-w-[350px]">
-              <form className="flex flex-col sm:flex-row">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="flex-grow px-4 py-3 border border-border rounded-md sm:rounded-l-md sm:rounded-r-none focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy mb-2 sm:mb-0"
-                />
-                <button
-                  type="submit"
-                  className="bg-primary text-white px-6 py-3 rounded-md sm:rounded-r-md sm:rounded-l-none hover:bg-primary-dark transition-colors flex items-center justify-center whitespace-nowrap">
-                  Subscribe
-                  <ArrowRightIcon size={16} className="ml-2" />
-                </button>
-              </form>
+            <div className="flex-shrink-0 w-full md:w-auto">
+              <Link
+                to="/subscription"
+                className="bg-primary text-copy-inverse px-6 py-3 rounded-md hover:bg-primary-dark transition-colors flex items-center justify-center whitespace-nowrap"
+              >
+                Go to Subscriptions
+                <ArrowRightIcon size={16} className="ml-2" />
+              </Link>
             </div>
           </div>
         </div>

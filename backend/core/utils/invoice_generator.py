@@ -109,7 +109,7 @@ class InvoiceGenerator:
             'items': items,
             
             # Company information
-            'logo_url': order_data.get('logo_url', 'file://' + str(Path(__file__).parent.parent.parent.parent / 'frontend' / 'public' / 'banwe_logo_green.png')),
+            'logo_url': order_data.get('logo_url', 'file://' + str(Path(__file__).parent.parent.parent.parent / 'frontend' / 'public' / 'banwee_logo_green.png')),
             'company_address_line1': order_data.get(
                 'company_address_line1', 
                 'Main Street, Number 66/B'

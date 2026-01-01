@@ -133,9 +133,11 @@ async def get_profile(
         }
         return Response.success(data=user_data)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Failed to get profile"
+            message=f"Failed to get profile: {str(e)}"
         )
 
 
@@ -169,7 +171,7 @@ async def create_address(
             user_id=current_user.id,
             **address_data.dict()
         )
-        return Response.success(data=address, message="Address created successfully")
+        return Response.success(data=AddressResponse.from_orm(address), message="Address created successfully")
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -195,7 +197,7 @@ async def update_address(
         if not address:
             raise APIException(status_code=status.HTTP_404_NOT_FOUND,
                                message="Address not found or not owned by user")
-        return Response.success(data=address, message="Address updated successfully")
+        return Response.success(data=AddressResponse.from_orm(address), message="Address updated successfully")
     except APIException:
         raise
     except Exception as e:
