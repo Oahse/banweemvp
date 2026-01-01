@@ -12,6 +12,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { CheckCircle, AlertTriangle } from 'lucide-react';
+import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 
 // Simple debounce function
 const debounce = (func: Function, wait: number) => {
@@ -34,6 +35,9 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   const { user } = useAuth();
   const { cart, clearCart } = useCart();
   const { formatCurrency } = useLocale();
+
+  const stripe = useStripe();
+  const elements = useElements();
   
   // Form state
   const [currentStep, setCurrentStep] = useState(1);
@@ -55,6 +59,36 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   const [realTimeValidation, setRealTimeValidation] = useState<any>({});
   const [orderSummary, setOrderSummary] = useState<any>(null);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [showNewCardForm, setShowNewCardForm] = useState(false);
+  const [isProcessingStripePayment, setIsProcessingStripePayment] = useState(false);
+
+  const fetchPaymentIntentClientSecret = useCallback(async () => {
+    if (!cart?.id || !user?.id) {
+      toast.error('Cart or user information missing for payment intent creation.');
+      return;
+    }
+
+    try {
+      setIsProcessingStripePayment(true);
+      const response = await OrdersAPI.createPaymentIntent({
+        cart_id: cart.id,
+        user_id: user.id,
+        amount: orderSummary?.total || cart.total_amount,
+        currency: cart.currency || 'usd', // Assuming cart has a currency
+      });
+      if (response?.data?.client_secret) {
+        setClientSecret(response.data.client_secret);
+      } else {
+        toast.error('Failed to get payment intent client secret.');
+      }
+    } catch (error) {
+      console.error('Error fetching payment intent client secret:', error);
+      toast.error('Failed to initialize payment. Please try again.');
+    } finally {
+      setIsProcessingStripePayment(false);
+    }
+  }, [cart, user, orderSummary]);
 
   // Auto-save form data to localStorage
   useEffect(() => {
@@ -100,19 +134,26 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   const loadCheckoutData = async () => {
     setLoading(true);
     try {
-      const [addressesRes, shippingRes, paymentsRes] = await Promise.all([
+      // Fetch addresses and payment methods in parallel
+      const [addressesRes, paymentsRes] = await Promise.all([
         AuthAPI.getAddresses(),
-        Promise.resolve({ data: [] }), // Placeholder - getShippingMethods doesn't exist
-        Promise.resolve({ data: [] })  // Placeholder - getPaymentMethods doesn't exist
+        AuthAPI.getPaymentMethods()
       ]);
 
+      const defaultAddress = addressesRes.data?.find((addr: any) => addr.is_default) || addressesRes.data?.[0];
+
+      let shippingMethodsRes = { data: [] };
+      if (defaultAddress) {
+        // Fetch shipping methods using the default address
+        shippingMethodsRes = await CartAPI.getShippingOptions(defaultAddress);
+      }
+      
       setAddresses(addressesRes.data || []);
-      setShippingMethods(shippingRes.data || []);
+      setShippingMethods(shippingMethodsRes.data || []);
       setPaymentMethods(paymentsRes.data || []);
 
       // Auto-select defaults
-      const defaultAddress = addressesRes.data?.find((addr: any) => addr.is_default) || addressesRes.data?.[0];
-      const standardShipping = shippingRes.data?.find((sm: any) => sm.name?.toLowerCase().includes('standard')) || shippingRes.data?.[0];
+      const standardShipping = shippingMethodsRes.data?.find((sm: any) => sm.name?.toLowerCase().includes('standard')) || shippingMethodsRes.data?.[0];
       const defaultPayment = paymentsRes.data?.find((pm: any) => pm.is_default) || paymentsRes.data?.[0];
 
       setFormData((prev: any) => ({
@@ -495,7 +536,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                     <label
                       key={method.id}
                       className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
-                        formData.payment_method_id === method.id
+                        formData.payment_method_id === method.id && !showNewCardForm
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
@@ -504,8 +545,11 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                         type="radio"
                         name="payment_method"
                         value={method.id}
-                        checked={formData.payment_method_id === method.id}
-                        onChange={(e) => setFormData(prev => ({ ...prev, payment_method_id: e.target.value }))}
+                        checked={formData.payment_method_id === method.id && !showNewCardForm}
+                        onChange={(e) => {
+                          setFormData(prev => ({ ...prev, payment_method_id: e.target.value }));
+                          setShowNewCardForm(false);
+                        }}
                         className="sr-only"
                       />
                       <div className="flex items-center justify-between">
@@ -531,15 +575,58 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                     </label>
                   ))}
                   
-                  {paymentMethods.length === 0 && (
+                  {/* Option to add a new card */}
+                  <label
+                    className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
+                      showNewCardForm
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      value="new_card"
+                      checked={showNewCardForm}
+                      onChange={() => {
+                        setShowNewCardForm(true);
+                        setFormData(prev => ({ ...prev, payment_method_id: null })); // Clear selected payment method
+                        if (!clientSecret) {
+                          fetchPaymentIntentClientSecret();
+                        }
+                      }}
+                      className="sr-only"
+                    />
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-6 bg-gray-100 rounded flex items-center justify-center text-xs font-bold">
+                        NEW
+                      </div>
+                      <div className="font-medium text-gray-900">Use a new card</div>
+                    </div>
+                  </label>
+
+                  {/* Stripe Payment Element for new card input */}
+                  {showNewCardForm && clientSecret && (
+                    <div className="mt-4 p-4 border border-gray-200 rounded-lg">
+                      <PaymentElement options={{ layout: "tabs" }} />
+                    </div>
+                  )}
+
+                  {(paymentMethods.length === 0 && !showNewCardForm) && (
                     <div className="text-center py-8 text-gray-500">
                       <p>No payment methods found. Please add a payment method to continue.</p>
                       <Button
-                        onClick={() => {/* Navigate to add payment method */}}
+                        onClick={() => {
+                          setShowNewCardForm(true);
+                          setFormData(prev => ({ ...prev, payment_method_id: null }));
+                          if (!clientSecret) {
+                            fetchPaymentIntentClientSecret();
+                          }
+                        }}
                         className="mt-4"
                         variant="outline"
                       >
-                        Add Payment Method
+                        Add New Card
                       </Button>
                     </div>
                   )}

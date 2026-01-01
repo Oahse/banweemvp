@@ -28,6 +28,13 @@ export class OrdersAPI {
   }
 
   /**
+   * Create Payment Intent and return client secret
+   */
+  static async createPaymentIntent(checkoutData: any) {
+    return await apiClient.post('/orders/create-payment-intent', checkoutData);
+  }
+
+  /**
    * Get user's orders
    */
   static async getOrders(params) {
