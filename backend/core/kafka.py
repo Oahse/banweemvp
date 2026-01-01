@@ -132,6 +132,13 @@ async def process_kafka_message(msg, db) -> dict:
         result = await handle_inventory_message(task_data)
         return {"action": "inventory_message_processed", "result": result}
         
+    elif msg.topic == settings.KAFKA_TOPIC_NOTIFICATION:
+        # Handle subscription task notifications
+        if task_data.get("task") in ["send_subscription_order_notifications"]:
+            from tasks.subscription_tasks import handle_subscription_task_message
+            result = await handle_subscription_task_message(task_data, db)
+            return {"action": "subscription_task_processed", "result": result}
+        
     elif service_name and method_name:
         try:
             service_module = importlib.import_module(SERVICE_MODULE_MAP.get(service_name))

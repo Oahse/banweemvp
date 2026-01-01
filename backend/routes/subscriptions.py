@@ -26,28 +26,174 @@ async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSe
 router = APIRouter(prefix="/subscriptions", tags=["Subscriptions"])
 
 
+@router.post("/trigger-order-processing")
+async def trigger_subscription_order_processing(
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Manually trigger subscription order processing (admin only)."""
+    try:
+        # Check if user is admin (you might want to implement proper admin check)
+        if not hasattr(current_user, 'role') or current_user.role != 'admin':
+            raise APIException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        from tasks.subscription_tasks import trigger_subscription_order_processing
+        
+        # Trigger the processing
+        result = await trigger_subscription_order_processing()
+        
+        return Response.success(
+            data=result,
+            message="Subscription order processing triggered successfully"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error triggering subscription order processing: {e}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to trigger order processing: {str(e)}"
+        )
+
+
+@router.post("/trigger-notifications")
+async def trigger_subscription_notifications(
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Manually trigger subscription order notifications (admin only)."""
+    try:
+        # Check if user is admin
+        if not hasattr(current_user, 'role') or current_user.role != 'admin':
+            raise APIException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required"
+            )
+        
+        from tasks.subscription_tasks import trigger_order_notifications
+        
+        # Trigger the notifications
+        await trigger_order_notifications()
+        
+        return Response.success(
+            message="Subscription order notifications triggered successfully"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error triggering subscription notifications: {e}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to trigger notifications: {str(e)}"
+        )
+
+
+@router.post("/calculate-cost")
+async def calculate_subscription_cost(
+    cost_request: SubscriptionCostCalculationRequest,
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Calculate subscription cost with VAT before creating subscription."""
+    try:
+        subscription_service = SubscriptionService(db)
+        
+        # Get variants
+        variant_result = await db.execute(
+            select(ProductVariant).where(ProductVariant.id.in_(cost_request.variant_ids))
+        )
+        variants = variant_result.scalars().all()
+        
+        if len(variants) != len(cost_request.variant_ids):
+            raise APIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Some product variants not found"
+            )
+        
+        # Get customer address for tax calculation
+        customer_address = None
+        if cost_request.delivery_address_id:
+            from models.user import Address
+            address_result = await db.execute(
+                select(Address).where(
+                    and_(Address.id == cost_request.delivery_address_id, Address.user_id == current_user.id)
+                )
+            )
+            address = address_result.scalar_one_or_none()
+            if address:
+                customer_address = {
+                    "street": address.street,
+                    "city": address.city,
+                    "state": address.state,
+                    "country": address.country,
+                    "post_code": address.post_code
+                }
+        
+        # Calculate cost
+        cost_breakdown = await subscription_service._calculate_subscription_cost(
+            variants=variants,
+            delivery_type=cost_request.delivery_type,
+            customer_address=customer_address,
+            currency=cost_request.currency,
+            user_id=current_user.id
+        )
+        
+        return Response.success(
+            data={
+                "cost_breakdown": cost_breakdown,
+                "estimated_total": cost_breakdown["total_amount"],
+                "currency": cost_request.currency,
+                "calculation_timestamp": datetime.utcnow()
+            },
+            message="Subscription cost calculated successfully"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error calculating subscription cost: {e}")
+        raise APIException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to calculate subscription cost: {str(e)}"
+        )
+
+
 @router.post("/")
 async def create_subscription(
     subscription_data: SubscriptionCreate,
     current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Create a new subscription."""
+    """Create a new subscription with product quantities and VAT calculation."""
     try:
         subscription_service = SubscriptionService(db)
         
-        # Extract product_variant_ids and other data
+        # Extract data from request
         product_variant_ids = subscription_data.product_variant_ids
+        variant_quantities = subscription_data.variant_quantities
         
-        # Pass data directly to the service method
+        # Create subscription with quantities
         subscription = await subscription_service.create_subscription(
             user_id=current_user.id,
             plan_id=subscription_data.plan_id,
             product_variant_ids=product_variant_ids,
-            # Add other fields from subscription_data as needed, e.g., delivery_type, delivery_address_id
-            # For now, assuming these are simple and can be directly passed or defaulted
-            delivery_type=subscription_data.delivery_type if hasattr(subscription_data, 'delivery_type') else "standard",
-            delivery_address_id=subscription_data.delivery_address_id if hasattr(subscription_data, 'delivery_address_id') else None
+            variant_quantities=variant_quantities,
+            delivery_type=subscription_data.delivery_type,
+            delivery_address_id=subscription_data.delivery_address_id,
+            payment_method_id=subscription_data.payment_method_id,
+            currency=subscription_data.currency
+        )
+        
+        return Response.success(
+            data=subscription.to_dict(include_products=True),
+            message="Subscription created successfully! Orders will be placed automatically based on your billing cycle."
+        )
+        
+    except Exception as e:
+        logger.error(f"Error creating subscription: {e}")
+        raise APIException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to create subscription: {str(e)}"
+        )
         )
         return Response.success(data=subscription, message="Subscription created successfully")
     except APIException:

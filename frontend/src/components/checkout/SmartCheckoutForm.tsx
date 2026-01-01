@@ -8,11 +8,13 @@ import { useCart } from '../../contexts/CartContext';
 import { useLocale } from '../../contexts/LocaleContext';
 import { OrdersAPI } from '../../apis/orders';
 import { AuthAPI } from '../../apis/auth';
+import { CartAPI } from '../../apis/cart';
 import { toast } from 'react-hot-toast';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { CheckCircle, AlertTriangle } from 'lucide-react';
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
+import AddAddressForm from '../forms/AddAddressForm';
 
 // Simple debounce function
 const debounce = (func: Function, wait: number) => {
@@ -62,6 +64,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [showNewCardForm, setShowNewCardForm] = useState(false);
   const [isProcessingStripePayment, setIsProcessingStripePayment] = useState(false);
+  const [showAddAddressForm, setShowAddAddressForm] = useState(false);
 
   const fetchPaymentIntentClientSecret = useCallback(async () => {
     if (!cart?.id || !user?.id) {
@@ -398,6 +401,13 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
     }
   };
 
+  const handleAddressAdded = (newAddress: any) => {
+    setAddresses(prev => [...prev, newAddress]);
+    setFormData(prev => ({ ...prev, shipping_address_id: newAddress.id }));
+    setShowAddAddressForm(false);
+    toast.success('Address added and selected!');
+  };
+
   const steps = [
     { number: 1, title: 'Shipping Address', icon: '📍' },
     { number: 2, title: 'Shipping Method', icon: '🚚' },
@@ -457,19 +467,19 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Form */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-surface rounded-lg shadow-sm border border-border p-6">
             {/* Step 1: Shipping Address */}
             {currentStep === 1 && (
               <div>
-                <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
+                <h3 className="text-lg font-semibold mb-4 text-copy">Shipping Address</h3>
                 <div className="space-y-4">
                   {addresses.map((address) => (
                     <label
                       key={address.id}
-                      className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
+                      className={`block p-4 border border-border rounded-lg cursor-pointer transition-colors ${
                         formData.shipping_address_id === address.id
                           ? 'border-primary bg-primary/10'
-                          : 'border hover:border-strong'
+                          : 'border-border hover:border-primary/50'
                       }`}
                     >
                       <input
@@ -502,15 +512,24 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   ))}
                   
                   {addresses.length === 0 && (
-                    <div className="text-center py-8 text-copy-muted">
-                      <p>No addresses found. Please add an address to continue.</p>
-                      <Button
-                        onClick={() => {/* Navigate to add address */}}
-                        className="mt-4"
-                        variant="outline"
-                      >
-                        Add Address
-                      </Button>
+                    <div className="text-center py-8 text-copy-light">
+                      <div className="bg-surface rounded-lg p-6 border border-border">
+                        <div className="text-copy-light mb-4">
+                          <svg className="w-12 h-12 mx-auto mb-3 text-copy-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <p className="text-copy">No addresses found</p>
+                          <p className="text-copy-light text-sm">Please add an address to continue with your order.</p>
+                        </div>
+                        <Button
+                          onClick={() => setShowAddAddressForm(true)}
+                          className="mt-4"
+                          variant="outline"
+                        >
+                          Add Address
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -658,21 +677,29 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   )}
 
                   {(paymentMethods.length === 0 && !showNewCardForm) && (
-                    <div className="text-center py-8 text-copy-muted">
-                      <p>No payment methods found. Please add a payment method to continue.</p>
-                      <Button
-                        onClick={() => {
-                          setShowNewCardForm(true);
-                          setFormData(prev => ({ ...prev, payment_method_id: null }));
-                          if (!clientSecret) {
-                            fetchPaymentIntentClientSecret();
-                          }
-                        }}
-                        className="mt-4"
-                        variant="outline"
-                      >
-                        Add New Card
-                      </Button>
+                    <div className="text-center py-8">
+                      <div className="bg-surface rounded-lg p-6 border border-border">
+                        <div className="text-copy-light mb-4">
+                          <svg className="w-12 h-12 mx-auto mb-3 text-copy-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          </svg>
+                          <p className="text-copy">No payment methods found</p>
+                          <p className="text-copy-light text-sm">Please add a payment method to continue with your order.</p>
+                        </div>
+                        <Button
+                          onClick={() => {
+                            setShowNewCardForm(true);
+                            setFormData(prev => ({ ...prev, payment_method_id: null }));
+                            if (!clientSecret) {
+                              fetchPaymentIntentClientSecret();
+                            }
+                          }}
+                          className="mt-4"
+                          variant="outline"
+                        >
+                          Add New Card
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -762,27 +789,27 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
         {/* Order Summary Sidebar */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-6">
-            <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
+          <div className="bg-surface rounded-lg shadow-sm border border-border p-6 sticky top-6">
+            <h3 className="text-lg font-semibold mb-4 text-copy">Order Summary</h3>
             
             {orderSummary && (
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span>Subtotal ({orderSummary.items} items)</span>
-                  <span>{formatCurrency(orderSummary.subtotal)}</span>
+                  <span className="text-copy-light">Subtotal ({orderSummary.items} items)</span>
+                  <span className="text-copy">{formatCurrency(orderSummary.subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Shipping</span>
-                  <span>{formatCurrency(orderSummary.shipping)}</span>
+                  <span className="text-copy-light">Shipping</span>
+                  <span className="text-copy">{formatCurrency(orderSummary.shipping)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Tax</span>
-                  <span>{formatCurrency(orderSummary.tax)}</span>
+                  <span className="text-copy-light">Tax</span>
+                  <span className="text-copy">{formatCurrency(orderSummary.tax)}</span>
                 </div>
-                <div className="border-t pt-3">
+                <div className="border-t border-border pt-3">
                   <div className="flex justify-between text-lg font-semibold">
-                    <span>Total</span>
-                    <span>{formatCurrency(orderSummary.total)}</span>
+                    <span className="text-copy">Total</span>
+                    <span className="text-primary">{formatCurrency(orderSummary.total)}</span>
                   </div>
                 </div>
               </div>
@@ -800,6 +827,15 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
           </div>
         </div>
       </div>
+
+      {/* Add Address Modal */}
+      {showAddAddressForm && (
+        <AddAddressForm
+          isModal={true}
+          onSuccess={handleAddressAdded}
+          onCancel={() => setShowAddAddressForm(false)}
+        />
+      )}
     </div>
   );
 };

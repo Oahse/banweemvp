@@ -29,11 +29,13 @@ class SubscriptionService:
         user_id: UUID,
         plan_id: str,
         product_variant_ids: List[UUID],
+        variant_quantities: Optional[Dict[str, int]] = None,
         delivery_type: str = "standard",
         delivery_address_id: Optional[UUID] = None,
-        payment_method_id: Optional[UUID] = None
+        payment_method_id: Optional[UUID] = None,
+        currency: str = "USD"
     ) -> Subscription:
-        """Create a new subscription"""
+        """Create a new subscription with enhanced VAT calculation and quantity support"""
         
         # Validate variants exist
         variant_result = await self.db.execute(
@@ -44,8 +46,34 @@ class SubscriptionService:
         if len(variants) != len(product_variant_ids):
             raise HTTPException(status_code=400, detail="Some variants not found")
         
-        # Calculate subscription cost
-        cost_breakdown = await self._calculate_subscription_cost(variants, delivery_type)
+        # Get customer address for tax calculation
+        customer_address = None
+        if delivery_address_id:
+            from models.user import Address
+            address_result = await self.db.execute(
+                select(Address).where(
+                    and_(Address.id == delivery_address_id, Address.user_id == user_id)
+                )
+            )
+            address = address_result.scalar_one_or_none()
+            if address:
+                customer_address = {
+                    "street": address.street,
+                    "city": address.city,
+                    "state": address.state,
+                    "country": address.country,
+                    "post_code": address.post_code
+                }
+        
+        # Calculate subscription cost with VAT (considering quantities)
+        cost_breakdown = await self._calculate_subscription_cost_with_quantities(
+            variants, 
+            variant_quantities or {},
+            delivery_type, 
+            customer_address=customer_address,
+            currency=currency,
+            user_id=user_id
+        )
         
         # Create subscription
         subscription = Subscription(
@@ -53,13 +81,25 @@ class SubscriptionService:
             plan_id=plan_id,
             status="active",
             price=cost_breakdown["total_amount"],
+            currency=currency,
             variant_ids=[str(vid) for vid in product_variant_ids],
             cost_breakdown=cost_breakdown,
             delivery_type=delivery_type,
             delivery_address_id=delivery_address_id,
             current_period_start=datetime.utcnow(),
             current_period_end=datetime.utcnow() + timedelta(days=30),  # Monthly by default
-            next_billing_date=datetime.utcnow() + timedelta(days=30)
+            next_billing_date=datetime.utcnow() + timedelta(days=30),
+            # Store tax information for audit
+            tax_rate_applied=cost_breakdown.get("tax_rate"),
+            tax_amount=cost_breakdown.get("tax_amount"),
+            admin_percentage_applied=cost_breakdown.get("admin_percentage"),
+            delivery_cost_applied=cost_breakdown.get("delivery_cost"),
+            # Store quantities in metadata
+            subscription_metadata={
+                "variant_quantities": variant_quantities or {str(vid): 1 for vid in product_variant_ids},
+                "created_with_vat": True,
+                "pricing_version": "v2_with_vat"
+            }
         )
         
         # Add products to the many-to-many relationship
@@ -83,12 +123,151 @@ class SubscriptionService:
         # Send notification
         await self.notification_service.create_notification(
             user_id=user_id,
-            message=f"Your subscription has been created successfully!",
+            message=f"Your subscription has been created successfully! Total: {cost_breakdown['total_amount']} {currency}. Next order will be placed on {subscription.next_billing_date.strftime('%Y-%m-%d')}.",
             type="success",
             related_id=str(subscription.id)
         )
         
         return subscription
+
+    async def _calculate_subscription_cost_with_quantities(
+        self,
+        variants: List[ProductVariant],
+        variant_quantities: Dict[str, int],
+        delivery_type: str,
+        customer_address: Optional[Dict] = None,
+        currency: str = "USD",
+        user_id: Optional[UUID] = None
+    ) -> Dict[str, Any]:
+        """Calculate subscription cost with quantities and proper VAT integration"""
+        from services.tax import TaxService
+        from decimal import Decimal
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        # Calculate subtotal from product variants with quantities
+        subtotal = Decimal('0.00')
+        product_details = []
+        
+        for variant in variants:
+            # Get quantity for this variant (default to 1)
+            quantity = variant_quantities.get(str(variant.id), 1)
+            
+            # Use current_price which handles sale_price vs base_price
+            unit_price = Decimal(str(variant.current_price or 0))
+            line_total = unit_price * quantity
+            subtotal += line_total
+            
+            product_details.append({
+                "variant_id": str(variant.id),
+                "name": getattr(variant, 'name', f"Variant {variant.id}"),
+                "unit_price": float(unit_price),
+                "quantity": quantity,
+                "line_total": float(line_total),
+                "currency": currency,
+                "category": getattr(variant, 'category', 'general')
+            })
+        
+        # Get admin configuration (make this configurable via AdminService later)
+        admin_percentage = Decimal('0.10')  # 10% - can be made configurable
+        admin_fee = subtotal * admin_percentage
+        
+        # Calculate delivery cost based on type
+        delivery_costs = {
+            "standard": Decimal('5.00'),
+            "express": Decimal('15.00'),
+            "overnight": Decimal('25.00')
+        }
+        delivery_cost = delivery_costs.get(delivery_type, Decimal('5.00'))
+        
+        # Calculate pre-tax total (subtotal + admin fee + delivery)
+        pre_tax_total = subtotal + admin_fee + delivery_cost
+        
+        # Calculate VAT/Tax using TaxService
+        tax_amount = Decimal('0.00')
+        tax_rate = Decimal('0.00')
+        tax_breakdown = []
+        tax_type = "VAT"
+        tax_jurisdiction = "Unknown"
+        
+        if customer_address:
+            try:
+                async with TaxService(self.db) as tax_service:
+                    tax_result = await tax_service.calculate_tax(
+                        amount=float(pre_tax_total),
+                        currency=currency,
+                        customer_address=customer_address,
+                        product_details=product_details
+                    )
+                    
+                    tax_amount = Decimal(str(tax_result.tax_amount))
+                    tax_rate = Decimal(str(tax_result.tax_rate))
+                    tax_breakdown = tax_result.breakdown
+                    tax_type = tax_result.tax_type.value
+                    tax_jurisdiction = tax_result.jurisdiction
+                    
+                    logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate}%) for {tax_jurisdiction}")
+                    
+            except Exception as e:
+                # Fallback to default tax rate if service fails
+                logger.warning(f"Tax calculation failed, using fallback: {e}")
+                country = customer_address.get('country', 'US') if isinstance(customer_address, dict) else 'US'
+                
+                # Use emergency fallback rates from TaxService
+                fallback_rates = {
+                    "US": {"rate": 0.085, "type": "SALES_TAX"},
+                    "GB": {"rate": 0.20, "type": "VAT"},
+                    "DE": {"rate": 0.19, "type": "VAT"},
+                    "FR": {"rate": 0.20, "type": "VAT"},
+                    "CA": {"rate": 0.13, "type": "GST"},
+                    "AU": {"rate": 0.10, "type": "GST"}
+                }
+                
+                fallback = fallback_rates.get(country, {"rate": 0.085, "type": "SALES_TAX"})
+                tax_rate = Decimal(str(fallback["rate"]))
+                tax_amount = pre_tax_total * tax_rate
+                tax_type = fallback["type"]
+                tax_jurisdiction = country
+        else:
+            # No address provided, use default tax rate
+            tax_rate = Decimal('0.085')  # 8.5% default
+            tax_amount = pre_tax_total * tax_rate
+            tax_type = "SALES_TAX"
+            tax_jurisdiction = "Default"
+        
+        # Calculate loyalty discount if user provided
+        loyalty_discount = Decimal('0.00')
+        if user_id:
+            try:
+                # Try to calculate loyalty discount (implement this service if needed)
+                # For now, just a placeholder
+                pass
+            except Exception:
+                pass
+        
+        # Calculate final total
+        total_amount = pre_tax_total + tax_amount - loyalty_discount
+        
+        return {
+            "subtotal": float(subtotal),
+            "admin_fee": float(admin_fee),
+            "admin_percentage": float(admin_percentage),
+            "delivery_cost": float(delivery_cost),
+            "delivery_type": delivery_type,
+            "pre_tax_total": float(pre_tax_total),
+            "tax_amount": float(tax_amount),
+            "tax_rate": float(tax_rate),
+            "tax_type": tax_type,
+            "tax_jurisdiction": tax_jurisdiction,
+            "tax_breakdown": tax_breakdown,
+            "loyalty_discount": float(loyalty_discount),
+            "total_amount": float(total_amount),
+            "currency": currency,
+            "product_details": product_details,
+            "calculation_timestamp": datetime.utcnow().isoformat(),
+            "calculation_method": "enhanced_vat_with_quantities"
+        }
 
     async def add_products_to_subscription(
         self,
@@ -475,40 +654,133 @@ class SubscriptionService:
     async def _calculate_subscription_cost(
         self,
         variants: List[ProductVariant],
-        delivery_type: str
+        delivery_type: str,
+        customer_address: Optional[Dict] = None,
+        currency: str = "USD",
+        user_id: Optional[UUID] = None
     ) -> Dict[str, Any]:
-        """Calculate subscription cost breakdown"""
-        # This is a simplified calculation - in reality you'd have complex pricing logic
-        subtotal = sum(variant.current_price or 0 for variant in variants)
+        """Calculate subscription cost with proper VAT integration and product-based pricing"""
+        from services.tax import TaxService
+        from decimal import Decimal
+        import logging
         
-        # Delivery costs
+        logger = logging.getLogger(__name__)
+        
+        # Calculate subtotal from product variants
+        subtotal = Decimal('0.00')
+        product_details = []
+        
+        for variant in variants:
+            # Use current_price which handles sale_price vs base_price
+            price = Decimal(str(variant.current_price or 0))
+            subtotal += price
+            
+            product_details.append({
+                "variant_id": str(variant.id),
+                "name": getattr(variant, 'name', f"Variant {variant.id}"),
+                "price": float(price),
+                "currency": currency,
+                "category": getattr(variant, 'category', 'general')
+            })
+        
+        # Get admin configuration (make this configurable via AdminService later)
+        admin_percentage = Decimal('0.10')  # 10% - can be made configurable
+        admin_fee = subtotal * admin_percentage
+        
+        # Calculate delivery cost based on type
         delivery_costs = {
-            "standard": 5.0,
-            "express": 15.0,
-            "overnight": 25.0
+            "standard": Decimal('5.00'),
+            "express": Decimal('15.00'),
+            "overnight": Decimal('25.00')
         }
-        delivery_cost = delivery_costs.get(delivery_type, 5.0)
+        delivery_cost = delivery_costs.get(delivery_type, Decimal('5.00'))
         
-        # Admin percentage (simplified)
-        admin_percentage = 10.0  # 10%
-        admin_fee = subtotal * (admin_percentage / 100)
+        # Calculate pre-tax total (subtotal + admin fee + delivery)
+        pre_tax_total = subtotal + admin_fee + delivery_cost
         
-        # Tax (simplified)
-        tax_rate = 8.5  # 8.5%
-        tax_amount = (subtotal + admin_fee + delivery_cost) * (tax_rate / 100)
+        # Calculate VAT/Tax using TaxService
+        tax_amount = Decimal('0.00')
+        tax_rate = Decimal('0.00')
+        tax_breakdown = []
+        tax_type = "VAT"
+        tax_jurisdiction = "Unknown"
         
-        total_amount = subtotal + admin_fee + delivery_cost + tax_amount
+        if customer_address:
+            try:
+                async with TaxService(self.db) as tax_service:
+                    tax_result = await tax_service.calculate_tax(
+                        amount=float(pre_tax_total),
+                        currency=currency,
+                        customer_address=customer_address,
+                        product_details=product_details
+                    )
+                    
+                    tax_amount = Decimal(str(tax_result.tax_amount))
+                    tax_rate = Decimal(str(tax_result.tax_rate))
+                    tax_breakdown = tax_result.breakdown
+                    tax_type = tax_result.tax_type.value
+                    tax_jurisdiction = tax_result.jurisdiction
+                    
+                    logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate}%) for {tax_jurisdiction}")
+                    
+            except Exception as e:
+                # Fallback to default tax rate if service fails
+                logger.warning(f"Tax calculation failed, using fallback: {e}")
+                country = customer_address.get('country', 'US') if isinstance(customer_address, dict) else 'US'
+                
+                # Use emergency fallback rates from TaxService
+                fallback_rates = {
+                    "US": {"rate": 0.085, "type": "SALES_TAX"},
+                    "GB": {"rate": 0.20, "type": "VAT"},
+                    "DE": {"rate": 0.19, "type": "VAT"},
+                    "FR": {"rate": 0.20, "type": "VAT"},
+                    "CA": {"rate": 0.13, "type": "GST"},
+                    "AU": {"rate": 0.10, "type": "GST"}
+                }
+                
+                fallback = fallback_rates.get(country, {"rate": 0.085, "type": "SALES_TAX"})
+                tax_rate = Decimal(str(fallback["rate"]))
+                tax_amount = pre_tax_total * tax_rate
+                tax_type = fallback["type"]
+                tax_jurisdiction = country
+        else:
+            # No address provided, use default tax rate
+            tax_rate = Decimal('0.085')  # 8.5% default
+            tax_amount = pre_tax_total * tax_rate
+            tax_type = "SALES_TAX"
+            tax_jurisdiction = "Default"
+        
+        # Calculate loyalty discount if user provided
+        loyalty_discount = Decimal('0.00')
+        if user_id:
+            try:
+                # Try to calculate loyalty discount (implement this service if needed)
+                # For now, just a placeholder
+                pass
+            except Exception:
+                pass
+        
+        # Calculate final total
+        total_amount = pre_tax_total + tax_amount - loyalty_discount
         
         return {
-            "subtotal": subtotal,
-            "admin_fee": admin_fee,
-            "admin_percentage": admin_percentage,
-            "delivery_cost": delivery_cost,
+            "subtotal": float(subtotal),
+            "admin_fee": float(admin_fee),
+            "admin_percentage": float(admin_percentage),
+            "delivery_cost": float(delivery_cost),
             "delivery_type": delivery_type,
-            "tax_amount": tax_amount,
-            "tax_rate": tax_rate,
-            "total_amount": total_amount,
-            "currency": "USD"
+            "pre_tax_total": float(pre_tax_total),
+            "tax_amount": float(tax_amount),
+            "tax_rate": float(tax_rate),
+            "tax_type": tax_type,
+            "tax_jurisdiction": tax_jurisdiction,
+            "tax_breakdown": tax_breakdown,
+            "loyalty_discount": float(loyalty_discount),
+            "total_amount": float(total_amount),
+            "currency": currency,
+            "product_details": product_details,
+            "calculation_timestamp": datetime.utcnow().isoformat(),
+            "calculation_method": "enhanced_vat_integration"
         }
 
     async def _get_subscription_variants(self, subscription: Subscription) -> List[ProductVariant]:

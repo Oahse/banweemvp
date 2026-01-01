@@ -83,7 +83,7 @@ class SubscriptionSchedulerService:
         }
     
     async def create_subscription_order(self, subscription: Subscription) -> Optional[Order]:
-        """Create an order from a subscription"""
+        """Create an order from a subscription with proper VAT calculation"""
         try:
             # Get user
             user_result = await self.db.execute(
@@ -107,7 +107,10 @@ class SubscriptionSchedulerService:
             if not variants:
                 raise Exception(f"No valid variants found for subscription {subscription.id}")
             
-            # Create order
+            # Recalculate pricing with current product prices and VAT
+            updated_cost = await self._recalculate_subscription_pricing(subscription, variants)
+            
+            # Create order with updated pricing
             order = Order(
                 user_id=subscription.user_id,
                 order_number=await self._generate_order_number(),
@@ -115,58 +118,74 @@ class SubscriptionSchedulerService:
                 payment_status=PaymentStatus.PENDING,
                 fulfillment_status=FulfillmentStatus.UNFULFILLED,
                 source=OrderSource.API,
-                subtotal=0.0,
-                tax_amount=subscription.tax_amount or 0.0,
-                total_amount=subscription.price or 0.0,
+                subtotal=updated_cost["subtotal"],
+                tax_amount=updated_cost["tax_amount"],
+                shipping_amount=updated_cost["delivery_cost"],
+                discount_amount=updated_cost.get("loyalty_discount", 0.0),
+                total_amount=updated_cost["total_amount"],
                 currency=subscription.currency or "USD",
+                shipping_method=subscription.delivery_type or "standard",
                 # Copy delivery info from subscription
                 shipping_address=await self._get_delivery_address(subscription),
+                billing_address=await self._get_delivery_address(subscription),  # Use same for billing
                 subscription_id=subscription.id,
-                subscription_metadata={
+                order_metadata={
+                    "subscription_order": True,
                     "subscription_id": str(subscription.id),
                     "billing_cycle": subscription.billing_cycle,
-                    "delivery_type": subscription.delivery_type
+                    "delivery_type": subscription.delivery_type,
+                    "cost_breakdown": updated_cost,
+                    "order_created_at": datetime.utcnow().isoformat()
                 }
             )
             
             self.db.add(order)
             await self.db.flush()  # Get order ID
             
-            # Create order items
-            subtotal = 0.0
-            for variant in variants:
-                # Default quantity to 1, could be stored in subscription metadata
-                quantity = 1
-                unit_price = variant.price or 0.0
-                line_total = unit_price * quantity
+            # Create order items with current prices
+            for product_detail in updated_cost.get("product_details", []):
+                variant_id = UUID(product_detail["variant_id"])
+                variant = next((v for v in variants if v.id == variant_id), None)
                 
-                order_item = OrderItem(
-                    order_id=order.id,
-                    product_variant_id=variant.id,
-                    quantity=quantity,
-                    unit_price=unit_price,
-                    total_price=line_total,
-                    product_name=variant.product.name if variant.product else "Unknown Product",
-                    variant_name=variant.name or "",
-                    sku=variant.sku or ""
-                )
-                
-                self.db.add(order_item)
-                subtotal += line_total
+                if variant:
+                    # Get quantity from subscription metadata or default to 1
+                    quantity = self._get_variant_quantity(subscription, variant_id)
+                    unit_price = product_detail["price"]
+                    line_total = unit_price * quantity
+                    
+                    order_item = OrderItem(
+                        order_id=order.id,
+                        product_variant_id=variant.id,
+                        quantity=quantity,
+                        unit_price=unit_price,
+                        total_price=line_total,
+                        product_name=getattr(variant, 'product_name', product_detail["name"]),
+                        variant_name=getattr(variant, 'name', ''),
+                        sku=getattr(variant, 'sku', ''),
+                        item_metadata={
+                            "subscription_item": True,
+                            "original_price": unit_price,
+                            "price_at_order": unit_price
+                        }
+                    )
+                    
+                    self.db.add(order_item)
             
-            # Update order totals
-            order.subtotal = subtotal
-            order.total_amount = subtotal + (subscription.tax_amount or 0.0)
+            # Update subscription with new pricing (in case product prices changed)
+            subscription.price = updated_cost["total_amount"]
+            subscription.cost_breakdown = updated_cost
+            subscription.tax_rate_applied = updated_cost.get("tax_rate")
+            subscription.tax_amount = updated_cost.get("tax_amount")
             
             # Update subscription billing dates
             await self._update_subscription_billing_dates(subscription)
             
             await self.db.commit()
             
-            # Send notification
+            # Send notification with order details
             await self.notification_service.create_notification(
                 user_id=subscription.user_id,
-                message=f"Your subscription order #{order.order_number} has been created and will be shipped soon!",
+                message=f"Your subscription order #{order.order_number} has been created! Total: {updated_cost['total_amount']} {subscription.currency}. It will be shipped soon.",
                 type="info",
                 related_id=str(order.id)
             )
@@ -185,10 +204,68 @@ class SubscriptionSchedulerService:
         short_uuid = str(uuid.uuid4())[:8].upper()
         return f"SUB-{timestamp}-{short_uuid}"
     
+    async def _recalculate_subscription_pricing(self, subscription: Subscription, variants: List[ProductVariant]) -> Dict[str, Any]:
+        """Recalculate subscription pricing with current product prices and VAT"""
+        from services.subscriptions.subscription import SubscriptionService
+        from models.user import Address
+        
+        # Get customer address for tax calculation
+        customer_address = None
+        if subscription.delivery_address_id:
+            address_result = await self.db.execute(
+                select(Address).where(Address.id == subscription.delivery_address_id)
+            )
+            address = address_result.scalar_one_or_none()
+            if address:
+                customer_address = {
+                    "street": address.street,
+                    "city": address.city,
+                    "state": address.state,
+                    "country": address.country,
+                    "post_code": address.post_code
+                }
+        
+        # Use the enhanced cost calculation from SubscriptionService
+        subscription_service = SubscriptionService(self.db)
+        updated_cost = await subscription_service._calculate_subscription_cost(
+            variants=variants,
+            delivery_type=subscription.delivery_type or "standard",
+            customer_address=customer_address,
+            currency=subscription.currency or "USD",
+            user_id=subscription.user_id
+        )
+        
+        return updated_cost
+    
+    def _get_variant_quantity(self, subscription: Subscription, variant_id: UUID) -> int:
+        """Get quantity for a variant from subscription metadata"""
+        if not subscription.subscription_metadata:
+            return 1
+        
+        # Check if quantities are stored in metadata
+        quantities = subscription.subscription_metadata.get("variant_quantities", {})
+        return quantities.get(str(variant_id), 1)
+    
     async def _get_delivery_address(self, subscription: Subscription) -> Dict[str, Any]:
         """Get delivery address for subscription order"""
-        # This would typically fetch from a user's saved addresses
-        # For now, return a placeholder structure
+        if subscription.delivery_address_id:
+            from models.user import Address
+            address_result = await self.db.execute(
+                select(Address).where(Address.id == subscription.delivery_address_id)
+            )
+            address = address_result.scalar_one_or_none()
+            if address:
+                return {
+                    "street": address.street,
+                    "city": address.city,
+                    "state": address.state,
+                    "country": address.country,
+                    "post_code": address.post_code,
+                    "type": "shipping",
+                    "delivery_type": subscription.delivery_type or "standard"
+                }
+        
+        # Fallback to basic structure
         return {
             "type": "shipping",
             "delivery_type": subscription.delivery_type or "standard"

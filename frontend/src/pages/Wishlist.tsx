@@ -22,10 +22,10 @@ export const Wishlist = () => {
 
   const handleAddToCart = async (item) => {
     await executeWithAuth(async () => {
-      // Ensure a variant is available
-      const targetVariantId = item.variant?.id || item.product?.variants?.[0]?.id;
+      // Ensure a variant is available - check variant_id first, then variant object, then product variants
+      const targetVariantId = item.variant_id || item.variant?.id || item.product?.variants?.[0]?.id;
       if (!targetVariantId) {
-        toast.error("Cannot add to cart: variant information missing.");
+        toast.error("Cannot add to cart: variant information missing. Please try refreshing the page.");
         return false;
       }
 

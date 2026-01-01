@@ -150,7 +150,7 @@ async def get_addresses(
     try:
         address_service = AddressService(db)
         addresses = await address_service.get_user_addresses(current_user.id)
-        return Response.success(data=[AddressResponse.from_orm(address) for address in addresses])
+        return APIResponse.success(data=[AddressResponse.from_orm(address) for address in addresses])
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

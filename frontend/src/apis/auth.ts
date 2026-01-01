@@ -245,35 +245,35 @@ export class AuthAPI {
    * Get user's payment methods
    */
   static async getPaymentMethods() {
-    return await apiClient.get('/users/me/payment-methods');
+    return await apiClient.get('/payments/methods');
   }
 
   /**
    * Add payment method
    */
   static async addPaymentMethod(paymentMethod) {
-    return await apiClient.post('/users/payment-methods', paymentMethod);
+    return await apiClient.post('/payments/methods', paymentMethod);
   }
 
   /**
    * Update payment method
    */
   static async updatePaymentMethod(paymentMethodId, paymentMethod) {
-    return await apiClient.put(`/users/payment-methods/${paymentMethodId}`, paymentMethod);
+    return await apiClient.put(`/payments/methods/${paymentMethodId}`, paymentMethod);
   }
 
   /**
    * Delete payment method
    */
   static async deletePaymentMethod(paymentMethodId) {
-    return await apiClient.delete(`/users/payment-methods/${paymentMethodId}`);
+    return await apiClient.delete(`/payments/methods/${paymentMethodId}`);
   }
 
   /**
    * Set default payment method
    */
   static async setDefaultPaymentMethod(paymentMethodId) {
-    return await apiClient.put(`/users/payment-methods/${paymentMethodId}/default`);
+    return await apiClient.put(`/payments/methods/${paymentMethodId}/default`);
   }
 
 
@@ -282,7 +282,7 @@ export class AuthAPI {
    * Get user's default payment method
    */
   static async getDefaultPaymentMethod() {
-    return await apiClient.get('/users/me/payment-methods/default');
+    return await apiClient.get('/payments/methods/default');
   }
 }
 

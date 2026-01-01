@@ -1,14 +1,18 @@
 """
-Background tasks for subscription management
-Handles periodic shipment creation and subscription lifecycle
+Background tasks for subscription management using Kafka
+Handles periodic order placement and subscription lifecycle
 """
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from typing import Dict, Any, List
+from uuid import UUID
 
 from core.database import get_db
-from services.subscriptions import SubscriptionSchedulerService
+from core.config import settings
+from core.kafka import get_kafka_producer_service
+from services.subscriptions.subscription_scheduler import SubscriptionSchedulerService
+from services.notifications import NotificationService
 from tasks.email_tasks import email_task_service
 from fastapi import BackgroundTasks
 
@@ -16,24 +20,32 @@ logger = logging.getLogger(__name__)
 
 
 class SubscriptionTaskManager:
-    """Manages background tasks for subscription operations"""
+    """Manages background tasks for subscription operations using Kafka"""
     
     def __init__(self):
         self.is_running = False
         self.check_interval_minutes = 60  # Check every hour
+        self.producer = None
         
+    async def initialize_kafka(self):
+        """Initialize Kafka producer"""
+        if not self.producer:
+            self.producer = await get_kafka_producer_service()
+    
     async def start_subscription_scheduler(self):
-        """Start the subscription shipment scheduler"""
+        """Start the subscription order scheduler using Kafka"""
         if self.is_running:
             logger.warning("Subscription scheduler is already running")
             return
         
         self.is_running = True
-        logger.info("Starting subscription shipment scheduler")
+        logger.info("Starting subscription order scheduler with Kafka")
+        
+        await self.initialize_kafka()
         
         while self.is_running:
             try:
-                await self._process_subscription_shipments()
+                await self._process_subscription_orders()
                 await asyncio.sleep(self.check_interval_minutes * 60)  # Convert to seconds
             except Exception as e:
                 logger.error(f"Error in subscription scheduler: {e}")
@@ -44,8 +56,8 @@ class SubscriptionTaskManager:
         self.is_running = False
         logger.info("Subscription scheduler stopped")
     
-    async def _process_subscription_shipments(self):
-        """Process subscriptions due for shipment"""
+    async def _process_subscription_orders(self):
+        """Process subscriptions due for order placement"""
         async for db in get_db():
             try:
                 scheduler = SubscriptionSchedulerService(db)
@@ -53,70 +65,296 @@ class SubscriptionTaskManager:
                 
                 logger.info(f"Subscription processing result: {result}")
                 
-                # Send summary email to admin if there were failures
+                # Send Kafka notifications for each processed order
+                for order_result in result["results"]:
+                    if order_result["status"] == "success":
+                        await self._send_order_created_notification(order_result)
+                    else:
+                        await self._send_order_failed_notification(order_result)
+                
+                # Send summary notification to admin if there were failures
                 if result["failed_count"] > 0:
                     await self._send_admin_failure_notification(result)
                 
             except Exception as e:
-                logger.error(f"Error processing subscription shipments: {e}")
+                logger.error(f"Error processing subscription orders: {e}")
             finally:
                 await db.close()
     
-    async def _send_admin_failure_notification(self, result: Dict[str, Any]):
-        """Send notification to admin about subscription processing failures"""
+    async def _send_order_created_notification(self, order_result: Dict[str, Any]):
+        """Send order created notification via Kafka"""
         try:
-            # This would send an email to admin about failures
-            logger.warning(f"Subscription processing had {result['failed_count']} failures")
-            # TODO: Implement admin notification email
+            await self.initialize_kafka()
+            
+            # Send order event
+            await self.producer.send_order_notification(
+                user_id=order_result.get("user_id", ""),
+                order_id=order_result["order_id"],
+                event_type="subscription_order_created",
+                order_data={
+                    "subscription_id": order_result["subscription_id"],
+                    "order_type": "subscription_recurring",
+                    "created_at": datetime.utcnow().isoformat()
+                }
+            )
+            
+            logger.info(f"Sent order created notification for order {order_result['order_id']}")
+            
+        except Exception as e:
+            logger.error(f"Failed to send order created notification: {e}")
+    
+    async def _send_order_failed_notification(self, order_result: Dict[str, Any]):
+        """Send order failed notification via Kafka"""
+        try:
+            await self.initialize_kafka()
+            
+            # Send notification to user about failed order
+            notification_message = {
+                "service": "NotificationService",
+                "method": "create_notification",
+                "args": [],
+                "kwargs": {
+                    "user_id": order_result.get("user_id", ""),
+                    "message": f"Failed to create your subscription order. Reason: {order_result.get('reason', 'Unknown error')}",
+                    "type": "error",
+                    "related_id": order_result["subscription_id"]
+                }
+            }
+            
+            await self.producer.send_message(
+                topic=settings.KAFKA_TOPIC_NOTIFICATION,
+                value=notification_message,
+                key=order_result.get("user_id", "")
+            )
+            
+            logger.info(f"Sent order failed notification for subscription {order_result['subscription_id']}")
+            
+        except Exception as e:
+            logger.error(f"Failed to send order failed notification: {e}")
+    
+    async def _send_admin_failure_notification(self, result: Dict[str, Any]):
+        """Send notification to admin about subscription processing failures via Kafka"""
+        try:
+            await self.initialize_kafka()
+            
+            # Send email notification to admin
+            email_message = {
+                "task": "send_admin_notification_email",
+                "args": [
+                    "Subscription Order Processing Failures",
+                    f"Subscription processing had {result['failed_count']} failures out of {result['total_due']} due subscriptions."
+                ]
+            }
+            
+            await self.producer.send_message(
+                topic=settings.KAFKA_TOPIC_EMAIL,
+                value=email_message,
+                key="admin_notification"
+            )
+            
+            logger.info(f"Sent admin failure notification: {result['failed_count']} failures")
+            
         except Exception as e:
             logger.error(f"Failed to send admin notification: {e}")
+    
+    async def schedule_order_notifications(self):
+        """Schedule order notifications via Kafka"""
+        try:
+            await self.initialize_kafka()
+            
+            message = {
+                "task": "send_subscription_order_notifications",
+                "scheduled_at": datetime.utcnow().isoformat(),
+                "event_type": "subscription_order_notifications"
+            }
+            
+            await self.producer.send_message(
+                topic=settings.KAFKA_TOPIC_NOTIFICATION,
+                value=message,
+                key="subscription_order_notifications"
+            )
+            
+            logger.info("Scheduled subscription order notifications via Kafka")
+            
+        except Exception as e:
+            logger.error(f"Failed to schedule order notifications: {e}")
+    
+    async def process_upcoming_order_notifications(self):
+        """Process and send notifications about upcoming orders"""
+        async for db in get_db():
+            try:
+                # Get subscriptions due in next 3 days
+                upcoming_orders = await self._get_upcoming_subscription_orders(db, days_ahead=3)
+                
+                notifications_sent = 0
+                
+                for order_info in upcoming_orders:
+                    days_until = order_info["days_until_order"]
+                    
+                    # Send notification for subscriptions due in 3 days, 1 day, or today
+                    if days_until in [3, 1, 0]:
+                        try:
+                            await self._send_upcoming_order_notification(order_info, days_until)
+                            notifications_sent += 1
+                        except Exception as e:
+                            logger.error(f"Failed to send notification for subscription {order_info['subscription_id']}: {e}")
+                
+                logger.info(f"Sent {notifications_sent} upcoming order notifications")
+                
+                return {
+                    "status": "completed",
+                    "notifications_sent": notifications_sent,
+                    "processed_at": datetime.utcnow().isoformat()
+                }
+                
+            except Exception as e:
+                logger.error(f"Error processing upcoming order notifications: {e}")
+                return {
+                    "status": "error",
+                    "error": str(e),
+                    "processed_at": datetime.utcnow().isoformat()
+                }
+            finally:
+                await db.close()
+    
+    async def _get_upcoming_subscription_orders(self, db, days_ahead: int = 7) -> List[Dict[str, Any]]:
+        """Get upcoming subscription orders"""
+        from sqlalchemy import select, and_
+        from sqlalchemy.orm import selectinload
+        from models.subscriptions import Subscription
+        
+        end_date = datetime.utcnow() + timedelta(days=days_ahead)
+        
+        query = select(Subscription).where(
+            and_(
+                Subscription.status == "active",
+                Subscription.auto_renew == True,
+                Subscription.next_billing_date <= end_date
+            )
+        ).options(selectinload(Subscription.user))
+        
+        result = await db.execute(query)
+        subscriptions = result.scalars().all()
+        
+        schedule = []
+        for subscription in subscriptions:
+            schedule.append({
+                "subscription_id": str(subscription.id),
+                "user_id": str(subscription.user_id),
+                "user_email": subscription.user.email if subscription.user else None,
+                "plan_id": subscription.plan_id,
+                "next_billing_date": subscription.next_billing_date.isoformat(),
+                "amount": subscription.price,
+                "currency": subscription.currency,
+                "billing_cycle": subscription.billing_cycle,
+                "days_until_order": (subscription.next_billing_date - datetime.utcnow()).days,
+                "product_count": len(subscription.variant_ids or [])
+            })
+        
+        return sorted(schedule, key=lambda x: x["next_billing_date"])
+    
+    async def _send_upcoming_order_notification(self, order_info: dict, days_until: int):
+        """Send upcoming order notification via Kafka"""
+        try:
+            await self.initialize_kafka()
+            
+            if days_until == 0:
+                message = f"Your subscription order will be placed today! Total: {order_info['amount']} {order_info['currency']} for {order_info['product_count']} item(s)."
+                notification_type = "info"
+            elif days_until == 1:
+                message = f"Your subscription order will be placed tomorrow! Total: {order_info['amount']} {order_info['currency']} for {order_info['product_count']} item(s)."
+                notification_type = "info"
+            else:  # days_until == 3
+                message = f"Your subscription order will be placed in {days_until} days. Total: {order_info['amount']} {order_info['currency']} for {order_info['product_count']} item(s)."
+                notification_type = "info"
+            
+            # Send notification via Kafka
+            notification_message = {
+                "service": "NotificationService",
+                "method": "create_notification",
+                "args": [],
+                "kwargs": {
+                    "user_id": order_info["user_id"],
+                    "message": message,
+                    "type": notification_type,
+                    "related_id": order_info["subscription_id"]
+                }
+            }
+            
+            await self.producer.send_message(
+                topic=settings.KAFKA_TOPIC_NOTIFICATION,
+                value=notification_message,
+                key=order_info["user_id"]
+            )
+            
+            logger.info(f"Sent upcoming order notification to user {order_info['user_id']}")
+            
+        except Exception as e:
+            logger.error(f"Failed to send upcoming order notification: {e}")
 
 
 # Global instance
 subscription_task_manager = SubscriptionTaskManager()
 
 
-# Task functions for FastAPI BackgroundTasks
+# Kafka message handlers for subscription tasks
+async def handle_subscription_task_message(message_data: dict, db):
+    """Handle subscription task messages from Kafka"""
+    
+    task = message_data.get("task")
+    
+    if task == "send_subscription_order_notifications":
+        return await subscription_task_manager.process_upcoming_order_notifications()
+    else:
+        logger.warning(f"Unknown subscription task: {task}")
+        return {"status": "unknown_task", "task": task}
+
+
+# Task functions for FastAPI BackgroundTasks (keeping for backward compatibility)
 def process_subscription_renewal(
     background_tasks: BackgroundTasks,
     subscription_id: str,
     user_email: str,
     user_name: str
 ):
-    """Process subscription renewal and send confirmation"""
-    background_tasks.add_task(_handle_subscription_renewal, subscription_id, user_email, user_name)
+    """Process subscription order creation and send confirmation"""
+    background_tasks.add_task(_handle_subscription_order_creation, subscription_id, user_email, user_name)
 
 
-async def _handle_subscription_renewal(subscription_id: str, user_email: str, user_name: str):
-    """Handle subscription renewal process"""
+async def _handle_subscription_order_creation(subscription_id: str, user_email: str, user_name: str):
+    """Handle subscription order creation process"""
     try:
         async for db in get_db():
             try:
                 scheduler = SubscriptionSchedulerService(db)
                 # Process specific subscription
-                # This could be enhanced to handle individual subscription processing
-                logger.info(f"Processing renewal for subscription {subscription_id}")
+                logger.info(f"Processing order creation for subscription {subscription_id}")
                 
-                # Send renewal confirmation email
+                # Send order confirmation email via Kafka
+                producer = await get_kafka_producer_service()
+                
                 email_data = {
-                    "to_email": user_email,
-                    "mail_type": "subscription_renewal",
-                    "context": {
+                    "task": "send_subscription_order_email",
+                    "args": [user_email, {
                         "customer_name": user_name,
                         "subscription_id": subscription_id,
-                        "renewal_date": datetime.utcnow(),
+                        "order_date": datetime.utcnow(),
                         "company_name": "Banwee",
                         "support_email": "support@banwee.com"
-                    }
+                    }]
                 }
                 
-                await email_task_service._send_email_direct(email_data)
+                await producer.send_message(
+                    topic=settings.KAFKA_TOPIC_EMAIL,
+                    value=email_data,
+                    key=user_email
+                )
                 
             finally:
                 await db.close()
                 
     except Exception as e:
-        logger.error(f"Failed to process subscription renewal {subscription_id}: {e}")
+        logger.error(f"Failed to process subscription order creation {subscription_id}: {e}")
 
 
 def send_subscription_shipment_notification(
@@ -126,21 +364,35 @@ def send_subscription_shipment_notification(
     order_number: str,
     tracking_number: str = None
 ):
-    """Send shipment notification for subscription order"""
-    email_data = {
-        "to_email": user_email,
-        "mail_type": "subscription_shipment",
-        "context": {
-            "customer_name": user_name,
-            "order_number": order_number,
-            "tracking_number": tracking_number,
-            "shipment_date": datetime.utcnow(),
-            "company_name": "Banwee",
-            "support_email": "support@banwee.com"
+    """Send shipment notification for subscription order via Kafka"""
+    background_tasks.add_task(_send_shipment_notification_kafka, user_email, user_name, order_number, tracking_number)
+
+
+async def _send_shipment_notification_kafka(user_email: str, user_name: str, order_number: str, tracking_number: str = None):
+    """Send shipment notification via Kafka"""
+    try:
+        producer = await get_kafka_producer_service()
+        
+        email_data = {
+            "task": "send_subscription_shipment_email",
+            "args": [user_email, {
+                "customer_name": user_name,
+                "order_number": order_number,
+                "tracking_number": tracking_number,
+                "shipment_date": datetime.utcnow(),
+                "company_name": "Banwee",
+                "support_email": "support@banwee.com"
+            }]
         }
-    }
-    
-    background_tasks.add_task(email_task_service._send_email_direct, email_data)
+        
+        await producer.send_message(
+            topic=settings.KAFKA_TOPIC_EMAIL,
+            value=email_data,
+            key=user_email
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to send shipment notification via Kafka: {e}")
 
 
 def send_subscription_pause_notification(
@@ -150,21 +402,35 @@ def send_subscription_pause_notification(
     subscription_id: str,
     pause_reason: str = None
 ):
-    """Send notification when subscription is paused"""
-    email_data = {
-        "to_email": user_email,
-        "mail_type": "subscription_paused",
-        "context": {
-            "customer_name": user_name,
-            "subscription_id": subscription_id,
-            "pause_reason": pause_reason or "User requested",
-            "pause_date": datetime.utcnow(),
-            "company_name": "Banwee",
-            "support_email": "support@banwee.com"
+    """Send notification when subscription is paused via Kafka"""
+    background_tasks.add_task(_send_pause_notification_kafka, user_email, user_name, subscription_id, pause_reason)
+
+
+async def _send_pause_notification_kafka(user_email: str, user_name: str, subscription_id: str, pause_reason: str = None):
+    """Send pause notification via Kafka"""
+    try:
+        producer = await get_kafka_producer_service()
+        
+        email_data = {
+            "task": "send_subscription_paused_email",
+            "args": [user_email, {
+                "customer_name": user_name,
+                "subscription_id": subscription_id,
+                "pause_reason": pause_reason or "User requested",
+                "pause_date": datetime.utcnow(),
+                "company_name": "Banwee",
+                "support_email": "support@banwee.com"
+            }]
         }
-    }
-    
-    background_tasks.add_task(email_task_service._send_email_direct, email_data)
+        
+        await producer.send_message(
+            topic=settings.KAFKA_TOPIC_EMAIL,
+            value=email_data,
+            key=user_email
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to send pause notification via Kafka: {e}")
 
 
 def send_subscription_resume_notification(
@@ -174,18 +440,43 @@ def send_subscription_resume_notification(
     subscription_id: str,
     next_shipment_date: datetime
 ):
-    """Send notification when subscription is resumed"""
-    email_data = {
-        "to_email": user_email,
-        "mail_type": "subscription_resumed",
-        "context": {
-            "customer_name": user_name,
-            "subscription_id": subscription_id,
-            "resume_date": datetime.utcnow(),
-            "next_shipment_date": next_shipment_date,
-            "company_name": "Banwee",
-            "support_email": "support@banwee.com"
+    """Send notification when subscription is resumed via Kafka"""
+    background_tasks.add_task(_send_resume_notification_kafka, user_email, user_name, subscription_id, next_shipment_date)
+
+
+async def _send_resume_notification_kafka(user_email: str, user_name: str, subscription_id: str, next_shipment_date: datetime):
+    """Send resume notification via Kafka"""
+    try:
+        producer = await get_kafka_producer_service()
+        
+        email_data = {
+            "task": "send_subscription_resumed_email",
+            "args": [user_email, {
+                "customer_name": user_name,
+                "subscription_id": subscription_id,
+                "resume_date": datetime.utcnow(),
+                "next_shipment_date": next_shipment_date,
+                "company_name": "Banwee",
+                "support_email": "support@banwee.com"
+            }]
         }
-    }
-    
-    background_tasks.add_task(email_task_service._send_email_direct, email_data)
+        
+        await producer.send_message(
+            topic=settings.KAFKA_TOPIC_EMAIL,
+            value=email_data,
+            key=user_email
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to send resume notification via Kafka: {e}")
+
+
+# Manual trigger functions
+async def trigger_subscription_order_processing():
+    """Manually trigger subscription order processing"""
+    await subscription_task_manager._process_subscription_orders()
+
+
+async def trigger_order_notifications():
+    """Manually trigger order notifications"""
+    await subscription_task_manager.schedule_order_notifications()
