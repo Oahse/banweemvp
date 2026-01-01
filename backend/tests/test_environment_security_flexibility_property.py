@@ -148,7 +148,7 @@ class ConfigurationValidator:
         for setting in ConfigurationValidator.REQUIRED_SECURITY_SETTINGS:
             if setting not in config_dict or not config_dict[setting]:
                 result['valid'] = False
-                result['errors'].append(f"Security setting {setting} is required for session management and token signing")
+                result['errors'].append(f"Security setting {setting} is required for token signing")
         
         # Check database settings - either full URL or individual components
         has_db_url = 'POSTGRES_DB_URL' in config_dict and config_dict['POSTGRES_DB_URL']
