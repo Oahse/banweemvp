@@ -16,7 +16,8 @@ router = APIRouter(prefix="/cart", tags=["Cart"])
 
 def get_session_id(request: Request) -> Optional[str]:
     """Extract session ID from request for guest carts"""
-    return request.session.get('session_id') or request.headers.get('X-Session-ID')
+    # No longer using request.session for "strictly JWT" with no cookies
+    return request.headers.get('X-Session-ID')
 
 
 @router.get("/")

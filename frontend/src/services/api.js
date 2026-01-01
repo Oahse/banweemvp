@@ -15,20 +15,12 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token and session ID
 api.interceptors.request.use(
   (config) => {
     // Add auth token if available
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    // Add session ID for guest users
-    const sessionId = localStorage.getItem('session_id') || generateSessionId();
-    if (sessionId && !token) {
-      config.headers['X-Session-ID'] = sessionId;
-      localStorage.setItem('session_id', sessionId);
     }
 
     if (config.debugMode) {
@@ -101,10 +93,7 @@ api.interceptors.response.use(
 );
 
 
-// Generate session ID for guest users
-function generateSessionId() {
-  return 'sess_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-}
+
 
 // API methods
 export const apiService = {

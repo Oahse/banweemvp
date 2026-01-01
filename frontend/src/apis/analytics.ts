@@ -8,7 +8,7 @@ export class AnalyticsAPI {
    * Track an analytics event
    */
   static async trackEvent(eventData: {
-    session_id: string;
+
     event_type: string;
     data?: any;
     page_url?: string;

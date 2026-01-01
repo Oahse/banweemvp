@@ -234,7 +234,7 @@ class APIClient {
         case 401:
           // Handled by auth interceptor, redirect to login
           if (!suppressToasts) {
-            apiError.message = 'Your session has expired. Please log in again.';
+
           }
           break;
         case 403:

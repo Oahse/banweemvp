@@ -224,7 +224,6 @@ class RedisKeyManager:
     
     # Key prefixes for different data types
     CART_PREFIX = "cart"
-    SESSION_PREFIX = "session"
     RATE_LIMIT_PREFIX = "rate_limit"
     SECURITY_PREFIX = "security"
     PRODUCT_CACHE_PREFIX = "product"
@@ -235,11 +234,6 @@ class RedisKeyManager:
     def cart_key(user_id: str) -> str:
         """Generate cart key for user"""
         return f"{RedisKeyManager.CART_PREFIX}:{user_id}"
-    
-    @staticmethod
-    def session_key(session_id: str) -> str:
-        """Generate session key"""
-        return f"{RedisKeyManager.SESSION_PREFIX}:{session_id}"
     
     @staticmethod
     def rate_limit_key(identifier: str, endpoint: str) -> str:

@@ -14,24 +14,19 @@ class WebSocketService {
     this.listeners = new Map();
     this.isConnected = false;
     this.userId = null;
-    this.sessionId = null;
   }
 
-  connect(userId = null, sessionId = null) {
+  connect(userId = null) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       return;
     }
 
     this.userId = userId;
-    this.sessionId = sessionId;
 
     try {
       const wsUrl = new URL(config.webSocketUrl);
       if (userId) {
         wsUrl.searchParams.set('user_id', userId);
-      }
-      if (sessionId) {
-        wsUrl.searchParams.set('session_id', sessionId);
       }
 
       this.ws = new WebSocket(wsUrl.toString());
@@ -69,7 +64,7 @@ class WebSocketService {
     }
 
     // Notify listeners about connection
-    this.emit('connected', { userId: this.userId, sessionId: this.sessionId });
+    this.emit('connected', { userId: this.userId });
   }
 
   handleMessage(event) {
@@ -140,7 +135,7 @@ class WebSocketService {
     }
 
     setTimeout(() => {
-      this.connect(this.userId, this.sessionId);
+      this.connect(this.userId);
     }, delay);
   }
 
@@ -217,8 +212,7 @@ class WebSocketService {
       isConnected: this.isConnected,
       readyState: this.ws ? this.ws.readyState : WebSocket.CLOSED,
       reconnectAttempts: this.reconnectAttempts,
-      userId: this.userId,
-      sessionId: this.sessionId
+      userId: this.userId
     };
   }
 }

@@ -7,20 +7,12 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { AnalyticsAPI } from '../apis/analytics';
 
-// Generate or get session ID
-const getSessionId = (): string => {
-  let sessionId = sessionStorage.getItem('analytics_session_id');
-  if (!sessionId) {
-    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    sessionStorage.setItem('analytics_session_id', sessionId);
-  }
-  return sessionId;
-};
+
 
 export const useAnalytics = () => {
   const location = useLocation();
   const { user } = useAuth();
-  const sessionId = getSessionId();
+
 
   // Track page views
   useEffect(() => {
@@ -43,7 +35,7 @@ export const useAnalytics = () => {
   ) => {
     try {
       await AnalyticsAPI.trackEvent({
-        session_id: sessionId,
+
         event_type: eventType,
         data: data || {},
         page_url: options?.page_url || location.pathname + location.search,
@@ -55,7 +47,7 @@ export const useAnalytics = () => {
     } catch (error) {
       console.error('Failed to track analytics event:', error);
     }
-  }, [sessionId, location]);
+  }, [location]);
 
   // E-commerce specific tracking methods
   const trackPurchase = useCallback((orderId: string, revenue: number, items?: any[]) => {
@@ -119,7 +111,7 @@ export const useAnalytics = () => {
     trackRefundRequest,
     trackUserRegister,
     trackUserLogin,
-    sessionId
+
   };
 };
 

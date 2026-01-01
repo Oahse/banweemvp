@@ -276,19 +276,7 @@ export class AuthAPI {
     return await apiClient.put(`/users/payment-methods/${paymentMethodId}/default`);
   }
 
-  /**
-   * Extend current session
-   */
-  static async extendSession() {
-    return await apiClient.post('/auth/extend-session');
-  }
 
-  /**
-   * Get current session information
-   */
-  static async getSessionInfo() {
-    return await apiClient.get('/auth/session-info');
-  }
 
   /**
    * Get user's default payment method

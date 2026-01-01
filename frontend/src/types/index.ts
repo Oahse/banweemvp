@@ -170,7 +170,7 @@ export interface CartItem {
 export interface Cart {
   id: string;
   user_id: string;
-  session_id?: string;
+
   promocode_id?: string;
   discount_amount?: number;
   items: CartItem[];

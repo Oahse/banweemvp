@@ -320,14 +320,8 @@ class Settings:
         # Session and Token Configuration
         self.ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30))
         self.REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS', 7))
-        self.SESSION_WARNING_THRESHOLD_MINUTES: int = int(os.getenv('SESSION_WARNING_THRESHOLD_MINUTES', 5))
-        self.SESSION_EXTENSION_MINUTES: int = int(os.getenv('SESSION_EXTENSION_MINUTES', 30))
-        
-        # Remember Me Configuration
-        self.REMEMBER_ME_TOKEN_EXPIRE_DAYS: int = int(os.getenv('REMEMBER_ME_TOKEN_EXPIRE_DAYS', 30))
         
         # Session Security
-        self.MAX_CONCURRENT_SESSIONS: int = int(os.getenv('MAX_CONCURRENT_SESSIONS', 5))
         self.FORCE_LOGOUT_ON_PASSWORD_CHANGE: bool = os.getenv('FORCE_LOGOUT_ON_PASSWORD_CHANGE', 'true').lower() == 'true'
         
         # --- Redis Configuration ---
@@ -426,7 +420,7 @@ class Settings:
         missing_settings = []
         
         if not self.SECRET_KEY:
-            missing_settings.append("SECRET_KEY is required for session management and token signing")
+            missing_settings.append("SECRET_KEY is required for token signing")
         
         if not self.STRIPE_SECRET_KEY:
             missing_settings.append("STRIPE_SECRET_KEY is required for Stripe API authentication")
