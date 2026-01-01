@@ -82,11 +82,11 @@ async def get_all_orders(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     order_status: Optional[str] = Query(None, alias="status"),
-    q: Optional[str] = None,
-    date_from: Optional[str] = None,
-    date_to: Optional[str] = None,
-    min_price: Optional[float] = None,
-    max_price: Optional[float] = None,
+    q: Optional[str] = Query(None),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    min_price: Optional[float] = Query(None),
+    max_price: Optional[float] = Query(None),
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
@@ -240,10 +240,10 @@ async def get_order_invoice_admin(
 async def get_all_users(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
-    role: Optional[str] = None,
-    search: Optional[str] = None,
-    status: Optional[str] = None,
-    verified: Optional[bool] = None,
+    role: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    verified: Optional[bool] = Query(None),
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
@@ -408,10 +408,10 @@ async def activate_user_account(
 async def get_all_products_admin(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
-    search: Optional[str] = None,
-    category: Optional[str] = None,
-    status: Optional[str] = None,
-    supplier: Optional[str] = None,
+    search: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    supplier: Optional[str] = Query(None),
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
@@ -435,8 +435,8 @@ async def get_all_products_admin(
 async def get_all_variants_admin(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
-    search: Optional[str] = None,
-    product_id: Optional[str] = None,
+    search: Optional[str] = Query(None),
+    product_id: Optional[str] = Query(None),
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
@@ -456,11 +456,11 @@ async def get_all_variants_admin(
 async def export_orders(
     format: str = Query("csv"),
     order_status: Optional[str] = Query(None, alias="status"),
-    q: Optional[str] = None,
-    date_from: Optional[str] = None,
-    date_to: Optional[str] = None,
-    min_price: Optional[float] = None,
-    max_price: Optional[float] = None,
+    q: Optional[str] = Query(None),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    min_price: Optional[float] = Query(None),
+    max_price: Optional[float] = Query(None),
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):

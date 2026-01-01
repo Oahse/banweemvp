@@ -218,7 +218,7 @@ async def checkout(
 async def get_orders(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
-    status_filter: Optional[str] = None,
+    status_filter: Optional[str] = Query(None),
     current_user: User = Depends(get_current_auth_user),
     order_service: OrderService = Depends(get_order_service)
 ):
