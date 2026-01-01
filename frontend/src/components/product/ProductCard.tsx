@@ -1,5 +1,6 @@
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon } from 'lucide-react';
+import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
@@ -8,6 +9,7 @@ import { useLocale } from '../../contexts/LocaleContext';
 import { SkeletonCard } from '../ui/SkeletonCard';
 import { QRCodeDisplay } from './QRCodeDisplay';
 import { BarcodeDisplay } from './BarcodeDisplay';
+import SubscriptionAPI from '../../apis/subscription';
 import { toast } from 'react-hot-toast';
 import { cn } from '../../lib/utils';
 
@@ -62,6 +64,8 @@ import { cn } from '../../lib/utils';
  * @property {string} [className]
  * @property {boolean} [isLoading=false]
  * @property {'shimmer' | 'pulse' | 'wave'} [animation='shimmer']
+ * @property {boolean} [showSubscriptionButton=false]
+ * @property {string} [subscriptionId]
  */
 
 export const ProductCard = ({
@@ -70,15 +74,17 @@ export const ProductCard = ({
   showQRCode = false,
   showBarcode = false,
   viewMode = 'grid',
-
   className,
   isLoading = false,
   animation = 'shimmer',
+  showSubscriptionButton = false,
+  subscriptionId,
 }) => {
   const { addItem: addToCart, cart } = useCart();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
   const { executeWithAuth } = useAuthenticatedAction();
   const { formatCurrency } = useLocale();
+  const [isAddingToSubscription, setIsAddingToSubscription] = useState(false);
 
   if (isLoading) { // <--- Add this check
     return <SkeletonCard viewMode={viewMode} animation={animation} />;
@@ -178,7 +184,23 @@ export const ProductCard = ({
         }
       };
 
+  const handleAddToSubscription = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     
+    if (!subscriptionId || !displayVariant) return;
+    
+    setIsAddingToSubscription(true);
+    try {
+      await SubscriptionAPI.addProductsToSubscription(subscriptionId, [displayVariant.id]);
+      toast.success('Product added to subscription!');
+    } catch (error) {
+      console.error('Failed to add to subscription:', error);
+      toast.error('Failed to add product to subscription');
+    } finally {
+      setIsAddingToSubscription(false);
+    }
+  };
 
       const handleAddToWishlist = async (e) => {
         e.preventDefault();
@@ -343,6 +365,25 @@ export const ProductCard = ({
             {isInCart ? <CheckIcon size={18} /> : <ShoppingCartIcon size={18} />}
             {viewMode === 'list' && <span className="hidden md:inline ml-2">{isInCart ? "In Cart" : "Add to Cart"}</span>}
           </button>
+          
+          {/* Subscription Button */}
+          {showSubscriptionButton && subscriptionId && (
+            <button
+              onClick={handleAddToSubscription}
+              disabled={isAddingToSubscription}
+              className={cn(
+                'ml-2 flex items-center text-white bg-green-600 hover:bg-green-700 px-3 py-2 rounded-md transition-colors',
+                isAddingToSubscription && 'opacity-50 cursor-not-allowed'
+              )}
+              aria-label="Add to subscription">
+              {isAddingToSubscription ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              ) : (
+                <PlusIcon size={16} />
+              )}
+              <span className="ml-1 text-sm">Subscribe</span>
+            </button>
+          )}
         </div>
 
         {/* QR Code and Barcode Display */}

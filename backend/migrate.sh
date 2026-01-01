@@ -179,7 +179,7 @@ async def check_alembic_version():
     engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI)
     try:
         async with engine.connect() as conn:
-            result = await conn.execute(text('SELECT version_num FROM banwee.alembic_version LIMIT 1'))
+            result = await conn.execute(text('SELECT version_num FROM alembic_version LIMIT 1'))
             version = result.scalar()
             print(version if version else '')
     except:
@@ -203,7 +203,7 @@ async def clear_version():
     engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI)
     try:
         async with engine.connect() as conn:
-            await conn.execute(text('DELETE FROM banwee.alembic_version'))
+            await conn.execute(text('DELETE FROM alembic_version'))
             await conn.commit()
     except Exception as e:
         print(f'Warning: Could not clear alembic version: {e}')
@@ -217,12 +217,12 @@ fi
 # Create initial migration if no migrations exist
 if [ ! "$(ls -A alembic/versions 2>/dev/null)" ]; then
     echo "📝 No migrations found, creating initial migration..."
-    python -m alembic revision --autogenerate -m "Initial migration"
+    python -m alembic revision -m "Initial empty migration"
     if [ $? -eq 0 ]; then
         echo "✅ Initial migration created successfully"
     else
-        echo "⚠️  Could not create initial migration, creating empty one..."
-        python -m alembic revision -m "Initial empty migration"
+        echo "❌ Could not create initial migration"
+        exit 1
     fi
 fi
 

@@ -1,12 +1,5 @@
 import { apiClient } from './client';
 
-
-
-
-
-
-
-
 class SubscriptionAPI {
   async createSubscription(data) {
     return apiClient.post('/subscriptions/', data);
@@ -27,6 +20,14 @@ class SubscriptionAPI {
   async deleteSubscription(subscriptionId) {
     return apiClient.delete(`/subscriptions/${subscriptionId}`);
   }
+
+  async addProductsToSubscription(subscriptionId, variantIds) {
+    return apiClient.post(`/subscriptions/${subscriptionId}/products`, variantIds);
+  }
+
+  async removeProductsFromSubscription(subscriptionId, variantIds) {
+    return apiClient.delete(`/subscriptions/${subscriptionId}/products`, { data: variantIds });
+  }
 }
 
-export default new SubscriptionAPI();
+export default SubscriptionAPI;

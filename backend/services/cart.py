@@ -15,17 +15,19 @@ from models.promocode import Promocode
 from schemas.cart import CartResponse, CartItemResponse, AddToCartRequest, UpdateCartItemRequest
 from core.config import settings
 from core.kafka import get_kafka_producer_service
+from core.redis import RedisService, RedisKeyManager
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class CartService:
+class CartService(RedisService):
     """
     Cart service using Redis for performance with PostgreSQL as source of truth
     """
     
     def __init__(self, db: AsyncSession):
+        super().__init__()
         self.db = db
 
     async def add_to_cart(self, user_id: UUID, variant_id: UUID, quantity: int, session_id: Optional[str] = None) -> CartResponse:
@@ -1050,7 +1052,7 @@ class CartService:
                 if variant_id:
                     variant = await self._get_variant_with_product(UUID(variant_id))
                     if variant:
-                        from schemas.product import ProductVariantResponse, ProductVariantImageResponse
+                        from schemas.product import ProductVariantResponse, ProductImageResponse
                         
                         # Create image responses
                         image_responses = []
@@ -1058,7 +1060,7 @@ class CartService:
                         
                         if variant.images:
                             for img in variant.images:
-                                img_response = ProductVariantImageResponse(
+                                img_response = ProductImageResponse(
                                     id=img.id,
                                     variant_id=img.variant_id,
                                     url=img.url,

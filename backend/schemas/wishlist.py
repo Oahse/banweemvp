@@ -44,7 +44,7 @@ class WishlistResponse(WishlistBase):
     id: UUID
     user_id: UUID
     created_at: str = Field(..., description="ISO format datetime string")
-    updated_at: str = Field(..., description="ISO format datetime string")
+    updated_at: Optional[str] = Field(None, description="ISO format datetime string")
     items: List[WishlistItemResponse] = []
 
     model_config = ConfigDict(from_attributes=True)

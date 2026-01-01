@@ -6,11 +6,11 @@ import { AdminLayout } from './components/admin/AdminLayout';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { RawWebSocketProvider } from './contexts/WebSocketContext';
 import { FontLoader } from './components/ui/FontLoader';
-import { Toaster, toast } from 'react-hot-toast';
-import { XIcon } from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -45,6 +45,9 @@ const FAQ = lazy(() => import('./pages/FAQ').then((module) => ({ default: module
 const Wishlist = lazy(() => import('./pages/Wishlist').then((module) => ({ default: module.Wishlist })));
 const Subscription = lazy(() =>
   import('./pages/Subscription').then((module) => ({ default: module.Subscription }))
+);
+const SubscriptionManagement = lazy(() =>
+  import('./pages/SubscriptionManagement').then((module) => ({ default: module.SubscriptionManagement }))
 );
 const TermsAndConditions = lazy(() =>
   import('./pages/TermsAndConditions').then((module) => ({ default: module.TermsAndConditions }))
@@ -144,9 +147,10 @@ export const App: React.FC = () => {
           <ThemeProvider>
             <LocaleProvider>
               <CartProvider>
-                <WishlistProvider>
+                <SubscriptionProvider>
+                  <WishlistProvider>
                   <NotificationProvider>
-                  <RawWebSocketProvider autoConnect={false}>
+                    <RawWebSocketProvider autoConnect={false}>
                       <CategoryProvider>
                       <FontLoader />
                       <OfflineIndicator />
@@ -468,6 +472,16 @@ export const App: React.FC = () => {
                                 }
                               />
                               <Route
+                                path="/subscription/:subscriptionId/manage"
+                                element={
+                                  <ProtectedRoute>
+                                    <Layout>
+                                      <SubscriptionManagement />
+                                    </Layout>
+                                  </ProtectedRoute>
+                                }
+                              />
+                              <Route
                                 path="/terms"
                                 element={
                                   <Layout>
@@ -490,9 +504,10 @@ export const App: React.FC = () => {
                         </Elements>
                       </BrowserRouter>
                       </CategoryProvider>
-                    </WebSocketProvider>
+                    </RawWebSocketProvider>
                   </NotificationProvider>
                 </WishlistProvider>
+                </SubscriptionProvider>
               </CartProvider>
             </LocaleProvider>
           </ThemeProvider>

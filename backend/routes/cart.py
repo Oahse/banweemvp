@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from core.database import get_db
 from core.exceptions import APIException
+from core.redis import RedisKeyManager
 from services.cart import CartService
 from models.user import User
 from core.utils.response import Response
@@ -74,7 +75,6 @@ async def update_cart_item(
         cart_service = CartService(db)
         
         # Get current cart to find the variant_id for this item_id
-        from core.redis import RedisKeyManager
         cart_key = RedisKeyManager.cart_key(str(current_user.id))
         cart_data = await cart_service.get_hash(cart_key)
         

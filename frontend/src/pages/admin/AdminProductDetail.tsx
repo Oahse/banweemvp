@@ -60,10 +60,10 @@ export const AdminProductDetail = () => {
 
   // Set initial variant when product loads
   useEffect(() => {
-    if (product && product.variants && product.variants.length > 0) {
+    if (product && product.variants && product.variants.length > 0 && !selectedVariant) {
       setSelectedVariant(product.variants[0]);
     }
-  }, [product]);
+  }, [product, selectedVariant]);
 
   const totalStock = Array.isArray(product.variants)
     ? product.variants.reduce((sum: number, variant: any) => sum + (variant.stock || 0), 0)
@@ -172,24 +172,40 @@ export const AdminProductDetail = () => {
                           {Object.entries(variant.attributes).map(([key, value]) => `${key}: ${value}`).join(', ')}
                         </p>
                       )}
-                      <div className="flex items-center space-x-2 mt-2">
-                        {variant.barcode && (
-                          <span className="flex items-center text-xs text-success">
-                            <ScanLineIcon size={12} className="mr-1" />
-                            Barcode
-                          </span>
-                        )}
-                        {variant.qr_code && (
-                          <span className="flex items-center text-xs text-success">
-                            <QrCodeIcon size={12} className="mr-1" />
-                            QR Code
-                          </span>
-                        )}
+                      <div className="flex items-center space-x-3 mt-2">
+                        <div className="flex items-center space-x-2">
+                          {variant.barcode ? (
+                            <span className="flex items-center text-xs bg-success/10 text-success px-2 py-1 rounded-full">
+                              <ScanLineIcon size={12} className="mr-1" />
+                              Barcode ✓
+                            </span>
+                          ) : (
+                            <span className="flex items-center text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
+                              <ScanLineIcon size={12} className="mr-1" />
+                              No Barcode
+                            </span>
+                          )}
+                          {variant.qr_code ? (
+                            <span className="flex items-center text-xs bg-success/10 text-success px-2 py-1 rounded-full">
+                              <QrCodeIcon size={12} className="mr-1" />
+                              QR Code ✓
+                            </span>
+                          ) : (
+                            <span className="flex items-center text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
+                              <QrCodeIcon size={12} className="mr-1" />
+                              No QR Code
+                            </span>
+                          )}
+                        </div>
                         <button
                           onClick={() => setSelectedVariant(variant)}
-                          className="text-xs text-primary hover:underline"
+                          className={`text-xs px-3 py-1 rounded-md transition-colors ${
+                            selectedVariant?.id === variant.id 
+                              ? 'bg-primary text-white' 
+                              : 'text-primary hover:bg-primary/10 border border-primary'
+                          }`}
                         >
-                          View Codes
+                          {selectedVariant?.id === variant.id ? 'Selected' : 'View Codes'}
                         </button>
                       </div>
                     </div>
@@ -215,12 +231,30 @@ export const AdminProductDetail = () => {
             </div>
           </div>
 
-          {/* Barcode/QR Code Section */}
-          {selectedVariant && (
+          {/* Barcode/QR Code Section - Always show for first variant or selected variant */}
+          {(selectedVariant || (product.variants && product.variants.length > 0)) && (
             <div className="bg-surface rounded-lg p-6 border border-border-light">
-              <h2 className="text-lg font-semibold text-main mb-4">Product Codes</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-main">Product Codes</h2>
+                {product.variants && product.variants.length > 1 && (
+                  <select
+                    value={selectedVariant?.id || product.variants[0]?.id || ''}
+                    onChange={(e) => {
+                      const variant = product.variants.find((v: any) => v.id === e.target.value);
+                      setSelectedVariant(variant);
+                    }}
+                    className="px-3 py-1 border border-border rounded-md text-sm"
+                  >
+                    {product.variants.map((variant: any) => (
+                      <option key={variant.id} value={variant.id}>
+                        {variant.name} ({variant.sku})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
               <BarcodeDisplay
-                variant={selectedVariant}
+                variant={selectedVariant || product.variants[0]}
                 showBoth={true}
                 size="md"
                 onCodesGenerated={handleCodesGenerated}

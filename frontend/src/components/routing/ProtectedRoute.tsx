@@ -17,7 +17,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Store intended destination when not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      setIntendedDestination(location.pathname + location.search, null);
+      setIntendedDestination(location.pathname + location.search);
     }
   }, [isLoading, isAuthenticated, location.pathname, location.search, setIntendedDestination]);
 
@@ -35,9 +35,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
-  // If authenticated but doesn't have required role, redirect to unauthorized page
+  // If authenticated but doesn't have required role, redirect to homepage
   if (requiredRole && user && !requiredRole.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // User is authenticated and has required role (if specified)

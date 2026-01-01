@@ -99,13 +99,16 @@ class EventProducer:
             raise ValueError(f"Event data validation failed for {event_type}")
 
         # Create simple event
+        # Add version to metadata since SimpleEvent doesn't have version parameter
+        event_metadata = metadata or {}
+        event_metadata['version'] = version
+        
         event = EventContract.create(
             event_type=event_type,
             data=data,
-            version=version,
             correlation_id=correlation_id,
             causation_id=causation_id,
-            metadata=metadata or {}
+            metadata=event_metadata
         )
 
         # Determine topic name

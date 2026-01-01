@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { QrCodeIcon, ScanLineIcon } from 'lucide-react';
 import { ProductVariant, BarcodeData } from '../../types';
 import { ProductsAPI } from '../../apis/products';
 
@@ -64,88 +65,118 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Product Codes</h3>
+        <h3 className="text-lg font-semibold text-main">
+          {variant.name} - Codes
+        </h3>
         {canGenerate && (
           <button
             onClick={handleGenerateCodes}
             disabled={isGenerating}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark disabled:opacity-50 transition-colors"
           >
             {isGenerating ? 'Generating...' : 'Generate Codes'}
           </button>
         )}
       </div>
 
-      <div className={`grid ${showBoth ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
+      <div className={`grid ${showBoth ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
         {/* Barcode */}
         {(showBoth || !codes.qr_code) && (
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-medium">Barcode</h4>
+          <div className="border border-border-light rounded-lg p-4 bg-surface">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium text-main flex items-center">
+                <ScanLineIcon size={16} className="mr-2 text-primary" />
+                Barcode
+              </h4>
               {codes.barcode && (
                 <button
                   onClick={() => downloadCode(codes.barcode!, `barcode-${variant.sku}.png`)}
-                  className="text-sm text-blue-600 hover:text-blue-800"
+                  className="text-sm text-primary hover:text-primary-dark transition-colors"
                 >
                   Download
                 </button>
               )}
             </div>
             {codes.barcode ? (
-              <div className="flex justify-center">
+              <div className="flex justify-center bg-white p-4 rounded border">
                 <img
                   src={codes.barcode}
                   alt={`Barcode for ${variant.sku}`}
-                  className={`${sizeClasses[size]} object-contain border`}
+                  className={`${sizeClasses[size]} object-contain`}
                 />
               </div>
             ) : (
-              <div className={`${sizeClasses[size]} border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-500`}>
-                No barcode available
+              <div className={`${sizeClasses[size]} border-2 border-dashed border-border flex items-center justify-center text-copy-light bg-surface-hover rounded`}>
+                <div className="text-center">
+                  <ScanLineIcon size={24} className="mx-auto mb-2 text-copy-light" />
+                  <p className="text-sm">No barcode available</p>
+                </div>
               </div>
             )}
-            <p className="text-xs text-gray-600 mt-2 text-center">SKU: {variant.sku}</p>
+            <p className="text-xs text-copy-light mt-2 text-center font-mono">SKU: {variant.sku}</p>
           </div>
         )}
 
         {/* QR Code */}
         {(showBoth || !codes.barcode) && (
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-medium">QR Code</h4>
+          <div className="border border-border-light rounded-lg p-4 bg-surface">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium text-main flex items-center">
+                <QrCodeIcon size={16} className="mr-2 text-primary" />
+                QR Code
+              </h4>
               {codes.qr_code && (
                 <button
                   onClick={() => downloadCode(codes.qr_code!, `qrcode-${variant.sku}.png`)}
-                  className="text-sm text-blue-600 hover:text-blue-800"
+                  className="text-sm text-primary hover:text-primary-dark transition-colors"
                 >
                   Download
                 </button>
               )}
             </div>
             {codes.qr_code ? (
-              <div className="flex justify-center">
+              <div className="flex justify-center bg-white p-4 rounded border">
                 <img
                   src={codes.qr_code}
                   alt={`QR Code for ${variant.name}`}
-                  className={`${sizeClasses[size]} object-contain border`}
+                  className={`${sizeClasses[size]} object-contain`}
                 />
               </div>
             ) : (
-              <div className={`${sizeClasses[size]} border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-500`}>
-                No QR code available
+              <div className={`${sizeClasses[size]} border-2 border-dashed border-border flex items-center justify-center text-copy-light bg-surface-hover rounded`}>
+                <div className="text-center">
+                  <QrCodeIcon size={24} className="mx-auto mb-2 text-copy-light" />
+                  <p className="text-sm">No QR code available</p>
+                </div>
               </div>
             )}
-            <p className="text-xs text-gray-600 mt-2 text-center">{variant.name}</p>
+            <p className="text-xs text-copy-light mt-2 text-center">{variant.name}</p>
           </div>
         )}
       </div>
 
       {/* Product Info */}
-      <div className="text-sm text-gray-600 space-y-1">
-        <p><span className="font-medium">Product:</span> {variant.product_name || 'N/A'}</p>
-        <p><span className="font-medium">Variant:</span> {variant.name}</p>
-        <p><span className="font-medium">Price:</span> ${variant.sale_price || variant.base_price}</p>
-        <p><span className="font-medium">Stock:</span> {variant.stock} units</p>
+      <div className="bg-surface-hover rounded-lg p-4 text-sm text-copy space-y-2">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <span className="font-medium text-main">Product:</span>
+            <p className="text-copy-light">{variant.product_name || 'N/A'}</p>
+          </div>
+          <div>
+            <span className="font-medium text-main">Variant:</span>
+            <p className="text-copy-light">{variant.name}</p>
+          </div>
+          <div>
+            <span className="font-medium text-main">Price:</span>
+            <p className="text-copy-light">${variant.sale_price || variant.base_price}</p>
+          </div>
+          <div>
+            <span className="font-medium text-main">Stock:</span>
+            <p className={`${(variant.stock || 0) > 10 ? 'text-success' : (variant.stock || 0) > 0 ? 'text-warning' : 'text-error'}`}>
+              {variant.stock || 0} units
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

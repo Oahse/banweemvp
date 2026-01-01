@@ -127,9 +127,25 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Failed to start WebSocket Kafka consumer: {e}")
 
+    # Start Subscription Scheduler
+    try:
+        from tasks.subscription_tasks import subscription_task_manager
+        asyncio.create_task(subscription_task_manager.start_subscription_scheduler())
+        logger.info("Subscription scheduler started successfully")
+    except Exception as e:
+        logger.error(f"Failed to start subscription scheduler: {e}")
+
     asyncio.create_task(run_notification_cleanup())
     yield
     # Shutdown event
+    # Stop Subscription Scheduler
+    try:
+        from tasks.subscription_tasks import subscription_task_manager
+        subscription_task_manager.stop_subscription_scheduler()
+        logger.info("Subscription scheduler stopped successfully")
+    except Exception as e:
+        logger.error(f"Error stopping subscription scheduler: {e}")
+    
     # Stop WebSocket Kafka Consumer
     try:
         from services.websockets import stop_websocket_kafka_consumer

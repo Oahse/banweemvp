@@ -52,6 +52,7 @@ class Order(BaseModel):
     __table_args__ = (
         # Optimized indexes for common order queries
         Index('idx_orders_user_status', 'user_id', 'order_status'),
+        Index('idx_orders_subscription_id', 'subscription_id'),
         Index('idx_orders_payment_status', 'payment_status', 'created_at'),
         Index('idx_orders_fulfillment_status', 'fulfillment_status'),
         Index('idx_orders_order_number', 'order_number'),
@@ -69,6 +70,9 @@ class Order(BaseModel):
     # Customer reference
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
     guest_email = Column(String(CHAR_LENGTH), nullable=True)  # For guest orders
+    
+    # Subscription reference for recurring orders
+    subscription_id = Column(GUID(), ForeignKey("subscriptions.id"), nullable=True)
     
     # Status fields as columns for fast querying and indexing
     order_status = Column(SQLEnum(OrderStatus), default=OrderStatus.PENDING, nullable=False)
@@ -102,6 +106,9 @@ class Order(BaseModel):
     customer_notes = Column(Text, nullable=True)
     internal_notes = Column(Text, nullable=True)
     
+    # Subscription metadata for recurring orders
+    subscription_metadata = Column(JSONB, nullable=True)
+    
     # Idempotency and source tracking
     idempotency_key = Column(String(255), unique=True, nullable=True)
     source = Column(SQLEnum(OrderSource), default=OrderSource.WEB, nullable=False)  # web, mobile, api
@@ -117,6 +124,7 @@ class Order(BaseModel):
 
     # Relationships with optimized lazy loading
     user = relationship("User", back_populates="orders")
+    subscription = relationship("Subscription", back_populates="orders")
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan", lazy="selectin")
     tracking_events = relationship("TrackingEvent", back_populates="order", cascade="all, delete-orphan", lazy="select")
     transactions = relationship("Transaction", back_populates="order", lazy="select")

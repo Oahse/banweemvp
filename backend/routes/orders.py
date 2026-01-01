@@ -3,14 +3,16 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Query, status, BackgroundTasks, Header
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from typing import Optional
 from core.database import get_db
 from core.utils.response import Response
 from core.exceptions import APIException
 from services.orders import OrderService
-from models.user import User
+from models.user import User, Address
 from models.orders import Order
+from models.shipping import ShippingMethod
+from models.payments import PaymentMethod
 from services.auth import AuthService
 from schemas.orders import OrderCreate, CheckoutRequest
 from core.dependencies import get_current_auth_user, get_order_service

@@ -70,10 +70,14 @@ export const Login = ({ isInitialLoading = false }) => {
   useEffect(() => {
     if (isAuthenticated) {
       const path = redirectPath || getRedirectPath({ role: isAdmin ? 'Admin' : isSupplier ? 'Supplier' : 'Customer' });
-      navigate(path);
+      navigate(path, { replace: true });
       setRedirectPath(null); // Clear redirect path after navigation
+      // Clear intended destination after navigation
+      if (intendedDestination) {
+        setIntendedDestination(null);
+      }
     }
-  }, [getRedirectPath, isAuthenticated, navigate, redirectPath, setRedirectPath, isAdmin, isSupplier]);
+  }, [getRedirectPath, isAuthenticated, navigate, redirectPath, setRedirectPath, isAdmin, isSupplier, intendedDestination, setIntendedDestination]);
 
   /**
    * Handles the form submission for user login.
@@ -95,7 +99,7 @@ export const Login = ({ isInitialLoading = false }) => {
       const user = await login(email, password);
       // Navigate to intended destination or default path
       const path = getRedirectPath(user);
-      navigate(path);
+      navigate(path, { replace: true });
       // Clear intended destination after navigation
       if (intendedDestination) {
         setIntendedDestination(null);
@@ -103,6 +107,7 @@ export const Login = ({ isInitialLoading = false }) => {
     } catch (error) {
       // Display error message if login fails
       toast.error('Login failed. Please check your email and password.');
+    } finally {
       setLoading(false); // Hide loading indicator
     }
   };

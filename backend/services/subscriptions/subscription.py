@@ -86,6 +86,149 @@ class SubscriptionService:
         
         return subscription
 
+    async def add_products_to_subscription(
+        self,
+        subscription_id: UUID,
+        variant_ids: List[UUID],
+        user_id: UUID
+    ) -> Subscription:
+        """Add products to an existing subscription"""
+        
+        # Get subscription and verify ownership
+        subscription_result = await self.db.execute(
+            select(Subscription).where(
+                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
+            ).options(selectinload(Subscription.products))
+        )
+        subscription = subscription_result.scalar_one_or_none()
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        if subscription.status not in ["active", "paused"]:
+            raise HTTPException(status_code=400, detail="Cannot modify inactive subscription")
+        
+        # Validate variants exist and are active
+        variant_result = await self.db.execute(
+            select(ProductVariant).where(
+                and_(ProductVariant.id.in_(variant_ids), ProductVariant.is_active == True)
+            )
+        )
+        variants = variant_result.scalars().all()
+        
+        if len(variants) != len(variant_ids):
+            raise HTTPException(status_code=400, detail="Some variants not found or inactive")
+        
+        # Get current variant IDs
+        current_variant_ids = subscription.variant_ids or []
+        new_variant_ids = [str(vid) for vid in variant_ids if str(vid) not in current_variant_ids]
+        
+        if not new_variant_ids:
+            raise HTTPException(status_code=400, detail="All variants already in subscription")
+        
+        # Update variant IDs
+        updated_variant_ids = current_variant_ids + new_variant_ids
+        subscription.variant_ids = updated_variant_ids
+        
+        # Add products to the many-to-many relationship
+        for variant in variants:
+            if variant not in subscription.products:
+                subscription.products.append(variant)
+        
+        # Recalculate subscription cost
+        await self.recalculate_subscription_on_variant_change(subscription_id)
+        
+        await self.db.commit()
+        await self.db.refresh(subscription)
+        
+        # Send notification
+        await self.notification_service.create_notification(
+            user_id=user_id,
+            message=f"Added {len(new_variant_ids)} product(s) to your subscription!",
+            type="success",
+            related_id=str(subscription.id)
+        )
+        
+        return subscription
+
+    async def remove_products_from_subscription(
+        self,
+        subscription_id: UUID,
+        variant_ids: List[UUID],
+        user_id: UUID
+    ) -> Subscription:
+        """Remove products from an existing subscription"""
+        
+        # Get subscription and verify ownership
+        subscription_result = await self.db.execute(
+            select(Subscription).where(
+                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
+            ).options(selectinload(Subscription.products))
+        )
+        subscription = subscription_result.scalar_one_or_none()
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        if subscription.status not in ["active", "paused"]:
+            raise HTTPException(status_code=400, detail="Cannot modify inactive subscription")
+        
+        # Get current variant IDs
+        current_variant_ids = subscription.variant_ids or []
+        variant_ids_str = [str(vid) for vid in variant_ids]
+        
+        # Check if variants are in subscription
+        variants_to_remove = [vid for vid in variant_ids_str if vid in current_variant_ids]
+        
+        if not variants_to_remove:
+            raise HTTPException(status_code=400, detail="None of the variants are in this subscription")
+        
+        # Ensure at least one product remains
+        remaining_variants = [vid for vid in current_variant_ids if vid not in variants_to_remove]
+        if not remaining_variants:
+            raise HTTPException(status_code=400, detail="Cannot remove all products from subscription")
+        
+        # Update variant IDs
+        subscription.variant_ids = remaining_variants
+        
+        # Remove products from the many-to-many relationship
+        subscription.products = [p for p in subscription.products if str(p.id) not in variant_ids_str]
+        
+        # Recalculate subscription cost
+        await self.recalculate_subscription_on_variant_change(subscription_id)
+        
+        await self.db.commit()
+        await self.db.refresh(subscription)
+        
+        # Send notification
+        await self.notification_service.create_notification(
+            user_id=user_id,
+            message=f"Removed {len(variants_to_remove)} product(s) from your subscription!",
+            type="info",
+            related_id=str(subscription.id)
+        )
+        
+        return subscription
+
+    async def get_subscription(
+        self,
+        subscription_id: UUID,
+        user_id: UUID
+    ) -> Subscription:
+        """Get a specific subscription by ID"""
+        
+        subscription_result = await self.db.execute(
+            select(Subscription).where(
+                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
+            ).options(selectinload(Subscription.products))
+        )
+        subscription = subscription_result.scalar_one_or_none()
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        return subscription
+
     async def get_user_subscriptions(
         self,
         user_id: UUID,
@@ -932,4 +1075,120 @@ class CostBreakdown:
             "total_amount": float(self.total_amount),
             "currency": self.currency,
             "breakdown_timestamp": self.breakdown_timestamp.isoformat() if self.breakdown_timestamp else None
+        }
+
+    async def pause_subscription(
+        self,
+        subscription_id: UUID,
+        user_id: UUID,
+        pause_reason: Optional[str] = None
+    ) -> Subscription:
+        """Pause an active subscription"""
+        
+        subscription_result = await self.db.execute(
+            select(Subscription).where(
+                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
+            )
+        )
+        subscription = subscription_result.scalar_one_or_none()
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        if subscription.status != "active":
+            raise HTTPException(status_code=400, detail="Can only pause active subscriptions")
+        
+        subscription.status = "paused"
+        subscription.paused_at = datetime.utcnow()
+        subscription.pause_reason = pause_reason
+        
+        await self.db.commit()
+        await self.db.refresh(subscription)
+        
+        return subscription
+
+    async def resume_subscription(
+        self,
+        subscription_id: UUID,
+        user_id: UUID
+    ) -> Subscription:
+        """Resume a paused subscription"""
+        
+        subscription_result = await self.db.execute(
+            select(Subscription).where(
+                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
+            )
+        )
+        subscription = subscription_result.scalar_one_or_none()
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        if subscription.status != "paused":
+            raise HTTPException(status_code=400, detail="Can only resume paused subscriptions")
+        
+        subscription.status = "active"
+        subscription.paused_at = None
+        subscription.pause_reason = None
+        
+        # Reset next billing date to current time + billing cycle
+        if subscription.billing_cycle == "weekly":
+            subscription.next_billing_date = datetime.utcnow() + timedelta(weeks=1)
+        elif subscription.billing_cycle == "yearly":
+            subscription.next_billing_date = datetime.utcnow() + timedelta(days=365)
+        else:  # monthly
+            subscription.next_billing_date = datetime.utcnow() + timedelta(days=30)
+        
+        await self.db.commit()
+        await self.db.refresh(subscription)
+        
+        return subscription
+
+    async def get_subscription_orders(
+        self,
+        subscription_id: UUID,
+        user_id: UUID,
+        page: int = 1,
+        limit: int = 10
+    ) -> Dict[str, Any]:
+        """Get orders created from a subscription"""
+        
+        # Verify subscription ownership
+        subscription_result = await self.db.execute(
+            select(Subscription).where(
+                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
+            )
+        )
+        subscription = subscription_result.scalar_one_or_none()
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        # Get orders with pagination
+        from models.orders import Order
+        offset = (page - 1) * limit
+        
+        orders_result = await self.db.execute(
+            select(Order).where(Order.subscription_id == subscription_id)
+            .order_by(Order.created_at.desc())
+            .offset(offset)
+            .limit(limit)
+            .options(selectinload(Order.items))
+        )
+        orders = orders_result.scalars().all()
+        
+        # Get total count
+        count_result = await self.db.execute(
+            select(Order).where(Order.subscription_id == subscription_id)
+        )
+        total_count = len(count_result.scalars().all())
+        
+        return {
+            "orders": [order.to_dict() for order in orders],
+            "pagination": {
+                "page": page,
+                "limit": limit,
+                "total": total_count,
+                "pages": (total_count + limit - 1) // limit
+            }
         }
