@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, status, BackgroundTasks
+from fastapi import APIRouter, Depends, status, BackgroundTasks, Response, Cookie
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from core.database import get_db
-from core.utils.response import Response
+from core.utils.response import Response as APIResponse
+from fastapi.responses import JSONResponse
 from core.exceptions import APIException
 from core.config import settings
-from schemas.auth import UserCreate, UserLogin, RefreshTokenRequest
+from schemas.auth import UserCreate, UserLogin
 from schemas.user import AddressCreate, AddressUpdate, AddressResponse
 from schemas.response import APIResponse
 from services.auth import AuthService
@@ -50,9 +51,32 @@ async def login(
     """Login user and return access token."""
     try:
         auth_service = AuthService(db)
-        token = await auth_service.authenticate_user(user_login.email, user_login.password, background_tasks)
-        print("Login successful, returning response.")
-        return Response(success=True, data=token, message="Login successful")
+        auth_response = await auth_service.authenticate_user(user_login.email, user_login.password, background_tasks)
+        
+        response = JSONResponse(content={"success": True, "message": "Login successful", "user": auth_response.user.dict()})
+        
+        response.set_cookie(
+            key="access_token",
+            value=auth_response.access_token,
+            httponly=True,
+            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            expires=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            samesite="lax",
+            secure=settings.ENVIRONMENT != "local" # Use secure in production
+        )
+        
+        response.set_cookie(
+            key="refresh_token",
+            value=auth_response.refresh_token,
+            httponly=True,
+            max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+            expires=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+            samesite="lax",
+            secure=settings.ENVIRONMENT != "local"
+        )
+        
+        return response
+        
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -62,14 +86,32 @@ async def login(
 
 @router.post("/refresh")
 async def refresh_token(
-    request: RefreshTokenRequest,
-    db: AsyncSession = Depends(get_db)
+    response: Response, # Use FastAPI's Response for setting cookies
+    db: AsyncSession = Depends(get_db),
+    refresh_token: Optional[str] = Cookie(None, alias="refresh_token")
 ):
-    """Refresh access token using refresh token."""
+    """Refresh access token using refresh token from cookie."""
+    if not refresh_token:
+        raise APIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            message="Refresh token not found in cookie"
+        )
+    
     try:
         auth_service = AuthService(db)
-        token_data = await auth_service.refresh_access_token(request.refresh_token)
-        return Response.success(data=token_data, message="Token refreshed successfully")
+        token_data = await auth_service.refresh_access_token(refresh_token)
+        
+        response.set_cookie(
+            key="access_token",
+            value=token_data["access_token"],
+            httponly=True,
+            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            expires=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            samesite="lax",
+            secure=settings.ENVIRONMENT != "local"
+        )
+        
+        return APIResponse.success(message="Token refreshed successfully") # Use APIResponse for standard JSON success format
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -102,10 +144,29 @@ async def revoke_refresh_token(
 
 @router.post("/logout")
 async def logout(
+    response: Response, # Use FastAPI's Response for setting cookies
     current_user: User = Depends(get_current_auth_user)
 ):
     """Logout user."""
-    return Response(success=True, message="Logged out successfully")
+    response.set_cookie(
+        key="access_token",
+        value="",
+        httponly=True,
+        max_age=0,
+        expires=0,
+        samesite="lax",
+        secure=settings.ENVIRONMENT != "local"
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value="",
+        httponly=True,
+        max_age=0,
+        expires=0,
+        samesite="lax",
+        secure=settings.ENVIRONMENT != "local"
+    )
+    return APIResponse.success(message="Logged out successfully")
 
 
 @router.get("/profile")
