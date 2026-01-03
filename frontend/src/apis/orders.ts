@@ -35,6 +35,13 @@ export class OrdersAPI {
   }
 
   /**
+   * Calculate tax for checkout
+   */
+  static async calculateTax(taxData) {
+    return await apiClient.post('/tax/calculate', taxData);
+  }
+
+  /**
    * Get user's orders
    */
   static async getOrders(params) {

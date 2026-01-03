@@ -78,57 +78,63 @@ export const usePaginatedApi = <T = any>(
       // Handle different response structures
       if (result?.data) {
         let dataArray: T[] = [];
+        let totalCount = 0;
+        let totalPagesCount = 0;
         
         // Check if result.data is directly an array
         if (Array.isArray(result.data)) {
           dataArray = result.data;
+          totalCount = result.total || result.data.length;
+          totalPagesCount = result.total_pages || result.pages || Math.ceil(totalCount / limit);
         } 
         // Check if result.data is an object with nested arrays (common backend pattern)
         else if (typeof result.data === 'object') {
           // First check if result.data.data exists (nested data structure)
           if (Array.isArray(result.data.data)) {
             dataArray = result.data.data;
-            // Also extract pagination info from this level
-            if (result.data.total !== undefined) {
-              setTotal(result.data.total);
-              setTotalPages(result.data.pages || Math.ceil(result.data.total / limit));
-            }
+            totalCount = result.data.total || result.total || result.data.data.length;
+            totalPagesCount = result.data.pages || result.data.total_pages || result.pages || result.total_pages || Math.ceil(totalCount / limit);
           } else {
             // Look for common array property names
-            const possibleArrayKeys = ['orders', 'users', 'products', 'variants', 'items', 'results', 'addresses'];
+            const possibleArrayKeys = ['orders', 'users', 'products', 'variants', 'items', 'results', 'addresses', 'inventory_items', 'locations'];
             for (const key of possibleArrayKeys) {
               if (Array.isArray(result.data[key])) {
                 dataArray = result.data[key];
+                totalCount = result.data.total || result.total || dataArray.length;
+                totalPagesCount = result.data.pages || result.data.total_pages || result.pages || result.total_pages || Math.ceil(totalCount / limit);
                 break;
               }
             }
             
             // If no array found in nested properties, check if data itself should be treated as single item
             if (dataArray.length === 0 && Object.keys(result.data).length > 0) {
-              // Check for pagination info in the data object
-              if (result.data.total !== undefined) {
-                setTotal(result.data.total);
-                setTotalPages(result.data.total_pages || result.data.pages || Math.ceil(result.data.total / limit));
-              }
+              totalCount = result.data.total || result.total || 0;
+              totalPagesCount = result.data.total_pages || result.data.pages || result.pages || result.total_pages || Math.ceil(totalCount / limit);
             }
           }
         }
         
         setData(dataArray);
+        setTotal(totalCount);
+        setTotalPages(totalPagesCount);
         
-        // Check for pagination info at root level
+        // Override with root level pagination info if available
         if (result.pagination) {
-          setTotal(result.pagination.total || 0);
-          setTotalPages(result.pagination.pages || 0);
+          setTotal(result.pagination.total || totalCount);
+          setTotalPages(result.pagination.pages || result.pagination.total_pages || totalPagesCount);
         } else if (result.total !== undefined) {
           setTotal(result.total);
-          setTotalPages(result.total_pages || Math.ceil(result.total / limit));
+          setTotalPages(result.total_pages || result.pages || Math.ceil(result.total / limit));
         }
       } else if (Array.isArray(result)) {
         setData(result);
+        setTotal(result.length);
+        setTotalPages(Math.ceil(result.length / limit));
       } else {
         // Fallback to empty array if result is not in expected format
         setData([]);
+        setTotal(0);
+        setTotalPages(0);
       }
       
       return result;

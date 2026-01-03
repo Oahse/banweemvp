@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { usePaginatedApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { Pagination } from '../../components/ui/Pagination';
 
 export const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,6 +34,7 @@ export const AdminUsers = () => {
     page: currentPage,
     limit: itemsPerPage,
     totalPages,
+    total: totalUsers,
     goToPage,
   } = usePaginatedApi(
     apiCall,
@@ -75,7 +77,7 @@ export const AdminUsers = () => {
   }
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, users.length);
+  const endIndex = Math.min(startIndex + itemsPerPage, totalUsers || users.length);
 
   return <div>
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -350,47 +352,16 @@ export const AdminUsers = () => {
         )}
       </div>
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-between">
-          <p className="text-sm text-copy-light">
-            Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-            <span className="font-medium">{endIndex}</span> of{' '}
-            <span className="font-medium">{users.length}</span> users
-          </p>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            
-            <div className="flex items-center gap-1">
-              {[...Array(totalPages)].map((_, pageNum) => (
-                <button
-                  key={pageNum + 1}
-                  onClick={() => goToPage(pageNum + 1)}
-                  className={`px-3 py-1 text-sm rounded-md ${
-                    currentPage === pageNum + 1
-                      ? 'bg-primary text-white'
-                      : 'border border-border text-copy hover:bg-surface-hover'
-                  }`}
-                >
-                  {pageNum + 1}
-                </button>
-              ))}
-            </div>
-            
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalUsers || users.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={goToPage}
+        showingStart={startIndex + 1}
+        showingEnd={endIndex}
+        itemName="users"
+        className="mt-6"
+      />
     </div>;
 };

@@ -5,6 +5,7 @@ import { usePaginatedApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
+import { Pagination } from '../../components/ui/Pagination';
 import { PLACEHOLDER_IMAGES } from '../../utils/placeholderImage';
 
 export const AdminVariants = () => {
@@ -30,6 +31,7 @@ export const AdminVariants = () => {
     page: currentPage,
     limit: itemsPerPage,
     totalPages,
+    total: totalVariants,
     goToPage,
   } = usePaginatedApi(
     apiCall,
@@ -57,7 +59,7 @@ export const AdminVariants = () => {
   }
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, variants.length);
+  const endIndex = Math.min(startIndex + itemsPerPage, totalVariants || variants.length);
 
   return (
     <div>
@@ -127,17 +129,30 @@ export const AdminVariants = () => {
                                PLACEHOLDER_IMAGES.small;
                 return (
                   <div className="flex items-center">
-                    <img 
-                      src={imageUrl} 
-                      alt={variant.name} 
-                      className="w-10 h-10 rounded-md object-cover mr-3" 
-                      onError={(e) => {
-                        e.currentTarget.src = PLACEHOLDER_IMAGES.small;
-                      }}
-                    />
-                    <div>
-                      <p className="font-medium text-main">{variant.name}</p>
-                      <p className="text-xs text-copy-light">SKU: {variant.sku}</p>
+                    <div className="relative w-10 h-10 mr-3 flex-shrink-0">
+                      <img 
+                        src={imageUrl} 
+                        alt={variant.name} 
+                        className="w-full h-full rounded-md object-cover border border-border-light" 
+                        onError={(e) => {
+                          e.currentTarget.src = PLACEHOLDER_IMAGES.small;
+                        }}
+                        onLoad={(e) => {
+                          e.currentTarget.classList.remove('opacity-50');
+                        }}
+                        style={{ 
+                          backgroundColor: '#f3f4f6',
+                          minHeight: '40px',
+                          minWidth: '40px'
+                        }}
+                      />
+                      {!imageUrl.startsWith('data:') && (
+                        <div className="absolute inset-0 bg-surface-hover animate-pulse rounded-md opacity-0 transition-opacity duration-200" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-main truncate">{variant.name}</p>
+                      <p className="text-xs text-copy-light truncate">SKU: {variant.sku}</p>
                     </div>
                   </div>
                 );
@@ -228,48 +243,17 @@ export const AdminVariants = () => {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-between">
-          <p className="text-sm text-copy-light">
-            Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-            <span className="font-medium">{Math.min(endIndex, variants.length)}</span> of{' '}
-            <span className="font-medium">{variants.length}</span> variants
-          </p>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            
-            <div className="flex items-center gap-1">
-              {[...Array(totalPages)].map((_, pageNum) => (
-                <button
-                  key={pageNum + 1}
-                  onClick={() => goToPage(pageNum + 1)}
-                  className={`px-3 py-1 text-sm rounded-md ${
-                    currentPage === pageNum + 1
-                      ? 'bg-primary text-white'
-                      : 'border border-border text-copy hover:bg-surface-hover'
-                  }`}
-                >
-                  {pageNum + 1}
-                </button>
-              ))}
-            </div>
-            
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalVariants || variants.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={goToPage}
+        showingStart={startIndex + 1}
+        showingEnd={Math.min(endIndex, totalVariants || variants.length)}
+        itemName="variants"
+        className="mt-6"
+      />
     </div>
   );
 };

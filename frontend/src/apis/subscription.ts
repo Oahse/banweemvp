@@ -28,6 +28,15 @@ class SubscriptionAPI {
   async removeProductsFromSubscription(subscriptionId, variantIds) {
     return apiClient.delete(`/subscriptions/${subscriptionId}/products`, { data: variantIds });
   }
+
+  // New methods for fetching shipping methods and calculating tax
+  async getShippingMethods() {
+    return apiClient.get('/admin/shipping-methods');
+  }
+
+  async calculateSubscriptionCost(data) {
+    return apiClient.post('/subscriptions/calculate-cost', data);
+  }
 }
 
 // Export an instance instead of the class

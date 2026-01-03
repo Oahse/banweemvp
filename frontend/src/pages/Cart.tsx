@@ -88,7 +88,8 @@ export const Cart = () => {
   const items = cart?.items || [];
   const subtotal = items.reduce((sum, item) => sum + (item.total_price || 0), 0);
   const shipping = subtotal > 49.99 ? 0 : 5.99;
-  const tax = subtotal * 0.08; // 8% tax rate - you might want to make this configurable
+  // Tax will be calculated at checkout based on shipping address
+  const tax = 0; // Removed hardcoded 8% tax - calculated at checkout
   const total = cart?.total_amount || (subtotal + shipping + tax);
 
   if (loading) {

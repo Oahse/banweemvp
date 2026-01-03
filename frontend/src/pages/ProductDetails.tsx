@@ -13,6 +13,7 @@ import {
   PlusIcon,
   QrCodeIcon,
   ScanLineIcon,
+  CalendarIcon,
 } from 'lucide-react';
 
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
@@ -20,10 +21,12 @@ import { VariantSelector } from '../components/product/VariantSelector';
 import { QRCodeModal } from '../components/product/QRCodeModal';
 import { BarcodeModal } from '../components/product/BarcodeModal';
 import { ProductCard } from '../components/product/ProductCard';
+import { SubscriptionSelector } from '../components/subscription/SubscriptionSelector';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useLocale } from '../contexts/LocaleContext';
 import { useApi } from '../hooks/useApi';
+import { useSubscriptionAction } from '../hooks/useSubscriptionAction';
 import { ProductsAPI } from '../apis';
 import { ReviewsAPI } from '../apis';
 
@@ -84,6 +87,7 @@ export const ProductDetails = () => {
   const [activeTab, setActiveTab] = useState('description');
   const [showQR, setShowQR] = useState(false);
   const [showBarcode, setShowBarcode] = useState(false);
+  const [showSubscriptionSelector, setShowSubscriptionSelector] = useState(false);
   const [minRating, setMinRating] = useState(undefined);
   const [maxRating, setMaxRating] = useState(undefined);
   const [sortBy, setSortBy] = useState(undefined);
@@ -92,6 +96,7 @@ export const ProductDetails = () => {
   const { addItem: addToCart, removeItem: removeFromCart, updateQuantity, cart } = useCart();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist, defaultWishlist } = useWishlist();
   const { executeWithAuth } = useAuthenticatedAction();
+  const { isAuthenticated, hasActiveSubscriptions } = useSubscriptionAction();
   const { formatCurrency } = useLocale();
 
   // API calls
@@ -479,86 +484,99 @@ export const ProductDetails = () => {
             )}
 
             {/* Action Buttons */}
-            <div className="flex space-x-4 mb-6">
+            <div className="space-y-4 mb-6">
               {/* Cart Button with Quantity */}
-              <div className="flex-1">
-                {cartQuantity > 0 ? (
-                  <div className="flex items-center space-x-2">
+              <div className="flex space-x-4">
+                <div className="flex-1">
+                  {cartQuantity > 0 ? (
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={async () => {
+                          if (!selectedVariant) return;
+                          const newQuantity = Math.max(0, cartQuantity - 1);
+                          if (newQuantity === 0) {
+                            if (cartItem) await removeFromCart(cartItem.id);
+                          } else {
+                            if (cartItem) await updateQuantity(cartItem.id, newQuantity);
+                          }
+                        }}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-md transition-colors"
+                      >
+                        <MinusIcon size={16} />
+                      </button>
+                      <span className="bg-primary text-white px-4 py-2 rounded-md font-medium min-w-[120px] text-center">
+                        In Cart ({cartQuantity})
+                      </span>
+                      <button
+                        onClick={async () => {
+                          if (!selectedVariant) return;
+                          if (cartItem) await updateQuantity(cartItem.id, cartQuantity + 1);
+                        }}
+                        disabled={selectedVariant && cartQuantity >= selectedVariant.stock}
+                        className="bg-primary hover:bg-primary-dark text-white p-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <PlusIcon size={16} />
+                      </button>
+                    </div>
+                  ) : (
                     <button
                       onClick={async () => {
                         if (!selectedVariant) return;
-                        const newQuantity = Math.max(0, cartQuantity - 1);
-                        if (newQuantity === 0) {
-                          if (cartItem) await removeFromCart(cartItem.id);
-                        } else {
-                          if (cartItem) await updateQuantity(cartItem.id, newQuantity);
+                        await executeWithAuth(async () => {
+                          await addToCart({ variant_id: String(selectedVariant.id), quantity: quantity });
+                          return true;
+                        }, 'cart');
+                      }}
+                      disabled={!selectedVariant || selectedVariant.stock <= 0}
+                      className="w-full bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ShoppingCartIcon size={20} className="mr-2" />
+                      {selectedVariant && selectedVariant.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                    </button>
+                  )}
+                </div>
+
+                {/* Wishlist Button */}
+                <button
+                  onClick={async () => {
+                    await executeWithAuth(async () => {
+                      if (!defaultWishlist) {
+                        toast.error("No default wishlist found.");
+                        return false;
+                      }
+                      if (isInWishlistState) {
+                        const wishlistItem = defaultWishlist.items?.find(
+                          item => item?.product_id === product.id && (selectedVariant ? item?.variant_id === selectedVariant.id : true)
+                        );
+                        if (wishlistItem) {
+                          await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
                         }
-                      }}
-                      className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-md transition-colors"
-                    >
-                      <MinusIcon size={16} />
-                    </button>
-                    <span className="bg-primary text-white px-4 py-2 rounded-md font-medium min-w-[120px] text-center">
-                      In Cart ({cartQuantity})
-                    </span>
-                    <button
-                      onClick={async () => {
-                        if (!selectedVariant) return;
-                        if (cartItem) await updateQuantity(cartItem.id, cartQuantity + 1);
-                      }}
-                      disabled={selectedVariant && cartQuantity >= selectedVariant.stock}
-                      className="bg-primary hover:bg-primary-dark text-white p-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <PlusIcon size={16} />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={async () => {
-                      if (!selectedVariant) return;
-                      await executeWithAuth(async () => {
-                        await addToCart({ variant_id: String(selectedVariant.id), quantity: quantity });
-                        return true;
-                      }, 'cart');
-                    }}
-                    disabled={!selectedVariant || selectedVariant.stock <= 0}
-                    className="w-full bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ShoppingCartIcon size={20} className="mr-2" />
-                    {selectedVariant && selectedVariant.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
-                  </button>
-                )}
+                      } else {
+                        await addToWishlist(product.id, selectedVariant?.id, quantity);
+                      }
+                      return true;
+                    }, 'wishlist');
+                  }}
+                  className={`px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center min-w-[60px] ${isInWishlistState
+                    ? 'bg-error-100 text-error-600 hover:bg-error-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  title={isInWishlistState ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                >
+                  <HeartIcon size={20} className={isInWishlistState ? 'fill-current' : ''} />
+                </button>
               </div>
 
-              {/* Wishlist Button */}
-              <button
-                onClick={async () => {
-                  await executeWithAuth(async () => {
-                    if (!defaultWishlist) {
-                      toast.error("No default wishlist found.");
-                      return false;
-                    }
-                    if (isInWishlistState) {
-                      const wishlistItem = defaultWishlist.items?.find(
-                        item => item?.product_id === product.id && (selectedVariant ? item?.variant_id === selectedVariant.id : true)
-                      );
-                      if (wishlistItem) {
-                        await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
-                      }
-                    } else {
-                      await addToWishlist(product.id, selectedVariant?.id, quantity);
-                    }
-                    return true;
-                  }, 'wishlist');
-                }}
-                className={`px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center min-w-[60px] ${isInWishlistState
-                  ? 'bg-error-100 text-error-600 hover:bg-error-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                title={isInWishlistState ? 'Remove from Wishlist' : 'Add to Wishlist'}
-              >
-                <HeartIcon size={20} className={isInWishlistState ? 'fill-current' : ''} />
-              </button>
+              {/* Subscription Button */}
+              {isAuthenticated && hasActiveSubscriptions && selectedVariant && selectedVariant.stock > 0 && (
+                <button
+                  onClick={() => setShowSubscriptionSelector(true)}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center"
+                >
+                  <CalendarIcon size={20} className="mr-2" />
+                  Add to Subscription
+                </button>
+              )}
             </div>
 
             {/* Product Features */}
@@ -852,6 +870,20 @@ export const ProductDetails = () => {
             </div>
           </div>
         </section>
+
+        {/* Subscription Selector Modal */}
+        {showSubscriptionSelector && selectedVariant && (
+          <SubscriptionSelector
+            isOpen={showSubscriptionSelector}
+            onClose={() => setShowSubscriptionSelector(false)}
+            productName={product.name}
+            variantId={selectedVariant.id}
+            quantity={quantity}
+            onSuccess={() => {
+              setShowSubscriptionSelector(false);
+            }}
+          />
+        )}
       </div>
     </div>
   );

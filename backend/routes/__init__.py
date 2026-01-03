@@ -15,6 +15,7 @@ from .review import router as review_router
 from .search import router as search_router
 from .social_auth import router as social_auth_router
 from .subscriptions import router as subscriptions_router
+from .tax import router as tax_router
 from .user import router as user_router
 from .webhooks import router as webhooks_router
 from .websockets import ws_router as websockets_router
@@ -38,6 +39,7 @@ __all__ = [
     "search_router",
     "social_auth_router",
     "subscriptions_router",
+    "tax_router",
     "user_router",
     "webhooks_router",
     "websockets_router",

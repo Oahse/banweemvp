@@ -5,6 +5,7 @@ import { usePaginatedApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
+import { Pagination } from '../../components/ui/Pagination';
 import { toast } from 'react-hot-toast';
 
 export const AdminWarehouseLocations = () => {
@@ -13,8 +14,12 @@ export const AdminWarehouseLocations = () => {
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
   const apiCall = useCallback((page: number, limit: number) => {
-    return AdminAPI.getWarehouseLocations();
-  }, []);
+    return AdminAPI.getWarehouseLocations({
+      page,
+      limit,
+      search: submittedSearchTerm || undefined,
+    });
+  }, [submittedSearchTerm]);
 
   const {
     data: locations,
@@ -24,6 +29,7 @@ export const AdminWarehouseLocations = () => {
     page: currentPage,
     limit: itemsPerPage,
     totalPages,
+    total: totalLocations,
     goToPage,
   } = usePaginatedApi(
     apiCall,
@@ -65,15 +71,11 @@ export const AdminWarehouseLocations = () => {
     );
   }
 
-  // Filter locations based on search term
-  const filteredLocations = locations.filter(location =>
-    location.name.toLowerCase().includes(submittedSearchTerm.toLowerCase()) ||
-    location.address?.toLowerCase().includes(submittedSearchTerm.toLowerCase()) ||
-    location.description?.toLowerCase().includes(submittedSearchTerm.toLowerCase())
-  );
+  // Filter locations based on search term - remove client-side filtering since we're doing server-side
+  const filteredLocations = locations;
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, filteredLocations.length);
+  const endIndex = Math.min(startIndex + itemsPerPage, totalLocations || locations.length);
 
   return (
     <div>
@@ -179,48 +181,17 @@ export const AdminWarehouseLocations = () => {
       </div>
 
       {/* Pagination */}
-      {Math.ceil(filteredLocations.length / itemsPerPage) > 1 && (
-        <div className="mt-6 flex items-center justify-between">
-          <p className="text-sm text-copy-light">
-            Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-            <span className="font-medium">{Math.min(endIndex, filteredLocations.length)}</span> of{' '}
-            <span className="font-medium">{filteredLocations.length}</span> locations
-          </p>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            
-            <div className="flex items-center gap-1">
-              {[...Array(Math.ceil(filteredLocations.length / itemsPerPage))].map((_, pageNum) => (
-                <button
-                  key={pageNum + 1}
-                  onClick={() => goToPage(pageNum + 1)}
-                  className={`px-3 py-1 text-sm rounded-md ${
-                    currentPage === pageNum + 1
-                      ? 'bg-primary text-white'
-                      : 'border border-border text-copy hover:bg-surface-hover'
-                  }`}
-                >
-                  {pageNum + 1}
-                </button>
-              ))}
-            </div>
-            
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === Math.ceil(filteredLocations.length / itemsPerPage)}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalLocations || locations.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={goToPage}
+        showingStart={startIndex + 1}
+        showingEnd={Math.min(endIndex, totalLocations || locations.length)}
+        itemName="locations"
+        className="mt-6"
+      />
     </div>
   );
 };

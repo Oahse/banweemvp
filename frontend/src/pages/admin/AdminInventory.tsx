@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { SearchIcon, FilterIcon, EditIcon, EyeIcon, PlusIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { SearchIcon, FilterIcon, EditIcon, EyeIcon, PlusIcon, ChevronDownIcon } from 'lucide-react';
 import { usePaginatedApi, useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
+import { Pagination } from '../../components/ui/Pagination';
 import { PLACEHOLDER_IMAGES } from '../../utils/placeholderImage';
 
 interface Product {
@@ -63,7 +64,7 @@ export const AdminInventory = () => {
     const loadFilterOptions = async () => {
       try {
         // Fetch products
-        const productsResult = await fetchProducts(AdminAPI.getAllProducts, { limit: 1000 });
+        const productsResult = await fetchProducts(AdminAPI.getAllProducts, { limit: 100 });
         if (productsResult?.data) {
           const productList = Array.isArray(productsResult.data) ? productsResult.data : [];
           setProducts(productList.map(p => ({ id: p.id, name: p.name })));
@@ -106,27 +107,6 @@ export const AdminInventory = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, total || 0);
-
-  // Generate page numbers for pagination
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      const start = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-      const end = Math.min(totalPages, start + maxVisiblePages - 1);
-      
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-    }
-    
-    return pages;
-  };
 
   return (
     <div className="p-4 sm:p-6 max-w-full">
@@ -271,14 +251,27 @@ export const AdminInventory = () => {
                 mobileLabel: 'Product',
                 render: (item) => (
                   <div className="flex items-center min-w-0">
-                    <img 
-                      src={item.variant?.primary_image?.url || item.variant?.images?.[0]?.url || PLACEHOLDER_IMAGES.small} 
-                      alt={item.variant?.product?.name || 'Product'} 
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-md object-cover mr-2 sm:mr-3 flex-shrink-0"
-                      onError={(e) => {
-                        e.currentTarget.src = PLACEHOLDER_IMAGES.small;
-                      }}
-                    />
+                    <div className="relative w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3 flex-shrink-0">
+                      <img 
+                        src={item.variant?.primary_image?.url || item.variant?.images?.[0]?.url || PLACEHOLDER_IMAGES.small} 
+                        alt={item.variant?.product?.name || 'Product'} 
+                        className="w-full h-full rounded-md object-cover border border-border-light"
+                        onError={(e) => {
+                          e.currentTarget.src = PLACEHOLDER_IMAGES.small;
+                        }}
+                        onLoad={(e) => {
+                          e.currentTarget.classList.remove('opacity-50');
+                        }}
+                        style={{ 
+                          backgroundColor: '#f3f4f6',
+                          minHeight: '32px',
+                          minWidth: '32px'
+                        }}
+                      />
+                      {!item.variant?.primary_image?.url && !item.variant?.images?.[0]?.url && (
+                        <div className="absolute inset-0 bg-surface-hover animate-pulse rounded-md opacity-0 transition-opacity duration-200" />
+                      )}
+                    </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-main text-sm truncate">{item.variant?.product?.name || 'Product Name'}</p>
                       <p className="text-xs text-copy-light truncate">{item.variant?.name || 'Default Variant'}</p>
@@ -351,54 +344,17 @@ export const AdminInventory = () => {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-          <div className="text-sm text-copy-light text-center sm:text-left">
-            Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-            <span className="font-medium">{endIndex}</span> of{' '}
-            <span className="font-medium">{total || 0}</span> items
-          </div>
-          
-          <div className="flex items-center justify-center space-x-1 sm:space-x-2">
-            {/* Previous button */}
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover"
-            >
-              <ChevronLeftIcon size={16} className="sm:mr-1" />
-              <span className="hidden sm:inline">Previous</span>
-            </button>
-            
-            {/* Page numbers */}
-            <div className="flex items-center space-x-1">
-              {getPageNumbers().map((pageNum) => (
-                <button
-                  key={pageNum}
-                  onClick={() => goToPage(pageNum)}
-                  className={`px-2 py-1 sm:px-3 sm:py-1 text-sm rounded-md min-w-[32px] ${
-                    currentPage === pageNum
-                      ? 'bg-primary text-white'
-                      : 'border border-border text-copy hover:bg-surface-hover'
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              ))}
-            </div>
-            
-            {/* Next button */}
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover"
-            >
-              <span className="hidden sm:inline">Next</span>
-              <ChevronRightIcon size={16} className="sm:ml-1" />
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={total || 0}
+        itemsPerPage={itemsPerPage}
+        onPageChange={goToPage}
+        showingStart={startIndex + 1}
+        showingEnd={endIndex}
+        itemName="items"
+        className="mt-6"
+      />
     </div>
   );
 };

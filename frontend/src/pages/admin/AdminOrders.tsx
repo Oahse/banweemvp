@@ -5,6 +5,7 @@ import { usePaginatedApi } from '../../hooks/useApi';
 import { useLocale } from '../../contexts/LocaleContext';
 import { AdminAPI, OrdersAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import { Pagination } from '../../components/ui/Pagination';
 import { toast } from 'react-hot-toast';
 
 export const AdminOrders = () => {
@@ -496,47 +497,16 @@ export const AdminOrders = () => {
         )}
       </div>
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-between">
-          <p className="text-sm text-copy-light">
-            Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-            <span className="font-medium">{endIndex}</span> of{' '}
-            <span className="font-medium">{totalOrders || orders.length}</span> orders
-          </p>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            
-            <div className="flex items-center gap-1">
-              {[...Array(totalPages)].map((_, pageNum) => (
-                <button
-                  key={pageNum + 1}
-                  onClick={() => goToPage(pageNum + 1)}
-                  className={`px-3 py-1 text-sm rounded-md ${
-                    currentPage === pageNum + 1
-                      ? 'bg-primary text-white'
-                      : 'border border-border text-copy hover:bg-surface-hover'
-                  }`}
-                >
-                  {pageNum + 1}
-                </button>
-              ))}
-            </div>
-            
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalOrders || orders.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={goToPage}
+        showingStart={startIndex + 1}
+        showingEnd={endIndex}
+        itemName="orders"
+        className="mt-6"
+      />
     </div>;
 };

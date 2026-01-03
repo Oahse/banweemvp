@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon } from 'lucide-react';
+import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon, CalendarIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useAuthenticatedAction } from '../../hooks/useAuthenticatedAction';
+import { useSubscriptionAction } from '../../hooks/useSubscriptionAction';
 import { useLocale } from '../../contexts/LocaleContext';
 import { SkeletonCard } from '../ui/SkeletonCard';
 import { QRCodeDisplay } from './QRCodeDisplay';
 import { BarcodeDisplay } from './BarcodeDisplay';
+import { SubscriptionSelector } from '../subscription/SubscriptionSelector';
 import SubscriptionAPI from '../../apis/subscription';
 import { toast } from 'react-hot-toast';
 import { cn } from '../../lib/utils';
@@ -83,8 +85,10 @@ export const ProductCard = ({
   const { addItem: addToCart, cart } = useCart();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
   const { executeWithAuth } = useAuthenticatedAction();
+  const { isAuthenticated, hasActiveSubscriptions } = useSubscriptionAction();
   const { formatCurrency } = useLocale();
   const [isAddingToSubscription, setIsAddingToSubscription] = useState(false);
+  const [showSubscriptionSelector, setShowSubscriptionSelector] = useState(false);
 
   if (isLoading) { // <--- Add this check
     return <SkeletonCard viewMode={viewMode} animation={animation} />;
@@ -188,18 +192,22 @@ export const ProductCard = ({
     e.preventDefault();
     e.stopPropagation();
     
-    if (!subscriptionId || !displayVariant) return;
-    
-    setIsAddingToSubscription(true);
-    try {
-      await SubscriptionAPI.addProductsToSubscription(subscriptionId, [displayVariant.id]);
-      toast.success('Product added to subscription!');
-    } catch (error) {
-      console.error('Failed to add to subscription:', error);
-      toast.error('Failed to add product to subscription');
-    } finally {
-      setIsAddingToSubscription(false);
+    if (!displayVariant) {
+      toast.error("This product has no variants available.");
+      return;
     }
+    
+    if (!isAuthenticated) {
+      toast.error('Please log in to add products to subscriptions');
+      return;
+    }
+    
+    if (!hasActiveSubscriptions) {
+      toast.error('You need an active subscription to add products');
+      return;
+    }
+    
+    setShowSubscriptionSelector(true);
   };
 
       const handleAddToWishlist = async (e) => {
@@ -297,6 +305,15 @@ export const ProductCard = ({
               aria-label={isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
               <HeartIcon size={16} />
             </button>
+            {/* Add to Subscription button */}
+            {isAuthenticated && hasActiveSubscriptions && (
+              <button
+                onClick={handleAddToSubscription}
+                className="w-9 h-9 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors"
+                aria-label="Add to subscription">
+                <CalendarIcon size={16} />
+              </button>
+            )}
             <Link
               to={`/product/${product.id}`}
               className="w-9 h-9 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
@@ -346,25 +363,50 @@ export const ProductCard = ({
             )}
           </div>
           {/* Show simple add to cart button on mobile for grid view */}
-          <button
-            onClick={handleAddToCart}
-            className={cn(
-              'sm:hidden text-copy-lighter hover:text-white transition-colors bg-primary text-white px-3 py-1.5 rounded-md flex items-center',
-              viewMode === 'list' && 'hidden' // Hide in list view on mobile
+          <div className={cn(
+            'flex items-center gap-2',
+            viewMode === 'grid' && 'sm:hidden',
+            viewMode === 'list' && 'hidden'
+          )}>
+            <button
+              onClick={handleAddToCart}
+              className="text-copy-lighter hover:text-white transition-colors bg-primary text-white px-3 py-1.5 rounded-md flex items-center"
+              aria-label={isInCart ? "Remove from cart" : "Add to cart"}>
+              {isInCart ? <CheckIcon size={16} /> : <ShoppingCartIcon size={16} />}
+            </button>
+            {/* Mobile subscription button */}
+            {isAuthenticated && hasActiveSubscriptions && (
+              <button
+                onClick={handleAddToSubscription}
+                className="text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md flex items-center transition-colors"
+                aria-label="Add to subscription">
+                <CalendarIcon size={16} />
+              </button>
             )}
-            aria-label={isInCart ? "Remove from cart" : "Add to cart"}>
-            {isInCart ? <CheckIcon size={16} /> : <ShoppingCartIcon size={16} />}
-          </button>
-          <button
-            onClick={handleAddToCart}
-            className={cn(
-              'hidden sm:flex text-copy-lighter hover:text-white transition-colors bg-primary text-white px-4 py-2 rounded-md items-center',
-              viewMode === 'list' && 'md:order-1 md:p-2 md:rounded-md md:bg-primary md:text-white md:hover:bg-primary-dark'
+          </div>
+          <div className={cn(
+            'hidden sm:flex items-center gap-2',
+            viewMode === 'list' && 'md:order-1'
+          )}>
+            <button
+              onClick={handleAddToCart}
+              className="text-copy-lighter hover:text-white transition-colors bg-primary text-white px-4 py-2 rounded-md flex items-center"
+              aria-label={isInCart ? "Remove from cart" : "Add to cart"}>
+              {isInCart ? <CheckIcon size={18} /> : <ShoppingCartIcon size={18} />}
+              {viewMode === 'list' && <span className="hidden md:inline ml-2">{isInCart ? "In Cart" : "Add to Cart"}</span>}
+            </button>
+            
+            {/* Desktop subscription button */}
+            {isAuthenticated && hasActiveSubscriptions && (
+              <button
+                onClick={handleAddToSubscription}
+                className="flex items-center text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md transition-colors"
+                aria-label="Add to subscription">
+                <CalendarIcon size={18} />
+                {viewMode === 'list' && <span className="hidden md:inline ml-2">Subscribe</span>}
+              </button>
             )}
-            aria-label={isInCart ? "Remove from cart" : "Add to cart"}>
-            {isInCart ? <CheckIcon size={18} /> : <ShoppingCartIcon size={18} />}
-            {viewMode === 'list' && <span className="hidden md:inline ml-2">{isInCart ? "In Cart" : "Add to Cart"}</span>}
-          </button>
+          </div>
           
           {/* Subscription Button */}
           {showSubscriptionButton && subscriptionId && (
@@ -385,6 +427,20 @@ export const ProductCard = ({
             </button>
           )}
         </div>
+
+        {/* Subscription Selector Modal */}
+        {showSubscriptionSelector && displayVariant && (
+          <SubscriptionSelector
+            isOpen={showSubscriptionSelector}
+            onClose={() => setShowSubscriptionSelector(false)}
+            productName={product.name}
+            variantId={displayVariant.id}
+            quantity={1}
+            onSuccess={() => {
+              setShowSubscriptionSelector(false);
+            }}
+          />
+        )}
 
         {/* QR Code and Barcode Display */}
         {(showQRCode || showBarcode) && displayVariant && (

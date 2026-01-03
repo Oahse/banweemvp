@@ -1,122 +1,184 @@
 import React, { useState } from 'react';
+import { XIcon, CalendarIcon, CreditCardIcon, PlusIcon } from 'lucide-react';
 import { useSubscription } from '../../contexts/SubscriptionContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { Button } from '../ui/Button';
-import { PlusIcon, CheckIcon } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { useSubscriptionAction } from '../../hooks/useSubscriptionAction';
+import { formatCurrency } from '../../lib/locale-config';
+import { themeClasses, getButtonClasses } from '../../lib/themeClasses';
 
 interface SubscriptionSelectorProps {
-  variantId: string;
+  isOpen: boolean;
+  onClose: () => void;
   productName: string;
-  className?: string;
+  variantId: string;
+  quantity?: number;
+  onSuccess?: () => void;
 }
 
 export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
-  variantId,
+  isOpen,
+  onClose,
   productName,
-  className = ''
+  variantId,
+  quantity = 1,
+  onSuccess
 }) => {
-  const { subscriptions, activeSubscription, addProductsToSubscription } = useSubscription();
-  const { isAuthenticated } = useAuth();
-  const [isAdding, setIsAdding] = useState(false);
+  const { subscriptions } = useSubscription();
+  const { addToSubscription } = useSubscriptionAction();
+  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  if (!isAuthenticated) {
-    return null;
-  }
+  const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
 
-  // Check if product is already in any subscription
-  const isInSubscription = subscriptions.some(sub => 
-    sub.products?.some(product => product.id === variantId)
-  );
+  const handleAddToSubscription = async () => {
+    if (!selectedSubscriptionId) {
+      return;
+    }
 
-  const handleAddToSubscription = async (subscriptionId: string) => {
-    setIsAdding(true);
+    setIsLoading(true);
     try {
-      const success = await addProductsToSubscription(subscriptionId, [variantId]);
-      if (success) {
-        toast.success(`Added ${productName} to your subscription!`);
-      }
+      // The API expects an array of variant IDs
+      await addToSubscription(selectedSubscriptionId, [variantId], quantity);
+      onSuccess?.();
+      onClose();
     } catch (error) {
       console.error('Failed to add to subscription:', error);
-      toast.error('Failed to add to subscription');
     } finally {
-      setIsAdding(false);
+      setIsLoading(false);
     }
   };
 
-  if (subscriptions.length === 0) {
-    return (
-      <div className={`bg-blue-50 border border-blue-200 rounded-lg p-4 ${className}`}>
-        <h3 className="font-medium text-blue-900 mb-2">Subscribe & Save</h3>
-        <p className="text-sm text-blue-700 mb-3">
-          Get this product delivered regularly with our subscription service.
-        </p>
-        <a
-          href="/subscription"
-          className="inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-white hover:bg-blue-100 transition-colors"
-        >
-          Learn More About Subscriptions
-        </a>
-      </div>
-    );
-  }
+  const formatBillingCycle = (cycle: string) => {
+    return cycle.charAt(0).toUpperCase() + cycle.slice(1);
+  };
 
-  if (isInSubscription) {
-    return (
-      <div className={`bg-green-50 border border-green-200 rounded-lg p-4 ${className}`}>
-        <div className="flex items-center">
-          <CheckIcon size={20} className="text-green-600 mr-2" />
-          <span className="text-green-800 font-medium">Already in your subscription</span>
-        </div>
-      </div>
-    );
-  }
+  const formatNextBilling = (date: string) => {
+    return new Date(date).toLocaleDateString();
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className={`bg-blue-50 border border-blue-200 rounded-lg p-4 ${className}`}>
-      <h3 className="font-medium text-blue-900 mb-2">Add to Subscription</h3>
-      <p className="text-sm text-blue-700 mb-3">
-        Add this product to your existing subscription for regular delivery.
-      </p>
-      
-      {activeSubscription ? (
-        <Button
-          onClick={() => handleAddToSubscription(activeSubscription.id)}
-          disabled={isAdding}
-          size="sm"
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {isAdding ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-          ) : (
-            <PlusIcon size={16} className="mr-2" />
-          )}
-          Add to {activeSubscription.plan_id.charAt(0).toUpperCase() + activeSubscription.plan_id.slice(1)} Plan
-        </Button>
-      ) : (
-        <div className="space-y-2">
-          {subscriptions.map((subscription) => (
-            <Button
-              key={subscription.id}
-              onClick={() => handleAddToSubscription(subscription.id)}
-              disabled={isAdding}
-              variant="outline"
-              size="sm"
-              className="w-full border-blue-300 text-blue-700 hover:bg-blue-100"
-            >
-              {isAdding ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-              ) : (
-                <PlusIcon size={16} className="mr-2" />
-              )}
-              Add to {subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)} Plan
-              <span className="ml-2 text-xs text-blue-600">
-                (${subscription.price}/{subscription.billing_cycle})
-              </span>
-            </Button>
-          ))}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className={`${themeClasses.surface} rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto`}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-border-light">
+          <h2 className={`text-xl font-semibold ${themeClasses.text}`}>
+            Add to Subscription
+          </h2>
+          <button
+            onClick={onClose}
+            className={`p-2 rounded-lg ${themeClasses.textMuted} hover:${themeClasses.surface} transition-colors`}
+          >
+            <XIcon className="w-5 h-5" />
+          </button>
         </div>
-      )}
+
+        {/* Content */}
+        <div className="p-6">
+          <div className="mb-6">
+            <p className={`${themeClasses.textMuted} mb-2`}>Product:</p>
+            <p className={`font-medium ${themeClasses.text}`}>{productName}</p>
+            {quantity > 1 && (
+              <p className={`text-sm ${themeClasses.textMuted}`}>Quantity: {quantity}</p>
+            )}
+          </div>
+
+          {activeSubscriptions.length === 0 ? (
+            <div className="text-center py-8">
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${themeClasses.surface} flex items-center justify-center`}>
+                <PlusIcon className={`w-8 h-8 ${themeClasses.textMuted}`} />
+              </div>
+              <h3 className={`text-lg font-medium ${themeClasses.text} mb-2`}>
+                No Active Subscriptions
+              </h3>
+              <p className={`${themeClasses.textMuted} mb-4`}>
+                You need an active subscription to add products.
+              </p>
+              <button
+                onClick={() => window.location.href = '/account/subscriptions'}
+                className={getButtonClasses('primary')}
+              >
+                Create Subscription
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6">
+                <label className={`block text-sm font-medium ${themeClasses.text} mb-3`}>
+                  Select Subscription:
+                </label>
+                <div className="space-y-3">
+                  {activeSubscriptions.map((subscription) => (
+                    <label
+                      key={subscription.id}
+                      className={`block cursor-pointer p-4 rounded-lg border-2 transition-colors ${
+                        selectedSubscriptionId === subscription.id
+                          ? 'border-primary bg-primary/5'
+                          : `border-border-light hover:border-border`
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="subscription"
+                        value={subscription.id}
+                        checked={selectedSubscriptionId === subscription.id}
+                        onChange={(e) => setSelectedSubscriptionId(e.target.value)}
+                        className="sr-only"
+                      />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className={`font-medium ${themeClasses.text}`}>
+                            {subscription.plan_id} Plan
+                          </div>
+                          <div className={`text-sm ${themeClasses.textMuted} flex items-center gap-4 mt-1`}>
+                            <span className="flex items-center gap-1">
+                              <CreditCardIcon className="w-4 h-4" />
+                              {formatCurrency(subscription.price)} / {formatBillingCycle(subscription.billing_cycle)}
+                            </span>
+                            {subscription.next_billing_date && (
+                              <span className="flex items-center gap-1">
+                                <CalendarIcon className="w-4 h-4" />
+                                Next: {formatNextBilling(subscription.next_billing_date)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className={`w-4 h-4 rounded-full border-2 ${
+                          selectedSubscriptionId === subscription.id
+                            ? 'border-primary bg-primary'
+                            : 'border-border'
+                        }`}>
+                          {selectedSubscriptionId === subscription.id && (
+                            <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                          )}
+                        </div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={onClose}
+                  className={getButtonClasses('secondary')}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddToSubscription}
+                  disabled={!selectedSubscriptionId || isLoading}
+                  className={getButtonClasses('primary')}
+                >
+                  {isLoading ? 'Adding...' : 'Add to Subscription'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

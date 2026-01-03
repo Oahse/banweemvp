@@ -152,12 +152,13 @@ async def get_points_history(
 ):
     """Get points transaction history for current user"""
     loyalty_service = LoyaltyService(db)
-    return await loyalty_service.get_points_history(
+    history = await loyalty_service.get_points_history(
         user_id=current_user.id,
         limit=limit,
         offset=offset,
         transaction_type=transaction_type
     )
+    return Response.success(data=history)
 
 
 @router.get("/analytics")
@@ -219,11 +220,11 @@ async def admin_award_points(
     db.add(transaction)
     await db.commit()
     
-    return {
+    return Response.success(data={
         "message": f"Successfully awarded {points} points to user {user_id}",
         "transaction_id": str(transaction.id),
         "new_total_points": loyalty_account.total_points
-    }
+    })
 
 
 # Integration endpoints for other services

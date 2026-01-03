@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeftIcon, PlusIcon, CalendarIcon, UserIcon, PackageIcon } from 'lucide-react';
-import { useApi } from '../../hooks/useApi';
+import { usePaginatedApi, useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
+import { Pagination } from '../../components/ui/Pagination';
 
 interface StockAdjustment {
   id: string;
@@ -46,7 +47,6 @@ interface InventoryItem {
 export const AdminInventoryAdjustments = () => {
   const { inventoryId } = useParams<{ inventoryId: string }>();
   const [inventoryItem, setInventoryItem] = useState<InventoryItem | null>(null);
-  const [adjustments, setAdjustments] = useState<StockAdjustment[]>([]);
 
   const {
     loading: inventoryLoading,
@@ -54,11 +54,27 @@ export const AdminInventoryAdjustments = () => {
     execute: fetchInventoryItem,
   } = useApi<{ data: InventoryItem }>();
 
+  const apiCall = useCallback((page: number, limit: number) => {
+    if (!inventoryId) return Promise.resolve({ data: [] });
+    return AdminAPI.getStockAdjustments(inventoryId, { page, limit });
+  }, [inventoryId]);
+
   const {
+    data: adjustments,
     loading: adjustmentsLoading,
     error: adjustmentsError,
     execute: fetchAdjustments,
-  } = useApi<{ data: StockAdjustment[] }>();
+    page: currentPage,
+    limit: itemsPerPage,
+    totalPages,
+    total: totalAdjustments,
+    goToPage,
+  } = usePaginatedApi(
+    apiCall,
+    1,
+    10,
+    { showErrorToast: false, autoFetch: true }
+  );
 
   useEffect(() => {
     if (inventoryId) {
@@ -68,15 +84,8 @@ export const AdminInventoryAdjustments = () => {
           setInventoryItem(result.data);
         }
       });
-
-      // Fetch stock adjustments
-      fetchAdjustments(AdminAPI.getStockAdjustments, inventoryId).then((result) => {
-        if (result?.data) {
-          setAdjustments(Array.isArray(result.data) ? result.data : []);
-        }
-      });
     }
-  }, [inventoryId, fetchInventoryItem, fetchAdjustments]);
+  }, [inventoryId, fetchInventoryItem]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -100,7 +109,7 @@ export const AdminInventoryAdjustments = () => {
           onRetry={() => {
             if (inventoryId) {
               fetchInventoryItem(AdminAPI.getInventoryItem, inventoryId);
-              fetchAdjustments(AdminAPI.getStockAdjustments, inventoryId);
+              fetchAdjustments();
             }
           }}
           onDismiss={() => {}}
@@ -253,6 +262,19 @@ export const AdminInventoryAdjustments = () => {
           />
         </div>
       </div>
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalAdjustments || adjustments.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={goToPage}
+        showingStart={(currentPage - 1) * itemsPerPage + 1}
+        showingEnd={Math.min(currentPage * itemsPerPage, totalAdjustments || adjustments.length)}
+        itemName="adjustments"
+        className="mt-6"
+      />
 
       {/* Summary Stats */}
       {adjustments.length > 0 && (

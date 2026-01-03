@@ -342,8 +342,24 @@ export interface Subscription {
   start_date: string;
   end_date?: string;
   next_billing_date?: string;
-  amount: number;
-  billing_cycle: 'monthly' | 'quarterly' | 'yearly';
+  amount?: number;
+  price?: number;
+  billing_cycle: 'weekly' | 'monthly' | 'yearly';
+  currency?: string;
+  delivery_type?: string;
+  auto_renew?: boolean;
+  tax_rate?: number;
+  shipping_cost?: number;
+  products?: Array<{
+    id: string;
+    name: string;
+    price: number;
+    image?: string;
+    quantity?: number;
+    currency?: string;
+  }>;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Admin Types

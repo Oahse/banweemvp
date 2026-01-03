@@ -3,15 +3,10 @@ import { Link } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { 
   CalendarIcon, 
-  CreditCardIcon, 
   ShoppingBagIcon, 
   PlusIcon, 
-  MinusIcon, 
-  EditIcon, 
   TrashIcon,
   SearchIcon,
-  FilterIcon,
-  MoreVerticalIcon,
   PackageIcon,
   ClockIcon,
   XIcon
@@ -21,35 +16,48 @@ import { themeClasses, getButtonClasses } from '../../lib/themeClasses';
 import { ProductsAPI } from '../../apis/products';
 import SubscriptionAPI from '../../apis/subscription';
 import { toast } from 'react-hot-toast';
+import { Product } from '../../types';
+
+interface NewSubscriptionData {
+  plan_id: string;
+  billing_cycle: string;
+  product_variant_ids: string[];
+  delivery_type: string;
+  currency: string;
+  auto_renew: boolean;
+}
 
 export const MySubscriptions = () => {
   const { subscriptions, loading, error, refreshSubscriptions } = useSubscription();
-  const [activeTab, setActiveTab] = useState('all');
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showAddProductModal, setShowAddProductModal] = useState(false);
-  const [selectedSubscription, setSelectedSubscription] = useState(null);
-  const [availableProducts, setAvailableProducts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProducts, setSelectedProducts] = useState(new Set());
-  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('all');
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [showAddProductModal, setShowAddProductModal] = useState<boolean>(false);
+  const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // New subscription form state
-  const [newSubscription, setNewSubscription] = useState({
-    name: '',
+  const [newSubscription, setNewSubscription] = useState<NewSubscriptionData>({
+    plan_id: 'basic',
     billing_cycle: 'monthly',
-    price: 0,
-    currency: 'USD'
+    product_variant_ids: [],
+    delivery_type: 'standard',
+    currency: 'USD',
+    auto_renew: true
   });
+  const [selectedProductsForNew, setSelectedProductsForNew] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     refreshSubscriptions();
   }, [refreshSubscriptions]);
 
   useEffect(() => {
-    if (showAddProductModal) {
+    if (showCreateModal || showAddProductModal) {
       loadAvailableProducts();
     }
-  }, [showAddProductModal, searchQuery]);
+  }, [showCreateModal, showAddProductModal, searchQuery]);
 
   const loadAvailableProducts = async () => {
     try {
@@ -65,20 +73,37 @@ export const MySubscriptions = () => {
     }
   };
 
-  const handleCreateSubscription = async (e) => {
+  const handleCreateSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      await SubscriptionAPI.createSubscription(newSubscription);
+      // Convert selected products to array
+      const productVariantIds = Array.from(selectedProductsForNew);
+      
+      // Ensure we have at least one product selected
+      if (productVariantIds.length === 0) {
+        toast.error('Please select at least one product for the subscription');
+        return;
+      }
+
+      const subscriptionData = {
+        ...newSubscription,
+        product_variant_ids: productVariantIds
+      };
+
+      await SubscriptionAPI.createSubscription(subscriptionData);
       toast.success('Subscription created successfully!');
       setShowCreateModal(false);
       setNewSubscription({
-        name: '',
+        plan_id: 'basic',
         billing_cycle: 'monthly',
-        price: 0,
-        currency: 'USD'
+        product_variant_ids: [],
+        delivery_type: 'standard',
+        currency: 'USD',
+        auto_renew: true
       });
+      setSelectedProductsForNew(new Set());
       refreshSubscriptions();
     } catch (error) {
       console.error('Failed to create subscription:', error);
@@ -91,6 +116,11 @@ export const MySubscriptions = () => {
   const handleAddProducts = async () => {
     if (selectedProducts.size === 0) {
       toast.error('Please select at least one product');
+      return;
+    }
+
+    if (!selectedSubscription) {
+      toast.error('No subscription selected');
       return;
     }
 
@@ -110,7 +140,7 @@ export const MySubscriptions = () => {
     }
   };
 
-  const handleRemoveProduct = async (subscriptionId, variantId) => {
+  const handleRemoveProduct = async (subscriptionId: string, variantId: string) => {
     try {
       await SubscriptionAPI.removeProductsFromSubscription(subscriptionId, [variantId]);
       toast.success('Product removed from subscription');
@@ -121,7 +151,7 @@ export const MySubscriptions = () => {
     }
   };
 
-  const handleUpdatePeriod = async (subscriptionId, newPeriod) => {
+  const handleUpdatePeriod = async (subscriptionId: string, newPeriod: string) => {
     try {
       await SubscriptionAPI.updateSubscription(subscriptionId, { billing_cycle: newPeriod });
       toast.success('Subscription period updated');
@@ -132,7 +162,7 @@ export const MySubscriptions = () => {
     }
   };
 
-  const handleDeleteSubscription = async (subscriptionId) => {
+  const handleDeleteSubscription = async (subscriptionId: string) => {
     if (!confirm('Are you sure you want to delete this subscription?')) return;
     
     try {
@@ -145,7 +175,7 @@ export const MySubscriptions = () => {
     }
   };
 
-  const filteredSubscriptions = subscriptions.filter(sub => {
+  const filteredSubscriptions = subscriptions.filter((sub: any) => {
     if (activeTab === 'all') return true;
     if (activeTab === 'active') return sub.status === 'active';
     if (activeTab === 'paused') return sub.status === 'paused';
@@ -171,13 +201,13 @@ export const MySubscriptions = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-        <h1 className={`${themeClasses.text.heading} text-2xl mb-4 sm:mb-0`}>My Subscriptions</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h1 className={`${themeClasses.text.heading} text-2xl`}>My Subscriptions</h1>
         <button
           onClick={() => setShowCreateModal(true)}
-          className={`${getButtonClasses('primary')} flex items-center`}
+          className={`${getButtonClasses('primary')} flex items-center w-full sm:w-auto justify-center`}
         >
           <PlusIcon size={20} className="mr-2" />
           New Subscription
@@ -185,17 +215,17 @@ export const MySubscriptions = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 mb-6 bg-surface-elevated rounded-lg p-1">
+      <div className="flex space-x-1 mb-6 bg-surface-elevated rounded-lg p-1 overflow-x-auto">
         {[
           { key: 'all', label: 'All', count: subscriptions.length },
-          { key: 'active', label: 'Active', count: subscriptions.filter(s => s.status === 'active').length },
-          { key: 'paused', label: 'Paused', count: subscriptions.filter(s => s.status === 'paused').length },
-          { key: 'cancelled', label: 'Cancelled', count: subscriptions.filter(s => s.status === 'cancelled').length }
+          { key: 'active', label: 'Active', count: subscriptions.filter((s: any) => s.status === 'active').length },
+          { key: 'paused', label: 'Paused', count: subscriptions.filter((s: any) => s.status === 'paused').length },
+          { key: 'cancelled', label: 'Cancelled', count: subscriptions.filter((s: any) => s.status === 'cancelled').length }
         ].map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === tab.key
                 ? `${themeClasses.background.surface} ${themeClasses.text.primary} shadow-sm`
                 : `${themeClasses.text.secondary} hover:${themeClasses.text.primary}`
@@ -224,16 +254,16 @@ export const MySubscriptions = () => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredSubscriptions.map((subscription) => (
-            <div key={subscription.id} className={`${themeClasses.card.base} p-6`}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          {filteredSubscriptions.map((subscription: any) => (
+            <div key={subscription.id} className={`${themeClasses.card.base} p-4 sm:p-6`}>
               {/* Subscription Header */}
               <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className={`${themeClasses.text.heading} text-lg`}>
-                    {subscription.name || `${subscription.billing_cycle} Subscription`}
+                <div className="flex-1 min-w-0">
+                  <h3 className={`${themeClasses.text.heading} text-lg truncate`}>
+                    {subscription.plan_id} Subscription
                   </h3>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${
                     subscription.status === 'active' 
                       ? themeClasses.status.success
                       : subscription.status === 'paused'
@@ -243,7 +273,7 @@ export const MySubscriptions = () => {
                     {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
                   </span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 ml-4">
                   <button
                     onClick={() => {
                       setSelectedSubscription(subscription);
@@ -265,35 +295,28 @@ export const MySubscriptions = () => {
               </div>
 
               {/* Subscription Details */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-sm">
                 <div className="flex items-center">
-                  <CreditCardIcon size={16} className={`${themeClasses.text.muted} mr-2`} />
-                  <span className={`${themeClasses.text.secondary} text-sm`}>
-                    {formatCurrency(subscription.price, subscription.currency || 'USD')} / {subscription.billing_cycle}
+                  <CalendarIcon size={16} className={`${themeClasses.text.muted} mr-2 flex-shrink-0`} />
+                  <span className={`${themeClasses.text.secondary} truncate`}>
+                    Next: {subscription.next_billing_date ? new Date(subscription.next_billing_date).toLocaleDateString() : 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <CalendarIcon size={16} className={`${themeClasses.text.muted} mr-2`} />
-                  <span className={`${themeClasses.text.secondary} text-sm`}>
-                    Next: {new Date(subscription.next_billing_date).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <ShoppingBagIcon size={16} className={`${themeClasses.text.muted} mr-2`} />
-                  <span className={`${themeClasses.text.secondary} text-sm`}>
+                  <ShoppingBagIcon size={16} className={`${themeClasses.text.muted} mr-2 flex-shrink-0`} />
+                  <span className={`${themeClasses.text.secondary} truncate`}>
                     {subscription.products?.length || 0} products
                   </span>
                 </div>
-                <div className="flex items-center">
-                  <ClockIcon size={16} className={`${themeClasses.text.muted} mr-2`} />
+                <div className="flex items-center sm:col-span-2">
+                  <ClockIcon size={16} className={`${themeClasses.text.muted} mr-2 flex-shrink-0`} />
                   <select
                     value={subscription.billing_cycle}
                     onChange={(e) => handleUpdatePeriod(subscription.id, e.target.value)}
-                    className={`${themeClasses.input.base} ${themeClasses.input.default} text-sm py-1`}
+                    className={`${themeClasses.input.base} ${themeClasses.input.default} text-sm py-1 flex-1`}
                   >
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
-                    <option value="quarterly">Quarterly</option>
                     <option value="yearly">Yearly</option>
                   </select>
                 </div>
@@ -304,21 +327,28 @@ export const MySubscriptions = () => {
                 <div className="mb-4">
                   <h4 className={`${themeClasses.text.heading} text-sm mb-2`}>Products:</h4>
                   <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {subscription.products.map((product) => (
+                    {subscription.products.map((product: any) => (
                       <div key={product.id} className={`${themeClasses.background.elevated} rounded-md p-2 flex justify-between items-center`}>
-                        <div className="flex items-center">
+                        <div className="flex items-center flex-1 min-w-0">
                           {product.image && (
                             <img 
                               src={product.image} 
                               alt={product.name}
-                              className="w-8 h-8 rounded object-cover mr-2"
+                              className="w-8 h-8 rounded object-cover mr-2 flex-shrink-0"
                             />
                           )}
-                          <span className={`${themeClasses.text.primary} text-sm`}>{product.name}</span>
+                          <div className="flex-1 min-w-0">
+                            <span className={`${themeClasses.text.primary} text-sm block truncate`}>
+                              {product.name}
+                            </span>
+                            <span className={`${themeClasses.text.muted} text-xs`}>
+                              {formatCurrency(product.price, subscription.currency || 'USD')}
+                            </span>
+                          </div>
                         </div>
                         <button
                           onClick={() => handleRemoveProduct(subscription.id, product.id)}
-                          className={`${themeClasses.text.error} hover:${themeClasses.background.hover} p-1 rounded`}
+                          className={`${themeClasses.text.error} hover:${themeClasses.background.hover} p-1 rounded flex-shrink-0 ml-2`}
                           title="Remove product"
                         >
                           <XIcon size={14} />
@@ -345,24 +375,26 @@ export const MySubscriptions = () => {
 
       {/* Create Subscription Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`${themeClasses.card.base} w-full max-w-md mx-4`}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className={`${themeClasses.card.base} w-full max-w-2xl max-h-[90vh] overflow-y-auto`}>
             <div className="p-6">
               <h2 className={`${themeClasses.text.heading} text-xl mb-4`}>Create New Subscription</h2>
               <form onSubmit={handleCreateSubscription}>
                 <div className="space-y-4">
                   <div>
                     <label className={`${themeClasses.text.primary} block text-sm font-medium mb-1`}>
-                      Subscription Name
+                      Subscription Plan
                     </label>
-                    <input
-                      type="text"
-                      value={newSubscription.name}
-                      onChange={(e) => setNewSubscription({...newSubscription, name: e.target.value})}
+                    <select
+                      value={newSubscription.plan_id}
+                      onChange={(e) => setNewSubscription({...newSubscription, plan_id: e.target.value})}
                       className={`${themeClasses.input.base} ${themeClasses.input.default}`}
-                      placeholder="e.g., Monthly Wellness Box"
                       required
-                    />
+                    >
+                      <option value="basic">Basic Plan</option>
+                      <option value="premium">Premium Plan</option>
+                      <option value="enterprise">Enterprise Plan</option>
+                    </select>
                   </div>
                   <div>
                     <label className={`${themeClasses.text.primary} block text-sm font-medium mb-1`}>
@@ -375,39 +407,125 @@ export const MySubscriptions = () => {
                     >
                       <option value="weekly">Weekly</option>
                       <option value="monthly">Monthly</option>
-                      <option value="quarterly">Quarterly</option>
                       <option value="yearly">Yearly</option>
                     </select>
                   </div>
                   <div>
                     <label className={`${themeClasses.text.primary} block text-sm font-medium mb-1`}>
-                      Price
+                      Delivery Type
                     </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={newSubscription.price}
-                      onChange={(e) => setNewSubscription({...newSubscription, price: parseFloat(e.target.value)})}
+                    <select
+                      value={newSubscription.delivery_type}
+                      onChange={(e) => setNewSubscription({...newSubscription, delivery_type: e.target.value})}
                       className={`${themeClasses.input.base} ${themeClasses.input.default}`}
-                      placeholder="0.00"
-                      required
+                    >
+                      <option value="standard">Standard Delivery</option>
+                      <option value="express">Express Delivery</option>
+                      <option value="overnight">Overnight Delivery</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`${themeClasses.text.primary} block text-sm font-medium mb-1`}>
+                      Currency
+                    </label>
+                    <select
+                      value={newSubscription.currency}
+                      onChange={(e) => setNewSubscription({...newSubscription, currency: e.target.value})}
+                      className={`${themeClasses.input.base} ${themeClasses.input.default}`}
+                    >
+                      <option value="USD">USD</option>
+                      <option value="EUR">EUR</option>
+                      <option value="GBP">GBP</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="auto_renew"
+                      checked={newSubscription.auto_renew}
+                      onChange={(e) => setNewSubscription({...newSubscription, auto_renew: e.target.checked})}
+                      className={`${themeClasses.input.base} mr-2`}
                     />
+                    <label htmlFor="auto_renew" className={`${themeClasses.text.primary} text-sm`}>
+                      Auto-renew subscription
+                    </label>
+                  </div>
+                  
+                  {/* Product Selection */}
+                  <div>
+                    <label className={`${themeClasses.text.primary} block text-sm font-medium mb-2`}>
+                      Select Products ({selectedProductsForNew.size} selected)
+                    </label>
+                    <div className="max-h-48 overflow-y-auto border border-border rounded-md p-2">
+                      {availableProducts.length === 0 ? (
+                        <p className={`${themeClasses.text.secondary} text-sm text-center py-4`}>
+                          Loading products...
+                        </p>
+                      ) : (
+                        <div className="space-y-2">
+                          {availableProducts.map((product: Product) => (
+                            <div key={product.id} className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={selectedProductsForNew.has(product.id)}
+                                onChange={(e) => {
+                                  const newSelected = new Set(selectedProductsForNew);
+                                  if (e.target.checked) {
+                                    newSelected.add(product.id);
+                                  } else {
+                                    newSelected.delete(product.id);
+                                  }
+                                  setSelectedProductsForNew(newSelected);
+                                }}
+                                className={`${themeClasses.input.base} flex-shrink-0`}
+                              />
+                              <div className="flex items-center space-x-2 flex-1 min-w-0">
+                                {product.images && product.images.length > 0 && (
+                                  <img 
+                                    src={product.images[0].url} 
+                                    alt={product.name}
+                                    className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <span className={`${themeClasses.text.primary} text-sm block truncate`}>
+                                    {product.name}
+                                  </span>
+                                  <span className={`${themeClasses.text.muted} text-xs`}>
+                                    {formatCurrency(product.price || product.min_price || 0, 'USD')}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className={`${themeClasses.background.elevated} rounded-md p-3`}>
+                    <p className={`${themeClasses.text.secondary} text-sm`}>
+                      You must select at least one product to create a subscription.
+                    </p>
                   </div>
                 </div>
-                <div className="flex justify-end space-x-3 mt-6">
+                <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
                   <button
                     type="button"
-                    onClick={() => setShowCreateModal(false)}
-                    className={getButtonClasses('outline')}
+                    onClick={() => {
+                      setShowCreateModal(false);
+                      setSelectedProductsForNew(new Set());
+                    }}
+                    className={`${getButtonClasses('outline')} w-full sm:w-auto`}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    disabled={isLoading}
-                    className={getButtonClasses('primary')}
+                    disabled={isLoading || selectedProductsForNew.size === 0}
+                    className={`${getButtonClasses('primary')} w-full sm:w-auto`}
                   >
-                    {isLoading ? 'Creating...' : 'Create Subscription'}
+                    {isLoading ? 'Creating...' : `Create Subscription (${selectedProductsForNew.size} products)`}
                   </button>
                 </div>
               </form>
@@ -418,9 +536,9 @@ export const MySubscriptions = () => {
 
       {/* Add Products Modal */}
       {showAddProductModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`${themeClasses.card.base} w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden`}>
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className={`${themeClasses.card.base} w-full max-w-4xl max-h-[90vh] overflow-hidden`}>
+            <div className="p-4 sm:p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className={`${themeClasses.text.heading} text-xl`}>Add Products to Subscription</h2>
                 <button
@@ -448,7 +566,7 @@ export const MySubscriptions = () => {
               {/* Products Grid */}
               <div className="max-h-96 overflow-y-auto mb-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {availableProducts.map((product) => (
+                  {availableProducts.map((product: Product) => (
                     <div key={product.id} className={`${themeClasses.card.base} p-4`}>
                       <div className="flex items-start space-x-3">
                         <input
@@ -463,19 +581,19 @@ export const MySubscriptions = () => {
                             }
                             setSelectedProducts(newSelected);
                           }}
-                          className={`${themeClasses.input.base} mt-1`}
+                          className={`${themeClasses.input.base} mt-1 flex-shrink-0`}
                         />
-                        <div className="flex-1">
-                          {product.image && (
+                        <div className="flex-1 min-w-0">
+                          {product.images && product.images.length > 0 && (
                             <img 
-                              src={product.image} 
+                              src={product.images[0].url} 
                               alt={product.name}
                               className="w-full h-24 object-cover rounded mb-2"
                             />
                           )}
-                          <h3 className={`${themeClasses.text.primary} font-medium text-sm`}>{product.name}</h3>
+                          <h3 className={`${themeClasses.text.primary} font-medium text-sm truncate`}>{product.name}</h3>
                           <p className={`${themeClasses.text.secondary} text-xs mt-1`}>
-                            {formatCurrency(product.price, product.currency || 'USD')}
+                            {formatCurrency(product.price || product.min_price || 0, 'USD')}
                           </p>
                         </div>
                       </div>
@@ -485,21 +603,21 @@ export const MySubscriptions = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <p className={themeClasses.text.secondary}>
                   {selectedProducts.size} product(s) selected
                 </p>
-                <div className="flex space-x-3">
+                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                   <button
                     onClick={() => setShowAddProductModal(false)}
-                    className={getButtonClasses('outline')}
+                    className={`${getButtonClasses('outline')} w-full sm:w-auto`}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleAddProducts}
                     disabled={selectedProducts.size === 0 || isLoading}
-                    className={getButtonClasses('primary')}
+                    className={`${getButtonClasses('primary')} w-full sm:w-auto`}
                   >
                     {isLoading ? 'Adding...' : `Add ${selectedProducts.size} Product(s)`}
                   </button>

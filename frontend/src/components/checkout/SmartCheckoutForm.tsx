@@ -16,6 +16,12 @@ import { Input } from '../ui/Input';
 import { CheckCircle, AlertTriangle } from 'lucide-react';
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import AddAddressForm from '../forms/AddAddressForm';
+import { 
+  handlePriceDiscrepancies, 
+  validatePrices, 
+  formatCurrency,
+  addMoney 
+} from '../../lib/price-validation';
 
 // Simple debounce function
 const debounce = (func: Function, wait: number) => {
@@ -172,7 +178,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   );
 
   useEffect(() => {
-    if (formData.shipping_address_id && formData.shipping_method_id) {
+    if (formData.shipping_address_id && formData.shipping_method_id && formData.payment_method_id) {
       debouncedValidation(formData);
     }
   }, [formData, debouncedValidation]);
@@ -236,7 +242,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
     }
   };
 
-  const updateOrderSummary = useCallback(() => {
+  const updateOrderSummary = useCallback(async () => {
     if (!cart || !formData.shipping_method_id) return;
 
     const safeShippingMethods = Array.isArray(shippingMethods) ? shippingMethods : [];
@@ -245,8 +251,13 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
     const subtotal = cart.subtotal || 0;
     const shipping = selectedShipping.price || 0;
-    const tax = calculateTax(subtotal, shipping);
-    const total = subtotal + shipping + tax;
+    
+    // Get selected shipping address for tax calculation
+    const selectedAddress = addresses.find(addr => addr.id === formData.shipping_address_id);
+    const tax = await calculateTax(subtotal, shipping, selectedAddress);
+    
+    // Use safe money operations to avoid floating point errors
+    const total = addMoney(addMoney(subtotal, shipping), tax);
 
     setOrderSummary({
       subtotal,
@@ -255,16 +266,29 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       total,
       items: cart.items?.length || 0
     });
-  }, [cart, formData.shipping_method_id, shippingMethods]);
+  }, [cart, formData.shipping_method_id, formData.shipping_address_id, shippingMethods, addresses]);
 
   useEffect(() => {
     updateOrderSummary();
   }, [updateOrderSummary]);
 
-  const calculateTax = (subtotal, shipping) => {
-    // Simple tax calculation - in real app, this would be based on address
-    const taxRate = 0.08; // 8%
-    return (subtotal + shipping) * taxRate;
+  const calculateTax = async (subtotal, shipping, shippingAddress) => {
+    try {
+      // Get tax rate from backend based on shipping address
+      if (!shippingAddress) return 0;
+      
+      const response = await OrdersAPI.calculateTax({
+        subtotal,
+        shipping,
+        shipping_address_id: shippingAddress.id
+      });
+      
+      return response.data?.tax_amount || 0;
+    } catch (error) {
+      console.error('Failed to calculate tax:', error);
+      // Fallback to 0 tax if calculation fails
+      return 0;
+    }
   };
 
   const validateStep = (step) => {
@@ -315,6 +339,37 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       if (!finalValidation.data?.can_proceed) {
         toast.error('Checkout validation failed. Please review your cart.');
         setCurrentStep(1); // Go back to review cart
+        setIsProcessingStripePayment(false);
+        return;
+      }
+
+      // Check for price discrepancies
+      if (finalValidation.data?.price_discrepancies) {
+        handlePriceDiscrepancies(
+          finalValidation.data.price_discrepancies,
+          () => {
+            // Refresh cart and order summary on price updates
+            updateOrderSummary();
+          }
+        );
+        
+        // If there are critical price errors, block checkout
+        const hasErrors = finalValidation.data.price_discrepancies.some(d => d.severity === 'error');
+        if (hasErrors) {
+          setIsProcessingStripePayment(false);
+          return;
+        }
+      }
+
+      // Validate frontend vs backend totals
+      const backendTotal = finalValidation.data?.estimated_totals?.total_amount || 0;
+      const frontendTotal = orderSummary?.total || 0;
+      
+      if (!validatePrices(frontendTotal, backendTotal)) {
+        toast.error(
+          `Price mismatch detected. Frontend: ${formatCurrency(frontendTotal)}, Backend: ${formatCurrency(backendTotal)}. Please refresh and try again.`,
+          { duration: 8000 }
+        );
         setIsProcessingStripePayment(false);
         return;
       }

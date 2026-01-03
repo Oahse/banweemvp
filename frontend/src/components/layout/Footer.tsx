@@ -41,7 +41,7 @@ export const Footer = () => {
             </div>
             <div className="flex-shrink-0 w-full md:w-auto">
               <Link
-                to="/subscription"
+                to="/account/subscriptions"
                 className="bg-primary text-copy-inverse px-6 py-3 rounded-md hover:bg-primary-dark transition-colors flex items-center justify-center whitespace-nowrap"
               >
                 Go to Subscriptions

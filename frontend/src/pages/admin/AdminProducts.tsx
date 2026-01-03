@@ -6,6 +6,7 @@ import { AdminAPI } from '../../apis';
 import { useCategories } from '../../contexts/CategoryContext';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';
+import { Pagination } from '../../components/ui/Pagination';
 import { PLACEHOLDER_IMAGES } from '../../utils/placeholderImage';
 
 export const AdminProducts = () => {
@@ -37,6 +38,7 @@ export const AdminProducts = () => {
     page: currentPage,
     limit: itemsPerPage,
     totalPages,
+    total: totalProducts,
     goToPage,
   } = usePaginatedApi(
     apiCall,
@@ -71,7 +73,7 @@ export const AdminProducts = () => {
   }
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, products.length);
+  const endIndex = Math.min(startIndex + itemsPerPage, totalProducts || products.length);
 
   return <div>
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -157,17 +159,32 @@ export const AdminProducts = () => {
                                PLACEHOLDER_IMAGES.small;
                 return (
                   <div className="flex items-center">
-                    <img 
-                      src={imageUrl} 
-                      alt={product.name} 
-                      className="w-12 h-12 rounded-md object-cover mr-3 border border-border-light" 
-                      onError={(e) => {
-                        e.currentTarget.src = PLACEHOLDER_IMAGES.small;
-                      }}
-                    />
-                    <div>
-                      <p className="font-medium text-main">{product.name}</p>
-                      <p className="text-xs text-copy-light">
+                    <div className="relative w-12 h-12 mr-3 flex-shrink-0">
+                      <img 
+                        src={imageUrl} 
+                        alt={product.name} 
+                        className="w-full h-full rounded-md object-cover border border-border-light" 
+                        onError={(e) => {
+                          e.currentTarget.src = PLACEHOLDER_IMAGES.small;
+                        }}
+                        onLoad={(e) => {
+                          // Remove any loading state if needed
+                          e.currentTarget.classList.remove('opacity-50');
+                        }}
+                        style={{ 
+                          backgroundColor: '#f3f4f6',
+                          minHeight: '48px',
+                          minWidth: '48px'
+                        }}
+                      />
+                      {/* Loading overlay */}
+                      {!imageUrl.startsWith('data:') && (
+                        <div className="absolute inset-0 bg-surface-hover animate-pulse rounded-md opacity-0 transition-opacity duration-200" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-main truncate">{product.name}</p>
+                      <p className="text-xs text-copy-light truncate">
                         {product.short_description && product.short_description.length > 50 
                           ? `${product.short_description.substring(0, 50)}...` 
                           : product.short_description || `ID: ${product.id.substring(0, 8)}...`}
@@ -344,47 +361,16 @@ export const AdminProducts = () => {
         />
       </div>
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-between">
-          <p className="text-sm text-copy-light">
-            Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-            <span className="font-medium">{endIndex}</span> of{' '}
-            <span className="font-medium">{products.length}</span> products
-          </p>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover"
-            >
-              Previous
-            </button>
-            
-            <div className="flex items-center gap-1">
-              {[...Array(totalPages)].map((_, pageNum) => (
-                <button
-                  key={pageNum + 1}
-                  onClick={() => goToPage(pageNum + 1)}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                    currentPage === pageNum + 1
-                      ? 'bg-primary text-white'
-                      : 'border border-border text-copy hover:bg-surface-hover'
-                  }`}
-                >
-                  {pageNum + 1}
-                </button>
-              ))}
-            </div>
-            
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalProducts || products.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={goToPage}
+        showingStart={startIndex + 1}
+        showingEnd={endIndex}
+        itemName="products"
+        className="mt-6"
+      />
     </div>;
 };
