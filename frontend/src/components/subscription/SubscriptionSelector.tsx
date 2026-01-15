@@ -58,11 +58,11 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
       <div className={`${themeClasses.surface} rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border-light">
-          <h2 className={`text-xl font-semibold ${themeClasses.text}`}>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border-light">
+          <h2 className={`text-lg sm:text-xl font-semibold ${themeClasses.text}`}>
             Add to Subscription
           </h2>
           <button
@@ -74,24 +74,24 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-6">
-          <div className="mb-6">
-            <p className={`${themeClasses.textMuted} mb-2`}>Product:</p>
-            <p className={`font-medium ${themeClasses.text}`}>{productName}</p>
+        <div className="p-4 sm:p-6">
+          <div className="mb-4 sm:mb-6">
+            <p className={`${themeClasses.textMuted} mb-2 text-sm sm:text-base`}>Product:</p>
+            <p className={`font-medium ${themeClasses.text} text-sm sm:text-base`}>{productName}</p>
             {quantity > 1 && (
-              <p className={`text-sm ${themeClasses.textMuted}`}>Quantity: {quantity}</p>
+              <p className={`text-xs sm:text-sm ${themeClasses.textMuted}`}>Quantity: {quantity}</p>
             )}
           </div>
 
           {activeSubscriptions.length === 0 ? (
-            <div className="text-center py-8">
-              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${themeClasses.surface} flex items-center justify-center`}>
-                <PlusIcon className={`w-8 h-8 ${themeClasses.textMuted}`} />
+            <div className="text-center py-6 sm:py-8">
+              <div className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 rounded-full ${themeClasses.surface} flex items-center justify-center`}>
+                <PlusIcon className={`w-6 h-6 sm:w-8 sm:h-8 ${themeClasses.textMuted}`} />
               </div>
-              <h3 className={`text-lg font-medium ${themeClasses.text} mb-2`}>
+              <h3 className={`text-base sm:text-lg font-medium ${themeClasses.text} mb-2`}>
                 No Active Subscriptions
               </h3>
-              <p className={`${themeClasses.textMuted} mb-4`}>
+              <p className={`${themeClasses.textMuted} mb-4 text-sm sm:text-base`}>
                 You need an active subscription to add products.
               </p>
               <button
@@ -103,15 +103,15 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
             </div>
           ) : (
             <>
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <label className={`block text-sm font-medium ${themeClasses.text} mb-3`}>
                   Select Subscription:
                 </label>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {activeSubscriptions.map((subscription) => (
                     <label
                       key={subscription.id}
-                      className={`block cursor-pointer p-4 rounded-lg border-2 transition-colors ${
+                      className={`block cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-colors ${
                         selectedSubscriptionId === subscription.id
                           ? 'border-primary bg-primary/5'
                           : `border-border-light hover:border-border`
@@ -126,24 +126,24 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
                         className="sr-only"
                       />
                       <div className="flex items-center justify-between">
-                        <div>
-                          <div className={`font-medium ${themeClasses.text}`}>
+                        <div className="flex-1 min-w-0 mr-2">
+                          <div className={`font-medium ${themeClasses.text} text-sm sm:text-base truncate`}>
                             {subscription.plan_id} Plan
                           </div>
-                          <div className={`text-sm ${themeClasses.textMuted} flex items-center gap-4 mt-1`}>
+                          <div className={`text-xs sm:text-sm ${themeClasses.textMuted} flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1`}>
                             <span className="flex items-center gap-1">
-                              <CreditCardIcon className="w-4 h-4" />
-                              {formatCurrency(subscription.price)} / {formatBillingCycle(subscription.billing_cycle)}
+                              <CreditCardIcon className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                              <span className="truncate">{formatCurrency(subscription.price)} / {formatBillingCycle(subscription.billing_cycle)}</span>
                             </span>
                             {subscription.next_billing_date && (
                               <span className="flex items-center gap-1">
-                                <CalendarIcon className="w-4 h-4" />
-                                Next: {formatNextBilling(subscription.next_billing_date)}
+                                <CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="truncate">Next: {formatNextBilling(subscription.next_billing_date)}</span>
                               </span>
                             )}
                           </div>
                         </div>
-                        <div className={`w-4 h-4 rounded-full border-2 ${
+                        <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
                           selectedSubscriptionId === subscription.id
                             ? 'border-primary bg-primary'
                             : 'border-border'
@@ -159,10 +159,10 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={onClose}
-                  className={getButtonClasses('secondary')}
+                  className={`${getButtonClasses('secondary')} w-full sm:w-auto`}
                   disabled={isLoading}
                 >
                   Cancel
@@ -170,7 +170,7 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
                 <button
                   onClick={handleAddToSubscription}
                   disabled={!selectedSubscriptionId || isLoading}
-                  className={getButtonClasses('primary')}
+                  className={`${getButtonClasses('primary')} w-full sm:w-auto`}
                 >
                   {isLoading ? 'Adding...' : 'Add to Subscription'}
                 </button>

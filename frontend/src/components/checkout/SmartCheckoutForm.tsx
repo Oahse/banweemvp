@@ -43,7 +43,7 @@ interface SmartCheckoutFormProps {
 export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess }) => {
   const { user } = useAuth();
   const { cart, clearCart } = useCart();
-  const { formatCurrency } = useLocale();
+  const { formatCurrency, currency, countryCode } = useLocale();
 
   const stripe = useStripe();
   const elements = useElements();
@@ -85,7 +85,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
         cart_id: cart.id,
         user_id: user.id,
         amount: orderSummary?.total || cart.total_amount,
-        currency: cart.currency || 'usd', // Assuming cart has a currency
+        currency: currency.toLowerCase(), // Use user's detected currency
       });
       if (response?.data?.client_secret) {
         setClientSecret(response.data.client_secret);
@@ -98,7 +98,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
     } finally {
       setIsProcessingStripePayment(false);
     }
-  }, [cart, user, orderSummary]);
+  }, [cart, user, orderSummary, currency]);
 
   // Auto-save form data to localStorage
   useEffect(() => {
@@ -181,10 +181,40 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
           return;
         }
         
+        // Log the data being sent for debugging
+        console.log('Validating checkout with data:', {
+          shipping_address_id: data.shipping_address_id,
+          shipping_method_id: data.shipping_method_id,
+          payment_method_id: data.payment_method_id,
+          notes: data.notes
+        });
+        
         const response = await OrdersAPI.validateCheckout(data);
-        setRealTimeValidation(response.data || {});
+        
+        console.log('Validation response:', response);
+        
+        // Check if response is successful
+        if (response.success) {
+          setRealTimeValidation(response.data || {});
+        } else {
+          // Handle validation failure from backend
+          console.error('Validation failed:', response);
+          setRealTimeValidation({ 
+            can_proceed: false, 
+            validation_errors: response.data?.validation_errors || [response.message || 'Validation failed'] 
+          });
+        }
       } catch (error) {
         console.error('Real-time validation failed:', error);
+        console.error('Error details:', {
+          message: error?.message,
+          response: error?.response?.data,
+          status: error?.response?.status
+        });
+        
+        const errorMessage = error?.response?.data?.message || error?.message || 'Validation failed';
+        const errorDetails = error?.response?.data?.data?.validation_errors || [];
+        
         // Only show validation errors if all required fields were provided
         if (data.shipping_address_id && 
             data.shipping_method_id && 
@@ -194,8 +224,11 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             data.payment_method_id !== '') {
           setRealTimeValidation({ 
             can_proceed: false, 
-            validation_errors: ['Validation failed. Please check your selections.'] 
+            validation_errors: errorDetails.length > 0 ? errorDetails : [errorMessage]
           });
+          
+          // Show toast with specific error
+          toast.error(`Checkout validation failed: ${errorMessage}`, { duration: 5000 });
         }
       }
     }, 500),
@@ -452,12 +485,14 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       // Generate idempotency key to prevent duplicate orders
       const idempotencyKey = `checkout_${user?.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Add idempotency key and calculated total for validation
+      // Add idempotency key, calculated total, and user's currency/location for validation
       const checkoutData = {
         ...formData,
         payment_method_id: finalPaymentMethodId, // Use the new payment method ID if applicable
         idempotency_key: idempotencyKey,
-        frontend_calculated_total: orderSummary?.total || 0
+        frontend_calculated_total: orderSummary?.total || 0,
+        currency: currency, // Pass user's detected currency
+        country_code: countryCode // Pass user's detected country
       };
       
       // Attempt checkout with retry logic for transient failures
@@ -901,22 +936,72 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 
                 {/* Order items */}
                 <div className="space-y-4 mb-6">
-                  {cart?.items?.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-4 p-4 bg-surface-hover rounded-lg">
-                      <img
-                        src={item.product?.image_url || '/placeholder-product.jpg'}
-                        alt={item.product?.name}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <div className="font-medium text-copy">{item.product?.name}</div>
-                        <div className="text-sm text-copy-light">Quantity: {item.quantity}</div>
+                  {cart?.items?.map((item) => {
+                    // Get variant image URL with multiple fallbacks
+                    let imageUrl = null;
+                    
+                    // First try to get from variant images array (if available)
+                    if (item.variant?.images && item.variant.images.length > 0) {
+                      const primaryImage = item.variant.images.find(img => img.is_primary);
+                      imageUrl = primaryImage?.url || item.variant.images[0]?.url;
+                    }
+                    
+                    // Fallback to direct image_url from cart item (if available)
+                    if (!imageUrl && (item as any).image_url) {
+                      imageUrl = (item as any).image_url;
+                    }
+                    
+                    // Fallback to variant primary_image if available
+                    if (!imageUrl && item.variant?.primary_image?.url) {
+                      imageUrl = item.variant.primary_image.url;
+                    }
+                    
+                    // Final fallback to product image
+                    if (!imageUrl && item.product?.image_url) {
+                      imageUrl = item.product.image_url;
+                    }
+                    
+                    return (
+                      <div key={item.id} className="flex items-center space-x-4 p-4 bg-surface-hover rounded-lg">
+                        <div className="w-16 h-16 rounded overflow-hidden flex-shrink-0 bg-gray-100">
+                          {imageUrl ? (
+                            <img
+                              src={imageUrl}
+                              alt={item.variant?.product_name || item.product?.name || item.variant?.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f3f4f6"/%3E%3Cpath d="M32 20c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%239ca3af"/%3E%3Cpath d="M44 16H20c-2.2 0-4 1.8-4 4v24c0 2.2 1.8 4 4 4h24c2.2 0 4-1.8 4-4V20c0-2.2-1.8-4-4-4zm0 28H20V20h24v24z" fill="%239ca3af"/%3E%3C/svg%3E';
+                                e.currentTarget.onerror = null;
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-copy">
+                            {item.variant?.product_name || item.product?.name}
+                          </div>
+                          <div className="text-sm text-copy-light">
+                            {item.variant?.name && item.variant.name !== 'Default' && (
+                              <span>Variant: {item.variant.name} • </span>
+                            )}
+                            Quantity: {item.quantity}
+                          </div>
+                          <div className="text-sm text-copy-light">
+                            {formatCurrency(item.price_per_unit)} each
+                          </div>
+                        </div>
+                        <div className="text-lg font-semibold text-copy">
+                          {formatCurrency(item.total_price)}
+                        </div>
                       </div>
-                      <div className="text-lg font-semibold text-copy">
-                        {formatCurrency(item.quantity * item.price_per_unit)}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Order notes */}
@@ -1000,12 +1085,32 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
             {/* Real-time validation status */}
             {realTimeValidation && Object.keys(realTimeValidation).length > 0 && (
-              <div className="mt-6 p-3 bg-success/10 border border-success/30 rounded-lg">
-                <div className="flex items-center text-sm text-success">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Order validated and ready to place
-                </div>
-              </div>
+              <>
+                {realTimeValidation.can_proceed ? (
+                  <div className="mt-6 p-3 bg-success/10 border border-success/30 rounded-lg">
+                    <div className="flex items-center text-sm text-success">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Order validated and ready to place
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-6 p-3 bg-error/10 border border-error/30 rounded-lg">
+                    <div className="flex items-start text-sm text-error">
+                      <AlertTriangle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <div className="font-medium mb-1">Validation Issues</div>
+                        {realTimeValidation.validation_errors && realTimeValidation.validation_errors.length > 0 && (
+                          <ul className="list-disc pl-4 space-y-1">
+                            {realTimeValidation.validation_errors.map((error, index) => (
+                              <li key={index}>{error}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import { 
   CalendarIcon, 
   ShoppingBagIcon, 
@@ -11,7 +12,6 @@ import {
   ClockIcon,
   XIcon
 } from 'lucide-react';
-import { formatCurrency } from '../../lib/locale-config';
 import { themeClasses, getButtonClasses } from '../../lib/themeClasses';
 import { ProductsAPI } from '../../apis/products';
 import SubscriptionAPI from '../../apis/subscription';
@@ -29,6 +29,7 @@ interface NewSubscriptionData {
 
 export const MySubscriptions = () => {
   const { subscriptions, loading, error, refreshSubscriptions } = useSubscription();
+  const { currency, countryCode, formatCurrency: formatCurrencyLocale } = useLocale();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   const [showAddProductModal, setShowAddProductModal] = useState<boolean>(false);
@@ -38,16 +39,21 @@ export const MySubscriptions = () => {
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // New subscription form state
+  // New subscription form state - use user's detected currency
   const [newSubscription, setNewSubscription] = useState<NewSubscriptionData>({
     plan_id: 'basic',
     billing_cycle: 'monthly',
     product_variant_ids: [],
     delivery_type: 'standard',
-    currency: 'USD',
+    currency: currency, // Use user's detected currency
     auto_renew: true
   });
   const [selectedProductsForNew, setSelectedProductsForNew] = useState<Set<string>>(new Set());
+
+  // Update currency when user's locale changes
+  useEffect(() => {
+    setNewSubscription(prev => ({ ...prev, currency: currency }));
+  }, [currency]);
 
   useEffect(() => {
     refreshSubscriptions();
@@ -342,7 +348,7 @@ export const MySubscriptions = () => {
                               {product.name}
                             </span>
                             <span className={`${themeClasses.text.muted} text-xs`}>
-                              {formatCurrency(product.price, subscription.currency || 'USD')}
+                              {formatCurrencyLocale(product.price, subscription.currency || currency)}
                             </span>
                           </div>
                         </div>
@@ -492,7 +498,7 @@ export const MySubscriptions = () => {
                                     {product.name}
                                   </span>
                                   <span className={`${themeClasses.text.muted} text-xs`}>
-                                    {formatCurrency(product.price || product.min_price || 0, 'USD')}
+                                    {formatCurrencyLocale(product.price || product.min_price || 0, currency)}
                                   </span>
                                 </div>
                               </div>
@@ -593,7 +599,7 @@ export const MySubscriptions = () => {
                           )}
                           <h3 className={`${themeClasses.text.primary} font-medium text-sm truncate`}>{product.name}</h3>
                           <p className={`${themeClasses.text.secondary} text-xs mt-1`}>
-                            {formatCurrency(product.price || product.min_price || 0, 'USD')}
+                            {formatCurrencyLocale(product.price || product.min_price || 0, currency)}
                           </p>
                         </div>
                       </div>

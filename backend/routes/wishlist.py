@@ -26,11 +26,20 @@ async def get_my_wishlists(
         wishlist_service = WishlistService(db)
         wishlists = await wishlist_service.get_wishlists(current_user.id)
         
-        # Convert to response schema
-        wishlist_responses = [WishlistResponse.from_orm(w) for w in wishlists]
+        # Return simple data without complex nested serialization
+        simple_wishlists = [
+            {
+                "id": str(w.id),
+                "name": w.name,
+                "is_default": w.is_default,
+                "item_count": len(w.items) if w.items else 0,
+                "created_at": w.created_at.isoformat() if w.created_at else None
+            }
+            for w in wishlists
+        ]
         
         return Response.success(
-            data=wishlist_responses,
+            data=simple_wishlists,
             message="Wishlists retrieved successfully"
         )
     except Exception as e:

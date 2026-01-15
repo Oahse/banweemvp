@@ -309,7 +309,7 @@ export const ProductCard = ({
             {isAuthenticated && hasActiveSubscriptions && (
               <button
                 onClick={handleAddToSubscription}
-                className="w-9 h-9 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors"
+                className="w-9 h-9 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors flex-shrink-0"
                 aria-label="Add to subscription">
                 <CalendarIcon size={16} />
               </button>
@@ -378,7 +378,7 @@ export const ProductCard = ({
             {isAuthenticated && hasActiveSubscriptions && (
               <button
                 onClick={handleAddToSubscription}
-                className="text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md flex items-center transition-colors"
+                className="text-white bg-green-600 hover:bg-green-700 px-2 sm:px-3 py-1.5 rounded-md flex items-center transition-colors flex-shrink-0"
                 aria-label="Add to subscription">
                 <CalendarIcon size={16} />
               </button>
@@ -400,10 +400,10 @@ export const ProductCard = ({
             {isAuthenticated && hasActiveSubscriptions && (
               <button
                 onClick={handleAddToSubscription}
-                className="flex items-center text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md transition-colors"
+                className="flex items-center text-white bg-green-600 hover:bg-green-700 px-3 sm:px-4 py-2 rounded-md transition-colors flex-shrink-0"
                 aria-label="Add to subscription">
-                <CalendarIcon size={18} />
-                {viewMode === 'list' && <span className="hidden md:inline ml-2">Subscribe</span>}
+                <CalendarIcon size={18} className="flex-shrink-0" />
+                {viewMode === 'list' && <span className="hidden md:inline ml-2 whitespace-nowrap">Subscribe</span>}
               </button>
             )}
           </div>
@@ -414,16 +414,16 @@ export const ProductCard = ({
               onClick={handleAddToSubscription}
               disabled={isAddingToSubscription}
               className={cn(
-                'ml-2 flex items-center text-white bg-green-600 hover:bg-green-700 px-3 py-2 rounded-md transition-colors',
+                'ml-2 flex items-center text-white bg-green-600 hover:bg-green-700 px-2 sm:px-3 py-2 rounded-md transition-colors flex-shrink-0',
                 isAddingToSubscription && 'opacity-50 cursor-not-allowed'
               )}
               aria-label="Add to subscription">
               {isAddingToSubscription ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               ) : (
-                <PlusIcon size={16} />
+                <PlusIcon size={16} className="flex-shrink-0" />
               )}
-              <span className="ml-1 text-sm">Subscribe</span>
+              <span className="ml-1 text-xs sm:text-sm whitespace-nowrap">Subscribe</span>
             </button>
           )}
         </div>

@@ -328,6 +328,24 @@ class OrderService:
                 order = Order(
                     user_id=user_id,
                     status="pending",
+                    order_number=order_number,
+                    subtotal=subtotal,
+                    tax_amount=tax_amount,
+                    shipping_amount=shipping_amount,
+                    discount_amount=discount_amount,
+                    total_amount=total_amount,
+                    currency=request.currency or "USD",  # Use user's currency from frontend
+                    shipping_method=shipping_method.name,
+                    tracking_number=None,
+                    carrier=None,
+                    billing_address=billing_address_dict,
+                    shipping_address=shipping_address_dict,
+                    notes=request.notes,
+                    idempotency_key=idempotency_key,
+                    payment_status="pending",
+                    fulfillment_status="unfulfilled",
+                    order_source="web"
+                )
                     total_amount=final_total["total_amount"],
                     shipping_address_id=request.shipping_address_id,
                     shipping_method_id=request.shipping_method_id,
@@ -698,7 +716,7 @@ class OrderService:
             user_id=str(order.user_id),
             status=order.status,
             total_amount=order.total_amount,
-            currency="USD",
+            currency=order.currency,  # Use order's currency
             tracking_number=order.tracking_number,
             estimated_delivery=estimated_delivery,
             items=items,
@@ -1105,7 +1123,7 @@ class OrderService:
                 order_id=str(order.id),
                 user_id=str(user_id),
                 amount=float(order.total_amount),
-                currency="USD",  # You can make this configurable
+                currency=order.currency,  # Use order's currency
                 items=order_items,
                 shipping_address=shipping_address,
                 payment_method="card",  # You can get this from payment method
@@ -1121,7 +1139,7 @@ class OrderService:
                     order_id=str(order.id),
                     payment_id=payment_id,
                     amount=float(order.total_amount),
-                    currency="USD",
+                    currency=order.currency,  # Use order's currency
                     payment_method="card",
                     correlation_id=correlation_id
                 )

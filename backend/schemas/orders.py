@@ -22,6 +22,10 @@ class CheckoutRequest(BaseModel):
     shipping_method_id: UUID  # Reverted back to UUID since we're using database shipping methods
     payment_method_id: UUID
     notes: Optional[str] = None
+    currency: Optional[str] = "USD"  # User's detected currency
+    country_code: Optional[str] = "US"  # User's detected country
+    frontend_calculated_total: Optional[float] = None  # For validation
+    idempotency_key: Optional[str] = None  # For duplicate prevention
 
 
 class OrderCreate(BaseModel):

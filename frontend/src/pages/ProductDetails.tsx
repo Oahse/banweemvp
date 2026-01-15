@@ -571,10 +571,10 @@ export const ProductDetails = () => {
               {isAuthenticated && hasActiveSubscriptions && selectedVariant && selectedVariant.stock > 0 && (
                 <button
                   onClick={() => setShowSubscriptionSelector(true)}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-colors flex items-center justify-center text-sm sm:text-base"
                 >
-                  <CalendarIcon size={20} className="mr-2" />
-                  Add to Subscription
+                  <CalendarIcon size={18} className="mr-1 sm:mr-2 flex-shrink-0" />
+                  <span className="truncate">Add to Subscription</span>
                 </button>
               )}
             </div>
