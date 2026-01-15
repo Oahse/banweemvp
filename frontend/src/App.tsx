@@ -116,6 +116,7 @@ const AdminInventoryItemForm = lazy(() => import('./pages/admin/AdminInventoryIt
 const AdminComments = lazy(() => import('./pages/admin/AdminComments').then((module) => ({ default: module.AdminComments })));
 const AdminShippingMethods = lazy(() => import('./pages/admin/AdminShippingMethods').then((module) => ({ default: module.AdminShippingMethods })));
 const AdminShippingMethodForm = lazy(() => import('./pages/admin/AdminShippingMethodForm').then((module) => ({ default: module.AdminShippingMethodForm })));
+const TaxRatesAdmin = lazy(() => import('./pages/admin/TaxRates').then((module) => ({ default: module.TaxRatesAdmin })));
 const Notifications = lazy(() =>
   import('./pages/account/Notifications').then((module) => ({ default: module.Notifications }))
 );
@@ -466,6 +467,17 @@ export const App: React.FC = () => {
                                       <ProtectedRoute requiredRole={['Admin']}>
                                           <AdminLayout>
                                               <AdminShippingMethodForm />
+                                          </AdminLayout>
+                                      </ProtectedRoute>
+                                  }
+                              />
+                              {/* Tax Rates Management Route */}
+                              <Route
+                                  path="/admin/tax-rates"
+                                  element={
+                                      <ProtectedRoute requiredRole={['Admin']}>
+                                          <AdminLayout>
+                                              <TaxRatesAdmin />
                                           </AdminLayout>
                                       </ProtectedRoute>
                                   }

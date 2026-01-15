@@ -906,6 +906,10 @@ async def main():
                 variants_per_product=args.variants,
                 batch_size=args.batch_size,
             )
+            # Seed tax rates after other data
+            print("🌍 Seeding tax rates...")
+            from scripts.seed_tax_rates import seed_tax_rates
+            await seed_tax_rates()
         print("✅ Database initialization complete!")
     except Exception as e:
         print(f"❌ Error initializing database: {e}")

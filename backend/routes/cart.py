@@ -26,15 +26,23 @@ def get_session_id(request: Request) -> Optional[str]:
 @router.get("/")
 async def get_cart(
     request: Request,
+    country: Optional[str] = None,  # Country code from query param or header
+    province: Optional[str] = None,  # Province/state code from query param or header
     current_user: Optional[User] = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
+        # Try to get location from query params, headers, or default to US
+        country_code = country or request.headers.get('X-Country-Code', 'US')
+        province_code = province or request.headers.get('X-Province-Code')
+        
         cart_service = CartService(db)
         session_id = get_session_id(request) if not current_user else None
         cart = await cart_service.get_cart(
             user_id=current_user.id if current_user else None,
-            session_id=session_id
+            session_id=session_id,
+            country_code=country_code,
+            province_code=province_code
         )
         return Response(success=True, data=cart)
     except Exception as e:

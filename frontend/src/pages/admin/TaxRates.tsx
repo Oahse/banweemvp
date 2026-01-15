@@ -1,0 +1,469 @@
+import React, { useState, useEffect } from 'react';
+import { PlusIcon, PencilIcon, TrashIcon, SearchIcon, FilterIcon } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { apiClient } from '../../apis/client';
+
+interface TaxRate {
+  id: string;
+  country_code: string;
+  country_name: string;
+  province_code?: string;
+  province_name?: string;
+  tax_rate: number;
+  tax_percentage: number;
+  tax_name?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+interface Country {
+  country_code: string;
+  country_name: string;
+  rate_count: number;
+}
+
+export const TaxRatesAdmin = () => {
+  const [taxRates, setTaxRates] = useState<TaxRate[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [editingRate, setEditingRate] = useState<TaxRate | null>(null);
+  
+  // Filters
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    country_code: '',
+    country_name: '',
+    province_code: '',
+    province_name: '',
+    tax_rate: '',
+    tax_name: '',
+    is_active: true
+  });
+
+  useEffect(() => {
+    fetchTaxRates();
+    fetchCountries();
+  }, [selectedCountry, activeFilter, searchTerm]);
+
+  const fetchTaxRates = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (selectedCountry) params.append('country_code', selectedCountry);
+      if (activeFilter !== null) params.append('is_active', String(activeFilter));
+      if (searchTerm) params.append('search', searchTerm);
+      params.append('per_page', '100');
+      
+      const response = await apiClient.get(`/admin/tax-rates?${params.toString()}`);
+      setTaxRates(response.data || []);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to load tax rates');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCountries = async () => {
+    try {
+      const response = await apiClient.get('/admin/tax-rates/countries');
+      setCountries(response.data || []);
+    } catch (error) {
+      console.error('Failed to load countries:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const data = {
+        ...formData,
+        tax_rate: parseFloat(formData.tax_rate) / 100, // Convert percentage to decimal
+        country_code: formData.country_code.toUpperCase(),
+        province_code: formData.province_code ? formData.province_code.toUpperCase() : undefined
+      };
+
+      if (editingRate) {
+        await apiClient.put(`/admin/tax-rates/${editingRate.id}`, data);
+        toast.success('Tax rate updated successfully');
+      } else {
+        await apiClient.post('/admin/tax-rates', data);
+        toast.success('Tax rate created successfully');
+      }
+      
+      setShowModal(false);
+      resetForm();
+      fetchTaxRates();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to save tax rate');
+    }
+  };
+
+  const handleEdit = (rate: TaxRate) => {
+    setEditingRate(rate);
+    setFormData({
+      country_code: rate.country_code,
+      country_name: rate.country_name,
+      province_code: rate.province_code || '',
+      province_name: rate.province_name || '',
+      tax_rate: rate.tax_percentage.toString(),
+      tax_name: rate.tax_name || '',
+      is_active: rate.is_active
+    });
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this tax rate?')) return;
+    
+    try {
+      await apiClient.delete(`/admin/tax-rates/${id}`);
+      toast.success('Tax rate deleted successfully');
+      fetchTaxRates();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to delete tax rate');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      country_code: '',
+      country_name: '',
+      province_code: '',
+      province_name: '',
+      tax_rate: '',
+      tax_name: '',
+      is_active: true
+    });
+    setEditingRate(null);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-copy">Tax Rates Management</h1>
+        <button
+          onClick={() => {
+            resetForm();
+            setShowModal(true);
+          }}
+          className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark flex items-center gap-2"
+        >
+          <PlusIcon size={20} />
+          Add Tax Rate
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-surface rounded-lg shadow-sm p-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-copy mb-2">
+              <SearchIcon size={16} className="inline mr-1" />
+              Search
+            </label>
+            <input
+              type="text"
+              placeholder="Search country or province..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-copy mb-2">
+              <FilterIcon size={16} className="inline mr-1" />
+              Country
+            </label>
+            <select
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy"
+            >
+              <option value="">All Countries</option>
+              {countries.map((country) => (
+                <option key={country.country_code} value={country.country_code}>
+                  {country.country_name} ({country.rate_count})
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-copy mb-2">Status</label>
+            <select
+              value={activeFilter === null ? '' : String(activeFilter)}
+              onChange={(e) => setActiveFilter(e.target.value === '' ? null : e.target.value === 'true')}
+              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy"
+            >
+              <option value="">All</option>
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+          
+          <div className="flex items-end">
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCountry('');
+                setActiveFilter(null);
+              }}
+              className="w-full px-4 py-2 border border-border rounded-md hover:bg-surface-hover text-copy"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Tax Rates Table */}
+      <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="p-8 text-center text-copy-light">Loading...</div>
+        ) : taxRates.length === 0 ? (
+          <div className="p-8 text-center text-copy-light">No tax rates found</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-background">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-copy uppercase tracking-wider">
+                    Country
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-copy uppercase tracking-wider">
+                    Province/State
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-copy uppercase tracking-wider">
+                    Tax Rate
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-copy uppercase tracking-wider">
+                    Tax Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-copy uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-copy uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-light">
+                {taxRates.map((rate) => (
+                  <tr key={rate.id} className="hover:bg-surface-hover">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <img
+                          src={`https://flagcdn.com/w20/${rate.country_code.toLowerCase()}.png`}
+                          alt={rate.country_code}
+                          className="w-5 h-auto mr-2"
+                        />
+                        <div>
+                          <div className="text-sm font-medium text-copy">{rate.country_name}</div>
+                          <div className="text-xs text-copy-light">{rate.country_code}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {rate.province_name ? (
+                        <div>
+                          <div className="text-sm text-copy">{rate.province_name}</div>
+                          <div className="text-xs text-copy-light">{rate.province_code}</div>
+                        </div>
+                      ) : (
+                        <span className="text-sm text-copy-light">National</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm font-medium text-copy">
+                        {rate.tax_percentage.toFixed(2)}%
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-copy">{rate.tax_name || '-'}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          rate.is_active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {rate.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => handleEdit(rate)}
+                        className="text-primary hover:text-primary-dark mr-3"
+                      >
+                        <PencilIcon size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(rate.id)}
+                        className="text-error hover:text-error-dark"
+                      >
+                        <TrashIcon size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-copy mb-6">
+                {editingRate ? 'Edit Tax Rate' : 'Add Tax Rate'}
+              </h2>
+              
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-copy mb-2">
+                      Country Code *
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={2}
+                      required
+                      disabled={!!editingRate}
+                      value={formData.country_code}
+                      onChange={(e) => setFormData({ ...formData, country_code: e.target.value.toUpperCase() })}
+                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy disabled:opacity-50"
+                      placeholder="US"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-copy mb-2">
+                      Country Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.country_name}
+                      onChange={(e) => setFormData({ ...formData, country_name: e.target.value })}
+                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy"
+                      placeholder="United States"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-copy mb-2">
+                      Province/State Code
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={10}
+                      disabled={!!editingRate}
+                      value={formData.province_code}
+                      onChange={(e) => setFormData({ ...formData, province_code: e.target.value.toUpperCase() })}
+                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy disabled:opacity-50"
+                      placeholder="CA"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-copy mb-2">
+                      Province/State Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.province_name}
+                      onChange={(e) => setFormData({ ...formData, province_name: e.target.value })}
+                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy"
+                      placeholder="California"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-copy mb-2">
+                      Tax Rate (%) *
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      required
+                      value={formData.tax_rate}
+                      onChange={(e) => setFormData({ ...formData, tax_rate: e.target.value })}
+                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy"
+                      placeholder="7.25"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-copy mb-2">
+                      Tax Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.tax_name}
+                      onChange={(e) => setFormData({ ...formData, tax_name: e.target.value })}
+                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy"
+                      placeholder="Sales Tax, VAT, GST"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_active"
+                    checked={formData.is_active}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                    className="h-4 w-4 text-primary focus:ring-primary border-border rounded"
+                  />
+                  <label htmlFor="is_active" className="ml-2 block text-sm text-copy">
+                    Active
+                  </label>
+                </div>
+
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowModal(false);
+                      resetForm();
+                    }}
+                    className="px-4 py-2 border border-border rounded-md hover:bg-surface-hover text-copy"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+                  >
+                    {editingRate ? 'Update' : 'Create'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TaxRatesAdmin;

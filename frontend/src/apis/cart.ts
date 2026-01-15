@@ -8,8 +8,15 @@ import { apiClient } from './client';
 
 
 export class CartAPI {
-  static async getCart(access_token: string) {
-    return await apiClient.get('/cart', {
+  static async getCart(access_token: string, country?: string, province?: string) {
+    const params = new URLSearchParams();
+    if (country) params.append('country', country);
+    if (province) params.append('province', province);
+    
+    const queryString = params.toString();
+    const url = queryString ? `/cart?${queryString}` : '/cart';
+    
+    return await apiClient.get(url, {
       headers: { 'Authorization': `Bearer ${access_token}` },
     });
   }

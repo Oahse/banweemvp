@@ -95,6 +95,13 @@ export const Header = ({
                 if (data.countryCode) {
                   setSelectedCountry(data.countryCode);
                   localStorage.setItem('detected_country', data.countryCode);
+                  
+                  // Also save province/state if available
+                  if (data.principalSubdivisionCode) {
+                    // Extract just the state/province code (e.g., "US-CA" -> "CA")
+                    const provinceCode = data.principalSubdivisionCode.split('-').pop();
+                    localStorage.setItem('detected_province', provinceCode);
+                  }
                 }
               } catch (error) {
                 console.log('Failed to get country from coordinates:', error);
@@ -303,7 +310,7 @@ export const Header = ({
               <Link to="/account/wishlist" className="hidden md:flex items-center hover:text-primary">
                 <div className="relative">
                   <HeartIcon size={24} />
-                  {defaultWishlist && defaultWishlist.items.length > 0 && (
+                  {defaultWishlist && defaultWishlist.items && defaultWishlist.items.length > 0 && (
                     <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                       {defaultWishlist.items.length}
                     </span>
@@ -328,7 +335,7 @@ export const Header = ({
                 <div className="hidden md:flex flex-col ml-1 text-xs">
                   <span>Your Cart</span>
                   <span className="font-semibold">
-                    ${cart?.total_amount?.toFixed(2) || '0.00'}
+                    ${cart?.subtotal?.toFixed(2) || '0.00'}
                   </span>
                 </div>
               </Link>

@@ -34,7 +34,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       console.log('CartContext: Fetching cart...');
-      const response = await CartAPI.getCart(token);
+      
+      // Get location from localStorage (set by Header component)
+      const detectedCountry = localStorage.getItem('detected_country') || 'US';
+      const detectedProvince = localStorage.getItem('detected_province') || null;
+      
+      const response = await CartAPI.getCart(token, detectedCountry, detectedProvince);
       console.log('CartContext: Fetch cart response:', response);
       
       // Backend returns { success: true, data: cart }

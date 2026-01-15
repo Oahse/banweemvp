@@ -348,11 +348,11 @@ class CartService(RedisService):
             logger.error(f"Error removing from cart by item_id: {e}")
             raise HTTPException(status_code=500, detail="Failed to remove item from cart")
 
-    async def get_cart(self, user_id: UUID, session_id: Optional[str] = None) -> CartResponse:
+    async def get_cart(self, user_id: UUID, session_id: Optional[str] = None, country_code: str = "US", province_code: Optional[str] = None) -> CartResponse:
         """Get user's cart from Redis"""
-        return await self.get_or_create_cart(user_id)
+        return await self.get_or_create_cart(user_id, country_code, province_code)
 
-    async def get_or_create_cart(self, user_id: UUID) -> CartResponse:
+    async def get_or_create_cart(self, user_id: UUID, country_code: str = "US", province_code: Optional[str] = None) -> CartResponse:
         """Get user's cart from Redis"""
         try:
             cart_key = RedisKeyManager.cart_key(str(user_id))
@@ -374,7 +374,7 @@ class CartService(RedisService):
             # Validate and refresh prices
             await self._validate_cart_prices(cart_data)
             
-            return await self._format_cart_response(cart_data)
+            return await self._format_cart_response(cart_data, country_code, province_code)
             
         except Exception as e:
             logger.error(f"Error getting cart: {e}")
@@ -384,7 +384,7 @@ class CartService(RedisService):
                 "total_items": 0,
                 "subtotal": 0.0,
                 "error": "Failed to load cart"
-            })
+            }, country_code, province_code)
 
     async def clear_cart(self, user_id: UUID) -> Dict[str, Any]:
         """Clear user's cart from Redis"""
@@ -1028,8 +1028,8 @@ class CartService(RedisService):
         except Exception as e:
             logger.error(f"Error validating cart prices: {e}")
 
-    async def _format_cart_response(self, cart_data: Dict[str, Any]) -> CartResponse:
-        """Format cart data for API response"""
+    async def _format_cart_response(self, cart_data: Dict[str, Any], country_code: str = "US", province_code: Optional[str] = None) -> CartResponse:
+        """Format cart data for API response with location-based tax"""
         try:
             items = []
             
@@ -1107,9 +1107,15 @@ class CartService(RedisService):
                             created_at=item_data.get("added_at", datetime.utcnow().isoformat())
                         ))
             
-            # Calculate totals
+            # Calculate totals with location-based tax
             subtotal = cart_data.get("subtotal", 0.0)
-            tax_amount = subtotal * 0.1  # 10% tax
+            
+            # Get tax rate for location
+            from services.tax import TaxService
+            tax_service = TaxService(self.db)
+            tax_amount = await tax_service.calculate_tax(subtotal, country_code, province_code)
+            
+            # Calculate shipping
             shipping_amount = 0.0 if subtotal >= 50 else 10.0  # Free shipping over $50
             total_amount = subtotal + tax_amount + shipping_amount
             

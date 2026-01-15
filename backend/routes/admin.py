@@ -763,3 +763,8 @@ async def delete_shipping_method(
             status_code=status.HTTP_400_BAD_REQUEST,
             message=f"Failed to delete shipping method: {str(e)}"
         )
+
+
+# Include tax rates admin routes
+from routes.admin.tax_rates import router as tax_rates_router
+router.include_router(tax_rates_router)
