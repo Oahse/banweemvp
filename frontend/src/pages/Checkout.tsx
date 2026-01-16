@@ -9,7 +9,6 @@ import { useWebSocket } from '../hooks/useWebSocket';
 import { AuthAPI } from '../apis/auth';
 import { CartAPI } from '../apis/cart';
 import { toast } from 'react-hot-toast';
-import ExpressCheckout from '../components/checkout/ExpressCheckout';
 import SmartCheckoutForm from '../components/checkout/SmartCheckoutForm';
 
 export const Checkout = () => {
@@ -123,39 +122,7 @@ export const Checkout = () => {
     return () => clearInterval(interval);
   }, [cart?.items]);
 
-  // Fetch checkout data for express mode
-  useEffect(() => {
-    const fetchCheckoutData = async () => {
-      if (!isAuthenticated) return;
-
-      try {
-        setLoading(true);
-        // Pre-load data needed for Checkout
-        await Promise.all([
-          AuthAPI.getAddresses(),
-          AuthAPI.getPaymentMethods(),
-          CartAPI.getShippingOptions({})
-        ]);
-      } catch (error) {
-        const errorMessage = error?.response?.data?.message || error?.message || 'Failed to load checkout information';
-        toast.error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCheckoutData();
-  }, [isAuthenticated]);
-
-  // Checkout handlers
-  const handleExpressSuccess = (orderId: string) => {
-    navigate(`/account/orders/${orderId}`);
-  };
-
-  const handleExpressFallback = () => {
-    toast.error('Checkout failed. Please try again or contact support.');
-  };
-
+  // Checkout handler
   const handleSmartCheckoutSuccess = (orderId: string) => {
     navigate(`/account/orders/${orderId}`);
   };
@@ -177,7 +144,7 @@ export const Checkout = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-copy">Checkout</h1>
           <p className="mt-2 text-copy-light">
-            Complete your purchase quickly and securely with one-click checkout
+            Complete your purchase quickly and securely
           </p>
         </div>
 
@@ -218,17 +185,9 @@ export const Checkout = () => {
 
         {/* Checkout */}
         {stockValidation.valid && (
-          <>
-            <ExpressCheckout
-              onSuccess={handleExpressSuccess}
-              onFallback={handleExpressFallback}
-            />
-            
-            {/* Smart Checkout Form as fallback */}
-            <SmartCheckoutForm
-              onSuccess={handleSmartCheckoutSuccess}
-            />
-          </>
+          <SmartCheckoutForm
+            onSuccess={handleSmartCheckoutSuccess}
+          />
         )}
 
         {/* Price update indicator */}
