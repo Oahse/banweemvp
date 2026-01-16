@@ -19,8 +19,7 @@ import AddAddressForm from '../forms/AddAddressForm';
 import { 
   handlePriceDiscrepancies, 
   validatePrices, 
-  formatCurrency,
-  addMoney 
+  formatCurrency
 } from '../../lib/price-validation';
 
 // Simple debounce function
@@ -66,7 +65,6 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<any>({});
   const [realTimeValidation, setRealTimeValidation] = useState<any>({});
-  const [orderSummary, setOrderSummary] = useState<any>(null);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [showNewCardForm, setShowNewCardForm] = useState(false);
@@ -84,7 +82,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       const response = await OrdersAPI.createPaymentIntent({
         cart_id: cart.id,
         user_id: user.id,
-        amount: orderSummary?.total || cart.total_amount,
+        amount: cart.total_amount,
         currency: currency.toLowerCase(), // Use user's detected currency
       });
       if (response?.data?.client_secret) {
@@ -98,7 +96,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
     } finally {
       setIsProcessingStripePayment(false);
     }
-  }, [cart, user, orderSummary, currency]);
+  }, [cart, user, currency]);
 
   // Auto-save form data to localStorage
   useEffect(() => {
@@ -309,55 +307,6 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
     }
   };
 
-  const updateOrderSummary = useCallback(async () => {
-    if (!cart || !formData.shipping_method_id) return;
-
-    const safeShippingMethods = Array.isArray(shippingMethods) ? shippingMethods : [];
-    const selectedShipping = safeShippingMethods.find(sm => sm.id === formData.shipping_method_id);
-    if (!selectedShipping) return;
-
-    const subtotal = cart.subtotal || 0;
-    const shipping = selectedShipping.price || 0;
-    
-    // Get selected shipping address for tax calculation
-    const selectedAddress = addresses.find(addr => addr.id === formData.shipping_address_id);
-    const tax = await calculateTax(subtotal, shipping, selectedAddress);
-    
-    // Use safe money operations to avoid floating point errors
-    const total = addMoney(addMoney(subtotal, shipping), tax);
-
-    setOrderSummary({
-      subtotal,
-      shipping,
-      tax,
-      total,
-      items: cart.items?.length || 0
-    });
-  }, [cart, formData.shipping_method_id, formData.shipping_address_id, shippingMethods, addresses]);
-
-  useEffect(() => {
-    updateOrderSummary();
-  }, [updateOrderSummary]);
-
-  const calculateTax = async (subtotal, shipping, shippingAddress) => {
-    try {
-      // Get tax rate from backend based on shipping address
-      if (!shippingAddress) return 0;
-      
-      const response = await OrdersAPI.calculateTax({
-        subtotal,
-        shipping,
-        shipping_address_id: shippingAddress.id
-      });
-      
-      return response.data?.tax_amount || 0;
-    } catch (error) {
-      console.error('Failed to calculate tax:', error);
-      // Fallback to 0 tax if calculation fails
-      return 0;
-    }
-  };
-
   const validateStep = (step) => {
     const errors = {};
     
@@ -415,8 +364,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
         handlePriceDiscrepancies(
           finalValidation.data.price_discrepancies,
           () => {
-            // Refresh cart and order summary on price updates
-            updateOrderSummary();
+            // Refresh cart on price updates - cart will be refreshed by the context
           }
         );
         
@@ -430,7 +378,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
       // Validate frontend vs backend totals
       const backendTotal = finalValidation.data?.estimated_totals?.total_amount || 0;
-      const frontendTotal = orderSummary?.total || 0;
+      const frontendTotal = cart?.total_amount || 0;
       
       if (!validatePrices(frontendTotal, backendTotal)) {
         toast.error(
@@ -490,7 +438,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
         ...formData,
         payment_method_id: finalPaymentMethodId, // Use the new payment method ID if applicable
         idempotency_key: idempotencyKey,
-        frontend_calculated_total: orderSummary?.total || 0,
+        frontend_calculated_total: cart?.total_amount || 0,
         currency: currency, // Pass user's detected currency
         country_code: countryCode // Pass user's detected country
       };
@@ -565,8 +513,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
         setCurrentStep(1); // Go back to cart review
       } else if (errorMessage.includes('Price mismatch') || errorMessage.includes('price')) {
         toast.error('Prices have been updated. Please review your order.');
-        // Reload order summary
-        updateOrderSummary();
+        // Cart will be automatically refreshed by the context
       } else if (errorMessage.includes('Insufficient stock')) {
         toast.error('Some items are no longer available. Please update your cart.');
         setCurrentStep(1);
@@ -1048,7 +995,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   className="bg-success hover:bg-success-dark w-full sm:w-auto order-1 sm:order-2"
                   size="lg"
                 >
-                  {processingPayment ? 'Processing...' : `Place Order - ${formatCurrency(orderSummary?.total || 0)}`}
+                  {processingPayment ? 'Processing...' : `Place Order - ${formatCurrency(cart?.total_amount || 0)}`}
                 </Button>
               )}
             </div>
@@ -1060,24 +1007,52 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
           <div className="bg-surface rounded-lg shadow-sm border border-border p-4 lg:p-6 lg:sticky lg:top-6">
             <h3 className="text-lg font-semibold mb-4 text-copy">Order Summary</h3>
             
-            {orderSummary && (
-              <div className="space-y-3">
+            {/* Cart Items List */}
+            {cart?.items && cart.items.length > 0 && (
+              <div className="mb-4 space-y-2">
+                {cart.items.map((item) => (
+                  <div key={item.id} className="flex justify-between text-sm py-2 border-b border-border last:border-b-0">
+                    <div className="flex-1">
+                      <div className="text-copy font-medium">
+                        {item.variant?.product_name || item.product?.name}
+                      </div>
+                      <div className="text-copy-light text-xs">
+                        {item.variant?.name && item.variant.name !== 'Default' && (
+                          <span>{item.variant.name} • </span>
+                        )}
+                        Qty: {item.quantity}
+                      </div>
+                    </div>
+                    <div className="text-copy font-medium ml-2">
+                      {formatCurrency(item.total_price)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {cart && (
+              <div className="space-y-3 border-t border-border pt-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-copy-light">Subtotal ({orderSummary.items} items)</span>
-                  <span className="text-copy">{formatCurrency(orderSummary.subtotal)}</span>
+                  <span className="text-copy-light">Subtotal ({cart.items?.length || 0} items)</span>
+                  <span className="text-copy">{formatCurrency(cart.subtotal || 0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-copy-light">Shipping</span>
-                  <span className="text-copy">{formatCurrency(orderSummary.shipping)}</span>
+                  <span className="text-copy-light">
+                    Shipping {(cart.shipping_amount || 0) === 0 ? '(Free)' : ''}
+                  </span>
+                  <span className="text-copy">
+                    {(cart.shipping_amount || 0) === 0 ? 'Free' : formatCurrency(cart.shipping_amount || 0)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-copy-light">Tax</span>
-                  <span className="text-copy">{formatCurrency(orderSummary.tax)}</span>
+                  <span className="text-copy">{formatCurrency(cart.tax_amount || 0)}</span>
                 </div>
                 <div className="border-t border-border pt-3">
                   <div className="flex justify-between text-lg font-semibold">
                     <span className="text-copy">Total</span>
-                    <span className="text-primary">{formatCurrency(orderSummary.total)}</span>
+                    <span className="text-primary">{formatCurrency(cart.total_amount || 0)}</span>
                   </div>
                 </div>
               </div>
