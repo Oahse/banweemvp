@@ -1197,13 +1197,9 @@ class OrderService:
                     correlation_id=correlation_id
                 )
             
-            import logging
-            logger = logging.getLogger(__name__)
             logger.info(f"Successfully published order events for order {order.id} using new event system")
             
         except Exception as e:
-            import logging
-            logger = logging.getLogger(__name__)
             logger.error(f"Failed to publish order events using new event system: {e}")
             raise
     async def request_refund(

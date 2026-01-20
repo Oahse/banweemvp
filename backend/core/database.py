@@ -584,6 +584,9 @@ def initialize_db(database_uri: str, env_is_local: bool, engine=None, use_optimi
 # Enhanced dependency to get the async session with retry logic
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Get database session with enhanced error handling and retry logic."""
+    # Get logger for this function
+    session_logger = logging.getLogger(__name__)
+    
     # Ensure database is initialized before getting a session
     if not db_manager.session_factory:
         raise DatabaseException(message="Database session factory not initialized.")

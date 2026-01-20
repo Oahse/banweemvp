@@ -15,6 +15,9 @@ import httpx
 from core.config import settings
 from core.utils.encryption import PasswordManager
 from services.event_service import event_service
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AddressService:
 
@@ -281,8 +284,6 @@ class UserService:
             )
         except Exception as e:
             # Log error but don't fail user creation
-            import logging
-            logger = logging.getLogger(__name__)
             logger.error(f"Failed to publish user.registered event for user {new_user.id}: {e}")
 
         return new_user
@@ -344,8 +345,6 @@ class UserService:
             )
         except Exception as e:
             # Log error but don't fail verification
-            import logging
-            logger = logging.getLogger(__name__)
             logger.error(f"Failed to publish user.verified event for user {user.id}: {e}")
 
         # Publish user.verified event using new event system
@@ -357,8 +356,6 @@ class UserService:
             )
         except Exception as e:
             # Log error but don't fail verification
-            import logging
-            logger = logging.getLogger(__name__)
             logger.error(f"Failed to publish user.verified event for user {user.id}: {e}")
 
     async def get_users(self, page: int = 1, limit: int = 10, role: Optional[str] = None) -> dict:

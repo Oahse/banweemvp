@@ -14,6 +14,9 @@ from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from services.payments import PaymentService
 from services.notifications import NotificationService
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SubscriptionService:
@@ -142,9 +145,6 @@ class SubscriptionService:
         """Calculate subscription cost with quantities and proper VAT integration"""
         from services.tax import TaxService
         from decimal import Decimal
-        import logging
-        
-        logger = logging.getLogger(__name__)
         
         # Calculate subtotal from product variants with quantities
         subtotal = Decimal('0.00')
@@ -662,9 +662,6 @@ class SubscriptionService:
         """Calculate subscription cost with proper VAT integration and product-based pricing"""
         from services.tax import TaxService
         from decimal import Decimal
-        import logging
-        
-        logger = logging.getLogger(__name__)
         
         # Calculate subtotal from product variants
         subtotal = Decimal('0.00')
