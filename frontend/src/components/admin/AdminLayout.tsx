@@ -37,23 +37,16 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
-  // Check authentication and admin access
+  // Check if user has admin access (additional security check)
   useEffect(() => {
     // Wait for auth check to complete
     if (isLoading) return;
-
-    // If not authenticated, redirect to login with return URL
-    if (!isAuthenticated) {
-      const returnUrl = encodeURIComponent(location.pathname + location.search);
-      navigate(`/login?redirect=${returnUrl}`, { replace: true });
-      return;
-    }
 
     // If authenticated but not admin, redirect to home
     if (user && (user as any).email !== 'admin@example.com' && (user as any).email !== 'admin@banwee.com') {
       navigate('/', { replace: true });
     }
-  }, [user, isAuthenticated, isLoading, navigate, location]);
+  }, [user, isAuthenticated, isLoading, navigate]);
 
   const menuItems = [
     { title: 'Dashboard', path: '/admin', icon: <LayoutDashboardIcon size={20} /> },
@@ -96,11 +89,6 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
         </div>
       </div>
     );
-  }
-
-  // Don't render admin content if not authenticated or not admin
-  if (!isAuthenticated || !user) {
-    return null;
   }
 
   return (
