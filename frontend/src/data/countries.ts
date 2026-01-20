@@ -1465,229 +1465,24 @@ export const getCountryRegion = (countryCode: string): string => {
 };
 
 export const taxNameOptions = [
-  // Common International Taxes
+  // Note: This is now deprecated. Use TaxAPI.getAvailableTaxTypes() instead
+  // for dynamic tax types from the database
   { value: 'VAT', label: 'VAT (Value Added Tax)' },
   { value: 'GST', label: 'GST (Goods and Services Tax)' },
   { value: 'Sales Tax', label: 'Sales Tax' },
   { value: 'IVA', label: 'IVA (Impuesto al Valor Agregado)' },
-  { value: 'TVA', label: 'TVA (Taxe sur la Valeur Ajoutée)' },
-  { value: 'MwSt', label: 'MwSt (Mehrwertsteuer)' },
-  { value: 'BTW', label: 'BTW (Belasting over de Toegevoegde Waarde)' },
-  { value: 'IVS', label: 'IVS (Imposta sul Valore Aggiunto)' },
-  { value: 'MOMS', label: 'MOMS (Merværdiafgift)' },
-  { value: 'ALV', label: 'ALV (Arvonlisävero)' },
-  { value: 'PDV', label: 'PDV (Porez na Dodatu Vrednost)' },
-  { value: 'DPH', label: 'DPH (Daň z Pridanej Hodnoty)' },
-  { value: 'ÁFA', label: 'ÁFA (Általános Forgalmi Adó)' },
-  { value: 'FPA', label: 'FPA (Φόρος Προστιθέμενης Αξίας)' },
-  { value: 'KDV', label: 'KDV (Katma Değer Vergisi)' },
-  { value: 'НДС', label: 'НДС (Налог на добавленную стоимость)' },
-  { value: 'ДДС', label: 'ДДС (Данък върху добавената стойност)' },
-  { value: 'PVM', label: 'PVM (Pridėtinės vertės mokestis)' },
-  { value: 'PVN', label: 'PVN (Pievienotās vērtības nodoklis)' },
-  { value: 'KMKM', label: 'KMKM (Käibemaks)' },
-
-  // North American Taxes
   { value: 'HST', label: 'HST (Harmonized Sales Tax)' },
   { value: 'PST', label: 'PST (Provincial Sales Tax)' },
   { value: 'QST', label: 'QST (Quebec Sales Tax)' },
-  { value: 'State Tax', label: 'State Tax' },
-  { value: 'Local Tax', label: 'Local Tax' },
-  { value: 'Municipal Tax', label: 'Municipal Tax' },
-  { value: 'County Tax', label: 'County Tax' },
-  { value: 'City Tax', label: 'City Tax' },
-  { value: 'District Tax', label: 'District Tax' },
-  { value: 'Use Tax', label: 'Use Tax' },
-  { value: 'Excise Tax', label: 'Excise Tax' },
-
-  // Latin American Taxes
-  { value: 'ICMS', label: 'ICMS (Brazilian State Tax)' },
-  { value: 'IPI', label: 'IPI (Brazilian Federal Tax)' },
-  { value: 'PIS', label: 'PIS (Brazilian Social Tax)' },
-  { value: 'COFINS', label: 'COFINS (Brazilian Social Tax)' },
-  { value: 'ISS', label: 'ISS (Brazilian Service Tax)' },
-  { value: 'IOF', label: 'IOF (Brazilian Financial Tax)' },
-  { value: 'CSLL', label: 'CSLL (Brazilian Social Contribution)' },
-  { value: 'IEPS', label: 'IEPS (Mexican Special Tax)' },
-  { value: 'ISAN', label: 'ISAN (Mexican Vehicle Tax)' },
-  { value: 'IETU', label: 'IETU (Mexican Business Tax)' },
-  { value: 'IDE', label: 'IDE (Mexican Deposit Tax)' },
-  { value: 'IVA-RET', label: 'IVA-RET (IVA Retention)' },
-  { value: 'Monotributo', label: 'Monotributo (Simplified Tax)' },
-  { value: 'Ingresos Brutos', label: 'Ingresos Brutos (Gross Income Tax)' },
-
-  // Asian Taxes
-  { value: 'Consumption Tax', label: 'Consumption Tax' },
-  { value: 'Service Tax', label: 'Service Tax' },
-  { value: 'Central GST', label: 'Central GST (CGST)' },
-  { value: 'State GST', label: 'State GST (SGST)' },
-  { value: 'Integrated GST', label: 'Integrated GST (IGST)' },
-  { value: 'Union Territory GST', label: 'Union Territory GST (UTGST)' },
-  { value: 'Cess', label: 'Cess' },
-  { value: 'Swachh Bharat Cess', label: 'Swachh Bharat Cess' },
-  { value: 'Krishi Kalyan Cess', label: 'Krishi Kalyan Cess' },
-  { value: 'TDS', label: 'TDS (Tax Deducted at Source)' },
-  { value: 'TCS', label: 'TCS (Tax Collected at Source)' },
-  { value: 'JCT', label: 'JCT (Japanese Consumption Tax)' },
-  { value: 'Local Consumption Tax', label: 'Local Consumption Tax' },
-  { value: 'Business Tax', label: 'Business Tax' },
-  { value: 'Stamp Duty', label: 'Stamp Duty' },
-  { value: 'Registration Tax', label: 'Registration Tax' },
-
-  // Middle Eastern Taxes
-  { value: 'Customs Duty', label: 'Customs Duty' },
-  { value: 'Import Tax', label: 'Import Tax' },
-  { value: 'Export Tax', label: 'Export Tax' },
-  { value: 'Selective Tax', label: 'Selective Tax' },
-  { value: 'Excise Duty', label: 'Excise Duty' },
-  { value: 'Special Tax', label: 'Special Tax' },
-  { value: 'Luxury Tax', label: 'Luxury Tax' },
-  { value: 'Sin Tax', label: 'Sin Tax' },
-  { value: 'Tobacco Tax', label: 'Tobacco Tax' },
-  { value: 'Alcohol Tax', label: 'Alcohol Tax' },
-  { value: 'Fuel Tax', label: 'Fuel Tax' },
-  { value: 'Carbon Tax', label: 'Carbon Tax' },
-
-  // African Taxes
-  { value: 'Withholding Tax', label: 'Withholding Tax' },
-  { value: 'Capital Gains Tax', label: 'Capital Gains Tax' },
-  { value: 'Transfer Tax', label: 'Transfer Tax' },
-  { value: 'Transaction Tax', label: 'Transaction Tax' },
-  { value: 'Turnover Tax', label: 'Turnover Tax' },
-  { value: 'Gross Receipts Tax', label: 'Gross Receipts Tax' },
-  { value: 'Business License Tax', label: 'Business License Tax' },
-  { value: 'Professional Tax', label: 'Professional Tax' },
-  { value: 'Occupation Tax', label: 'Occupation Tax' },
-
-  // European Specific Taxes
-  { value: 'Solidarity Tax', label: 'Solidarity Tax' },
-  { value: 'Church Tax', label: 'Church Tax' },
-  { value: 'Broadcasting Tax', label: 'Broadcasting Tax' },
-  { value: 'Digital Tax', label: 'Digital Tax' },
-  { value: 'Financial Transaction Tax', label: 'Financial Transaction Tax' },
-  { value: 'Bank Levy', label: 'Bank Levy' },
-  { value: 'Insurance Premium Tax', label: 'Insurance Premium Tax' },
-  { value: 'Landfill Tax', label: 'Landfill Tax' },
-  { value: 'Aggregates Levy', label: 'Aggregates Levy' },
-  { value: 'Climate Change Levy', label: 'Climate Change Levy' },
-
-  // Tourism and Hospitality Taxes
-  { value: 'Tourism Tax', label: 'Tourism Tax' },
-  { value: 'Tourist Tax', label: 'Tourist Tax' },
-  { value: 'City Tax', label: 'City Tax' },
-  { value: 'Resort Tax', label: 'Resort Tax' },
-  { value: 'Hotel Tax', label: 'Hotel Tax' },
-  { value: 'Occupancy Tax', label: 'Occupancy Tax' },
-  { value: 'Bed Tax', label: 'Bed Tax' },
-  { value: 'Visitor Tax', label: 'Visitor Tax' },
-
-  // Environmental Taxes
-  { value: 'Environmental Tax', label: 'Environmental Tax' },
-  { value: 'Pollution Tax', label: 'Pollution Tax' },
-  { value: 'Waste Tax', label: 'Waste Tax' },
-  { value: 'Recycling Tax', label: 'Recycling Tax' },
-  { value: 'Plastic Tax', label: 'Plastic Tax' },
-  { value: 'Packaging Tax', label: 'Packaging Tax' },
-  { value: 'Energy Tax', label: 'Energy Tax' },
-  { value: 'Electricity Tax', label: 'Electricity Tax' },
-  { value: 'Gas Tax', label: 'Gas Tax' },
-  { value: 'Water Tax', label: 'Water Tax' },
-
-  // Transport and Vehicle Taxes
-  { value: 'Road Tax', label: 'Road Tax' },
-  { value: 'Vehicle Tax', label: 'Vehicle Tax' },
-  { value: 'Motor Vehicle Tax', label: 'Motor Vehicle Tax' },
-  { value: 'Registration Fee', label: 'Registration Fee' },
-  { value: 'License Fee', label: 'License Fee' },
-  { value: 'Permit Fee', label: 'Permit Fee' },
-  { value: 'Toll Tax', label: 'Toll Tax' },
-  { value: 'Congestion Charge', label: 'Congestion Charge' },
-  { value: 'Parking Tax', label: 'Parking Tax' },
-
-  // Property and Real Estate Taxes
-  { value: 'Property Tax', label: 'Property Tax' },
-  { value: 'Real Estate Tax', label: 'Real Estate Tax' },
-  { value: 'Land Tax', label: 'Land Tax' },
-  { value: 'Building Tax', label: 'Building Tax' },
-  { value: 'Development Tax', label: 'Development Tax' },
-  { value: 'Infrastructure Tax', label: 'Infrastructure Tax' },
-  { value: 'Betterment Levy', label: 'Betterment Levy' },
-
-  // Digital and Technology Taxes
-  { value: 'Digital Services Tax', label: 'Digital Services Tax' },
-  { value: 'Internet Tax', label: 'Internet Tax' },
-  { value: 'Telecommunications Tax', label: 'Telecommunications Tax' },
-  { value: 'Software Tax', label: 'Software Tax' },
-  { value: 'Data Tax', label: 'Data Tax' },
-  { value: 'E-commerce Tax', label: 'E-commerce Tax' },
-  { value: 'Platform Tax', label: 'Platform Tax' },
-
-  // Financial and Banking Taxes
-  { value: 'Banking Tax', label: 'Banking Tax' },
-  { value: 'Interest Tax', label: 'Interest Tax' },
-  { value: 'Dividend Tax', label: 'Dividend Tax' },
-  { value: 'Securities Tax', label: 'Securities Tax' },
-  { value: 'Investment Tax', label: 'Investment Tax' },
-  { value: 'Currency Tax', label: 'Currency Tax' },
-  { value: 'Foreign Exchange Tax', label: 'Foreign Exchange Tax' },
-
-  // Industry Specific Taxes
-  { value: 'Mining Tax', label: 'Mining Tax' },
-  { value: 'Petroleum Tax', label: 'Petroleum Tax' },
-  { value: 'Royalty Tax', label: 'Royalty Tax' },
-  { value: 'Resource Tax', label: 'Resource Tax' },
-  { value: 'Extraction Tax', label: 'Extraction Tax' },
-  { value: 'Production Tax', label: 'Production Tax' },
-  { value: 'Manufacturing Tax', label: 'Manufacturing Tax' },
-  { value: 'Processing Tax', label: 'Processing Tax' },
-  { value: 'Agricultural Tax', label: 'Agricultural Tax' },
-  { value: 'Fisheries Tax', label: 'Fisheries Tax' },
-  { value: 'Forestry Tax', label: 'Forestry Tax' },
-
-  // Social and Welfare Taxes
-  { value: 'Social Security Tax', label: 'Social Security Tax' },
-  { value: 'Medicare Tax', label: 'Medicare Tax' },
-  { value: 'Unemployment Tax', label: 'Unemployment Tax' },
-  { value: 'Disability Tax', label: 'Disability Tax' },
-  { value: 'Health Tax', label: 'Health Tax' },
-  { value: 'Education Tax', label: 'Education Tax' },
-  { value: 'Training Tax', label: 'Training Tax' },
-  { value: 'Apprenticeship Tax', label: 'Apprenticeship Tax' },
-
-  // Regional and Administrative Taxes
-  { value: 'Regional Tax', label: 'Regional Tax' },
-  { value: 'Federal Tax', label: 'Federal Tax' },
-  { value: 'Provincial Tax', label: 'Provincial Tax' },
-  { value: 'Territorial Tax', label: 'Territorial Tax' },
-  { value: 'Departmental Tax', label: 'Departmental Tax' },
-  { value: 'Communal Tax', label: 'Communal Tax' },
-  { value: 'Parish Tax', label: 'Parish Tax' },
-  { value: 'Borough Tax', label: 'Borough Tax' },
-  { value: 'Metropolitan Tax', label: 'Metropolitan Tax' },
-
-  // Miscellaneous Taxes
-  { value: 'Inheritance Tax', label: 'Inheritance Tax' },
-  { value: 'Estate Tax', label: 'Estate Tax' },
-  { value: 'Gift Tax', label: 'Gift Tax' },
-  { value: 'Wealth Tax', label: 'Wealth Tax' },
-  { value: 'Net Worth Tax', label: 'Net Worth Tax' },
-  { value: 'Solidarity Surcharge', label: 'Solidarity Surcharge' },
-  { value: 'War Tax', label: 'War Tax' },
-  { value: 'Emergency Tax', label: 'Emergency Tax' },
-  { value: 'Temporary Tax', label: 'Temporary Tax' },
-  { value: 'Supplementary Tax', label: 'Supplementary Tax' },
-  { value: 'Additional Tax', label: 'Additional Tax' },
-  { value: 'Surcharge', label: 'Surcharge' },
-  { value: 'Penalty Tax', label: 'Penalty Tax' },
-  { value: 'Fine', label: 'Fine' },
-  { value: 'Fee', label: 'Fee' },
-  { value: 'Levy', label: 'Levy' },
-  { value: 'Assessment', label: 'Assessment' },
-  { value: 'Contribution', label: 'Contribution' },
-  { value: 'Charge', label: 'Charge' },
-  { value: 'Duty', label: 'Duty' },
-  { value: 'Tariff', label: 'Tariff' },
-  { value: 'Impost', label: 'Impost' },
-  { value: 'Tribute', label: 'Tribute' },
   { value: 'Other', label: 'Other' }
 ];
+
+/**
+ * @deprecated Use TaxAPI.getAvailableTaxTypes() instead
+ * This function returns hardcoded tax types and should be replaced
+ * with dynamic data from the database
+ */
+export const getTaxNameOptions = () => {
+  console.warn('getTaxNameOptions() is deprecated. Use TaxAPI.getAvailableTaxTypes() instead.');
+  return taxNameOptions;
+};
