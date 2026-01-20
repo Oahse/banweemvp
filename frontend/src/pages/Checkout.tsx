@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { AuthAPI } from '../apis/auth';
 import { CartAPI } from '../apis/cart';
@@ -14,7 +15,11 @@ import SmartCheckoutForm from '../components/checkout/SmartCheckoutForm';
 export const Checkout = () => {
   const navigate = useNavigate();
   const { cart, loading: cartLoading, clearCart, refreshCart } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { shouldRedirect } = useAuthRedirect({
+    requireAuth: true,
+    message: 'Please login to checkout'
+  });
   const { isConnected } = useWebSocket();
 
   // UI state
@@ -60,21 +65,21 @@ export const Checkout = () => {
     };
   }, [refreshCart]);
 
-  // Redirect if not authenticated
+  // Handle authentication check
   useEffect(() => {
-    if (!isAuthenticated) {
-      toast.error('Please login to checkout');
-      navigate('/login');
+    // If should redirect, don't continue with checkout logic
+    if (shouldRedirect) {
+      return;
     }
-  }, [isAuthenticated, navigate]);
+  }, [shouldRedirect]);
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (only after auth is confirmed)
   useEffect(() => {
-    if (!cartLoading && (!cart || !cart.items || cart.items.length === 0)) {
+    if (!authLoading && isAuthenticated && !cartLoading && (!cart || !cart.items || cart.items.length === 0)) {
       toast.error('Your cart is empty');
       navigate('/cart');
     }
-  }, [cart, cartLoading, navigate]);
+  }, [cart, cartLoading, navigate, authLoading, isAuthenticated]);
 
   // Real-time stock validation using bulk check
   useEffect(() => {
@@ -115,27 +120,41 @@ export const Checkout = () => {
       }
     };
 
-    // Validate stock when cart changes or every 5 minutes (further reduced frequency)
-    validateStock();
-    const interval = setInterval(validateStock, 300000); // 5 minutes instead of 30 seconds
-
-    return () => clearInterval(interval);
-  }, [cart?.items]);
+    // Only validate stock if authenticated and cart is loaded
+    if (!authLoading && isAuthenticated && cart?.items) {
+      validateStock();
+      const interval = setInterval(validateStock, 300000); // 5 minutes
+      return () => clearInterval(interval);
+    }
+  }, [cart?.items, authLoading, isAuthenticated]);
 
   // Checkout handler
   const handleSmartCheckoutSuccess = (orderId: string) => {
     navigate(`/account/orders/${orderId}`);
   };
 
-  if (loading || cartLoading) {
+  // Show loading state while checking authentication or loading cart
+  if (authLoading || (isAuthenticated && cartLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-copy-light">Loading checkout...</p>
+          <p className="mt-4 text-copy-light">
+            {authLoading ? 'Checking authentication...' : 'Loading checkout...'}
+          </p>
         </div>
       </div>
     );
+  }
+
+  // Don't render anything if should redirect (useAuthRedirect will handle it)
+  if (shouldRedirect) {
+    return null;
+  }
+
+  // Don't render if cart is empty (redirect will happen)
+  if (!cart || !cart.items || cart.items.length === 0) {
+    return null;
   }
 
   return (
