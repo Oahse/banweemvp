@@ -193,8 +193,8 @@ class SubscriptionService:
         
         if customer_address:
             try:
-                async with TaxService(self.db) as tax_service:
-                    tax_result = await tax_service.calculate_tax(
+                tax_service = TaxService(self.db)
+                tax_result = await tax_service.calculate_tax(
                         amount=float(pre_tax_total),
                         currency=currency,
                         customer_address=customer_address,
@@ -707,8 +707,8 @@ class SubscriptionService:
         
         if customer_address:
             try:
-                async with TaxService(self.db) as tax_service:
-                    tax_result = await tax_service.calculate_tax(
+                tax_service = TaxService(self.db)
+                tax_result = await tax_service.calculate_tax(
                         amount=float(pre_tax_total),
                         currency=currency,
                         customer_address=customer_address,

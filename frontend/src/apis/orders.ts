@@ -36,8 +36,10 @@ export class OrdersAPI {
 
   /**
    * Calculate tax for checkout
+   * @deprecated Use TaxAPI.calculateTax() instead
    */
   static async calculateTax(taxData) {
+    console.warn('OrdersAPI.calculateTax() is deprecated. Use TaxAPI.calculateTax() instead.');
     return await apiClient.post('/tax/calculate', taxData);
   }
 

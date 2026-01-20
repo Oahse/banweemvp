@@ -79,9 +79,10 @@ class TestCheckoutPricingAccuracy:
     @pytest.mark.asyncio
     async def test_tax_calculation_accuracy(self, mock_db):
         """Test tax calculation accuracy"""
-        async with TaxService(mock_db) as tax_service:
-            # Mock the tax calculation to return a known result
-            tax_service._calculate_with_real_services = AsyncMock(return_value=None)
+        tax_service = TaxService(mock_db)
+        
+        # Mock the tax calculation to return a known result
+        tax_service._calculate_with_real_services = AsyncMock(return_value=None)
             tax_service._get_location_info = AsyncMock(return_value={
                 "country_code": "US",
                 "state_code": "CA"
