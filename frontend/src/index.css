@@ -4,6 +4,64 @@
 @import 'tailwindcss/utilities';
 /* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
 
+/* Custom responsive utilities */
+@layer utilities {
+  /* Extra small screens (below 475px) */
+  @media (max-width: 474px) {
+    .xs\:hidden {
+      display: none;
+    }
+    .xs\:inline {
+      display: inline;
+    }
+    .xs\:block {
+      display: block;
+    }
+    .xs\:flex {
+      display: flex;
+    }
+  }
+  
+  /* Mobile-first responsive text sizes */
+  .text-responsive-xs {
+    @apply text-xs sm:text-sm;
+  }
+  .text-responsive-sm {
+    @apply text-sm sm:text-base;
+  }
+  .text-responsive-base {
+    @apply text-base sm:text-lg;
+  }
+  .text-responsive-lg {
+    @apply text-lg sm:text-xl;
+  }
+  .text-responsive-xl {
+    @apply text-xl sm:text-2xl;
+  }
+  
+  /* Mobile-first responsive spacing */
+  .p-responsive {
+    @apply p-3 sm:p-6;
+  }
+  .px-responsive {
+    @apply px-3 sm:px-6;
+  }
+  .py-responsive {
+    @apply py-3 sm:py-6;
+  }
+  .m-responsive {
+    @apply m-3 sm:m-6;
+  }
+  .gap-responsive {
+    @apply gap-3 sm:gap-6;
+  }
+  
+  /* Mobile-optimized card padding */
+  .card-padding {
+    @apply p-4 sm:p-6;
+  }
+}
+
 @layer base {
   :root {
     /* Brand Colors */
