@@ -195,19 +195,19 @@ class SubscriptionService:
             try:
                 tax_service = TaxService(self.db)
                 tax_result = await tax_service.calculate_tax(
-                        amount=float(pre_tax_total),
-                        currency=currency,
-                        customer_address=customer_address,
-                        product_details=product_details
+                    amount=float(pre_tax_total),
+                    currency=currency,
+                    customer_address=customer_address,
+                    product_details=product_details
                     )
                     
-                    tax_amount = Decimal(str(tax_result.tax_amount))
-                    tax_rate = Decimal(str(tax_result.tax_rate))
-                    tax_breakdown = tax_result.breakdown
-                    tax_type = tax_result.tax_type.value
-                    tax_jurisdiction = tax_result.jurisdiction
+                tax_amount = Decimal(str(tax_result.tax_amount))
+                tax_rate = Decimal(str(tax_result.tax_rate))
+                tax_breakdown = tax_result.breakdown
+                tax_type = tax_result.tax_type.value
+                tax_jurisdiction = tax_result.jurisdiction
                     
-                    logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate}%) for {tax_jurisdiction}")
+                logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate}%) for {tax_jurisdiction}")
                     
             except Exception as e:
                 # Fallback to default tax rate if service fails
@@ -709,19 +709,19 @@ class SubscriptionService:
             try:
                 tax_service = TaxService(self.db)
                 tax_result = await tax_service.calculate_tax(
-                        amount=float(pre_tax_total),
-                        currency=currency,
-                        customer_address=customer_address,
-                        product_details=product_details
+                    amount=float(pre_tax_total),
+                    currency=currency,
+                    customer_address=customer_address,
+                    product_details=product_details
                     )
                     
-                    tax_amount = Decimal(str(tax_result.tax_amount))
-                    tax_rate = Decimal(str(tax_result.tax_rate))
-                    tax_breakdown = tax_result.breakdown
-                    tax_type = tax_result.tax_type.value
-                    tax_jurisdiction = tax_result.jurisdiction
+                tax_amount = Decimal(str(tax_result.tax_amount))
+                tax_rate = Decimal(str(tax_result.tax_rate))
+                tax_breakdown = tax_result.breakdown
+                tax_type = tax_result.tax_type.value
+                tax_jurisdiction = tax_result.jurisdiction
                     
-                    logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate}%) for {tax_jurisdiction}")
+                logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate}%) for {tax_jurisdiction}")
                     
             except Exception as e:
                 # Fallback to default tax rate if service fails

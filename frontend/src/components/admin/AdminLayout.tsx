@@ -42,8 +42,8 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     // Wait for auth check to complete
     if (isLoading) return;
 
-    // If authenticated but not admin, redirect to home
-    if (user && (user as any).email !== 'admin@example.com' && (user as any).email !== 'admin@banwee.com') {
+    // If authenticated but not admin or supplier, redirect to home
+    if (user && (user as any).role !== 'Admin' && (user as any).role !== 'Supplier') {
       navigate('/', { replace: true });
     }
   }, [user, isAuthenticated, isLoading, navigate]);

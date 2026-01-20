@@ -65,19 +65,28 @@ export const TaxRatesAdmin = () => {
 
   const fetchTaxTypes = async () => {
     try {
+      console.log('Fetching tax types from API...');
       const data = await TaxAPI.getAvailableTaxTypes();
+      console.log('Tax types received:', data);
       setTaxTypes(data || []);
     } catch (error) {
       console.error('Failed to load tax types:', error);
       // Fallback to basic tax types if API fails
-      setTaxTypes([
+      const fallbackTypes = [
         { value: 'VAT', label: 'VAT (Value Added Tax)', usage_count: 0 },
         { value: 'GST', label: 'GST (Goods and Services Tax)', usage_count: 0 },
         { value: 'Sales Tax', label: 'Sales Tax', usage_count: 0 },
         { value: 'IVA', label: 'IVA (Impuesto al Valor Agregado)', usage_count: 0 },
         { value: 'HST', label: 'HST (Harmonized Sales Tax)', usage_count: 0 },
+        { value: 'PST', label: 'PST (Provincial Sales Tax)', usage_count: 0 },
+        { value: 'QST', label: 'QST (Quebec Sales Tax)', usage_count: 0 },
+        { value: 'ICMS', label: 'ICMS (Brazilian State Tax)', usage_count: 0 },
+        { value: 'KDV', label: 'KDV (Turkish VAT)', usage_count: 0 },
+        { value: 'Consumption Tax', label: 'Consumption Tax', usage_count: 0 },
         { value: 'Other', label: 'Other', usage_count: 0 }
-      ]);
+      ];
+      console.log('Using fallback tax types:', fallbackTypes);
+      setTaxTypes(fallbackTypes);
     }
   };
 
@@ -362,6 +371,13 @@ export const TaxRatesAdmin = () => {
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Debug info - remove in production */}
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="bg-gray-100 p-3 rounded text-xs">
+                    <strong>Debug:</strong> Loaded {taxTypes.length} tax types: {taxTypes.map(t => t.value).join(', ')}
+                  </div>
+                )}
+                
                 <div className="grid grid-cols-2 gap-4">
                   <SearchableSelect
                     label="Country"
@@ -439,17 +455,42 @@ export const TaxRatesAdmin = () => {
                     />
                   </div>
                   
-                  <SearchableSelect
-                    label="Tax Name"
-                    placeholder="Search or type tax name..."
-                    value={formData.tax_name}
-                    onChange={(value) => setFormData({ ...formData, tax_name: value })}
-                    options={taxTypes.map(type => ({
-                      value: type.value,
-                      label: `${type.label} (${type.usage_count} uses)`
-                    }))}
-                    allowClear
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-copy mb-2">
+                      Tax Name
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={formData.tax_name}
+                        onChange={(e) => setFormData({ ...formData, tax_name: e.target.value })}
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-surface text-copy"
+                        placeholder="e.g., Sales Tax, VAT, GST..."
+                        list="tax-types-list"
+                      />
+                      <datalist id="tax-types-list">
+                        {taxTypes.map(type => (
+                          <option key={type.value} value={type.value}>
+                            {type.label} ({type.usage_count} uses)
+                          </option>
+                        ))}
+                        {/* Common fallback options */}
+                        <option value="Sales Tax">Sales Tax</option>
+                        <option value="VAT">VAT (Value Added Tax)</option>
+                        <option value="GST">GST (Goods and Services Tax)</option>
+                        <option value="HST">HST (Harmonized Sales Tax)</option>
+                        <option value="IVA">IVA (Impuesto al Valor Agregado)</option>
+                        <option value="PST">PST (Provincial Sales Tax)</option>
+                        <option value="QST">QST (Quebec Sales Tax)</option>
+                        <option value="ICMS">ICMS (Brazilian State Tax)</option>
+                        <option value="KDV">KDV (Turkish VAT)</option>
+                        <option value="Consumption Tax">Consumption Tax</option>
+                      </datalist>
+                    </div>
+                    <p className="mt-1 text-xs text-copy-light">
+                      Start typing to see suggestions from existing tax types, or enter a custom name
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex items-center">
