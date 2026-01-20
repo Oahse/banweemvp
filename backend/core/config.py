@@ -598,18 +598,33 @@ class Settings:
     def _load_environment(self):
         """Load environment variables from .env file"""
         ENVIRONMENT = os.getenv('ENVIRONMENT', 'local')
-        env_file = '.dev.env' if ENVIRONMENT in ['local', 'dev'] else '.prod.env'
         
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        ENV_PATH = os.path.join(BASE_DIR, env_file)
         
-        if os.path.exists(ENV_PATH):
-            load_dotenv(ENV_PATH)
+        # Priority order for environment files
+        env_files = []
+        
+        if ENVIRONMENT in ['local', 'dev']:
+            # For local development, check these files in order
+            env_files = [
+                os.path.join(BASE_DIR, 'backend', '.env.local'),  # Backend-specific local config
+                os.path.join(BASE_DIR, '.dev.env'),               # Development config
+                os.path.join(BASE_DIR, '.env')                    # Fallback
+            ]
         else:
-            # Fallback to .env for backward compatibility or other setups
-            fallback_path = os.path.join(BASE_DIR, '.env')
-            if os.path.exists(fallback_path):
-                load_dotenv(fallback_path)
+            env_files = [
+                os.path.join(BASE_DIR, '.prod.env'),              # Production config
+                os.path.join(BASE_DIR, '.env')                    # Fallback
+            ]
+        
+        # Load the first existing file
+        for env_file in env_files:
+            if os.path.exists(env_file):
+                load_dotenv(env_file)
+                logger.info(f"Loaded environment from {env_file}")
+                break
+        else:
+            logger.warning("No environment file found")
 
     def _initialize_settings(self):
         """Initialize all configuration settings."""
