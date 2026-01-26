@@ -14,7 +14,6 @@ from models.subscriptions import Subscription
 from models.orders import Order, OrderItem, OrderStatus, PaymentStatus, FulfillmentStatus, OrderSource
 from models.product import ProductVariant
 from models.user import User
-from services.notifications import NotificationService
 from core.database import get_db
 
 logger = logging.getLogger(__name__)
@@ -25,7 +24,6 @@ class SubscriptionSchedulerService:
     
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.notification_service = NotificationService(db)
     
     async def process_due_subscriptions(self) -> Dict[str, Any]:
         """Process all subscriptions that are due for shipment"""
@@ -181,14 +179,6 @@ class SubscriptionSchedulerService:
             await self._update_subscription_billing_dates(subscription)
             
             await self.db.commit()
-            
-            # Send notification with order details
-            await self.notification_service.create_notification(
-                user_id=subscription.user_id,
-                message=f"Your subscription order #{order.order_number} has been created! Total: {updated_cost['total_amount']} {subscription.currency}. It will be shipped soon.",
-                type="info",
-                related_id=str(order.id)
-            )
             
             return order
             

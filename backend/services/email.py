@@ -184,7 +184,7 @@ class EmailService:
 
     async def send_low_stock_alert(self, recipient_email: str, product_name: str, variant_name: str, location_name: str, current_stock: int, threshold: int):
         """
-        Sends an email notification for a low stock alert.
+        Sends an email alert for a low stock situation.
         """
         context = {
             "recipient_email": recipient_email,
@@ -204,7 +204,7 @@ class EmailService:
         
     async def send_payment_method_expiration_notice(self, user_id: UUID, payment_method_id: UUID):
         """
-        Sends an email notification to a user about their expiring payment method.
+        Sends an email to a user about their expiring payment method.
         """
         from models.payments import PaymentMethod
         
@@ -226,7 +226,7 @@ class EmailService:
                           payment_method_id=str(payment_method_id), **context)
         print(f"📧 ARQ task queued for payment method expiration notice to {user.email}.")
     
-    async def send_subscription_cost_change_notification(
+    async def send_subscription_cost_change_email(
         self, 
         user_id: UUID, 
         subscription_id: UUID,
@@ -235,7 +235,7 @@ class EmailService:
         change_reason: str
     ):
         """
-        Send notification when subscription cost changes
+        Send email when subscription cost changes
         """
         user = await self._get_user_by_id(user_id)
         
@@ -253,7 +253,7 @@ class EmailService:
         await send_email_hybrid(None, "subscription_cost_change", user.email, use_arq=True,
                           subscription_id=str(subscription_id), old_cost=old_cost, 
                           new_cost=new_cost, change_reason=change_reason, **context)
-        print(f"📧 Subscription cost change notification sent to {user.email}")
+        print(f"📧 Subscription cost change email sent to {user.email}")
     
     async def send_payment_confirmation(
         self,
@@ -284,7 +284,7 @@ class EmailService:
                           payment_method=payment_method, cost_breakdown=cost_breakdown, **context)
         print(f"📧 Payment confirmation sent to {user.email}")
     
-    async def send_payment_failure_notification(
+    async def send_payment_failure_email(
         self,
         user_id: UUID,
         subscription_id: UUID,
@@ -292,7 +292,7 @@ class EmailService:
         retry_url: str
     ):
         """
-        Send payment failure notification with retry instructions
+        Send payment failure email with retry instructions
         """
         user = await self._get_user_by_id(user_id)
         
@@ -309,7 +309,7 @@ class EmailService:
         await send_email_hybrid(None, "payment_failure", user.email, use_arq=True,
                           subscription_id=str(subscription_id), failure_reason=failure_reason,
                           retry_url=retry_url, **context)
-        print(f"📧 Payment failure notification sent to {user.email}")
+        print(f"📧 Payment failure email sent to {user.email}")
     
     async def render_email_with_template(
         self,

@@ -94,26 +94,6 @@ class HybridTaskManager:
         """Add inventory task to FastAPI BackgroundTasks for immediate processing"""
         background_tasks.add_task(self.update_inventory_task, variant_id, action, **kwargs)
     
-    # Notification Tasks - Use FastAPI for immediate, ARQ for scheduled
-
-        else:
-            # Fallback to direct notification
-            from services.notifications import NotificationService
-            from core.database import AsyncSessionDB
-            async with AsyncSessionDB() as db:
-                notification_service = NotificationService(db)
-                await notification_service.create_notification(
-                    user_id=UUID(user_id),
-                    title=kwargs.get('title', ''),
-                    message=kwargs.get('message', ''),
-                    notification_type=notification_type,
-                    data=kwargs.get('data', {})
-                )
-    
-    def add_quick_notification_task(self, background_tasks: BackgroundTasks, user_id: str, notification_type: str, **kwargs):
-        """Add notification task to FastAPI BackgroundTasks for immediate processing"""
-        background_tasks.add_task(self.send_notification_task, user_id, notification_type, **kwargs)
-    
     # Subscription Tasks - Complex logic uses ARQ
     async def process_subscription_renewal(self, subscription_id: str, **kwargs):
         """Process subscription renewal using ARQ for reliability"""

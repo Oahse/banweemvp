@@ -146,7 +146,7 @@ async def ship_order(
             request.carrier_name,
             background_tasks
         )
-        return Response.success(data=order, message="Order status updated to shipped and notification sent.")
+        return Response.success(data=order, message="Order status updated to shipped.")
     except APIException:
         raise
     except Exception as e:

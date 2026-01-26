@@ -564,14 +564,6 @@ class SubscriptionService:
         await self.db.commit()
         await self.db.refresh(subscription)
         
-        # Send notification
-        await self.notification_service.create_notification(
-            user_id=user_id,
-            message=f"Your subscription has been resumed.",
-            type="success",
-            related_id=str(subscription.id)
-        )
-        
         return subscription
 
     async def process_subscription_payment(

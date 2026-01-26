@@ -49,7 +49,7 @@
 
 Banwee is a full-featured, production-ready e-commerce platform designed for scalability, performance, and developer experience. Built with modern technologies and best practices, it provides a complete solution for online retail businesses with support for multiple user roles, payment processing, inventory management, and comprehensive analytics.
 
-The platform features a React-based frontend with TypeScript for type safety, a FastAPI backend for high-performance async operations, and includes advanced features like location-based internationalization, real-time notifications, and automated email workflows.
+The platform features a React-based frontend with TypeScript for type safety, a FastAPI backend for high-performance async operations, and includes advanced features like location-based internationalization and automated email workflows.
 
 ## ✨ Features
 
@@ -60,7 +60,7 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 - ⭐ **Product Reviews** - Rate and review purchased products
 - ❤️ **Wishlist** - Save favorite products for later
 - 🔐 **User Authentication** - Secure registration and login with JWT tokens
-- 📧 **Email Notifications** - Automated order confirmations and updates
+- 📧 **Email Confirmations** - Automated order confirmations and updates
 - 🌍 **Internationalization** - Auto-detect location and set language/currency for 21+ countries
 - 📱 **Responsive Design** - Optimized for desktop, tablet, and mobile devices
 - 💰 **Price Negotiation** - Interactive price negotiation system with AI-powered agents
@@ -72,18 +72,15 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 - 📦 **Product Management** - Create, update, and organize products with variants
 - 🏷️ **Promo Codes** - Create and manage discount codes
 - 📈 **Sales Reports** - Export analytics data in CSV and Excel formats
-- 🔔 **Notification System** - Real-time notifications for important events
-- ⚙️ **System Settings** - Configure maintenance mode, file uploads, and notifications
+- ⚙️ **System Settings** - Configure maintenance mode and file uploads
 - 🎨 **Activity Logs** - Track all user actions and system events
 
 ### Supplier Features
 - 📦 **Inventory Management** - Manage product stock and variants
 - 📊 **Sales Analytics** - View performance metrics for supplied products
-- 🔔 **Low Stock Alerts** - Automated notifications for inventory management
 
 ### Technical Features
 - 🚀 **Async Operations** - FastAPI with async/await for high performance
-- 🔄 **Real-time Updates** - WebSocket support for live notifications
 - 📧 **Email System** - email templates with Mailgun integration
 - 🎨 **Modern UI** - Tailwind CSS with custom theming
 - 🔒 **Security** - JWT authentication, password hashing, CORS protection
@@ -148,7 +145,7 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 
 ### Optional Services
 - Stripe account (for payment processing)
-- Mailgun account (for email notifications)
+- Mailgun account (for email confirmations)
 - GitHub account (for image storage)
 
 ---

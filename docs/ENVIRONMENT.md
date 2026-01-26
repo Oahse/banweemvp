@@ -121,8 +121,7 @@ REDIS_CACHE_TTL=3600
 
 ```bash
 KAFKA_BOOTSTRAP_SERVERS=kafka:29092  # Use 'localhost:9092' for local
-KAFKA_TOPIC_EMAIL=banwee-email-notifications
-KAFKA_TOPIC_NOTIFICATION=banwee-user-notifications
+KAFKA_TOPIC_EMAIL=banwee-email
 # ... (see .env.example for all topics)
 ```
 

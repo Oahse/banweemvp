@@ -43,9 +43,9 @@ async def websocket_endpoint(websocket: WebSocket, token: Optional[str] = Query(
             await manager.disconnect(connection_id, "error")
 
 
-@ws_router.websocket("/v1/ws/notifications/{user_id}")
-async def user_notifications_endpoint(websocket: WebSocket, user_id: str, token: Optional[str] = Query(None)):
-    """WebSocket endpoint for user-specific notifications with authentication"""
+@ws_router.websocket("/v1/ws/user/{user_id}")
+async def user_websocket_endpoint(websocket: WebSocket, user_id: str, token: Optional[str] = Query(None)):
+    """WebSocket endpoint for user-specific updates with authentication"""
     connection_id = None
     try:
         # Verify token if provided
@@ -60,7 +60,7 @@ async def user_notifications_endpoint(websocket: WebSocket, user_id: str, token:
         logger.info(f"User WebSocket connection established: {connection_id} for user {user_id}")
 
         # Auto-subscribe to user-specific events
-        user_events = ["notifications", "order_updates", "cart_updates", "user_status"]
+        user_events = ["order_updates", "cart_updates", "user_status"]
         await manager.subscribe_to_events(connection_id, user_events)
 
         # Send subscription confirmation
@@ -70,7 +70,7 @@ async def user_notifications_endpoint(websocket: WebSocket, user_id: str, token:
                 "auto_subscribed": True,
                 "events": user_events,
                 "user_id": user_id,
-                "message": f"Auto-subscribed to notifications for user {user_id}"
+                "message": f"Auto-subscribed to updates for user {user_id}"
             },
             connection_id=connection_id,
             user_id=user_id
@@ -159,14 +159,14 @@ async def broadcast_message(message: Dict[str, Any]):
     }
 
 
-@ws_router.post("/v1/ws/notify/{user_id}")
-async def notify_user(user_id: str, notification: Dict[str, Any]):
-    """Send notification to a specific user"""
-    sent_count = await manager.notify_user(user_id, notification)
+@ws_router.post("/v1/ws/message/{user_id}")
+async def message_user(user_id: str, message: Dict[str, Any]):
+    """Send message to a specific user"""
+    sent_count = await manager.notify_user(user_id, message)
     return {
-        "message": f"Notification sent to user {user_id}",
+        "message": f"Message sent to user {user_id}",
         "sent_to_connections": sent_count,
-        "notification": notification
+        "message_data": message
     }
 
 
