@@ -72,17 +72,17 @@ class SearchService:
                 p.description,
                 c.name as category_name,
                 GREATEST(
-                    CASE WHEN LOWER(p.name) LIKE :prefix_query THEN :exact_weight
-                         WHEN LOWER(p.name) LIKE :fuzzy_query THEN :prefix_weight
-                         ELSE similarity(LOWER(p.name), :query) * :fuzzy_weight
+                    CASE WHEN LOWER(p.name) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT)
+                         WHEN LOWER(p.name) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT)
+                         ELSE similarity(LOWER(p.name), :query) * CAST(:fuzzy_weight AS FLOAT)
                     END,
-                    CASE WHEN LOWER(p.description) LIKE :prefix_query THEN :exact_weight * :desc_weight
-                         WHEN LOWER(p.description) LIKE :fuzzy_query THEN :prefix_weight * :desc_weight
-                         ELSE similarity(LOWER(p.description), :query) * :fuzzy_weight * :desc_weight
+                    CASE WHEN LOWER(p.description) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
+                         WHEN LOWER(p.description) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
+                         ELSE similarity(LOWER(p.description), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
                     END,
-                    CASE WHEN LOWER(c.name) LIKE :prefix_query THEN :exact_weight * :cat_weight
-                         WHEN LOWER(c.name) LIKE :fuzzy_query THEN :prefix_weight * :cat_weight
-                         ELSE similarity(LOWER(c.name), :query) * :fuzzy_weight * :cat_weight
+                    CASE WHEN LOWER(c.name) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                         WHEN LOWER(c.name) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                         ELSE similarity(LOWER(c.name), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
                     END
                 ) as relevance_score
             FROM products p
@@ -92,9 +92,9 @@ class SearchService:
                 LOWER(p.name) LIKE :fuzzy_query
                 OR LOWER(p.description) LIKE :fuzzy_query
                 OR LOWER(c.name) LIKE :fuzzy_query
-                OR similarity(LOWER(p.name), :query) > :similarity_threshold
-                OR similarity(LOWER(p.description), :query) > :similarity_threshold
-                OR similarity(LOWER(c.name), :query) > :similarity_threshold
+                OR similarity(LOWER(p.name), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(p.description), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(c.name), :query) > CAST(:similarity_threshold AS FLOAT)
             )
             ORDER BY relevance_score DESC, p.rating DESC, p.review_count DESC
             LIMIT :limit
@@ -104,12 +104,12 @@ class SearchService:
             "query": query,
             "prefix_query": f"{query}%",
             "fuzzy_query": f"%{query}%",
-            "exact_weight": self.weights["exact"],
-            "prefix_weight": self.weights["prefix"],
-            "fuzzy_weight": self.weights["fuzzy"],
-            "desc_weight": self.product_field_weights["description"],
-            "cat_weight": self.product_field_weights["category"],
-            "similarity_threshold": self.similarity_threshold,
+            "exact_weight": float(self.weights["exact"]),
+            "prefix_weight": float(self.weights["prefix"]),
+            "fuzzy_weight": float(self.weights["fuzzy"]),
+            "desc_weight": float(self.product_field_weights["description"]),
+            "cat_weight": float(self.product_field_weights["category"]),
+            "similarity_threshold": float(self.similarity_threshold),
             "limit": limit
         })
         
@@ -135,17 +135,17 @@ class SearchService:
                 u.lastname,
                 u.email,
                 GREATEST(
-                    CASE WHEN LOWER(u.firstname) LIKE :prefix_query THEN :exact_weight
-                         WHEN LOWER(u.firstname) LIKE :fuzzy_query THEN :prefix_weight
-                         ELSE similarity(LOWER(u.firstname), :query) * :fuzzy_weight
+                    CASE WHEN LOWER(u.firstname) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT)
+                         WHEN LOWER(u.firstname) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT)
+                         ELSE similarity(LOWER(u.firstname), :query) * CAST(:fuzzy_weight AS FLOAT)
                     END,
-                    CASE WHEN LOWER(u.lastname) LIKE :prefix_query THEN :exact_weight
-                         WHEN LOWER(u.lastname) LIKE :fuzzy_query THEN :prefix_weight
-                         ELSE similarity(LOWER(u.lastname), :query) * :fuzzy_weight
+                    CASE WHEN LOWER(u.lastname) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT)
+                         WHEN LOWER(u.lastname) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT)
+                         ELSE similarity(LOWER(u.lastname), :query) * CAST(:fuzzy_weight AS FLOAT)
                     END,
-                    CASE WHEN LOWER(u.email) LIKE :prefix_query THEN :exact_weight * 0.8
-                         WHEN LOWER(u.email) LIKE :fuzzy_query THEN :prefix_weight * 0.8
-                         ELSE similarity(LOWER(u.email), :query) * :fuzzy_weight * 0.8
+                    CASE WHEN LOWER(u.email) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * 0.8
+                         WHEN LOWER(u.email) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * 0.8
+                         ELSE similarity(LOWER(u.email), :query) * CAST(:fuzzy_weight AS FLOAT) * 0.8
                     END
                 ) as relevance_score
             FROM users u
@@ -154,9 +154,9 @@ class SearchService:
                 LOWER(u.firstname) LIKE :fuzzy_query
                 OR LOWER(u.lastname) LIKE :fuzzy_query
                 OR LOWER(u.email) LIKE :fuzzy_query
-                OR similarity(LOWER(u.firstname), :query) > :similarity_threshold
-                OR similarity(LOWER(u.lastname), :query) > :similarity_threshold
-                OR similarity(LOWER(u.email), :query) > :similarity_threshold
+                OR similarity(LOWER(u.firstname), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(u.lastname), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(u.email), :query) > CAST(:similarity_threshold AS FLOAT)
             )
             ORDER BY relevance_score DESC
             LIMIT :limit
@@ -195,13 +195,13 @@ class SearchService:
                 c.name,
                 c.description,
                 GREATEST(
-                    CASE WHEN LOWER(c.name) LIKE :prefix_query THEN :exact_weight
-                         WHEN LOWER(c.name) LIKE :fuzzy_query THEN :prefix_weight
-                         ELSE similarity(LOWER(c.name), :query) * :fuzzy_weight
+                    CASE WHEN LOWER(c.name) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT)
+                         WHEN LOWER(c.name) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT)
+                         ELSE similarity(LOWER(c.name), :query) * CAST(:fuzzy_weight AS FLOAT)
                     END,
-                    CASE WHEN LOWER(c.description) LIKE :prefix_query THEN :exact_weight * 0.5
-                         WHEN LOWER(c.description) LIKE :fuzzy_query THEN :prefix_weight * 0.5
-                         ELSE similarity(LOWER(c.description), :query) * :fuzzy_weight * 0.5
+                    CASE WHEN LOWER(c.description) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * 0.5
+                         WHEN LOWER(c.description) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * 0.5
+                         ELSE similarity(LOWER(c.description), :query) * CAST(:fuzzy_weight AS FLOAT) * 0.5
                     END
                 ) as relevance_score
             FROM categories c
@@ -209,8 +209,8 @@ class SearchService:
             AND (
                 LOWER(c.name) LIKE :fuzzy_query
                 OR LOWER(c.description) LIKE :fuzzy_query
-                OR similarity(LOWER(c.name), :query) > :similarity_threshold
-                OR similarity(LOWER(c.description), :query) > :similarity_threshold
+                OR similarity(LOWER(c.name), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(c.description), :query) > CAST(:similarity_threshold AS FLOAT)
             )
             ORDER BY relevance_score DESC
             LIMIT :limit
@@ -265,15 +265,15 @@ class SearchService:
         base_conditions = ["p.is_active = true"]
         params = {
             "query": query,
-            "similarity_threshold": self.similarity_threshold,
+            "similarity_threshold": float(self.similarity_threshold),
             "limit": limit,
-            "exact_weight": self.weights["exact"],
-            "prefix_weight": self.weights["prefix"],
-            "fuzzy_weight": self.weights["fuzzy"],
-            "name_weight": self.product_field_weights["name"],
-            "desc_weight": self.product_field_weights["description"],
-            "cat_weight": self.product_field_weights["category"],
-            "tag_weight": self.product_field_weights["tags"]
+            "exact_weight": float(self.weights["exact"]),
+            "prefix_weight": float(self.weights["prefix"]),
+            "fuzzy_weight": float(self.weights["fuzzy"]),
+            "name_weight": float(self.product_field_weights["name"]),
+            "desc_weight": float(self.product_field_weights["description"]),
+            "cat_weight": float(self.product_field_weights["category"]),
+            "tag_weight": float(self.product_field_weights["tags"])
         }
         
         # Add filters
@@ -315,29 +315,29 @@ class SearchService:
                 -- Calculate weighted relevance score
                 (
                     -- Name matching (highest weight)
-                    CASE WHEN LOWER(p.name) = :query THEN :exact_weight * :name_weight
-                         WHEN LOWER(p.name) LIKE CONCAT(:query, '%') THEN :prefix_weight * :name_weight * 0.9
-                         WHEN LOWER(p.name) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * :name_weight * 0.7
-                         ELSE similarity(LOWER(p.name), :query) * :fuzzy_weight * :name_weight
+                    CASE WHEN LOWER(p.name) = :query THEN CAST(:exact_weight AS FLOAT) * CAST(:name_weight AS FLOAT)
+                         WHEN LOWER(p.name) LIKE CONCAT(:query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:name_weight AS FLOAT) * 0.9
+                         WHEN LOWER(p.name) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:name_weight AS FLOAT) * 0.7
+                         ELSE similarity(LOWER(p.name), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:name_weight AS FLOAT)
                     END +
                     -- Description matching
-                    CASE WHEN LOWER(p.description) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * :desc_weight
-                         ELSE similarity(LOWER(p.description), :query) * :fuzzy_weight * :desc_weight
+                    CASE WHEN LOWER(p.description) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
+                         ELSE similarity(LOWER(p.description), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
                     END +
                     -- Category matching
-                    CASE WHEN LOWER(c.name) = :query THEN :exact_weight * :cat_weight
-                         WHEN LOWER(c.name) LIKE CONCAT(:query, '%') THEN :prefix_weight * :cat_weight
-                         WHEN LOWER(c.name) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * :cat_weight * 0.7
-                         ELSE similarity(LOWER(c.name), :query) * :fuzzy_weight * :cat_weight
+                    CASE WHEN LOWER(c.name) = :query THEN CAST(:exact_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                         WHEN LOWER(c.name) LIKE CONCAT(:query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                         WHEN LOWER(c.name) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:cat_weight AS FLOAT) * 0.7
+                         ELSE similarity(LOWER(c.name), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
                     END +
                     -- Dietary tags matching (if tags contain the query)
-                    CASE WHEN p.dietary_tags::text ILIKE CONCAT('%', :query, '%') THEN :prefix_weight * :tag_weight
+                    CASE WHEN p.dietary_tags::text ILIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:tag_weight AS FLOAT)
                          ELSE 0
                     END +
                     -- Boost for higher rated products
-                    (p.rating / 5.0) * 0.1 +
+                    (COALESCE(p.rating, 0) / 5.0) * 0.1 +
                     -- Boost for products with more reviews
-                    LEAST(p.review_count / 100.0, 0.1)
+                    LEAST(COALESCE(p.review_count, 0) / 100.0, 0.1)
                 ) as relevance_score
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.id
@@ -347,9 +347,9 @@ class SearchService:
                 OR LOWER(p.description) LIKE CONCAT('%', :query, '%')
                 OR LOWER(c.name) LIKE CONCAT('%', :query, '%')
                 OR p.dietary_tags::text ILIKE CONCAT('%', :query, '%')
-                OR similarity(LOWER(p.name), :query) > :similarity_threshold
-                OR similarity(LOWER(p.description), :query) > :similarity_threshold
-                OR similarity(LOWER(c.name), :query) > :similarity_threshold
+                OR similarity(LOWER(p.name), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(p.description), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(c.name), :query) > CAST(:similarity_threshold AS FLOAT)
             )
             ORDER BY relevance_score DESC, p.rating DESC, p.review_count DESC
             LIMIT :limit
@@ -398,11 +398,11 @@ class SearchService:
         base_conditions = ["u.is_active = true"]
         params = {
             "query": query,
-            "similarity_threshold": self.similarity_threshold,
+            "similarity_threshold": float(self.similarity_threshold),
             "limit": limit,
-            "exact_weight": self.weights["exact"],
-            "prefix_weight": self.weights["prefix"],
-            "fuzzy_weight": self.weights["fuzzy"]
+            "exact_weight": float(self.weights["exact"]),
+            "prefix_weight": float(self.weights["prefix"]),
+            "fuzzy_weight": float(self.weights["fuzzy"])
         }
         
         if role_filter:
@@ -421,25 +421,25 @@ class SearchService:
                 u.verified,
                 (
                     -- First name matching
-                    CASE WHEN LOWER(u.firstname) = :query THEN :exact_weight
-                         WHEN LOWER(u.firstname) LIKE CONCAT(:query, '%') THEN :prefix_weight
-                         WHEN LOWER(u.firstname) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.7
-                         ELSE similarity(LOWER(u.firstname), :query) * :fuzzy_weight
+                    CASE WHEN LOWER(u.firstname) = :query THEN CAST(:exact_weight AS FLOAT)
+                         WHEN LOWER(u.firstname) LIKE CONCAT(:query, '%') THEN CAST(:prefix_weight AS FLOAT)
+                         WHEN LOWER(u.firstname) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * 0.7
+                         ELSE similarity(LOWER(u.firstname), :query) * CAST(:fuzzy_weight AS FLOAT)
                     END +
                     -- Last name matching
-                    CASE WHEN LOWER(u.lastname) = :query THEN :exact_weight
-                         WHEN LOWER(u.lastname) LIKE CONCAT(:query, '%') THEN :prefix_weight
-                         WHEN LOWER(u.lastname) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.7
-                         ELSE similarity(LOWER(u.lastname), :query) * :fuzzy_weight
+                    CASE WHEN LOWER(u.lastname) = :query THEN CAST(:exact_weight AS FLOAT)
+                         WHEN LOWER(u.lastname) LIKE CONCAT(:query, '%') THEN CAST(:prefix_weight AS FLOAT)
+                         WHEN LOWER(u.lastname) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * 0.7
+                         ELSE similarity(LOWER(u.lastname), :query) * CAST(:fuzzy_weight AS FLOAT)
                     END +
                     -- Email matching (lower weight)
-                    CASE WHEN LOWER(u.email) LIKE CONCAT(:query, '%') THEN :prefix_weight * 0.8
-                         WHEN LOWER(u.email) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.6
-                         ELSE similarity(LOWER(u.email), :query) * :fuzzy_weight * 0.8
+                    CASE WHEN LOWER(u.email) LIKE CONCAT(:query, '%') THEN CAST(:prefix_weight AS FLOAT) * 0.8
+                         WHEN LOWER(u.email) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * 0.6
+                         ELSE similarity(LOWER(u.email), :query) * CAST(:fuzzy_weight AS FLOAT) * 0.8
                     END +
                     -- Full name matching (concatenated)
-                    CASE WHEN LOWER(CONCAT(u.firstname, ' ', u.lastname)) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.9
-                         ELSE similarity(LOWER(CONCAT(u.firstname, ' ', u.lastname)), :query) * :fuzzy_weight * 0.9
+                    CASE WHEN LOWER(CONCAT(u.firstname, ' ', u.lastname)) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * 0.9
+                         ELSE similarity(LOWER(CONCAT(u.firstname, ' ', u.lastname)), :query) * CAST(:fuzzy_weight AS FLOAT) * 0.9
                     END
                 ) as relevance_score
             FROM users u
@@ -449,9 +449,9 @@ class SearchService:
                 OR LOWER(u.lastname) LIKE CONCAT('%', :query, '%')
                 OR LOWER(u.email) LIKE CONCAT('%', :query, '%')
                 OR LOWER(CONCAT(u.firstname, ' ', u.lastname)) LIKE CONCAT('%', :query, '%')
-                OR similarity(LOWER(u.firstname), :query) > :similarity_threshold
-                OR similarity(LOWER(u.lastname), :query) > :similarity_threshold
-                OR similarity(LOWER(u.email), :query) > :similarity_threshold
+                OR similarity(LOWER(u.firstname), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(u.lastname), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(u.email), :query) > CAST(:similarity_threshold AS FLOAT)
             )
             ORDER BY relevance_score DESC, u.verified DESC
             LIMIT :limit
@@ -504,14 +504,14 @@ class SearchService:
                 COUNT(p.id) as product_count,
                 (
                     -- Name matching (highest weight)
-                    CASE WHEN LOWER(c.name) = :query THEN :exact_weight
-                         WHEN LOWER(c.name) LIKE CONCAT(:query, '%') THEN :prefix_weight
-                         WHEN LOWER(c.name) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.7
-                         ELSE similarity(LOWER(c.name), :query) * :fuzzy_weight
+                    CASE WHEN LOWER(c.name) = :query THEN CAST(:exact_weight AS FLOAT)
+                         WHEN LOWER(c.name) LIKE CONCAT(:query, '%') THEN CAST(:prefix_weight AS FLOAT)
+                         WHEN LOWER(c.name) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * 0.7
+                         ELSE similarity(LOWER(c.name), :query) * CAST(:fuzzy_weight AS FLOAT)
                     END +
                     -- Description matching
-                    CASE WHEN LOWER(c.description) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * 0.5
-                         ELSE similarity(LOWER(c.description), :query) * :fuzzy_weight * 0.5
+                    CASE WHEN LOWER(c.description) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * 0.5
+                         ELSE similarity(LOWER(c.description), :query) * CAST(:fuzzy_weight AS FLOAT) * 0.5
                     END +
                     -- Boost for categories with more products
                     LEAST(COUNT(p.id) / 10.0, 0.2)
@@ -522,8 +522,8 @@ class SearchService:
             AND (
                 LOWER(c.name) LIKE CONCAT('%', :query, '%')
                 OR LOWER(c.description) LIKE CONCAT('%', :query, '%')
-                OR similarity(LOWER(c.name), :query) > :similarity_threshold
-                OR similarity(LOWER(c.description), :query) > :similarity_threshold
+                OR similarity(LOWER(c.name), :query) > CAST(:similarity_threshold AS FLOAT)
+                OR similarity(LOWER(c.description), :query) > CAST(:similarity_threshold AS FLOAT)
             )
             GROUP BY c.id, c.name, c.description, c.image_url
             ORDER BY relevance_score DESC, product_count DESC
@@ -532,11 +532,11 @@ class SearchService:
         
         result = await self.db.execute(sql_query, {
             "query": query,
-            "similarity_threshold": self.similarity_threshold,
+            "similarity_threshold": float(self.similarity_threshold),
             "limit": limit,
-            "exact_weight": self.weights["exact"],
-            "prefix_weight": self.weights["prefix"],
-            "fuzzy_weight": self.weights["fuzzy"]
+            "exact_weight": float(self.weights["exact"]),
+            "prefix_weight": float(self.weights["prefix"]),
+            "fuzzy_weight": float(self.weights["fuzzy"])
         })
         
         categories = []

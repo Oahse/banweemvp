@@ -573,15 +573,15 @@ class ProductService:
         base_conditions = ["p.is_active = true"]
         params = {
             "query": query,
-            "similarity_threshold": self.similarity_threshold,
+            "similarity_threshold": float(self.similarity_threshold),
             "limit": limit,
-            "exact_weight": self.weights["exact"],
-            "prefix_weight": self.weights["prefix"],
-            "fuzzy_weight": self.weights["fuzzy"],
-            "name_weight": self.product_field_weights["name"],
-            "desc_weight": self.product_field_weights["description"],
-            "cat_weight": self.product_field_weights["category"],
-            "tag_weight": self.product_field_weights["tags"]
+            "exact_weight": float(self.weights["exact"]),
+            "prefix_weight": float(self.weights["prefix"]),
+            "fuzzy_weight": float(self.weights["fuzzy"]),
+            "name_weight": float(self.product_field_weights["name"]),
+            "desc_weight": float(self.product_field_weights["description"]),
+            "cat_weight": float(self.product_field_weights["category"]),
+            "tag_weight": float(self.product_field_weights["tags"])
         }
         
         # Add filters
@@ -623,29 +623,29 @@ class ProductService:
                 -- Calculate weighted relevance score
                 (
                     -- Name matching (highest weight)
-                    CASE WHEN LOWER(p.name) = :query THEN :exact_weight * :name_weight
-                         WHEN LOWER(p.name) LIKE CONCAT(:query, '%') THEN :prefix_weight * :name_weight * 0.9
-                         WHEN LOWER(p.name) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * :name_weight * 0.7
-                         ELSE similarity(LOWER(p.name), :query) * :fuzzy_weight * :name_weight
+                    CASE WHEN LOWER(p.name) = :query THEN CAST(:exact_weight AS FLOAT) * CAST(:name_weight AS FLOAT)
+                         WHEN LOWER(p.name) LIKE CONCAT(:query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:name_weight AS FLOAT) * 0.9
+                         WHEN LOWER(p.name) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:name_weight AS FLOAT) * 0.7
+                         ELSE similarity(LOWER(p.name), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:name_weight AS FLOAT)
                     END +
                     -- Description matching
-                    CASE WHEN LOWER(p.description) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * :desc_weight
-                         ELSE similarity(LOWER(p.description), :query) * :fuzzy_weight * :desc_weight
+                    CASE WHEN LOWER(p.description) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
+                         ELSE similarity(LOWER(p.description), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
                     END +
                     -- Category matching
-                    CASE WHEN LOWER(c.name) = :query THEN :exact_weight * :cat_weight
-                         WHEN LOWER(c.name) LIKE CONCAT(:query, '%') THEN :prefix_weight * :cat_weight
-                         WHEN LOWER(c.name) LIKE CONCAT('%', :query, '%') THEN :prefix_weight * :cat_weight * 0.7
-                         ELSE similarity(LOWER(c.name), :query) * :fuzzy_weight * :cat_weight
+                    CASE WHEN LOWER(c.name) = :query THEN CAST(:exact_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                         WHEN LOWER(c.name) LIKE CONCAT(:query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                         WHEN LOWER(c.name) LIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:cat_weight AS FLOAT) * 0.7
+                         ELSE similarity(LOWER(c.name), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
                     END +
                     -- Dietary tags matching (if tags contain the query)
-                    CASE WHEN p.dietary_tags::text ILIKE CONCAT('%', :query, '%') THEN :prefix_weight * :tag_weight
+                    CASE WHEN p.dietary_tags::text ILIKE CONCAT('%', :query, '%') THEN CAST(:prefix_weight AS FLOAT) * CAST(:tag_weight AS FLOAT)
                          ELSE 0
                     END +
                     -- Boost for higher rated products
-                    (p.rating / 5.0) * 0.1 +
+                    (COALESCE(p.rating, 0) / 5.0) * 0.1 +
                     -- Boost for products with more reviews
-                    LEAST(p.review_count / 100.0, 0.1)
+                    LEAST(COALESCE(p.review_count, 0) / 100.0, 0.1)
                 ) as relevance_score
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.id
