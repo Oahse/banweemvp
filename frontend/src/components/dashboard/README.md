@@ -1,6 +1,6 @@
 # Ultra-Rich Dashboard System
 
-A comprehensive dashboard system with advanced data visualization, real-time updates, and customizable layouts.
+A comprehensive dashboard system with advanced data visualization and customizable layouts.
 
 ## Features
 
@@ -14,7 +14,7 @@ A comprehensive dashboard system with advanced data visualization, real-time upd
 - **Interactive Charts**: Hover tooltips, drill-down functionality, export options
 - **Time-Series Visualizations**: Multiple time range selectors, trend analysis
 - **Geographic Data**: Interactive maps with multiple view modes
-- **Real-time Widgets**: Live data feeds with WebSocket support
+- **Data Widgets**: Live data feeds with automatic updates
 
 ### 🔧 Customization Features
 - **Drag & Drop**: Rearrange widgets with react-grid-layout
@@ -25,7 +25,7 @@ A comprehensive dashboard system with advanced data visualization, real-time upd
 ### 📈 Data Management
 - **Advanced Tables**: Sorting, filtering, grouping, pagination
 - **Export Functionality**: CSV, Excel, PDF, PNG formats
-- **Real-time Updates**: WebSocket connections for live data
+- **Live Updates**: Automatic data refresh and updates
 - **Caching**: Optimized performance with data caching
 
 ## Components
@@ -103,20 +103,6 @@ import { CustomizableDashboard } from '@/components/dashboard';
 />
 ```
 
-#### RealTimeWidget
-```tsx
-import { RealTimeWidget } from '@/components/dashboard';
-
-<RealTimeWidget
-  title="Live Orders"
-  dataSource="wss://api.example.com/orders"
-  chartType="line"
-  maxDataPoints={50}
-  updateInterval={1000}
-  thresholds={{ warning: 100, critical: 200 }}
-/>
-```
-
 ## Data Structures
 
 ### Chart Data Format
@@ -137,14 +123,6 @@ import { RealTimeWidget } from '@/components/dashboard';
 
 
 ### Widget Templates
-
-
-## Real-time Features
-
-### WebSocket Integration
-
-
-### Polling Integration
 
 
 ## Export Functionality
@@ -177,7 +155,7 @@ exportToCSV(tableData, 'my-export');
 ### Best Practices
 1. **Data Virtualization**: Use virtual scrolling for large datasets
 2. **Memoization**: Cache expensive calculations with React.memo
-3. **Lazy Loading**: Load widgets on demand
+3. **Lazy Loading**: Load components on demand
 4. **Debounced Updates**: Prevent excessive re-renders
 5. **Efficient Queries**: Use pre-computed analytics tables
 

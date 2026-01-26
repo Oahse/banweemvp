@@ -43,14 +43,33 @@ export const CartItem: React.FC<CartItemProps> = ({
 
   const { updateQuantity, removeItem } = useCart();
 
-  // Get primary image or first available image
+  // Get primary image or first available image with proper fallback
   const getItemImage = () => {
+    // Check if variant has images
     if (!item.variant.images || item.variant.images.length === 0) {
       return '/placeholder-product.jpg';
     }
     
+    // Try to find primary image first
     const primaryImage = item.variant.images.find(img => img.is_primary);
-    return primaryImage?.url || item.variant.images[0]?.url || '/placeholder-product.jpg';
+    if (primaryImage?.url) {
+      return primaryImage.url;
+    }
+    
+    // Fall back to first image
+    const firstImage = item.variant.images[0];
+    if (firstImage?.url) {
+      return firstImage.url;
+    }
+    
+    // Final fallback
+    return '/placeholder-product.jpg';
+  };
+
+  // Get image alt text
+  const getImageAltText = () => {
+    const image = item.variant.images?.find(img => img.is_primary) || item.variant.images?.[0];
+    return image?.alt_text || `${item.variant.product_name || item.variant.name} - ${item.variant.name}`;
   };
 
   // Format variant attributes for display
@@ -183,15 +202,29 @@ export const CartItem: React.FC<CartItemProps> = ({
     <div className={`flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg ${isRemoving ? 'opacity-50' : ''}`}>
       {/* Product Image */}
       <div className="flex-shrink-0">
-        <img
-          src={getItemImage()}
-          alt={item.variant.product_name || item.variant.name}
-          className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = '/placeholder-product.jpg';
-          }}
-        />
+        <div className="relative w-16 h-16">
+          <img
+            src={getItemImage()}
+            alt={getImageAltText()}
+            className="w-full h-full object-cover rounded-lg border border-gray-200"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (target.src !== '/placeholder-product.jpg') {
+                target.src = '/placeholder-product.jpg';
+              }
+            }}
+          />
+          
+          {/* Stock status indicator */}
+          {item.variant.stock <= 5 && item.variant.stock > 0 && (
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border border-white" 
+                 title={`Low stock: ${item.variant.stock} remaining`} />
+          )}
+          {item.variant.stock === 0 && (
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white" 
+                 title="Out of stock" />
+          )}
+        </div>
       </div>
 
       {/* Product Details */}

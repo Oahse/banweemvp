@@ -191,8 +191,7 @@ v1_router.include_router(webhooks_router)
 # Include the v1 router into the main app
 app.include_router(v1_router)
 
-# Note: WebSocket router disabled for MVP
-# app.include_router(websockets_router)
+
 
 
 

@@ -275,8 +275,6 @@ services:
       timeout: 10s
       retries: 3
 
-  kafka:
-    image: confluentinc/cp-kafka:latest
   backend:
     build:
       context: ./backend

@@ -3,7 +3,6 @@ import { CustomizableDashboard } from './widgets/CustomizableDashboard';
 import { InteractiveChart } from './charts/InteractiveChart';
 import { GeographicChart } from './charts/GeographicChart';
 import { AdvancedTable } from './tables/AdvancedTable';
-import { RealTimeWidget } from './widgets/RealTimeWidget';
 import { useApi } from '../../hooks/useApi';
 import { AdminAPI } from '../../apis';
 import {
@@ -193,16 +192,6 @@ export const AdminDashboard = () => {
       component: GeographicWidget,
       defaultLayout: { w: 6, h: 5, minW: 4, minH: 4 },
       icon: <MapIcon size={20} />,
-      category: 'analytics'
-    },
-    {
-      id: 'realtime-template',
-      name: 'Real-time Monitor',
-      description: 'Live data updates',
-      type: 'realtime',
-      component: RealTimeWidget,
-      defaultLayout: { w: 6, h: 4, minW: 4, minH: 3 },
-      icon: <ActivityIcon size={20} />,
       category: 'analytics'
     }
   ];

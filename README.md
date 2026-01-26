@@ -54,7 +54,7 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 ## ✨ Features
 
 ### Customer Features
-- 🛒 **Shopping Cart** - Add, update, and manage cart items with real-time updates
+- 🛒 **Shopping Cart** - Add, update, and manage cart items
 - 💳 **Secure Checkout** - Stripe integration for secure payment processing
 - 📦 **Order Tracking** - Track orders from placement to delivery
 - ⭐ **Product Reviews** - Rate and review purchased products

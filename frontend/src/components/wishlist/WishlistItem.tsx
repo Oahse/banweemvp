@@ -55,14 +55,33 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
   const { removeItem } = useWishlist();
   const { addItem: addToCart } = useCart();
 
-  // Get primary image or first available image
+  // Get primary image or first available image with proper fallback
   const getItemImage = () => {
+    // Check if variant has images
     if (!item.variant?.images || item.variant.images.length === 0) {
       return '/placeholder-product.jpg';
     }
     
+    // Try to find primary image first
     const primaryImage = item.variant.images.find(img => img.is_primary);
-    return primaryImage?.url || item.variant.images[0]?.url || '/placeholder-product.jpg';
+    if (primaryImage?.url) {
+      return primaryImage.url;
+    }
+    
+    // Fall back to first image
+    const firstImage = item.variant.images[0];
+    if (firstImage?.url) {
+      return firstImage.url;
+    }
+    
+    // Final fallback
+    return '/placeholder-product.jpg';
+  };
+
+  // Get image alt text
+  const getImageAltText = () => {
+    const image = item.variant?.images?.find(img => img.is_primary) || item.variant?.images?.[0];
+    return image?.alt_text || `${item.product?.name || 'Product'} - ${item.variant?.name || 'Variant'}`;
   };
 
   // Get current price (sale price if available, otherwise base price)
@@ -169,11 +188,13 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
       <div className="relative aspect-square">
         <img
           src={getItemImage()}
-          alt={item.product?.name || item.variant?.name || 'Product'}
+          alt={getImageAltText()}
           className="w-full h-full object-cover"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = '/placeholder-product.jpg';
+            if (target.src !== '/placeholder-product.jpg') {
+              target.src = '/placeholder-product.jpg';
+            }
           }}
         />
         
@@ -184,10 +205,17 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
           </div>
         )}
 
-        {/* Stock status */}
+        {/* Stock status overlay */}
         {!isInStock() && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <span className="text-white font-medium">Out of Stock</span>
+          </div>
+        )}
+
+        {/* Low stock indicator */}
+        {isInStock() && item.variant && item.variant.stock <= 5 && (
+          <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-medium">
+            {item.variant.stock} left
           </div>
         )}
 
