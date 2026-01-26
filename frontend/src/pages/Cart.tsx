@@ -29,6 +29,9 @@ export const Cart = () => {
   const [couponCode, setCouponCode] = useState('');
   const [taxLocation, setTaxLocation] = useState<{ country: string; province?: string }>({ country: 'US' });
 
+  const items = cart?.items || [];
+  const { subtotal, tax, shipping, total } = getCartSummary();
+
   // Simple redirect to login function
   const redirectToLogin = (message?: string) => {
     if (message) {
@@ -194,9 +197,6 @@ export const Cart = () => {
     // Navigate to checkout
     navigate('/checkout');
   }, [isAuthenticated, setIntendedDestination, redirectToLogin, validateForCheckout, navigate]);
-
-  const items = cart?.items || [];
-  const { subtotal, tax, shipping, total } = getCartSummary();
 
   // Show loading state while cart or auth is loading
   if (loading || authLoading) {
