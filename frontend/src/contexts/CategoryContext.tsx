@@ -1,29 +1,33 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { useApi } from '../hooks/useApi';
+import { useAsync } from '../hooks/useAsync';
 import { CategoriesAPI } from '../apis';
 
+interface Category {
+  id: string;
+  name: string;
+}
 
+interface CategoryContextType {
+  categories: Category[];
+  loading: boolean;
+  error: any;
+}
 
+export const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
 
-export const CategoryContext = createContext(undefined);
-
-
-
-export const CategoryProvider = ({ children }) => {
-  const { data, loading, error, execute } = useApi();
-  const [categories, setCategories] = useState([]);
+export const CategoryProvider = ({ children }: { children: React.ReactNode }) => {
+  const { loading, error, execute } = useAsync();
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    execute(CategoriesAPI.getCategories);
-  }, [execute]);
-
-  useEffect(() => {
-    if (data) {
+    execute(async () => {
+      const response = await CategoriesAPI.getCategories();
       // API returns { success: true, data: { categories: [...] } }
-      const categoriesArray = data.data?.categories || data.categories || data.data || data;
+      const categoriesArray = response.data?.categories || response.categories || response.data || response;
       setCategories(Array.isArray(categoriesArray) ? categoriesArray : []);
-    }
-  }, [data]);
+      return response;
+    });
+  }, [execute]);
 
   return (
     <CategoryContext.Provider value={{ categories, loading, error }}>
@@ -31,6 +35,7 @@ export const CategoryProvider = ({ children }) => {
     </CategoryContext.Provider>
   );
 };
+
 export const useCategories = () => {
   const context = useContext(CategoryContext);
   if (context === undefined) {

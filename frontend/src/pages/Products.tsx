@@ -163,11 +163,11 @@ const Products = () => {
         {showFilters && (
           <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
             {/* Categories */}
-            {categories && Array.isArray(categories) && categories.length > 0 && (
+            {categories && categories.length > 0 && (
               <div>
                 <h3 className="heading text-sm font-medium mb-2">Categories</h3>
                 <div className="flex flex-wrap gap-2">
-                  {categories.map((category: any) => (
+                  {categories.map((category) => (
                     <button
                       key={category.id}
                       onClick={() => handleCategoryChange(category.id)}

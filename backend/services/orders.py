@@ -277,10 +277,6 @@ class OrderService:
                 backend_calculated_total = price_validation_result["total_amount"]
                 price_updates = price_validation_result.get("price_updates", [])
                 
-                # If there are price updates, send notification to frontend via WebSocket
-                if price_updates:
-                    await self._send_price_update_notification(user_id, price_updates)
-                
                 # STEP 3: CHECK STOCK AVAILABILITY (optimized for Checkout)
                 stock_validation_results = []
                 for item in active_items:
