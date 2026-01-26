@@ -611,7 +611,8 @@ async def seed_sample_data(
             num_variants = max(
                 1, min(variants_per_product, random.randint(1, 3)))
             for v_idx in range(1, num_variants + 1):
-                sku = f"{product.name[:3].upper().replace(' ', '')}-{str(product.id)[:8]}-{v_idx}"
+                # Generate unique SKU using product index and variant index to avoid duplicates
+                sku = f"{product.name[:3].upper().replace(' ', '')}-{i:06d}-{v_idx}"
 
                 # Better variant names based on category
                 variant_names = {
