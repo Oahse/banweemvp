@@ -30,7 +30,6 @@ class EnhancedProductVariantResponse(ProductVariantResponse):
     product_origin: Optional[str] = None
     image_count: int = 0
     inventory_quantity_available: Optional[int] = None
-    inventory_quantity_reserved: Optional[int] = None
     inventory_reorder_level: Optional[int] = None
     inventory_last_updated: Optional[str] = None
 

@@ -84,7 +84,7 @@ class CartService:
             try:
                 tax_rate = await self.tax_service.get_tax_rate(country_code, province_code)
                 if tax_rate:
-                    tax_amount = float(subtotal) * tax_rate.tax_rate
+                    tax_amount = float(subtotal) * tax_rate
             except Exception as e:
                 logger.warning(f"Failed to calculate tax: {e}")
 
@@ -221,8 +221,7 @@ class CartService:
                 if hasattr(variant, 'inventory') and variant.inventory:
                     variant_dict.update({
                         'inventory_quantity_available': variant.inventory.quantity_available,
-                        'inventory_quantity_reserved': variant.inventory.quantity_reserved,
-                        'inventory_reorder_level': variant.inventory.reorder_level,
+                        'inventory_reorder_level': variant.inventory.reorder_point,
                         'inventory_last_updated': variant.inventory.updated_at.isoformat() if variant.inventory.updated_at else None
                     })
                 

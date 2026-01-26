@@ -841,7 +841,6 @@ class ProductService:
                 variant_id=db_variant.id,
                 location_id=default_location.id,
                 quantity_available=stock_quantity,
-                quantity_reserved=0,
                 quantity=stock_quantity,  # Legacy field for backward compatibility
                 low_stock_threshold=10,
                 reorder_point=5,
