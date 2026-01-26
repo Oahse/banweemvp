@@ -6,7 +6,6 @@ from .review import Review
 from .promocode import Promocode
 from .shipping import ShippingMethod
 from .wishlist import Wishlist, WishlistItem
-from .notifications import Notification, NotificationPreference, NotificationHistory
 from .loyalty import LoyaltyAccount, PointsTransaction
 from .variant_tracking import VariantTrackingEntry, VariantPriceHistory, VariantAnalytics, VariantSubstitution
 from .analytics import UserSession, AnalyticsEvent, ConversionFunnel, CustomerLifecycleMetrics
@@ -53,11 +52,6 @@ __all__ = [
     "PaymentMethod",
     "PaymentIntent",
     "Transaction",
-
-    # Notification models (consolidated)
-    "Notification",
-    "NotificationPreference",
-    "NotificationHistory",
 
     # Inventory models (consolidated)
     "WarehouseLocation",

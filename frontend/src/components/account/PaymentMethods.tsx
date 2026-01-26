@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, PlusCircle, Trash2, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { PaymentsAPI } from '../../apis/payments';
 
 

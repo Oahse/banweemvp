@@ -11,7 +11,6 @@ from . import transaction
 from . import wishlist
 from . import promocode
 from . import response
-from . import notifications  # Updated to consolidated notifications
 from . import loyalty
 from . import inventories  # Updated to consolidated inventories
 from . import tax

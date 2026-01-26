@@ -8,7 +8,6 @@ import { CustomizableDashboard } from './widgets/CustomizableDashboard';
 import { InteractiveChart } from './charts/InteractiveChart';
 import { GeographicChart } from './charts/GeographicChart';
 import { AdvancedTable } from './tables/AdvancedTable';
-import { RealTimeWidget } from './widgets/RealTimeWidget';
 
 // Mock external dependencies
 vitest.mock('../../hooks/useApi', () => ({
@@ -29,7 +28,6 @@ vitest.mock('./widgets/CustomizableDashboard', () => ({
 vitest.mock('./charts/InteractiveChart', () => ({ InteractiveChart: vitest.fn(() => null) }));
 vitest.mock('./charts/GeographicChart', () => ({ GeographicChart: vitest.fn(() => null) }));
 vitest.mock('./tables/AdvancedTable', () => ({ AdvancedTable: vitest.fn(() => null) }));
-vitest.mock('./widgets/RealTimeWidget', () => ({ RealTimeWidget: vitest.fn(() => null) }));
 
 // Mock lucide-react icons if they cause issues, though for component props usually not needed
 vitest.mock('lucide-react', () => ({

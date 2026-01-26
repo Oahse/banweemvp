@@ -1,7 +1,7 @@
 import React from 'react';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useCart } from '../../contexts/CartContext';
-import { useAuthenticatedAction } from '../../hooks/useAuthenticatedAction';
+import { useAuth } from '../../hooks/useAuth';
 import { ShoppingCartIcon, TrashIcon, HeartIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
@@ -9,7 +9,7 @@ import { toast } from 'react-hot-toast';
 export const Wishlist = () => {
   const { defaultWishlist, removeItem, clearWishlist } = useWishlist();
   const { addItem } = useCart();
-  const { executeWithAuth } = useAuthenticatedAction();
+  const { executeWithAuth } = useAuth();
 
   const items = defaultWishlist?.items || [];
 

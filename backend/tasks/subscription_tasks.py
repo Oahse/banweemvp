@@ -15,7 +15,6 @@ from core.config import settings
 from core.hybrid_tasks import hybrid_task_manager, send_email_hybrid, send_notification_hybrid
 from core.arq_worker import enqueue_subscription_processing, enqueue_subscription_renewal
 from services.subscriptions.subscription_scheduler import SubscriptionSchedulerService
-from services.notifications import NotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -170,18 +169,8 @@ class SubscriptionTaskManager:
         try:
             await self.initialize_kafka()
             
-            # Send notification to user about failed order
-            notification_message = {
-                "service": "NotificationService",
-                "method": "create_notification",
-                "args": [],
-                "kwargs": {
-                    "user_id": order_result.get("user_id", ""),
-                    "message": f"Failed to create your subscription order. Reason: {order_result.get('reason', 'Unknown error')}",
-                    "type": "error",
-                    "related_id": order_result["subscription_id"]
-                }
-            }
+            # Log failed order (notification system removed)
+            logger.error(f"Failed to create subscription order for user {order_result.get('user_id', '')}: {order_result.get('reason', 'Unknown error')}")
             
             await self.producer.send_message(
                 topic=settings.KAFKA_TOPIC_NOTIFICATION,
@@ -330,18 +319,8 @@ class SubscriptionTaskManager:
                 message = f"Your subscription order will be placed in {days_until} days. Total: {order_info['amount']} {order_info['currency']} for {order_info['product_count']} item(s)."
                 notification_type = "info"
             
-            # Send notification via Kafka
-            notification_message = {
-                "service": "NotificationService",
-                "method": "create_notification",
-                "args": [],
-                "kwargs": {
-                    "user_id": order_info["user_id"],
-                    "message": message,
-                    "type": notification_type,
-                    "related_id": order_info["subscription_id"]
-                }
-            }
+            # Log subscription status (notification system removed)
+            logger.info(f"Subscription status for user {order_info['user_id']}: {message}")
             
             await self.producer.send_message(
                 topic=settings.KAFKA_TOPIC_NOTIFICATION,

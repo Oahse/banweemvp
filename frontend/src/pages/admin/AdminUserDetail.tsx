@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, EditIcon, TrashIcon, ShoppingBagIcon, CheckCircleIcon, XCircleIcon, MailIcon, PhoneIcon, CalendarIcon } from 'lucide-react';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import toast from 'react-hot-toast';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';

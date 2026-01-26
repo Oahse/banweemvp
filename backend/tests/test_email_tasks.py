@@ -160,59 +160,6 @@ class TestEmailTasks:
         assert len(email_data["context"]["low_stock_products"]) == 2
         assert email_data["context"]["low_stock_products"][0]["sku"] == "TEST-001"
 
-    @pytest.mark.asyncio
-    async def test_email_task_service_kafka_integration(self, email_task_service):
-        """Test EmailTaskService Kafka integration"""
-        email_data = {
-            "to_email": "test@example.com",
-            "mail_type": "test_email",
-            "context": {"test": "data"}
-        }
-        
-        # Create a mock producer with async send_message method
-        mock_producer = AsyncMock()
-        mock_producer.send_message = AsyncMock()
-        
-        # Mock the async get_kafka_producer_service function
-        async def mock_get_producer():
-            return mock_producer
-        
-        with patch('tasks.email_tasks.get_kafka_producer_service', side_effect=mock_get_producer) as mock_kafka:
-            await email_task_service._send_email_via_kafka(email_data)
-            
-            # Verify the producer service was called
-            mock_kafka.assert_called_once()
-            # Verify send_message was called with correct parameters
-            mock_producer.send_message.assert_called_once_with(
-                email_task_service.kafka_topic,
-                email_data
-            )
-
-    @pytest.mark.asyncio
-    async def test_email_task_service_direct_fallback(self, email_task_service):
-        """Test EmailTaskService direct email fallback when Kafka fails"""
-        email_data = {
-            "to_email": "test@example.com",
-            "mail_type": "test_email",
-            "context": {"test": "data"}
-        }
-        
-        with patch('tasks.email_tasks.get_kafka_producer_service') as mock_kafka, \
-             patch('tasks.email_tasks.send_email') as mock_send_email:
-            
-            # Make Kafka fail
-            mock_kafka.side_effect = Exception("Kafka unavailable")
-            mock_send_email.return_value = AsyncMock()
-            
-            await email_task_service._send_email_via_kafka(email_data)
-            
-            # Should fallback to direct email
-            mock_send_email.assert_called_once_with(
-                to_email="test@example.com",
-                mail_type="test_email",
-                context={"test": "data"}
-            )
-
     def test_email_task_service_add_task(self, email_task_service, background_tasks):
         """Test adding email task to background tasks"""
         email_data = {

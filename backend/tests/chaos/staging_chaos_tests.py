@@ -263,25 +263,6 @@ class StagingChaosRunner:
             logger.warning(f"❌ Redis connectivity test failed: {e}")
             return False
     
-    async def test_kafka_connectivity(self):
-        """Test Kafka connectivity after chaos events"""
-        try:
-            # Simple Kafka connectivity test
-            # In real implementation, would use kafka-python or similar
-            result = subprocess.run([
-                "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"
-            ], capture_output=True, text=True, timeout=10)
-            
-            if result.returncode == 0:
-                logger.info("✅ Kafka connectivity test passed")
-                return True
-            else:
-                logger.warning(f"❌ Kafka connectivity test failed: {result.stderr}")
-                return False
-        except Exception as e:
-            logger.warning(f"❌ Kafka connectivity test failed: {e}")
-            return False
-    
     async def run_application_health_checks(self):
         """Run application health checks during chaos"""
         logger.info("🏥 Running application health checks")

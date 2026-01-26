@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ShoppingBagIcon, HeartIcon, MapPinIcon, CreditCardIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SkeletonDashboard } from '../ui/SkeletonDashboard';
-import { usePaginatedApi } from '../../hooks/useApi';
+import { usePaginatedApi } from '../../hooks/useAsync';
 import OrdersAPI from '../../apis/orders';
 
 interface DashboardProps {

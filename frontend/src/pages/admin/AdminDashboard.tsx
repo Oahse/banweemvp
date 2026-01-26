@@ -31,7 +31,7 @@ import {
   AreaChart
 } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { AdminAPI, CategoriesAPI } from '../../apis';
 
 import { SalesFilters, SalesData, SalesMetrics } from '../../components/admin/sales/types';

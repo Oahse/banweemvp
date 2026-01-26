@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { XIcon, CalendarIcon, CreditCardIcon, PlusIcon } from 'lucide-react';
 import { useSubscription } from '../../contexts/SubscriptionContext';
-import { useSubscriptionAction } from '../../hooks/useSubscriptionAction';
+import { useSubscriptionAction } from '../../hooks/useSubscription';
 import { formatCurrency } from '../../lib/locale-config';
 import { themeClasses, getButtonClasses } from '../../lib/themeClasses';
 

@@ -160,7 +160,6 @@ exportToCSV(tableData, 'my-export');
 5. **Efficient Queries**: Use pre-computed analytics tables
 
 ### Memory Management
-- Cleanup WebSocket connections on unmount
 - Remove event listeners properly
 - Use AbortController for fetch requests
 - Implement proper error boundaries
@@ -189,7 +188,6 @@ exportToCSV(tableData, 'my-export');
 
 ### Required Features
 - ES2020 support
-- WebSocket API
 - Canvas API (for charts)
 - CSS Grid and Flexbox
 

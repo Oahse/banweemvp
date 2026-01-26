@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeftIcon, PlusIcon, CalendarIcon, UserIcon, PackageIcon } from 'lucide-react';
-import { usePaginatedApi, useApi } from '../../hooks/useApi';
+import { usePaginatedApi, useApi } from '../../hooks/useAsync';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';

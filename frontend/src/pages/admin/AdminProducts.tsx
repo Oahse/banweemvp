@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PlusIcon, SearchIcon, FilterIcon, EditIcon, TrashIcon, ChevronDownIcon, EyeIcon, MoreHorizontalIcon } from 'lucide-react';
-import { usePaginatedApi } from '../../hooks/useApi';
+import { usePaginatedApi } from '../../hooks/useAsync';
 import { AdminAPI } from '../../apis';
 import { useCategories } from '../../contexts/CategoryContext';
 import ErrorMessage from '../../components/common/ErrorMessage';

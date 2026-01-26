@@ -105,7 +105,6 @@ const AdminWarehouseLocationForm = lazy(() => import('./pages/admin/AdminWarehou
 const AdminInventoryAdjustmentForm = lazy(() => import('./pages/admin/AdminInventoryAdjustmentForm').then((module) => ({ default: module.AdminInventoryAdjustmentForm })));
 const AdminStockAdjustments = lazy(() => import('./pages/admin/AdminStockAdjustments').then((module) => ({ default: module.AdminStockAdjustments })));
 const AdminInventoryItemForm = lazy(() => import('./pages/admin/AdminInventoryItemForm').then((module) => ({ default: module.AdminInventoryItemForm })));
-const AdminComments = lazy(() => import('./pages/admin/AdminComments').then((module) => ({ default: module.AdminComments })));
 const AdminShippingMethods = lazy(() => import('./pages/admin/AdminShippingMethods').then((module) => ({ default: module.AdminShippingMethods })));
 const AdminShippingMethodForm = lazy(() => import('./pages/admin/AdminShippingMethodForm').then((module) => ({ default: module.AdminShippingMethodForm })));
 const TaxRatesAdmin = lazy(() => import('./pages/admin/TaxRates').then((module) => ({ default: module.TaxRatesAdmin })));

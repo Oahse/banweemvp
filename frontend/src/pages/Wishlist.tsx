@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
-import { useAuthenticatedAction } from '../hooks/useAuthenticatedAction';
+import { useAuth } from '../hooks/useAuth';
 import { HeartIcon, ShoppingCartIcon, XCircleIcon, RefreshCwIcon, AlertCircleIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { PLACEHOLDER_IMAGES } from '../utils/placeholderImage';
@@ -10,7 +10,7 @@ import { PLACEHOLDER_IMAGES } from '../utils/placeholderImage';
 export const Wishlist = () => {
   const { defaultWishlist, removeItem, fetchWishlists, loading, error } = useWishlist();
   const { addItem: addToCart } = useCart();
-  const { executeWithAuth } = useAuthenticatedAction();
+  const { executeWithAuth } = useAuth();
 
   useEffect(() => {
     fetchWishlists();

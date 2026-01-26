@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import OrderDetails from '../order/OrderDetails';
-import { usePaginatedApi } from '../../hooks/useApi';
+import { usePaginatedApi } from '../../hooks/useAsync';
 import { OrdersAPI } from '../../apis';
 
 /**

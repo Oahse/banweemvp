@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, DownloadIcon, ShoppingBagIcon, TruckIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SkeletonOrderTable } from '../ui/SkeletonTable';
-import { usePaginatedApi } from '../../hooks/useApi';
+import { usePaginatedApi } from '../../hooks/useAsync';
 import OrdersAPI from '../../apis/orders';
 import { toast } from 'react-hot-toast';
 

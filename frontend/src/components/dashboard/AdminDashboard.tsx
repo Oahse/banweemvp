@@ -3,7 +3,7 @@ import { CustomizableDashboard } from './widgets/CustomizableDashboard';
 import { InteractiveChart } from './charts/InteractiveChart';
 import { GeographicChart } from './charts/GeographicChart';
 import { AdvancedTable } from './tables/AdvancedTable';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { AdminAPI } from '../../apis';
 import {
   BarChart3Icon,

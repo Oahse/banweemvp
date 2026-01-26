@@ -13,21 +13,6 @@ import { AuthProvider } from '../../contexts/AuthContext';
 import { server } from '../mocks/server';
 import { rest } from 'msw';
 
-// Mock WebSocket
-const mockWebSocket = {
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  send: vi.fn(),
-  close: vi.fn(),
-  readyState: WebSocket.OPEN
-};
-
-vi.mock('../../hooks/useWebSocket', () => ({
-  useWebSocket: () => ({
-    isConnected: true,
-    socket: mockWebSocket
-  })
-}));
 
 // Mock toast notifications
 vi.mock('react-hot-toast', () => ({
@@ -269,47 +254,6 @@ describe('Checkout Integration Tests', () => {
 
     // Should not navigate away
     expect(mockNavigate).not.toHaveBeenCalled();
-  });
-
-  it('should handle real-time price updates via WebSocket', async () => {
-    render(
-      <TestWrapper>
-        <Checkout />
-      </TestWrapper>
-    );
-
-    // Wait for initial load
-    await waitFor(() => {
-      expect(screen.getByText('$65.97')).toBeInTheDocument();
-    });
-
-    // Simulate price update event
-    const priceUpdateEvent = new CustomEvent('priceUpdate', {
-      detail: {
-        items: [
-          {
-            variant_id: 'variant-1',
-            old_price: 29.99,
-            new_price: 24.99,
-            price_change: -5.00
-          }
-        ],
-        summary: {
-          total_items_updated: 1,
-          total_price_change: -10.00, // 2 items * -5.00
-          new_total: 55.97
-        },
-        message: 'Prices updated due to promotion'
-      }
-    });
-
-    act(() => {
-      window.dispatchEvent(priceUpdateEvent);
-    });
-
-    // Should show price update notification
-    // Note: In a real test, you'd verify the toast was called
-    // and that the cart was refreshed with new prices
   });
 
   it('should validate form fields before submission', async () => {

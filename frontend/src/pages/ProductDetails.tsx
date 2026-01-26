@@ -25,14 +25,14 @@ import { SubscriptionSelector } from '../components/subscription/SubscriptionSel
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useLocale } from '../contexts/LocaleContext';
-import { useApi } from '../hooks/useApi';
-import { useSubscriptionAction } from '../hooks/useSubscriptionAction';
+import { useApi } from '../hooks/useAsync';
+import { useSubscriptionAction } from '../hooks/useSubscription';
 import { ProductsAPI } from '../apis';
 import { ReviewsAPI } from '../apis';
 
 import ErrorMessage from '../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';
-import { useAuthenticatedAction } from '../hooks/useAuthenticatedAction';
+import { useAuth } from '../hooks/useAuth';
 
 // Transform API product data with null checks
 const transformProduct = (product, averageRating, reviewCount) => {
@@ -95,7 +95,7 @@ export const ProductDetails = () => {
 
   const { addItem: addToCart, removeItem: removeFromCart, updateQuantity, cart } = useCart();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist, defaultWishlist } = useWishlist();
-  const { executeWithAuth } = useAuthenticatedAction();
+  const { executeWithAuth } = useAuth();
   const { isAuthenticated, hasActiveSubscriptions } = useSubscriptionAction();
   const { formatCurrency } = useLocale();
 

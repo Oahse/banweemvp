@@ -8,7 +8,7 @@ import {
   ArrowDownIcon,
   RefreshCwIcon
 } from 'lucide-react';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { AdminAPI } from '../../apis';
 import { themeClasses } from '../../lib/themeClasses';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';

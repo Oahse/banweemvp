@@ -4,10 +4,10 @@ import { ShoppingCartIcon, HeartIcon, ShareIcon, MinusIcon, PlusIcon, CheckIcon,
 import Breadcrumbs from '../ui/Breadcrumbs';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
-import { useAuthenticatedAction } from '../../hooks/useAuthenticatedAction';
+import { useAuth } from '../../hooks/useAuth';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { ProductsAPI } from '../../apis';
 
 import ErrorMessage from '../common/ErrorMessage';
@@ -43,7 +43,7 @@ export const ProductDetails = () => {
   const { id } = useParams();
   const { addItem } = useCart();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
-  const { executeWithAuth } = useAuthenticatedAction();
+  const { executeWithAuth } = useAuth();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState(undefined);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);

@@ -15,7 +15,6 @@ export { AdvancedTable } from './tables/AdvancedTable';
 
 // Widget Components
 export { CustomizableDashboard } from './widgets/CustomizableDashboard';
-export { RealTimeWidget } from './widgets/RealTimeWidget';
 
 // Utility Components
 export { exportToCSV, exportToJSON, exportToExcel, exportToPDF, exportChartAsPNG } from '../../lib/exportUtils';

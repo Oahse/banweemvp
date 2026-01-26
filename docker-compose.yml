@@ -61,22 +61,26 @@ services:
       - banwee_network
     restart: unless-stopped
 
-  # Unified Application (Frontend + Backend + ARQ Worker)
-  app:
+  # Backend API Service
+  backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
-    container_name: banwee_app
+    container_name: banwee_backend
     ports:
-      - "80:80"
       - "8000:8000"
     env_file:
-      - ./.env
+      - ./backend/.env.local
+    environment:
+      - ENVIRONMENT=local
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/.venv
     networks:
       - banwee_network
     restart: unless-stopped
@@ -86,6 +90,52 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: banwee_frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./frontend/.env
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - banwee_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ARQ Worker Service
+  arq_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: banwee_arq_worker
+    command: python start_arq_worker.py
+    env_file:
+      - ./backend/.env.local
+    environment:
+      - ENVIRONMENT=local
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/.venv
+    networks:
+      - banwee_network
+    restart: unless-stopped
 
 # Docker Volumes for data persistence
 volumes:

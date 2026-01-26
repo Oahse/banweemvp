@@ -4,8 +4,8 @@ import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon, CalendarIcon
 import { motion } from 'framer-motion';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
-import { useAuthenticatedAction } from '../../hooks/useAuthenticatedAction';
-import { useSubscriptionAction } from '../../hooks/useSubscriptionAction';
+import { useAuth } from '../../hooks/useAuth';
+import { useSubscriptionAction } from '../../hooks/useSubscription';
 import { useLocale } from '../../contexts/LocaleContext';
 import { SkeletonCard } from '../ui/SkeletonCard';
 import { QRCodeDisplay } from './QRCodeDisplay';
@@ -84,7 +84,7 @@ export const ProductCard = ({
 }) => {
   const { addItem: addToCart, cart } = useCart();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
-  const { executeWithAuth } = useAuthenticatedAction();
+  const { executeWithAuth } = useAuth();
   const { isAuthenticated, hasActiveSubscriptions } = useSubscriptionAction();
   const { formatCurrency } = useLocale();
   const [isAddingToSubscription, setIsAddingToSubscription] = useState(false);

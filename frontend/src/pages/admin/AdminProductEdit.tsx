@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ProductEditForm } from '../../components/admin/products/ProductEditForm';
 import { ArrowLeftIcon, SaveIcon } from 'lucide-react';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { ProductsAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { BarcodeDisplay } from '../../components/product/BarcodeDisplay';

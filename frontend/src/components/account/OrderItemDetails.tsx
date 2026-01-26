@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { apiClient, ProductsAPI } from '../../apis';
 
 /**

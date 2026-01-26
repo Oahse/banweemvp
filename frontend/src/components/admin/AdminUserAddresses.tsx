@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircleIcon, MapPinIcon, HomeIcon, BriefcaseIcon, TrashIcon, PencilIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { AdminAPI } from '../../apis/admin'; // Use AdminAPI
 
 export const AdminUserAddresses = ({ userId }) => { // Accept userId prop

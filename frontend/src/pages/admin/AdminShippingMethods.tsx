@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { SearchIcon, FilterIcon, EditIcon, TrashIcon, PlusIcon, TruckIcon } from 'lucide-react';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { AdminAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { ResponsiveTable } from '../../components/ui/ResponsiveTable';

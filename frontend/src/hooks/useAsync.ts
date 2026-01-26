@@ -1,7 +1,15 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 
-export function useAsync(options = {}) {
+interface UseAsyncOptions {
+  onSuccess?: (data: any) => void;
+  onError?: (error: any) => void;
+  showSuccessToast?: boolean;
+  showErrorToast?: boolean;
+  successMessage?: string;
+}
+
+export function useAsync(options: UseAsyncOptions = {}) {
   const {
     onSuccess,
     onError,
@@ -10,15 +18,19 @@ export function useAsync(options = {}) {
     successMessage = 'Success',
   } = options;
 
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
 
-  const execute = useCallback(async (asyncFn) => {
+  const execute = useCallback(async (asyncFn: (...args: any[]) => Promise<any>, ...args: any[]) => {
+    if (!asyncFn) return null;
+
     setLoading(true);
     setError(null);
 
     try {
-      const result = await asyncFn();
+      const result = await asyncFn(...args);
+      setData(result);
       
       if (showSuccessToast) {
         toast.success(successMessage);
@@ -29,7 +41,7 @@ export function useAsync(options = {}) {
       }
       
       return result;
-    } catch (err) {
+    } catch (err: any) {
       setError(err);
       
       if (showErrorToast) {
@@ -47,5 +59,42 @@ export function useAsync(options = {}) {
     }
   }, [onSuccess, onError, showSuccessToast, showErrorToast, successMessage]);
 
-  return { loading, error, execute };
+  return { data, loading, error, execute };
+}
+
+// Alias for API calls - same functionality
+export const useApi = useAsync;
+
+// Paginated version for admin pages
+export function usePaginatedApi(options: UseAsyncOptions = {}) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  
+  const { data, loading, error, execute: baseExecute } = useAsync(options);
+
+  const execute = useCallback(async (apiFunction: (...args: any[]) => Promise<any>, ...args: any[]) => {
+    const result = await baseExecute(apiFunction, ...args);
+    
+    if (result && typeof result === 'object') {
+      // Handle paginated response structure
+      if (result.data && Array.isArray(result.data)) {
+        setTotalPages(result.total_pages || 1);
+        setTotalItems(result.total || result.data.length);
+      }
+    }
+    
+    return result;
+  }, [baseExecute]);
+
+  return {
+    data,
+    loading,
+    error,
+    execute,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    totalItems
+  };
 }

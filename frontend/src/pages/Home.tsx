@@ -5,7 +5,7 @@ import { ArrowRightIcon, TruckIcon, BadgeCheckIcon, ShieldIcon, HeadphonesIcon, 
 import { ProductCard } from '../components/product/ProductCard';
 import { CategoryCard } from '../components/category/CategoryCard';
 import { useLocale } from '../contexts/LocaleContext';
-import { useApi } from '../hooks/useApi';
+import { useAsync } from '../hooks/useAsync';
 import { ProductsAPI } from '../apis/products';
 
 // Filter categories configuration system
@@ -103,7 +103,7 @@ export const Home = () => {
   const { formatCurrency } = useLocale();
 
   // Single API call for all home page data
-  const { data: homeData, loading: homeLoading, error: homeError, execute } = useApi();
+  const { data: homeData, loading: homeLoading, error: homeError, execute } = useAsync();
 
   const [categories, setCategories] = useState<any[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);

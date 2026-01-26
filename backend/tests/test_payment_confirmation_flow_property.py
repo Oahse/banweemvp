@@ -173,15 +173,6 @@ class TestPaymentConfirmationFlowProperty:
         async def mock_send_payment_failed_email(transaction, reason):
             mock_email_calls.append(('failure', transaction.id, reason))
 
-        # Mock Kafka producer for notifications
-        mock_kafka_producer = AsyncMock()
-        mock_kafka_calls = []
-
-        async def mock_send_message(topic, message):
-            mock_kafka_calls.append((topic, message))
-
-        mock_kafka_producer.send_message = mock_send_message
-
         # Mock activity service
         mock_activity_service = AsyncMock()
 
@@ -201,7 +192,6 @@ class TestPaymentConfirmationFlowProperty:
                 
                 with patch.object(payment_service, 'send_payment_receipt_email', side_effect=mock_send_payment_receipt_email):
                     with patch.object(payment_service, 'send_payment_failed_email', side_effect=mock_send_payment_failed_email):
-                        with patch('core.kafka.get_kafka_producer_service', return_value=mock_kafka_producer):
                             with patch('services.activity.ActivityService', return_value=mock_activity_service):
                                 
                                 try:
@@ -244,13 +234,6 @@ class TestPaymentConfirmationFlowProperty:
                                         activity = payment_activities[0]
                                         assert activity['user_id'] == sample_transaction.user_id, "Activity should be logged for correct user"
                                         assert str(sample_transaction.order_id) in str(activity.get('metadata', {})), "Activity should include order ID"
-
-                                        # Property: Notification should be sent if order exists
-                                        if has_order:
-                                            notification_calls = [call for call in mock_kafka_calls if 'NotificationService' in str(call[1])]
-                                            assert len(notification_calls) > 0, "Order confirmation notification should be sent"
-                                            notification_message = notification_calls[0][1]
-                                            assert str(sample_transaction.order_id) in str(notification_message), "Notification should reference order ID"
 
                                         # Property: Result should include order and transaction IDs
                                         if has_order:
@@ -428,12 +411,10 @@ class TestPaymentConfirmationFlowProperty:
             mock_email_calls.append(('receipt', transaction.id))
 
         mock_activity_service = AsyncMock()
-        mock_kafka_producer = AsyncMock()
 
         with patch('stripe.PaymentIntent.retrieve', return_value=mock_stripe_intent):
             with patch.object(payment_service, 'send_payment_receipt_email', side_effect=mock_send_payment_receipt_email):
                 with patch('services.activity.ActivityService', return_value=mock_activity_service):
-                    with patch('core.kafka.get_kafka_producer_service', return_value=mock_kafka_producer):
                         
                         try:
                             result = asyncio.run(payment_service.confirm_payment_and_order(

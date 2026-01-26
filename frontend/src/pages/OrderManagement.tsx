@@ -3,7 +3,7 @@ import OrderList from '../components/order/OrderList';
 import OrderDetails from '../components/order/OrderDetails';
 import SupplierOrderDashboard from '../components/supplier/SupplierOrderDashboard';
 import { useAuth } from '../contexts/AuthContext';
-import { usePaginatedApi } from '../hooks/useApi';
+import { usePaginatedApi } from '../hooks/useAsync';
 import { OrdersAPI } from '../apis';
 
 /**

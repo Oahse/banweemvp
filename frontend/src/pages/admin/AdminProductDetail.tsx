@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, EditIcon, TrashIcon, PackageIcon, TrendingUpIcon, UsersIcon, QrCodeIcon, ScanLineIcon } from 'lucide-react';
-import { useApi } from '../../hooks/useApi';
+import { useApi } from '../../hooks/useAsync';
 import { ProductsAPI } from '../../apis';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { BarcodeDisplay } from '../../components/product/BarcodeDisplay';

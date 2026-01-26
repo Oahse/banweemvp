@@ -42,18 +42,18 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Check if tables exist
-TABLES_EXIST=$(python -c "
+# Check if database is already initialized by checking for products
+PRODUCT_COUNT=$(python -c "
 import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import text
 from core.config import settings
 
-async def check_tables():
+async def check_products():
     engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI)
     try:
         async with engine.connect() as conn:
-            result = await conn.execute(text(\"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'\"))
+            result = await conn.execute(text('SELECT COUNT(*) FROM products'))
             count = result.scalar()
             print(count if count else 0)
     except Exception as e:
@@ -61,8 +61,16 @@ async def check_tables():
     finally:
         await engine.dispose()
 
-asyncio.run(check_tables())
+asyncio.run(check_products())
 " 2>/dev/null)
+
+# If database already has products, skip initialization
+if [ "$PRODUCT_COUNT" != "0" ] && [ -n "$PRODUCT_COUNT" ]; then
+    echo "✅ Database already initialized with $PRODUCT_COUNT products"
+    echo "✅ Database setup completed successfully"
+    echo "🚀 Starting FastAPI server..."
+    exec uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+fi
 
 # If no tables exist, initialize and seed the database
 if [ "$TABLES_EXIST" = "0" ] || [ -z "$TABLES_EXIST" ]; then
@@ -114,3 +122,6 @@ asyncio.run(check_products())
 fi
 
 echo "✅ Database setup completed successfully"
+
+echo "🚀 Starting FastAPI server..."
+exec uvicorn main:app --host 0.0.0.0 --port 8000 --reload
