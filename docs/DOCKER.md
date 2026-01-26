@@ -491,9 +491,6 @@ POSTGRES_PASSWORD=mypassword
 # Redis Configuration
 REDIS_URL=redis://redis:6379
 
-# Kafka Configuration
-KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-
 # Application Settings
 ENVIRONMENT=development
 DEBUG=true
@@ -515,9 +512,6 @@ POSTGRES_DB_URL=postgresql://myuser:mypassword@postgres:5432/myapp
 
 # Redis
 REDIS_URL=redis://redis:6379
-
-# Kafka
-KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 
 # Security
 SECRET_KEY=your-secret-key-here
@@ -548,7 +542,6 @@ LOG_FILE=/app/logs/app.log
 ```bash
 # API Configuration
 REACT_APP_API_URL=http://localhost:8000
-REACT_APP_WS_URL=ws://localhost:8000/ws
 
 # Stripe
 REACT_APP_STRIPE_PUBLISHABLE_KEY=pk_test_...

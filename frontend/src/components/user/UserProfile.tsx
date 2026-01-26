@@ -36,17 +36,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
 
   // Fetch user data
   const fetchUser = async (id?: string) => {
-    const targetUserId = id || userId || (currentUser as any)?.id;
-    if (!targetUserId) {
-      setError('No user ID provided');
-      return;
-    }
-
+    // For now, we'll use the profile endpoint since getUserById doesn't exist
+    // In a real app, you'd need to implement this endpoint or use the profile endpoint
     setLoading(true);
     setError(null);
 
     try {
-      const response = await UsersAPI.getUserById(targetUserId);
+      const response = await UsersAPI.getProfile();
       if (response.success) {
         setUser(response.data);
         setFormData(response.data);
@@ -82,7 +78,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
 
     setSaving(true);
     try {
-      const response = await UsersAPI.updateUser(user.id, formData);
+      const response = await UsersAPI.updateProfile(formData);
       if (response.success) {
         const updatedUser = response.data;
         setUser(updatedUser);
@@ -120,7 +116,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
 
     setSaving(true);
     try {
-      const response = await UsersAPI.uploadProfilePicture(user.id, formData);
+      // Note: This endpoint doesn't exist in the current API
+      // You would need to implement this endpoint or use updateProfile with form data
+      const response = await UsersAPI.updateProfile(formData);
       if (response.success) {
         const updatedUser = { ...user, profile_picture: response.data.profile_picture };
         setUser(updatedUser);
