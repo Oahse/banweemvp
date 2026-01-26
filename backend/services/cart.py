@@ -76,7 +76,7 @@ class CartService:
             await self.db.refresh(cart)
 
         # Calculate totals
-        subtotal = sum(item.total_price for item in cart.items)
+        subtotal = sum((item.total_price for item in cart.items), Decimal('0.0'))
         
         # Calculate tax if location provided
         tax_amount = Decimal('0.0')
@@ -103,7 +103,7 @@ class CartService:
             "shipping_amount": float(shipping_amount),
             "total_amount": float(total_amount),
             "item_count": len(cart.items),
-            "total_items": sum(item.quantity for item in cart.items),
+            "total_items": sum((item.quantity for item in cart.items), 0),
             "currency": "USD",  # Can be made configurable
             "created_at": cart.created_at.isoformat() if cart.created_at else None,
             "updated_at": cart.updated_at.isoformat() if cart.updated_at else None,

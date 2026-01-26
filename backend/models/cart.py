@@ -45,7 +45,7 @@ class CartItem(BaseModel):
 
     @property
     def total_price(self) -> Decimal:
-        return self.price_per_unit * self.quantity
+        return Decimal(str(self.price_per_unit)) * Decimal(str(self.quantity))
 
     @validates('quantity')
     def validate_quantity(self, key, quantity):

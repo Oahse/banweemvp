@@ -92,49 +92,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       throw new Error('User must be authenticated to add items to cart');
     }
 
-    // Optimistic update using setState
-    const previousCart = cart;
-    if (cart) {
-      const existingIndex = cart.items.findIndex(i => i.variant_id === item.variant_id);
-      let newItems;
-      
-      if (existingIndex >= 0) {
-        newItems = [...cart.items];
-        newItems[existingIndex] = {
-          ...newItems[existingIndex],
-          quantity: newItems[existingIndex].quantity + (item.quantity || 1)
-        };
-      } else {
-        const newItem = {
-          id: `temp-${Date.now()}`,
-          cart_id: cart.id || '',
-          variant_id: item.variant_id,
-          quantity: item.quantity || 1,
-          price_per_unit: item.price_per_unit || 0,
-          total_price: (item.price_per_unit || 0) * (item.quantity || 1),
-          variant: item.variant,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        newItems = [...cart.items, newItem];
-      }
-
-      const optimisticCart = {
-        ...cart,
-        items: newItems,
-        total_items: newItems.reduce((sum, i) => sum + i.quantity, 0)
-      };
-      setCart(optimisticCart);
-    }
+    // Only send the required fields to the backend
+    const requestData = {
+      variant_id: item.variant_id,
+      quantity: item.quantity || 1
+    };
 
     try {
-      const response = await CartAPI.addToCart(item, token);
+      const response = await CartAPI.addToCart(requestData, token);
       setCart(response?.data);
       toast.success(`Added ${item.quantity || 1} item${(item.quantity || 1) > 1 ? 's' : ''} to cart`);
       return true;
     } catch (error: any) {
-      // Revert optimistic update
-      setCart(previousCart);
       toast.error(error.message || 'Failed to add item to cart');
       throw error;
     }

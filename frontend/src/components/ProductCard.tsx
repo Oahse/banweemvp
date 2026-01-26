@@ -96,16 +96,6 @@ export const ProductCard = ({ product }: { product: any }) => {
       const cartItem = {
         variant_id: variant.id,
         quantity: selectedQuantity,
-        price_per_unit: isOnSale ? salePrice : price,
-        variant: {
-          ...variant,
-          product_name: product.name,
-          images: variant.images || [{ 
-            url: getPrimaryImage(), 
-            alt_text: `${product.name} - ${variant.name}`, 
-            is_primary: true 
-          }]
-        }
       };
 
       await addToCart(cartItem);
