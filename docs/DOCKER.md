@@ -289,7 +289,6 @@ services:
     environment:
       - POSTGRES_DB_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       - REDIS_URL=redis://redis:6379
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - ENVIRONMENT=production
     volumes:
       - backend_uploads:/app/uploads
@@ -436,27 +435,6 @@ redis-cli -h localhost -p 6379
 docker-compose exec redis redis-cli
 ```
 
-### Kafka Message Broker
-- **Port**: 9092
-- **Purpose**: Event streaming, async messaging
-- **Dependencies**: Zookeeper
-- **Topics**: Auto-created as needed
-
-**Testing:**
-```bash
-# List topics
-docker-compose exec kafka kafka-topics --bootstrap-server localhost:9092 --list
-
-# Create topic
-docker-compose exec kafka kafka-topics --bootstrap-server localhost:9092 --create --topic test-topic
-
-# Produce messages
-docker-compose exec kafka kafka-console-producer --bootstrap-server localhost:9092 --topic test-topic
-
-# Consume messages
-docker-compose exec kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic test-topic --from-beginning
-```
-
 ### Backend API
 - **Port**: 8000
 - **Framework**: FastAPI
@@ -589,11 +567,9 @@ The connection URLs for services differ based on the environment:
 -   **Development (`ENVIRONMENT=local`)**:
     -   Database: `localhost:5432`
     -   Redis: `localhost:6379`
-    -   Kafka: `localhost:9092`
 -   **Production (`ENVIRONMENT=production`)**:
     -   Database: `postgres:5432` (using the Docker service name)
     -   Redis: `redis:6379` (using the Docker service name)
-    -   Kafka: `kafka:29092` (using the Docker service name)
 
 ### Security Considerations
 

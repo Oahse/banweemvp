@@ -60,7 +60,7 @@ export const ProductCard = ({ product }: { product: any }) => {
     try {
       if (isWishlisted) {
         // Remove from wishlist logic would go here
-        toast.info('Item is already in your wishlist');
+        toast('Item is already in your wishlist');
       } else {
         await addToWishlist(product.id, variant.id, 1);
       }

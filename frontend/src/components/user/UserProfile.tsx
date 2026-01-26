@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { UserAPI } from '../../apis/users';
+import { UsersAPI } from '../../apis/users';
 import { useAuth } from '../../contexts/AuthContext';
 import { Loading } from '../Loading';
 import { Error } from '../Error';
@@ -46,7 +46,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
     setError(null);
 
     try {
-      const response = await UserAPI.getUserById(targetUserId);
+      const response = await UsersAPI.getUserById(targetUserId);
       if (response.success) {
         setUser(response.data);
         setFormData(response.data);
@@ -82,7 +82,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
 
     setSaving(true);
     try {
-      const response = await UserAPI.updateUser(user.id, formData);
+      const response = await UsersAPI.updateUser(user.id, formData);
       if (response.success) {
         const updatedUser = response.data;
         setUser(updatedUser);
@@ -120,7 +120,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
 
     setSaving(true);
     try {
-      const response = await UserAPI.uploadProfilePicture(user.id, formData);
+      const response = await UsersAPI.uploadProfilePicture(user.id, formData);
       if (response.success) {
         const updatedUser = { ...user, profile_picture: response.data.profile_picture };
         setUser(updatedUser);
