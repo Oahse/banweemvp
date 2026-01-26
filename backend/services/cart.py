@@ -79,18 +79,19 @@ class CartService:
         subtotal = sum(item.total_price for item in cart.items)
         
         # Calculate tax if location provided
-        tax_amount = 0.0
+        tax_amount = Decimal('0.0')
         if country_code and subtotal > 0:
             try:
                 tax_rate = await self.tax_service.get_tax_rate(country_code, province_code)
                 if tax_rate:
-                    tax_amount = float(subtotal) * tax_rate
+                    # Convert tax_rate to Decimal to avoid mixing Decimal and float
+                    tax_amount = subtotal * Decimal(str(tax_rate))
             except Exception as e:
                 logger.warning(f"Failed to calculate tax: {e}")
 
         # For now, shipping is 0 - can be calculated based on items/location
-        shipping_amount = 0.0
-        total_amount = float(subtotal) + tax_amount + shipping_amount
+        shipping_amount = Decimal('0.0')
+        total_amount = subtotal + tax_amount + shipping_amount
 
         # Convert cart to dict format expected by frontend
         cart_data = {
@@ -98,9 +99,9 @@ class CartService:
             "user_id": str(cart.user_id),
             "items": [],
             "subtotal": float(subtotal),
-            "tax_amount": tax_amount,
-            "shipping_amount": shipping_amount,
-            "total_amount": total_amount,
+            "tax_amount": float(tax_amount),
+            "shipping_amount": float(shipping_amount),
+            "total_amount": float(total_amount),
             "item_count": len(cart.items),
             "total_items": sum(item.quantity for item in cart.items),
             "currency": "USD",  # Can be made configurable
