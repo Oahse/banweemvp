@@ -122,7 +122,7 @@ async def update_cart_item(
         
         # Check if the specific item exists in cart
         cart_items = cart_data.get('items', [])
-        item_exists = any(item['id'] == str(cart_item_id) for item in cart_items)
+        item_exists = any(str(item['id']) == str(cart_item_id) for item in cart_items)
         if not item_exists:
             logger.warning(f"Cart item {cart_item_id} not found in user {current_user.id}'s cart")
             available_items = [item['id'] for item in cart_items]

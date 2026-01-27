@@ -322,7 +322,6 @@ class CartService:
         session_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """Update cart item quantity"""
-        
         if not user_id:
             raise HTTPException(status_code=401, detail="User must be authenticated")
 
