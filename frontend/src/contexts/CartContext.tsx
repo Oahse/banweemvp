@@ -18,6 +18,7 @@ interface CartContextType {
   items: Cart['items'];
   refreshCart: () => Promise<void>;
   validateCart: () => Promise<void>;
+  updateTrigger?: number;
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -31,9 +32,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
+  const [updateTrigger, setUpdateTrigger] = useState<number>(0);
   
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Force update function to trigger re-renders
+  const forceUpdate = useCallback(() => {
+    setUpdateTrigger(prev => prev + 1);
+  }, []);
 
   // Helper function to handle authentication errors
   const handleAuthError = useCallback((error: any) => {
@@ -164,6 +171,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       
       // Update state with complete backend response
       setCart(response?.data);
+      forceUpdate(); // Force re-render
       toast.success(`Added ${item.quantity || 1} item${(item.quantity || 1) > 1 ? 's' : ''} to cart`);
       return true;
     } catch (error: any) {
@@ -213,6 +221,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       const response = await CartAPI.removeFromCart(itemId, token);
       // Update with backend response to ensure consistency
       setCart(response?.data);
+      forceUpdate(); // Force re-render
       toast.success(`${itemName} removed from cart`);
     } catch (error: any) {
       // Revert optimistic update on error
@@ -265,6 +274,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       const response = await CartAPI.updateCartItem(itemId, quantity, token);
       // Update with backend response to ensure consistency
       setCart(response?.data);
+      forceUpdate(); // Force re-render
       toast.success('Cart updated');
     } catch (error: any) {
       // Revert optimistic update on error
@@ -305,6 +315,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       const response = await CartAPI.clearCart(token);
       // Update with backend response to ensure consistency
       setCart(response?.data || optimisticCart);
+      forceUpdate(); // Force re-render
       toast.success('Cart cleared');
     } catch (error: any) {
       // Revert optimistic update on error
@@ -331,6 +342,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         items,
         refreshCart,
         validateCart,
+        updateTrigger, // Add trigger to force re-renders
       }}
     >
       {children}

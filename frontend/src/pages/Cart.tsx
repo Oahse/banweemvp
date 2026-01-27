@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon, AlertCircle, CheckCircle, Loader2, RefreshCwIcon } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
@@ -16,7 +16,8 @@ export const Cart = () => {
     updateQuantity, 
     clearCart, 
     loading,
-    refreshCart
+    refreshCart,
+    updateTrigger
   } = useCart();
   const { isAuthenticated, isLoading: authLoading, setIntendedDestination } = useAuth();
   const { formatCurrency } = useLocale();
@@ -28,8 +29,8 @@ export const Cart = () => {
   const [clearingCart, setClearingCart] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Use cart items directly from context - no local state needed
-  const cartItems = cart?.items || [];
+  // Use cart items directly from context - memoized to ensure proper updates
+  const cartItems = useMemo(() => cart?.items || [], [cart?.items]);
   
   // Local functions to replace missing ones
   const fetchCart = refreshCart;
@@ -39,7 +40,17 @@ export const Cart = () => {
     if (isAuthenticated) {
       fetchCart();
     }
-  }, [isAuthenticated, fetchCart]);
+  }, [isAuthenticated]); // Remove fetchCart dependency to avoid stale closures
+
+  // Add effect to log cart changes for debugging
+  useEffect(() => {
+    console.log('Cart page detected cart change:', {
+      itemCount: cartItems.length,
+      cartId: cart?.id,
+      updateTrigger,
+      timestamp: new Date().toISOString()
+    });
+  }, [cart, cartItems, updateTrigger]);
   
   const validateForCheckout = () => {
     if (!cartItems.length) {
@@ -447,7 +458,7 @@ export const Cart = () => {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8 text-copy">
+    <div className="container mx-auto px-4 py-8 text-copy" key={`cart-${cart?.id || 'empty'}-${cartItems.length}`}>
       {/* Breadcrumb */}
       <nav className="flex mb-6 text-sm">
         <Link to="/" className="text-copy-lighter hover:text-primary">
