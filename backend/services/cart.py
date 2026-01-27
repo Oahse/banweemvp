@@ -563,26 +563,71 @@ class CartService:
         address: Dict[str, Any] = None,
         session_id: Optional[str] = None
     ) -> Dict[str, Any]:
-        """Get shipping options for cart (placeholder implementation)"""
-        # This would integrate with shipping service
-        return {
-            "shipping_options": [
-                {
-                    "id": "standard",
-                    "name": "Standard Shipping",
-                    "description": "3-5 business days",
-                    "price": 5.99,
-                    "estimated_days": "3-5"
-                },
-                {
-                    "id": "express",
-                    "name": "Express Shipping",
-                    "description": "1-2 business days",
-                    "price": 12.99,
-                    "estimated_days": "1-2"
-                }
-            ]
-        }
+        """Get shipping options for cart from database"""
+        from models.shipping import ShippingMethod
+        from sqlalchemy import select
+        
+        try:
+            # Get active shipping methods from database
+            result = await self.db.execute(
+                select(ShippingMethod).where(ShippingMethod.is_active == True)
+            )
+            shipping_methods = result.scalars().all()
+            
+            # Convert to API format
+            shipping_options = []
+            for method in shipping_methods:
+                shipping_options.append({
+                    "id": str(method.id),  # Convert UUID to string for JSON serialization
+                    "name": method.name,
+                    "description": method.description or f"{method.estimated_days} business days",
+                    "price": method.price,
+                    "estimated_days": str(method.estimated_days)
+                })
+            
+            # If no shipping methods in database, return default options
+            if not shipping_options:
+                shipping_options = [
+                    {
+                        "id": "standard",
+                        "name": "Standard Shipping",
+                        "description": "3-5 business days",
+                        "price": 5.99,
+                        "estimated_days": "3-5"
+                    },
+                    {
+                        "id": "express",
+                        "name": "Express Shipping", 
+                        "description": "1-2 business days",
+                        "price": 12.99,
+                        "estimated_days": "1-2"
+                    }
+                ]
+            
+            return {
+                "shipping_options": shipping_options
+            }
+            
+        except Exception as e:
+            # Fallback to default options if database query fails
+            return {
+                "shipping_options": [
+                    {
+                        "id": "standard",
+                        "name": "Standard Shipping",
+                        "description": "3-5 business days",
+                        "price": 5.99,
+                        "estimated_days": "3-5"
+                    },
+                    {
+                        "id": "express",
+                        "name": "Express Shipping",
+                        "description": "1-2 business days", 
+                        "price": 12.99,
+                        "estimated_days": "1-2"
+                    }
+                ]
+            }
 
     async def calculate_totals(
         self,
