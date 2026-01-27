@@ -235,7 +235,7 @@ async def validate_checkout(
                 # Handle both CartResponse object and dict
                 if hasattr(cart, 'items'):
                     # It's a Pydantic CartResponse object
-                    cart_items = cart.items
+                    cart_items = cart['items']
                     logger.info(f"Cart is a Pydantic object with {len(cart_items)} items")
                 elif isinstance(cart, dict) and 'items' in cart:
                     # It's a dictionary

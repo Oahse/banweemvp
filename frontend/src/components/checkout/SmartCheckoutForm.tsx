@@ -235,16 +235,14 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
         console.log('Extracted error details:', { errorMessage, errorDetails });
         
         // Only show validation errors if all required fields were provided
-        if (data.shipping_address_id && 
-            data.shipping_method_id && 
-            data.payment_method_id) {
-          setRealTimeValidation({ 
-            can_proceed: false, 
-            validation_errors: errorDetails.length > 0 ? errorDetails : [errorMessage]
-          });
-          
-          // Show toast with specific error
-          toast.error(`Checkout validation failed: ${errorMessage}`, { duration: 5000 });
+        if (data.shipping_address_id &&  data.shipping_method_id &&  data.payment_method_id) {
+            setRealTimeValidation({ 
+              can_proceed: false, 
+              validation_errors: errorDetails.length > 0 ? errorDetails : [errorMessage]
+            });
+            
+            // Show toast with specific error
+            toast.error(`Checkout validation failed--: ${errorMessage}`, { duration: 5000 });
         }
       }
     }, 500),
