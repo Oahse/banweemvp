@@ -133,8 +133,6 @@ export const Cart = () => {
 
   // Enhanced quantity change handler with optimistic updates
   const handleQuantityChange = useCallback(async (id: string, quantity: number) => {
-    console.log('handleQuantityChange called:', { id, quantity, isAuthenticated });
-    
     // Check authentication for cart operations
     if (!isAuthenticated) {
       setIntendedDestination({ 
@@ -147,19 +145,15 @@ export const Cart = () => {
 
     // If quantity is 0 or less, remove the item instead
     if (quantity <= 0) {
-      console.log('Quantity <= 0, removing item');
       await handleRemoveItem(id);
       return;
     }
 
-    console.log('Updating quantity to:', quantity);
-    
     // Add to processing items
     setProcessingItems(prev => new Set(prev).add(id));
 
     try {
       await updateQuantity(String(id), quantity);
-      console.log('Quantity updated successfully');
     } catch (error: any) {
       console.error('Failed to update quantity:', error);
       const errorMessage = error?.message || 'Failed to update cart. Please try again.';
@@ -411,10 +405,7 @@ export const Cart = () => {
           <div className="col-span-2 flex justify-center">
             <div className="flex items-center border border-border rounded-md">
               <button
-                onClick={() => {
-                  console.log('Minus clicked:', item.id, 'current quantity:', item.quantity, 'new quantity:', item.quantity - 1);
-                  handleQuantityChange(item.id, item.quantity - 1);
-                }}
+                onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                 disabled={item.quantity <= 1 || isProcessing}
                 className="px-2 py-1 text-copy-light hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed">
                 <MinusIcon size={14} />
@@ -431,10 +422,7 @@ export const Cart = () => {
                 className="w-10 text-center border-none focus:outline-none bg-transparent disabled:opacity-50"
               />
               <button
-                onClick={() => {
-                  console.log('Plus clicked:', item.id, 'current quantity:', item.quantity, 'new quantity:', item.quantity + 1, 'stock:', item.variant?.stock);
-                  handleQuantityChange(item.id, item.quantity + 1);
-                }}
+                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                 disabled={isProcessing || (item.variant?.stock !== undefined && item.quantity >= item.variant.stock)}
                 className="px-2 py-1 text-copy-light hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed">
                 <PlusIcon size={14} />
