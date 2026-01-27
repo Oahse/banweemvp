@@ -35,6 +35,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Debug: Log cart changes
+  useEffect(() => {
+    console.log('Cart state updated:', {
+      itemCount: cart?.items?.length || 0,
+      totalItems: cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0,
+      cartId: cart?.id
+    });
+  }, [cart]);
+
   // Helper function to handle authentication errors
   const handleAuthError = useCallback((error: any) => {
     if (error.message === 'User must be authenticated to add items to cart' || 
@@ -155,47 +164,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     // Store previous cart for rollback
     const previousCart = cart;
 
-    // Optimistic update: Update useState first
-    if (cart) {
-      // Check if item already exists
-      const existingItemIndex = cart.items.findIndex(i => i.variant_id === item.variant_id);
-      
-      if (existingItemIndex >= 0) {
-        // Update existing item quantity
-        const newItems = [...cart.items];
-        const existingItem = newItems[existingItemIndex];
-        newItems[existingItemIndex] = {
-          ...existingItem,
-          quantity: existingItem.quantity + (item.quantity || 1),
-          total_price: (existingItem.quantity + (item.quantity || 1)) * existingItem.price_per_unit
-        };
-        
-        const optimisticCart = {
-          ...cart,
-          items: newItems,
-          total_items: newItems.reduce((sum, i) => sum + i.quantity, 0)
-        };
-        setCart(optimisticCart);
-      } else {
-        // For new items, we'll let the backend response handle the addition
-        // since we don't have all the variant data locally
-      }
-    }
-
-    // Only send the required fields to the backend
-    const requestData = {
-      variant_id: item.variant_id,
-      quantity: item.quantity || 1
-    };
-
     try {
-      const response = await CartAPI.addToCart(requestData, token);
-      // Backend returns full cart with all variant fields
+      // Always call backend first to get complete cart data
+      const response = await CartAPI.addToCart({
+        variant_id: item.variant_id,
+        quantity: item.quantity || 1
+      }, token);
+      
+      // Update state with complete backend response
       setCart(response?.data);
       toast.success(`Added ${item.quantity || 1} item${(item.quantity || 1) > 1 ? 's' : ''} to cart`);
       return true;
     } catch (error: any) {
-      // Revert optimistic update on error
+      // Revert to previous cart on error
       setCart(previousCart);
       handleAuthError(error);
       throw error;
@@ -220,29 +201,31 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     const itemName = item?.variant?.product_name || item?.variant?.name || 'Item';
 
-    // Optimistic update using setState FIRST
+    // Store previous cart for rollback
     const previousCart = cart;
+
+    // Optimistic update: Remove item immediately from UI
     if (cart) {
       const newItems = cart.items.filter(i => i.id !== itemId);
+      const newSubtotal = newItems.reduce((sum, i) => sum + i.total_price, 0);
       const optimisticCart = {
         ...cart,
         items: newItems,
         total_items: newItems.reduce((sum, i) => sum + i.quantity, 0),
-        subtotal: newItems.reduce((sum, i) => sum + i.total_price, 0)
+        subtotal: newSubtotal,
+        item_count: newItems.length
       };
       setCart(optimisticCart);
     }
 
     try {
       const response = await CartAPI.removeFromCart(itemId, token);
-      // Backend returns updated cart with all variant fields
+      // Update with backend response to ensure consistency
       setCart(response?.data);
       toast.success(`${itemName} removed from cart`);
     } catch (error: any) {
-      // Revert optimistic update
+      // Revert optimistic update on error
       setCart(previousCart);
-      
-      // Handle cart sync errors with user-friendly messages
       handleCartSyncError(error, fetchCart);
       throw error;
     }
@@ -267,33 +250,34 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       throw new Error('Item not found in cart');
     }
 
-    // Optimistic update using setState FIRST
+    // Store previous cart for rollback
     const previousCart = cart;
+
+    // Optimistic update: Update quantity immediately in UI
     if (cart) {
       const newItems = cart.items.map(item => 
         item.id === itemId 
           ? { ...item, quantity, total_price: quantity * item.price_per_unit }
           : item
       );
+      const newSubtotal = newItems.reduce((sum, i) => sum + i.total_price, 0);
       const optimisticCart = {
         ...cart,
         items: newItems,
         total_items: newItems.reduce((sum, i) => sum + i.quantity, 0),
-        subtotal: newItems.reduce((sum, i) => sum + i.total_price, 0)
+        subtotal: newSubtotal
       };
       setCart(optimisticCart);
     }
 
     try {
       const response = await CartAPI.updateCartItem(itemId, quantity, token);
-      // Backend returns updated cart with all variant fields
+      // Update with backend response to ensure consistency
       setCart(response?.data);
       toast.success('Cart updated');
     } catch (error: any) {
-      // Revert optimistic update
+      // Revert optimistic update on error
       setCart(previousCart);
-      
-      // Handle cart sync errors with user-friendly messages
       handleCartSyncError(error, fetchCart);
       throw error;
     }
@@ -310,8 +294,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     if (!cart?.items?.length) throw new Error('Cart is already empty');
 
-    // Optimistic update using setState FIRST
+    // Store previous cart for rollback
     const previousCart = cart;
+
+    // Optimistic update: Clear cart immediately in UI
     const optimisticCart = { 
       ...cart, 
       items: [], 
@@ -319,17 +305,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       subtotal: 0,
       tax_amount: 0,
       shipping_amount: 0,
-      total_amount: 0
+      total_amount: 0,
+      item_count: 0
     };
     setCart(optimisticCart);
 
     try {
       const response = await CartAPI.clearCart(token);
-      // Backend returns empty cart with all fields properly set
+      // Update with backend response to ensure consistency
       setCart(response?.data || optimisticCart);
       toast.success('Cart cleared');
     } catch (error: any) {
-      // Revert optimistic update
+      // Revert optimistic update on error
       setCart(previousCart);
       handleAuthError(error);
       throw error;

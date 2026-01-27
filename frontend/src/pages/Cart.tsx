@@ -32,6 +32,13 @@ export const Cart = () => {
   
   // Local functions to replace missing ones
   const fetchCart = refreshCart;
+
+  // Refresh cart when component mounts or when navigating to cart page
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart();
+    }
+  }, [isAuthenticated, fetchCart]);
   
   const validateForCheckout = () => {
     if (!cartItems.length) {
