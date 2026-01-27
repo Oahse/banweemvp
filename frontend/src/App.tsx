@@ -87,50 +87,50 @@ export const App: React.FC = () => {
         <AuthProvider>
           <ThemeProvider>
             <LocaleProvider>
-              <CartProvider>
-                <SubscriptionProvider>
-                  <WishlistProvider>
-                      <CategoryProvider>
-                      <FontLoader />
-                      <Toaster
-                        position="top-right"
-                        toastOptions={{
-                          success: {
-                            duration: 3000,
-                            style: {
-                              background: 'var(--color-success)',
-                              color: 'var(--color-copy-inverse)',
-                            },
-                          },
-                          error: {
-                            duration: 5000,
-                            style: {
-                              background: 'var(--color-error)',
-                              color: 'var(--color-copy-inverse)',
-                            }
-                          },
-                          loading: {
-                            duration: Infinity, // Loading toasts should remain until dismissed by toast.success or toast.error
-                            style: {
-                              background: 'var(--color-surface-elevated)',
-                              color: 'var(--color-copy)',
-                            },
-                          },
-                          blank: {
-                            duration: 2000,
-                            style: {
-                              background: 'var(--color-surface)',
-                              color: 'var(--color-copy)',
-                            },
-                          },
-                        }}
-                      />
-                      <BrowserRouter
-                        future={{
-                          v7_startTransition: true,
-                          v7_relativeSplatPath: true,
-                        }}
-                      >
+              <CategoryProvider>
+                <FontLoader />
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    success: {
+                      duration: 3000,
+                      style: {
+                        background: 'var(--color-success)',
+                        color: 'var(--color-copy-inverse)',
+                      },
+                    },
+                    error: {
+                      duration: 5000,
+                      style: {
+                        background: 'var(--color-error)',
+                        color: 'var(--color-copy-inverse)',
+                      }
+                    },
+                    loading: {
+                      duration: Infinity, // Loading toasts should remain until dismissed by toast.success or toast.error
+                      style: {
+                        background: 'var(--color-surface-elevated)',
+                        color: 'var(--color-copy)',
+                      },
+                    },
+                    blank: {
+                      duration: 2000,
+                      style: {
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-copy)',
+                      },
+                    },
+                  }}
+                />
+                <BrowserRouter
+                  future={{
+                    v7_startTransition: true,
+                    v7_relativeSplatPath: true,
+                  }}
+                >
+                  <CartProvider>
+                    <SubscriptionProvider>
+                      <WishlistProvider>
                         <SupportWidget />
                         <Elements stripe={stripePromise}>
                           <Suspense fallback={<PageLoading />}>
@@ -476,11 +476,11 @@ export const App: React.FC = () => {
                             </Routes>
                           </Suspense>
                         </Elements>
-                      </BrowserRouter>
-                      </CategoryProvider>
-                </WishlistProvider>
-                </SubscriptionProvider>
-              </CartProvider>
+                      </WishlistProvider>
+                    </SubscriptionProvider>
+                  </CartProvider>
+                </BrowserRouter>
+              </CategoryProvider>
             </LocaleProvider>
           </ThemeProvider>
         </AuthProvider>
