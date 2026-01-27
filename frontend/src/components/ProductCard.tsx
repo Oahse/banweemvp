@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { HeartIcon, ShoppingCartIcon, EyeIcon } from 'lucide-react';
+import { HeartIcon, ShoppingCartIcon, EyeIcon, CalendarIcon } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import { useSubscription } from '../contexts/SubscriptionContext';
 import { stockMonitor } from '../services/stockMonitoring';
 import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
@@ -10,12 +11,14 @@ import { themeClasses, combineThemeClasses } from '../lib/themeClasses';
 export const ProductCard = ({ product }: { product: any }) => {
   // ✅ Using useState for local state management
   const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false);
+  const [isAddingToSubscription, setIsAddingToSubscription] = useState<boolean>(false);
   const [isAddingToWishlist, setIsAddingToWishlist] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const [stockStatus, setStockStatus] = useState<any>(null);
 
   const { addItem: addToCart } = useCart();
+  const { activeSubscription, addProductsToSubscription } = useSubscription();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
 
   const variant = product.variants?.[0] || product;
@@ -110,6 +113,40 @@ export const ProductCard = ({ product }: { product: any }) => {
     }
   };
 
+  // Handle adding to Subscription - automatically add 1 quantity
+  const handleAddToSubscription = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation if this is inside a Link
+    
+    if (!isInStock || stockStatus?.status === 'out_of_stock') {
+      toast.error('This item is currently out of stock');
+      return;
+    }
+
+    if (!activeSubscription) {
+      toast.error('You need an active subscription to add products');
+      return;
+    }
+
+    setIsAddingToSubscription(true);
+
+    try {
+      await addProductsToSubscription(activeSubscription.id, [variant.id]);
+
+      // Update stock monitoring after successful subscription addition
+      const newStock = variant.stock - 1;
+      stockMonitor.updateStock(variant.id, newStock, product.name, variant.name);
+      
+      // Update local stock status
+      const status = stockMonitor.getStockStatus(variant.id);
+      setStockStatus(status);
+      
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to add item to subscription');
+    } finally {
+      setIsAddingToSubscription(false);
+    }
+  };
+
   // Handle adding to wishlist
   const handleAddToWishlist = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation if this is inside a Link
@@ -130,7 +167,7 @@ export const ProductCard = ({ product }: { product: any }) => {
   };
 
   // Handle image error
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+  const handleImageError = () => {
     if (!imageError) {
       setImageError(true);
     }
@@ -139,22 +176,6 @@ export const ProductCard = ({ product }: { product: any }) => {
   // Handle image load
   const handleImageLoad = () => {
     setImageLoaded(true);
-  };
-
-  // Handle quantity change - removed since we don't need quantity selector
-
-  // Get stock status styling - Theme-aware
-  const getStockStatusStyle = () => {
-    if (!stockStatus) return '';
-    
-    const styles: Record<string, string> = {
-      in_stock: 'text-green-600 dark:text-green-400',
-      low_stock: 'text-yellow-600 dark:text-yellow-400',
-      critical: 'text-orange-600 dark:text-orange-400',
-      out_of_stock: 'text-red-600 dark:text-red-400'
-    };
-    
-    return styles[stockStatus.status] || combineThemeClasses(themeClasses.text.muted);
   };
 
   return (
@@ -324,7 +345,13 @@ export const ProductCard = ({ product }: { product: any }) => {
 
         {/* Stock Status - Theme-aware */}
         {stockStatus && (
-          <div className={`text-xs font-medium ${getStockStatusStyle()}`}>
+          <div className={`text-xs font-medium ${
+            stockStatus.status === 'in_stock' ? 'text-green-600 dark:text-green-400' :
+            stockStatus.status === 'low_stock' ? 'text-yellow-600 dark:text-yellow-400' :
+            stockStatus.status === 'critical' ? 'text-orange-600 dark:text-orange-400' :
+            stockStatus.status === 'out_of_stock' ? 'text-red-600 dark:text-red-400' :
+            combineThemeClasses(themeClasses.text.muted)
+          }`}>
             {stockStatus.message}
           </div>
         )}
@@ -368,6 +395,48 @@ export const ProductCard = ({ product }: { product: any }) => {
             </>
           )}
         </button>
+
+        {/* Add to Subscription Button - Only show if user has active subscription */}
+        {activeSubscription && (
+          <button
+            onClick={handleAddToSubscription}
+            disabled={!isInStock || isAddingToSubscription || stockStatus?.status === 'out_of_stock'}
+            className={combineThemeClasses(
+              'w-full flex items-center justify-center gap-1 sm:gap-1.5 px-2 py-1.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]',
+              themeClasses.interactive.disabled,
+              isInStock && stockStatus?.status !== 'out_of_stock'
+                ? combineThemeClasses(
+                    'bg-secondary hover:bg-secondary-dark dark:bg-secondary-light dark:hover:bg-secondary',
+                    themeClasses.text.inverse,
+                    themeClasses.shadow.sm,
+                    'hover:shadow-md'
+                  )
+                : combineThemeClasses(
+                    themeClasses.background.disabled,
+                    themeClasses.text.muted,
+                    'cursor-not-allowed'
+                  )
+            )}
+          >
+            {isAddingToSubscription ? (
+              <>
+                <div className={combineThemeClasses(themeClasses.loading.spinner, 'w-3 h-3 border-current border-t-transparent')}></div>
+                <span className="hidden sm:inline">Adding...</span>
+                <span className="sm:hidden">...</span>
+              </>
+            ) : (
+              <>
+                <CalendarIcon size={12} className="sm:w-3.5 sm:h-3.5" />
+                <span className="hidden sm:inline">
+                  {!isInStock || stockStatus?.status === 'out_of_stock' ? 'Out of Stock' : 'Add to Subscription'}
+                </span>
+                <span className="sm:hidden">
+                  {!isInStock || stockStatus?.status === 'out_of_stock' ? 'Out' : 'Subscribe'}
+                </span>
+              </>
+            )}
+          </button>
+        )}
 
         {/* Additional stock info - Responsive */}
         {isInStock && stockStatus?.status === 'critical' && variant.stock && (
