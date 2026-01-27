@@ -35,15 +35,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Debug: Log cart changes
-  useEffect(() => {
-    console.log('Cart state updated:', {
-      itemCount: cart?.items?.length || 0,
-      totalItems: cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0,
-      cartId: cart?.id
-    });
-  }, [cart]);
-
   // Helper function to handle authentication errors
   const handleAuthError = useCallback((error: any) => {
     if (error.message === 'User must be authenticated to add items to cart' || 

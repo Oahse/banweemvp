@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon, AlertCircle, CheckCircle, Loader2, RefreshCwIcon } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-hot-toast';
@@ -26,6 +26,7 @@ export const Cart = () => {
   const [taxLocation, setTaxLocation] = useState<{ country: string; province?: string }>({ country: 'US' });
   const [processingItems, setProcessingItems] = useState<Set<string>>(new Set());
   const [clearingCart, setClearingCart] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Use cart items directly from context - no local state needed
   const cartItems = cart?.items || [];
@@ -456,7 +457,24 @@ export const Cart = () => {
         <span className="text-copy">Shopping Cart</span>
       </nav>
 
-      <h1 className="text-2xl md:text-3xl font-bold text-copy mb-6">Your Shopping Cart</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-copy mb-6 flex items-center justify-between">
+        <span>Your Shopping Cart</span>
+        <button
+          onClick={() => {
+            setRefreshing(true);
+            fetchCart().finally(() => setRefreshing(false));
+          }}
+          className="text-sm bg-primary hover:bg-primary-dark text-white px-3 py-1 rounded-md transition-colors flex items-center"
+          disabled={refreshing || loading}
+        >
+          {refreshing ? (
+            <Loader2 size={16} className="animate-spin mr-1" />
+          ) : (
+            <RefreshCwIcon size={16} className="mr-1" />
+          )}
+          Refresh
+        </button>
+      </h1>
 
       {cartItems.length === 0 ? (
         <div className="text-center py-12">
