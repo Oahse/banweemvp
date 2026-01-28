@@ -13,7 +13,7 @@ from schemas.product import (
     ProductVariantResponse, CategoryResponse, SupplierResponse,
     ProductImageResponse, PriceRange
 )
-from lib.errors import APIException
+from core.errors import APIException
 
 
 class ProductService:

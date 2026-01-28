@@ -2,10 +2,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from typing import List, Optional
 from uuid import UUID
-from lib.utils.uuid_utils import uuid7
+from core.utils.uuid_utils import uuid7
 from models.shipping import ShippingMethod
 from schemas.shipping import ShippingMethodCreate, ShippingMethodUpdate
-from lib.errors import APIException
+from core.errors import APIException
 import logging
 
 logger = logging.getLogger(__name__)

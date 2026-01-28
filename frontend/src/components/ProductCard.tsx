@@ -3,7 +3,7 @@ import { HeartIcon, ShoppingCartIcon, EyeIcon, CalendarIcon } from 'lucide-react
 import { useCart } from '../store/CartContext';
 import { useWishlist } from '../store/WishlistContext';
 import { useSubscription } from '../store/SubscriptionContext';
-import { stockMonitor } from '../services/stockMonitoring';
+import { stockMonitor } from '../utils/stock';
 import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { themeClasses, combineThemeClasses } from '../utils/themeClasses';

@@ -31,8 +31,6 @@
 - [Tech Stack](#tech-stack)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
-  - [Docker Setup (Recommended)](#docker-setup-recommended)
-  - [Local Development Setup](#local-development-setup)
 - [Usage](#usage)
 - [Testing](#testing)
 - [Documentation](#documentation)
@@ -84,7 +82,6 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 - 📧 **Email System** - email templates with Mailgun integration
 - 🎨 **Modern UI** - Tailwind CSS with custom theming
 - 🔒 **Security** - JWT authentication, password hashing, CORS protection
-- 🐳 **Docker Support** - Complete containerized deployment
 - 🧪 **Property-Based Testing** - Comprehensive test coverage with Hypothesis
 - 📝 **API Documentation** - Auto-generated Swagger/ReDoc documentation
 - 🖼️ **CDN Image Delivery** - GitHub + jsDelivr for fast image loading
@@ -117,34 +114,33 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 - **Email**: Mailgun API
 - **Payment**: Stripe API
 - **Testing**: Pytest, Hypothesis (PBT)
-- **Migrations**: Alembic (runs automatically on Docker startup)
+- **Migrations**: Alembic (automatic on startup)
 - **ASGI Server**: Uvicorn
 
 ### Infrastructure
-- **Containerization**: Docker & Docker Compose
-- **Database**: PostgreSQL 16
-- **Cache**: Redis 7
+- **Database**: Neon PostgreSQL (Cloud)
+- **Cache**: Upstash Redis (Cloud)
 - **Image CDN**: GitHub + jsDelivr
 
 ---
 
 ## 📦 Prerequisites
 
-### For Docker Setup (Recommended)
-- Docker 20.10+
-- Docker Compose 2.0+
-
-### For Local Development
+### System Requirements
 - Python 3.11 or higher
 - Node.js 18 or higher
-- PostgreSQL 14 or higher
-- Redis 6 or higher
 - Git
+
+### Cloud Services (Pre-configured)
+- Neon PostgreSQL (database URL already in `.env`)
+- Upstash Redis (cache URL already in `.env`)
 
 ### Optional Services
 - Stripe account (for payment processing)
 - Mailgun account (for email confirmations)
 - GitHub account (for image storage)
+
+**Note**: No local database installation required - cloud databases are pre-configured and ready to use.
 
 ---
 
@@ -152,220 +148,119 @@ The platform features a React-based frontend with TypeScript for type safety, a 
 
 ### Prerequisites
 
-- Docker & Docker Compose (recommended)
-- OR: Python 3.11+, Node.js 18+, PostgreSQL 14+, Redis
+- Python 3.11 or higher
+- Node.js 18 or higher
+- Git
 
-### Docker Setup (Recommended)
+**Note**: Docker has been removed from this project. The application now uses cloud databases (Neon PostgreSQL and Upstash Redis) for simplified deployment.
 
-**The fastest way to get started with Docker:**
+### Cloud Database Setup
 
-#### Prerequisites
-- Docker 20.10+ and Docker Compose 2.0+
-- 4GB+ RAM available for containers
-- 10GB+ free disk space
+This application uses cloud databases instead of local Docker containers:
 
-#### Step-by-Step Setup
+- **Database**: Neon PostgreSQL (already configured in `.env`)
+- **Cache**: Upstash Redis (already configured in `.env`)
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Oahse/banweemvp.git
-   cd banweemvp
-   ```
+No additional database setup is required - the cloud databases are ready to use.
 
-2. **Configure environment variables**
-   ```bash
-   # Backend configuration (already configured for Docker)
-   cp backend/.env.example backend/.env
-   
-   # Frontend configuration (already configured for Docker)
-   cp frontend/.env.example frontend/.env
-   
-   # Optional: Update with your API keys for full functionality
-   # - Stripe keys for payment processing
-   # - Mailgun keys for email confirmations
-   # - Social auth keys for OAuth login
-   ```
+### One-Command Setup
 
-3. **Start all services**
-   ```bash
-   # Start all services in the background
-   docker-compose up -d
-   
-   # Or use the convenience script
-   ./docker-start.sh
-   ```
-
-4. **Verify services are running**
-   ```bash
-   # Check service status
-   docker-compose ps
-   
-   # All services should show "healthy" or "running" status:
-   # - PostgreSQL (healthy)
-   # - Redis (healthy)  
-   # - Backend (healthy)
-   # - Frontend (healthy)
-      ```
-
-5. **Access the application**
-   - **Frontend**: http://localhost:5173
-   - **Backend API**: http://localhost:8000
-   - **API Documentation**: http://localhost:8000/docs
-   - **Health Check**: http://localhost:8000/health/live
-
-6. **Optional: Seed with sample data**
-   ```bash
-   # Add sample products, users, and orders
-   ./seed-database.sh
-   ```
-
-#### Docker Services Overview
-
-| Service | Port | Description |
-|---------|------|-------------|
-| Frontend | 5173 | React/Vite development server |
-| Backend | 8000 | FastAPI application server |
-| PostgreSQL | 5432 | Database server |
-| Redis | 6379 | Cache and message broker |
-
-
-#### Default Credentials (After Seeding)
-- **Admin**: `admin@banwee.com` / `adminpass`
-- **Supplier**: `supplier@banwee.com` / `supplierpass`
-- **Customer**: `customer@banwee.com` / `customerpass`
-
-#### Docker Commands
+**The fastest way to get started:**
 
 ```bash
-# Start services
-docker-compose up -d
+# Clone the repository
+git clone https://github.com/Oahse/banweemvp.git
+cd banweemvp
 
-# View logs
-docker-compose logs -f [service_name]
-
-# Stop services
-docker-compose down
-
-# Rebuild services (after code changes)
-docker-compose build
-docker-compose up -d
-
-# Clean restart (removes volumes - WARNING: deletes data)
-docker-compose down -v
-docker-compose up -d
-
-# Access service shell
-docker-compose exec backend bash
-docker-compose exec frontend sh
+# Start the application (initializes database and starts servers)
+./start-app.sh
 ```
 
-#### Troubleshooting Docker Setup
+This script will:
+1. Set up Python virtual environment
+2. Install all dependencies
+3. Initialize and seed the database
+4. Start both backend and frontend servers
 
-**Services not starting:**
+### Manual Setup
+
+If you prefer to set up manually:
+
+#### 1. Clone the repository
 ```bash
-# Check Docker daemon is running
-docker info
-
-# Check service logs
-docker-compose logs backend
-docker-compose logs frontend
-
-# Restart specific service
-docker-compose restart backend
+git clone https://github.com/Oahse/banweemvp.git
+cd banweemvp
 ```
+
+#### 2. Initialize Database
+```bash
+# Initialize database with sample data
+./init-database.sh
+
+# Or without sample data
+./init-database.sh --no-seed
+```
+
+#### 3. Start Backend
+```bash
+cd backend
+source .venv/bin/activate  # Virtual environment is created by init script
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+#### 4. Start Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Access the Application
+
+Once running, you can access:
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
+
+### Default Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@banwee.com | admin123 |
+| Supplier | supplier1@banwee.com | supplier1123 |
+| Customer | customer1@example.com | customer1123 |
+
+### Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `./start-app.sh` | Complete setup and start (recommended) |
+| `./init-database.sh` | Initialize database only |
+| `./deploy-to-github.sh` | Commit and push changes to GitHub |
+
+### Troubleshooting
 
 **Database connection issues:**
-```bash
-# Check PostgreSQL is healthy
-docker-compose ps postgres
-
-# Test database connection
-docker-compose exec backend python -c "from core.database import db_manager; print('DB OK')"
-```
+- Verify your `.env` file contains the correct `POSTGRES_DB_URL`
+- Check your internet connection (cloud database required)
 
 **Port conflicts:**
 ```bash
 # Check if ports are in use
 lsof -i :5173  # Frontend
 lsof -i :8000  # Backend
-lsof -i :5432  # PostgreSQL
-lsof -i :6379  # Redis
-
-# Stop conflicting services or change ports in docker-compose.yml
 ```
 
-**Performance issues:**
+**Python environment issues:**
 ```bash
-# Check Docker resource usage
-docker stats
-
-# Increase Docker memory limit in Docker Desktop settings
-# Recommended: 4GB+ RAM, 2+ CPU cores
+# Recreate virtual environment
+cd backend
+rm -rf .venv
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
-
-### Local Development Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Oahse/banweemvp.git
-   cd banwee-platform
-   ```
-
-2. **Backend Setup**
-   ```bash
-   cd backend
-   
-   # Create and activate virtual environment
-   python3 -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   
-   # Install dependencies
-   pip install -r requirements.txt
-   
-   # Configure environment variables
-   cp .env.example .env
-   # Edit .env file - update POSTGRES_DB_URL if needed
-   
-   # Initialize database
-   python init_db.py --seed
-   
-   # Start the backend server
-   uvicorn main:app --reload
-   ```
-
-3. **Frontend Setup**
-   ```bash
-   cd frontend
-   
-   # Install dependencies
-   npm install
-   
-   # Configure environment variables
-   cp .env.example .env
-   
-   # Start the development server
-   npm run dev
-   ```
-
-4. **Access the Application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:8000
-   - API Documentation (Swagger): http://localhost:8000/docs
-   - Alternative API Docs (ReDoc): http://localhost:8000/redoc
-
-### GitHub Image Upload Configuration (Optional)
-
-The platform supports uploading product images to GitHub for CDN delivery via jsDelivr:
-
-1. Create a GitHub repository for image storage
-2. Generate a GitHub Personal Access Token with `repo` permissions
-3. Update `frontend/src/lib/github.tsx` with your repository details:
-   - `GITHUB_OWNER`: Your GitHub username
-   - `GITHUB_REPO`: Your repository name
-   - `GITHUB_BRANCH`: Branch to use (typically `main`)
-4. Encrypt your GitHub token and update the `encryptedToken` variable
-
-**Note**: For production, store the GitHub token in environment variables instead of hardcoding it.
 
 ## 🧪 Testing
 
@@ -408,9 +303,9 @@ The seeded database includes the following test accounts:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@banwee.com | adminpass |
-| Supplier | supplier@banwee.com | supplierpass |
-| Customer | customer@banwee.com | customerpass |
+| Admin | admin@banwee.com | admin123 |
+| Supplier | supplier1@banwee.com | supplier1123 |
+| Customer | customer1@example.com | customer1123 |
 
 ### Key Workflows
 
@@ -454,8 +349,8 @@ The platform includes an innovative price negotiation system:
 All project documentation is now located in the `docs/` directory.
 
 - **[API.md](./docs/API.md)** - Complete API endpoint reference and usage guide.
-- **[DOCKER.md](./docs/DOCKER.md)** - Docker setup, commands, and troubleshooting.
 - **[MIGRATION.md](./docs/MIGRATION.md)** - Database migration guide.
+- **[ENVIRONMENT.md](./docs/ENVIRONMENT.md)** - Environment configuration guide.
 - **[EMAIL_USE_CASES.txt](./docs/EMAIL_USE_CASES.txt)** - Quick reference for all 45 email use cases.
 
 ### Live Documentation
@@ -546,7 +441,7 @@ All backend environment variables should be configured in `backend/.env`. See `b
 |----------|-------------|---------|
 | `POSTGRES_DB_URL` | Complete PostgreSQL connection URL | `postgresql+asyncpg://banwee:banwee_password@postgres:5432/banwee_db` |
 | `SECRET_KEY` | JWT secret key (min 32 chars) | Generate with `openssl rand -hex 32` |
-| `REDIS_URL` | Redis connection URL (use `redis://redis:6379/0` for Docker) | `redis://redis:6379/0` |
+| `REDIS_URL` | Redis connection URL | `rediss://default:***@upstash.io:6379` |
 
 #### Optional Variables
 
@@ -608,65 +503,6 @@ All frontend environment variables should be configured in `frontend/.env`. See 
 | `VITE_FACEBOOK_APP_ID` | Facebook app ID | - |
 | `VITE_TIKTOK_CLIENT_ID` | TikTok client ID | - |
 
-### Docker Environment Variables
-
-When using Docker, environment variables are automatically configured for container networking:
-
-#### Pre-configured for Docker
-The included `.env` files are already configured for Docker deployment:
-
-**Backend (`backend/.env`):**
-```bash
-# Database (configured for Docker service names)
-POSTGRES_DB_URL=postgresql+asyncpg://banwee:banwee_password@postgres:5432/banwee_db
-REDIS_URL=redis://redis:6379/0
-
-# CORS (configured for Docker networking)
-BACKEND_CORS_ORIGINS=http://localhost:5173,http://localhost:5173,http://127.0.0.1:5173
-```
-
-**Frontend (`frontend/.env`):**
-```bash
-# API endpoint (configured for Docker host networking)
-VITE_API_BASE_URL=http://localhost:8000/v1
-```
-
-#### Optional Service Configuration
-To enable full functionality, add your API keys to `backend/.env`:
-
-```bash
-# Stripe (for payment processing)
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
-STRIPE_PUBLIC_KEY=pk_test_your_stripe_public_key
-
-# Mailgun (for email confirmations)
-MAILGUN_API_KEY=your_mailgun_api_key
-MAILGUN_DOMAIN=mg.yourdomain.com
-MAILGUN_FROM_EMAIL=Banwee <noreply@yourdomain.com>
-
-# Social Authentication (optional)
-GOOGLE_CLIENT_ID=your_google_client_id
-FACEBOOK_APP_ID=your_facebook_app_id
-TIKTOK_CLIENT_KEY=your_tiktok_client_key
-```
-
-And to `frontend/.env`:
-```bash
-# Stripe (for payment processing)
-VITE_STRIPE_PUBLIC_KEY=pk_test_your_stripe_public_key
-
-# Social Authentication (optional)
-VITE_GOOGLE_CLIENT_ID=your_google_client_id
-VITE_FACEBOOK_APP_ID=your_facebook_app_id
-VITE_TIKTOK_CLIENT_ID=your_tiktok_client_id
-```
-
-#### Docker-specific considerations:
-- Service names are used for inter-container communication (`postgres`, `redis`)
-- Host networking is used for browser-to-backend communication (`localhost:8000`)
-- Environment variables are passed through `docker-compose.yml`
-- Sensitive variables should never be committed to git
-
 ### Security Best Practices
 
 1. **Never commit `.env` files** - They contain sensitive credentials
@@ -680,11 +516,12 @@ VITE_TIKTOK_CLIENT_ID=your_tiktok_client_id
 
 ### Database Migrations
 
-Migrations are handled automatically when the Docker container starts. For manual migration operations:
+Migrations are handled automatically when the application starts. For manual migration operations:
 
 ```bash
-# Enter the backend container
-docker-compose exec backend sh
+# Navigate to backend directory
+cd backend
+source .venv/bin/activate
 
 # Create new migration (after model changes)
 alembic revision --autogenerate -m "Description of changes"
@@ -743,21 +580,12 @@ gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind localhost:8000
 # Deploy to: AWS EC2, DigitalOcean Droplet, Heroku, or any VPS
 ```
 
-#### Docker Production Deployment
-```bash
-# Build production images
-docker-compose -f docker-compose.prod.yml build
-
-# Deploy with orchestration
-# Use Kubernetes, Docker Swarm, or AWS ECS for production
-```
-
 ### Recommended Hosting Platforms
 
 - **Frontend**: Vercel, Netlify, AWS Amplify, Cloudflare Pages
 - **Backend**: AWS EC2/ECS, DigitalOcean, Heroku, Railway
-- **Database**: AWS RDS, DigitalOcean Managed Database, Supabase
-- **Redis**: AWS ElastiCache, Redis Cloud, DigitalOcean Managed Redis
+- **Database**: Neon PostgreSQL (already configured)
+- **Cache**: Upstash Redis (already configured)
 - **Full Stack**: AWS, Google Cloud Platform, Azure, DigitalOcean
 
 ---

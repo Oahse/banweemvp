@@ -1,0 +1,166 @@
+{% extends "base_banwee.html" %}
+
+{% block title %}Order Confirmed - Banwee{% endblock %}
+
+{% block content %}
+<h1>✅ Order Confirmed!</h1>
+
+<p>Hi {{ customer_name | default("there") }},</p>
+
+<p>
+    Thank you for your order! We're excited to prepare your authentic African products for delivery. 
+    Your order <strong style="color: #E67E22;">#{{ order_number }}</strong> has been confirmed and will be 
+    processed shortly.
+</p>
+
+<div class="highlight-box">
+    <h3>📦 Order Details</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+        <thead>
+            <tr style="border-bottom: 2px solid #2D5016;">
+                <th style="padding: 10px; text-align: left; color: #2D5016;">Product</th>
+                <th style="padding: 10px; text-align: center; color: #2D5016;">Qty</th>
+                <th style="padding: 10px; text-align: right; color: #2D5016;">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+            <tr style="border-bottom: 1px solid #ECF0F1;">
+                <td style="padding: 12px 10px;">{{ item.name }}</td>
+                <td style="padding: 12px 10px; text-align: center;">{{ item.quantity }}</td>
+                <td style="padding: 12px 10px; text-align: right; font-weight: 600;">{{ item.price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="border-top: 2px solid #2D5016;">
+                <td colspan="2" style="padding: 15px 10px; text-align: right; font-weight: bold; font-size: 16px;">Total:</td>
+                <td style="padding: 15px 10px; text-align: right; font-weight: bold; font-size: 18px; color: #E67E22;">{{ order_total }}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div style="background-color: #F5F5F5; padding: 20px; border-radius: 8px; margin: 25px 0;">
+    <p style="margin: 0 0 10px 0;"><strong>📅 Order Date:</strong> {{ order_date }}</p>
+    <p style="margin: 0 0 10px 0;"><strong>💳 Payment Method:</strong> {{ payment_method | default("Card") }}</p>
+    {% if shipping_address %}
+    <p style="margin: 0 0 5px 0;"><strong>📍 Shipping Address:</strong></p>
+    <p style="margin: 0; padding-left: 20px;">
+        {{ shipping_address.line1 }}<br>
+        {% if shipping_address.line2 %}{{ shipping_address.line2 }}<br>{% endif %}
+        {{ shipping_address.city }}, {{ shipping_address.state_zip }}<br>
+        {{ shipping_address.country }}
+    </p>
+    {% endif %}
+</div>
+
+<div class="cta-container">
+    <a href="{{ order_tracking_url | default('#') }}" class="cta-button">
+        Track Your Order
+    </a>
+</div>
+
+<div class="info-box">
+    <p><strong>📧 What's Next?</strong><br>
+    You'll receive a shipping confirmation email with tracking information once your order is on its way. 
+    Estimated delivery: <strong>{{ estimated_delivery | default("3-5 business days") }}</strong></p>
+</div>
+
+<p>
+    Thank you for supporting African farmers and artisans through your purchase. 
+    If you have any questions, our support team is here to help!
+</p>
+
+<p style="margin-top: 30px;">
+    <strong>Happy Shopping!</strong><br>
+    The Banwee Team
+</p>
+{% endblock %}
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <p style="margin: 0 0 16px; font-size: 16px; color: #111827;">Hi {{ customer_name | default("there") }},</p>
+                            
+                            <p style="margin: 0 0 16px; font-size: 16px; color: #111827;">
+                                Thank you for your order! Your order <strong style="color: #10b981;">#{{ order_number }}</strong> has been confirmed and is being prepared for shipment.
+                            </p>
+                            
+                            <!-- Order Summary -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0; background-color: #f9fafb; border-radius: 8px; overflow: hidden;">
+                                <tr>
+                                    <td style="background-color: #10b981; padding: 12px; text-align: center;">
+                                        <h2 style="color: #ffffff; font-size: 20px; font-weight: 600; margin: 0;">Order Summary</h2>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <thead>
+                                                <tr style="border-bottom: 2px solid #e5e7eb;">
+                                                    <th style="padding: 12px 0; text-align: left; color: #6b7280; font-weight: 600; font-size: 14px;">Item</th>
+                                                    <th style="padding: 12px 0; text-align: center; color: #6b7280; font-weight: 600; font-size: 14px;">Qty</th>
+                                                    <th style="padding: 12px 0; text-align: right; color: #6b7280; font-weight: 600; font-size: 14px;">Price</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in order_items %}
+                                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                                    <td style="padding: 12px 0; color: #111827; font-size: 14px;">{{ item.name }}</td>
+                                                    <td style="padding: 12px 0; text-align: center; color: #6b7280; font-size: 14px;">{{ item.quantity }}</td>
+                                                    <td style="padding: 12px 0; text-align: right; color: #111827; font-weight: 600; font-size: 14px;">{{ item.price }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <td colspan="2" style="padding: 16px 0 0; text-align: right; font-weight: 700; color: #111827; font-size: 16px;">Total:</td>
+                                                    <td style="padding: 16px 0 0; text-align: right; font-weight: 700; color: #10b981; font-size: 18px;">{{ order_total }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                                            <p style="margin: 0 0 8px; font-size: 14px; color: #6b7280;"><strong style="color: #111827;">Order Date:</strong> {{ order_date }}</p>
+                                            {% if shipping_address %}
+                                            <p style="margin: 0 0 8px; font-size: 14px; color: #6b7280;"><strong style="color: #111827;">Shipping Address:</strong></p>
+                                            <p style="margin: 0; font-size: 14px; color: #6b7280;">
+                                                {{ shipping_address.line1 }}<br>
+                                                {% if shipping_address.line2 %}{{ shipping_address.line2 }}<br>{% endif %}
+                                                {{ shipping_address.city }}, {{ shipping_address.state_zip }}<br>
+                                                {{ shipping_address.country }}
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- CTA Button -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{ order_tracking_url | default('#') }}" style="display: inline-block; background-color: #10b981; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">Track Your Order</a>
+                            </div>
+                            
+                            <p style="margin: 0; font-size: 14px; color: #6b7280; text-align: center;">
+                                If you have any questions, please contact our support team.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0 0 10px; font-size: 14px; color: #6b7280;">
+                                &copy; 2024 Banwee. All rights reserved.
+                            </p>
+                            <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                                <a href="{{ unsubscribe_url | default('#') }}" style="color: #10b981; text-decoration: none;">Unsubscribe</a> |
+                                <a href="{{ privacy_policy_url | default('#') }}" style="color: #10b981; text-decoration: none;">Privacy Policy</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

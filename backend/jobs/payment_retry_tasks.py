@@ -11,9 +11,9 @@ import asyncio
 import logging
 from fastapi import BackgroundTasks
 
-from lib.db import get_db
+from core.db import get_db
 from core.hybrid_tasks import hybrid_task_manager, process_payment_hybrid
-from lib.arq_worker import enqueue_payment_retry, enqueue_data_cleanup
+from core.arq_worker import enqueue_payment_retry, enqueue_data_cleanup
 from models.payments import PaymentIntent, Transaction
 from models.subscriptions import Subscription
 from models.orders import Order
@@ -40,7 +40,7 @@ class PaymentRetryTaskManager:
         logger.info("Starting payment retry scheduler with ARQ")
         
         # Use ARQ for scheduled processing
-        from lib.arq_worker import get_arq_pool
+        from core.arq_worker import get_arq_pool
         pool = await get_arq_pool()
         
         while self.is_running:

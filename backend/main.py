@@ -7,10 +7,10 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.exc import SQLAlchemyError
 
-from lib.db import AsyncSessionDB, initialize_db, db_manager, DatabaseOptimizer
-from lib.cache import redis_manager
-from lib.config import settings, validate_startup_environment, get_setup_instructions
-from lib.errors import (
+from core.db import AsyncSessionDB, initialize_db, db_manager, DatabaseOptimizer
+from core.cache import redis_manager
+from core.config import settings, validate_startup_environment, get_setup_instructions
+from core.errors import (
     APIException,
     api_exception_handler,
     http_exception_handler,
@@ -43,6 +43,11 @@ from api import (
 )
 
 from contextlib import asynccontextmanager
+from arq import Worker
+import logging
+
+# Global variable to store the ARQ worker
+arq_worker = None
 
 async def run_notification_cleanup():
     """Background task to clean up old notifications"""
@@ -56,11 +61,51 @@ async def run_notification_cleanup():
             logger = logging.getLogger(__name__)
             logger.error(f"Notification cleanup error: {e}")
 
+async def start_arq_worker():
+    """Start ARQ worker in the background"""
+    global arq_worker
+    try:
+        from core.arq_worker import WorkerSettings
+        
+        logger = logging.getLogger(__name__)
+        logger.info("Starting ARQ worker...")
+        
+        # Create and start the ARQ worker
+        arq_worker = Worker(
+            functions=WorkerSettings.functions,
+            redis_settings=WorkerSettings.redis_settings,
+            on_startup=WorkerSettings.on_startup,
+            on_shutdown=WorkerSettings.on_shutdown,
+            max_jobs=WorkerSettings.max_jobs,
+            job_timeout=WorkerSettings.job_timeout,
+            keep_result=WorkerSettings.keep_result,
+        )
+        
+        # Start the worker in a background task
+        asyncio.create_task(arq_worker.async_run())
+        logger.info("ARQ worker started successfully ✅")
+        
+    except Exception as e:
+        logger.error(f"Failed to start ARQ worker: {e}")
+        raise
+
+async def stop_arq_worker():
+    """Stop ARQ worker gracefully"""
+    global arq_worker
+    if arq_worker:
+        try:
+            logger = logging.getLogger(__name__)
+            logger.info("Stopping ARQ worker...")
+            await arq_worker.close()
+            logger.info("ARQ worker stopped successfully")
+        except Exception as e:
+            logger.error(f"Error stopping ARQ worker: {e}")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup event
     # Validate environment variables first
-    from lib.config import validate_startup_environment, get_setup_instructions
+    from core.config import validate_startup_environment, get_setup_instructions
     import logging
     
     logger = logging.getLogger(__name__)
@@ -89,7 +134,7 @@ async def lifespan(app: FastAPI):
             logger.warning(warning)
     
     # Initialize the database engine and session factory with optimization
-    from lib.config import settings
+    from core.config import settings
     optimized_engine = DatabaseOptimizer.get_optimized_engine()
     initialize_db(settings.SQLALCHEMY_DATABASE_URI, settings.ENVIRONMENT == "local", engine=optimized_engine)
 
@@ -104,13 +149,17 @@ async def lifespan(app: FastAPI):
             if settings.ENVIRONMENT != "local":
                 raise RuntimeError("Redis connection required for production")
 
-    # Initialize ARQ if enabled
+    # Initialize ARQ if enabled and start worker
     if settings.ENABLE_ARQ:
         try:
-            from lib.arq_worker import get_arq_pool
+            from core.arq_worker import get_arq_pool
             arq_pool = await get_arq_pool()
             await arq_pool.ping()
             logger.info("ARQ connection established ✅")
+            
+            # Start ARQ worker in the same process
+            await start_arq_worker()
+            
         except Exception as e:
             logger.error(f"ARQ connection failed: {e}")
             if settings.ENVIRONMENT != "local":
@@ -130,6 +179,10 @@ async def lifespan(app: FastAPI):
     
     # Shutdown event
     logger.info("Application shutting down...")
+    
+    # Stop ARQ worker
+    if settings.ENABLE_ARQ:
+        await stop_arq_worker()
     
     # Close Redis connections
     if settings.ENABLE_REDIS:

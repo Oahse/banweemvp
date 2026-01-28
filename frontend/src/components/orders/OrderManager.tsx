@@ -11,7 +11,7 @@ import {
   MailIcon
 } from 'lucide-react';
 import { useAsync } from '../../hooks/useAsync';
-import { stockMonitor } from '../../services/stockMonitoring';
+import { stockMonitor } from '../../utils/stock';
 
 interface OrderItem {
   id: string;

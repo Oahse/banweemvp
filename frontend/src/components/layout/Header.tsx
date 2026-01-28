@@ -7,7 +7,7 @@ import { ChevronDownIcon, SearchIcon, UserIcon, HeartIcon, ShoppingCartIcon, Men
 import { motion } from 'framer-motion';
 
 import { SkeletonHeader } from '../ui/SkeletonNavigation';
-import { getCountryByCode } from '../../utils/countries';
+import { getCountryByCode } from '../../data/countries';
 
 const TopHeaderAds = [
   'Authentic African spices delivered to your door',

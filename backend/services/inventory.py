@@ -6,7 +6,7 @@ from sqlalchemy import select, func, and_, or_
 from sqlalchemy.orm import selectinload, joinedload
 from typing import Optional, List, Dict, Any
 from uuid import UUID
-from lib.utils.uuid_utils import uuid7
+from core.utils.uuid_utils import uuid7
 from datetime import datetime, timedelta
 from models.inventories import Inventory, WarehouseLocation, StockAdjustment
 from models.product import ProductVariant, Product, ProductImage
@@ -16,7 +16,7 @@ from schemas.inventory import (
     InventoryCreate, InventoryUpdate, InventoryResponse,
     StockAdjustmentCreate, StockAdjustmentResponse
 )
-from lib.errors import APIException
+from core.errors import APIException
 import asyncio
 import logging
 

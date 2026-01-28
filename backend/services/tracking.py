@@ -13,7 +13,7 @@ from models.variant_tracking import (
 from models.product import ProductVariant, Product
 from models.subscriptions import Subscription
 from models.inventories import Inventory
-from lib.errors import APIException
+from core.errors import APIException
 
 
 class VariantTrackingService:

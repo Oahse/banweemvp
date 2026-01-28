@@ -11,9 +11,9 @@ from models.product import ProductVariant
 from services.templates import JinjaTemplateService
 # Email tasks are imported separately where needed
 # from tasks.email_tasks import (...)
-from lib.config import settings
+from core.config import settings
 from core.hybrid_tasks import send_email_hybrid
-from lib.errors import APIException # Assuming APIException is suitable for service layer errors
+from core.errors import APIException # Assuming APIException is suitable for service layer errors
 
 
 
