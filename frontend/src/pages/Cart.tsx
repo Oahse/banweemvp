@@ -23,7 +23,6 @@ export const Cart = () => {
   const location = useLocation();
   const [couponCode, setCouponCode] = useState('');
   const [taxLocation, setTaxLocation] = useState<{ country: string; province?: string }>({ country: 'US' });
-  const [processingItems, setProcessingItems] = useState<Set<string>>(new Set());
   const [clearingCart, setClearingCart] = useState(false);
   
   // Use cart items directly from context - this ensures the component re-renders when cart object changes
@@ -52,9 +51,14 @@ export const Cart = () => {
   
   // Calculate cart summary locally
   const getCartSummary = () => {
+    // Always prefer backend-calculated values when available
     const subtotal = cart?.subtotal || cartItems.reduce((sum, item) => sum + item.total_price, 0);
     const tax = cart?.tax_amount || 0;
-    const shipping = cart?.shipping_amount || (subtotal >= 100 ? 0 : 10); // Free shipping over $100
+    
+    // Use shipping exactly as provided by backend, no fallback calculations
+    const shipping = cart?.shipping_amount || 0;
+    
+    // Always prefer backend total when available
     const total = cart?.total_amount || (subtotal + tax + shipping);
     
     return { subtotal, tax, shipping, total };
@@ -227,7 +231,6 @@ export const Cart = () => {
 
   // Enhanced cart item component with loading states
   const CartItemRow = React.forwardRef<HTMLDivElement, { item: typeof cartItems[0] }>(({ item }, ref) => {
-    const isProcessing = processingItems.has(item.id);
     
     return (
       <motion.div 
@@ -235,7 +238,7 @@ export const Cart = () => {
         key={item.id} 
         className="p-4"
         initial={{ opacity: 1 }}
-        animate={{ opacity: isProcessing ? 0.6 : 1 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
       >
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
@@ -282,12 +285,7 @@ export const Cart = () => {
                 );
               })()}
               
-              {/* Processing overlay */}
-              {isProcessing && (
-                <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
-                  <Loader2 size={16} className="animate-spin text-primary" />
-                </div>
-              )}
+              {/* Processing overlay - removed since not using processing state */}
             </div>
             <div className="ml-4">
               <Link
@@ -338,13 +336,8 @@ export const Cart = () => {
               </Link>
               <button
                 onClick={() => handleRemoveItem(item.id)}
-                disabled={isProcessing}
-                className="text-sm text-error hover:text-error-dark flex items-center mt-1 disabled:opacity-50">
-                {isProcessing ? (
-                  <Loader2 size={14} className="mr-1 animate-spin" />
-                ) : (
-                  <TrashIcon size={14} className="mr-1" />
-                )}
+                className="text-sm text-error hover:text-error-dark flex items-center mt-1">
+                <TrashIcon size={14} className="mr-1" />
                 Remove
               </button>
             </div>
@@ -377,12 +370,11 @@ export const Cart = () => {
                 onChange={(e) =>
                   handleQuantityChange(item.id, parseInt(e.target.value) || 1)
                 }
-                disabled={isProcessing}
-                className="w-10 text-center border-none focus:outline-none bg-transparent disabled:opacity-50"
+                className="w-10 text-center border-none focus:outline-none bg-transparent"
               />
               <button
                 onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                disabled={isProcessing || (item.variant?.stock !== undefined && item.quantity >= item.variant.stock)}
+                disabled={item.variant?.stock !== undefined && item.quantity >= item.variant.stock}
                 className="px-2 py-1 text-copy-light hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Increase quantity">
                 <PlusIcon size={14} />
@@ -471,40 +463,15 @@ export const Cart = () => {
             <div className="bg-surface rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-copy mb-4">Order Summary</h2>
               
-              {/* Free shipping progress indicator */}
-              {subtotal > 0 && subtotal < 100 && (
-                <div className="mb-4 p-3 bg-primary/10 rounded-md">
-                  <p className="text-sm text-copy">
-                    Add <span className="font-semibold text-primary">{formatCurrency(100 - subtotal)}</span> more to get <span className="font-semibold">FREE Standard Shipping</span>!
-                  </p>
-                  <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-primary h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min((subtotal / 100) * 100, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-              
-              {subtotal >= 100 && (
-                <div className="mb-4 p-3 bg-success/10 rounded-md">
-                  <p className="text-sm text-success font-medium">
-                    🎉 You've qualified for FREE Standard Shipping!
-                  </p>
-                </div>
-              )}
-              
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-copy-light">Subtotal</span>
                   <span className="font-medium text-copy">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-copy-light">
-                    Shipping {shipping === 0 ? '(Free - Standard)' : '(Standard)'}
-                  </span>
+                  <span className="text-copy-light">Shipping</span>
                   <span className="font-medium text-copy">
-                    {shipping === 0 ? 'Free' : formatCurrency(shipping)}
+                    {formatCurrency(shipping)}
                   </span>
                 </div>
                 <div className="flex justify-between">

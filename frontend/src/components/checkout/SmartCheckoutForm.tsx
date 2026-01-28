@@ -42,7 +42,7 @@ interface SmartCheckoutFormProps {
 
 export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess }) => {
   const { user } = useAuth();
-  const { cart, clearCart } = useCart();
+  const { cart, clearCart, refreshCart } = useCart();
   const { formatCurrency, currency, countryCode } = useLocale();
   
   // Form state
@@ -232,6 +232,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   const loadCheckoutData = async () => {
     setLoading(true);
     try {
+      console.log('Loading checkout data, current cart:', cart);
+      
       // Fetch addresses and payment methods in parallel
       const [addressesRes, paymentsRes] = await Promise.all([
         AuthAPI.getAddresses(),
@@ -342,8 +344,14 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       if (finalValidation.data?.price_discrepancies) {
         handlePriceDiscrepancies(
           finalValidation.data.price_discrepancies,
-          () => {
-            // Refresh cart on price updates - cart will be refreshed by the context
+          async () => {
+            // Refresh cart on price updates
+            try {
+              await refreshCart();
+              toast.success('Cart refreshed with updated prices');
+            } catch (error) {
+              console.error('Failed to refresh cart:', error);
+            }
           }
         );
         
@@ -358,12 +366,42 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       const backendTotal = finalValidation.data?.estimated_totals?.total_amount || 0;
       const frontendTotal = cart?.total_amount || 0;
       
+      console.log('Checkout price validation:', {
+        frontendTotal,
+        backendTotal,
+        difference: Math.abs(frontendTotal - backendTotal),
+        cart: cart,
+        backendData: finalValidation.data?.estimated_totals
+      });
+      
       if (!validatePrices(frontendTotal, backendTotal)) {
-        toast.error(
-          `Price mismatch detected. Frontend: ${formatCurrency(frontendTotal)}, Backend: ${formatCurrency(backendTotal)}. Please refresh and try again.`,
-          { duration: 8000 }
-        );
-        return;
+        // Try to refresh cart data before failing
+        console.warn('Price mismatch detected, attempting to refresh cart...');
+        
+        try {
+          await refreshCart();
+          // After refresh, get the updated total
+          const updatedTotal = cart?.total_amount || frontendTotal;
+          
+          // Check again with updated data
+          if (validatePrices(updatedTotal, backendTotal)) {
+            console.log('Price mismatch resolved after cart refresh');
+            // Continue with checkout using updated data
+          } else {
+            throw new Error('Price mismatch persists after refresh');
+          }
+        } catch (refreshError) {
+          console.error('Failed to refresh cart:', refreshError);
+          
+          // Show a more helpful error message
+          const difference = Math.abs(frontendTotal - backendTotal);
+          toast.error(
+            `Price mismatch detected (difference: ${formatCurrency(difference)}). This may be due to updated prices, taxes, or shipping costs. Please refresh your cart and try again.`,
+            { duration: 10000 }
+          );
+          
+          return;
+        }
       }
       
       if (!formData.payment_method_id) {
@@ -631,43 +669,6 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 <h3 className="text-lg font-semibold mb-4">Shipping Method</h3>
                 <div className="space-y-3">
                   {safeShippingMethods.length > 0 ? (
-                    (cart?.shipping_amount || 0) === 0 ? (
-                      <label
-                        key={safeShippingMethods[0].id}
-                        className={`block p-4 border rounded-lg cursor-pointer transition-colors ${
-                          formData.shipping_method_id === safeShippingMethods[0].id
-                            ? 'border-primary bg-primary/10'
-                            : 'border hover:border-strong'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="shipping_method"
-                          value={safeShippingMethods[0].id}
-                          checked={formData.shipping_method_id === safeShippingMethods[0].id}
-                          onChange={() =>
-                            setFormData(prev => ({
-                              ...prev,
-                              shipping_method_id: safeShippingMethods[0].id,
-                            }))
-                          }
-                          className="sr-only"
-                        />
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-copy">
-                              {safeShippingMethods[0].name}
-                            </div>
-                            <div className="text-sm text-copy-light">
-                              {safeShippingMethods[0].delivery_days ||
-                                safeShippingMethods[0].estimated_days}{' '}
-                              business days
-                            </div>
-                          </div>
-                          <div className="text-lg font-semibold text-copy">Free</div>
-                        </div>
-                      </label>
-                    ) : (
                       safeShippingMethods.map(method => (
                         <label
                           key={method.id}
@@ -700,7 +701,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                           </div>
                         </label>
                       ))
-                    )
+                    
                   ) : (
                     <div className="text-center py-8">
                       <div className="bg-surface rounded-lg p-6 border border-border">
@@ -997,10 +998,10 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-copy-light">
-                    Shipping {(cart.shipping_amount || 0) === 0 ? '(Economy)' : ''}
+                    Shipping
                   </span>
                   <span className="text-copy">
-                    {(cart.shipping_amount || 0) === 0 ? 'Free' : formatCurrency(cart.shipping_amount || 0)}
+                    {formatCurrency(cart.shipping_amount || 0)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">

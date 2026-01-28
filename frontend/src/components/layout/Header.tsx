@@ -10,7 +10,7 @@ import { SkeletonHeader } from '../ui/SkeletonNavigation';
 import { getCountryByCode } from '../../lib/countries';
 
 const TopHeaderAds = [
-  'Free shipping on orders over $100',
+  'Authentic African spices delivered to your door',
   'Authentic African spices delivered to your door',
   'Fresh produce sourced from local farmers',
   'New arrivals every week – don’t miss out',

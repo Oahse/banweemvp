@@ -630,7 +630,7 @@ export const ProductDetails = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
                 <TruckIcon size={20} className="text-primary" />
-                <span className="text-sm">Free Shipping</span>
+                <span className="text-sm">Standard Shipping Available</span>
               </div>
               <div className="flex items-center space-x-2">
                 <ShieldCheckIcon size={20} className="text-primary" />

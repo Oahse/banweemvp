@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, lazy } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 import { Link, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -9,7 +9,6 @@ import {
   CreditCardIcon,
   LogOutIcon,
   ChevronRightIcon,
-  PaletteIcon,
   PackageIcon,
   ShieldIcon
 } from 'lucide-react';
@@ -24,6 +23,7 @@ const TrackOrder = lazy(() => import('../components/account/TrackOrder'));
 const Wishlist = lazy(() => import('../components/account/Wishlist'));
 const Addresses = lazy(() => import('../components/account/Addresses'));
 const MySubscriptions = lazy(() => import('../components/account/MySubscriptions').then(module => ({ default: module.MySubscriptions })));
+const SubscriptionOrders = lazy(() => import('../components/account/SubscriptionOrders'));
 
 const PaymentMethods = lazy(() =>
   import('../components/account/PaymentMethods').then(module => ({ default: module.PaymentMethods }))
@@ -41,7 +41,7 @@ export const Account = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAdmin, isSupplier } = useAuth();
-  const { items } = useWishlist();
+  const { defaultWishlist } = useWishlist();
 
   useEffect(() => {
     if (!user) {
@@ -82,7 +82,7 @@ export const Account = () => {
     navItems.push({ path: '/admin', label: 'Admin Dashboard', icon: <ShieldIcon size={20} /> });
   }
 
-  const isActive = path => {
+  const isActive = (path: string) => {
     if (path === '/account') {
       return location.pathname === '/account';
     }
@@ -135,9 +135,9 @@ export const Account = () => {
                     >
                       <span className="mr-3">{item.icon}</span>
                       <span>{item.label}</span>
-                      {item.path === '/account/wishlist' && items && items.length > 0 && (
+                      {item.path === '/account/wishlist' && defaultWishlist && defaultWishlist.items && defaultWishlist.items.length > 0 && (
                         <span className="ml-auto bg-border text-copy-light text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                          {items.length}
+                          {defaultWishlist.items.length}
                         </span>
                       )}
                     </Link>
@@ -170,6 +170,7 @@ export const Account = () => {
               <Route path="/addresses" element={<Addresses />} />
               <Route path="/payment-methods" element={<PaymentMethods />} />
               <Route path="/subscriptions" element={<MySubscriptions />} />
+              <Route path="/subscription/:subscriptionId/orders" element={<SubscriptionOrders />} />
 
               <Route path="*" element={<Dashboard />} />
             </Routes>

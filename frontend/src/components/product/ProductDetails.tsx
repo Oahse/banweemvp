@@ -409,8 +409,7 @@ export const ProductDetails = () => {
                 <TruckIcon size={14} className="text-blue-600" />
               </div>
               <span className="text-sm">
-                <span className="font-medium text-main">Shipping:</span> Free
-                shipping on orders over $49.99
+                <span className="font-medium text-main">Shipping:</span> Standard shipping available
               </span>
             </div>
             <div className="flex items-center">

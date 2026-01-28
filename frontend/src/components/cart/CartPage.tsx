@@ -220,7 +220,7 @@ const CartPage = () => {
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>{shipping > 0 ? `$${shipping.toFixed(2)}` : 'Free'}</span>
+                <span>{formatCurrency(shipping)}</span>
               </div>
               <div className="border-t pt-2 flex justify-between font-semibold text-base sm:text-lg">
                 <span>Total</span>

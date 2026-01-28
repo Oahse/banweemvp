@@ -14,6 +14,7 @@ interface CartContextType {
   removeItem: (itemId: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
+  refreshCart: () => Promise<void>;
   totalItems: number;
   items: Cart['items'];
   validateCart: () => Promise<void>;
@@ -316,6 +317,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         removeItem,
         updateQuantity,
         clearCart,
+        refreshCart: fetchCart,
         totalItems,
         items,
         validateCart,

@@ -366,7 +366,13 @@ export const MySubscriptions = () => {
               )}
 
               {/* Actions */}
-              <div className="flex justify-end">
+              <div className="flex justify-between items-center">
+                <Link 
+                  to={`/subscription/${subscription.id}/orders`} 
+                  className={`${getButtonClasses('outline')} text-sm mr-2`}
+                >
+                  View Orders
+                </Link>
                 <Link 
                   to={`/subscription/${subscription.id}/manage`} 
                   className={`${getButtonClasses('outline')} text-sm`}

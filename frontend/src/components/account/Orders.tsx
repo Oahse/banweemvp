@@ -6,37 +6,67 @@ import { SkeletonOrderTable } from '../ui/SkeletonTable';
 import { usePaginatedApi } from '../../hooks/useAsync';
 import OrdersAPI from '../../apis/orders';
 import { toast } from 'react-hot-toast';
+import { useLocale } from '../../contexts/LocaleContext';
 
-/**
- * @typedef {object} OrdersProps
- * @property {'shimmer' | 'pulse' | 'wave'} [animation='shimmer']
- */
+interface Order {
+  id: string;
+  created_at: string;
+  status: string;
+  total_amount: number;
+  items: any[];
+}
+
+interface OrdersProps {
+  animation?: 'shimmer' | 'pulse' | 'wave';
+}
 
 export const Orders = ({
   animation = 'shimmer' 
-}) => {
+}: OrdersProps) => {
   const { data: paginatedData, loading, error, execute } = usePaginatedApi();
-  const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
-    execute(OrdersAPI.getOrders);
+    execute(() => OrdersAPI.getOrders({}));
   }, [execute]);
+
+  // Debug logging
+  useEffect(() => {
+    if (paginatedData) {
+      console.log('Orders API Response:', paginatedData);
+      console.log('Processed orders:', orders);
+    }
+  }, [paginatedData, orders]);
 
   // Handle the response structure properly
   const orders = (() => {
     if (!paginatedData) return [];
     // Handle Response.success wrapper
     if ((paginatedData as any)?.success) {
-      return (paginatedData as any).data || [];
+      const data = (paginatedData as any).data;
+      // Check if data has orders array (paginated response)
+      if (data && data.orders) {
+        return data.orders;
+      }
+      // Otherwise return data directly if it's an array
+      return Array.isArray(data) ? data : [];
     }
-    return Array.isArray(paginatedData) ? paginatedData : [];
+    // Handle direct array response
+    if (Array.isArray(paginatedData)) {
+      return paginatedData;
+    }
+    // Handle object with orders property
+    if (paginatedData && typeof paginatedData === 'object' && 'orders' in paginatedData) {
+      return (paginatedData as any).orders || [];
+    }
+    return [];
   })();
 
-  const toggleOrderExpand = (orderId) => {
+  const toggleOrderExpand = (orderId: string) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'delivered':
       case 'confirmed':
@@ -70,9 +100,27 @@ export const Orders = ({
   }
 
   if (error) {
+    console.error('Orders error:', error);
     return (
-      <div className="text-error text-center p-8">
-        <p>Error fetching orders: {error.message}</p>
+      <div>
+        <h1 className="text-2xl font-bold text-main dark:text-white mb-6">
+          My Orders
+        </h1>
+        <div className="text-error text-center p-8">
+          <p>Error fetching orders: {error.message}</p>
+          <button 
+            onClick={() => execute(() => OrdersAPI.getOrders({}))}
+            className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
+          >
+            Try Again
+          </button>
+          <div className="mt-4 text-sm text-gray-600">
+            <p>Debug info:</p>
+            <pre className="text-left bg-gray-100 p-2 rounded mt-2">
+              {JSON.stringify(error, null, 2)}
+            </pre>
+          </div>
+        </div>
       </div>
     );
   }
@@ -132,7 +180,7 @@ export const Orders = ({
                         Subtotal: ${order.total_amount.toFixed(2)}
                       </p>
                       <p className="text-gray-500 dark:text-gray-400">
-                        Shipping: Free
+                        Shipping: {formatCurrency(order.shipping_amount || 0)}
                       </p>
                       <p className="font-medium text-main dark:text-white">
                         Total: ${order.total_amount.toFixed(2)}
@@ -175,9 +223,24 @@ export const Orders = ({
           <p className="text-gray-500 dark:text-gray-400 mb-4">
             You haven't placed any orders yet.
           </p>
-          <Link to="/products" className="inline-block px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md">
-            Start Shopping
-          </Link>
+          <div className="space-y-2">
+            <Link to="/products" className="inline-block px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md">
+              Start Shopping
+            </Link>
+            <div className="text-sm text-gray-500">
+              <button 
+                onClick={() => execute(() => OrdersAPI.getOrders({}))}
+                className="text-primary hover:underline"
+              >
+                Refresh Orders
+              </button>
+            </div>
+          </div>
+          <div className="mt-4 text-xs text-gray-400">
+            <p>Debug: {orders.length} orders found</p>
+            <p>Loading: {loading ? 'Yes' : 'No'}</p>
+            <p>Error: {error ? 'Yes' : 'No'}</p>
+          </div>
         </div>}
     </div>;
 };
