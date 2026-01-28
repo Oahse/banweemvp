@@ -1,5 +1,4 @@
 services:
-  # PostgreSQL Database (Alpine) - Optimized Configuration
   postgres:
     image: postgres:16-alpine
     container_name: banwee_postgres
@@ -42,7 +41,6 @@ services:
       - banwee_network
     restart: unless-stopped
 
-  # Redis (Alpine) - For cart storage and caching
   redis:
     image: redis:7-alpine
     container_name: banwee_redis
@@ -61,7 +59,6 @@ services:
       - banwee_network
     restart: unless-stopped
 
-  # Backend API Service
   backend:
     build:
       context: ./backend
@@ -91,7 +88,6 @@ services:
       retries: 3
       start_period: 40s
 
-  # Frontend Service
   frontend:
     build:
       context: ./frontend
@@ -114,12 +110,11 @@ services:
       retries: 3
       start_period: 40s
 
-  # ARQ Worker Service - Lightweight
-  arq_worker:
+  worker:
     build:
       context: ./backend
       dockerfile: Dockerfile.arq
-    container_name: banwee_arq_worker
+    container_name: banwee_worker
     env_file:
       - ./backend/.env.local
     environment:
@@ -133,12 +128,10 @@ services:
       - banwee_network
     restart: unless-stopped
 
-# Docker Volumes for data persistence
 volumes:
   postgres_data:
   redis_data:
 
-# Docker Networks for inter-service communication
 networks:
   banwee_network:
     driver: bridge

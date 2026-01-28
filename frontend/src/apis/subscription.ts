@@ -227,12 +227,12 @@ export const getSubscriptions = async (page: number = 1, limit: number = 10): Pr
   return response; // Backend returns { subscriptions: [...], total: 10, page: 1, limit: 10, has_more: false }
 };
 
-// Get user subscriptions (alias for getSubscriptions for backwards compatibility)
+// Get user subscriptions
 export const getUserSubscriptions = async (page: number = 1, limit: number = 10) => {
   try {
     const response = await apiClient.get('/subscriptions', { params: { page, limit } });
     console.log(response,'response===+++')
-    return response; // Return the response directly since apiClient already extracts .data
+    return response;
   } catch (error) {
     console.error('Error fetching user subscriptions:', error);
     throw error;
@@ -271,15 +271,9 @@ export const activateSubscription = async (id: string) => {
   return response;
 };
 
-// Add products to subscription (alias for addProducts)
-export const addProductsToSubscription = async (id: string, variantIds: string[]) => {
-  return addProducts(id, variantIds);
-};
-
-// Remove products from subscription (alias for removeProducts)
-export const removeProductsFromSubscription = async (id: string, variantIds: string[]) => {
-  return removeProducts(id, variantIds);
-};
+// Deprecated aliases - use addProducts and removeProducts directly
+export const addProductsToSubscription = addProducts;
+export const removeProductsFromSubscription = removeProducts;
 
 // === PRODUCT MANAGEMENT ===
 

@@ -1,10 +1,4 @@
 services:
-  # PostgreSQL Database (Alpine) - Optimized Configuration
-  # This service sets up the PostgreSQL database with performance optimizations.
-  # The 'environment' section configures the database name, user, and password for initial setup.
-  # 'ports' maps the container's PostgreSQL port to the host machine.
-  # 'volumes' ensures data persistence across container restarts.
-  # 'healthcheck' verifies the database is ready for connections.
   postgres:
     image: postgres:16-alpine
     container_name: banwee_postgres
@@ -46,8 +40,6 @@ services:
       - banwee_network
     restart: unless-stopped
 
-  # Redis (Alpine) - Optimized for Cart Storage
-  # This service provides a Redis instance for caching,
   redis:
     image: redis:7-alpine
     container_name: banwee_redis
@@ -66,7 +58,6 @@ services:
       - banwee_network
     restart: unless-stopped
 
-  # Unified Application (Frontend + Backend + ARQ Worker)
   app:
     build:
       context: .
@@ -94,12 +85,10 @@ services:
       retries: 3
       start_period: 40s
 
-# Docker Volumes for data persistence
 volumes:
   postgres_data:
   redis_data:
 
-# Docker Networks for inter-service communication
 networks:
   banwee_network:
     driver: bridge

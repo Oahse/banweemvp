@@ -7,12 +7,10 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.exc import SQLAlchemyError
 
-from core.database import AsyncSessionDB, initialize_db, db_manager, DatabaseOptimizer
-from core.redis import redis_manager
-# Import configuration and middleware
-from core.config import settings, validate_startup_environment, get_setup_instructions
-# Import exceptions and handlers
-from core.exceptions import (
+from lib.db import AsyncSessionDB, initialize_db, db_manager, DatabaseOptimizer
+from lib.cache import redis_manager
+from lib.config import settings, validate_startup_environment, get_setup_instructions
+from lib.errors import (
     APIException,
     api_exception_handler,
     http_exception_handler,
@@ -21,8 +19,7 @@ from core.exceptions import (
     general_exception_handler
 )
 
-# Import all routers from routes package
-from routes import (
+from api import (
     admin_router,
     analytics_router,
     auth_router,
@@ -63,7 +60,7 @@ async def run_notification_cleanup():
 async def lifespan(app: FastAPI):
     # Startup event
     # Validate environment variables first
-    from core.config import validate_startup_environment, get_setup_instructions
+    from lib.config import validate_startup_environment, get_setup_instructions
     import logging
     
     logger = logging.getLogger(__name__)
@@ -92,7 +89,7 @@ async def lifespan(app: FastAPI):
             logger.warning(warning)
     
     # Initialize the database engine and session factory with optimization
-    from core.config import settings # Import settings here to avoid circular dependency
+    from lib.config import settings
     optimized_engine = DatabaseOptimizer.get_optimized_engine()
     initialize_db(settings.SQLALCHEMY_DATABASE_URI, settings.ENVIRONMENT == "local", engine=optimized_engine)
 
@@ -110,7 +107,7 @@ async def lifespan(app: FastAPI):
     # Initialize ARQ if enabled
     if settings.ENABLE_ARQ:
         try:
-            from core.arq_worker import get_arq_pool
+            from lib.arq_worker import get_arq_pool
             arq_pool = await get_arq_pool()
             await arq_pool.ping()
             logger.info("ARQ connection established ✅")
