@@ -26,6 +26,30 @@ export const Orders = ({
   const { data: paginatedData, loading, error, execute } = usePaginatedApi();
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
+  // Handle the response structure properly - moved before useEffect
+  const orders = (() => {
+    if (!paginatedData) return [];
+    // Handle Response.success wrapper
+    if ((paginatedData as any)?.success) {
+      const data = (paginatedData as any).data;
+      // Check if data has orders array (paginated response)
+      if (data && data.orders) {
+        return data.orders;
+      }
+      // Otherwise return data directly if it's an array
+      return Array.isArray(data) ? data : [];
+    }
+    // Handle direct array response
+    if (Array.isArray(paginatedData)) {
+      return paginatedData;
+    }
+    // Handle object with orders property
+    if (paginatedData && typeof paginatedData === 'object' && 'orders' in paginatedData) {
+      return (paginatedData as any).orders || [];
+    }
+    return [];
+  })();
+
   useEffect(() => {
     execute(() => OrdersAPI.getOrders({}));
   }, [execute]);
@@ -37,16 +61,6 @@ export const Orders = ({
       console.log('Processed orders:', orders);
     }
   }, [paginatedData, orders]);
-
-  // Handle the response structure properly
-  const orders = (() => {
-    if (!paginatedData) return [];
-    // Handle Response.success wrapper
-    if ((paginatedData as any)?.success) {
-      const data = (paginatedData as any).data;
-      // Check if data has orders array (paginated response)
-      if (data && data.orders) {
-        return data.orders;
       }
       // Otherwise return data directly if it's an array
       return Array.isArray(data) ? data : [];

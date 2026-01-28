@@ -36,26 +36,7 @@ export const Dashboard = ({
   const { data: paginatedOrders, loading, error, execute: fetchRecentOrders } = usePaginatedApi<{ data: Order[]; pagination?: any }>();
   const { data: subscriptionOrders, loading: subscriptionOrdersLoading, execute: fetchSubscriptionOrders } = usePaginatedApi<{ data: Order[]; pagination?: any }>();
 
-  useEffect(() => {
-    fetchRecentOrders(() => OrdersAPI.getOrders({ limit: 3 }));
-    // Fetch subscription orders if there are active subscriptions
-    if (subscriptions.length > 0) {
-      const activeSubscription = subscriptions.find(sub => sub.status === 'active');
-      if (activeSubscription) {
-        fetchSubscriptionOrders(() => SubscriptionAPI.getSubscriptionOrders(activeSubscription.id, 1, 3));
-      }
-    }
-  }, [fetchRecentOrders, fetchSubscriptionOrders, subscriptions]);
-
-  // Debug logging
-  useEffect(() => {
-    if (paginatedOrders) {
-      console.log('Dashboard Orders API Response:', paginatedOrders);
-      console.log('Dashboard Processed orders:', recentOrders);
-    }
-  }, [paginatedOrders, recentOrders]);
-
-  // Handle both array and object responses
+  // Handle both array and object responses - moved before useEffect
   const recentOrders: Order[] = (() => {
     if (!paginatedOrders) return [];
     // Handle Response.success wrapper
@@ -104,6 +85,25 @@ export const Dashboard = ({
 
   // Get active subscriptions
   const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
+
+  useEffect(() => {
+    fetchRecentOrders(() => OrdersAPI.getOrders({ limit: 3 }));
+    // Fetch subscription orders if there are active subscriptions
+    if (subscriptions.length > 0) {
+      const activeSubscription = subscriptions.find(sub => sub.status === 'active');
+      if (activeSubscription) {
+        fetchSubscriptionOrders(() => SubscriptionAPI.getSubscriptionOrders(activeSubscription.id, 1, 3));
+      }
+    }
+  }, [fetchRecentOrders, fetchSubscriptionOrders, subscriptions]);
+
+  // Debug logging
+  useEffect(() => {
+    if (paginatedOrders) {
+      console.log('Dashboard Orders API Response:', paginatedOrders);
+      console.log('Dashboard Processed orders:', recentOrders);
+    }
+  }, [paginatedOrders, recentOrders]);
 
   if (loading || subscriptionsLoading) {
     return <SkeletonDashboard className="p-6" animation={animation} />;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../../hooks/useCart';
 import { useAuth } from '../../hooks/useAuth';
+import { useLocale } from '../../contexts/LocaleContext';
 import { toast } from 'react-hot-toast';
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 
@@ -98,6 +99,7 @@ const CartItem = ({ item, onUpdate, onRemove }) => {
 };
 
 const CartPage = () => {
+  const { formatCurrency } = useLocale();
   const { user } = useAuth();
   const { cart, loading, items, totalItems, addItem, removeItem, updateQuantity, clearCart } = useCart();
 
