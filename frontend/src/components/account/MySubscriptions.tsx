@@ -175,11 +175,9 @@ export const MySubscriptions = () => {
     }
   };
 
-  const handleDeleteSubscription = async (subscriptionId: string) => {
-    if (!confirm('Are you sure you want to cancel this subscription?')) return;
-    
+  const handleDeleteSubscription = async (subscriptionId: string, reason?: string) => {
     try {
-      await cancelSubscription(subscriptionId);
+      await cancelSubscription(subscriptionId, reason);
     } catch (error) {
       console.error('Failed to cancel subscription:', error);
       toast.error('Failed to cancel subscription');
@@ -207,8 +205,6 @@ export const MySubscriptions = () => {
   };
 
   const handleResumeSubscription = async (subscriptionId: string) => {
-    if (!confirm('Are you sure you want to resume this subscription?')) return;
-    
     try {
       await resumeSubscription(subscriptionId);
     } catch (error) {

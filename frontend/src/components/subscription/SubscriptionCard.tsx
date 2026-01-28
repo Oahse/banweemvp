@@ -16,6 +16,8 @@ import { themeClasses, combineThemeClasses, getButtonClasses } from '../../lib/t
 import { useLocale } from '../../contexts/LocaleContext';
 import { AutoRenewToggle } from './AutoRenewToggle';
 import { PauseSubscriptionModal } from './PauseSubscriptionModal';
+import { ResumeSubscriptionModal } from './ResumeSubscriptionModal';
+import { CancelSubscriptionModal } from './CancelSubscriptionModal';
 
 interface SubscriptionCardProps {
   subscription: {
@@ -54,7 +56,7 @@ interface SubscriptionCardProps {
     created_at: string;
   };
   onUpdate?: (subscriptionId: string, data: any) => void;
-  onCancel?: (subscriptionId: string) => void;
+  onCancel?: (subscriptionId: string, reason?: string) => void;
   onPause?: (subscriptionId: string, reason?: string) => void;
   onResume?: (subscriptionId: string) => void;
   onActivate?: (subscriptionId: string) => void;
@@ -110,7 +112,11 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
   const sizeClasses = getSizeClasses(size);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showPauseModal, setShowPauseModal] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [isPausing, setIsPausing] = useState(false);
+  const [isResuming, setIsResuming] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const { formatCurrency } = useLocale();
 
   const getStatusColor = (status: string) => {
@@ -171,6 +177,30 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       setShowPauseModal(false);
     } finally {
       setIsPausing(false);
+    }
+  };
+
+  const handleResumeConfirm = async () => {
+    if (!onResume) return;
+    
+    setIsResuming(true);
+    try {
+      await onResume(subscription.id);
+      setShowResumeModal(false);
+    } finally {
+      setIsResuming(false);
+    }
+  };
+
+  const handleCancelConfirm = async (reason?: string) => {
+    if (!onCancel) return;
+    
+    setIsCancelling(true);
+    try {
+      await onCancel(subscription.id, reason);
+      setShowCancelModal(false);
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -396,7 +426,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
 
                 {subscription.status === 'paused' && onResume && (
                   <button
-                    onClick={() => onResume(subscription.id)}
+                    onClick={() => setShowResumeModal(true)}
                     className={combineThemeClasses(
                       'p-1.5 sm:p-2 rounded-md transition-colors border',
                       themeClasses.text.success,
@@ -413,11 +443,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 {/* Cancel Button */}
                 {(subscription.status === 'active' || subscription.status === 'paused') && onCancel && (
                   <button
-                    onClick={() => {
-                      if (window.confirm('Are you sure you want to cancel this subscription? This action cannot be undone.')) {
-                        onCancel(subscription.id);
-                      }
-                    }}
+                    onClick={() => setShowCancelModal(true)}
                     className={combineThemeClasses(
                       'p-1.5 sm:p-2 rounded-md transition-colors border',
                       themeClasses.text.error,
@@ -539,6 +565,27 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
         subscriptionId={subscription.id}
         planName={subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)}
         loading={isPausing}
+      />
+
+      {/* Resume Subscription Modal */}
+      <ResumeSubscriptionModal
+        isOpen={showResumeModal}
+        onClose={() => setShowResumeModal(false)}
+        onConfirm={handleResumeConfirm}
+        subscriptionId={subscription.id}
+        planName={subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)}
+        nextBillingDate={subscription.next_billing_date}
+        loading={isResuming}
+      />
+
+      {/* Cancel Subscription Modal */}
+      <CancelSubscriptionModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancelConfirm}
+        subscriptionId={subscription.id}
+        planName={subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)}
+        loading={isCancelling}
       />
     </div>
   );

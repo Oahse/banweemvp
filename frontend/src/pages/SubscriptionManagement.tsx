@@ -211,8 +211,8 @@ export const SubscriptionManagement = () => {
 
     try {
       setIsAddingProducts(true);
-      const variantIds = Array.from(selectedProducts);
-      const success = await addProductsToSubscription(subscriptionId, variantIds);
+      const variantIds = Array.from(selectedProducts) as string[];
+      const success = await addProductsToSubscription(subscriptionId!, variantIds);
       
       if (success) {
         setSelectedProducts(new Set());
@@ -464,9 +464,9 @@ export const SubscriptionManagement = () => {
               isEnabled={subscription.auto_renew || false}
               onToggle={async (enabled) => {
                 try {
-                  const success = await updateSubscription(subscriptionId, { auto_renew: enabled });
+                  const success = await updateSubscription(subscriptionId!, { auto_renew: enabled });
                   if (success) {
-                    setSubscription(prev => ({ ...prev, auto_renew: enabled }));
+                    setSubscription((prev: any) => ({ ...prev, auto_renew: enabled }));
                   }
                 } catch (error) {
                   console.error('Failed to update auto-renew:', error);
@@ -533,7 +533,7 @@ export const SubscriptionManagement = () => {
           </h2>
           {subscription.products && subscription.products.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {subscription.products.map((variantInSubscription) => (
+              {subscription.products.map((variantInSubscription: any) => (
                 <SubscriptionProductCard
                   key={variantInSubscription.id}
                   product={{
@@ -606,14 +606,14 @@ export const SubscriptionManagement = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {availableProducts.map((product) => {
+              {availableProducts.map((product: any) => {
                 const availableVariants = getAvailableVariants(product);
                 
                 if (availableVariants.length === 0) {
                   return null; // Skip products with no available variants
                 }
 
-                return availableVariants.map((variant) => (
+                return availableVariants.map((variant: any) => (
                   <div key={variant.id} className="relative">
                     <SubscriptionProductCard
                       product={{
