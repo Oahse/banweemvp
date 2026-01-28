@@ -378,13 +378,6 @@ async def seed_sample_data(
                 "price": 15.99,
                 "estimated_days": 3,
                 "is_active": True,
-                "available_countries": None,  # Available worldwide
-                "restricted_countries": None,
-                "regions": ["Global"],
-                "min_order_amount": None,
-                "max_weight_kg": 25.0,
-                "price_per_kg": 4.00,
-                "base_weight_kg": 1.0,
                 "carrier": "Global Express",
                 "tracking_url_template": "https://track.globalexpress.com/{tracking_number}"
             },

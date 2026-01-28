@@ -12,6 +12,7 @@ from models.user import User, Address
 from models.product import ProductVariant
 from models.shipping import ShippingMethod
 from models.payments import PaymentMethod
+from models.tax_rates import TaxRate
 from schemas.orders import OrderResponse, OrderItemResponse, CheckoutRequest, OrderCreate
 from schemas.inventories import StockAdjustmentCreate
 from services.cart import CartService
@@ -914,10 +915,9 @@ class OrderService:
                     total_weight_kg=total_weight_kg
                 )
             
-            # Calculate tax based on shipping address (tax applies to subtotal + shipping)
+            # Calculate tax based on shipping address (tax applies to subtotal only)
             tax_rate = await self._get_tax_rate(shipping_address)
-            taxable_amount = subtotal + shipping_cost  # Tax applies to subtotal + shipping
-            tax_amount = taxable_amount * tax_rate
+            tax_amount = subtotal * tax_rate  # Tax on subtotal only
             
             # Apply any discounts (from promocodes, etc.)
             discount_amount = await self._calculate_discount_amount(validated_items, subtotal)
@@ -985,14 +985,14 @@ class OrderService:
         """
         try:
             if not shipping_address:
+                logger.info("No shipping address provided, using 0.0 tax rate")
                 return 0.0
             
             # Get state/country from address
             state = getattr(shipping_address, 'state', None) or shipping_address.get('state', '')
             country = getattr(shipping_address, 'country', None) or shipping_address.get('country', 'US')
             
-            # Import TaxRate model
-            from models.tax_rates import TaxRate
+            logger.info(f"Looking up tax rate for country: {country}, state: {state}")
             
             # First try to find tax rate with specific province/state
             if state:
@@ -1008,8 +1008,10 @@ class OrderService:
                 tax_rate_record = tax_rate_result.scalar_one_or_none()
                 
                 if tax_rate_record:
-                    logger.info(f"Found tax rate for {country}-{state}: {tax_rate_record.tax_rate}")
+                    logger.info(f"Found state/province tax rate for {country}-{state}: {tax_rate_record.tax_rate} ({tax_rate_record.tax_name})")
                     return tax_rate_record.tax_rate
+                else:
+                    logger.info(f"No state/province tax rate found for {country}-{state}")
             
             # If no state-specific rate found, try country-level rate
             tax_rate_result = await self.db.execute(
@@ -1024,7 +1026,7 @@ class OrderService:
             tax_rate_record = tax_rate_result.scalar_one_or_none()
             
             if tax_rate_record:
-                logger.info(f"Found country tax rate for {country}: {tax_rate_record.tax_rate}")
+                logger.info(f"Found country tax rate for {country}: {tax_rate_record.tax_rate} ({tax_rate_record.tax_name})")
                 return tax_rate_record.tax_rate
             
             # No tax rate found in database

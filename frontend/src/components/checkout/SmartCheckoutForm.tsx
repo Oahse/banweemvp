@@ -91,32 +91,47 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
     }
 
     try {
-      const accessToken = TokenManager.getToken();
-      if (!accessToken) {
-        console.error('No access token available');
-        return;
-      }
-
       const selectedAddress = addresses.find(addr => addr.id === addressId);
       if (!selectedAddress) {
         console.error('Selected address not found');
         return;
       }
 
-      const response = await CartAPI.getShippingOptions(selectedAddress, accessToken);
-      const shippingMethodsData = Array.isArray(response.data?.shipping_options) ? response.data.shipping_options : [];
-      setShippingMethods(shippingMethodsData);
+      // Use the new shipping API to get country-specific methods
+      const ShippingAPI = (await import('../../apis/shipping')).default;
+      
+      // Calculate order amount from cart for minimum order validation
+      const orderAmount = cart?.subtotal || cart?.total_amount || 0;
+      const totalWeight = 1.0; // Default weight - could be calculated from cart items
+      
+      const availableMethods = await ShippingAPI.getAvailableShippingMethods(
+        selectedAddress.country || 'US',
+        orderAmount,
+        totalWeight
+      );
 
-      // Auto-select the first shipping method if none is selected
-      if (shippingMethodsData.length > 0 && !formData.shipping_method_id) {
-        const firstShipping = shippingMethodsData[0];
-        setFormData(prev => ({ ...prev, shipping_method_id: firstShipping?.id || null }));
+      // Filter to only available methods and sort by price
+      const availableOnly = availableMethods
+        .filter(method => method.available)
+        .sort((a, b) => a.calculated_price - b.calculated_price);
+
+      setShippingMethods(availableOnly);
+
+      // Auto-select the cheapest available method if none is selected
+      if (availableOnly.length > 0 && !formData.shipping_method_id) {
+        const cheapestMethod = availableOnly[0];
+        setFormData(prev => ({ ...prev, shipping_method_id: cheapestMethod.method.id }));
+      } else if (availableOnly.length === 0) {
+        // No shipping methods available for this destination
+        setFormData(prev => ({ ...prev, shipping_method_id: null }));
+        toast.error(`No shipping methods available for ${selectedAddress.country}. Please select a different address.`);
       }
     } catch (error) {
       console.error('Failed to load shipping methods:', error);
       setShippingMethods([]);
+      toast.error('Failed to load shipping options');
     }
-  }, [addresses, formData.shipping_method_id]);
+  }, [addresses, formData.shipping_method_id, cart]);
 
   // Load shipping methods when address selection changes
   useEffect(() => {
