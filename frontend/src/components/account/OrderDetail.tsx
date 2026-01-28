@@ -202,7 +202,9 @@ export const OrderDetail = () => {
               <>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                  <span className="text-gray-900 dark:text-white">${displaySubtotal.toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-white">
+                    ${displaySubtotal > 0 ? displaySubtotal.toFixed(2) : 'Price not set'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600 dark:text-gray-400">Shipping</span>
@@ -214,7 +216,9 @@ export const OrderDetail = () => {
                 </div>
                 <div className="flex justify-between items-center text-lg font-semibold border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
                   <span className="text-gray-900 dark:text-white">Total</span>
-                  <span className="text-gray-900 dark:text-white">${order.total_amount?.toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-white">
+                    ${order.total_amount > 0 ? order.total_amount.toFixed(2) : 'Price not set'}
+                  </span>
                 </div>
               </>
             );
