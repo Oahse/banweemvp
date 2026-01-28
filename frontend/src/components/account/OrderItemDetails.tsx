@@ -53,8 +53,13 @@ export const OrderItemDetails = ({ productId, quantity, price }) => {
         <h3 className="font-medium text-main dark:text-white">
           {product.name}
         </h3>
+        {variant?.name && (
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Variant: {variant.name}
+          </p>
+        )}
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Qty: {quantity}
+          Quantity: {quantity} × ${(price / quantity).toFixed(2)}
         </p>
       </div>
       <p className="font-medium text-main dark:text-white">
