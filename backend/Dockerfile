@@ -22,7 +22,13 @@ RUN apk add --no-cache \
     gdk-pixbuf-dev \
     fontconfig-dev \
     libxml2-dev \
-    libxslt-dev
+    libxslt-dev \
+    ttf-dejavu \
+    ttf-liberation \
+    fontconfig
+
+# Configure fontconfig
+RUN fc-cache -fv
 
 # Copy Python dependency requirements file
 COPY requirements.txt .

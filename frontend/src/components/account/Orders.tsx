@@ -180,18 +180,31 @@ export const Orders = ({
                   </div>
                   <div className="mt-6 flex justify-between">
                     <div className="space-y-1 text-sm">
-                      <p className="text-gray-500 dark:text-gray-400">
-                        Subtotal: {formatCurrency(order.subtotal || order.total_amount)}
-                      </p>
-                      <p className="text-gray-500 dark:text-gray-400">
-                        Shipping: {formatCurrency(order.shipping_amount || 0)}
-                      </p>
-                      <p className="text-gray-500 dark:text-gray-400">
-                        Tax: {formatCurrency(order.tax_amount || 0)}
-                      </p>
-                      <p className="font-medium text-main dark:text-white">
-                        Total: {formatCurrency(order.total_amount)}
-                      </p>
+                      {(() => {
+                        // Calculate subtotal from items if not provided or is zero
+                        const calculatedSubtotal = order.items?.reduce((sum: number, item: any) => {
+                          return sum + (item.total_price || 0);
+                        }, 0) || 0;
+                        
+                        const displaySubtotal = order.subtotal && order.subtotal > 0 ? order.subtotal : calculatedSubtotal;
+                        
+                        return (
+                          <>
+                            <p className="text-gray-500 dark:text-gray-400">
+                              Subtotal: {formatCurrency(displaySubtotal)}
+                            </p>
+                            <p className="text-gray-500 dark:text-gray-400">
+                              Shipping: {formatCurrency(order.shipping_amount || 0)}
+                            </p>
+                            <p className="text-gray-500 dark:text-gray-400">
+                              Tax: {formatCurrency(order.tax_amount || 0)}
+                            </p>
+                            <p className="font-medium text-main dark:text-white">
+                              Total: {formatCurrency(order.total_amount)}
+                            </p>
+                          </>
+                        );
+                      })()}
                     </div>
                     <div className="flex space-x-2">
                       <Link to={`/track-order/${order.id}`} className="flex items-center px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">

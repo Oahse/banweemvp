@@ -184,22 +184,35 @@ export const OrderDetail = () => {
 
         {/* Order Summary */}
         <div className="border-t border-gray-200 dark:border-gray-700 mt-6 pt-6">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-            <span className="text-gray-900 dark:text-white">${(order.subtotal || order.total_amount)?.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600 dark:text-gray-400">Shipping</span>
-            <span className="text-gray-900 dark:text-white">${(order.shipping_amount || 0).toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600 dark:text-gray-400">Tax</span>
-            <span className="text-gray-900 dark:text-white">${(order.tax_amount || 0).toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between items-center text-lg font-semibold border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-            <span className="text-gray-900 dark:text-white">Total</span>
-            <span className="text-gray-900 dark:text-white">${order.total_amount?.toFixed(2)}</span>
-          </div>
+          {(() => {
+            // Calculate subtotal from items if not provided or is zero
+            const calculatedSubtotal = order.items?.reduce((sum: number, item: any) => {
+              return sum + (item.total_price || 0);
+            }, 0) || 0;
+            
+            const displaySubtotal = order.subtotal && order.subtotal > 0 ? order.subtotal : calculatedSubtotal;
+            
+            return (
+              <>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                  <span className="text-gray-900 dark:text-white">${displaySubtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600 dark:text-gray-400">Shipping</span>
+                  <span className="text-gray-900 dark:text-white">${(order.shipping_amount || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600 dark:text-gray-400">Tax</span>
+                  <span className="text-gray-900 dark:text-white">${(order.tax_amount || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center text-lg font-semibold border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                  <span className="text-gray-900 dark:text-white">Total</span>
+                  <span className="text-gray-900 dark:text-white">${order.total_amount?.toFixed(2)}</span>
+                </div>
+              </>
+            );
+          })()}
         </div>
 
         {/* Shipping Address */}

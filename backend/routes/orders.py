@@ -536,7 +536,6 @@ async def get_order_invoice(
     
     try:
         invoice_result = await order_service.generate_invoice(order_id, current_user.id)
-        
         if invoice_result.get('success') and invoice_result.get('pdf_bytes'):
             # Return PDF bytes as response
             from fastapi.responses import Response

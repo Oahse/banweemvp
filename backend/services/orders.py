@@ -935,14 +935,6 @@ class OrderService:
             
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to calculate order total: {str(e)}")
-                "tax_amount": tax_amount,
-                "tax_rate": tax_rate,
-                "discount_amount": discount_amount,
-                "total_amount": total_amount
-            }
-            
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to calculate order total: {str(e)}")
 
     async def _calculate_discount_amount(self, cart_items: List, subtotal: float) -> float:
         """Calculate discount amount from applied promocodes and loyalty points"""
@@ -1483,9 +1475,10 @@ class OrderService:
             raise
         except Exception as e:
             logger.error(f"Failed to generate invoice for order {order_id}: {e}")
+            logger.error(f"Order data: {order_data if 'order_data' in locals() else 'Not available'}")
             raise HTTPException(
                 status_code=500,
-                detail="Failed to generate invoice"
+                detail=f"Failed to generate invoice: {str(e)}"
             )
 
     async def add_order_note(self, order_id: UUID, user_id: UUID, note: str) -> Dict[str, Any]:

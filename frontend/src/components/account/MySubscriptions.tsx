@@ -67,12 +67,14 @@ export const MySubscriptions = () => {
 
   const loadAvailableProducts = async () => {
     try {
+      console.log('Loading products with query:', searchQuery);
       const response = await ProductsAPI.getProducts({ 
-        search: searchQuery,
+        q: searchQuery,
         page: 1,
         limit: 20 
       });
-      setAvailableProducts(response.data.products || []);
+      console.log('Products response:', response);
+      setAvailableProducts(response.data.data || []);
     } catch (error) {
       console.error('Failed to load products:', error);
       toast.error('Failed to load products');
@@ -466,7 +468,7 @@ export const MySubscriptions = () => {
                   {/* Product Selection */}
                   <div>
                     <label className={`${themeClasses.text.primary} block text-sm font-medium mb-2`}>
-                      Select Products ({selectedProductsForNew.size} selected)
+                      Select Product Variants ({selectedProductsForNew.size} selected)
                     </label>
                     <div className="max-h-48 overflow-y-auto border border-border rounded-md p-2">
                       {availableProducts.length === 0 ? (
@@ -476,38 +478,57 @@ export const MySubscriptions = () => {
                       ) : (
                         <div className="space-y-2">
                           {availableProducts.map((product: Product) => (
-                            <div key={product.id} className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                checked={selectedProductsForNew.has(product.id)}
-                                onChange={(e) => {
-                                  const newSelected = new Set(selectedProductsForNew);
-                                  if (e.target.checked) {
-                                    newSelected.add(product.id);
-                                  } else {
-                                    newSelected.delete(product.id);
-                                  }
-                                  setSelectedProductsForNew(newSelected);
-                                }}
-                                className={`${themeClasses.input.base} flex-shrink-0`}
-                              />
-                              <div className="flex items-center space-x-2 flex-1 min-w-0">
-                                {product.images && product.images.length > 0 && (
-                                  <img 
-                                    src={product.images[0].url} 
-                                    alt={product.name}
-                                    className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                  />
-                                )}
-                                <div className="flex-1 min-w-0">
-                                  <span className={`${themeClasses.text.primary} text-sm block truncate`}>
-                                    {product.name}
-                                  </span>
+                            <div key={product.id} className="border-b border-border pb-2 last:border-b-0">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <span className={`${themeClasses.text.primary} text-sm font-medium`}>
+                                  {product.name}
+                                </span>
+                              </div>
+                              {product.variants && product.variants.length > 0 ? (
+                                <div className="ml-4 space-y-1">
+                                  {product.variants.map((variant: any) => (
+                                    <div key={variant.id} className="flex items-center space-x-2">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedProductsForNew.has(variant.id)}
+                                        onChange={(e) => {
+                                          const newSelected = new Set(selectedProductsForNew);
+                                          if (e.target.checked) {
+                                            newSelected.add(variant.id);
+                                          } else {
+                                            newSelected.delete(variant.id);
+                                          }
+                                          setSelectedProductsForNew(newSelected);
+                                        }}
+                                        className={`${themeClasses.input.base} flex-shrink-0`}
+                                      />
+                                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                                        {variant.images && variant.images.length > 0 && (
+                                          <img 
+                                            src={variant.images[0].url} 
+                                            alt={variant.name}
+                                            className="w-6 h-6 rounded object-cover flex-shrink-0"
+                                          />
+                                        )}
+                                        <div className="flex-1 min-w-0">
+                                          <span className={`${themeClasses.text.primary} text-xs block truncate`}>
+                                            {variant.name || 'Default Variant'}
+                                          </span>
+                                          <span className={`${themeClasses.text.muted} text-xs`}>
+                                            {formatCurrencyLocale(variant.current_price || variant.base_price || 0, currency)}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="ml-4">
                                   <span className={`${themeClasses.text.muted} text-xs`}>
-                                    {formatCurrencyLocale(product.price || product.min_price || 0, currency)}
+                                    No variants available
                                   </span>
                                 </div>
-                              </div>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -537,7 +558,7 @@ export const MySubscriptions = () => {
                     disabled={isLoading || selectedProductsForNew.size === 0}
                     className={`${getButtonClasses('primary')} w-full sm:w-auto`}
                   >
-                    {isLoading ? 'Creating...' : `Create Subscription (${selectedProductsForNew.size} products)`}
+                    {isLoading ? 'Creating...' : `Create Subscription (${selectedProductsForNew.size} variants)`}
                   </button>
                 </div>
               </form>

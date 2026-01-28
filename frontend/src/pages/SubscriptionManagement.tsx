@@ -53,7 +53,7 @@ export const SubscriptionManagement = () => {
         limit: 20,
         availability: true 
       });
-      setAvailableProducts(response.data?.products || []);
+      setAvailableProducts(response.data.data || []);
     } catch (error) {
       console.error('Failed to load products:', error);
       toast.error('Failed to load available products');
@@ -66,7 +66,7 @@ export const SubscriptionManagement = () => {
     try {
       setLoading(true);
       const response = await ProductsAPI.searchProducts(searchQuery, { limit: 20 });
-      setAvailableProducts(response.data?.products || []);
+      setAvailableProducts(response.data.products || []);
     } catch (error) {
       console.error('Failed to search products:', error);
       toast.error('Failed to search products');

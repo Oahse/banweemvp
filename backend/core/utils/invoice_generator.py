@@ -45,6 +45,16 @@ class InvoiceGenerator:
         short_id = order_id.replace("-", "")[:8].upper()
         return f"INV-{short_id}"
     
+    def _get_logo_url(self, order_data: Dict) -> str:
+        """Get logo URL with fallback handling"""
+        # If logo_url is provided in order_data, use it
+        if order_data.get('logo_url'):
+            return order_data['logo_url']
+        
+        # For now, return None to use the text fallback in the template
+        # In production, you would configure a proper logo URL or base64 encoded image
+        return None
+    
     def prepare_invoice_data(self, order_data: Dict) -> Dict:
         """
         Prepare invoice data from order information
@@ -110,7 +120,7 @@ class InvoiceGenerator:
             'items': items,
             
             # Company information
-            'logo_url': order_data.get('logo_url', 'file://' + str(Path(__file__).parent.parent.parent.parent / 'frontend' / 'public' / 'banwee_logo_green.png')),
+            'logo_url': self._get_logo_url(order_data),
             'company_address_line1': order_data.get(
                 'company_address_line1', 
                 'Main Street, Number 66/B'
@@ -138,14 +148,62 @@ class InvoiceGenerator:
         Returns:
             Rendered HTML string
         """
-        # Prepare data
-        invoice_data = self.prepare_invoice_data(order_data)
-        
-        # Load and render template
-        template = self.env.get_template(template_name)
-        html_content = template.render(**invoice_data)
-        
-        return html_content
+        try:
+            # Prepare data
+            invoice_data = self.prepare_invoice_data(order_data)
+            
+            # Load and render template
+            template = self.env.get_template(template_name)
+            html_content = template.render(**invoice_data)
+            
+            return html_content
+        except Exception as e:
+            # If template loading fails, create a simple HTML invoice
+            invoice_ref = self.generate_invoice_ref(order_data.get('order_id', ''))
+            customer_name = order_data.get('customer', {}).get('name', 'N/A')
+            total_amount = order_data.get('total_amount', 0)
+            
+            simple_html = f"""
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <title>Invoice - {invoice_ref}</title>
+                <style>
+                    body {{ font-family: Arial, sans-serif; margin: 40px; }}
+                    .header {{ border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px; }}
+                    .invoice-title {{ font-size: 24px; font-weight: bold; color: #333; }}
+                    .invoice-details {{ margin: 20px 0; }}
+                    .total {{ font-size: 18px; font-weight: bold; margin-top: 20px; }}
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="invoice-title">INVOICE</div>
+                    <div>Invoice #: {invoice_ref}</div>
+                    <div>Date: {self.format_date(datetime.now())}</div>
+                </div>
+                
+                <div class="invoice-details">
+                    <h3>Bill To:</h3>
+                    <p>{customer_name}</p>
+                    
+                    <h3>Order Details:</h3>
+                    <p>Order ID: {order_data.get('order_id', 'N/A')}</p>
+                    <p>Subtotal: ${order_data.get('subtotal', 0):.2f}</p>
+                    <p>Tax: ${order_data.get('tax_amount', 0):.2f}</p>
+                    <p>Shipping: ${order_data.get('shipping_amount', 0):.2f}</p>
+                    
+                    <div class="total">
+                        Total: ${total_amount:.2f}
+                    </div>
+                </div>
+                
+                <p><em>Note: Simplified invoice due to template error: {str(e)}</em></p>
+            </body>
+            </html>
+            """
+            return simple_html
     
     def generate_pdf(
         self,
@@ -187,13 +245,33 @@ class InvoiceGenerator:
         Returns:
             PDF content as bytes
         """
-        # Generate HTML
-        html_content = self.generate_html(order_data, template_name)
-        
-        # Convert to PDF bytes
-        pdf_bytes = HTML(string=html_content).write_pdf()
-        
-        return pdf_bytes
+        try:
+            # Generate HTML
+            html_content = self.generate_html(order_data, template_name)
+            
+            # Convert to PDF bytes
+            pdf_bytes = HTML(string=html_content).write_pdf()
+            
+            return pdf_bytes
+        except Exception as e:
+            # If WeasyPrint fails, create a simple HTML fallback
+            fallback_html = f"""
+            <!DOCTYPE html>
+            <html>
+            <head><title>Invoice - {self.generate_invoice_ref(order_data.get('order_id', ''))}</title></head>
+            <body>
+                <h1>Invoice</h1>
+                <p><strong>Order ID:</strong> {order_data.get('order_id', 'N/A')}</p>
+                <p><strong>Customer:</strong> {order_data.get('customer', {}).get('name', 'N/A')}</p>
+                <p><strong>Total:</strong> ${order_data.get('total_amount', 0):.2f}</p>
+                <p><em>Note: Full invoice template could not be loaded. Error: {str(e)}</em></p>
+            </body>
+            </html>
+            """
+            try:
+                return HTML(string=fallback_html).write_pdf()
+            except Exception as fallback_error:
+                raise Exception(f"Both main template and fallback failed. Main error: {str(e)}, Fallback error: {str(fallback_error)}")
     
     async def generate_invoice(self, order_data: Dict) -> Dict:
         """
@@ -206,6 +284,23 @@ class InvoiceGenerator:
             Dictionary with invoice result
         """
         try:
+            # Validate template directory exists
+            if not self.template_dir.exists():
+                return {
+                    "success": False,
+                    "error": f"Template directory not found: {self.template_dir}",
+                    "message": "Invoice template directory is missing"
+                }
+            
+            # Check if template file exists
+            template_file = self.template_dir / "invoice_template.html"
+            if not template_file.exists():
+                return {
+                    "success": False,
+                    "error": f"Template file not found: {template_file}",
+                    "message": "Invoice template file is missing"
+                }
+            
             # Generate PDF bytes
             pdf_bytes = self.generate_pdf_bytes(order_data)
             
@@ -219,10 +314,13 @@ class InvoiceGenerator:
             }
             
         except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
             return {
                 "success": False,
                 "error": str(e),
-                "message": "Failed to generate invoice"
+                "error_details": error_details,
+                "message": f"Failed to generate invoice: {str(e)}"
             }
 
 

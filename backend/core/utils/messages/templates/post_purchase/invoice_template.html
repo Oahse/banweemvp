@@ -70,7 +70,10 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 30px;
-            gap: 40px;
+        }
+
+        .info-section .info-block:not(:last-child) {
+            margin-right: 40px;
         }
 
         .info-block {
@@ -263,7 +266,11 @@
                 <p class="invoice-date"><strong>Date:</strong> {{ bnw_invoice_issue_date }}</p>
             </div>
             <div class="company-logo">
+                {% if logo_url %}
                 <img src="{{ logo_url }}" alt="Company Logo">
+                {% else %}
+                <div style="font-size: 24px; font-weight: bold; color: #61b482;">BANWEE</div>
+                {% endif %}
             </div>
         </div>
 
