@@ -87,12 +87,33 @@ class SubscriptionService:
         if len(variants) != len(product_variant_ids):
             raise HTTPException(status_code=400, detail="Some variants not found")
         
+        # Get customer address for tax calculation if delivery_address_id is provided
+        customer_address = None
+        if delivery_address_id:
+            from models.user import Address
+            address_result = await self.db.execute(
+                select(Address).where(
+                    and_(Address.id == delivery_address_id, Address.user_id == user_id)
+                )
+            )
+            address = address_result.scalar_one_or_none()
+            if address:
+                customer_address = {
+                    "street": address.street,
+                    "city": address.city,
+                    "state": address.state,
+                    "country": address.country,
+                    "post_code": address.post_code
+                }
+        
         # Calculate subscription cost with simplified structure
         cost_breakdown = await self._calculate_simplified_subscription_cost(
             variants, 
             variant_quantities or {},
             delivery_type, 
-            currency=currency
+            currency=currency,
+            customer_address=customer_address,
+            user_id=user_id
         )
         from datetime import timezone
         now = datetime.now(timezone.utc)
@@ -154,7 +175,9 @@ class SubscriptionService:
         variants: List[ProductVariant],
         variant_quantities: Dict[str, int],
         delivery_type: str,
-        currency: str = "USD"
+        currency: str = "USD",
+        customer_address: Optional[Dict] = None,
+        user_id: Optional[UUID] = None
     ) -> Dict[str, Any]:
         """Calculate subscription cost with simplified pricing structure"""
         from decimal import Decimal
@@ -195,9 +218,28 @@ class SubscriptionService:
         # Calculate shipping cost from database shipping methods
         shipping_cost = await self._get_delivery_cost_from_db(delivery_type)
         
-        # No default tax calculation - tax should be calculated based on address
+        # Calculate tax based on customer address using the comprehensive tax calculation
         tax_rate = Decimal('0.00')
         tax_amount = Decimal('0.00')
+        
+        if customer_address:
+            try:
+                # Use the existing comprehensive tax calculation method
+                tax_result = await self._calculate_subscription_cost(
+                    variants=variants,
+                    delivery_type=delivery_type,
+                    customer_address=customer_address,
+                    currency=currency,
+                    user_id=user_id
+                )
+                tax_amount = Decimal(str(tax_result.get("tax_amount", 0.0)))
+                tax_rate = Decimal(str(tax_result.get("tax_rate", 0.0)))
+            except Exception as e:
+                logger.warning(f"Tax calculation failed, using 0% tax: {e}")
+                tax_rate = Decimal('0.00')
+                tax_amount = Decimal('0.00')
+        else:
+            logger.info("No customer address provided, using 0% tax")
         
         # Calculate final total
         total_amount = subtotal + shipping_cost + tax_amount
@@ -408,12 +450,31 @@ class SubscriptionService:
         # Get current quantities
         variant_quantities = subscription.variant_quantities or {str(vid): 1 for vid in subscription.variant_ids}
         
+        # Get customer address for tax calculation
+        customer_address = None
+        if hasattr(subscription, 'delivery_address_id') and subscription.delivery_address_id:
+            from models.user import Address
+            address_result = await self.db.execute(
+                select(Address).where(Address.id == subscription.delivery_address_id)
+            )
+            address = address_result.scalar_one_or_none()
+            if address:
+                customer_address = {
+                    "street": address.street,
+                    "city": address.city,
+                    "state": address.state,
+                    "country": address.country,
+                    "post_code": address.post_code
+                }
+        
         # Recalculate cost
         cost_breakdown = await self._calculate_simplified_subscription_cost(
             variants,
             variant_quantities,
             "standard",  # Default delivery type
-            subscription.currency or "USD"
+            subscription.currency or "USD",
+            customer_address=customer_address,
+            user_id=subscription.user_id
         )
         
         # Update subscription fields
@@ -622,12 +683,32 @@ class SubscriptionService:
                     )
                 )
             
+            # Get customer address for tax calculation
+            customer_address = None
+            address_id = delivery_address_id or subscription.delivery_address_id
+            if address_id:
+                from models.user import Address
+                address_result = await self.db.execute(
+                    select(Address).where(Address.id == address_id)
+                )
+                address = address_result.scalar_one_or_none()
+                if address:
+                    customer_address = {
+                        "street": address.street,
+                        "city": address.city,
+                        "state": address.state,
+                        "country": address.country,
+                        "post_code": address.post_code
+                    }
+            
             # Recalculate cost
             cost_breakdown = await self._calculate_simplified_subscription_cost(
                 variants, 
                 subscription.variant_quantities or {str(vid): 1 for vid in product_variant_ids},
                 delivery_type or "standard",
-                subscription.currency or "USD"
+                subscription.currency or "USD",
+                customer_address=customer_address,
+                user_id=subscription.user_id
             )
             subscription.cost_breakdown = cost_breakdown
             subscription.price = cost_breakdown["total_amount"]
@@ -639,11 +720,32 @@ class SubscriptionService:
             # Recalculate cost if delivery type changed
             if product_variant_ids is None:  # Only recalculate if we didn't already do it above
                 current_variants = await self._get_subscription_variants(subscription)
+                
+                # Get customer address for tax calculation
+                customer_address = None
+                address_id = delivery_address_id or subscription.delivery_address_id
+                if address_id:
+                    from models.user import Address
+                    address_result = await self.db.execute(
+                        select(Address).where(Address.id == address_id)
+                    )
+                    address = address_result.scalar_one_or_none()
+                    if address:
+                        customer_address = {
+                            "street": address.street,
+                            "city": address.city,
+                            "state": address.state,
+                            "country": address.country,
+                            "post_code": address.post_code
+                        }
+                
                 cost_breakdown = await self._calculate_simplified_subscription_cost(
                     current_variants, 
                     subscription.variant_quantities or {str(v.id): 1 for v in current_variants},
                     delivery_type,
-                    subscription.currency or "USD"
+                    subscription.currency or "USD",
+                    customer_address=customer_address,
+                    user_id=subscription.user_id
                 )
                 subscription.cost_breakdown = cost_breakdown
                 subscription.price = cost_breakdown["total_amount"]
