@@ -37,7 +37,6 @@ interface SubscriptionCardProps {
       delivery_cost: number;
       delivery_type: string;
       total_amount: number;
-      admin_fee?: number;
       loyalty_discount?: number;
     };
     products?: Array<{
@@ -60,6 +59,8 @@ interface SubscriptionCardProps {
   onActivate?: (subscriptionId: string) => void;
   showActions?: boolean;
   compact?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
 export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
@@ -69,8 +70,43 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
   onPause,
   onResume,
   showActions = true,
-  compact = false
+  compact = false,
+  size = 'md',
+  className = ''
 }) => {
+  const getSizeClasses = (size: 'sm' | 'md' | 'lg') => {
+    switch (size) {
+      case 'sm':
+        return {
+          card: 'text-sm',
+          padding: 'p-3',
+          headerPadding: 'p-3 pb-2',
+          title: 'text-sm font-semibold',
+          spacing: 'gap-2',
+          iconSize: 'w-3 h-3',
+        };
+      case 'lg':
+        return {
+          card: 'text-base',
+          padding: 'p-6',
+          headerPadding: 'p-6 pb-4',
+          title: 'text-xl font-bold',
+          spacing: 'gap-4',
+          iconSize: 'w-5 h-5',
+        };
+      default: // md
+        return {
+          card: 'text-sm sm:text-base',
+          padding: 'p-4 sm:p-5',
+          headerPadding: 'p-4 sm:p-6 pb-4',
+          title: 'text-base sm:text-lg lg:text-xl font-bold',
+          spacing: 'gap-3 sm:gap-4',
+          iconSize: 'w-3 h-3 sm:w-4 sm:h-4',
+        };
+    }
+  };
+
+  const sizeClasses = getSizeClasses(size);
   const [isUpdating, setIsUpdating] = useState(false);
   const { formatCurrency } = useLocale();
 
@@ -127,7 +163,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     return (
       <div className={combineThemeClasses(
         themeClasses.card.base,
-        'p-4 hover:shadow-md transition-shadow duration-200'
+        sizeClasses.card,
+        sizeClasses.padding,
+        'hover:shadow-md transition-shadow duration-200',
+        className
       )}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -135,7 +174,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               <h3 className={combineThemeClasses(themeClasses.text.heading, 'font-medium')}>
                 {subscription.plan_id} Plan
               </h3>
-              <div className="flex items-center space-x-2 mt-1">
+              <div className={combineThemeClasses('flex items-center space-x-2 mt-1', sizeClasses.spacing)}>
                 <span className={combineThemeClasses(themeClasses.text.secondary, 'text-sm')}>
                   {formatCurrency(subscription.price, subscription.currency)} / {formatBillingCycle(subscription.billing_cycle)}
                 </span>
@@ -146,12 +185,16 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               
               {/* Compact cost info */}
               {(subscription.tax_amount || subscription.delivery_cost_applied) && (
-                <div className="flex items-center space-x-3 mt-1 text-xs text-gray-600">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs">
                   {subscription.tax_amount && (
-                    <span>Tax: {formatCurrency(subscription.tax_amount, subscription.currency)}</span>
+                    <span className={themeClasses.text.muted}>
+                      Tax: {formatCurrency(subscription.tax_amount, subscription.currency)}
+                    </span>
                   )}
                   {subscription.delivery_cost_applied && (
-                    <span>Shipping: {formatCurrency(subscription.delivery_cost_applied, subscription.currency)}</span>
+                    <span className={themeClasses.text.muted}>
+                      Shipping: {formatCurrency(subscription.delivery_cost_applied, subscription.currency)}
+                    </span>
                   )}
                 </div>
               )}
@@ -172,17 +215,20 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
   return (
     <div className={combineThemeClasses(
       themeClasses.card.base,
-      'overflow-hidden hover:shadow-lg transition-all duration-300'
+      sizeClasses.card,
+      'overflow-hidden hover:shadow-lg transition-all duration-300',
+      className
     )}>
       {/* Header */}
-      <div className="p-6 pb-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-4">
+      <div className={sizeClasses.headerPadding}>
+        <div className={combineThemeClasses('flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4', sizeClasses.spacing)}>
           {/* Left: Plan info */}
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h3
               className={combineThemeClasses(
                 themeClasses.text.heading,
-                'text-lg sm:text-xl font-bold mb-1 truncate'
+                sizeClasses.title,
+                'mb-1 truncate'
               )}
             >
               {subscription.plan_id.charAt(0).toUpperCase() +
@@ -190,10 +236,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               Plan
             </h3>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+            <div className={combineThemeClasses('flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1 text-xs sm:text-sm', sizeClasses.spacing)}>
               <div className="flex items-center gap-1">
                 <CreditCardIcon
-                  className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')}
+                  className={combineThemeClasses(themeClasses.text.muted, sizeClasses.iconSize)}
                 />
                 <span className={themeClasses.text.secondary}>
                   {formatCurrency(subscription.price, subscription.currency)} /{" "}
@@ -204,7 +250,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               {subscription.products && (
                 <div className="flex items-center gap-1">
                   <ShoppingBagIcon
-                    className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')}
+                    className={combineThemeClasses(themeClasses.text.muted, sizeClasses.iconSize)}
                   />
                   <span className={themeClasses.text.secondary}>
                     {subscription.products.length} products
@@ -215,19 +261,23 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
 
             {/* Cost Breakdown */}
             {(subscription.cost_breakdown || subscription.tax_amount || subscription.delivery_cost_applied) && (
-              <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
-                <div className="flex items-center gap-2 mb-2">
+              <div className={combineThemeClasses(
+                'mt-3 p-1 rounded-lg border w-auto inline-block',
+                themeClasses.background.elevated,
+                themeClasses.border.light
+              )}>
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <ReceiptIcon className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')} />
-                  <h4 className={combineThemeClasses(themeClasses.text.heading, 'text-sm font-medium')}>
+                  <h4 className={combineThemeClasses(themeClasses.text.heading, 'text-sm sm:text-base font-medium')}>
                     Cost Breakdown
                   </h4>
                 </div>
-                <div className="space-y-1 text-xs">
+                <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm min-w-max">
                   {/* Subtotal */}
                   {subscription.cost_breakdown?.subtotal && (
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center gap-4">
                       <span className={themeClasses.text.secondary}>Subtotal:</span>
-                      <span className={themeClasses.text.primary}>
+                      <span className={combineThemeClasses(themeClasses.text.primary, 'font-medium')}>
                         {formatCurrency(subscription.cost_breakdown.subtotal, subscription.currency)}
                       </span>
                     </div>
@@ -235,15 +285,15 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   
                   {/* Tax */}
                   {(subscription.cost_breakdown?.tax_amount || subscription.tax_amount) && (
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center gap-4">
                       <div className="flex items-center gap-1">
-                        <PercentIcon className="w-3 h-3 text-gray-500" />
+                        <PercentIcon className={combineThemeClasses(themeClasses.text.muted, 'w-3 h-3 flex-shrink-0')} />
                         <span className={themeClasses.text.secondary}>
                           Tax {subscription.cost_breakdown?.tax_rate ? `(${(subscription.cost_breakdown.tax_rate * 100).toFixed(1)}%)` : 
                                subscription.tax_rate_applied ? `(${(subscription.tax_rate_applied * 100).toFixed(1)}%)` : ''}:
                         </span>
                       </div>
-                      <span className={themeClasses.text.primary}>
+                      <span className={combineThemeClasses(themeClasses.text.primary, 'font-medium')}>
                         {formatCurrency(
                           subscription.cost_breakdown?.tax_amount || subscription.tax_amount || 0, 
                           subscription.currency
@@ -254,14 +304,14 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   
                   {/* Shipping */}
                   {(subscription.cost_breakdown?.delivery_cost || subscription.delivery_cost_applied) && (
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center gap-4">
                       <div className="flex items-center gap-1">
-                        <TruckIcon className="w-3 h-3 text-gray-500" />
+                        <TruckIcon className={combineThemeClasses(themeClasses.text.muted, 'w-3 h-3 flex-shrink-0')} />
                         <span className={themeClasses.text.secondary}>
                           Shipping {subscription.cost_breakdown?.delivery_type ? `(${subscription.cost_breakdown.delivery_type})` : ''}:
                         </span>
                       </div>
-                      <span className={themeClasses.text.primary}>
+                      <span className={combineThemeClasses(themeClasses.text.primary, 'font-medium')}>
                         {formatCurrency(
                           subscription.cost_breakdown?.delivery_cost || subscription.delivery_cost_applied || 0, 
                           subscription.currency
@@ -270,21 +320,11 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                     </div>
                   )}
                   
-                  {/* Admin Fee */}
-                  {subscription.cost_breakdown?.admin_fee && subscription.cost_breakdown.admin_fee > 0 && (
-                    <div className="flex justify-between items-center">
-                      <span className={themeClasses.text.secondary}>Admin Fee:</span>
-                      <span className={themeClasses.text.primary}>
-                        {formatCurrency(subscription.cost_breakdown.admin_fee, subscription.currency)}
-                      </span>
-                    </div>
-                  )}
-                  
                   {/* Loyalty Discount */}
                   {subscription.cost_breakdown?.loyalty_discount && subscription.cost_breakdown.loyalty_discount > 0 && (
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center gap-4">
                       <span className={themeClasses.text.secondary}>Loyalty Discount:</span>
-                      <span className="text-green-600">
+                      <span className={combineThemeClasses(themeClasses.text.success, 'font-medium')}>
                         -{formatCurrency(subscription.cost_breakdown.loyalty_discount, subscription.currency)}
                       </span>
                     </div>
@@ -292,7 +332,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   
                   {/* Total */}
                   {subscription.cost_breakdown?.total_amount && (
-                    <div className="flex justify-between items-center pt-1 border-t border-gray-200 font-medium">
+                    <div className={combineThemeClasses(
+                      'flex justify-between items-center gap-4 pt-1 border-t font-medium',
+                      themeClasses.border.light
+                    )}>
                       <span className={themeClasses.text.primary}>Total:</span>
                       <span className={themeClasses.text.primary}>
                         {formatCurrency(subscription.cost_breakdown.total_amount, subscription.currency)}
@@ -305,11 +348,11 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           </div>
 
           {/* Right: Status + Actions */}
-          <div className="flex items-center justify-between sm:justify-end gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between sm:justify-end gap-3">
             {/* Status badge */}
             <span
               className={combineThemeClasses(
-                'px-2 py-0.5 text-[11px] font-medium rounded-full border whitespace-nowrap',
+                'px-2 sm:px-3 py-1 text-xs sm:text-[11px] font-medium rounded-full border whitespace-nowrap',
                 getStatusColor(subscription.status)
               )}
             >
@@ -318,19 +361,21 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
             </span>
 
             {showActions && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 {/* Pause/Resume Button */}
                 {subscription.status === 'active' && onPause && (
                   <button
                     onClick={() => onPause(subscription.id)}
                     className={combineThemeClasses(
-                      'p-2 rounded-md transition-colors',
-                      'text-yellow-600 hover:bg-yellow-50',
-                      'border border-yellow-200 hover:border-yellow-300'
+                      'p-1.5 sm:p-2 rounded-md transition-colors border',
+                      themeClasses.text.warning,
+                      themeClasses.background.surface,
+                      themeClasses.border.warning,
+                      themeClasses.interactive.hover
                     )}
                     title="Pause Subscription"
                   >
-                    <PauseIcon className="w-4 h-4" />
+                    <PauseIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
                 )}
 
@@ -338,13 +383,15 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   <button
                     onClick={() => onResume(subscription.id)}
                     className={combineThemeClasses(
-                      'p-2 rounded-md transition-colors',
-                      'text-green-600 hover:bg-green-50',
-                      'border border-green-200 hover:border-green-300'
+                      'p-1.5 sm:p-2 rounded-md transition-colors border',
+                      themeClasses.text.success,
+                      themeClasses.background.surface,
+                      themeClasses.border.success,
+                      themeClasses.interactive.hover
                     )}
                     title="Resume Subscription"
                   >
-                    <PlayIcon className="w-4 h-4" />
+                    <PlayIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
                 )}
 
@@ -357,13 +404,15 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                       }
                     }}
                     className={combineThemeClasses(
-                      'p-2 rounded-md transition-colors',
-                      'text-red-600 hover:bg-red-50',
-                      'border border-red-200 hover:border-red-300'
+                      'p-1.5 sm:p-2 rounded-md transition-colors border',
+                      themeClasses.text.error,
+                      themeClasses.background.surface,
+                      themeClasses.border.error,
+                      themeClasses.interactive.hover
                     )}
                     title="Cancel Subscription"
                   >
-                    <TrashIcon className="w-4 h-4" />
+                    <TrashIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
                 )}
               </div>
@@ -374,9 +423,9 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
 
         {/* Next Billing Date */}
         {subscription.next_billing_date && subscription.status === 'active' && (
-          <div className="flex items-center space-x-1 mb-4">
-            <CalendarIcon className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')} />
-            <span className={combineThemeClasses(themeClasses.text.secondary, 'text-sm')}>
+          <div className="flex items-center gap-1 sm:gap-2 mb-3 sm:mb-4">
+            <CalendarIcon className={combineThemeClasses(themeClasses.text.muted, 'w-3 h-3 sm:w-4 sm:h-4')} />
+            <span className={combineThemeClasses(themeClasses.text.secondary, 'text-xs sm:text-sm')}>
               Next billing: {formatDate(subscription.next_billing_date)}
             </span>
           </div>
@@ -384,46 +433,52 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
 
         {/* Auto-Renew Toggle */}
         {subscription.status === 'active' && onUpdate && (
-          <AutoRenewToggle
-            isEnabled={subscription.auto_renew}
-            onToggle={handleAutoRenewToggle}
-            loading={isUpdating}
-            nextBillingDate={subscription.next_billing_date}
-            billingCycle={subscription.billing_cycle}
-            showDetails={false}
-            size="sm"
-          />
+          <div className="mb-2">
+            <AutoRenewToggle
+              isEnabled={subscription.auto_renew}
+              onToggle={handleAutoRenewToggle}
+              loading={isUpdating}
+              nextBillingDate={subscription.next_billing_date}
+              billingCycle={subscription.billing_cycle}
+              showDetails={false}
+              size="sm"
+            />
+          </div>
         )}
       </div>
 
       {/* Product Preview */}
       {subscription.products && subscription.products.length > 0 && (
-        <div className={combineThemeClasses(themeClasses.background.elevated, 'p-4 border-t', themeClasses.border.light)}>
-          <h4 className={combineThemeClasses(themeClasses.text.heading, 'font-medium text-sm mb-3')}>
+        <div className={combineThemeClasses(
+          themeClasses.background.elevated, 
+          'p-3 sm:p-4 border-t', 
+          themeClasses.border.light
+        )}>
+          <h4 className={combineThemeClasses(themeClasses.text.heading, 'font-medium text-sm sm:text-base mb-3')}>
             Products ({subscription.products.length})
           </h4>
-          <div className="flex items-center space-x-3 overflow-x-auto">
+          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-1">
             {subscription.products.slice(0, 4).map((product, index) => {
               const imageUrl = getPrimaryImage(product);
               return (
-                <div key={product.id || index} className="flex-shrink-0 flex items-center space-x-2">
+                <div key={product.id || index} className="flex-shrink-0 flex items-center gap-2 min-w-0">
                   {imageUrl ? (
                     <img
                       src={imageUrl}
                       alt={product.name}
-                      className="w-10 h-10 rounded-lg object-cover"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover"
                     />
                   ) : (
                     <div className={combineThemeClasses(
-                      'w-10 h-10 rounded-lg flex items-center justify-center border-2 border-dashed',
+                      'w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center border-2 border-dashed',
                       themeClasses.border.light,
                       themeClasses.background.surface
                     )}>
-                      <PackageIcon className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')} />
+                      <PackageIcon className={combineThemeClasses(themeClasses.text.muted, 'w-3 h-3 sm:w-4 sm:h-4')} />
                     </div>
                   )}
-                  <div className="min-w-0">
-                    <p className={combineThemeClasses(themeClasses.text.primary, 'text-xs truncate max-w-20')}>
+                  <div className="min-w-0 flex-1">
+                    <p className={combineThemeClasses(themeClasses.text.primary, 'text-xs truncate max-w-16 sm:max-w-20')}>
                       {product.name}
                     </p>
                     <p className={combineThemeClasses(themeClasses.text.muted, 'text-xs')}>
@@ -434,7 +489,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               );
             })}
             {subscription.products.length > 4 && (
-              <div className={combineThemeClasses(themeClasses.text.muted, 'text-xs flex-shrink-0')}>
+              <div className={combineThemeClasses(themeClasses.text.muted, 'text-xs flex-shrink-0 ml-2')}>
                 +{subscription.products.length - 4} more
               </div>
             )}
@@ -443,14 +498,18 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       )}
 
       {/* Actions */}
-      <div className={combineThemeClasses(themeClasses.background.elevated, 'p-4 border-t', themeClasses.border.light)}>
-        <div className="flex items-center justify-between">
+      <div className={combineThemeClasses(
+        themeClasses.background.elevated, 
+        'p-3 sm:p-4 border-t', 
+        themeClasses.border.light
+      )}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <span className={combineThemeClasses(themeClasses.text.muted, 'text-xs')}>
             Created {formatDate(subscription.created_at)}
           </span>
           <Link
             to={`/subscription/${subscription.id}/manage`}
-            className={combineThemeClasses(getButtonClasses('primary'), 'text-sm')}
+            className={combineThemeClasses(getButtonClasses('primary'), 'text-sm w-full sm:w-auto text-center')}
           >
             Manage Subscription
           </Link>

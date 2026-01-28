@@ -138,6 +138,11 @@ export function LocaleProvider({ children }: LocaleProviderProps) {
 
   // Format currency with conversion
   const formatCurrency = (amount: number, sourceCurrency: string = 'USD'): string => {
+    // Handle invalid amounts
+    if (amount === null || amount === undefined || isNaN(amount)) {
+      amount = 0;
+    }
+    
     let finalAmount = amount;
     
     // Convert if source currency is different from user's currency

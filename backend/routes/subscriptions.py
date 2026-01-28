@@ -440,7 +440,7 @@ async def pause_subscription(
         send_subscription_pause_notification(
             background_tasks,
             current_user.email,
-            current_user.name or current_user.email,
+            current_user.full_name or current_user.email,
             str(subscription_id),
             pause_reason
         )
@@ -476,7 +476,7 @@ async def resume_subscription(
         send_subscription_resume_notification(
             background_tasks,
             current_user.email,
-            current_user.name or current_user.email,
+            current_user.full_name or current_user.email,
             str(subscription_id),
             subscription.next_billing_date
         )

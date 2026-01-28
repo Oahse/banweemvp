@@ -19,6 +19,18 @@ const mockSubscription = {
   auto_renew: true,
   next_billing_date: '2024-02-15',
   current_period_end: '2024-02-15',
+  tax_rate_applied: 0.08,
+  tax_amount: 2.40,
+  delivery_cost_applied: 5.99,
+  cost_breakdown: {
+    subtotal: 28.98,
+    tax_amount: 2.40,
+    tax_rate: 0.08,
+    delivery_cost: 5.99,
+    delivery_type: 'standard',
+    total_amount: 37.37,
+    loyalty_discount: 1.50
+  },
   products: [
     {
       id: 'prod_1',

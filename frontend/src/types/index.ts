@@ -352,12 +352,30 @@ export interface Subscription {
   delivery_type?: string;
   auto_renew?: boolean;
   tax_rate?: number;
+  tax_rate_applied?: number;
+  tax_amount?: number;
   shipping_cost?: number;
+  delivery_cost_applied?: number;
+  cost_breakdown?: {
+    subtotal: number;
+    tax_amount: number;
+    tax_rate: number;
+    delivery_cost: number;
+    delivery_type: string;
+    total_amount: number;
+    admin_fee?: number;
+    loyalty_discount?: number;
+  };
   products?: Array<{
     id: string;
     name: string;
     price: number;
+    current_price?: number;
+    base_price?: number;
+    sale_price?: number;
     image?: string;
+    primary_image?: { url: string };
+    images?: Array<{ url: string; is_primary?: boolean }>;
     quantity?: number;
     currency?: string;
   }>;
