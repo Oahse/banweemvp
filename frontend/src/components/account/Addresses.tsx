@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PlusCircleIcon, MapPinIcon, HomeIcon, BriefcaseIcon, TrashIcon, PencilIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useApi } from '../../hooks/useAsync';
-import { AuthAPI } from '../../apis';
+import { AuthAPI } from '../../api';
 
 /**
  * Addresses component allows users to manage their saved addresses.

@@ -27,8 +27,7 @@ import { useWishlist } from '../store/WishlistContext';
 import { useLocale } from '../store/LocaleContext';
 import { useApi } from '../hooks/useAsync';
 import { useSubscriptionAction } from '../hooks/useSubscription';
-import { ProductsAPI } from '../apis';
-import { ReviewsAPI } from '../apis';
+import { ProductsAPI, ReviewsAPI } from '../api';
 
 import ErrorMessage from '../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';

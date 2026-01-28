@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useApi } from '../../hooks/useAsync';
-import { apiClient, ProductsAPI } from '../../apis';
+import { apiClient, ProductsAPI } from '../../api';
 import { getBestPrice } from '../../utils/price-utils';
 
 /**

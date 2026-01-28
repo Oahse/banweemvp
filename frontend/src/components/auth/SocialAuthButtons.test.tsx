@@ -5,7 +5,7 @@ import SocialAuthButtons from './SocialAuthButtons';
 import { GoogleLogin } from '@react-oauth/google';
 import FacebookLogin from '@greatsumini/react-facebook-login';
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../../apis';
+import { apiClient } from '../../api';
 
 // --- Mock external dependencies ---
 vitest.mock('@react-oauth/google', () => ({

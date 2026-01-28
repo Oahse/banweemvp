@@ -4,7 +4,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { describe, it, expect, vitest, beforeEach } from 'vitest';
 import ReviewForm from './ReviewForm'; // Default export
 import { useAuth } from '../../store/AuthContext';
-import { ReviewsAPI } from '../../apis';
+import { ReviewsAPI } from '../../api';
 import { toast } from 'react-hot-toast';
 
 // --- Mock external dependencies ---

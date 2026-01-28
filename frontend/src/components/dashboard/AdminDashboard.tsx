@@ -4,7 +4,7 @@ import { InteractiveChart } from './charts/InteractiveChart';
 import { GeographicChart } from './charts/GeographicChart';
 import { AdvancedTable } from './tables/AdvancedTable';
 import { useApi } from '../../hooks/useAsync';
-import { AdminAPI } from '../../apis';
+import { AdminAPI } from '../../api';
 import {
   BarChart3Icon,
   MapIcon,

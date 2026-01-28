@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vitest, beforeEach } from 'vitest';
 import { AdminDashboard } from './AdminDashboard';
 import { useApi } from '../../hooks/useApi';
-import { AdminAPI } from '../../apis';
+import { AdminAPI } from '../../api';
 import { CustomizableDashboard } from './widgets/CustomizableDashboard';
 import { InteractiveChart } from './charts/InteractiveChart';
 import { GeographicChart } from './charts/GeographicChart';

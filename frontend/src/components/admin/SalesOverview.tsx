@@ -9,7 +9,7 @@ import {
   RefreshCwIcon
 } from 'lucide-react';
 import { useApi } from '../../hooks/useAsync';
-import { AdminAPI } from '../../apis';
+import { AdminAPI } from '../../api';
 import { themeClasses } from '../../utils/themeClasses';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 

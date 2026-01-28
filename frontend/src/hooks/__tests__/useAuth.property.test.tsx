@@ -39,7 +39,7 @@ vi.mock('react-hot-toast', () => ({
   },
 }));
 
-import { TokenManager, AuthAPI } from '../../apis';
+import { TokenManager, AuthAPI } from '../../api';
 
 const mockTokenManager = TokenManager as any;
 const mockAuthAPI = AuthAPI as any;

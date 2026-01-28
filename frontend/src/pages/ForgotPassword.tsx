@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Input } from '../components/forms/Input';
 import { toast } from 'react-hot-toast';
 import { validation } from '../utils/validation';
-import { AuthAPI } from '../apis';
+import { AuthAPI } from '../api';
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState('');

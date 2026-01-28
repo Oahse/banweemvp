@@ -8,7 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useApi } from '../../hooks/useAsync';
-import { ProductsAPI } from '../../apis';
+import { ProductsAPI } from '../../api';
 
 import ErrorMessage from '../common/ErrorMessage';
 import ReviewForm from './ReviewForm';

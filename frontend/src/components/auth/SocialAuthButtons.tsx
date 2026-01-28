@@ -8,7 +8,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import FacebookLogin from '@greatsumini/react-facebook-login';
 import { FaFacebook, FaTiktok } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../../apis';
+import { apiClient } from '../../api';
 
 // Extend Window interface for Facebook SDK
 declare global {
