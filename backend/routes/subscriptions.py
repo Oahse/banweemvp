@@ -7,7 +7,7 @@ from typing import List
 from core.database import get_db,logger
 from core.utils.response import Response
 from core.exceptions import APIException
-from schemas.subscriptions import SubscriptionCreate, SubscriptionUpdate,SubscriptionCostCalculationRequest
+from schemas.subscriptions import SubscriptionCreate, SubscriptionUpdate, SubscriptionCostCalculationRequest, SubscriptionAddProducts, SubscriptionRemoveProducts, SubscriptionUpdateQuantity, SubscriptionQuantityChange
 from services.subscriptions import SubscriptionService, SubscriptionSchedulerService
 from models.user import User
 from models.product import Product, ProductVariant, Category, ProductImage
@@ -237,7 +237,7 @@ async def get_subscriptions(
 @router.post("/{subscription_id}/products")
 async def add_products_to_subscription(
     subscription_id: UUID,
-    variant_ids: List[UUID],
+    request: SubscriptionAddProducts,
     current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -245,7 +245,7 @@ async def add_products_to_subscription(
     try:
         subscription_service = SubscriptionService(db)
         subscription = await subscription_service.add_products_to_subscription(
-            subscription_id, variant_ids, current_user.id
+            subscription_id, request.variant_ids, current_user.id
         )
         return Response.success(data=subscription.to_dict(include_products=True), message="Products added to subscription successfully")
     except APIException:
@@ -260,7 +260,7 @@ async def add_products_to_subscription(
 @router.delete("/{subscription_id}/products")
 async def remove_products_from_subscription(
     subscription_id: UUID,
-    variant_ids: List[UUID],
+    request: SubscriptionRemoveProducts,
     current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -268,7 +268,7 @@ async def remove_products_from_subscription(
     try:
         subscription_service = SubscriptionService(db)
         subscription = await subscription_service.remove_products_from_subscription(
-            subscription_id, variant_ids, current_user.id
+            subscription_id, request.variant_ids, current_user.id
         )
         return Response.success(data=subscription.to_dict(include_products=True), message="Products removed from subscription successfully")
     except APIException:
@@ -280,7 +280,129 @@ async def remove_products_from_subscription(
         )
 
 
+@router.put("/{subscription_id}/products/quantity")
+async def update_variant_quantity(
+    subscription_id: UUID,
+    request: SubscriptionUpdateQuantity,
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update the quantity of a specific variant in a subscription."""
+    try:
+        subscription_service = SubscriptionService(db)
+        subscription = await subscription_service.update_variant_quantity(
+            subscription_id, request.variant_id, request.quantity, current_user.id
+        )
+        return Response.success(
+            data=subscription.to_dict(include_products=True), 
+            message=f"Variant quantity updated to {request.quantity} successfully"
+        )
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to update variant quantity: {str(e)}"
+        )
 
+
+@router.patch("/{subscription_id}/products/quantity")
+async def change_variant_quantity(
+    subscription_id: UUID,
+    request: SubscriptionQuantityChange,
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Increment or decrement the quantity of a specific variant in a subscription."""
+    try:
+        subscription_service = SubscriptionService(db)
+        subscription = await subscription_service.change_variant_quantity(
+            subscription_id, request.variant_id, request.change, current_user.id
+        )
+        
+        action = "increased" if request.change > 0 else "decreased"
+        return Response.success(
+            data=subscription.to_dict(include_products=True), 
+            message=f"Variant quantity {action} by {abs(request.change)} successfully"
+        )
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to change variant quantity: {str(e)}"
+        )
+
+
+@router.get("/{subscription_id}/products/quantities")
+async def get_subscription_variant_quantities(
+    subscription_id: UUID,
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get the quantities of all variants in a subscription."""
+    try:
+        subscription_service = SubscriptionService(db)
+        quantities = await subscription_service.get_subscription_variant_quantities(
+            subscription_id, current_user.id
+        )
+        return Response.success(
+            data={"variant_quantities": quantities}, 
+            message="Variant quantities retrieved successfully"
+        )
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to get variant quantities: {str(e)}"
+        )
+
+
+
+
+
+@router.patch("/{subscription_id}/auto-renew")
+async def toggle_auto_renew(
+    subscription_id: UUID,
+    auto_renew: bool,
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Simple toggle for auto-renew setting."""
+    try:
+        subscription_service = SubscriptionService(db)
+        
+        # Get the subscription
+        subscription = await subscription_service.get_subscription_by_id(subscription_id, current_user.id)
+        if not subscription:
+            raise APIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Subscription not found"
+            )
+        
+        # Update auto_renew
+        subscription.auto_renew = auto_renew
+        await db.commit()
+        await db.refresh(subscription)
+        
+        return Response.success(
+            data={
+                "id": str(subscription.id),
+                "auto_renew": subscription.auto_renew,
+                "status": subscription.status,
+                "next_billing_date": subscription.next_billing_date.isoformat() if subscription.next_billing_date else None
+            },
+            message=f"Auto-renew {'enabled' if auto_renew else 'disabled'}"
+        )
+    except APIException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating auto-renew: {e}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update auto-renew setting"
+        )
 
 
 @router.get("/{subscription_id}")
@@ -330,7 +452,10 @@ async def update_subscription(
             product_variant_ids=product_variant_ids,
             # Pass other updateable fields from subscription_data
             delivery_type=subscription_data.delivery_type if hasattr(subscription_data, 'delivery_type') else None,
-            delivery_address_id=subscription_data.delivery_address_id if hasattr(subscription_data, 'delivery_address_id') else None
+            delivery_address_id=subscription_data.delivery_address_id if hasattr(subscription_data, 'delivery_address_id') else None,
+            auto_renew=subscription_data.auto_renew if hasattr(subscription_data, 'auto_renew') else None,
+            billing_cycle=subscription_data.billing_cycle if hasattr(subscription_data, 'billing_cycle') else None,
+            pause_reason=subscription_data.pause_reason if hasattr(subscription_data, 'pause_reason') else None
             # Add other fields here as needed
         )
         return Response.success(data=subscription.to_dict(include_products=True), message="Subscription updated successfully")

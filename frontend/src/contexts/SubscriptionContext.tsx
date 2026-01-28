@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
-import SubscriptionAPI from '../apis/subscription';
+import * as SubscriptionAPI from '../apis/subscription';
 import { toast } from 'react-hot-toast';
 
 interface Subscription {

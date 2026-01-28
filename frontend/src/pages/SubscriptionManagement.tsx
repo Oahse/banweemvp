@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useLocale } from '../contexts/LocaleContext';
 import { getBestPrice, formatPriceWithFallback } from '../lib/price-utils';
-import SubscriptionAPI from '../apis/subscription';
+import * as SubscriptionAPI from '../apis/subscription';
 import { ProductsAPI } from '../apis/products';
 import { SubscriptionProductCard } from '../components/subscription/SubscriptionProductCard';
 import { AutoRenewToggle } from '../components/subscription/AutoRenewToggle';
@@ -137,9 +137,9 @@ export const SubscriptionManagement = () => {
       const response = await SubscriptionAPI.getSubscription(subscriptionId);
       console.log('Subscription API response:', response);
       
-      if (response && response.data) {
-        setSubscription(response.data);
-        console.log('Subscription data loaded successfully:', response.data);
+      if (response) {
+        setSubscription(response);
+        console.log('Subscription data loaded successfully:', response);
       } else {
         throw new Error('Invalid response format from API');
       }

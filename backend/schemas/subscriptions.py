@@ -10,8 +10,6 @@ from schemas.product import ProductVariantResponse
 class CostBreakdownSchema(BaseModel):
     """Schema for subscription cost breakdown"""
     subtotal: float
-    admin_fee: float
-    admin_percentage: float
     delivery_cost: float
     delivery_type: str
     pre_tax_total: float
@@ -111,6 +109,46 @@ class SubscriptionRemoveProducts(BaseModel):
         return v
 
 
+class SubscriptionUpdateQuantity(BaseModel):
+    """Schema for updating variant quantity in a subscription"""
+    variant_id: UUID = Field(..., description="Variant ID to update quantity for")
+    quantity: int = Field(..., ge=1, le=100, description="New quantity (1-100)")
+
+    @validator('quantity')
+    def validate_quantity(cls, v):
+        if v < 1:
+            raise ValueError('Quantity must be at least 1')
+        if v > 100:
+            raise ValueError('Quantity cannot exceed 100')
+        return v
+
+
+class SubscriptionQuantityChange(BaseModel):
+    """Schema for incrementing/decrementing variant quantity"""
+    variant_id: UUID = Field(..., description="Variant ID to change quantity for")
+    change: int = Field(..., ge=-99, le=99, description="Quantity change (-99 to +99)")
+
+    @validator('change')
+    def validate_change(cls, v):
+        if v == 0:
+            raise ValueError('Change cannot be zero')
+        return v
+
+
+class SubscriptionCostCalculationRequest(BaseModel):
+    """Schema for calculating subscription cost"""
+    variant_ids: List[UUID] = Field(..., min_items=1, description="List of product variant IDs")
+    delivery_type: str = Field(default="standard", pattern="^(standard|express|overnight)$")
+    delivery_address_id: Optional[UUID] = Field(None, description="Delivery address ID for tax calculation")
+    currency: str = Field(default="USD", min_length=3, max_length=3)
+
+    @validator('variant_ids')
+    def validate_variant_ids(cls, v):
+        if not v or len(v) == 0:
+            raise ValueError('At least one variant ID must be specified')
+        return v
+
+
 class SubscriptionPause(BaseModel):
     """Schema for pausing a subscription"""
     reason: Optional[str] = Field(None, max_length=500, description="Reason for pausing the subscription")
@@ -150,20 +188,6 @@ class SubscriptionListResponse(BaseModel):
     """Schema for paginated subscription list"""
     subscriptions: List[SubscriptionResponse]
     pagination: Dict[str, Any]
-
-
-class SubscriptionCostCalculationRequest(BaseModel):
-    """Schema for calculating subscription cost"""
-    variant_ids: List[UUID] = Field(..., min_items=1)
-    delivery_type: str = Field(default="standard", pattern="^(standard|express|overnight)$")
-    delivery_address_id: Optional[UUID] = None
-    currency: str = Field(default="USD", min_length=3, max_length=3)
-
-    @validator('variant_ids')
-    def validate_variant_ids(cls, v):
-        if not v or len(v) == 0:
-            raise ValueError('At least one variant ID must be specified')
-        return v
 
 
 class SubscriptionCostCalculationResponse(BaseModel):

@@ -118,6 +118,7 @@ class Subscription(BaseModel):
             "pause_reason": self.pause_reason,
             "next_billing_date": self.next_billing_date.isoformat() if self.next_billing_date else None,
             "metadata": self.subscription_metadata,
+            "variant_quantities": self.subscription_metadata.get("variant_quantities", {}) if self.subscription_metadata else {},
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

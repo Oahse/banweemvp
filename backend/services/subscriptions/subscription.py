@@ -25,6 +25,44 @@ class SubscriptionService:
         self.db = db
         self.payment_service = PaymentService(db)
 
+    async def _get_delivery_cost_from_db(self, delivery_type: str) -> 'Decimal':
+        """Get delivery cost from database shipping methods"""
+        from decimal import Decimal
+        from models.shipping import ShippingMethod
+        
+        # Map delivery types to shipping method names
+        delivery_type_mapping = {
+            "standard": "Standard Shipping",
+            "express": "Express Shipping", 
+            "overnight": "Priority Shipping"
+        }
+        
+        method_name = delivery_type_mapping.get(delivery_type, "Standard Shipping")
+        
+        # Get shipping method from database
+        result = await self.db.execute(
+            select(ShippingMethod).where(
+                and_(
+                    ShippingMethod.name == method_name,
+                    ShippingMethod.is_active == True
+                )
+            )
+        )
+        shipping_method = result.scalar_one_or_none()
+        
+        if shipping_method:
+            return Decimal(str(shipping_method.price))
+        
+        # Fallback to default costs if method not found
+        fallback_costs = {
+            "standard": Decimal('8.99'),
+            "express": Decimal('15.99'), 
+            "overnight": Decimal('29.99')
+        }
+        
+        logger.warning(f"Shipping method '{method_name}' not found in database, using fallback cost")
+        return fallback_costs.get(delivery_type, Decimal('8.99'))
+
     async def create_subscription(
         self,
         user_id: UUID,
@@ -177,13 +215,8 @@ class SubscriptionService:
         admin_percentage = Decimal('0.10')  # 10% - can be made configurable
         admin_fee = subtotal * admin_percentage
         
-        # Calculate delivery cost based on type
-        delivery_costs = {
-            "standard": Decimal('5.00'),
-            "express": Decimal('15.00'),
-            "overnight": Decimal('25.00')
-        }
-        delivery_cost = delivery_costs.get(delivery_type, Decimal('5.00'))
+        # Calculate delivery cost from database shipping methods
+        delivery_cost = await self._get_delivery_cost_from_db(delivery_type)
         
         # Calculate pre-tax total (subtotal + admin fee + delivery)
         pre_tax_total = subtotal + admin_fee + delivery_cost
@@ -198,20 +231,49 @@ class SubscriptionService:
         if customer_address:
             try:
                 tax_service = TaxService(self.db)
-                tax_result = await tax_service.calculate_tax(
+                
+                # Extract country and state/province from customer address
+                country = customer_address.get('country', '')
+                state = customer_address.get('state', '')
+                
+                # Map country names to ISO codes
+                country_mapping = {
+                    "United States": "US",
+                    "Canada": "CA", 
+                    "United Kingdom": "GB",
+                    "Germany": "DE",
+                    "France": "FR",
+                    "Australia": "AU",
+                    "Ghana": "GH",
+                    "Nigeria": "NG",
+                    "Kenya": "KE"
+                }
+                
+                # Get country code
+                country_code = country_mapping.get(country, country[:2].upper() if len(country) >= 2 else "US")
+                
+                # Get state/province code
+                state_code = state[:2].upper() if state and len(state) >= 2 else None
+                
+                # Calculate tax using the correct TaxService method
+                tax_amount_calculated = await tax_service.calculate_tax(
                     amount=float(pre_tax_total),
-                    currency=currency,
-                    customer_address=customer_address,
-                    product_details=product_details
-                    )
+                    country_code=country_code,
+                    province_code=state_code
+                )
+                
+                # Get tax rate info
+                tax_info = await tax_service.get_tax_info(country_code, state_code)
+                
+                tax_amount = Decimal(str(tax_amount_calculated))
+                tax_rate = Decimal(str(tax_info.get('tax_rate', 0.0)))
+                tax_breakdown = []
+                tax_type = tax_info.get('tax_name', 'TAX')
+                tax_jurisdiction = f"{tax_info.get('country_name', country)}"
+                if tax_info.get('province_name'):
+                    tax_jurisdiction += f" - {tax_info.get('province_name')}"
                     
-                tax_amount = Decimal(str(tax_result.tax_amount))
-                tax_rate = Decimal(str(tax_result.tax_rate))
-                tax_breakdown = tax_result.breakdown
-                tax_type = tax_result.tax_type.value
-                tax_jurisdiction = tax_result.jurisdiction
-                    
-                logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate}%) for {tax_jurisdiction}")
+                logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate*100:.1f}%) for {tax_jurisdiction}")
                     
             except Exception as e:
                 # Fallback to default tax rate if service fails
@@ -234,11 +296,11 @@ class SubscriptionService:
                 tax_type = fallback["type"]
                 tax_jurisdiction = country
         else:
-            # No address provided, use default tax rate
-            tax_rate = Decimal('0.085')  # 8.5% default
+            # No address provided, default to 0% tax
+            tax_rate = Decimal('0.00')  # 0% default when no address
             tax_amount = pre_tax_total * tax_rate
-            tax_type = "SALES_TAX"
-            tax_jurisdiction = "Default"
+            tax_type = "NO_TAX"
+            tax_jurisdiction = "No Address Provided"
         
         # Calculate loyalty discount if user provided
         loyalty_discount = Decimal('0.00')
@@ -389,6 +451,153 @@ class SubscriptionService:
         
         return subscription
 
+    async def update_variant_quantity(
+        self,
+        subscription_id: UUID,
+        variant_id: UUID,
+        new_quantity: int,
+        user_id: UUID
+    ) -> Subscription:
+        """Update the quantity of a specific variant in a subscription"""
+        
+        # Get subscription and verify ownership
+        subscription_result = await self.db.execute(
+            select(Subscription).where(
+                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
+            ).options(selectinload(Subscription.products))
+        )
+        subscription = subscription_result.scalar_one_or_none()
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        if subscription.status not in ["active", "paused"]:
+            raise HTTPException(status_code=400, detail="Cannot modify inactive subscription")
+        
+        # Check if variant is in subscription
+        current_variant_ids = subscription.variant_ids or []
+        variant_id_str = str(variant_id)
+        
+        if variant_id_str not in current_variant_ids:
+            raise HTTPException(status_code=400, detail="Variant not found in subscription")
+        
+        # Validate new quantity
+        if new_quantity < 1:
+            raise HTTPException(status_code=400, detail="Quantity must be at least 1")
+        if new_quantity > 100:
+            raise HTTPException(status_code=400, detail="Quantity cannot exceed 100")
+        
+        # Update quantity in metadata
+        if not subscription.subscription_metadata:
+            subscription.subscription_metadata = {}
+        
+        if "variant_quantities" not in subscription.subscription_metadata:
+            subscription.subscription_metadata["variant_quantities"] = {vid: 1 for vid in current_variant_ids}
+        
+        old_quantity = subscription.subscription_metadata["variant_quantities"].get(variant_id_str, 1)
+        subscription.subscription_metadata["variant_quantities"][variant_id_str] = new_quantity
+        
+        # Recalculate subscription cost
+        await self.recalculate_subscription_on_variant_change(
+            subscription_id, 
+            user_id=user_id
+        )
+        
+        await self.db.commit()
+        await self.db.refresh(subscription)
+        
+        logger.info(f"Updated variant {variant_id} quantity from {old_quantity} to {new_quantity} in subscription {subscription_id}")
+        
+        return subscription
+
+    async def change_variant_quantity(
+        self,
+        subscription_id: UUID,
+        variant_id: UUID,
+        quantity_change: int,
+        user_id: UUID
+    ) -> Subscription:
+        """Increment or decrement the quantity of a specific variant in a subscription"""
+        
+        # Get subscription and verify ownership
+        subscription_result = await self.db.execute(
+            select(Subscription).where(
+                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
+            ).options(selectinload(Subscription.products))
+        )
+        subscription = subscription_result.scalar_one_or_none()
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        if subscription.status not in ["active", "paused"]:
+            raise HTTPException(status_code=400, detail="Cannot modify inactive subscription")
+        
+        # Check if variant is in subscription
+        current_variant_ids = subscription.variant_ids or []
+        variant_id_str = str(variant_id)
+        
+        if variant_id_str not in current_variant_ids:
+            raise HTTPException(status_code=400, detail="Variant not found in subscription")
+        
+        # Get current quantity
+        if not subscription.subscription_metadata:
+            subscription.subscription_metadata = {}
+        
+        if "variant_quantities" not in subscription.subscription_metadata:
+            subscription.subscription_metadata["variant_quantities"] = {vid: 1 for vid in current_variant_ids}
+        
+        current_quantity = subscription.subscription_metadata["variant_quantities"].get(variant_id_str, 1)
+        new_quantity = current_quantity + quantity_change
+        
+        # Validate new quantity
+        if new_quantity < 1:
+            raise HTTPException(status_code=400, detail="Cannot reduce quantity below 1")
+        if new_quantity > 100:
+            raise HTTPException(status_code=400, detail="Cannot increase quantity above 100")
+        
+        # Update quantity
+        subscription.subscription_metadata["variant_quantities"][variant_id_str] = new_quantity
+        
+        # Recalculate subscription cost
+        await self.recalculate_subscription_on_variant_change(
+            subscription_id, 
+            user_id=user_id
+        )
+        
+        await self.db.commit()
+        await self.db.refresh(subscription)
+        
+        logger.info(f"Changed variant {variant_id} quantity from {current_quantity} to {new_quantity} in subscription {subscription_id}")
+        
+        return subscription
+
+    async def get_subscription_variant_quantities(
+        self,
+        subscription_id: UUID,
+        user_id: UUID
+    ) -> Dict[str, int]:
+        """Get the quantities of all variants in a subscription"""
+        
+        subscription_result = await self.db.execute(
+            select(Subscription).where(
+                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
+            )
+        )
+        subscription = subscription_result.scalar_one_or_none()
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        # Get quantities from metadata
+        if (subscription.subscription_metadata and 
+            "variant_quantities" in subscription.subscription_metadata):
+            return subscription.subscription_metadata["variant_quantities"]
+        
+        # Fallback: assume quantity 1 for all variants
+        variant_ids = subscription.variant_ids or []
+        return {vid: 1 for vid in variant_ids}
+
     async def get_subscription(
         self,
         subscription_id: UUID,
@@ -452,9 +661,12 @@ class SubscriptionService:
         user_id: UUID,
         product_variant_ids: Optional[List[UUID]] = None,
         delivery_type: Optional[str] = None,
-        delivery_address_id: Optional[UUID] = None
+        delivery_address_id: Optional[UUID] = None,
+        auto_renew: Optional[bool] = None,
+        billing_cycle: Optional[str] = None,
+        pause_reason: Optional[str] = None
     ) -> Subscription:
-        """Update a subscription"""
+        """Update a subscription with support for auto_renew and other settings"""
         subscription = await self.get_subscription_by_id(subscription_id, user_id)
         
         if not subscription:
@@ -501,6 +713,20 @@ class SubscriptionService:
         
         if delivery_address_id is not None:
             subscription.delivery_address_id = delivery_address_id
+        
+        # Update auto_renew setting
+        if auto_renew is not None:
+            subscription.auto_renew = auto_renew
+            logger.info(f"Updated subscription {subscription_id} auto_renew to {auto_renew}")
+        
+        # Update billing cycle
+        if billing_cycle is not None:
+            subscription.billing_cycle = billing_cycle
+            logger.info(f"Updated subscription {subscription_id} billing_cycle to {billing_cycle}")
+        
+        # Update pause reason (for paused subscriptions)
+        if pause_reason is not None and subscription.status == "paused":
+            subscription.pause_reason = pause_reason
         
         await self.db.commit()
         await self.db.refresh(subscription)
@@ -660,13 +886,8 @@ class SubscriptionService:
         admin_percentage = Decimal('0.10')  # 10% - can be made configurable
         admin_fee = subtotal * admin_percentage
         
-        # Calculate delivery cost based on type
-        delivery_costs = {
-            "standard": Decimal('5.00'),
-            "express": Decimal('15.00'),
-            "overnight": Decimal('25.00')
-        }
-        delivery_cost = delivery_costs.get(delivery_type, Decimal('5.00'))
+        # Calculate delivery cost from database shipping methods
+        delivery_cost = await self._get_delivery_cost_from_db(delivery_type)
         
         # Calculate pre-tax total (subtotal + admin fee + delivery)
         pre_tax_total = subtotal + admin_fee + delivery_cost
@@ -681,20 +902,49 @@ class SubscriptionService:
         if customer_address:
             try:
                 tax_service = TaxService(self.db)
-                tax_result = await tax_service.calculate_tax(
+                
+                # Extract country and state/province from customer address
+                country = customer_address.get('country', '')
+                state = customer_address.get('state', '')
+                
+                # Map country names to ISO codes
+                country_mapping = {
+                    "United States": "US",
+                    "Canada": "CA", 
+                    "United Kingdom": "GB",
+                    "Germany": "DE",
+                    "France": "FR",
+                    "Australia": "AU",
+                    "Ghana": "GH",
+                    "Nigeria": "NG",
+                    "Kenya": "KE"
+                }
+                
+                # Get country code
+                country_code = country_mapping.get(country, country[:2].upper() if len(country) >= 2 else "US")
+                
+                # Get state/province code
+                state_code = state[:2].upper() if state and len(state) >= 2 else None
+                
+                # Calculate tax using the correct TaxService method
+                tax_amount_calculated = await tax_service.calculate_tax(
                     amount=float(pre_tax_total),
-                    currency=currency,
-                    customer_address=customer_address,
-                    product_details=product_details
-                    )
+                    country_code=country_code,
+                    province_code=state_code
+                )
+                
+                # Get tax rate info
+                tax_info = await tax_service.get_tax_info(country_code, state_code)
+                
+                tax_amount = Decimal(str(tax_amount_calculated))
+                tax_rate = Decimal(str(tax_info.get('tax_rate', 0.0)))
+                tax_breakdown = []
+                tax_type = tax_info.get('tax_name', 'TAX')
+                tax_jurisdiction = f"{tax_info.get('country_name', country)}"
+                if tax_info.get('province_name'):
+                    tax_jurisdiction += f" - {tax_info.get('province_name')}"
                     
-                tax_amount = Decimal(str(tax_result.tax_amount))
-                tax_rate = Decimal(str(tax_result.tax_rate))
-                tax_breakdown = tax_result.breakdown
-                tax_type = tax_result.tax_type.value
-                tax_jurisdiction = tax_result.jurisdiction
-                    
-                logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate}%) for {tax_jurisdiction}")
+                logger.info(f"Tax calculated via TaxService: {tax_amount} ({tax_rate*100:.1f}%) for {tax_jurisdiction}")
                     
             except Exception as e:
                 # Fallback to default tax rate if service fails
@@ -717,11 +967,11 @@ class SubscriptionService:
                 tax_type = fallback["type"]
                 tax_jurisdiction = country
         else:
-            # No address provided, use default tax rate
-            tax_rate = Decimal('0.085')  # 8.5% default
+            # No address provided, default to 0% tax
+            tax_rate = Decimal('0.00')  # 0% default when no address
             tax_amount = pre_tax_total * tax_rate
-            tax_type = "SALES_TAX"
-            tax_jurisdiction = "Default"
+            tax_type = "NO_TAX"
+            tax_jurisdiction = "No Address Provided"
         
         # Calculate loyalty discount if user provided
         loyalty_discount = Decimal('0.00')
@@ -962,8 +1212,16 @@ class SubscriptionService:
             if user_id and subscription.user_id != user_id:
                 raise HTTPException(status_code=403, detail="User not authorized")
             
-            # Get current variant IDs
+            # Get current variant IDs and quantities
             current_variant_ids = [UUID(vid) for vid in (subscription.variant_ids or [])]
+            
+            # Get current quantities from metadata
+            variant_quantities = {}
+            if subscription.subscription_metadata and "variant_quantities" in subscription.subscription_metadata:
+                variant_quantities = subscription.subscription_metadata["variant_quantities"]
+            else:
+                # Default to quantity 1 for all variants
+                variant_quantities = {str(vid): 1 for vid in current_variant_ids}
             
             # Apply changes
             new_variant_ids = current_variant_ids.copy()
@@ -972,34 +1230,67 @@ class SubscriptionService:
                 for variant_id in added_variant_ids:
                     if variant_id not in new_variant_ids:
                         new_variant_ids.append(variant_id)
+                        # Set default quantity for new variants
+                        variant_quantities[str(variant_id)] = 1
             
             if removed_variant_ids:
                 for variant_id in removed_variant_ids:
                     if variant_id in new_variant_ids:
                         new_variant_ids.remove(variant_id)
+                        # Remove quantity for removed variants
+                        variant_quantities.pop(str(variant_id), None)
             
             if not new_variant_ids:
                 raise HTTPException(status_code=400, detail="Cannot remove all variants from subscription")
             
-            # Calculate new cost
-            new_cost_breakdown = await self.calculate_subscription_cost(
-                variant_ids=new_variant_ids,
+            # Get variants for cost calculation
+            variant_result = await self.db.execute(
+                select(ProductVariant).where(ProductVariant.id.in_(new_variant_ids))
+            )
+            variants = variant_result.scalars().all()
+            
+            # Get customer address for tax calculation
+            customer_address = None
+            if subscription.delivery_address_id:
+                from models.user import Address
+                address_result = await self.db.execute(
+                    select(Address).where(Address.id == subscription.delivery_address_id)
+                )
+                address = address_result.scalar_one_or_none()
+                if address:
+                    customer_address = {
+                        "street": address.street,
+                        "city": address.city,
+                        "state": address.state,
+                        "country": address.country,
+                        "post_code": address.post_code
+                    }
+            
+            # Calculate new cost with quantities
+            new_cost_breakdown = await self._calculate_subscription_cost_with_quantities(
+                variants=variants,
+                variant_quantities=variant_quantities,
                 delivery_type=subscription.delivery_type or "standard",
+                customer_address=customer_address,
                 currency=subscription.currency or "USD",
-                user_id=subscription.user_id,
-                shipping_address_id=subscription.delivery_address_id
+                user_id=subscription.user_id
             )
             
             # Calculate cost difference
             old_total = subscription.cost_breakdown.get("total_amount", 0) if subscription.cost_breakdown else 0
-            new_total = float(new_cost_breakdown.total_amount)
+            new_total = new_cost_breakdown["total_amount"]
             cost_difference = new_total - old_total
             
             # Update subscription
             subscription.variant_ids = [str(vid) for vid in new_variant_ids]
-            subscription.cost_breakdown = new_cost_breakdown.to_dict()
+            subscription.cost_breakdown = new_cost_breakdown
             subscription.price = new_total
             subscription.updated_at = datetime.utcnow()
+            
+            # Update quantities in metadata
+            if not subscription.subscription_metadata:
+                subscription.subscription_metadata = {}
+            subscription.subscription_metadata["variant_quantities"] = variant_quantities
             
             await self.db.commit()
             
@@ -1020,7 +1311,7 @@ class SubscriptionService:
                 "old_cost": old_total,
                 "new_cost": new_total,
                 "cost_difference": cost_difference,
-                "new_cost_breakdown": new_cost_breakdown.to_dict(),
+                "new_cost_breakdown": new_cost_breakdown,
                 "updated_variant_ids": [str(vid) for vid in new_variant_ids],
                 "recalculated_at": datetime.utcnow().isoformat()
             }

@@ -321,6 +321,7 @@ export const MySubscriptions = () => {
               onActivate={handleActivateSubscription}
               onPause={handlePauseSubscription}
               onResume={handleResumeSubscription}
+              onProductsUpdated={refreshSubscriptions}
               showActions={true}
               compact={false}
             />
