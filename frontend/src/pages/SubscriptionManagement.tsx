@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronRightIcon, PlusIcon, MinusIcon, ShoppingBagIcon, CalendarIcon, CreditCardIcon } from 'lucide-react';
+import { ChevronRightIcon, PlusIcon, MinusIcon, ShoppingBagIcon, CalendarIcon, CreditCardIcon, ToggleLeftIcon, ToggleRightIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import SubscriptionAPI from '../apis/subscription';
 import { ProductsAPI } from '../apis/products';
-import { ProductCard } from '../components/product/ProductCard';
+import { SubscriptionProductCard } from '../components/subscription/SubscriptionProductCard';
+import { AutoRenewToggle } from '../components/subscription/AutoRenewToggle';
 import { Button } from '../components/ui/Button';
 import { toast } from 'react-hot-toast';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '../lib/themeClasses';
 
 export const SubscriptionManagement = () => {
   const { subscriptionId } = useParams();
@@ -188,13 +190,13 @@ export const SubscriptionManagement = () => {
 
       <div className="max-w-6xl mx-auto">
         {/* Subscription Header */}
-        <div className="bg-surface rounded-lg shadow-md p-6 mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className={combineThemeClasses(themeClasses.card.base, 'p-6 mb-8')}>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-copy mb-2">
+              <h1 className={combineThemeClasses(themeClasses.text.heading, 'text-2xl font-bold mb-2')}>
                 {subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)} Subscription
               </h1>
-              <div className="flex items-center space-x-4 text-sm text-copy-light">
+              <div className={combineThemeClasses(themeClasses.text.secondary, 'flex items-center space-x-4 text-sm')}>
                 <div className="flex items-center">
                   <CalendarIcon size={16} className="mr-1" />
                   <span>Next billing: {new Date(subscription.next_billing_date).toLocaleDateString()}</span>
@@ -219,53 +221,77 @@ export const SubscriptionManagement = () => {
               </span>
             </div>
           </div>
+
+          {/* Auto-Renew Toggle */}
+          <AutoRenewToggle
+            isEnabled={subscription.auto_renew || false}
+            onToggle={async (enabled) => {
+              try {
+                await SubscriptionAPI.updateSubscription(subscriptionId, { auto_renew: enabled });
+                setSubscription(prev => ({ ...prev, auto_renew: enabled }));
+                toast.success(`Auto-renew ${enabled ? 'enabled' : 'disabled'}`);
+              } catch (error) {
+                console.error('Failed to update auto-renew:', error);
+                toast.error('Failed to update auto-renew setting');
+              }
+            }}
+            nextBillingDate={subscription.next_billing_date}
+            billingCycle={subscription.billing_cycle}
+            showDetails={true}
+            size="md"
+          />
         </div>
 
         {/* Current Products */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-copy mb-4">Current Products in Your Subscription</h2>
+          <h2 className={combineThemeClasses(themeClasses.text.heading, 'text-xl font-bold mb-4')}>
+            Current Products in Your Subscription
+          </h2>
           {subscription.products && subscription.products.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {subscription.products.map((variantInSubscription) => (
-                <div key={variantInSubscription.id} className="relative">
-                  <ProductCard 
-                    product={{
-                      id: variantInSubscription.product_id, // Use the product_id from the variant
-                      name: variantInSubscription.product_name || variantInSubscription.name, // Use product name or variant name
-                      image: variantInSubscription.primary_image?.url || '/placeholder-product.jpg',
-                      variants: [], // ProductCard will use selectedVariant for price, etc.
-                    }}
-                    selectedVariant={variantInSubscription}
-                    viewMode="grid"
-                  />
-                  <Button
-                    onClick={() => handleRemoveProduct(product.id)}
-                    variant="outline"
-                    size="sm"
-                    className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 text-red-600 border-red-200"
-                  >
-                    <MinusIcon size={16} />
-                  </Button>
-                </div>
+                <SubscriptionProductCard
+                  key={variantInSubscription.id}
+                  product={{
+                    id: variantInSubscription.id,
+                    product_id: variantInSubscription.product_id,
+                    product_name: variantInSubscription.product_name || variantInSubscription.name,
+                    name: variantInSubscription.product_name || variantInSubscription.name,
+                    price: variantInSubscription.price || 0,
+                    currency: subscription.currency,
+                    quantity: variantInSubscription.quantity || 1,
+                    primary_image: variantInSubscription.primary_image,
+                    images: variantInSubscription.images,
+                    variant_name: variantInSubscription.name,
+                    variant_id: variantInSubscription.id,
+                    stock: variantInSubscription.stock,
+                    sku: variantInSubscription.sku
+                  }}
+                  onRemove={handleRemoveProduct}
+                  showActions={true}
+                  viewMode="grid"
+                />
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-copy-light">
-              <ShoppingBagIcon size={48} className="mx-auto mb-4 text-copy-lighter" />
-              <p>No products in your subscription yet.</p>
+            <div className={combineThemeClasses(themeClasses.card.base, 'text-center py-8')}>
+              <ShoppingBagIcon size={48} className={combineThemeClasses(themeClasses.text.muted, 'mx-auto mb-4')} />
+              <p className={themeClasses.text.secondary}>No products in your subscription yet.</p>
             </div>
           )}
         </div>
 
         {/* Add Products Section */}
-        <div className="bg-surface rounded-lg shadow-md p-6">
+        <div className={combineThemeClasses(themeClasses.card.base, 'p-6')}>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-            <h2 className="text-xl font-bold text-copy mb-4 md:mb-0">Add Products to Your Subscription</h2>
+            <h2 className={combineThemeClasses(themeClasses.text.heading, 'text-xl font-bold mb-4 md:mb-0')}>
+              Add Products to Your Subscription
+            </h2>
             {selectedProducts.size > 0 && (
               <Button
                 onClick={handleAddProducts}
                 disabled={isAddingProducts}
-                className="flex items-center"
+                className={combineThemeClasses(getButtonClasses('primary'), 'flex items-center')}
               >
                 <PlusIcon size={16} className="mr-2" />
                 Add {selectedProducts.size} Product{selectedProducts.size !== 1 ? 's' : ''}
@@ -281,14 +307,18 @@ export const SubscriptionManagement = () => {
               placeholder="Search for products to add..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className={combineThemeClasses(
+                themeClasses.input.base,
+                themeClasses.input.default,
+                'w-full px-4 py-2'
+              )}
             />
           </div>
 
           {/* Available Products */}
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className={combineThemeClasses(themeClasses.loading.spinner, 'h-8 w-8')}></div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -301,9 +331,22 @@ export const SubscriptionManagement = () => {
 
                 return availableVariants.map((variant) => (
                   <div key={variant.id} className="relative">
-                    <ProductCard 
-                      product={product} // Pass the full product object
-                      selectedVariant={variant} // Pass the specific variant as selected
+                    <SubscriptionProductCard
+                      product={{
+                        id: variant.id,
+                        product_id: product.id,
+                        product_name: product.name,
+                        name: product.name,
+                        price: variant.current_price || variant.base_price || 0,
+                        currency: subscription.currency,
+                        primary_image: variant.primary_image,
+                        images: variant.images,
+                        variant_name: variant.name,
+                        variant_id: variant.id,
+                        stock: variant.stock,
+                        sku: variant.sku
+                      }}
+                      showActions={false}
                       viewMode="grid"
                     />
                     <Button
@@ -325,8 +368,8 @@ export const SubscriptionManagement = () => {
           )}
 
           {!loading && availableProducts.length === 0 && (
-            <div className="text-center py-8 text-copy-light">
-              <p>No products found. Try a different search term.</p>
+            <div className={combineThemeClasses(themeClasses.card.base, 'text-center py-8')}>
+              <p className={themeClasses.text.secondary}>No products found. Try a different search term.</p>
             </div>
           )}
         </div>

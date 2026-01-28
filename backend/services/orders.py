@@ -348,6 +348,23 @@ class OrderService:
             shipping_address
         )
 
+        # VALIDATION: Ensure total calculation is correct
+        calculated_total = (
+            final_total["subtotal"] + 
+            final_total["shipping_cost"] + 
+            final_total["tax_amount"] - 
+            final_total["discount_amount"]
+        )
+        
+        if abs(calculated_total - final_total["total_amount"]) > 0.01:
+            logger.error(f"Order total calculation mismatch for user {user_id}: "
+                        f"calculated={calculated_total:.2f}, "
+                        f"returned={final_total['total_amount']:.2f}")
+            raise HTTPException(
+                status_code=500, 
+                detail="Order total calculation error. Please try again."
+            )
+
         # STEP 5: ATOMIC TRANSACTION FOR ORDER CREATION
         try:
             # Begin transaction - all operations below must succeed or all will be rolled back
@@ -401,6 +418,49 @@ class OrderService:
                     order_status="pending",
                     source="web"
                 )
+                
+                # CRITICAL VALIDATION: Ensure order total is correct before saving
+                order_calculated_total = order.subtotal + order.shipping_amount + order.tax_amount - order.discount_amount
+                
+                # ALWAYS log order creation for debugging
+                logger.info(f"🔍 ORDER CREATION - User {user_id}:")
+                logger.info(f"   Subtotal: ${order.subtotal:.2f}")
+                logger.info(f"   Shipping: ${order.shipping_amount:.2f}")
+                logger.info(f"   Tax:      ${order.tax_amount:.2f}")
+                logger.info(f"   Discount: ${order.discount_amount:.2f}")
+                logger.info(f"   Total:    ${order.total_amount:.2f}")
+                logger.info(f"   Calculated: ${order_calculated_total:.2f}")
+                
+                if abs(order_calculated_total - order.total_amount) > 0.01:
+                    logger.error(f"❌ ORDER TOTAL VALIDATION FAILED for user {user_id}:")
+                    logger.error(f"  Calculated: ${order_calculated_total:.2f}")
+                    logger.error(f"  Set total:  ${order.total_amount:.2f}")
+                    logger.error(f"  Subtotal:   ${order.subtotal:.2f}")
+                    logger.error(f"  Shipping:   ${order.shipping_amount:.2f}")
+                    logger.error(f"  Tax:        ${order.tax_amount:.2f}")
+                    logger.error(f"  Discount:   ${order.discount_amount:.2f}")
+                    logger.error(f"  Difference: ${abs(order_calculated_total - order.total_amount):.2f}")
+                    
+                    # Write to a debug file as well
+                    with open("/tmp/order_validation_errors.log", "a") as f:
+                        f.write(f"{datetime.utcnow()}: ORDER VALIDATION FAILED\n")
+                        f.write(f"  User: {user_id}\n")
+                        f.write(f"  Calculated: ${order_calculated_total:.2f}\n")
+                        f.write(f"  Set total:  ${order.total_amount:.2f}\n")
+                        f.write(f"  Difference: ${abs(order_calculated_total - order.total_amount):.2f}\n\n")
+                    
+                    raise HTTPException(
+                        status_code=500, 
+                        detail="Order total calculation validation failed. Please try again."
+                    )
+                else:
+                    logger.info(f"✅ Order total validation PASSED")
+                    # Write success to debug file too
+                    with open("/tmp/order_validation_success.log", "a") as f:
+                        f.write(f"{datetime.utcnow()}: ORDER VALIDATION PASSED\n")
+                        f.write(f"  User: {user_id}\n")
+                        f.write(f"  Total: ${order.total_amount:.2f}\n\n")
+                
                 self.db.add(order)
                 await self.db.flush()  # Get order ID without committing
 
@@ -514,6 +574,53 @@ class OrderService:
                 
             # Refresh order after transaction commit
             await self.db.refresh(order)
+            
+            # POST-COMMIT VALIDATION: Verify order total is still correct after database commit
+            post_commit_calculated_total = order.subtotal + order.shipping_amount + order.tax_amount - order.discount_amount
+            
+            # ALWAYS log post-commit state for debugging
+            logger.info(f"🔍 POST-COMMIT CHECK - Order {order.id}:")
+            logger.info(f"   Subtotal: ${order.subtotal:.2f}")
+            logger.info(f"   Shipping: ${order.shipping_amount:.2f}")
+            logger.info(f"   Tax:      ${order.tax_amount:.2f}")
+            logger.info(f"   Discount: ${order.discount_amount:.2f}")
+            logger.info(f"   Total:    ${order.total_amount:.2f}")
+            logger.info(f"   Calculated: ${post_commit_calculated_total:.2f}")
+            
+            if abs(post_commit_calculated_total - order.total_amount) > 0.01:
+                logger.error(f"❌ POST-COMMIT: Order total was modified after database commit for order {order.id}!")
+                logger.error(f"  Expected: ${post_commit_calculated_total:.2f}")
+                logger.error(f"  Actual:   ${order.total_amount:.2f}")
+                logger.error(f"  Subtotal: ${order.subtotal:.2f}")
+                logger.error(f"  Shipping: ${order.shipping_amount:.2f}")
+                logger.error(f"  Tax:      ${order.tax_amount:.2f}")
+                logger.error(f"  Discount: ${order.discount_amount:.2f}")
+                logger.error(f"  Difference: ${abs(post_commit_calculated_total - order.total_amount):.2f}")
+                
+                # Write to debug file
+                with open("/tmp/order_post_commit_errors.log", "a") as f:
+                    f.write(f"{datetime.utcnow()}: POST-COMMIT ERROR\n")
+                    f.write(f"  Order: {order.id}\n")
+                    f.write(f"  Expected: ${post_commit_calculated_total:.2f}\n")
+                    f.write(f"  Actual:   ${order.total_amount:.2f}\n")
+                    f.write(f"  Difference: ${abs(post_commit_calculated_total - order.total_amount):.2f}\n\n")
+                
+                # This indicates a database trigger, constraint, or other process is modifying the order
+                # For now, we'll fix it by updating the order with the correct total
+                logger.warning(f"🛠️ Correcting order total from ${order.total_amount:.2f} to ${post_commit_calculated_total:.2f}")
+                order.total_amount = post_commit_calculated_total
+                await self.db.commit()
+                await self.db.refresh(order)
+                
+                logger.info(f"✅ Order total corrected to ${order.total_amount:.2f}")
+            else:
+                logger.info(f"✅ Post-commit validation PASSED")
+                # Write success to debug file
+                with open("/tmp/order_post_commit_success.log", "a") as f:
+                    f.write(f"{datetime.utcnow()}: POST-COMMIT SUCCESS\n")
+                    f.write(f"  Order: {order.id}\n")
+                    f.write(f"  Total: ${order.total_amount:.2f}\n\n")
+            
             
             # Send ARQ events with idempotency after successful transaction commit
             try:
@@ -760,6 +867,33 @@ class OrderService:
         # Use calculated subtotal if order subtotal is missing or zero
         display_subtotal = order.subtotal if order.subtotal and order.subtotal > 0 else calculated_subtotal
 
+        # CRITICAL FIX: Validate and correct order total before returning to frontend
+        expected_total = display_subtotal + (order.shipping_amount or 0) + (order.tax_amount or 0) - (order.discount_amount or 0)
+        
+        # If the stored total is wrong, log it and use the calculated total
+        if abs(expected_total - order.total_amount) > 0.01:
+            logger.warning(f"🔧 ORDER TOTAL CORRECTION for order {order.id}:")
+            logger.warning(f"   Stored total:    ${order.total_amount:.2f}")
+            logger.warning(f"   Calculated total: ${expected_total:.2f}")
+            logger.warning(f"   Subtotal:        ${display_subtotal:.2f}")
+            logger.warning(f"   Shipping:        ${order.shipping_amount or 0:.2f}")
+            logger.warning(f"   Tax:             ${order.tax_amount or 0:.2f}")
+            logger.warning(f"   Discount:        ${order.discount_amount or 0:.2f}")
+            
+            # Use the calculated total instead of the stored (incorrect) total
+            corrected_total = expected_total
+            
+            # Optionally update the database with the correct total
+            try:
+                order.total_amount = corrected_total
+                await self.db.commit()
+                logger.info(f"✅ Updated order {order.id} total in database to ${corrected_total:.2f}")
+            except Exception as e:
+                logger.error(f"Failed to update order total in database: {e}")
+                # Continue with the corrected total even if DB update fails
+        else:
+            corrected_total = order.total_amount
+
         # Calculate estimated delivery
         estimated_delivery = None
         if order.status in ["confirmed", "shipped"]:
@@ -770,7 +904,7 @@ class OrderService:
             id=str(order.id),
             user_id=str(order.user_id),
             status=order.status,
-            total_amount=order.total_amount,
+            total_amount=corrected_total,  # Use corrected total instead of order.total_amount
             subtotal=display_subtotal,
             tax_amount=order.tax_amount,
             shipping_amount=order.shipping_amount,

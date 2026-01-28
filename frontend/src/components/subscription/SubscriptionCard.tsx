@@ -1,0 +1,351 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  CalendarIcon, 
+  CreditCardIcon, 
+  ShoppingBagIcon, 
+  SettingsIcon,
+  PauseIcon,
+  PlayIcon,
+  TrashIcon,
+  EditIcon,
+  MoreVerticalIcon,
+  PackageIcon
+} from 'lucide-react';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '../../lib/themeClasses';
+import { formatCurrency } from '../../lib/locale-config';
+import { AutoRenewToggle } from './AutoRenewToggle';
+
+interface SubscriptionCardProps {
+  subscription: {
+    id: string;
+    plan_id: string;
+    status: 'active' | 'cancelled' | 'expired' | 'paused';
+    price: number;
+    currency: string;
+    billing_cycle: 'weekly' | 'monthly' | 'yearly';
+    auto_renew: boolean;
+    next_billing_date?: string;
+    current_period_end?: string;
+    products?: Array<{
+      id: string;
+      name: string;
+      price: number;
+      image?: string;
+      primary_image?: { url: string };
+      images?: Array<{ url: string; is_primary?: boolean }>;
+    }>;
+    created_at: string;
+  };
+  onUpdate?: (subscriptionId: string, data: any) => void;
+  onCancel?: (subscriptionId: string) => void;
+  onPause?: (subscriptionId: string) => void;
+  onResume?: (subscriptionId: string) => void;
+  showActions?: boolean;
+  compact?: boolean;
+}
+
+export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
+  subscription,
+  onUpdate,
+  onCancel,
+  onPause,
+  onResume,
+  showActions = true,
+  compact = false
+}) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'paused':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'expired':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const formatBillingCycle = (cycle: string) => {
+    return cycle.charAt(0).toUpperCase() + cycle.slice(1);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const getPrimaryImage = (product: any) => {
+    if (product.images && product.images.length > 0) {
+      const primaryImage = product.images.find((img: any) => img.is_primary);
+      if (primaryImage?.url) return primaryImage.url;
+      if (product.images[0]?.url) return product.images[0].url;
+    }
+    if (product.primary_image?.url) return product.primary_image.url;
+    if (product.image) return product.image;
+    return null;
+  };
+
+  const handleAutoRenewToggle = async (enabled: boolean) => {
+    if (!onUpdate) return;
+    
+    setIsUpdating(true);
+    try {
+      await onUpdate(subscription.id, { auto_renew: enabled });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  if (compact) {
+    return (
+      <div className={combineThemeClasses(
+        themeClasses.card.base,
+        'p-4 hover:shadow-md transition-shadow duration-200'
+      )}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div>
+              <h3 className={combineThemeClasses(themeClasses.text.heading, 'font-medium')}>
+                {subscription.plan_id} Plan
+              </h3>
+              <div className="flex items-center space-x-2 mt-1">
+                <span className={combineThemeClasses(themeClasses.text.secondary, 'text-sm')}>
+                  {formatCurrency(subscription.price, subscription.currency)} / {formatBillingCycle(subscription.billing_cycle)}
+                </span>
+                <span className={`px-2 py-0.5 text-xs rounded-full border ${getStatusColor(subscription.status)}`}>
+                  {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <Link
+            to={`/account/subscriptions/${subscription.id}`}
+            className={combineThemeClasses(getButtonClasses('outline'), 'text-sm')}
+          >
+            Manage
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={combineThemeClasses(
+      themeClasses.card.base,
+      'overflow-hidden hover:shadow-lg transition-all duration-300'
+    )}>
+      {/* Header */}
+      <div className="p-6 pb-4">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h3 className={combineThemeClasses(themeClasses.text.heading, 'text-xl font-bold mb-2')}>
+              {subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)} Plan
+            </h3>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-1">
+                <CreditCardIcon className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')} />
+                <span className={combineThemeClasses(themeClasses.text.secondary, 'text-sm')}>
+                  {formatCurrency(subscription.price, subscription.currency)} / {formatBillingCycle(subscription.billing_cycle)}
+                </span>
+              </div>
+              {subscription.products && (
+                <div className="flex items-center space-x-1">
+                  <ShoppingBagIcon className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')} />
+                  <span className={combineThemeClasses(themeClasses.text.secondary, 'text-sm')}>
+                    {subscription.products.length} products
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <span className={`px-3 py-1 text-sm font-medium rounded-full border ${getStatusColor(subscription.status)}`}>
+              {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+            </span>
+            
+            {showActions && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className={combineThemeClasses(
+                    'p-2 rounded-lg transition-colors duration-200',
+                    themeClasses.text.muted,
+                    'hover:bg-gray-100'
+                  )}
+                >
+                  <MoreVerticalIcon className="w-5 h-5" />
+                </button>
+
+                {showMenu && (
+                  <div className={combineThemeClasses(
+                    'absolute right-0 top-full mt-2 w-48 rounded-lg shadow-lg border z-10',
+                    themeClasses.background.surface,
+                    themeClasses.border.light
+                  )}>
+                    <div className="py-1">
+                      <Link
+                        to={`/account/subscriptions/${subscription.id}`}
+                        className={combineThemeClasses(
+                          'flex items-center px-4 py-2 text-sm transition-colors duration-200',
+                          themeClasses.text.primary,
+                          'hover:bg-gray-50'
+                        )}
+                        onClick={() => setShowMenu(false)}
+                      >
+                        <EditIcon className="w-4 h-4 mr-2" />
+                        Manage Products
+                      </Link>
+                      
+                      {subscription.status === 'active' && onPause && (
+                        <button
+                          onClick={() => {
+                            onPause(subscription.id);
+                            setShowMenu(false);
+                          }}
+                          className={combineThemeClasses(
+                            'flex items-center w-full px-4 py-2 text-sm transition-colors duration-200',
+                            themeClasses.text.primary,
+                            'hover:bg-gray-50'
+                          )}
+                        >
+                          <PauseIcon className="w-4 h-4 mr-2" />
+                          Pause Subscription
+                        </button>
+                      )}
+                      
+                      {subscription.status === 'paused' && onResume && (
+                        <button
+                          onClick={() => {
+                            onResume(subscription.id);
+                            setShowMenu(false);
+                          }}
+                          className={combineThemeClasses(
+                            'flex items-center w-full px-4 py-2 text-sm transition-colors duration-200',
+                            themeClasses.text.primary,
+                            'hover:bg-gray-50'
+                          )}
+                        >
+                          <PlayIcon className="w-4 h-4 mr-2" />
+                          Resume Subscription
+                        </button>
+                      )}
+                      
+                      {onCancel && (
+                        <button
+                          onClick={() => {
+                            onCancel(subscription.id);
+                            setShowMenu(false);
+                          }}
+                          className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
+                        >
+                          <TrashIcon className="w-4 h-4 mr-2" />
+                          Cancel Subscription
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Next Billing Date */}
+        {subscription.next_billing_date && subscription.status === 'active' && (
+          <div className="flex items-center space-x-1 mb-4">
+            <CalendarIcon className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')} />
+            <span className={combineThemeClasses(themeClasses.text.secondary, 'text-sm')}>
+              Next billing: {formatDate(subscription.next_billing_date)}
+            </span>
+          </div>
+        )}
+
+        {/* Auto-Renew Toggle */}
+        {subscription.status === 'active' && onUpdate && (
+          <AutoRenewToggle
+            isEnabled={subscription.auto_renew}
+            onToggle={handleAutoRenewToggle}
+            loading={isUpdating}
+            nextBillingDate={subscription.next_billing_date}
+            billingCycle={subscription.billing_cycle}
+            showDetails={false}
+            size="sm"
+          />
+        )}
+      </div>
+
+      {/* Product Preview */}
+      {subscription.products && subscription.products.length > 0 && (
+        <div className={combineThemeClasses(themeClasses.background.elevated, 'p-4 border-t', themeClasses.border.light)}>
+          <h4 className={combineThemeClasses(themeClasses.text.heading, 'font-medium text-sm mb-3')}>
+            Products ({subscription.products.length})
+          </h4>
+          <div className="flex items-center space-x-3 overflow-x-auto">
+            {subscription.products.slice(0, 4).map((product, index) => {
+              const imageUrl = getPrimaryImage(product);
+              return (
+                <div key={product.id || index} className="flex-shrink-0 flex items-center space-x-2">
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={product.name}
+                      className="w-10 h-10 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className={combineThemeClasses(
+                      'w-10 h-10 rounded-lg flex items-center justify-center border-2 border-dashed',
+                      themeClasses.border.light,
+                      themeClasses.background.surface
+                    )}>
+                      <PackageIcon className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')} />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className={combineThemeClasses(themeClasses.text.primary, 'text-xs truncate max-w-20')}>
+                      {product.name}
+                    </p>
+                    <p className={combineThemeClasses(themeClasses.text.muted, 'text-xs')}>
+                      {formatCurrency(product.price, subscription.currency)}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+            {subscription.products.length > 4 && (
+              <div className={combineThemeClasses(themeClasses.text.muted, 'text-xs flex-shrink-0')}>
+                +{subscription.products.length - 4} more
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className={combineThemeClasses(themeClasses.background.elevated, 'p-4 border-t', themeClasses.border.light)}>
+        <div className="flex items-center justify-between">
+          <span className={combineThemeClasses(themeClasses.text.muted, 'text-xs')}>
+            Created {formatDate(subscription.created_at)}
+          </span>
+          <Link
+            to={`/account/subscriptions/${subscription.id}`}
+            className={combineThemeClasses(getButtonClasses('primary'), 'text-sm')}
+          >
+            Manage Subscription
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};

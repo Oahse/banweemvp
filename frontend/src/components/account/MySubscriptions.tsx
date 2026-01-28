@@ -12,11 +12,14 @@ import {
   ClockIcon,
   XIcon
 } from 'lucide-react';
-import { themeClasses, getButtonClasses } from '../../lib/themeClasses';
+import { themeClasses, getButtonClasses, combineThemeClasses } from '../../lib/themeClasses';
 import { ProductsAPI } from '../../apis/products';
 import SubscriptionAPI from '../../apis/subscription';
 import { toast } from 'react-hot-toast';
 import { Product } from '../../types';
+import { SubscriptionProductCard } from '../subscription/SubscriptionProductCard';
+import { AutoRenewToggle } from '../subscription/AutoRenewToggle';
+import { SubscriptionCard } from '../subscription/SubscriptionCard';
 
 interface NewSubscriptionData {
   plan_id: string;
@@ -264,125 +267,23 @@ export const MySubscriptions = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {filteredSubscriptions.map((subscription: any) => (
-            <div key={subscription.id} className={`${themeClasses.card.base} p-4 sm:p-6`}>
-              {/* Subscription Header */}
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1 min-w-0">
-                  <h3 className={`${themeClasses.text.heading} text-lg truncate`}>
-                    {subscription.plan_id} Subscription
-                  </h3>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${
-                    subscription.status === 'active' 
-                      ? themeClasses.status.success
-                      : subscription.status === 'paused'
-                      ? themeClasses.status.warning
-                      : themeClasses.status.error
-                  }`}>
-                    {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2 ml-4">
-                  <button
-                    onClick={() => {
-                      setSelectedSubscription(subscription);
-                      setShowAddProductModal(true);
-                    }}
-                    className={`${getButtonClasses('outline')} p-2`}
-                    title="Add Products"
-                  >
-                    <PlusIcon size={16} />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteSubscription(subscription.id)}
-                    className={`${getButtonClasses('danger')} p-2`}
-                    title="Delete Subscription"
-                  >
-                    <TrashIcon size={16} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Subscription Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-sm">
-                <div className="flex items-center">
-                  <CalendarIcon size={16} className={`${themeClasses.text.muted} mr-2 flex-shrink-0`} />
-                  <span className={`${themeClasses.text.secondary} truncate`}>
-                    Next: {subscription.next_billing_date ? new Date(subscription.next_billing_date).toLocaleDateString() : 'N/A'}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <ShoppingBagIcon size={16} className={`${themeClasses.text.muted} mr-2 flex-shrink-0`} />
-                  <span className={`${themeClasses.text.secondary} truncate`}>
-                    {subscription.products?.length || 0} products
-                  </span>
-                </div>
-                <div className="flex items-center sm:col-span-2">
-                  <ClockIcon size={16} className={`${themeClasses.text.muted} mr-2 flex-shrink-0`} />
-                  <select
-                    value={subscription.billing_cycle}
-                    onChange={(e) => handleUpdatePeriod(subscription.id, e.target.value)}
-                    className={`${themeClasses.input.base} ${themeClasses.input.default} text-sm py-1 flex-1`}
-                  >
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Products List */}
-              {subscription.products && subscription.products.length > 0 && (
-                <div className="mb-4">
-                  <h4 className={`${themeClasses.text.heading} text-sm mb-2`}>Products:</h4>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {subscription.products.map((product: any) => (
-                      <div key={product.id} className={`${themeClasses.background.elevated} rounded-md p-2 flex justify-between items-center`}>
-                        <div className="flex items-center flex-1 min-w-0">
-                          {product.image && (
-                            <img 
-                              src={product.image} 
-                              alt={product.name}
-                              className="w-8 h-8 rounded object-cover mr-2 flex-shrink-0"
-                            />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <span className={`${themeClasses.text.primary} text-sm block truncate`}>
-                              {product.name}
-                            </span>
-                            <span className={`${themeClasses.text.muted} text-xs`}>
-                              {formatCurrencyLocale(product.price, subscription.currency || currency)}
-                            </span>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveProduct(subscription.id, product.id)}
-                          className={`${themeClasses.text.error} hover:${themeClasses.background.hover} p-1 rounded flex-shrink-0 ml-2`}
-                          title="Remove product"
-                        >
-                          <XIcon size={14} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Actions */}
-              <div className="flex justify-between items-center">
-                <Link 
-                  to={`/subscription/${subscription.id}/orders`} 
-                  className={`${getButtonClasses('outline')} text-sm mr-2`}
-                >
-                  View Orders
-                </Link>
-                <Link 
-                  to={`/subscription/${subscription.id}/manage`} 
-                  className={`${getButtonClasses('outline')} text-sm`}
-                >
-                  Manage Details
-                </Link>
-              </div>
-            </div>
+            <SubscriptionCard
+              key={subscription.id}
+              subscription={subscription}
+              onUpdate={async (subscriptionId, data) => {
+                try {
+                  await SubscriptionAPI.updateSubscription(subscriptionId, data);
+                  await refreshSubscriptions();
+                  toast.success('Subscription updated successfully');
+                } catch (error) {
+                  console.error('Failed to update subscription:', error);
+                  toast.error('Failed to update subscription');
+                }
+              }}
+              onCancel={handleDeleteSubscription}
+              showActions={true}
+              compact={false}
+            />
           ))}
         </div>
       )}
@@ -458,11 +359,14 @@ export const MySubscriptions = () => {
                       id="auto_renew"
                       checked={newSubscription.auto_renew}
                       onChange={(e) => setNewSubscription({...newSubscription, auto_renew: e.target.checked})}
-                      className={`${themeClasses.input.base} mr-2`}
+                      className="sr-only"
                     />
-                    <label htmlFor="auto_renew" className={`${themeClasses.text.primary} text-sm`}>
-                      Auto-renew subscription
-                    </label>
+                    <AutoRenewToggle
+                      isEnabled={newSubscription.auto_renew}
+                      onToggle={(enabled) => setNewSubscription({...newSubscription, auto_renew: enabled})}
+                      showDetails={false}
+                      size="sm"
+                    />
                   </div>
                   
                   {/* Product Selection */}

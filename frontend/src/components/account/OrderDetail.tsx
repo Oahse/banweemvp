@@ -166,11 +166,13 @@ export const OrderDetail = () => {
                     <p className="font-medium text-gray-900 dark:text-white">
                       {item.variant?.product_name || item.variant?.name || 'Product'}
                     </p>
+                    {item.variant?.name && item.variant?.product_name && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Variant: {item.variant.name}
+                      </p>
+                    )}
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {item.variant?.name && item.variant?.product_name && `Variant: ${item.variant.name}`}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Quantity: {item.quantity} × ${item.price_per_unit?.toFixed(2)}
+                      Quantity: {item.quantity} × ${(item.price_per_unit || 0).toFixed(2)}
                     </p>
                   </div>
                   <p className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
