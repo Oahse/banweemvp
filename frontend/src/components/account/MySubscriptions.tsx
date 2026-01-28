@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useLocale } from '../../contexts/LocaleContext';
 import { 
-  CalendarIcon, 
-  ShoppingBagIcon, 
   PlusIcon, 
-  TrashIcon,
   SearchIcon,
   PackageIcon,
-  ClockIcon,
   XIcon
 } from 'lucide-react';
-import { themeClasses, getButtonClasses, combineThemeClasses } from '../../lib/themeClasses';
+import { themeClasses, getButtonClasses } from '../../lib/themeClasses';
 import { ProductsAPI } from '../../apis/products';
-import SubscriptionAPI from '../../apis/subscription';
 import { toast } from 'react-hot-toast';
 import { Product } from '../../types';
-import { SubscriptionProductCard } from '../subscription/SubscriptionProductCard';
 import { AutoRenewToggle } from '../subscription/AutoRenewToggle';
 import { SubscriptionCard } from '../subscription/SubscriptionCard';
 
@@ -31,8 +24,18 @@ interface NewSubscriptionData {
 }
 
 export const MySubscriptions = () => {
-  const { subscriptions, loading, error, refreshSubscriptions } = useSubscription();
-  const { currency, countryCode, formatCurrency: formatCurrencyLocale } = useLocale();
+  const { 
+    subscriptions, 
+    loading, 
+    error, 
+    refreshSubscriptions, 
+    createSubscription, 
+    updateSubscription, 
+    cancelSubscription,
+    addProductsToSubscription,
+    removeProductsFromSubscription 
+  } = useSubscription();
+  const { currency, formatCurrency: formatCurrencyLocale } = useLocale();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   const [showAddProductModal, setShowAddProductModal] = useState<boolean>(false);
@@ -103,19 +106,19 @@ export const MySubscriptions = () => {
         product_variant_ids: productVariantIds
       };
 
-      await SubscriptionAPI.createSubscription(subscriptionData);
-      toast.success('Subscription created successfully!');
-      setShowCreateModal(false);
-      setNewSubscription({
-        plan_id: 'basic',
-        billing_cycle: 'monthly',
-        product_variant_ids: [],
-        delivery_type: 'standard',
-        currency: 'USD',
-        auto_renew: true
-      });
-      setSelectedProductsForNew(new Set());
-      refreshSubscriptions();
+      const result = await createSubscription(subscriptionData);
+      if (result) {
+        setShowCreateModal(false);
+        setNewSubscription({
+          plan_id: 'basic',
+          billing_cycle: 'monthly',
+          product_variant_ids: [],
+          delivery_type: 'standard',
+          currency: currency,
+          auto_renew: true
+        });
+        setSelectedProductsForNew(new Set());
+      }
     } catch (error) {
       console.error('Failed to create subscription:', error);
       toast.error('Failed to create subscription');
@@ -138,11 +141,11 @@ export const MySubscriptions = () => {
     setIsLoading(true);
     try {
       const variantIds = Array.from(selectedProducts);
-      await SubscriptionAPI.addProductsToSubscription(selectedSubscription.id, variantIds);
-      toast.success(`Added ${selectedProducts.size} product(s) to subscription!`);
-      setShowAddProductModal(false);
-      setSelectedProducts(new Set());
-      refreshSubscriptions();
+      const result = await addProductsToSubscription(selectedSubscription.id, variantIds);
+      if (result) {
+        setShowAddProductModal(false);
+        setSelectedProducts(new Set());
+      }
     } catch (error) {
       console.error('Failed to add products:', error);
       toast.error('Failed to add products to subscription');
@@ -153,9 +156,7 @@ export const MySubscriptions = () => {
 
   const handleRemoveProduct = async (subscriptionId: string, variantId: string) => {
     try {
-      await SubscriptionAPI.removeProductsFromSubscription(subscriptionId, [variantId]);
-      toast.success('Product removed from subscription');
-      refreshSubscriptions();
+      await removeProductsFromSubscription(subscriptionId, [variantId]);
     } catch (error) {
       console.error('Failed to remove product:', error);
       toast.error('Failed to remove product');
@@ -164,9 +165,7 @@ export const MySubscriptions = () => {
 
   const handleUpdatePeriod = async (subscriptionId: string, newPeriod: string) => {
     try {
-      await SubscriptionAPI.updateSubscription(subscriptionId, { billing_cycle: newPeriod });
-      toast.success('Subscription period updated');
-      refreshSubscriptions();
+      await updateSubscription(subscriptionId, { billing_cycle: newPeriod });
     } catch (error) {
       console.error('Failed to update subscription:', error);
       toast.error('Failed to update subscription period');
@@ -177,13 +176,16 @@ export const MySubscriptions = () => {
     if (!confirm('Are you sure you want to delete this subscription?')) return;
     
     try {
-      await SubscriptionAPI.deleteSubscription(subscriptionId);
-      toast.success('Subscription deleted successfully');
-      refreshSubscriptions();
+      await cancelSubscription(subscriptionId);
     } catch (error) {
       console.error('Failed to delete subscription:', error);
       toast.error('Failed to delete subscription');
     }
+  };
+
+  const handleOpenAddProductModal = (subscription: any) => {
+    setSelectedSubscription(subscription);
+    setShowAddProductModal(true);
   };
 
   const filteredSubscriptions = subscriptions.filter((sub: any) => {
@@ -271,14 +273,7 @@ export const MySubscriptions = () => {
               key={subscription.id}
               subscription={subscription}
               onUpdate={async (subscriptionId, data) => {
-                try {
-                  await SubscriptionAPI.updateSubscription(subscriptionId, data);
-                  await refreshSubscriptions();
-                  toast.success('Subscription updated successfully');
-                } catch (error) {
-                  console.error('Failed to update subscription:', error);
-                  toast.error('Failed to update subscription');
-                }
+                await updateSubscription(subscriptionId, data);
               }}
               onCancel={handleDeleteSubscription}
               showActions={true}
@@ -425,7 +420,9 @@ export const MySubscriptions = () => {
                                           className="w-6 h-6 rounded object-cover border border-border"
                                         />
                                       ) : (
-                                        <div className="w-6 h-6" />
+                                        <div className="w-6 h-6 rounded bg-gray-100 flex items-center justify-center">
+                                          <PackageIcon className="w-3 h-3 text-gray-400" />
+                                        </div>
                                       )}
 
                                       {/* Name */}
@@ -448,16 +445,31 @@ export const MySubscriptions = () => {
                                   ))}
                                 </div>
                               ) : (
-                                <span className={`${themeClasses.text.muted} text-xs`}>
-                                  No variants available
-                                </span>
+                                <div className="px-2 py-1">
+                                  <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedProductsForNew.has(product.id)}
+                                      onChange={(e) => {
+                                        const next = new Set(selectedProductsForNew);
+                                        e.target.checked
+                                          ? next.add(product.id)
+                                          : next.delete(product.id);
+                                        setSelectedProductsForNew(next);
+                                      }}
+                                      className={`${themeClasses.input.base}`}
+                                    />
+                                    <span className={`${themeClasses.text.muted} text-xs`}>
+                                      Default variant - {formatCurrencyLocale(product.price || 0, currency)}
+                                    </span>
+                                  </label>
+                                </div>
                               )}
                             </div>
                           ))
                         )}
                       </div>
                     </div>
-
                   </div>
                   
                   <div className={`${themeClasses.background.elevated} rounded-md p-3`}>

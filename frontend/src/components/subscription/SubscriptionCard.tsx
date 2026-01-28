@@ -4,7 +4,6 @@ import {
   CalendarIcon, 
   CreditCardIcon, 
   ShoppingBagIcon, 
-  SettingsIcon,
   PauseIcon,
   PlayIcon,
   TrashIcon,
@@ -13,7 +12,7 @@ import {
   PackageIcon
 } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../lib/themeClasses';
-import { formatCurrency } from '../../lib/locale-config';
+import { useLocale } from '../../contexts/LocaleContext';
 import { AutoRenewToggle } from './AutoRenewToggle';
 
 interface SubscriptionCardProps {
@@ -56,6 +55,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const { formatCurrency } = useLocale();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -100,7 +100,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     
     setIsUpdating(true);
     try {
-      await onUpdate(subscription.id, { auto_renew: enabled });
+      onUpdate(subscription.id, { auto_renew: enabled });
     } finally {
       setIsUpdating(false);
     }

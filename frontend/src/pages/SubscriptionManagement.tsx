@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronRightIcon, PlusIcon, MinusIcon, ShoppingBagIcon, CalendarIcon, CreditCardIcon, ToggleLeftIcon, ToggleRightIcon } from 'lucide-react';
+import { ChevronRightIcon, PlusIcon, MinusIcon, ShoppingBagIcon, CalendarIcon, CreditCardIcon, TrashIcon, AlertTriangleIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useSubscription } from '../contexts/SubscriptionContext';
+import { useLocale } from '../contexts/LocaleContext';
 import SubscriptionAPI from '../apis/subscription';
 import { ProductsAPI } from '../apis/products';
 import { SubscriptionProductCard } from '../components/subscription/SubscriptionProductCard';
@@ -13,6 +15,8 @@ import { themeClasses, combineThemeClasses, getButtonClasses } from '../lib/them
 export const SubscriptionManagement = () => {
   const { subscriptionId } = useParams();
   const { user } = useAuth();
+  const { updateSubscription, cancelSubscription, addProductsToSubscription, removeProductsFromSubscription } = useSubscription();
+  const { currency, formatCurrency } = useLocale();
   const [subscription, setSubscription] = useState(null);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,6 +24,8 @@ export const SubscriptionManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProducts, setSelectedProducts] = useState(new Set());
   const [isAddingProducts, setIsAddingProducts] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     if (subscriptionId) {
@@ -86,11 +92,12 @@ export const SubscriptionManagement = () => {
     try {
       setIsAddingProducts(true);
       const variantIds = Array.from(selectedProducts);
-      await SubscriptionAPI.addProductsToSubscription(subscriptionId, variantIds);
+      const success = await addProductsToSubscription(subscriptionId, variantIds);
       
-      toast.success(`Added ${selectedProducts.size} product(s) to your subscription!`);
-      setSelectedProducts(new Set());
-      await loadSubscriptionData(); // Refresh subscription data
+      if (success) {
+        setSelectedProducts(new Set());
+        await loadSubscriptionData(); // Refresh subscription data
+      }
     } catch (error) {
       console.error('Failed to add products:', error);
       toast.error('Failed to add products to subscription');
@@ -101,12 +108,30 @@ export const SubscriptionManagement = () => {
 
   const handleRemoveProduct = async (variantId) => {
     try {
-      await SubscriptionAPI.removeProductsFromSubscription(subscriptionId, [variantId]);
-      toast.success('Product removed from subscription');
-      await loadSubscriptionData(); // Refresh subscription data
+      const success = await removeProductsFromSubscription(subscriptionId, [variantId]);
+      if (success) {
+        await loadSubscriptionData(); // Refresh subscription data
+      }
     } catch (error) {
       console.error('Failed to remove product:', error);
       toast.error('Failed to remove product from subscription');
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    try {
+      setIsCancelling(true);
+      const success = await cancelSubscription(subscriptionId);
+      if (success) {
+        setShowCancelDialog(false);
+        // Redirect to subscriptions list after successful cancellation
+        window.location.href = '/account/subscriptions';
+      }
+    } catch (error) {
+      console.error('Failed to cancel subscription:', error);
+      toast.error('Failed to cancel subscription');
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -203,7 +228,7 @@ export const SubscriptionManagement = () => {
                 </div>
                 <div className="flex items-center">
                   <CreditCardIcon size={16} className="mr-1" />
-                  <span>${subscription.price}/{subscription.billing_cycle}</span>
+                  <span>{formatCurrency(subscription.price, subscription.currency)}/{subscription.billing_cycle}</span>
                 </div>
                 <div className="flex items-center">
                   <ShoppingBagIcon size={16} className="mr-1" />
@@ -223,23 +248,38 @@ export const SubscriptionManagement = () => {
           </div>
 
           {/* Auto-Renew Toggle */}
-          <AutoRenewToggle
-            isEnabled={subscription.auto_renew || false}
-            onToggle={async (enabled) => {
-              try {
-                await SubscriptionAPI.updateSubscription(subscriptionId, { auto_renew: enabled });
-                setSubscription(prev => ({ ...prev, auto_renew: enabled }));
-                toast.success(`Auto-renew ${enabled ? 'enabled' : 'disabled'}`);
-              } catch (error) {
-                console.error('Failed to update auto-renew:', error);
-                toast.error('Failed to update auto-renew setting');
-              }
-            }}
-            nextBillingDate={subscription.next_billing_date}
-            billingCycle={subscription.billing_cycle}
-            showDetails={true}
-            size="md"
-          />
+          <div className="mb-6">
+            <AutoRenewToggle
+              isEnabled={subscription.auto_renew || false}
+              onToggle={async (enabled) => {
+                try {
+                  const success = await updateSubscription(subscriptionId, { auto_renew: enabled });
+                  if (success) {
+                    setSubscription(prev => ({ ...prev, auto_renew: enabled }));
+                  }
+                } catch (error) {
+                  console.error('Failed to update auto-renew:', error);
+                  toast.error('Failed to update auto-renew setting');
+                }
+              }}
+              nextBillingDate={subscription.next_billing_date}
+              billingCycle={subscription.billing_cycle}
+              showDetails={true}
+              size="md"
+            />
+          </div>
+
+          {/* Cancel Subscription Button */}
+          <div className="flex justify-end">
+            <Button
+              onClick={() => setShowCancelDialog(true)}
+              variant="outline"
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+            >
+              <TrashIcon size={16} className="mr-2" />
+              Cancel Subscription
+            </Button>
+          </div>
         </div>
 
         {/* Current Products */}
@@ -374,6 +414,65 @@ export const SubscriptionManagement = () => {
           )}
         </div>
       </div>
+
+      {/* Cancel Subscription Confirmation Dialog */}
+      {showCancelDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className={combineThemeClasses(themeClasses.card.base, 'w-full max-w-md')}>
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <AlertTriangleIcon className="w-6 h-6 text-red-600 mr-3" />
+                <h3 className={combineThemeClasses(themeClasses.text.heading, 'text-lg font-bold')}>
+                  Cancel Subscription
+                </h3>
+              </div>
+              
+              <div className="mb-6">
+                <p className={combineThemeClasses(themeClasses.text.secondary, 'mb-3')}>
+                  Are you sure you want to cancel your subscription? This action cannot be undone.
+                </p>
+                <div className={combineThemeClasses(themeClasses.background.elevated, 'p-3 rounded-lg')}>
+                  <p className={combineThemeClasses(themeClasses.text.primary, 'text-sm font-medium mb-1')}>
+                    {subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)} Plan
+                  </p>
+                  <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
+                    {formatCurrency(subscription.price, subscription.currency)}/{subscription.billing_cycle}
+                  </p>
+                  <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
+                    {subscription.products?.length || 0} products included
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={() => setShowCancelDialog(false)}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={isCancelling}
+                >
+                  Keep Subscription
+                </Button>
+                <Button
+                  onClick={handleCancelSubscription}
+                  variant="primary"
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  disabled={isCancelling}
+                >
+                  {isCancelling ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Cancelling...
+                    </>
+                  ) : (
+                    'Yes, Cancel Subscription'
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

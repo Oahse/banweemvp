@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MinusIcon, PlusIcon, ImageIcon, PackageIcon } from 'lucide-react';
+import { MinusIcon, PlusIcon, PackageIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../lib/themeClasses';
-import { formatCurrency } from '../../lib/locale-config';
+import { useLocale } from '../../contexts/LocaleContext';
 
 interface SubscriptionProductCardProps {
   product: {
@@ -38,6 +38,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [quantity, setQuantity] = useState(product.quantity || 1);
+  const { formatCurrency } = useLocale();
 
   const getPrimaryImage = () => {
     if (imageError) return null;
