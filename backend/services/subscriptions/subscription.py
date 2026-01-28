@@ -113,11 +113,14 @@ class SubscriptionService:
             variant_quantities=variant_quantities or {str(vid): 1 for vid in product_variant_ids}
         )
         
-        # Add products to the many-to-many relationship
+        # Add subscription to session first
+        self.db.add(subscription)
+        await self.db.flush()  # Flush to get the ID without committing
+        
+        # Now add products to the many-to-many relationship
         for variant in variants:
             subscription.products.append(variant)
         
-        self.db.add(subscription)
         await self.db.commit()
         await self.db.refresh(subscription)
         

@@ -37,8 +37,8 @@ describe('Checkout Integration Tests', () => {
   const mockUser = {
     id: 'user-123',
     email: 'test@example.com',
-    first_name: 'Test',
-    last_name: 'User'
+    firstname: 'Test',
+    lastname: 'User'
   };
 
   const mockCart = {

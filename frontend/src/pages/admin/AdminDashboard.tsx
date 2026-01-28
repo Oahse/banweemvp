@@ -123,7 +123,7 @@ const OrderRow = ({ order }: OrderRowProps) => {
   const customerName = customer 
     ? (typeof customer === 'string' 
         ? customer 
-        : `${customer.firstname || customer.first_name || ''} ${customer.lastname || customer.last_name || ''}`.trim() || customer.email || customer.name || 'Unknown Customer'
+        : `${customer.firstname || customer.firstname || ''} ${customer.lastname || customer.lastname || ''}`.trim() || customer.email || customer.name || 'Unknown Customer'
       )
     : 'Guest Customer';
   

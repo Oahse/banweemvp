@@ -50,8 +50,8 @@ class TestCheckoutIntegration:
         return {
             "id": uuid7(),
             "email": "test@example.com",
-            "first_name": "Test",
-            "last_name": "User"
+            "firstname": "Test",
+            "lastname": "User"
         }
 
     @pytest.fixture

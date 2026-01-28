@@ -9,7 +9,7 @@ class TelegramBotHandler:
 
     async def get_bot_info(self):
         me = await self.bot.get_me()
-        print(f"Bot Name: {me.first_name}")
+        print(f"Bot Name: {me.firstname}")
         print(f"Bot Username: @{me.username}")
         return me
 
