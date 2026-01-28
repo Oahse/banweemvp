@@ -323,7 +323,11 @@ class SubscriptionService:
                 subscription.products.append(variant)
         
         # Recalculate subscription cost
-        await self.recalculate_subscription_on_variant_change(subscription_id)
+        await self.recalculate_subscription_on_variant_change(
+            subscription_id, 
+            added_variant_ids=variant_ids, 
+            user_id=user_id
+        )
         
         await self.db.commit()
         await self.db.refresh(subscription)
@@ -374,7 +378,11 @@ class SubscriptionService:
         subscription.products = [p for p in subscription.products if str(p.id) not in variant_ids_str]
         
         # Recalculate subscription cost
-        await self.recalculate_subscription_on_variant_change(subscription_id)
+        await self.recalculate_subscription_on_variant_change(
+            subscription_id, 
+            removed_variant_ids=variant_ids, 
+            user_id=user_id
+        )
         
         await self.db.commit()
         await self.db.refresh(subscription)
@@ -848,7 +856,7 @@ class SubscriptionService:
             subtotal = Decimal('0')
             
             for variant in variants:
-                variant_price = Decimal(str(variant.price))
+                variant_price = Decimal(str(variant.current_price))
                 if currency != "USD":
                     # Convert currency if needed
                     variant_price = await self._convert_currency(variant_price, "USD", currency)
@@ -1322,73 +1330,6 @@ class CostBreakdown:
             "currency": self.currency,
             "breakdown_timestamp": self.breakdown_timestamp.isoformat() if self.breakdown_timestamp else None
         }
-
-    async def pause_subscription(
-        self,
-        subscription_id: UUID,
-        user_id: UUID,
-        pause_reason: Optional[str] = None
-    ) -> Subscription:
-        """Pause an active subscription"""
-        
-        subscription_result = await self.db.execute(
-            select(Subscription).where(
-                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
-            )
-        )
-        subscription = subscription_result.scalar_one_or_none()
-        
-        if not subscription:
-            raise HTTPException(status_code=404, detail="Subscription not found")
-        
-        if subscription.status != "active":
-            raise HTTPException(status_code=400, detail="Can only pause active subscriptions")
-        
-        subscription.status = "paused"
-        subscription.paused_at = datetime.utcnow()
-        subscription.pause_reason = pause_reason
-        
-        await self.db.commit()
-        await self.db.refresh(subscription)
-        
-        return subscription
-
-    async def resume_subscription(
-        self,
-        subscription_id: UUID,
-        user_id: UUID
-    ) -> Subscription:
-        """Resume a paused subscription"""
-        
-        subscription_result = await self.db.execute(
-            select(Subscription).where(
-                and_(Subscription.id == subscription_id, Subscription.user_id == user_id)
-            )
-        )
-        subscription = subscription_result.scalar_one_or_none()
-        
-        if not subscription:
-            raise HTTPException(status_code=404, detail="Subscription not found")
-        
-        if subscription.status != "paused":
-            raise HTTPException(status_code=400, detail="Can only resume paused subscriptions")
-        
-        subscription.status = "active"
-        subscription.paused_at = None
-        subscription.pause_reason = None
-        
-        # Reset next billing date to current time + billing cycle
-        if subscription.billing_cycle == "weekly":
-            subscription.next_billing_date = datetime.utcnow() + timedelta(weeks=1)
-        elif subscription.billing_cycle == "yearly":
-            subscription.next_billing_date = datetime.utcnow() + timedelta(days=365)
-        else:  # monthly
-            subscription.next_billing_date = datetime.utcnow() + timedelta(days=30)
-        
-        await self.db.commit()
-        await self.db.refresh(subscription)
-        
-        return subscription
 
     async def get_subscription_orders(
         self,

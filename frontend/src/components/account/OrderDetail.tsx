@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeftIcon, PackageIcon, DownloadIcon, MapPinIcon } from 'lucide-react';
 import { OrdersAPI } from '../../apis/orders';
 import { toast } from 'react-hot-toast';
+import { getBestPrice, formatPriceWithFallback } from '../../lib/price-utils';
 
 export const OrderDetail = () => {
   const { orderId } = useParams();
@@ -172,11 +173,14 @@ export const OrderDetail = () => {
                       </p>
                     )}
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Quantity: {item.quantity} × ${(item.price_per_unit || 0).toFixed(2)}
+                      Quantity: {item.quantity} × ${(() => {
+                        const unitPrice = (item.price_per_unit || 0);
+                        return unitPrice > 0 ? unitPrice.toFixed(2) : 'Price not set';
+                      })()}
                     </p>
                   </div>
                   <p className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                    ${item.total_price?.toFixed(2)}
+                    ${item.total_price > 0 ? item.total_price.toFixed(2) : 'Price not set'}
                   </p>
                 </div>
               );

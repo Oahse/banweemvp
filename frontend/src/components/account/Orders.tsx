@@ -7,6 +7,7 @@ import { usePaginatedApi } from '../../hooks/useAsync';
 import OrdersAPI from '../../apis/orders';
 import { toast } from 'react-hot-toast';
 import { useLocale } from '../../contexts/LocaleContext';
+import { formatPriceWithFallback } from '../../lib/price-utils';
 
 interface Order {
   id: string;
@@ -157,7 +158,7 @@ export const Orders = ({
                     Total
                   </p>
                   <p className="font-medium text-main dark:text-white">
-                    {formatCurrency(order.total_amount)}
+                    {order.total_amount > 0 ? formatCurrency(order.total_amount) : 'Price not set'}
                   </p>
                 </div>
                 <div>
@@ -191,7 +192,7 @@ export const Orders = ({
                         return (
                           <>
                             <p className="text-gray-500 dark:text-gray-400">
-                              Subtotal: {formatCurrency(displaySubtotal)}
+                              Subtotal: {displaySubtotal > 0 ? formatCurrency(displaySubtotal) : 'Price not set'}
                             </p>
                             <p className="text-gray-500 dark:text-gray-400">
                               Shipping: {formatCurrency(order.shipping_amount || 0)}
@@ -200,7 +201,7 @@ export const Orders = ({
                               Tax: {formatCurrency(order.tax_amount || 0)}
                             </p>
                             <p className="font-medium text-main dark:text-white">
-                              Total: {formatCurrency(order.total_amount)}
+                              Total: {order.total_amount > 0 ? formatCurrency(order.total_amount) : 'Price not set'}
                             </p>
                           </>
                         );

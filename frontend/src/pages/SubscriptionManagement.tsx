@@ -449,7 +449,7 @@ export const SubscriptionManagement = () => {
                 </div>
                 <div className="flex items-center">
                   <CreditCardIcon size={16} className="mr-1" />
-                  <span>{formatCurrency(subscription.price, subscription.currency)}/{subscription.billing_cycle}</span>
+                  <span>{formatPriceWithFallback(subscription, subscription.currency, formatCurrency, 'Price not set')}/{subscription.billing_cycle}</span>
                 </div>
                 <div className="flex items-center">
                   <ShoppingBagIcon size={16} className="mr-1" />
@@ -690,7 +690,7 @@ export const SubscriptionManagement = () => {
                     {subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)} Plan
                   </p>
                   <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
-                    {formatCurrency(subscription.price, subscription.currency)}/{subscription.billing_cycle}
+                    {formatPriceWithFallback(subscription, subscription.currency, formatCurrency, 'Price not set')}/{subscription.billing_cycle}
                   </p>
                   <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
                     {subscription.products?.length || 0} products included
@@ -749,7 +749,7 @@ export const SubscriptionManagement = () => {
                     {subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)} Plan
                   </p>
                   <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
-                    {formatCurrency(subscription.price, subscription.currency)}/{subscription.billing_cycle}
+                    {formatPriceWithFallback(subscription, subscription.currency, formatCurrency, 'Price not set')}/{subscription.billing_cycle}
                   </p>
                   <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
                     {subscription.products?.length || 0} products included
@@ -825,7 +825,7 @@ export const SubscriptionManagement = () => {
                     {subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)} Plan
                   </p>
                   <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
-                    {formatCurrency(subscription.price, subscription.currency)}/{subscription.billing_cycle}
+                    {formatPriceWithFallback(subscription, subscription.currency, formatCurrency, 'Price not set')}/{subscription.billing_cycle}
                   </p>
                   <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
                     {subscription.products?.length || 0} products included
