@@ -7,60 +7,29 @@ import {
   pauseSubscription as pauseSubscriptionAPI,
   resumeSubscription as resumeSubscriptionAPI,
   cancelSubscription as cancelSubscriptionAPI,
-  Subscription
+  type Subscription
 } from '../../apis/subscription';
 import { toast } from 'react-hot-toast';
 
-export const SubscriptionList: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Mock data for demo
-  const mockSubscriptions: Subscription[] = [
-    {
-      id: '1',
-      plan_id: 'premium',
-      status: 'active',
-      price: 29.99,
-      currency: 'USD',
-      billing_cycle: 'monthly',
-      auto_renew: true,
-      next_billing_date: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-      created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-    },
-    {
-      id: '2',
-      plan_id: 'basic',
-      status: 'paused',
-      price: 9.99,
-      currency: 'USD',
-      billing_cycle: 'monthly',
-      auto_renew: false,
-      created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString()
-    }
-  ];
+export const SubscriptionList: React.FC = () => {
 
   useEffect(() => {
     loadSubscriptions();
-  }, []);
+  }, []); // Remove the dependency to prevent infinite loops
 
   const loadSubscriptions = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // In a real app, this would call the API
-      // const data = await getSubscriptions();
-      // setSubscriptions(data);
-      
-      // For demo, use mock data
-      setTimeout(() => {
-        setSubscriptions(mockSubscriptions);
-        setIsLoading(false);
-      }, 1000);
+      const data = await getSubscriptions();
+      setSubscriptions(data.subscriptions || []);
     } catch (error) {
       console.error('Failed to load subscriptions:', error);
       setError('Failed to load subscriptions');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -77,9 +46,7 @@ export const SubscriptionList: React.FC = () => {
 
   const handlePause = async (id: string) => {
     try {
-      // In a real app, this would call the API
-      // await pauseSubscriptionAPI(id);
-      
+      await pauseSubscriptionAPI(id);
       handleUpdate(id, { status: 'paused' });
       toast.success('Subscription paused');
     } catch (error) {
@@ -90,9 +57,7 @@ export const SubscriptionList: React.FC = () => {
 
   const handleResume = async (id: string) => {
     try {
-      // In a real app, this would call the API
-      // await resumeSubscriptionAPI(id);
-      
+      await resumeSubscriptionAPI(id);
       handleUpdate(id, { 
         status: 'active',
         next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -110,9 +75,7 @@ export const SubscriptionList: React.FC = () => {
     }
     
     try {
-      // In a real app, this would call the API
-      // await cancelSubscriptionAPI(id);
-      
+      await cancelSubscriptionAPI(id);
       handleUpdate(id, { status: 'cancelled', auto_renew: false });
       toast.success('Subscription cancelled');
     } catch (error) {

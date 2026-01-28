@@ -33,8 +33,8 @@ export const Dashboard = ({
 }: DashboardProps) => {
   const { user } = useAuth() as { user: User | null };
   const { subscriptions, loading: subscriptionsLoading } = useSubscription();
-  const { data: paginatedOrders, loading, error, execute: fetchRecentOrders } = usePaginatedApi<{ data: Order[]; pagination?: any }>();
-  const { data: subscriptionOrders, loading: subscriptionOrdersLoading, execute: fetchSubscriptionOrders } = usePaginatedApi<{ data: Order[]; pagination?: any }>();
+  const { data: paginatedOrders, loading, error, execute: fetchRecentOrders } = usePaginatedApi();
+  const { data: subscriptionOrders, loading: subscriptionOrdersLoading, execute: fetchSubscriptionOrders } = usePaginatedApi();
 
   // Handle both array and object responses - moved before useEffect
   const recentOrders: Order[] = (() => {
@@ -92,7 +92,7 @@ export const Dashboard = ({
     if (subscriptions.length > 0) {
       const activeSubscription = subscriptions.find(sub => sub.status === 'active');
       if (activeSubscription) {
-        fetchSubscriptionOrders(() => SubscriptionAPI.getSubscriptionOrders(activeSubscription.id, 1, 3));
+        fetchSubscriptionOrders(() => SubscriptionAPI.getOrders(activeSubscription.id, 1, 3));
       }
     }
   }, [fetchRecentOrders, fetchSubscriptionOrders, subscriptions]);

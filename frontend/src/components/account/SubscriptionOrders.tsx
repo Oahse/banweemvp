@@ -29,7 +29,7 @@ export const SubscriptionOrders = () => {
   const fetchSubscriptionOrders = async () => {
     try {
       setLoading(true);
-      const response = await SubscriptionAPI.getSubscriptionOrders(subscriptionId!, 1, 50);
+      const response = await SubscriptionAPI.getOrders(subscriptionId!, 1, 50);
       
       // Handle the response structure properly
       let ordersData = [];

@@ -62,13 +62,13 @@ export interface CostCalculationRequest {
 // Trigger order processing (admin only)
 export const triggerOrderProcessing = async () => {
   const response = await apiClient.post('/subscriptions/trigger-order-processing', {}, {});
-  return response.data;
+  return response;
 };
 
 // Trigger notifications (admin only)
 export const triggerNotifications = async () => {
   const response = await apiClient.post('/subscriptions/trigger-notifications', {}, {});
-  return response.data;
+  return response;
 };
 
 // === COST CALCULATION ===
@@ -76,7 +76,7 @@ export const triggerNotifications = async () => {
 // Calculate subscription cost
 export const calculateCost = async (request: CostCalculationRequest) => {
   const response = await apiClient.post('/subscriptions/calculate-cost', request, {});
-  return response.data;
+  return response;
 };
 
 // === SUBSCRIPTION CRUD ===
@@ -85,7 +85,7 @@ export const calculateCost = async (request: CostCalculationRequest) => {
 export const createSubscription = async (request: CreateSubscriptionRequest) => {
   try {
     const response = await apiClient.post('/subscriptions', request, {});
-    return response.data;
+    return response; // Return response directly since apiClient already extracts .data
   } catch (error) {
     console.error('Error creating subscription:', error);
     throw error;
@@ -101,16 +101,14 @@ export const getSubscriptions = async (page: number = 1, limit: number = 10): Pr
   has_more: boolean;
 }> => {
   const response = await apiClient.get('/subscriptions', { params: { page, limit } });
-  return response.data;
+  return response; // Backend returns { subscriptions: [...], total: 10, page: 1, limit: 10, has_more: false }
 };
 
 // Get user subscriptions (alias for getSubscriptions for backwards compatibility)
 export const getUserSubscriptions = async (page: number = 1, limit: number = 10) => {
   try {
     const response = await apiClient.get('/subscriptions', { params: { page, limit } });
-    return {
-      data: response.data.data // Extract the nested data structure from backend
-    };
+    return response; // Return the response directly since apiClient already extracts .data
   } catch (error) {
     console.error('Error fetching user subscriptions:', error);
     throw error;
@@ -120,26 +118,26 @@ export const getUserSubscriptions = async (page: number = 1, limit: number = 10)
 // Get one subscription
 export const getSubscription = async (id: string): Promise<Subscription> => {
   const response = await apiClient.get(`/subscriptions/${id}`, {});
-  return response.data;
+  return response;
 };
 
 // Update subscription
 export const updateSubscription = async (id: string, request: UpdateSubscriptionRequest) => {
   const response = await apiClient.put(`/subscriptions/${id}`, request, {});
-  return response.data;
+  return response; // Return response directly since apiClient already extracts .data
 };
 
 // Delete/Cancel subscription
 export const cancelSubscription = async (id: string, reason?: string) => {
   const data = reason ? { reason } : {};
   const response = await apiClient.delete(`/subscriptions/${id}`, { data });
-  return response.data;
+  return response;
 };
 
 // Activate subscription (uses resume endpoint which handles both resume and activate)
 export const activateSubscription = async (id: string) => {
   const response = await apiClient.post(`/subscriptions/${id}/resume`, {}, {});
-  return response.data;
+  return response;
 };
 
 // Add products to subscription (alias for addProducts)
@@ -159,7 +157,7 @@ export const addProducts = async (id: string, variantIds: string[]) => {
   const response = await apiClient.post(`/subscriptions/${id}/products`, { 
     variant_ids: variantIds 
   }, {});
-  return response.data;
+  return response; // Return response directly since apiClient already extracts .data
 };
 
 // Remove products from subscription
@@ -167,7 +165,7 @@ export const removeProducts = async (id: string, variantIds: string[]) => {
   const response = await apiClient.delete(`/subscriptions/${id}/products`, { 
     data: { variant_ids: variantIds } 
   });
-  return response.data;
+  return response; // Return response directly since apiClient already extracts .data
 };
 
 // === QUANTITY MANAGEMENT ===
@@ -178,7 +176,7 @@ export const updateQuantity = async (id: string, variantId: string, quantity: nu
     variant_id: variantId,
     quantity: quantity
   }, {});
-  return response.data;
+  return response;
 };
 
 // Change variant quantity (increment/decrement)
@@ -187,13 +185,13 @@ export const changeQuantity = async (id: string, variantId: string, change: numb
     variant_id: variantId,
     change: change
   }, {});
-  return response.data;
+  return response;
 };
 
 // Get all variant quantities
 export const getQuantities = async (id: string) => {
   const response = await apiClient.get(`/subscriptions/${id}/products/quantities`, {});
-  return response.data;
+  return response;
 };
 
 // === AUTO-RENEW MANAGEMENT ===
@@ -203,7 +201,7 @@ export const toggleAutoRenew = async (id: string, autoRenew: boolean) => {
   const response = await apiClient.patch(`/subscriptions/${id}/auto-renew`, {}, { 
     params: { auto_renew: autoRenew } 
   });
-  return response.data;
+  return response;
 };
 
 // === SUBSCRIPTION LIFECYCLE ===
@@ -212,13 +210,13 @@ export const toggleAutoRenew = async (id: string, autoRenew: boolean) => {
 export const pauseSubscription = async (id: string, reason?: string) => {
   const params = reason ? { pause_reason: reason } : {};
   const response = await apiClient.post(`/subscriptions/${id}/pause`, {}, { params });
-  return response.data;
+  return response;
 };
 
 // Resume subscription
 export const resumeSubscription = async (id: string) => {
   const response = await apiClient.post(`/subscriptions/${id}/resume`, {}, {});
-  return response.data;
+  return response;
 };
 
 // === ORDERS & SHIPMENTS ===
@@ -226,13 +224,13 @@ export const resumeSubscription = async (id: string) => {
 // Process subscription shipment
 export const processShipment = async (id: string) => {
   const response = await apiClient.post(`/subscriptions/${id}/process-shipment`, {}, {});
-  return response.data;
+  return response;
 };
 
 // Get subscription orders
 export const getOrders = async (id: string, page: number = 1, limit: number = 10) => {
   const response = await apiClient.get(`/subscriptions/${id}/orders`, { params: { page, limit } });
-  return response.data;
+  return response;
 };
 
 // === CONVENIENCE FUNCTIONS ===
@@ -290,4 +288,5 @@ const SubscriptionAPI = {
   getOrders,
 };
 
+export { SubscriptionAPI };
 export default SubscriptionAPI;

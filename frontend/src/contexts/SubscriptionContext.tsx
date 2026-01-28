@@ -73,7 +73,9 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
     setError(null);
     try {
       const response = await SubscriptionAPI.getUserSubscriptions();
-      setSubscriptions(response.data?.subscriptions || []);
+      // Handle different response structures - response could be the data directly or nested
+      const subscriptionsData = response?.subscriptions || response?.data?.subscriptions || [];
+      setSubscriptions(subscriptionsData);
     } catch (error) {
       console.error('Failed to fetch subscriptions:', error);
       setError('Failed to load subscriptions');
@@ -90,7 +92,8 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
 
     try {
       const response = await SubscriptionAPI.createSubscription(data);
-      const newSubscription = response.data.data; // Extract from nested structure
+      // Handle different response structures - response could be the data directly or nested
+      const newSubscription = response?.data || response;
       
       // Optimistically update the state
       setSubscriptions(prev => [...prev, newSubscription]);
@@ -111,7 +114,8 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
 
     try {
       const response = await SubscriptionAPI.updateSubscription(subscriptionId, data);
-      const updatedSubscription = response.data.data; // Extract from nested structure
+      // Handle different response structures - response could be the data directly or nested
+      const updatedSubscription = response?.data || response;
       
       // Optimistically update the state
       setSubscriptions(prev => 
@@ -230,7 +234,8 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
 
     try {
       const response = await SubscriptionAPI.addProductsToSubscription(subscriptionId, variantIds);
-      const updatedSubscription = response.data.data; // Extract from nested structure
+      // Handle different response structures - response could be the data directly or nested
+      const updatedSubscription = response?.data || response;
       
       // Optimistically update the state
       setSubscriptions(prev => 
@@ -255,7 +260,8 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
 
     try {
       const response = await SubscriptionAPI.removeProductsFromSubscription(subscriptionId, variantIds);
-      const updatedSubscription = response.data.data; // Extract from nested structure
+      // Handle different response structures - response could be the data directly or nested
+      const updatedSubscription = response?.data || response;
       
       // Optimistically update the state
       setSubscriptions(prev => 

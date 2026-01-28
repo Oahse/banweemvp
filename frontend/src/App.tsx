@@ -449,11 +449,9 @@ export const App: React.FC = () => {
                               <Route
                                 path="/subscriptions"
                                 element={
-                                  <ProtectedRoute>
-                                    <Layout>
-                                      <Subscriptions />
-                                    </Layout>
-                                  </ProtectedRoute>
+                                  <Layout>
+                                    <Subscriptions />
+                                  </Layout>
                                 }
                               />
                               <Route
