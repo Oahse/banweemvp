@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../lib/themeClasses';
 import { useLocale } from '../../contexts/LocaleContext';
+import { formatPriceWithFallback, getBestPrice } from '../../lib/price-utils';
 import { AutoRenewToggle } from './AutoRenewToggle';
 import { PauseSubscriptionModal } from './PauseSubscriptionModal';
 import { ResumeSubscriptionModal } from './ResumeSubscriptionModal';
@@ -523,12 +524,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                       {product.name}
                     </p>
                     <p className={combineThemeClasses(themeClasses.text.muted, 'text-xs')}>
-                      {(() => {
-                        const price = product.current_price || product.base_price || product.price || 0;
-                        return price > 0 
-                          ? formatCurrency(price, subscription.currency)
-                          : 'Price not set';
-                      })()}
+                      {formatPriceWithFallback(product, subscription.currency, formatCurrency, 'Price not set')}
                     </p>
                   </div>
                 </div>

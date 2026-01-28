@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useApi } from '../../hooks/useAsync';
 import { apiClient, ProductsAPI } from '../../apis';
+import { getBestPrice } from '../../lib/price-utils';
 
 /**
  * @typedef {object} OrderItemDetailsProps

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { MinusIcon, PlusIcon, PackageIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../lib/themeClasses';
 import { useLocale } from '../../contexts/LocaleContext';
+import { formatPriceWithFallback, getBestPrice } from '../../lib/price-utils';
 
 interface SubscriptionProductCardProps {
   product: {
@@ -134,7 +135,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
           )}
           <div className="flex items-center mt-2 space-x-4">
             <span className={combineThemeClasses(themeClasses.text.heading, 'font-semibold')}>
-              {formatCurrency(product.current_price || product.base_price || product.price || 0, product.currency)}
+              {formatPriceWithFallback(product, product.currency, formatCurrency, 'Price not set')}
             </span>
             {product.stock !== undefined && (
               <span className={combineThemeClasses(
@@ -284,7 +285,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
 
         <div className="flex items-center justify-between">
           <span className={combineThemeClasses(themeClasses.text.heading, 'font-bold text-lg')}>
-            {formatCurrency(product.current_price || product.base_price || product.price || 0, product.currency)}
+            {formatPriceWithFallback(product, product.currency, formatCurrency, 'Price not set')}
           </span>
           
           {showActions && onQuantityChange && (
