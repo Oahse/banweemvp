@@ -15,6 +15,7 @@ import {
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../lib/themeClasses';
 import { useLocale } from '../../contexts/LocaleContext';
 import { AutoRenewToggle } from './AutoRenewToggle';
+import { PauseSubscriptionModal } from './PauseSubscriptionModal';
 
 interface SubscriptionCardProps {
   subscription: {
@@ -54,7 +55,7 @@ interface SubscriptionCardProps {
   };
   onUpdate?: (subscriptionId: string, data: any) => void;
   onCancel?: (subscriptionId: string) => void;
-  onPause?: (subscriptionId: string) => void;
+  onPause?: (subscriptionId: string, reason?: string) => void;
   onResume?: (subscriptionId: string) => void;
   onActivate?: (subscriptionId: string) => void;
   showActions?: boolean;
@@ -108,6 +109,8 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
 
   const sizeClasses = getSizeClasses(size);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showPauseModal, setShowPauseModal] = useState(false);
+  const [isPausing, setIsPausing] = useState(false);
   const { formatCurrency } = useLocale();
 
   const getStatusColor = (status: string) => {
@@ -156,6 +159,18 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       onUpdate(subscription.id, { auto_renew: enabled });
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handlePauseConfirm = async (reason?: string) => {
+    if (!onPause) return;
+    
+    setIsPausing(true);
+    try {
+      await onPause(subscription.id, reason);
+      setShowPauseModal(false);
+    } finally {
+      setIsPausing(false);
     }
   };
 
@@ -365,7 +380,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 {/* Pause/Resume Button */}
                 {subscription.status === 'active' && onPause && (
                   <button
-                    onClick={() => onPause(subscription.id)}
+                    onClick={() => setShowPauseModal(true)}
                     className={combineThemeClasses(
                       'p-1.5 sm:p-2 rounded-md transition-colors border',
                       themeClasses.text.warning,
@@ -515,6 +530,16 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           </Link>
         </div>
       </div>
+
+      {/* Pause Subscription Modal */}
+      <PauseSubscriptionModal
+        isOpen={showPauseModal}
+        onClose={() => setShowPauseModal(false)}
+        onConfirm={handlePauseConfirm}
+        subscriptionId={subscription.id}
+        planName={subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)}
+        loading={isPausing}
+      />
     </div>
   );
 };

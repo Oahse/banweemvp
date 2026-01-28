@@ -197,9 +197,7 @@ export const MySubscriptions = () => {
     }
   };
 
-  const handlePauseSubscription = async (subscriptionId: string) => {
-    const reason = prompt('Please provide a reason for pausing (optional):');
-    
+  const handlePauseSubscription = async (subscriptionId: string, reason?: string) => {
     try {
       await pauseSubscription(subscriptionId, reason || undefined);
     } catch (error) {

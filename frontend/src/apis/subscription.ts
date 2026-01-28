@@ -30,7 +30,15 @@ class SubscriptionAPI {
   }
 
   async getSubscription(subscriptionId: string) {
-    return apiClient.get(`/subscriptions/${subscriptionId}`);
+    console.log('SubscriptionAPI.getSubscription called with ID:', subscriptionId);
+    try {
+      const response = await apiClient.get(`/subscriptions/${subscriptionId}`);
+      console.log('SubscriptionAPI.getSubscription response:', response);
+      return response;
+    } catch (error) {
+      console.error('SubscriptionAPI.getSubscription error:', error);
+      throw error;
+    }
   }
 
   async updateSubscription(subscriptionId: string, data: SubscriptionUpdateData) {

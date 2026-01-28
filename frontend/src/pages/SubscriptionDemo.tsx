@@ -160,6 +160,7 @@ export const SubscriptionDemo = () => {
               console.log('Update subscription:', id, data);
             }}
             onCancel={(id) => console.log('Cancel subscription:', id)}
+            onPause={(id, reason) => console.log('Pause subscription:', id, 'Reason:', reason)}
             showActions={true}
             compact={false}
           />
@@ -169,6 +170,7 @@ export const SubscriptionDemo = () => {
               console.log('Update subscription:', id, data);
             }}
             onResume={(id) => console.log('Resume subscription:', id)}
+            onPause={(id, reason) => console.log('Pause subscription:', id, 'Reason:', reason)}
             showActions={true}
             compact={false}
           />

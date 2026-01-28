@@ -17,7 +17,7 @@ export const SubscriptionManagement = () => {
   const { user } = useAuth();
   const { updateSubscription, cancelSubscription, activateSubscription, pauseSubscription, resumeSubscription, addProductsToSubscription, removeProductsFromSubscription } = useSubscription();
   const { currency, formatCurrency } = useLocale();
-  const [subscription, setSubscription] = useState(null);
+  const [subscription, setSubscription] = useState<any>(null);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
@@ -31,12 +31,86 @@ export const SubscriptionManagement = () => {
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [isPausing, setIsPausing] = useState(false);
   const [pauseReason, setPauseReason] = useState('');
+  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (subscriptionId) {
-      loadSubscriptionData();
+    if (!user) {
+      console.error('User not authenticated');
+      toast.error('Please log in to view your subscriptions');
+      return;
     }
-  }, [subscriptionId]);
+    
+    if (!subscriptionId) {
+      console.error('No subscription ID provided in URL');
+      toast.error('Invalid subscription URL');
+      return;
+    }
+    
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(subscriptionId)) {
+      console.error('Invalid subscription ID format:', subscriptionId);
+      toast.error('Invalid subscription ID format');
+      return;
+    }
+    
+    console.log('Loading subscription for user:', user.id, 'subscription:', subscriptionId);
+    loadSubscriptionData();
+  }, [subscriptionId, user]);
+
+  // Add error state for when subscription fails to load
+
+  // Show error state if subscription failed to load
+  if (subscriptionError && !subscriptionLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className={combineThemeClasses(themeClasses.card.base, 'p-8')}>
+            <div className="mb-6">
+              <AlertTriangleIcon className="w-16 h-16 text-error mx-auto mb-4" />
+              <h1 className={combineThemeClasses(themeClasses.text.heading, 'text-2xl font-bold mb-2')}>
+                Unable to Load Subscription
+              </h1>
+              <p className={combineThemeClasses(themeClasses.text.secondary, 'mb-6')}>
+                {subscriptionError}
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                onClick={() => {
+                  setSubscriptionError(null);
+                  loadSubscriptionData();
+                }}
+                variant="primary"
+                className="flex items-center justify-center"
+              >
+                Try Again
+              </Button>
+              <Link
+                to="/account/subscriptions"
+                className={combineThemeClasses(getButtonClasses('outline'), 'flex items-center justify-center')}
+              >
+                Back to Subscriptions
+              </Link>
+            </div>
+            
+            {/* Debug Info in Development */}
+            {import.meta.env.DEV && (
+              <div className="mt-6 p-4 bg-gray-100 rounded-lg text-left">
+                <h3 className="font-medium text-sm mb-2">Debug Information</h3>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <p>Subscription ID: {subscriptionId}</p>
+                  <p>User ID: {user?.id}</p>
+                  <p>API Base URL: {import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (searchQuery) {
@@ -49,11 +123,52 @@ export const SubscriptionManagement = () => {
   const loadSubscriptionData = async () => {
     try {
       setSubscriptionLoading(true);
+      setSubscriptionError(null);
+      console.log('Loading subscription data for ID:', subscriptionId);
+      
+      if (!subscriptionId) {
+        throw new Error('No subscription ID provided');
+      }
+      
       const response = await SubscriptionAPI.getSubscription(subscriptionId);
-      setSubscription(response.data);
-    } catch (error) {
+      console.log('Subscription API response:', response);
+      
+      if (response && response.data) {
+        setSubscription(response.data);
+        console.log('Subscription data loaded successfully:', response.data);
+      } else {
+        throw new Error('Invalid response format from API');
+      }
+    } catch (error: any) {
       console.error('Failed to load subscription:', error);
-      toast.error('Failed to load subscription details');
+      
+      // More detailed error logging
+      if (error.response) {
+        console.error('Error response:', error.response);
+        console.error('Error status:', error.response.status);
+        console.error('Error data:', error.response.data);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+      
+      // Show more specific error messages
+      let errorMessage = 'Failed to load subscription details';
+      if (error.statusCode === 404) {
+        errorMessage = 'Subscription not found. It may have been deleted or you may not have access to it.';
+      } else if (error.statusCode === 401) {
+        errorMessage = 'You are not authorized to view this subscription. Please log in again.';
+      } else if (error.statusCode === 403) {
+        errorMessage = 'You do not have permission to view this subscription.';
+      } else if (error.code === 'CONNECTION_ERROR') {
+        errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setSubscriptionError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setSubscriptionLoading(false);
     }
@@ -112,13 +227,13 @@ export const SubscriptionManagement = () => {
     }
   };
 
-  const handleRemoveProduct = async (variantId) => {
+  const handleRemoveProduct = async (variantId: string) => {
     if (!window.confirm('Are you sure you want to remove this product from your subscription?')) {
       return;
     }
 
     try {
-      const success = await removeProductsFromSubscription(subscriptionId, [variantId]);
+      const success = await removeProductsFromSubscription(subscriptionId!, [variantId]);
       if (success) {
         await loadSubscriptionData(); // Refresh subscription data
         toast.success('Product removed from subscription successfully');
@@ -130,7 +245,7 @@ export const SubscriptionManagement = () => {
   };
 
   const handleCancelSubscription = async () => {
-    if (subscription.status === 'cancelled') {
+    if (!subscription || subscription.status === 'cancelled') {
       toast.error('This subscription is already cancelled');
       setShowCancelDialog(false);
       return;
@@ -138,7 +253,7 @@ export const SubscriptionManagement = () => {
 
     try {
       setIsCancelling(true);
-      const success = await cancelSubscription(subscriptionId);
+      const success = await cancelSubscription(subscriptionId!);
       if (success) {
         setShowCancelDialog(false);
         toast.success('Subscription cancelled successfully');
@@ -158,7 +273,7 @@ export const SubscriptionManagement = () => {
   const handleActivateSubscription = async () => {
     try {
       setIsActivating(true);
-      const success = await activateSubscription(subscriptionId);
+      const success = await activateSubscription(subscriptionId!);
       if (success) {
         setShowActivateDialog(false);
         await loadSubscriptionData(); // Refresh subscription data
@@ -175,7 +290,7 @@ export const SubscriptionManagement = () => {
   const handlePauseSubscription = async () => {
     try {
       setIsPausing(true);
-      const success = await pauseSubscription(subscriptionId, pauseReason);
+      const success = await pauseSubscription(subscriptionId!, pauseReason);
       if (success) {
         setShowPauseDialog(false);
         setPauseReason('');
@@ -192,7 +307,7 @@ export const SubscriptionManagement = () => {
 
   const handleResumeSubscription = async () => {
     try {
-      const success = await resumeSubscription(subscriptionId);
+      const success = await resumeSubscription(subscriptionId!);
       if (success) {
         await loadSubscriptionData(); // Refresh subscription data
         toast.success('Subscription resumed successfully');
@@ -203,7 +318,7 @@ export const SubscriptionManagement = () => {
     }
   };
 
-  const toggleProductSelection = (variantId) => {
+  const toggleProductSelection = (variantId: string) => {
     const newSelection = new Set(selectedProducts);
     if (newSelection.has(variantId)) {
       newSelection.delete(variantId);
@@ -213,56 +328,84 @@ export const SubscriptionManagement = () => {
     setSelectedProducts(newSelection);
   };
 
-  const isProductInSubscription = (productId) => {
-    return subscription?.products?.some(p => p.product_id === productId);
+  const isProductInSubscription = (productId: string) => {
+    return subscription?.products?.some((p: any) => p.product_id === productId);
   };
 
-  const getAvailableVariants = (product) => {
+  const getAvailableVariants = (product: any) => {
     if (!subscription?.products) return product.variants || [];
     
-    const subscriptionVariantIds = subscription.products.map(p => p.id);
-    return (product.variants || []).filter(v => !subscriptionVariantIds.includes(v.id));
+    const subscriptionVariantIds = subscription.products.map((p: any) => p.id);
+    return (product.variants || []).filter((v: any) => !subscriptionVariantIds.includes(v.id));
   };
 
   if (loading || subscriptionLoading || !subscription) {
     return (
       <div className="container mx-auto px-4 py-8">
-        {/* Skeleton for Subscription Header */}
-        <div className="bg-surface rounded-lg shadow-md p-6 mb-8 animate-pulse">
-          <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
-          <div className="flex items-center space-x-4">
-            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+        <div className="max-w-4xl mx-auto">
+          {/* Loading Header */}
+          <div className="text-center mb-8">
+            <h1 className={combineThemeClasses(themeClasses.text.heading, 'text-2xl font-bold mb-2')}>
+              Loading Subscription Details...
+            </h1>
+            <p className={themeClasses.text.secondary}>
+              {subscriptionLoading ? 'Fetching your subscription information' : 'Loading available products'}
+            </p>
           </div>
-        </div>
 
-        {/* Skeleton for Current Products */}
-        <div className="mb-8">
-          <div className="h-6 bg-gray-300 rounded w-1/2 mb-6 animate-pulse"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, i) => ( // Show 3 skeleton cards
-              <div key={i} className="bg-surface rounded-lg shadow-md p-4 animate-pulse">
-                <div className="h-48 bg-gray-300 rounded mb-4"></div>
-                <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+          {/* Debug Info in Development */}
+          {import.meta.env.DEV && (
+            <div className={combineThemeClasses(themeClasses.card.base, 'p-4 mb-6')}>
+              <h3 className={combineThemeClasses(themeClasses.text.heading, 'text-sm font-medium mb-2')}>
+                Debug Information
+              </h3>
+              <div className={combineThemeClasses(themeClasses.text.muted, 'text-xs space-y-1')}>
+                <p>Subscription ID: {subscriptionId || 'Not provided'}</p>
+                <p>User ID: {user?.id || 'Not authenticated'}</p>
+                <p>Subscription Loading: {subscriptionLoading ? 'Yes' : 'No'}</p>
+                <p>Products Loading: {loading ? 'Yes' : 'No'}</p>
+                <p>Subscription Data: {subscription ? 'Loaded' : 'Not loaded'}</p>
               </div>
-            ))}
+            </div>
+          )}
+
+          {/* Skeleton for Subscription Header */}
+          <div className="bg-surface rounded-lg shadow-md p-6 mb-8 animate-pulse">
+            <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
+            <div className="flex items-center space-x-4">
+              <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+            </div>
           </div>
-        </div>
 
-        {/* Skeleton for Add Products Section */}
-        <div className="bg-surface rounded-lg shadow-md p-6 animate-pulse">
-          <div className="h-6 bg-gray-300 rounded w-2/3 mb-6"></div>
-          <div className="h-10 bg-gray-300 rounded mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, i) => ( // Show 3 skeleton cards
-              <div key={i} className="bg-surface rounded-lg shadow-md p-4 animate-pulse">
-                <div className="h-48 bg-gray-300 rounded mb-4"></div>
-                <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-              </div>
-            ))}
+          {/* Skeleton for Current Products */}
+          <div className="mb-8">
+            <div className="h-6 bg-gray-300 rounded w-1/2 mb-6 animate-pulse"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => ( // Show 3 skeleton cards
+                <div key={i} className="bg-surface rounded-lg shadow-md p-4 animate-pulse">
+                  <div className="h-48 bg-gray-300 rounded mb-4"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Skeleton for Add Products Section */}
+          <div className="bg-surface rounded-lg shadow-md p-6 animate-pulse">
+            <div className="h-6 bg-gray-300 rounded w-2/3 mb-6"></div>
+            <div className="h-10 bg-gray-300 rounded mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => ( // Show 3 skeleton cards
+                <div key={i} className="bg-surface rounded-lg shadow-md p-4 animate-pulse">
+                  <div className="h-48 bg-gray-300 rounded mb-4"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
