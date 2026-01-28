@@ -122,9 +122,16 @@ class SubscriptionService:
         self.db.add(subscription)
         await self.db.flush()  # Flush to get the ID without committing
         
-        # Now add products to the many-to-many relationship
+        # Now add products to the many-to-many relationship using the association table
+        from models.subscriptions import subscription_product_association
         for variant in variants:
-            subscription.products.append(variant)
+            # Insert into association table directly
+            await self.db.execute(
+                subscription_product_association.insert().values(
+                    subscription_id=subscription.id,
+                    product_variant_id=variant.id
+                )
+            )
         
         await self.db.commit()
         await self.db.refresh(subscription)
@@ -850,24 +857,7 @@ class SubscriptionService:
                     
             except Exception as e:
                 # Fallback to default tax rate if service fails
-                logger.warning(f"Tax calculation failed, using fallback: {e}")
-                country = customer_address.get('country', 'US') if isinstance(customer_address, dict) else 'US'
-                
-                # Use emergency fallback rates from TaxService
-                fallback_rates = {
-                    "US": {"rate": 0.085, "type": "SALES_TAX"},
-                    "GB": {"rate": 0.20, "type": "VAT"},
-                    "DE": {"rate": 0.19, "type": "VAT"},
-                    "FR": {"rate": 0.20, "type": "VAT"},
-                    "CA": {"rate": 0.13, "type": "GST"},
-                    "AU": {"rate": 0.10, "type": "GST"}
-                }
-                
-                fallback = fallback_rates.get(country, {"rate": 0.085, "type": "SALES_TAX"})
-                tax_rate = Decimal(str(fallback["rate"]))
-                tax_amount = pre_tax_total * tax_rate
-                tax_type = fallback["type"]
-                tax_jurisdiction = country
+                raise e
         else:
             # No address provided, default to 0% tax
             tax_rate = Decimal('0.00')  # 0% default when no address
