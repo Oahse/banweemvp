@@ -146,6 +146,14 @@ class SubscriptionService:
             
             # Use current_price which handles sale_price vs base_price
             unit_price = Decimal(str(variant.current_price or 0))
+            
+            # Validate that the variant has a reasonable price
+            if unit_price <= 0:
+                logger.warning(f"Variant {variant.id} has zero or negative price: {unit_price}")
+                # Set a minimum price to prevent zero-cost subscriptions
+                unit_price = Decimal('9.99')  # Default minimum price
+                logger.info(f"Applied minimum price {unit_price} to variant {variant.id}")
+            
             line_total = unit_price * quantity
             subtotal += line_total
             
@@ -158,6 +166,12 @@ class SubscriptionService:
                 "currency": currency,
                 "category": getattr(variant, 'category', 'general')
             })
+        
+        # Ensure minimum subtotal
+        if subtotal <= 0:
+            logger.warning(f"Calculated subtotal is zero or negative: {subtotal}")
+            subtotal = Decimal('9.99')  # Minimum subscription cost
+            logger.info(f"Applied minimum subtotal: {subtotal}")
         
         # Get admin configuration (make this configurable via AdminService later)
         admin_percentage = Decimal('0.10')  # 10% - can be made configurable
@@ -616,6 +630,14 @@ class SubscriptionService:
         for variant in variants:
             # Use current_price which handles sale_price vs base_price
             price = Decimal(str(variant.current_price or 0))
+            
+            # Validate that the variant has a reasonable price
+            if price <= 0:
+                logger.warning(f"Variant {variant.id} has zero or negative price: {price}")
+                # Set a minimum price to prevent zero-cost subscriptions
+                price = Decimal('9.99')  # Default minimum price
+                logger.info(f"Applied minimum price {price} to variant {variant.id}")
+            
             subtotal += price
             
             product_details.append({

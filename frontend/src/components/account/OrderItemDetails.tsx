@@ -60,7 +60,13 @@ export const OrderItemDetails = ({ productId, quantity, price }) => {
           </p>
         )}
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Quantity: {quantity} × ${(price / quantity).toFixed(2)}
+          Quantity: {quantity} × ${(() => {
+            const unitPrice = price / quantity;
+            const variantPrice = getBestPrice(variant || {});
+            // Use the order item price if available, otherwise fall back to variant price
+            const displayPrice = unitPrice > 0 ? unitPrice : variantPrice;
+            return displayPrice.toFixed(2);
+          })()}
         </p>
       </div>
       <p className="font-medium text-main dark:text-white">

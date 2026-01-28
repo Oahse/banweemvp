@@ -4,6 +4,7 @@ import { ChevronRightIcon, PlusIcon, MinusIcon, ShoppingBagIcon, CalendarIcon, C
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useLocale } from '../contexts/LocaleContext';
+import { getBestPrice, formatPriceWithFallback } from '../lib/price-utils';
 import SubscriptionAPI from '../apis/subscription';
 import { ProductsAPI } from '../apis/products';
 import { SubscriptionProductCard } from '../components/subscription/SubscriptionProductCard';
@@ -550,7 +551,7 @@ export const SubscriptionManagement = () => {
                     product_id: variantInSubscription.product_id,
                     product_name: variantInSubscription.product_name || variantInSubscription.name,
                     name: variantInSubscription.product_name || variantInSubscription.name,
-                    price: variantInSubscription.price || 0,
+                    price: getBestPrice(variantInSubscription),
                     currency: subscription.currency,
                     quantity: variantInSubscription.quantity || 1,
                     primary_image: variantInSubscription.primary_image,
@@ -630,7 +631,7 @@ export const SubscriptionManagement = () => {
                         product_id: product.id,
                         product_name: product.name,
                         name: product.name,
-                        price: variant.current_price || variant.base_price || 0,
+                        price: getBestPrice(variant),
                         currency: subscription.currency,
                         primary_image: variant.primary_image,
                         images: variant.images,
