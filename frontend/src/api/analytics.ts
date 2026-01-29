@@ -20,7 +20,7 @@ export class AnalyticsAPI {
     properties?: Record<string, any>;
     timestamp?: string;
   }) {
-    return await apiClient.post('/v1/analytics/track', eventData);
+    return await apiClient.post('/analytics/track', eventData);
   }
 
   /**
@@ -38,7 +38,7 @@ export class AnalyticsAPI {
     if (params?.end_date) queryParams.append('end_date', params.end_date);
     if (params?.funnel_type) queryParams.append('funnel_type', params.funnel_type);
 
-    const url = `/v1/analytics/conversion-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/analytics/conversion-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -57,7 +57,7 @@ export class AnalyticsAPI {
     if (params?.end_date) queryParams.append('end_date', params.end_date);
     if (params?.segment) queryParams.append('segment', params.segment);
 
-    const url = `/v1/analytics/cart-abandonment${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/analytics/cart-abandonment${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -76,7 +76,7 @@ export class AnalyticsAPI {
     if (params?.end_date) queryParams.append('end_date', params.end_date);
     if (params?.segment) queryParams.append('segment', params.segment);
 
-    const url = `/v1/analytics/time-to-purchase${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/analytics/time-to-purchase${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -95,7 +95,7 @@ export class AnalyticsAPI {
     if (params?.end_date) queryParams.append('end_date', params.end_date);
     if (params?.product_category) queryParams.append('product_category', params.product_category);
 
-    const url = `/v1/analytics/refund-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/analytics/refund-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -114,7 +114,7 @@ export class AnalyticsAPI {
     if (params?.end_date) queryParams.append('end_date', params.end_date);
     if (params?.cohort_period) queryParams.append('cohort_period', params.cohort_period);
 
-    const url = `/v1/analytics/repeat-customers${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/analytics/repeat-customers${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -135,7 +135,7 @@ export class AnalyticsAPI {
       params.metrics.forEach(metric => queryParams.append('metrics', metric));
     }
 
-    const url = `/v1/analytics/dashboard${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/analytics/dashboard${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -144,7 +144,7 @@ export class AnalyticsAPI {
    * ACCESS: Admin - Requires admin authentication
    */
   static async getSalesTrend(days: number = 30) {
-    return await apiClient.get(`/v1/analytics/sales-trend?days=${days}`);
+    return await apiClient.get(`/analytics/sales-trend?days=${days}`);
   }
 
   /**
@@ -164,7 +164,7 @@ export class AnalyticsAPI {
     if (params?.group_by) queryParams.append('group_by', params.group_by);
     if (params?.include_refunds !== undefined) queryParams.append('include_refunds', params.include_refunds.toString());
 
-    const url = `/v1/analytics/sales-overview${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/analytics/sales-overview${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -183,7 +183,7 @@ export class AnalyticsAPI {
     if (params?.end_date) queryParams.append('end_date', params.end_date);
     if (params?.compare_period !== undefined) queryParams.append('compare_period', params.compare_period.toString());
 
-    const url = `/v1/analytics/kpis${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/analytics/kpis${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 }

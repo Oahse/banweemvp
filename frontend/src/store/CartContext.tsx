@@ -81,14 +81,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       const province = localStorage.getItem('detected_province');
       const validProvince = province && province !== 'null' && province !== 'undefined' ? province : undefined;
       
-      const response = await CartAPI.getCart(token, country, validProvince);
-      const cartData = response?.data;
+      // CartAPI now automatically uses interceptor for token
+      const response = await CartAPI.getCart(country, validProvince);
+      // Unwrap response data if it comes wrapped in { success, data }
+      const cartData = response?.data || response;
       // Ensure new object reference for React to detect changes
       setCart(cartData ? { ...cartData } : null);
       return cartData;
     } catch (err: any) {
       // Handle authentication errors gracefully
-      if (err?.status === 401 || err?.response?.status === 401) {
+      if (err?.statusCode === 401 || err?.response?.status === 401 || err?.code === '401') {
         setCart(null);
         setError(null); // Don't show error for auth issues
         TokenManager.clearTokens(); // Clear invalid token
@@ -108,9 +110,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     if (!token) return;
 
     try {
-      const response = await CartAPI.validateCart(token);
-      if (response?.data) {
-        setCart(response.data);
+      // CartAPI now automatically uses interceptor for token
+      const response = await CartAPI.validateCart();
+      // Unwrap response data if it comes wrapped
+      const cartData = response?.data || response;
+      if (cartData) {
+        setCart(cartData);
         toast.success('Cart synchronized');
       }
     } catch (error: any) {
@@ -150,17 +155,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       throw error;
     }
 
-
     try {
-      // Always call backend first to get complete cart data
+      // CartAPI now automatically uses interceptor for token
       const response = await CartAPI.addToCart({
         variant_id: item.variant_id,
         quantity: item.quantity || 1
-      }, token);
+      });
       
-      // Update state with complete backend response - ensure new object reference
-      const newCart = { ...response?.data };
-      setCart(newCart);
+      // Unwrap response data if it comes wrapped in { success, data }
+      const newCart = response?.data || response;
+      setCart(newCart ? { ...newCart } : cart);
       toast.success(`Added ${item.quantity || 1} item${(item.quantity || 1) > 1 ? 's' : ''} to cart`);
       return true;
     } catch (error: any) {
@@ -205,10 +209,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
 
     try {
-      const response = await CartAPI.removeFromCart(itemId, token);
-      // Update with backend response to ensure consistency - ensure new object reference
-      const newCart = { ...response?.data };
-      setCart(newCart);
+      // CartAPI now automatically uses interceptor for token
+      const response = await CartAPI.removeFromCart(itemId);
+      // Unwrap response data if it comes wrapped
+      const newCart = response?.data || response;
+      setCart(newCart ? { ...newCart } : null);
       toast.success(`${itemName} removed from cart`);
     } catch (error: any) {
       // Revert optimistic update on error
@@ -237,7 +242,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       throw new Error('Item not found in cart');
     }
 
-
     // Optimistic update: Update quantity immediately in UI
     if (cart) {
       const newItems = cart.items.map(item => 
@@ -256,11 +260,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
 
     try {
-      const response = await CartAPI.updateCartItem(itemId, quantity, token);
-      // Update with backend response to ensure consistency - ensure new object reference
-      const newCart = { ...response?.data };
-      console.log(newCart,'=======dsdsdsinc')
-      setCart(newCart);
+      // CartAPI now automatically uses interceptor for token
+      const response = await CartAPI.updateCartItem(itemId, quantity);
+      // Unwrap response data if it comes wrapped
+      const newCart = response?.data || response;
+      setCart(newCart ? { ...newCart } : cart);
       toast.success('Cart updated');
     } catch (error: any) {
       handleCartSyncError(error, fetchCart);
@@ -295,10 +299,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setCart(optimisticCart);
 
     try {
-      const response = await CartAPI.clearCart(token);
-      // Update with backend response to ensure consistency - ensure new object reference
-      const newCart = { ...(response?.data || optimisticCart) };
-      setCart(newCart);
+      // CartAPI now automatically uses interceptor for token
+      const response = await CartAPI.clearCart();
+      // Unwrap response data if it comes wrapped
+      const newCart = response?.data || optimisticCart;
+      setCart(newCart ? { ...newCart } : null);
       toast.success('Cart cleared');
     } catch (error: any) {
       handleAuthError(error);

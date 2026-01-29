@@ -15,7 +15,7 @@ export class ProductsAPI {
    * Get all products with optional filters
    * ACCESS: Public - No authentication required
    */
-  static async getProducts(params) {
+  static async getProducts(params: any) {
     const queryParams = new URLSearchParams();
     
     if (params?.q) queryParams.append('q', params.q);
@@ -30,7 +30,7 @@ export class ProductsAPI {
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
 
-    const url = `/v1/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -38,15 +38,15 @@ export class ProductsAPI {
    * Get product by ID
    * ACCESS: Public - No authentication required
    */
-  static async getProduct(productId) {
-    return await apiClient.get(`/v1/products/${productId}`);
+  static async getProduct(productId: string) {
+    return await apiClient.get(`/products/${productId}`);
   }
 
   /**
    * Search products (advanced search with fuzzy matching)
    * ACCESS: Public - No authentication required
    */
-  static async searchProducts(query, filters) {
+  static async searchProducts(query: string, filters: any) {
     // Ensure query is provided and not empty
     if (!query || query.trim().length < 2) {
       return { data: { products: [], count: 0 } };
@@ -59,20 +59,20 @@ export class ProductsAPI {
     if (filters?.max_price !== undefined) params.append('max_price', filters.max_price.toString());
     if (filters?.limit) params.append('limit', filters.limit.toString());
 
-    return await apiClient.get(`/v1/products/search?${params.toString()}`);
+    return await apiClient.get(`/products/search?${params.toString()}`);
   }
 
   /**
    * Search categories (advanced search with fuzzy matching)
    * ACCESS: Public - No authentication required
    */
-  static async searchCategories(query, limit = 20) {
+  static async searchCategories(query: string, limit = 20) {
     const params = new URLSearchParams({
       q: query,
       limit: limit.toString()
     });
     
-    return await apiClient.get(`/v1/products/categories/search?${params.toString()}`);
+    return await apiClient.get(`/products/categories/search?${params.toString()}`);
   }
 
   /**
@@ -80,23 +80,23 @@ export class ProductsAPI {
    * ACCESS: Public - No authentication required
    */
   static async getHomeData() {
-    return await apiClient.get('/v1/products/home');
+    return await apiClient.get('/products/home');
   }
 
   /**
    * Get product variants
    * ACCESS: Public - No authentication required
    */
-  static async getProductVariants(productId) {
-    return await apiClient.get(`/v1/products/${productId}/variants`);
+  static async getProductVariants(productId: string) {
+    return await apiClient.get(`/products/${productId}/variants`);
   }
 
   /**
    * Get variant by ID
    * ACCESS: Public - No authentication required
    */
-  static async getVariant(variantId) {
-    return await apiClient.get(`/v1/products/variants/${variantId}`);
+  static async getVariant(variantId: string) {
+    return await apiClient.get(`/products/variants/${variantId}`);
   }
 
   /**
@@ -104,7 +104,7 @@ export class ProductsAPI {
    * ACCESS: Public - No authentication required
    */
   static async getVariantQRCode(variantId) {
-    return await apiClient.get(`/v1/products/variants/${variantId}/qrcode`);
+    return await apiClient.get(`/products/variants/${variantId}/qrcode`);
   }
 
   /**
@@ -112,7 +112,7 @@ export class ProductsAPI {
    * ACCESS: Public - No authentication required
    */
   static async getVariantBarcode(variantId) {
-    return await apiClient.get(`/v1/products/variants/${variantId}/barcode`);
+    return await apiClient.get(`/products/variants/${variantId}/barcode`);
   }
 
   /**
@@ -120,7 +120,7 @@ export class ProductsAPI {
    * ACCESS: Supplier/Admin - Requires supplier or admin role
    */
   static async generateVariantCodes(variantId) {
-    return await apiClient.post(`/v1/products/variants/${variantId}/codes/generate`);
+    return await apiClient.post(`/products/variants/${variantId}/codes/generate`);
   }
 
   /**
@@ -128,7 +128,7 @@ export class ProductsAPI {
    * ACCESS: Supplier/Admin - Requires supplier or admin role
    */
   static async updateVariantCodes(variantId, codes) {
-    return await apiClient.put(`/v1/products/variants/${variantId}/codes`, codes);
+    return await apiClient.put(`/products/variants/${variantId}/codes`, codes);
   }
 
   /**
@@ -136,7 +136,7 @@ export class ProductsAPI {
    * ACCESS: Public - No authentication required
    */
   static async getFeaturedProducts(limit = 10) {
-    return await apiClient.get(`/v1/products/featured?limit=${limit}`);
+    return await apiClient.get(`/products/featured?limit=${limit}`);
   }
   
   /**
@@ -144,7 +144,7 @@ export class ProductsAPI {
    * ACCESS: Public - No authentication required
    */
   static async getPopularProducts(limit = 10) {
-    return await apiClient.get(`/v1/products/popular?limit=${limit}`);
+    return await apiClient.get(`/products/popular?limit=${limit}`);
   }
 
   /**
@@ -157,7 +157,7 @@ export class ProductsAPI {
       return { data: [] };
     }
 
-    const url = `/v1/products/${productId}/recommendations?limit=${limit}`;
+    const url = `/products/${productId}/recommendations?limit=${limit}`;
     return await apiClient.get(url);
   }
 
@@ -166,7 +166,7 @@ export class ProductsAPI {
    * ACCESS: Public - No authentication required
    */
   static async getProductReviews(productId, page = 1, limit = 10) {
-    return await apiClient.get(`/v1/reviews/product/${productId}?page=${page}&limit=${limit}`);
+    return await apiClient.get(`/reviews/product/${productId}?page=${page}&limit=${limit}`);
   }
 
   /**
@@ -174,7 +174,7 @@ export class ProductsAPI {
    * ACCESS: Authenticated - Requires user login
    */
   static async addProductReview(productId, review) {
-    return await apiClient.post(`/v1/reviews`, { ...review, product_id: productId });
+    return await apiClient.post(`/reviews`, { ...review, product_id: productId });
   }
 
   /**
@@ -182,7 +182,7 @@ export class ProductsAPI {
    * ACCESS: Public - No authentication required
    */
   static async checkAvailability(variantId, quantity = 1) {
-    return await apiClient.get(`/v1/inventory/check-stock/${variantId}?quantity=${quantity}`);
+    return await apiClient.get(`/inventory/check-stock/${variantId}?quantity=${quantity}`);
   }
 
   // Supplier/Admin endpoints
@@ -191,7 +191,7 @@ export class ProductsAPI {
    * ACCESS: Supplier/Admin - Requires supplier or admin role
    */
   static async createProduct(product) {
-    return await apiClient.post('/v1/products', product);
+    return await apiClient.post('/products', product);
   }
 
   /**
@@ -199,7 +199,7 @@ export class ProductsAPI {
    * ACCESS: Supplier/Admin - Requires supplier or admin role
    */
   static async updateProduct(productId, updates) {
-    return await apiClient.put(`/v1/products/${productId}`, updates);
+    return await apiClient.put(`/products/${productId}`, updates);
   }
 
   /**
@@ -207,7 +207,7 @@ export class ProductsAPI {
    * ACCESS: Supplier/Admin - Requires supplier or admin role
    */
   static async deleteProduct(productId) {
-    return await apiClient.delete(`/v1/products/${productId}`);
+    return await apiClient.delete(`/products/${productId}`);
   }
 
   /**

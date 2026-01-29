@@ -108,7 +108,7 @@ export class OrdersAPI {
    * ACCESS: Authenticated - Requires user login
    */
   static async createOrder(orderData) {
-    return await apiClient.post('/v1/orders', orderData);
+    return await apiClient.post('/orders', orderData);
   }
 
   /**
@@ -126,7 +126,7 @@ export class OrdersAPI {
     frontend_calculated_total?: number;
   }) {
     try {
-      const response = await apiClient.post('/v1/orders/checkout/validate', checkoutData);
+      const response = await apiClient.post('/orders/checkout/validate', checkoutData);
       return {
         success: true,
         data: response.data
@@ -157,7 +157,7 @@ export class OrdersAPI {
   }) {
     try {
       // Increase timeout for checkout as it involves payment processing
-      const response = await apiClient.post('/v1/orders/checkout', checkoutData, { timeout: 60000 });
+      const response = await apiClient.post('/orders/checkout', checkoutData, { timeout: 60000 });
       return {
         success: true,
         data: response.data
@@ -177,7 +177,7 @@ export class OrdersAPI {
    * ACCESS: Authenticated - Requires user login
    */
   static async createPaymentIntent(checkoutData: any) {
-    return await apiClient.post('/v1/orders/create-payment-intent', checkoutData);
+    return await apiClient.post('/orders/create-payment-intent', checkoutData);
   }
 
   /**
@@ -186,14 +186,14 @@ export class OrdersAPI {
    */
   static async calculateTax(taxData) {
     console.warn('OrdersAPI.calculateTax() is deprecated. Use TaxAPI.calculateTax() instead.');
-    return await apiClient.post('/v1/tax/calculate', taxData);
+    return await apiClient.post('/tax/calculate', taxData);
   }
 
   /**
    * Get user's orders
    * ACCESS: Authenticated - Requires user login (own orders only)
    */
-  static async getOrders(params) {
+  static async getOrders(params: any) {
     const queryParams = new URLSearchParams();
     
     if (params?.status) queryParams.append('status', params.status);
@@ -202,7 +202,7 @@ export class OrdersAPI {
     if (params?.date_from) queryParams.append('date_from', params.date_from);
     if (params?.date_to) queryParams.append('date_to', params.date_to);
 
-    const url = `/v1/orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -210,32 +210,32 @@ export class OrdersAPI {
    * Get order by ID
    * ACCESS: Authenticated - Requires user login (own orders only)
    */
-  static async getOrder(orderId) {
-    return await apiClient.get(`/v1/orders/${orderId}`);
+  static async getOrder(orderId: string) {
+    return await apiClient.get(`/orders/${orderId}`);
   }
 
   /**
    * Get order tracking information (authenticated)
    * ACCESS: Authenticated - Requires user login (own orders only)
    */
-  static async getOrderTracking(orderId) {
-    return await apiClient.get(`/v1/orders/${orderId}/tracking`);
+  static async getOrderTracking(orderId: string) {
+    return await apiClient.get(`/orders/${orderId}/tracking`);
   }
 
   /**
    * Get order tracking information (public - no auth required)
    * ACCESS: Public - No authentication required
    */
-  static async trackOrderPublic(orderId) {
-    return await apiClient.get(`/v1/orders/track/${orderId}`);
+  static async trackOrderPublic(orderId: string) {
+    return await apiClient.get(`/orders/track/${orderId}`);
   }
 
   /**
    * Cancel order
    * ACCESS: Authenticated - Requires user login (own orders only)
    */
-  static async cancelOrder(orderId, reason) {
-    return await apiClient.put(`/v1/orders/${orderId}/cancel`, { reason });
+  static async cancelOrder(orderId: string, reason: string) {
+    return await apiClient.put(`/orders/${orderId}/cancel`, { reason });
   }
 
   /**

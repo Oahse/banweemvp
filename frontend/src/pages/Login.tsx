@@ -6,7 +6,6 @@ import { toast } from 'react-hot-toast';
 import { Input } from '../components/forms/Input';
 import { Checkbox } from '../components/forms/Checkbox';
 import { SkeletonLoginForm } from '../components/ui/SkeletonForm';
-import { useSkeleton } from '../hooks/useSkeleton';
 import SocialAuth from '../components/auth/SocialAuth';
 
 /**
@@ -30,8 +29,6 @@ export const Login = ({ isInitialLoading = false }) => {
 
   // Auth context for login functionality and authentication status
   const { login, isAuthenticated, isAdmin, isSupplier, redirectPath, setRedirectPath, intendedDestination, setIntendedDestination } = useAuth();
-  // Custom hook for managing skeleton loading state
-  const skeleton = useSkeleton(isInitialLoading, { showOnMount: false });
   // React Router hooks for navigation and location
   const navigate = useNavigate();
   const location = useLocation();
@@ -159,17 +156,6 @@ export const Login = ({ isInitialLoading = false }) => {
       setLoading(false); // Hide loading indicator
     }
   };
-
-  // Show skeleton loader while initial loading is in progress
-  if (skeleton.showSkeleton) {
-    return (
-      <div className="container mx-auto px-4 py-12 text-copy">
-        <div className="max-w-md mx-auto">
-          <SkeletonLoginForm />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto px-4 py-12 text-copy">

@@ -31,7 +31,7 @@ export class TaxAPI {
    * ACCESS: Public - No authentication required
    */
   static async calculateTax(request: TaxCalculationRequest): Promise<TaxCalculationResponse> {
-    const response = await apiClient.post('/v1/tax/calculate', request);
+    const response = await apiClient.post('/tax/calculate', request);
     return response.data;
   }
 
@@ -56,7 +56,7 @@ export class TaxAPI {
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.per_page) queryParams.append('per_page', params.per_page.toString());
 
-    const url = `/v1/tax/admin/tax-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/tax/admin/tax-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -73,7 +73,7 @@ export class TaxAPI {
     tax_name?: string;
     is_active?: boolean;
   }) {
-    return await apiClient.post('/v1/tax/admin/tax-rates', data);
+    return await apiClient.post('/tax/admin/tax-rates', data);
   }
 
   /**
@@ -87,7 +87,7 @@ export class TaxAPI {
     tax_name?: string;
     is_active?: boolean;
   }) {
-    return await apiClient.put(`/v1/tax/admin/tax-rates/${taxRateId}`, data);
+    return await apiClient.put(`/tax/admin/tax-rates/${taxRateId}`, data);
   }
 
   /**
@@ -95,7 +95,7 @@ export class TaxAPI {
    * ACCESS: Admin - Requires admin authentication
    */
   static async deleteTaxRate(taxRateId: string) {
-    return await apiClient.delete(`/v1/tax/admin/tax-rates/${taxRateId}`);
+    return await apiClient.delete(`/tax/admin/tax-rates/${taxRateId}`);
   }
 
   /**
@@ -103,7 +103,7 @@ export class TaxAPI {
    * ACCESS: Admin - Requires admin authentication
    */
   static async getCountriesWithTaxRates() {
-    return await apiClient.get('/v1/tax/admin/tax-rates/countries');
+    return await apiClient.get('/tax/admin/tax-rates/countries');
   }
 
   /**
@@ -111,7 +111,7 @@ export class TaxAPI {
    * ACCESS: Admin - Requires admin authentication
    */
   static async getAvailableTaxTypes() {
-    return await apiClient.get('/v1/tax/admin/tax-rates/tax-types');
+    return await apiClient.get('/tax/admin/tax-rates/tax-types');
   }
 }
 

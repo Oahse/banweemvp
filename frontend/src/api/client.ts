@@ -226,7 +226,8 @@ class APIClient {
                 refresh_token: refreshToken,
               });
 
-              const { access_token } = response.data;
+              // Extract token from response - backend returns { success, data: { access_token } }
+              const access_token = response.data?.access_token || response.access_token;
               TokenManager.setToken(access_token);
 
               this.processQueue(null, access_token);
@@ -280,11 +281,16 @@ class APIClient {
       // Preserve the full error data for detailed error handling
       apiError.data = errorData;
       
-      // Handle backend error structure
+      // Handle backend error structure - supports both wrapped and unwrapped responses
       if (errorData.message) {
         apiError.message = errorData.message;
       } else if (errorData.detail) {
-        apiError.message = errorData.detail;
+        // Handle FastAPI validation errors that come as arrays
+        apiError.message = Array.isArray(errorData.detail) 
+          ? (errorData.detail[0]?.msg || errorData.detail[0]) 
+          : errorData.detail;
+      } else if (errorData.error) {
+        apiError.message = errorData.error;
       }
       
       // Handle validation errors
@@ -518,41 +524,41 @@ class APIClient {
 
   // Auth methods
   async login(credentials) {
-    return this.post('/v1/auth/login', credentials);
+    return this.post('/auth/login', credentials);
   }
 
   async register(userData) {
-    return this.post('/v1/auth/register', userData);
+    return this.post('/auth/register', userData);
   }
 
   async logout() {
-    return this.post('/v1/auth/logout', {});
+    return this.post('/auth/logout', {});
   }
 
   async refreshToken() {
-    return this.post('/v1/auth/refresh', {});
+    return this.post('/auth/refresh', {});
   }
 
   // User methods
   async getCurrentUser() {
-    return this.get('/v1/users/me');
+    return this.get('/users/me');
   }
 
   async updateProfile(updates) {
-    return this.put('/v1/users/me', updates);
+    return this.put('/users/me', updates);
   }
 
   async changePassword(data) {
-    return this.put('/v1/users/me/password', data);
+    return this.put('/users/me/password', data);
   }
 
   // Address methods
   async getUserAddresses() {
-    return this.get('/v1/users/me/addresses');
+    return this.get('/users/me/addresses');
   }
 
   async createAddress(address) {
-    return this.post('/v1/users/me/addresses', address);
+    return this.post('/users/me/addresses', address);
   }
 
   async updateAddress(id, updates) {
@@ -605,11 +611,11 @@ class APIClient {
 
   // Cart methods
   async getCart() {
-    return this.get('/v1/cart');
+    return this.get('/cart');
   }
 
   async addToCart(variantId, quantity) {
-    return this.post('/v1/cart/add', { variant_id: variantId, quantity });
+    return this.post('/cart/add', { variant_id: variantId, quantity });
   }
 
   async updateCartItem(itemId, quantity) {
@@ -621,7 +627,7 @@ class APIClient {
   }
 
   async clearCart() {
-    return this.delete('/v1/cart/clear');
+    return this.delete('/cart/clear');
   }
 
   // Order methods

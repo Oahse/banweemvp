@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
-import { useWishlist } from './useContexts';
-import { useAuthActions } from './useAuth';
+import { useCallback, useState, useContext } from 'react';
+import { WishlistContext } from '../store/WishlistContext';
+import { useAuth } from '../store/AuthContext';
 import { toast } from 'react-hot-toast';
 
 /**
@@ -8,15 +8,20 @@ import { toast } from 'react-hot-toast';
  * Similar to useEnhancedCart but for wishlist functionality
  */
 export const useEnhancedWishlist = () => {
+  const context = useContext(WishlistContext);
+  if (!context) {
+    throw new Error('useEnhancedWishlist must be used within a WishlistProvider');
+  }
+
   const { 
-    wishlist, 
+    wishlists: wishlist,
     loading, 
-    fetchWishlist, 
+    fetchWishlists, 
     addItem, 
     removeItem, 
     clearWishlist,
-    items 
-  } = useWishlist();
+    defaultWishlist: items
+  } = context;
 
   const { executeWithAuth } = useAuthActions({
     requireAuth: true,
@@ -238,7 +243,7 @@ export const useEnhancedWishlist = () => {
     isInWishlist,
     getWishlistSummary,
     getItemsByCategory,
-    fetchWishlist,
+    fetchWishlists,
     
     // UI state
     processingItems,

@@ -110,5 +110,5 @@ export function getLanguageDirection(languageCode: string): 'ltr' | 'rtl' {
 }
 
 // Re-export locale utilities
-export { useLocale } from './hooks/useLocale';
-export { LocaleProvider } from './contexts/LocaleContext';
+export { useLocale } from './store/LocaleContext';
+export { LocaleProvider } from './store/LocaleContext';

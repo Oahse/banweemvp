@@ -26,7 +26,7 @@ export class RefundsAPI {
    * ACCESS: Authenticated - Requires user login and ownership of order
    */
   static async checkRefundEligibility(orderId: string) {
-    return await apiClient.get(`/v1/refunds/orders/${orderId}/eligibility`);
+    return await apiClient.get(`/refunds/orders/${orderId}/eligibility`);
   }
 
   /**
@@ -34,7 +34,7 @@ export class RefundsAPI {
    * ACCESS: Authenticated - Requires user login and ownership of order
    */
   static async requestRefund(orderId: string, refundRequest: RefundRequest) {
-    return await apiClient.post(`/v1/refunds/orders/${orderId}/request`, refundRequest);
+    return await apiClient.post(`/refunds/orders/${orderId}/request`, refundRequest);
   }
 
   /**
@@ -52,7 +52,7 @@ export class RefundsAPI {
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
 
-    const url = `/v1/refunds${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/refunds${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
@@ -61,7 +61,7 @@ export class RefundsAPI {
    * ACCESS: Authenticated - Requires user login and ownership of refund
    */
   static async getRefund(refundId: string) {
-    return await apiClient.get(`/v1/refunds/${refundId}`);
+    return await apiClient.get(`/refunds/${refundId}`);
   }
 
   /**
@@ -69,7 +69,7 @@ export class RefundsAPI {
    * ACCESS: Authenticated - Requires user login and ownership of refund
    */
   static async cancelRefund(refundId: string) {
-    return await apiClient.put(`/v1/refunds/${refundId}/cancel`);
+    return await apiClient.put(`/refunds/${refundId}/cancel`);
   }
 
   /**
@@ -77,7 +77,7 @@ export class RefundsAPI {
    * ACCESS: Admin - Requires admin authentication
    */
   static async getRefundStats() {
-    return await apiClient.get('/v1/refunds/stats/summary');
+    return await apiClient.get('/refunds/stats/summary');
   }
 }
 

@@ -16,7 +16,7 @@ export class CartAPI {
    * Get user's cart
    * ACCESS: Authenticated - Requires user login
    */
-  static async getCart(access_token: string, country?: string, province?: string) {
+  static async getCart(country?: string, province?: string) {
     const params = new URLSearchParams();
     if (country) params.append('country', country);
     if (province && province !== 'null' && province !== 'undefined') {
@@ -24,115 +24,108 @@ export class CartAPI {
     }
     
     const queryString = params.toString();
-    const url = queryString ? `/v1/cart?${queryString}` : '/v1/cart';
+    const url = queryString ? `/cart?${queryString}` : '/cart';
     
-    return await apiClient.get(url, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+    // Token is automatically added by interceptor
+    return await apiClient.get(url);
   }
 
   /**
    * Add item to cart
    * ACCESS: Authenticated - Requires user login
    */
-  static async addToCart(item: any, access_token: string) {
-    const country = localStorage.getItem('detected_country') || 'US';
-    const province = localStorage.getItem('detected_province');
+  static async addToCart(item: any, country?: string, province?: string) {
+    const _country = country || localStorage.getItem('detected_country') || 'US';
+    const _province = province || localStorage.getItem('detected_province');
     
     const params = new URLSearchParams();
-    if (country) params.append('country', country);
-    if (province && province !== 'null' && province !== 'undefined') {
-      params.append('province', province);
+    if (_country) params.append('country', _country);
+    if (_province && _province !== 'null' && _province !== 'undefined') {
+      params.append('province', _province);
     }
     
     const queryString = params.toString();
-    const url = queryString ? `/v1/cart/add?${queryString}` : '/v1/cart/add';
+    const url = queryString ? `/cart/add?${queryString}` : '/cart/add';
     
-    return await apiClient.post(url, item, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+    // Token is automatically added by interceptor
+    return await apiClient.post(url, item);
   }
 
   /**
    * Update cart item quantity
    * ACCESS: Authenticated - Requires user login
    */
-  static async updateCartItem(itemId: string, quantity: number, access_token: string) {
-    const country = localStorage.getItem('detected_country') || 'US';
-    const province = localStorage.getItem('detected_province');
+  static async updateCartItem(itemId: string, quantity: number, country?: string, province?: string) {
+    const _country = country || localStorage.getItem('detected_country') || 'US';
+    const _province = province || localStorage.getItem('detected_province');
     
     const params = new URLSearchParams();
-    if (country) params.append('country', country);
-    if (province && province !== 'null' && province !== 'undefined') {
-      params.append('province', province);
+    if (_country) params.append('country', _country);
+    if (_province && _province !== 'null' && _province !== 'undefined') {
+      params.append('province', _province);
     }
     
     const queryString = params.toString();
-    const url = queryString ? `/v1/cart/items/${itemId}?${queryString}` : `/v1/cart/items/${itemId}`;
+    const url = queryString ? `/cart/items/${itemId}?${queryString}` : `/cart/items/${itemId}`;
     
-    return await apiClient.put(url, { quantity }, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+    // Token is automatically added by interceptor
+    return await apiClient.put(url, { quantity });
   }
 
   /**
    * Remove item from cart
    * ACCESS: Authenticated - Requires user login
    */
-  static async removeFromCart(itemId: string, access_token: string) {
-    return await apiClient.delete(`/v1/cart/items/${itemId}`, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async removeFromCart(itemId: string) {
+    // Token is automatically added by interceptor
+    return await apiClient.delete(`/cart/items/${itemId}`);
   }
 
   /**
    * Clear entire cart
    * ACCESS: Authenticated - Requires user login
    */
-  static async clearCart(access_token: string) {
-    return await apiClient.post('/v1/cart/clear', {}, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async clearCart() {
+    // Token is automatically added by interceptor
+    return await apiClient.post('/cart/clear', {});
   }
 
   /**
    * Apply promo code to cart
    * ACCESS: Authenticated - Requires user login
    */
-  static async applyPromocode(code: string, access_token: string) {
-    return await apiClient.post('/v1/cart/promocode', { code }, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async applyPromocode(code: string) {
+    // Token is automatically added by interceptor
+    return await apiClient.post('/cart/promocode', { code });
   }
 
   /**
    * Remove promo code from cart
    * ACCESS: Authenticated - Requires user login
    */
-  static async removePromocode(access_token: string) {
-    return await apiClient.delete('/v1/cart/promocode', {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async removePromocode() {
+    // Token is automatically added by interceptor
+    return await apiClient.delete('/cart/promocode');
   }
 
   /**
    * Check stock availability for a variant
    * ACCESS: Public - No authentication required
    */
-  static async checkStock(variantId, quantity) {
+  static async checkStock(variantId: string, quantity: number) {
     // Guard against undefined/null variantId
     if (!variantId || variantId === 'undefined' || variantId === 'null') {
       throw new Error('Invalid variant ID provided');
     }
     
-    return await apiClient.get(`/v1/inventory/check-stock/${variantId}?quantity=${quantity}`);
+    return await apiClient.get(`/inventory/check-stock/${variantId}?quantity=${quantity}`);
   }
 
   /**
    * Check stock for multiple items at once (for Checkout)
    * ACCESS: Public - No authentication required
    */
-  static async checkBulkStock(items) {
+  static async checkBulkStock(items: any[]) {
     // Validate items array
     if (!Array.isArray(items) || items.length === 0) {
       throw new Error('Invalid items array provided');
@@ -149,77 +142,68 @@ export class CartAPI {
       };
     });
     
-    return await apiClient.post('/v1/inventory/check-stock/bulk', validatedItems);
+    return await apiClient.post('/inventory/check-stock/bulk', validatedItems);
   }
 
   /**
    * Get cart item count
    * ACCESS: Authenticated - Requires user login
    */
-  static async getCartItemCount(access_token) {
-    return await apiClient.get('/v1/cart/count', {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async getCartItemCount() {
+    // Token is automatically added by interceptor
+    return await apiClient.get('/cart/count');
   }
 
-  static async validateCart(access_token) {
-    const country = localStorage.getItem('detected_country') || 'US';
-    const province = localStorage.getItem('detected_province');
+  static async validateCart(country?: string, province?: string) {
+    const _country = country || localStorage.getItem('detected_country') || 'US';
+    const _province = province || localStorage.getItem('detected_province');
     
     const params = new URLSearchParams();
-    if (country) params.append('country', country);
-    if (province && province !== 'null' && province !== 'undefined') {
-      params.append('province', province);
+    if (_country) params.append('country', _country);
+    if (_province && _province !== 'null' && _province !== 'undefined') {
+      params.append('province', _province);
     }
     
     const queryString = params.toString();
-    const url = queryString ? `/v1/cart/validate?${queryString}` : '/v1/cart/validate';
+    const url = queryString ? `/cart/validate?${queryString}` : '/cart/validate';
     
-    return await apiClient.post(url, {}, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+    // Token is automatically added by interceptor
+    return await apiClient.post(url, {});
   }
 
-  static async getShippingOptions(address, access_token) {
-    return await apiClient.post('/cart/shipping-options', address, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async getShippingOptions(address: any) {
+    // Token is automatically added by interceptor
+    return await apiClient.post('/cart/shipping-options', address);
   }
 
-  static async calculateTotals(data, access_token) {
-    return await apiClient.post('/cart/calculate', data, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async calculateTotals(data: any) {
+    // Token is automatically added by interceptor
+    return await apiClient.post('/cart/calculate', data);
   }
 
-  static async saveForLater(itemId, access_token) {
-    return await apiClient.post(`/cart/items/${itemId}/save-for-later`, {}, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async saveForLater(itemId: string) {
+    // Token is automatically added by interceptor
+    return await apiClient.post(`/cart/items/${itemId}/save-for-later`, {});
   }
 
-  static async moveToCart(itemId, access_token) {
-    return await apiClient.post(`/cart/items/${itemId}/move-to-cart`, {}, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async moveToCart(itemId: string) {
+    // Token is automatically added by interceptor
+    return await apiClient.post(`/cart/items/${itemId}/move-to-cart`, {});
   }
 
-  static async getSavedItems(access_token) {
-    return await apiClient.get('/cart/saved-items', {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async getSavedItems() {
+    // Token is automatically added by interceptor
+    return await apiClient.get('/cart/saved-items');
   }
 
-  static async mergeCart(guestCartItems, access_token) {
-    return await apiClient.post('/cart/merge', { items: guestCartItems }, {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async mergeCart(guestCartItems: any[]) {
+    // Token is automatically added by interceptor
+    return await apiClient.post('/cart/merge', { items: guestCartItems });
   }
 
-  static async getCheckoutSummary(access_token) {
-    return await apiClient.get('/cart/checkout-summary', {
-      headers: { 'Authorization': `Bearer ${access_token}` },
-    });
+  static async getCheckoutSummary() {
+    // Token is automatically added by interceptor
+    return await apiClient.get('/cart/checkout-summary');
   }
 }
 

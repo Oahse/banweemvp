@@ -29,7 +29,7 @@ import { useApi } from '../hooks/useAsync';
 import { useSubscriptionAction } from '../hooks/useSubscription';
 import { ProductsAPI, ReviewsAPI } from '../api';
 
-import ErrorMessage from '../components/common/ErrorMessage';
+import ErrorMessage from '../components/Error';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 

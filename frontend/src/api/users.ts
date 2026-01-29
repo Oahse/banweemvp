@@ -2,7 +2,7 @@
  * Users API endpoints
  */
 
-import { apiClient   } from './client';
+import { apiClient } from './client';
 
 
 export class UsersAPI {
@@ -10,32 +10,32 @@ export class UsersAPI {
    * Get user profile
    */
   static async getProfile() {
-    return await apiClient.get('/v1/users/profile');
+    return await apiClient.get('/users/profile');
   }
 
   /**
    * Update user profile
    */
-  static async updateProfile(data) {
-    return await apiClient.put('/v1/users/profile', data);
+  static async updateProfile(data: any) {
+    return await apiClient.put('/users/profile', data);
   }
 
   /**
    * Search users (advanced search with fuzzy matching)
    */
-  static async searchUsers(query, filters) {
+  static async searchUsers(query: string, filters: any) {
     const params = new URLSearchParams({ q: query });
     
     if (filters?.role) params.append('role', filters.role);
     if (filters?.limit) params.append('limit', filters.limit.toString());
 
-    return await apiClient.get(`/v1/users/search?${params.toString()}`);
+    return await apiClient.get(`/users/search?${params.toString()}`);
   }
 
   /**
    * Get users list (for admin)
    */
-  static async getUsers(params) {
+  static async getUsers(params: any) {
     const queryParams = new URLSearchParams();
     
     if (params?.page) queryParams.append('page', params.page.toString());
@@ -44,7 +44,7 @@ export class UsersAPI {
     if (params?.q) queryParams.append('q', params.q);
     if (params?.search_mode) queryParams.append('search_mode', params.search_mode);
 
-    const url = `/v1/users${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/users${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 }

@@ -15,7 +15,7 @@ class ReviewsAPI {
    * ACCESS: Authenticated - Requires user login
    */
   async createReview(productId, rating, comment) {
-    return apiClient.post('/v1/reviews/', { product_id: productId, rating, comment });
+    return apiClient.post('/reviews/', { product_id: productId, rating, comment });
   }
 
   /**
@@ -35,7 +35,7 @@ class ReviewsAPI {
     if (sortBy) {
       params.append('sort_by', sortBy);
     }
-    return apiClient.get(`/v1/reviews/product/${productId}?${params.toString()}`);
+    return apiClient.get(`/reviews/product/${productId}?${params.toString()}`);
   }
 
   /**
@@ -43,7 +43,7 @@ class ReviewsAPI {
    * ACCESS: Public - No authentication required
    */
   async getReview(reviewId) {
-    return apiClient.get(`/v1/reviews/${reviewId}`);
+    return apiClient.get(`/reviews/${reviewId}`);
   }
 
   /**
@@ -51,7 +51,7 @@ class ReviewsAPI {
    * ACCESS: Authenticated - Requires user login and ownership of review
    */
   async updateReview(reviewId, rating, comment) {
-    return apiClient.put(`/v1/reviews/${reviewId}`, { rating, comment });
+    return apiClient.put(`/reviews/${reviewId}`, { rating, comment });
   }
 
   /**
@@ -59,7 +59,7 @@ class ReviewsAPI {
    * ACCESS: Authenticated - Requires user login and ownership of review
    */
   async deleteReview(reviewId) {
-    return apiClient.delete(`/v1/reviews/${reviewId}`);
+    return apiClient.delete(`/reviews/${reviewId}`);
   }
 }
 

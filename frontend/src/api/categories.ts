@@ -14,7 +14,7 @@ export class CategoriesAPI {
    * ACCESS: Public - No authentication required
    */
   static async getCategories() {
-    return await apiClient.get('/v1/products/categories');
+    return await apiClient.get('/products/categories');
   }
 
   /**
@@ -22,7 +22,7 @@ export class CategoriesAPI {
    * ACCESS: Public - No authentication required
    */
   static async getCategory(categoryId: string) {
-    return await apiClient.get(`/v1/products/categories/${categoryId}`);
+    return await apiClient.get(`/products/categories/${categoryId}`);
   }
 }
 

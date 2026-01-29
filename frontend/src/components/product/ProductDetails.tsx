@@ -10,7 +10,7 @@ import { toast } from 'react-hot-toast';
 import { useApi } from '../../hooks/useAsync';
 import { ProductsAPI } from '../../api';
 
-import ErrorMessage from '../common/ErrorMessage';
+import ErrorMessage from '../Error';
 import ReviewForm from './ReviewForm';
 import { NegotiationModal } from './NegotiationModal';
 
