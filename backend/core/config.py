@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from dotenv import load_dotenv
-from pydantic import Field, field_validator, ValidationError
+from pydantic import Field, field_validator, ValidationError, ConfigDict
 from pydantic_settings import BaseSettings
 
 # Configure logging
@@ -120,6 +120,8 @@ def parse_cors(value: str) -> List[str]:
 class DatabaseConfig(BaseSettings):
     """Pydantic model for database configuration validation"""
     
+    model_config = ConfigDict(extra='ignore', env_file='.env', case_sensitive=True)
+    
     POSTGRES_DB_URL: str = Field(..., description="Complete PostgreSQL connection URL")
     
     DB_POOL_SIZE: int = Field(default=20, ge=1, le=100, description="Database connection pool size")
@@ -134,14 +136,12 @@ class DatabaseConfig(BaseSettings):
         if not v.startswith(('postgresql://', 'postgresql+asyncpg://', 'postgresql+psycopg2://')):
             raise ValueError('Database URL must start with postgresql:// or postgresql+asyncpg://')
         return v
-    
-    class Config:
-        env_file = '.env'
-        case_sensitive = True
 
 
 class RedisConfig(BaseSettings):
     """Pydantic model for Redis configuration validation"""
+    
+    model_config = ConfigDict(extra='ignore', env_file='.env', case_sensitive=True)
     
     REDIS_URL: str = Field(
         default="redis://redis:6379/0",
@@ -155,17 +155,15 @@ class RedisConfig(BaseSettings):
     @classmethod
     def validate_redis_url(cls, v):
         """Validate Redis URL format"""
-        if not v.startswith('redis://'):
-            raise ValueError('Redis URL must start with redis://')
+        if not v.startswith(('redis://', 'rediss://')):
+            raise ValueError('Redis URL must start with redis:// or rediss://')
         return v
-    
-    class Config:
-        env_file = '.env'
-        case_sensitive = True
 
 
 class SecurityConfig(BaseSettings):
     """Pydantic model for security configuration validation"""
+    
+    model_config = ConfigDict(extra='ignore', env_file='.env', case_sensitive=True)
     
     SECRET_KEY: str = Field(..., min_length=32, description="Application secret key")
     ALGORITHM: str = Field(default="HS256", description="JWT algorithm")
@@ -208,14 +206,12 @@ class SecurityConfig(BaseSettings):
         if not v.startswith('whsec_'):
             raise ValueError("STRIPE_WEBHOOK_SECRET must start with 'whsec_'")
         return v
-    
-    class Config:
-        env_file = '.env'
-        case_sensitive = True
 
 
 class ApplicationConfig(BaseSettings):
     """Pydantic model for general application configuration validation"""
+    
+    model_config = ConfigDict(extra='ignore', env_file='.env', case_sensitive=True)
     
     ENVIRONMENT: Literal["local", "staging", "production"] = Field(
         default="local",
@@ -256,10 +252,6 @@ class ApplicationConfig(BaseSettings):
         if env == 'production' and not v:
             logger.warning(f'Email configuration is not set in production environment')
         return v
-    
-    class Config:
-        env_file = '.env'
-        case_sensitive = True
 
 
 class PydanticConfigValidator:
@@ -569,13 +561,28 @@ class Settings:
         """Constructs the SQLAlchemy database URI for async operations."""
         if not self.POSTGRES_DB_URL:
             raise ValueError("POSTGRES_DB_URL is required")
+        # Add asyncpg driver for async operations
+        if '+asyncpg' not in self.POSTGRES_DB_URL and '+psycopg2' not in self.POSTGRES_DB_URL:
+            return self.POSTGRES_DB_URL.replace('postgresql://', 'postgresql+asyncpg://')
         return self.POSTGRES_DB_URL
     
     @property
     def SQLALCHEMY_DATABASE_URI_SYNC(self) -> str:
         """Constructs the SQLAlchemy database URI for synchronous operations."""
-        uri = self.SQLALCHEMY_DATABASE_URI
-        return uri.replace('+asyncpg', '+psycopg2')
+        if not self.POSTGRES_DB_URL:
+            raise ValueError("POSTGRES_DB_URL is required")
+        # Add psycopg2 driver for sync operations and convert SSL parameters
+        sync_uri = self.POSTGRES_DB_URL
+        if '+asyncpg' not in sync_uri and '+psycopg2' not in sync_uri:
+            sync_uri = sync_uri.replace('postgresql://', 'postgresql+psycopg2://')
+        elif '+asyncpg' in sync_uri:
+            sync_uri = sync_uri.replace('+asyncpg', '+psycopg2')
+        
+        # Convert SSL parameters for psycopg2
+        if 'ssl=require' in sync_uri:
+            sync_uri = sync_uri.replace('ssl=require', 'sslmode=require')
+        
+        return sync_uri
     
     def _validate_configuration(self):
         """Validate all configuration settings"""

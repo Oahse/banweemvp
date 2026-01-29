@@ -44,7 +44,64 @@ class ReviewService:
         # Update product rating and review count
         await self._update_product_rating(review_data.product_id)
 
-        return new_review
+        return ReviewResponse.from_orm(new_review)
+
+    def _parse_sort_by(self, sort_by: Optional[str]) -> tuple:
+        """Parse sort_by parameter and return (field, order) tuple"""
+        if not sort_by or '_' not in sort_by:
+            return 'created_at', 'desc'
+        
+        # Split from the right to handle "created_at_desc" properly
+        parts = sort_by.rsplit('_', 1)
+        if len(parts) != 2:
+            return 'created_at', 'desc'
+        
+        sort_field, sort_order = parts
+        
+        # Validate field exists on Review model
+        if not hasattr(Review, sort_field):
+            return 'created_at', 'desc'
+        
+        # Validate sort order
+        if sort_order not in ['asc', 'desc']:
+            return 'created_at', 'desc'
+        
+        return sort_field, sort_order
+
+    async def get_all_reviews(self, page: int = 1, limit: int = 10, min_rating: Optional[int] = None, max_rating: Optional[int] = None, sort_by: Optional[str] = None) -> dict:
+        """Get all reviews with pagination and filtering"""
+        offset = (page - 1) * limit
+        query = select(Review).options(
+            selectinload(Review.user).load_only(
+                User.id, User.firstname, User.lastname),
+            selectinload(Review.product).load_only(
+                Product.id, Product.name)
+        )
+        total_query = select(func.count()).select_from(Review)
+
+        if min_rating is not None:
+            query = query.filter(Review.rating >= min_rating)
+            total_query = total_query.filter(Review.rating >= min_rating)
+        if max_rating is not None:
+            query = query.filter(Review.rating <= max_rating)
+            total_query = total_query.filter(Review.rating <= max_rating)
+
+        # Apply sorting
+        sort_field, sort_order = self._parse_sort_by(sort_by)
+        if sort_order == 'asc':
+            query = query.order_by(getattr(Review, sort_field).asc())
+        else:
+            query = query.order_by(getattr(Review, sort_field).desc())
+
+        total_reviews = (await self.db.execute(total_query)).scalar_one()
+        reviews = (await self.db.execute(query.offset(offset).limit(limit))).scalars().all()
+
+        return {
+            "total": total_reviews,
+            "page": page,
+            "limit": limit,
+            "data": [ReviewResponse.from_orm(r) for r in reviews]
+        }
 
     async def get_reviews_for_product(self, product_id: UUID, page: int = 1, limit: int = 10, min_rating: Optional[int] = None, max_rating: Optional[int] = None, sort_by: Optional[str] = None) -> dict:
         offset = (page - 1) * limit
@@ -62,14 +119,12 @@ class ReviewService:
             query = query.filter(Review.rating <= max_rating)
             total_query = total_query.filter(Review.rating <= max_rating)
 
-        if sort_by:
-            sort_field, sort_order = sort_by.split('_')
-            if sort_order == 'asc':
-                query = query.order_by(getattr(Review, sort_field).asc())
-            else:
-                query = query.order_by(getattr(Review, sort_field).desc())
+        # Apply sorting
+        sort_field, sort_order = self._parse_sort_by(sort_by)
+        if sort_order == 'asc':
+            query = query.order_by(getattr(Review, sort_field).asc())
         else:
-            query = query.order_by(desc(Review.created_at))
+            query = query.order_by(getattr(Review, sort_field).desc())
 
         total_reviews = (await self.db.execute(total_query)).scalar_one()
         reviews = (await self.db.execute(query.offset(offset).limit(limit))).scalars().all()
@@ -103,7 +158,7 @@ class ReviewService:
         # Update product rating
         await self._update_product_rating(review.product_id)
 
-        return review
+        return ReviewResponse.from_orm(review)
 
     async def delete_review(self, review_id: UUID, user_id: UUID):
         review = await self.get_review_by_id(review_id)

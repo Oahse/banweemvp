@@ -90,7 +90,6 @@ async def test_tax_service(
 @router.post("/calculate")
 async def calculate_tax(
     request: TaxCalculationRequest,
-    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -163,7 +162,6 @@ async def list_tax_rates(
     search: Optional[str] = Query(None, description="Search in country/province names"),
     page: int = Query(1, ge=1),
     per_page: int = Query(50, ge=1, le=100),
-    current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
     """List all tax rates with filtering and pagination (Admin only)"""
@@ -231,7 +229,6 @@ async def list_tax_rates(
 
 @router.get("/admin/tax-rates/countries")
 async def get_countries_with_tax_rates(
-    current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
     """Get list of countries that have tax rates configured"""
@@ -265,7 +262,6 @@ async def get_countries_with_tax_rates(
 
 @router.get("/admin/tax-rates/tax-types")
 async def get_available_tax_types(
-    current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
     """Get list of all tax types currently in use"""
@@ -297,7 +293,6 @@ async def get_available_tax_types(
 @router.get("/admin/tax-rates/{tax_rate_id}", response_model=TaxRateResponse)
 async def get_tax_rate(
     tax_rate_id: UUID,
-    current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
     """Get a specific tax rate by ID (Admin only)"""

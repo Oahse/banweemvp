@@ -7,6 +7,9 @@ from models.product import Product, Category
 from models.user import User
 from schemas.product import ProductResponse, CategoryResponse
 from schemas.user import UserResponse
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SearchService:
@@ -30,6 +33,29 @@ class SearchService:
             "category": 0.4,
             "tags": 0.3
         }
+        
+        # Check if pg_trgm extension is available
+        self.pg_trgm_available = None
+
+    async def _check_pg_trgm_availability(self) -> bool:
+        """Check if pg_trgm extension is available and enabled."""
+        if self.pg_trgm_available is not None:
+            return self.pg_trgm_available
+            
+        try:
+            result = await self.db.execute(text("""
+                SELECT EXISTS(
+                    SELECT 1 FROM pg_extension WHERE extname = 'pg_trgm'
+                );
+            """))
+            self.pg_trgm_available = result.scalar()
+            if not self.pg_trgm_available:
+                logger.warning("pg_trgm extension is not enabled. Falling back to basic text search.")
+            return self.pg_trgm_available
+        except Exception as e:
+            logger.error(f"Error checking pg_trgm availability: {e}")
+            self.pg_trgm_available = False
+            return False
 
     async def autocomplete(
         self, 
@@ -63,131 +89,200 @@ class SearchService:
             return []
 
     async def _autocomplete_products(self, query: str, limit: int) -> List[Dict[str, Any]]:
-        """Autocomplete for products using prefix matching and trigrams."""
-        # Use PostgreSQL trigram similarity for prefix matching
-        sql_query = text("""
-            SELECT 
-                p.id,
-                p.name,
-                p.description,
-                c.name as category_name,
-                GREATEST(
-                    CASE WHEN LOWER(p.name) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT)
-                         WHEN LOWER(p.name) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT)
-                         ELSE similarity(LOWER(p.name), :query) * CAST(:fuzzy_weight AS FLOAT)
-                    END,
-                    CASE WHEN LOWER(p.description) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
-                         WHEN LOWER(p.description) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
-                         ELSE similarity(LOWER(p.description), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
-                    END,
-                    CASE WHEN LOWER(c.name) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
-                         WHEN LOWER(c.name) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
-                         ELSE similarity(LOWER(c.name), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
-                    END
-                ) as relevance_score
-            FROM products p
-            LEFT JOIN categories c ON p.category_id = c.id
-            WHERE p.is_active = true
-            AND (
-                LOWER(p.name) LIKE :fuzzy_query
-                OR LOWER(p.description) LIKE :fuzzy_query
-                OR LOWER(c.name) LIKE :fuzzy_query
-                OR similarity(LOWER(p.name), :query) > CAST(:similarity_threshold AS FLOAT)
-                OR similarity(LOWER(p.description), :query) > CAST(:similarity_threshold AS FLOAT)
-                OR similarity(LOWER(c.name), :query) > CAST(:similarity_threshold AS FLOAT)
-            )
-            ORDER BY relevance_score DESC, p.rating DESC, p.review_count DESC
-            LIMIT :limit
-        """)
+        """Autocomplete for products using pg_trgm similarity matching."""
+        pg_trgm_available = await self._check_pg_trgm_availability()
         
-        result = await self.db.execute(sql_query, {
-            "query": query,
-            "prefix_query": f"{query}%",
-            "fuzzy_query": f"%{query}%",
-            "exact_weight": float(self.weights["exact"]),
-            "prefix_weight": float(self.weights["prefix"]),
-            "fuzzy_weight": float(self.weights["fuzzy"]),
-            "desc_weight": float(self.product_field_weights["description"]),
-            "cat_weight": float(self.product_field_weights["category"]),
-            "similarity_threshold": float(self.similarity_threshold),
-            "limit": limit
-        })
-        
-        suggestions = []
-        for row in result:
-            suggestions.append({
-                "id": str(row.id),
-                "name": row.name,
-                "description": row.description,
-                "category_name": row.category_name,
-                "type": "product",
-                "relevance_score": float(row.relevance_score)
-            })
+        if pg_trgm_available:
+            # Use pg_trgm similarity function
+            sql_query = text("""
+                SELECT 
+                    p.id,
+                    p.name,
+                    p.description,
+                    c.name as category_name,
+                    GREATEST(
+                        CASE WHEN LOWER(p.name) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT)
+                             WHEN LOWER(p.name) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT)
+                             ELSE similarity(LOWER(p.name), :query) * CAST(:fuzzy_weight AS FLOAT)
+                        END,
+                        CASE WHEN LOWER(p.description) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
+                             WHEN LOWER(p.description) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
+                             ELSE similarity(LOWER(p.description), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
+                        END,
+                        CASE WHEN LOWER(c.name) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                             WHEN LOWER(c.name) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                             ELSE similarity(LOWER(c.name), :query) * CAST(:fuzzy_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                        END
+                    ) as relevance_score
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.is_active = true
+                AND (
+                    LOWER(p.name) LIKE :fuzzy_query
+                    OR LOWER(p.description) LIKE :fuzzy_query
+                    OR LOWER(c.name) LIKE :fuzzy_query
+                    OR similarity(LOWER(p.name), :query) > CAST(:similarity_threshold AS FLOAT)
+                    OR similarity(LOWER(p.description), :query) > CAST(:similarity_threshold AS FLOAT)
+                    OR similarity(LOWER(c.name), :query) > CAST(:similarity_threshold AS FLOAT)
+                )
+                ORDER BY relevance_score DESC, p.rating DESC, p.review_count DESC
+                LIMIT :limit
+            """)
             
-        return suggestions
+            params = {
+                "query": query,
+                "prefix_query": f"{query}%",
+                "fuzzy_query": f"%{query}%",
+                "exact_weight": float(self.weights["exact"]),
+                "prefix_weight": float(self.weights["prefix"]),
+                "fuzzy_weight": float(self.weights["fuzzy"]),
+                "desc_weight": float(self.product_field_weights["description"]),
+                "cat_weight": float(self.product_field_weights["category"]),
+                "similarity_threshold": float(self.similarity_threshold),
+                "limit": limit
+            }
+        else:
+            # Fallback to basic ILIKE matching
+            sql_query = text("""
+                SELECT 
+                    p.id,
+                    p.name,
+                    p.description,
+                    c.name as category_name,
+                    GREATEST(
+                        CASE WHEN LOWER(p.name) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT)
+                             WHEN LOWER(p.name) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT)
+                             ELSE 0.1
+                        END,
+                        CASE WHEN LOWER(p.description) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
+                             WHEN LOWER(p.description) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * CAST(:desc_weight AS FLOAT)
+                             ELSE 0.1 * CAST(:desc_weight AS FLOAT)
+                        END,
+                        CASE WHEN LOWER(c.name) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                             WHEN LOWER(c.name) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * CAST(:cat_weight AS FLOAT)
+                             ELSE 0.1 * CAST(:cat_weight AS FLOAT)
+                        END
+                    ) as relevance_score
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.is_active = true
+                AND (
+                    LOWER(p.name) LIKE :fuzzy_query
+                    OR LOWER(p.description) LIKE :fuzzy_query
+                    OR LOWER(c.name) LIKE :fuzzy_query
+                )
+                ORDER BY relevance_score DESC, p.rating DESC, p.review_count DESC
+                LIMIT :limit
+            """)
+            
+            params = {
+                "prefix_query": f"{query}%",
+                "fuzzy_query": f"%{query}%",
+                "exact_weight": float(self.weights["exact"]),
+                "prefix_weight": float(self.weights["prefix"]),
+                "desc_weight": float(self.product_field_weights["description"]),
+                "cat_weight": float(self.product_field_weights["category"]),
+                "limit": limit
+            }
+        
+        try:
+            result = await self.db.execute(sql_query, params)
+            
+            suggestions = []
+            for row in result:
+                suggestions.append({
+                    "id": str(row.id),
+                    "name": row.name,
+                    "description": row.description,
+                    "category_name": row.category_name,
+                    "type": "product",
+                    "relevance_score": float(row.relevance_score)
+                })
+                
+            return suggestions
+        except Exception as e:
+            logger.error(f"Error in _autocomplete_products: {e}")
+            return []
 
     async def _autocomplete_users(self, query: str, limit: int) -> List[Dict[str, Any]]:
-        """Autocomplete for users using prefix matching on name and email."""
-        sql_query = text("""
-            SELECT 
-                u.id,
-                u.firstname,
-                u.lastname,
-                u.email,
-                GREATEST(
-                    CASE WHEN LOWER(u.firstname) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT)
-                         WHEN LOWER(u.firstname) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT)
-                         ELSE similarity(LOWER(u.firstname), :query) * CAST(:fuzzy_weight AS FLOAT)
-                    END,
-                    CASE WHEN LOWER(u.lastname) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT)
-                         WHEN LOWER(u.lastname) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT)
-                         ELSE similarity(LOWER(u.lastname), :query) * CAST(:fuzzy_weight AS FLOAT)
-                    END,
-                    CASE WHEN LOWER(u.email) LIKE :prefix_query THEN CAST(:exact_weight AS FLOAT) * 0.8
-                         WHEN LOWER(u.email) LIKE :fuzzy_query THEN CAST(:prefix_weight AS FLOAT) * 0.8
-                         ELSE similarity(LOWER(u.email), :query) * CAST(:fuzzy_weight AS FLOAT) * 0.8
-                    END
-                ) as relevance_score
-            FROM users u
-            WHERE u.is_active = true
-            AND (
-                LOWER(u.firstname) LIKE :fuzzy_query
-                OR LOWER(u.lastname) LIKE :fuzzy_query
-                OR LOWER(u.email) LIKE :fuzzy_query
-                OR similarity(LOWER(u.firstname), :query) > CAST(:similarity_threshold AS FLOAT)
-                OR similarity(LOWER(u.lastname), :query) > CAST(:similarity_threshold AS FLOAT)
-                OR similarity(LOWER(u.email), :query) > CAST(:similarity_threshold AS FLOAT)
+        """Autocomplete for users using simple text matching."""
+        base_query = select(
+            User.id,
+            User.firstname,
+            User.lastname,
+            User.email
+        ).where(
+            and_(
+                User.is_active == True,
+                or_(
+                    func.lower(User.firstname).like(f'{query}%'),
+                    func.lower(User.lastname).like(f'{query}%'),
+                    func.lower(User.email).like(f'{query}%'),
+                    func.lower(User.firstname).like(f'%{query}%'),
+                    func.lower(User.lastname).like(f'%{query}%')
+                )
             )
-            ORDER BY relevance_score DESC
-            LIMIT :limit
-        """)
+        ).order_by(
+            func.lower(User.firstname).like(f'{query}%').desc(),
+            User.firstname,
+            User.lastname
+        ).limit(limit)
         
-        result = await self.db.execute(sql_query, {
-            "query": query,
-            "prefix_query": f"{query}%",
-            "fuzzy_query": f"%{query}%",
-            "exact_weight": self.weights["exact"],
-            "prefix_weight": self.weights["prefix"],
-            "fuzzy_weight": self.weights["fuzzy"],
-            "similarity_threshold": self.similarity_threshold,
-            "limit": limit
-        })
-        
-        suggestions = []
-        for row in result:
-            suggestions.append({
-                "id": str(row.id),
-                "firstname": row.firstname,
-                "lastname": row.lastname,
-                "full_name": f"{row.firstname} {row.lastname}",
-                "email": row.email,
-                "type": "user",
-                "relevance_score": float(row.relevance_score)
-            })
+        try:
+            result = await self.db.execute(base_query)
+            users = result.fetchall()
             
-        return suggestions
+            suggestions = []
+            for user in users:
+                suggestions.append({
+                    "id": str(user.id),
+                    "name": f"{user.firstname} {user.lastname}",
+                    "email": user.email,
+                    "type": "user"
+                })
+            
+            return suggestions
+        except Exception as e:
+            logger.error(f"Error in _autocomplete_users: {e}")
+            return []
 
     async def _autocomplete_categories(self, query: str, limit: int) -> List[Dict[str, Any]]:
+        """Autocomplete for categories using simple text matching."""
+        base_query = select(
+            Category.id,
+            Category.name,
+            Category.description
+        ).where(
+            and_(
+                Category.is_active == True,
+                or_(
+                    func.lower(Category.name).like(f'{query}%'),
+                    func.lower(Category.name).like(f'%{query}%'),
+                    func.lower(Category.description).like(f'%{query}%')
+                )
+            )
+        ).order_by(
+            func.lower(Category.name).like(f'{query}%').desc(),
+            Category.name
+        ).limit(limit)
+        
+        try:
+            result = await self.db.execute(base_query)
+            categories = result.fetchall()
+            
+            suggestions = []
+            for category in categories:
+                suggestions.append({
+                    "id": str(category.id),
+                    "name": category.name,
+                    "description": category.description,
+                    "type": "category"
+                })
+            
+            return suggestions
+        except Exception as e:
+            logger.error(f"Error in _autocomplete_categories: {e}")
+            return []
         """Autocomplete for categories using prefix matching and fuzzy search."""
         sql_query = text("""
             SELECT 

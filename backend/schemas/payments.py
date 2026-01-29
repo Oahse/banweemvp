@@ -46,8 +46,9 @@ class PaymentIntentBase(BaseModel):
     payment_method_id: Optional[UUID] = None
 
 
-class PaymentIntentCreate(PaymentIntentBase):
-    user_id: UUID
+class PaymentIntentCreate(BaseModel):
+    amount: float
+    currency: str = "USD"
     order_id: Optional[UUID] = None
 
 

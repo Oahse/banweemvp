@@ -22,6 +22,41 @@ async def get_current_auth_user(token: str = Depends(oauth2_scheme), db: AsyncSe
 router = APIRouter(prefix="/reviews", tags=["Reviews"])
 
 
+@router.get("/")
+async def get_reviews(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    product_id: Optional[UUID] = Query(None, description="Filter by product ID"),
+    min_rating: Optional[int] = Query(None, ge=1, le=5),
+    max_rating: Optional[int] = Query(None, ge=1, le=5),
+    sort_by: Optional[str] = Query("created_at_desc", pattern="^(created_at|rating)_(asc|desc)$"),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all reviews with optional filtering and sorting."""
+    try:
+        review_service = ReviewService(db)
+        
+        if product_id:
+            # Get reviews for specific product
+            reviews = await review_service.get_reviews_for_product(
+                product_id, page, limit, min_rating, max_rating, sort_by
+            )
+        else:
+            # Get all reviews
+            reviews = await review_service.get_all_reviews(
+                page, limit, min_rating, max_rating, sort_by
+            )
+        
+        return Response.success(data=reviews)
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to fetch reviews: {str(e)}"
+        )
+
+
 @router.post("/")
 async def create_review(
     review_data: ReviewCreate,

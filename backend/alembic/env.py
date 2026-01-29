@@ -41,8 +41,8 @@ from models.validation_rules import *
 # access to the values within the .ini file in use.
 config = context.config
 
-# Set the database URL from our settings
-config.set_main_option("sqlalchemy.url", settings.SQLALCHEMY_DATABASE_URI)
+# Set the database URL from our settings (use sync version for Alembic)
+config.set_main_option("sqlalchemy.url", settings.SQLALCHEMY_DATABASE_URI_SYNC)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

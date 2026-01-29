@@ -42,6 +42,15 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Ensure pg_trgm extension is enabled
+echo "🔧 Preparing database for migrations..."
+python migration_helper.py
+if [ $? -eq 0 ]; then
+    echo "✅ Database preparation completed successfully"
+else
+    echo "⚠️ Database preparation failed, but continuing..."
+fi
+
 # Check if database is already initialized by checking for products
 PRODUCT_COUNT=$(python -c "
 import asyncio

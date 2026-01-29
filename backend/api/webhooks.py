@@ -29,15 +29,16 @@ async def stripe_webhook(
         if not sig_header:
             raise HTTPException(status_code=400, detail="Missing Stripe signature")
         
-        # Get client IP for logging
+        # Get client IP for logging (but don't pass to webhook service)
         client_ip = request.client.host if request.client else None
+        logger.info(f"Webhook request from IP: {client_ip}")
         
         # Process webhook
         webhook_service = WebhookService(db)
         result = await webhook_service.handle_stripe_webhook(
+            request=request,
             request_body=payload,
-            signature=sig_header,
-            ip_address=client_ip
+            signature=sig_header
         )
         
         return result

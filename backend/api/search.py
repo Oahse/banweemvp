@@ -10,6 +10,52 @@ from services.search import SearchService
 router = APIRouter(prefix="/search", tags=["Search"])
 
 
+@router.get("/")
+async def search_products(
+    q: str = Query(..., min_length=2, description="Search query (minimum 2 characters)"),
+    limit: int = Query(20, ge=1, le=100, description="Maximum number of results"),
+    category_id: Optional[UUID] = Query(None, description="Filter by category ID"),
+    min_price: Optional[float] = Query(None, ge=0, description="Minimum price filter"),
+    max_price: Optional[float] = Query(None, ge=0, description="Maximum price filter"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Search for products with fuzzy matching and weighted ranking.
+    """
+    try:
+        from services.products import ProductService
+        product_service = ProductService(db)
+        
+        # Build filters
+        filters = {}
+        if category_id:
+            filters["category_id"] = category_id
+        if min_price is not None:
+            filters["min_price"] = min_price
+        if max_price is not None:
+            filters["max_price"] = max_price
+        
+        products = await product_service.search_products(
+            query=q,
+            limit=limit,
+            filters=filters if filters else None
+        )
+        
+        return Response.success(
+            data={
+                "query": q,
+                "filters": filters,
+                "products": products,
+                "count": len(products)
+            }
+        )
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to search products: {str(e)}"
+        )
+
+
 @router.get("/autocomplete")
 async def autocomplete_search(
     q: str = Query(..., min_length=2, description="Search query (minimum 2 characters)"),

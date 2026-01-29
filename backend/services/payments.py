@@ -225,11 +225,13 @@ class PaymentService:
             stripe_intent = stripe.PaymentIntent.create(
                 amount=int(amount * 100),  # Convert to cents
                 currency=currency.lower(),
-                metadata=metadata or {}
+                metadata=metadata or {},
+                idempotency_key=str(uuid7())  # Provide explicit idempotency key
             )
             
             # Create our payment intent record
             payment_intent = PaymentIntent(
+                id=uuid7(),
                 stripe_payment_intent_id=stripe_intent.id,
                 user_id=user_id,
                 order_id=order_id,

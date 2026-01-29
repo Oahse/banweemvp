@@ -22,6 +22,93 @@ router = APIRouter(prefix="/users", tags=["Users & Addresses"])
 # USER ENDPOINTS
 # ==========================================================
 
+@router.get("/profile")
+async def get_user_profile(
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get current user's profile"""
+    try:
+        from schemas.user import UserResponse
+        
+        # Convert User model to UserResponse
+        user_data = {
+            "id": current_user.id,
+            "email": current_user.email,
+            "firstname": current_user.firstname,
+            "lastname": current_user.lastname,
+            "full_name": f"{current_user.firstname} {current_user.lastname}",
+            "phone": current_user.phone,
+            "role": current_user.role,
+            "verified": current_user.verified,
+            "is_active": current_user.is_active,
+            "age": current_user.age,
+            "gender": current_user.gender,
+            "country": current_user.country,
+            "language": current_user.language,
+            "timezone": current_user.timezone,
+            "created_at": current_user.created_at,
+            "updated_at": current_user.updated_at
+        }
+        
+        user_response = UserResponse.model_validate(user_data)
+        return Response.success(data=user_response)
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to fetch user profile: {str(e)}"
+        )
+
+
+@router.put("/profile")
+async def update_user_profile(
+    payload: UserUpdate,
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update current user's profile"""
+    try:
+        from schemas.user import UserResponse
+        service = UserService(db)
+        updated_user = await service.update_user(current_user.id, payload)
+        if not updated_user:
+            raise APIException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                message="User profile not found"
+            )
+        
+        # Convert User model to UserResponse
+        user_data = {
+            "id": updated_user.id,
+            "email": updated_user.email,
+            "firstname": updated_user.firstname,
+            "lastname": updated_user.lastname,
+            "full_name": f"{updated_user.firstname} {updated_user.lastname}",
+            "phone": updated_user.phone,
+            "role": updated_user.role,
+            "verified": updated_user.verified,
+            "is_active": updated_user.is_active,
+            "age": updated_user.age,
+            "gender": updated_user.gender,
+            "country": updated_user.country,
+            "language": updated_user.language,
+            "timezone": updated_user.timezone,
+            "created_at": updated_user.created_at,
+            "updated_at": updated_user.updated_at
+        }
+        
+        user_response = UserResponse.model_validate(user_data)
+        return Response.success(data=user_response, message="Profile updated successfully")
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to update user profile: {str(e)}"
+        )
+
 
 @router.get("/search")
 async def search_users(

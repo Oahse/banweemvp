@@ -98,8 +98,8 @@ async def create_payment_intent(
         amount=payment_intent_data.amount,
         currency=payment_intent_data.currency,
         order_id=payment_intent_data.order_id,
-        subscription_id=payment_intent_data.subscription_id,
-        metadata=payment_intent_data.metadata
+        subscription_id=None,  # Not provided in schema
+        metadata={}  # Default empty metadata
     )
     return Response.success(data=PaymentIntentResponse.from_orm(payment_intent))
 

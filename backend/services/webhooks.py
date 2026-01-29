@@ -293,45 +293,18 @@ class WebhookService:
         try:
             event_type = event.get("type", "unknown")
             
-            # Determine appropriate topic and data based on event type
-            if event_type.startswith("payment_intent"):
-                await publish_payment_event(
-                    event_type=f"webhook_{event_type}",
-                    payment_data={
-                        "stripe_event_id": event.get("id"),
-                        "stripe_event_type": event_type,
-                        "processing_result": processing_result,
-                        "security_metadata": security_metadata
-                    },
-                    correlation_id=event.get("id")
-                )
+            # Log the webhook event processing for monitoring
+            logger.info(f"Webhook event processed: {event.get('id')} - {event_type}")
+            logger.info(f"Processing result: {processing_result}")
             
-            elif event_type.startswith("charge"):
-                await publish_payment_event(
-                    event_type=f"webhook_{event_type}",
-                    payment_data={
-                        "stripe_event_id": event.get("id"),
-                        "stripe_event_type": event_type,
-                        "processing_result": processing_result
-                    },
-                    correlation_id=event.get("id")
-                )
+            # TODO: Implement actual message broker publishing when needed
+            # For now, we just log the events for monitoring
             
-            # Publish order events if order was affected
             if processing_result.get("order_id"):
-                await publish_order_event(
-                    event_type=f"order_{event_type}",
-                    order_data={
-                        "order_id": processing_result["order_id"],
-                        "stripe_event_id": event.get("id"),
-                        "action": processing_result.get("action"),
-                        "status_change": True
-                    },
-                    correlation_id=processing_result["order_id"]
-                )
+                logger.info(f"Order affected by webhook: {processing_result['order_id']}")
             
-            logger.info(f"Webhook event published securely: {event.get('id')}")
+            logger.info(f"Webhook event logged successfully: {event.get('id')}")
             
         except Exception as e:
-            logger.error(f"Failed to publish webhook event: {e}")
-            # Don't fail the webhook processing if publishing fails
+            logger.error(f"Failed to log webhook event: {e}")
+            # Don't fail the webhook processing if logging fails

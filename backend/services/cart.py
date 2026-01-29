@@ -65,7 +65,7 @@ class CartService:
             return self._create_empty_cart_response(session_id, country_code, province_code)
 
         # Get or create cart for authenticated user
-        cart = await self._get_or_create_cart(user_id)
+        cart = await self.get_or_create_cart(user_id)
         
         if not cart.items:
             return self._create_empty_cart_response(None, country_code, province_code, cart.id)
@@ -117,7 +117,7 @@ class CartService:
                         round(((item.variant.base_price - item.variant.sale_price) / item.variant.base_price) * 100, 1)
                         if item.variant.sale_price else 0
                     ),
-                    "weight": item.variant.weight,
+                    "weight": getattr(item.variant, 'weight', 0.0),  # Default weight if not available
                     "attributes": item.variant.attributes,
                     "is_active": item.variant.is_active,
                     "images": [
@@ -352,7 +352,7 @@ class CartService:
         
         return issues
 
-    async def _get_or_create_cart(self, user_id: UUID) -> Cart:
+    async def get_or_create_cart(self, user_id: UUID) -> Cart:
         """Get existing cart or create new one"""
         result = await self.db.execute(
             select(Cart)
