@@ -1,5 +1,9 @@
 /**
  * Shopping Cart API endpoints
+ * 
+ * ACCESS LEVELS:
+ * - Authenticated: All cart operations require user login
+ * - Public: Stock checking (no authentication required)
  */
 
 import { apiClient } from './client';
@@ -8,6 +12,10 @@ import { apiClient } from './client';
 
 
 export class CartAPI {
+  /**
+   * Get user's cart
+   * ACCESS: Authenticated - Requires user login
+   */
   static async getCart(access_token: string, country?: string, province?: string) {
     const params = new URLSearchParams();
     if (country) params.append('country', country);
@@ -16,13 +24,17 @@ export class CartAPI {
     }
     
     const queryString = params.toString();
-    const url = queryString ? `/cart?${queryString}` : '/cart';
+    const url = queryString ? `/v1/cart?${queryString}` : '/v1/cart';
     
     return await apiClient.get(url, {
       headers: { 'Authorization': `Bearer ${access_token}` },
     });
   }
 
+  /**
+   * Add item to cart
+   * ACCESS: Authenticated - Requires user login
+   */
   static async addToCart(item: any, access_token: string) {
     const country = localStorage.getItem('detected_country') || 'US';
     const province = localStorage.getItem('detected_province');
@@ -34,13 +46,17 @@ export class CartAPI {
     }
     
     const queryString = params.toString();
-    const url = queryString ? `/cart/add?${queryString}` : '/cart/add';
+    const url = queryString ? `/v1/cart/add?${queryString}` : '/v1/cart/add';
     
     return await apiClient.post(url, item, {
       headers: { 'Authorization': `Bearer ${access_token}` },
     });
   }
 
+  /**
+   * Update cart item quantity
+   * ACCESS: Authenticated - Requires user login
+   */
   static async updateCartItem(itemId: string, quantity: number, access_token: string) {
     const country = localStorage.getItem('detected_country') || 'US';
     const province = localStorage.getItem('detected_province');
@@ -52,7 +68,7 @@ export class CartAPI {
     }
     
     const queryString = params.toString();
-    const url = queryString ? `/cart/items/${itemId}?${queryString}` : `/cart/items/${itemId}`;
+    const url = queryString ? `/v1/cart/items/${itemId}?${queryString}` : `/v1/cart/items/${itemId}`;
     
     return await apiClient.put(url, { quantity }, {
       headers: { 'Authorization': `Bearer ${access_token}` },
@@ -60,25 +76,25 @@ export class CartAPI {
   }
 
   static async removeFromCart(itemId: string, access_token: string) {
-    return await apiClient.delete(`/cart/items/${itemId}`, {
+    return await apiClient.delete(`/v1/cart/items/${itemId}`, {
       headers: { 'Authorization': `Bearer ${access_token}` },
     });
   }
 
   static async clearCart(access_token: string) {
-    return await apiClient.post('/cart/clear', {}, {
+    return await apiClient.post('/v1/cart/clear', {}, {
       headers: { 'Authorization': `Bearer ${access_token}` },
     });
   }
 
   static async applyPromocode(code: string, access_token: string) {
-    return await apiClient.post('/cart/promocode', { code }, {
+    return await apiClient.post('/v1/cart/promocode', { code }, {
       headers: { 'Authorization': `Bearer ${access_token}` },
     });
   }
 
   static async removePromocode(access_token: string) {
-    return await apiClient.delete('/cart/promocode', {
+    return await apiClient.delete('/v1/cart/promocode', {
       headers: { 'Authorization': `Bearer ${access_token}` },
     });
   }
@@ -89,7 +105,7 @@ export class CartAPI {
       throw new Error('Invalid variant ID provided');
     }
     
-    return await apiClient.get(`/inventory/check-stock/${variantId}?quantity=${quantity}`);
+    return await apiClient.get(`/v1/inventory/check-stock/${variantId}?quantity=${quantity}`);
   }
 
   /**
@@ -112,11 +128,11 @@ export class CartAPI {
       };
     });
     
-    return await apiClient.post('/inventory/check-stock/bulk', validatedItems);
+    return await apiClient.post('/v1/inventory/check-stock/bulk', validatedItems);
   }
 
   static async getCartItemCount(access_token) {
-    return await apiClient.get('/cart/count', {
+    return await apiClient.get('/v1/cart/count', {
       headers: { 'Authorization': `Bearer ${access_token}` },
     });
   }
@@ -132,7 +148,7 @@ export class CartAPI {
     }
     
     const queryString = params.toString();
-    const url = queryString ? `/cart/validate?${queryString}` : '/cart/validate';
+    const url = queryString ? `/v1/cart/validate?${queryString}` : '/v1/cart/validate';
     
     return await apiClient.post(url, {}, {
       headers: { 'Authorization': `Bearer ${access_token}` },

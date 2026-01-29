@@ -9,14 +9,14 @@ export class AdminAPI {
    * Get admin dashboard statistics
    */
   static async getAdminStats() {
-    return await apiClient.get('/admin/stats', {});
+    return await apiClient.get('/v1/admin/stats', {});
   }
 
   /**
    * Get platform overview
    */
   static async getPlatformOverview() {
-    return await apiClient.get('/admin/overview', {});
+    return await apiClient.get('/v1/admin/overview', {});
   }
 
   // User Management
@@ -40,7 +40,7 @@ export class AdminAPI {
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
 
-    const url = `/admin/users${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/v1/admin/users${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url, {});
   }
 
@@ -48,35 +48,35 @@ export class AdminAPI {
    * Get user details
    */
   static async getUser(userId: string) {
-    return await apiClient.get(`/admin/users/${userId}`, {});
+    return await apiClient.get(`/v1/admin/users/${userId}`, {});
   }
 
   /**
    * Update user
    */
   static async updateUser(userId: string, updates: any) {
-    return await apiClient.put(`/admin/users/${userId}`, updates, {});
+    return await apiClient.put(`/v1/admin/users/${userId}`, updates, {});
   }
 
   /**
    * Activate/Deactivate user
    */
   static async toggleUserStatus(userId: string, active: boolean) {
-    return await apiClient.put(`/admin/users/${userId}/status`, { active }, {});
+    return await apiClient.put(`/v1/admin/users/${userId}/status`, { active }, {});
   }
 
   /**
    * Verify user
    */
   static async verifyUser(userId: string) {
-    return await apiClient.put(`/admin/users/${userId}/verify`, {}, {});
+    return await apiClient.put(`/v1/admin/users/${userId}/verify`, {}, {});
   }
 
   /**
    * Delete user
    */
   static async deleteUser(userId: string) {
-    return await apiClient.delete(`/admin/users/${userId}`, {});
+    return await apiClient.delete(`/v1/admin/users/${userId}`, {});
   }
 
   /**
@@ -167,7 +167,7 @@ export class AdminAPI {
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
 
-    const url = `/admin/orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/v1/admin/orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url, {});
   }
 
@@ -202,21 +202,21 @@ export class AdminAPI {
    * Get order details
    */
   static async getOrder(orderId: string) {
-    return await apiClient.get(`/admin/orders/${orderId}`, {});
+    return await apiClient.get(`/v1/admin/orders/${orderId}`, {});
   }
 
   /**
    * Update order status
    */
   static async updateOrderStatus(orderId: string, status: string) {
-    return await apiClient.put(`/admin/orders/${orderId}/status`, { status }, {});
+    return await apiClient.put(`/v1/admin/orders/${orderId}/status`, { status }, {});
   }
 
   /**
    * Get order invoice (admin)
    */
   static async getOrderInvoice(orderId: string) {
-    await apiClient.download(`/admin/orders/${orderId}/invoice`, `invoice-${orderId}.pdf`);
+    await apiClient.download(`/v1/admin/orders/${orderId}/invoice`, `invoice-${orderId}.pdf`);
   }
 
   /**

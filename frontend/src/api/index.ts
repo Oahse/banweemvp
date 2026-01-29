@@ -17,7 +17,13 @@ export { default as AnalyticsAPI } from './analytics';
 export { default as AdminAPI } from './admin';
 export { default as ReviewsAPI } from './reviews';
 export { default as SubscriptionAPI } from './subscription';
+// SubscriptionsAPI consolidated into SubscriptionAPI
 export { default as CategoriesAPI } from './categories';
+export { default as PaymentsAPI } from './payments';
+export { default as ShippingAPI } from './shipping';
+export { default as WishlistAPI } from './wishlists';
+export { default as TaxAPI } from './tax';
+export { default as RefundsAPI } from './refunds';
 
 // Create a centralized API object for easy access
 import AuthAPI from './auth';
@@ -30,7 +36,13 @@ import AnalyticsAPI from './analytics';
 import AdminAPI from './admin';
 import ReviewsAPI from './reviews';
 import SubscriptionAPI from './subscription';
+// SubscriptionsAPI consolidated into SubscriptionAPI
 import CategoriesAPI from './categories';
+import PaymentsAPI from './payments';
+import ShippingAPI from './shipping';
+import WishlistAPI from './wishlists';
+import TaxAPI from './tax';
+import RefundsAPI from './refunds';
 import { apiClient } from './client';
 
 // Main API object - use apiClient directly for new code
@@ -49,7 +61,13 @@ export const API = {
   admin: AdminAPI,
   reviews: ReviewsAPI,
   subscription: SubscriptionAPI,
+  // subscriptions: consolidated into subscription
   categories: CategoriesAPI,
+  payments: PaymentsAPI,
+  shipping: ShippingAPI,
+  wishlists: WishlistAPI,
+  tax: TaxAPI,
+  refunds: RefundsAPI,
 };
 
 // Export the client as default for easy importing

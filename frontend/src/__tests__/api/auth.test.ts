@@ -1,248 +1,506 @@
 /**
- * Tests for Auth API
+ * Tests for Auth API - Comprehensive test suite aligned with backend reality
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import AuthAPI from '../../api/auth';
-import { apiClient } from '../../api/client';
-import { mockApiResponses, mockUser } from '../setup';
+import { AuthAPI } from '../../api/auth';
+import { apiClient, TokenManager } from '../../api/client';
 
-vi.mock('../../api/client');
+// Mock the API client
+vi.mock('../../api/client', () => ({
+  apiClient: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn()
+  },
+  TokenManager: {
+    setToken: vi.fn(),
+    setRefreshToken: vi.fn(),
+    setUser: vi.fn(),
+    clearTokens: vi.fn(),
+    getRefreshToken: vi.fn(),
+    isAuthenticated: vi.fn(),
+    getUser: vi.fn()
+  }
+}));
+
+const mockApiClient = vi.mocked(apiClient);
+const mockTokenManager = vi.mocked(TokenManager);
 
 describe('AuthAPI', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('login', () => {
-    it('should login successfully with valid credentials', async () => {
-      const mockResponse = mockApiResponses.auth.login;
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
+  describe('register', () => {
+    it('should register a new user with correct backend format', async () => {
+      const registerData = {
+        email: 'test@example.com',
+        password: 'password123',
+        firstname: 'John',
+        lastname: 'Doe'
+      };
 
-      const credentials = {
+      const mockResponse = {
+        success: true,
+        data: {
+          id: 'user123',
+          email: 'test@example.com',
+          firstname: 'John',
+          lastname: 'Doe'
+        },
+        message: 'User registered successfully'
+      };
+
+      mockApiClient.post.mockResolvedValue(mockResponse);
+
+      const result = await AuthAPI.register(registerData);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/v1/auth/register', registerData);
+      expect(result).toEqual(mockResponse);
+      // Should not set tokens automatically - let AuthContext handle it
+      expect(mockTokenManager.setToken).not.toHaveBeenCalled();
+    });
+
+    it('should handle registration errors', async () => {
+      const registerData = {
+        email: 'invalid-email',
+        password: '123',
+        firstname: 'John',
+        lastname: 'Doe'
+      };
+
+      const mockError = {
+        response: {
+          status: 422,
+          data: {
+            message: 'Validation error',
+            details: {
+              email: ['Invalid email format'],
+              password: ['Password must be at least 8 characters']
+            }
+          }
+        }
+      };
+
+      mockApiClient.post.mockRejectedValue(mockError);
+
+      await expect(AuthAPI.register(registerData)).rejects.toEqual(mockError);
+    });
+  });
+
+  describe('login', () => {
+    it('should login user with correct backend format', async () => {
+      const loginData = {
         email: 'test@example.com',
         password: 'password123'
       };
 
-      const result = await AuthAPI.login(credentials);
+      const mockResponse = {
+        success: true,
+        data: {
+          access_token: 'token123',
+          refresh_token: 'refresh123',
+          user: {
+            id: 'user123',
+            email: 'test@example.com',
+            firstname: 'John',
+            lastname: 'Doe'
+          }
+        },
+        message: 'Login successful'
+      };
 
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/login', credentials);
+      mockApiClient.post.mockResolvedValue(mockResponse);
+
+      const result = await AuthAPI.login(loginData);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/v1/auth/login', loginData);
       expect(result).toEqual(mockResponse);
+      // Should not set tokens automatically - let AuthContext handle it
+      expect(mockTokenManager.setToken).not.toHaveBeenCalled();
     });
 
-    it('should handle login failure', async () => {
-      const errorResponse = {
-        response: {
-          status: 401,
-          data: { message: 'Invalid credentials' }
-        }
-      };
-      vi.mocked(apiClient.post).mockRejectedValue(errorResponse);
-
-      const credentials = {
+    it('should handle login errors', async () => {
+      const loginData = {
         email: 'test@example.com',
         password: 'wrongpassword'
       };
 
-      await expect(AuthAPI.login(credentials)).rejects.toThrow();
-    });
-  });
-
-  describe('register', () => {
-    it('should register user successfully', async () => {
-      const mockResponse = mockApiResponses.auth.register;
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
-
-      const userData = {
-        email: 'newuser@example.com',
-        username: 'newuser',
-        first_name: 'New',
-        last_name: 'User',
-        password: 'password123'
-      };
-
-      const result = await AuthAPI.register(userData);
-
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/register', userData);
-      expect(result).toEqual(mockResponse);
-    });
-
-    it('should handle registration with existing email', async () => {
-      const errorResponse = {
-        response: {
-          status: 400,
-          data: { message: 'Email already registered' }
-        }
-      };
-      vi.mocked(apiClient.post).mockRejectedValue(errorResponse);
-
-      const userData = {
-        email: 'existing@example.com',
-        username: 'existinguser',
-        first_name: 'Existing',
-        last_name: 'User',
-        password: 'password123'
-      };
-
-      await expect(AuthAPI.register(userData)).rejects.toThrow();
-    });
-  });
-
-  describe('refreshToken', () => {
-    it('should refresh token successfully', async () => {
-      const mockResponse = {
-        access_token: 'new_access_token',
-        token_type: 'bearer'
-      };
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
-
-      const refreshToken = 'valid_refresh_token';
-      const result = await AuthAPI.refreshToken(refreshToken);
-
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/refresh', {
-        refresh_token: refreshToken
-      });
-      expect(result).toEqual(mockResponse);
-    });
-
-    it('should handle invalid refresh token', async () => {
-      const errorResponse = {
+      const mockError = {
         response: {
           status: 401,
-          data: { message: 'Invalid refresh token' }
+          data: {
+            message: 'Invalid credentials'
+          }
         }
       };
-      vi.mocked(apiClient.post).mockRejectedValue(errorResponse);
 
-      const refreshToken = 'invalid_refresh_token';
+      mockApiClient.post.mockRejectedValue(mockError);
 
-      await expect(AuthAPI.refreshToken(refreshToken)).rejects.toThrow();
-    });
-  });
-
-  describe('forgotPassword', () => {
-    it('should send password reset email', async () => {
-      const mockResponse = { message: 'Password reset email sent' };
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
-
-      const email = 'test@example.com';
-      const result = await AuthAPI.forgotPassword(email);
-
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/forgot-password', {
-        email
-      });
-      expect(result).toEqual(mockResponse);
-    });
-  });
-
-  describe('resetPassword', () => {
-    it('should reset password with valid token', async () => {
-      const mockResponse = { message: 'Password reset successful' };
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
-
-      const token = 'valid_reset_token';
-      const newPassword = 'newpassword123';
-      const result = await AuthAPI.resetPassword(token, newPassword);
-
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/reset-password', {
-        token,
-        new_password: newPassword
-      });
-      expect(result).toEqual(mockResponse);
-    });
-  });
-
-  describe('verifyEmail', () => {
-    it('should verify email with valid token', async () => {
-      const mockResponse = { message: 'Email verified successfully' };
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
-
-      const token = 'valid_verification_token';
-      const result = await AuthAPI.verifyEmail(token);
-
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/verify-email', {
-        token
-      });
-      expect(result).toEqual(mockResponse);
+      await expect(AuthAPI.login(loginData)).rejects.toEqual(mockError);
     });
   });
 
   describe('logout', () => {
-    it('should logout successfully', async () => {
-      const mockResponse = { message: 'Logged out successfully' };
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
+    it('should logout user and clear tokens', async () => {
+      mockApiClient.post.mockResolvedValue({ success: true });
 
-      const result = await AuthAPI.logout();
+      await AuthAPI.logout();
 
-      expect(apiClient.post).toHaveBeenCalledWith('/auth/logout');
-      expect(result).toEqual(mockResponse);
+      expect(mockApiClient.post).toHaveBeenCalledWith('/v1/auth/logout');
+      expect(mockTokenManager.clearTokens).toHaveBeenCalled();
+    });
+
+    it('should clear tokens even if API call fails', async () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      mockApiClient.post.mockRejectedValue(new Error('Network error'));
+
+      await AuthAPI.logout();
+
+      expect(mockTokenManager.clearTokens).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith('Logout API call failed:', expect.any(Error));
+      
+      consoleSpy.mockRestore();
     });
   });
 
   describe('getProfile', () => {
-    it('should get user profile', async () => {
-      const mockResponse = mockApiResponses.auth.profile;
-      vi.mocked(apiClient.get).mockResolvedValue({ data: mockResponse });
+    it('should get user profile with correct backend format', async () => {
+      const mockResponse = {
+        success: true,
+        data: {
+          id: 'user123',
+          email: 'test@example.com',
+          firstname: 'John',
+          lastname: 'Doe',
+          full_name: 'John Doe',
+          phone: '+1234567890',
+          role: 'Customer',
+          verified: true,
+          is_active: true,
+          created_at: '2024-01-01T00:00:00Z'
+        }
+      };
+
+      mockApiClient.get.mockResolvedValue(mockResponse);
 
       const result = await AuthAPI.getProfile();
 
-      expect(apiClient.get).toHaveBeenCalledWith('/user/profile');
+      expect(mockApiClient.get).toHaveBeenCalledWith('/v1/auth/profile');
       expect(result).toEqual(mockResponse);
     });
   });
 
   describe('updateProfile', () => {
-    it('should update user profile', async () => {
-      const updatedUser = { ...mockUser, first_name: 'Updated' };
-      vi.mocked(apiClient.put).mockResolvedValue({ data: updatedUser });
+    it('should update user profile and store updated user data', async () => {
+      const profileData = {
+        firstname: 'Jane',
+        lastname: 'Smith',
+        email: 'jane@example.com'
+      };
 
-      const updateData = { first_name: 'Updated' };
-      const result = await AuthAPI.updateProfile(updateData);
+      const mockResponse = {
+        success: true,
+        data: {
+          id: 'user123',
+          email: 'jane@example.com',
+          firstname: 'Jane',
+          lastname: 'Smith',
+          full_name: 'Jane Smith'
+        },
+        message: 'Profile updated successfully'
+      };
 
-      expect(apiClient.put).toHaveBeenCalledWith('/user/profile', updateData);
-      expect(result).toEqual(updatedUser);
+      mockApiClient.put.mockResolvedValue(mockResponse);
+
+      const result = await AuthAPI.updateProfile(profileData);
+
+      expect(mockApiClient.put).toHaveBeenCalledWith('/v1/auth/profile', profileData);
+      expect(mockTokenManager.setUser).toHaveBeenCalledWith(mockResponse.data);
+      expect(result).toEqual(mockResponse);
     });
   });
 
   describe('changePassword', () => {
-    it('should change password successfully', async () => {
-      const mockResponse = { message: 'Password changed successfully' };
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
-
+    it('should change password with correct format', async () => {
       const passwordData = {
         current_password: 'oldpassword',
         new_password: 'newpassword123'
       };
+
+      const mockResponse = {
+        success: true,
+        message: 'Password changed successfully'
+      };
+
+      mockApiClient.put.mockResolvedValue(mockResponse);
+
       const result = await AuthAPI.changePassword(passwordData);
 
-      expect(apiClient.post).toHaveBeenCalledWith('/user/change-password', passwordData);
+      expect(mockApiClient.put).toHaveBeenCalledWith('/v1/auth/change-password', passwordData);
       expect(result).toEqual(mockResponse);
     });
   });
 
-  describe('deactivateAccount', () => {
-    it('should deactivate account successfully', async () => {
-      const mockResponse = { message: 'Account deactivated successfully' };
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
+  describe('requestPasswordReset', () => {
+    it('should request password reset', async () => {
+      const email = 'test@example.com';
+      const mockResponse = {
+        success: true,
+        message: 'Password reset email sent'
+      };
 
-      const password = 'currentpassword';
-      const result = await AuthAPI.deactivateAccount(password);
+      mockApiClient.post.mockResolvedValue(mockResponse);
 
-      expect(apiClient.post).toHaveBeenCalledWith('/user/deactivate', {
-        password
+      const result = await AuthAPI.requestPasswordReset(email);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/v1/auth/forgot-password', { email });
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('forgotPassword', () => {
+    it('should be an alias for requestPasswordReset', async () => {
+      const email = 'test@example.com';
+      const mockResponse = {
+        success: true,
+        message: 'Password reset email sent'
+      };
+
+      mockApiClient.post.mockResolvedValue(mockResponse);
+
+      const result = await AuthAPI.forgotPassword(email);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/v1/auth/forgot-password', { email });
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should reset password with token', async () => {
+      const resetData = {
+        token: 'reset-token-123',
+        password: 'newpassword123'
+      };
+
+      const mockResponse = {
+        success: true,
+        message: 'Password reset successfully'
+      };
+
+      mockApiClient.post.mockResolvedValue(mockResponse);
+
+      const result = await AuthAPI.resetPassword(resetData);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/v1/auth/reset-password', resetData);
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('verifyEmail', () => {
+    it('should verify email with token', async () => {
+      const token = 'verify-token-123';
+      const mockResponse = {
+        success: true,
+        message: 'Email verified successfully'
+      };
+
+      mockApiClient.get.mockResolvedValue(mockResponse);
+
+      const result = await AuthAPI.verifyEmail(token);
+
+      expect(mockApiClient.get).toHaveBeenCalledWith(`/v1/auth/verify-email?token=${token}`);
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('refreshToken', () => {
+    it('should refresh access token', async () => {
+      const refreshToken = 'refresh123';
+      mockTokenManager.getRefreshToken.mockReturnValue(refreshToken);
+
+      const mockResponse = {
+        success: true,
+        data: {
+          access_token: 'new-token-123'
+        },
+        message: 'Token refreshed successfully'
+      };
+
+      mockApiClient.post.mockResolvedValue(mockResponse);
+
+      const result = await AuthAPI.refreshToken();
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/v1/auth/refresh', {
+        refresh_token: refreshToken
       });
+      expect(mockTokenManager.setToken).toHaveBeenCalledWith('new-token-123');
       expect(result).toEqual(mockResponse);
+    });
+
+    it('should throw error if no refresh token available', async () => {
+      mockTokenManager.getRefreshToken.mockReturnValue(null);
+
+      await expect(AuthAPI.refreshToken()).rejects.toThrow('No refresh token available');
+    });
+
+    it('should clear tokens on refresh failure', async () => {
+      const refreshToken = 'refresh123';
+      mockTokenManager.getRefreshToken.mockReturnValue(refreshToken);
+      mockApiClient.post.mockRejectedValue(new Error('Invalid refresh token'));
+
+      await expect(AuthAPI.refreshToken()).rejects.toThrow('Invalid refresh token');
+      expect(mockTokenManager.clearTokens).toHaveBeenCalled();
     });
   });
 
-  describe('exportUserData', () => {
-    it('should export user data successfully', async () => {
-      const mockResponse = { download_url: 'https://example.com/export.zip' };
-      vi.mocked(apiClient.post).mockResolvedValue({ data: mockResponse });
+  describe('Address Management', () => {
+    describe('getAddresses', () => {
+      it('should get user addresses', async () => {
+        const mockResponse = {
+          success: true,
+          data: [
+            {
+              id: 'addr123',
+              street: '123 Main St',
+              city: 'New York',
+              state: 'NY',
+              postal_code: '10001',
+              country: 'US'
+            }
+          ]
+        };
 
-      const result = await AuthAPI.exportUserData();
+        mockApiClient.get.mockResolvedValue(mockResponse);
 
-      expect(apiClient.post).toHaveBeenCalledWith('/user/export-data');
-      expect(result).toEqual(mockResponse);
+        const result = await AuthAPI.getAddresses();
+
+        expect(mockApiClient.get).toHaveBeenCalledWith('/v1/auth/addresses');
+        expect(result).toEqual(mockResponse);
+      });
+    });
+
+    describe('createAddress', () => {
+      it('should create new address', async () => {
+        const addressData = {
+          street: '456 Oak Ave',
+          city: 'Los Angeles',
+          state: 'CA',
+          postal_code: '90210',
+          country: 'US'
+        };
+
+        const mockResponse = {
+          success: true,
+          data: {
+            id: 'addr456',
+            ...addressData
+          },
+          message: 'Address created successfully'
+        };
+
+        mockApiClient.post.mockResolvedValue(mockResponse);
+
+        const result = await AuthAPI.createAddress(addressData);
+
+        expect(mockApiClient.post).toHaveBeenCalledWith('/v1/auth/addresses', addressData);
+        expect(result).toEqual(mockResponse);
+      });
+    });
+
+    describe('updateAddress', () => {
+      it('should update existing address', async () => {
+        const addressId = 'addr123';
+        const addressData = {
+          street: '789 Pine St'
+        };
+
+        const mockResponse = {
+          success: true,
+          data: {
+            id: addressId,
+            street: '789 Pine St',
+            city: 'New York',
+            state: 'NY'
+          },
+          message: 'Address updated successfully'
+        };
+
+        mockApiClient.put.mockResolvedValue(mockResponse);
+
+        const result = await AuthAPI.updateAddress(addressId, addressData);
+
+        expect(mockApiClient.put).toHaveBeenCalledWith(`/v1/auth/addresses/${addressId}`, addressData);
+        expect(result).toEqual(mockResponse);
+      });
+    });
+
+    describe('deleteAddress', () => {
+      it('should delete address', async () => {
+        const addressId = 'addr123';
+        const mockResponse = {
+          success: true,
+          message: 'Address deleted successfully'
+        };
+
+        mockApiClient.delete.mockResolvedValue(mockResponse);
+
+        const result = await AuthAPI.deleteAddress(addressId);
+
+        expect(mockApiClient.delete).toHaveBeenCalledWith(`/v1/auth/addresses/${addressId}`);
+        expect(result).toEqual(mockResponse);
+      });
+    });
+  });
+
+  describe('Utility Methods', () => {
+    describe('isAuthenticated', () => {
+      it('should return authentication status from TokenManager', () => {
+        mockTokenManager.isAuthenticated.mockReturnValue(true);
+
+        const result = AuthAPI.isAuthenticated();
+
+        expect(mockTokenManager.isAuthenticated).toHaveBeenCalled();
+        expect(result).toBe(true);
+      });
+    });
+
+    describe('getCurrentUser', () => {
+      it('should return current user from TokenManager', () => {
+        const mockUser = {
+          id: 'user123',
+          email: 'test@example.com',
+          firstname: 'John'
+        };
+
+        mockTokenManager.getUser.mockReturnValue(mockUser);
+
+        const result = AuthAPI.getCurrentUser();
+
+        expect(mockTokenManager.getUser).toHaveBeenCalled();
+        expect(result).toEqual(mockUser);
+      });
+    });
+
+    describe('deleteAccount', () => {
+      it('should delete user account and clear tokens', async () => {
+        const password = 'password123';
+        const mockResponse = {
+          success: true,
+          message: 'Account deleted successfully'
+        };
+
+        mockApiClient.delete.mockResolvedValue(mockResponse);
+
+        const result = await AuthAPI.deleteAccount(password);
+
+        expect(mockApiClient.delete).toHaveBeenCalledWith('/v1/users', {
+          data: { password }
+        });
+        expect(mockTokenManager.clearTokens).toHaveBeenCalled();
+        expect(result).toEqual(mockResponse);
+      });
     });
   });
 });

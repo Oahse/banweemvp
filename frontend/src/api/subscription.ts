@@ -1,4 +1,11 @@
+/**
+ * Consolidated Subscription API
+ * Handles all subscription-related API calls with comprehensive error handling and retry logic
+ */
+
 import { apiClient } from './client';
+
+// === INTERFACES ===
 
 // API Error interface
 export interface APIError {
@@ -20,6 +27,128 @@ interface RetryConfig {
   retryDelay: number;
   retryCondition?: (error: APIError) => boolean;
 }
+
+// Enhanced subscription interface with product management support
+export interface Subscription {
+  id: string;
+  plan_id: string;
+  status: 'active' | 'cancelled' | 'paused';
+  price: number;
+  currency: string;
+  billing_cycle: 'weekly' | 'monthly' | 'yearly';
+  auto_renew: boolean;
+  next_billing_date?: string;
+  created_at: string;
+  updated_at?: string;
+  products?: Array<{
+    id: string;
+    name: string;
+    price: number;
+    current_price?: number;
+    image?: string;
+  }>;
+  variant_quantities?: { [variantId: string]: number };
+  cost_breakdown?: {
+    subtotal: number;
+    shipping_cost: number;
+    tax_amount: number;
+    tax_rate: number;
+    total_amount: number;
+    currency: string;
+    product_variants?: Array<{
+      variant_id: string;
+      name: string;
+      price: number;
+      quantity: number;
+    }>;
+  };
+  // Simplified cost fields
+  shipping_cost?: number;
+  tax_amount?: number;
+  tax_rate?: number;
+  discounts?: AppliedDiscount[];
+  subtotal?: number;
+  total?: number;
+}
+
+// Subscription product interface
+export interface SubscriptionProduct {
+  id: string;
+  subscription_id: string;
+  product_id: string;
+  variant_id: string;
+  name: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  image?: string;
+  added_at: string;
+}
+
+// Applied discount interface
+export interface AppliedDiscount {
+  id: string;
+  subscription_id: string;
+  discount_id: string;
+  discount_code: string;
+  discount_type: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_SHIPPING';
+  discount_amount: number;
+  applied_at: string;
+}
+
+// Request interfaces
+export interface CreateSubscriptionRequest {
+  plan_id: string;
+  product_variant_ids: string[];
+  variant_quantities?: { [variantId: string]: number };
+  delivery_type?: 'standard' | 'express' | 'overnight';
+  delivery_address_id?: string;
+  payment_method_id?: string;
+  currency?: string;
+  billing_cycle?: 'weekly' | 'monthly' | 'yearly';
+  auto_renew?: boolean;
+}
+
+export interface UpdateSubscriptionRequest {
+  plan_id?: string;
+  product_variant_ids?: string[];
+  delivery_type?: 'standard' | 'express' | 'overnight';
+  delivery_address_id?: string;
+  billing_cycle?: 'weekly' | 'monthly' | 'yearly';
+  auto_renew?: boolean;
+  pause_reason?: string;
+}
+
+export interface CostCalculationRequest {
+  variant_ids: string[];
+  delivery_type?: 'standard' | 'express' | 'overnight';
+  delivery_address_id?: string;
+  currency?: string;
+}
+
+// Response interfaces
+export interface SubscriptionDetailsResponse {
+  subscription: Subscription;
+  products: SubscriptionProduct[];
+  discounts: AppliedDiscount[];
+}
+
+export interface DiscountResponse {
+  success: boolean;
+  discount: AppliedDiscount;
+  updated_subscription: Subscription;
+  message?: string;
+}
+
+export interface SubscriptionListResponse {
+  subscriptions: Subscription[];
+  total: number;
+  page: number;
+  limit: number;
+  has_more: boolean;
+}
+
+// === UTILITY FUNCTIONS ===
 
 // Default retry configuration
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
@@ -61,408 +190,336 @@ async function withErrorHandling<T>(
   throw lastError!;
 }
 
-// Enhanced subscription interface with product management support
-export interface Subscription {
-  id: string;
-  plan_id: string;
-  status: 'active' | 'cancelled' | 'paused';
-  price: number;
-  currency: string;
-  billing_cycle: 'weekly' | 'monthly' | 'yearly';
-  auto_renew: boolean;
-  next_billing_date?: string;
-  created_at: string;
-  products?: Array<{
-    id: string;
-    name: string;
-    price: number;
-    current_price?: number;
-    image?: string;
-  }>;
-  variant_quantities?: { [variantId: string]: number };
-  cost_breakdown?: {
-    subtotal: number;
-    shipping_cost: number; // Updated field name
-    tax_amount: number;
-    tax_rate: number;
-    total_amount: number;
-    currency: string;
-    product_variants?: Array<{
-      variant_id: string;
-      name: string;
-      price: number;
-      quantity: number;
-    }>;
-  };
-  // Simplified cost fields - using new field names
-  shipping_cost?: number; // Updated field name
-  tax_amount?: number;
-  tax_rate?: number;
-  // Enhanced fields for product management
-  discounts?: AppliedDiscount[];
-  subtotal?: number;
-  total?: number;
-}
+// === SUBSCRIPTION API CLASS ===
 
-// Subscription product interface
-export interface SubscriptionProduct {
-  id: string;
-  subscription_id: string;
-  product_id: string;
-  name: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-  image?: string;
-  added_at: string;
-}
+export class SubscriptionAPI {
+  // === ADMIN ENDPOINTS ===
 
-// Applied discount interface
-export interface AppliedDiscount {
-  id: string;
-  subscription_id: string;
-  discount_id: string;
-  discount_code: string;
-  discount_type: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_SHIPPING';
-  discount_amount: number;
-  applied_at: string;
-}
-
-// Discount application request
-export interface DiscountApplicationRequest {
-  discount_code: string;
-}
-
-// Discount application response
-export interface DiscountResponse {
-  success: boolean;
-  discount: AppliedDiscount;
-  updated_subscription: Subscription;
-  message?: string;
-}
-
-// Subscription details response for modal
-export interface SubscriptionDetailsResponse {
-  subscription: Subscription;
-  products: SubscriptionProduct[];
-  discounts: AppliedDiscount[];
-}
-
-// Create subscription request
-export interface CreateSubscriptionRequest {
-  plan_id: string;
-  product_variant_ids: string[];
-  variant_quantities?: { [variantId: string]: number };
-  delivery_type?: 'standard' | 'express' | 'overnight';
-  delivery_address_id?: string;
-  payment_method_id?: string;
-  currency?: string;
-  billing_cycle?: 'weekly' | 'monthly' | 'yearly';
-  auto_renew?: boolean;
-}
-
-// Update subscription request
-export interface UpdateSubscriptionRequest {
-  plan_id?: string;
-  product_variant_ids?: string[];
-  delivery_type?: 'standard' | 'express' | 'overnight';
-  delivery_address_id?: string;
-  billing_cycle?: 'weekly' | 'monthly' | 'yearly';
-  auto_renew?: boolean;
-  pause_reason?: string;
-}
-
-// Cost calculation request
-export interface CostCalculationRequest {
-  variant_ids: string[];
-  delivery_type?: 'standard' | 'express' | 'overnight';
-  delivery_address_id?: string;
-  currency?: string;
-}
-
-// === ADMIN ENDPOINTS ===
-
-// Trigger order processing (admin only)
-export const triggerOrderProcessing = async () => {
-  const response = await apiClient.post('/subscriptions/trigger-order-processing', {}, {});
-  return response;
-};
-
-// Trigger notifications (admin only)
-export const triggerNotifications = async () => {
-  const response = await apiClient.post('/subscriptions/trigger-notifications', {}, {});
-  return response;
-};
-
-// === COST CALCULATION ===
-
-// Calculate subscription cost
-export const calculateCost = async (request: CostCalculationRequest) => {
-  const response = await apiClient.post('/subscriptions/calculate-cost', request, {});
-  return response;
-};
-
-// === SUBSCRIPTION CRUD ===
-
-// Create subscription
-export const createSubscription = async (request: CreateSubscriptionRequest) => {
-  try {
-    const response = await apiClient.post('/subscriptions', request, {});
-    return response; // Return response directly since apiClient already extracts .data
-  } catch (error) {
-    console.error('Error creating subscription:', error);
-    throw error;
+  /**
+   * Trigger order processing (admin only)
+   */
+  static async triggerOrderProcessing() {
+    return await apiClient.post('/subscriptions/trigger-order-processing', {});
   }
-};
 
-// Get all subscriptions
-export const getSubscriptions = async (page: number = 1, limit: number = 10): Promise<{
-  subscriptions: Subscription[];
-  total: number;
-  page: number;
-  limit: number;
-  has_more: boolean;
-}> => {
-  const response = await apiClient.get('/subscriptions', { params: { page, limit } });
-  return response; // Backend returns { subscriptions: [...], total: 10, page: 1, limit: 10, has_more: false }
-};
-
-// Get user subscriptions
-export const getUserSubscriptions = async (page: number = 1, limit: number = 10) => {
-  try {
-    const response = await apiClient.get('/subscriptions', { params: { page, limit } });
-    console.log(response,'response===+++')
-    return response;
-  } catch (error) {
-    console.error('Error fetching user subscriptions:', error);
-    throw error;
+  /**
+   * Trigger notifications (admin only)
+   */
+  static async triggerNotifications() {
+    return await apiClient.post('/subscriptions/trigger-notifications', {});
   }
-};
 
-// Get one subscription
-export const getSubscription = async (id: string): Promise<Subscription> => {
-  return withErrorHandling(async () => {
-    const response = await apiClient.get(`/subscriptions/${id}`, {});
-    console.log(response,'response===+++')
-    return response;
-  });
-};
+  // === COST CALCULATION ===
 
-// Update subscription
-export const updateSubscription = async (id: string, request: UpdateSubscriptionRequest) => {
-  return withErrorHandling(async () => {
-    const response = await apiClient.put(`/subscriptions/${id}`, request, {});
-    return response; // Return response directly since apiClient already extracts .data
-  });
-};
+  /**
+   * Calculate subscription cost
+   */
+  static async calculateCost(request: CostCalculationRequest) {
+    return await apiClient.post('/subscriptions/calculate-cost', request);
+  }
 
-// Delete/Cancel subscription
-export const cancelSubscription = async (id: string, reason?: string) => {
-  return withErrorHandling(async () => {
-    const data = reason ? { reason } : {};
-    const response = await apiClient.delete(`/subscriptions/${id}`, { data });
-    return response;
-  });
-};
+  // === SUBSCRIPTION CRUD ===
 
-// Activate subscription (uses resume endpoint which handles both resume and activate)
-export const activateSubscription = async (id: string) => {
-  const response = await apiClient.post(`/subscriptions/${id}/resume`, {}, {});
-  return response;
-};
+  /**
+   * Create new subscription
+   */
+  static async createSubscription(request: CreateSubscriptionRequest): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.post('/subscriptions', request);
+      return response;
+    });
+  }
 
-// Deprecated aliases - use addProducts and removeProducts directly
-export const addProductsToSubscription = addProducts;
-export const removeProductsFromSubscription = removeProducts;
+  /**
+   * Get all user subscriptions with pagination
+   */
+  static async getSubscriptions(params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<SubscriptionListResponse> {
+    const queryParams = {
+      page: params?.page || 1,
+      limit: params?.limit || 10
+    };
 
-// === PRODUCT MANAGEMENT ===
+    return await apiClient.get('/subscriptions', { params: queryParams });
+  }
 
-// Add products to subscription
-export const addProducts = async (id: string, variantIds: string[]) => {
-  const response = await apiClient.post(`/subscriptions/${id}/products`, { 
-    variant_ids: variantIds 
-  }, {});
-  return response; // Return response directly since apiClient already extracts .data
-};
+  /**
+   * Get subscription by ID
+   */
+  static async getSubscription(subscriptionId: string): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.get(`/subscriptions/${subscriptionId}`);
+      return response;
+    });
+  }
 
-// Remove products from subscription
-export const removeProducts = async (id: string, variantIds: string[]) => {
-  const response = await apiClient.delete(`/subscriptions/${id}/products`, { 
-    data: { variant_ids: variantIds } 
-  });
-  return response; // Return response directly since apiClient already extracts .data
-};
+  /**
+   * Update subscription
+   */
+  static async updateSubscription(subscriptionId: string, request: UpdateSubscriptionRequest): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.put(`/subscriptions/${subscriptionId}`, request);
+      return response;
+    });
+  }
 
-// Remove single product from subscription (new method for product management)
-export const removeProduct = async (subscriptionId: string, productId: string): Promise<Subscription> => {
-  return withErrorHandling(async () => {
-    const response = await apiClient.delete(`/subscriptions/${subscriptionId}/products/${productId}`, {});
-    return response;
-  });
-};
+  /**
+   * Cancel subscription
+   */
+  static async cancelSubscription(subscriptionId: string, reason?: string) {
+    return withErrorHandling(async () => {
+      const data = reason ? { reason } : {};
+      const response = await apiClient.delete(`/subscriptions/${subscriptionId}`, { data });
+      return response;
+    });
+  }
 
-// Get subscription details for modal (new method)
-export const getSubscriptionDetails = async (subscriptionId: string): Promise<SubscriptionDetailsResponse> => {
-  return withErrorHandling(async () => {
-    const response = await apiClient.get(`/subscriptions/${subscriptionId}/details`, {});
-    return response;
-  });
-};
+  // === SUBSCRIPTION LIFECYCLE ===
 
-// === DISCOUNT MANAGEMENT ===
+  /**
+   * Pause subscription
+   */
+  static async pauseSubscription(subscriptionId: string, reason?: string) {
+    const data = reason ? { pause_reason: reason } : {};
+    return await apiClient.post(`/subscriptions/${subscriptionId}/pause`, data);
+  }
 
-// Apply discount to subscription (new method)
-export const applyDiscount = async (subscriptionId: string, discountCode: string): Promise<DiscountResponse> => {
-  return withErrorHandling(async () => {
-    const response = await apiClient.post(`/subscriptions/${subscriptionId}/discounts`, {
-      discount_code: discountCode
-    }, {});
-    return response;
-  }, {
-    ...DEFAULT_RETRY_CONFIG,
-    retryCondition: (error) => {
-      // Don't retry on validation errors (400, 422) or not found (404)
-      if (error.statusCode === 400 || error.statusCode === 422 || error.statusCode === 404) {
-        return false;
+  /**
+   * Resume subscription
+   */
+  static async resumeSubscription(subscriptionId: string) {
+    return await apiClient.post(`/subscriptions/${subscriptionId}/resume`, {});
+  }
+
+  /**
+   * Activate subscription (alias for resume)
+   */
+  static async activateSubscription(subscriptionId: string) {
+    return this.resumeSubscription(subscriptionId);
+  }
+
+  // === PRODUCT MANAGEMENT ===
+
+  /**
+   * Add products to subscription
+   */
+  static async addProducts(subscriptionId: string, variantIds: string[]): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.post(`/subscriptions/${subscriptionId}/products`, { 
+        variant_ids: variantIds 
+      });
+      return response;
+    });
+  }
+
+  /**
+   * Remove products from subscription
+   */
+  static async removeProducts(subscriptionId: string, variantIds: string[]): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.delete(`/subscriptions/${subscriptionId}/products`, { 
+        data: { variant_ids: variantIds } 
+      });
+      return response;
+    });
+  }
+
+  /**
+   * Remove single product from subscription
+   */
+  static async removeProduct(subscriptionId: string, productId: string): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.delete(`/subscriptions/${subscriptionId}/products/${productId}`);
+      return response;
+    });
+  }
+
+  /**
+   * Get subscription details with products and discounts
+   */
+  static async getSubscriptionDetails(subscriptionId: string): Promise<SubscriptionDetailsResponse> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.get(`/subscriptions/${subscriptionId}/details`);
+      return response;
+    });
+  }
+
+  // === QUANTITY MANAGEMENT ===
+
+  /**
+   * Update variant quantity (set specific amount)
+   */
+  static async updateVariantQuantity(subscriptionId: string, variantId: string, quantity: number): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.put(`/subscriptions/${subscriptionId}/products/quantity`, {
+        variant_id: variantId,
+        quantity: quantity
+      });
+      return response;
+    });
+  }
+
+  /**
+   * Change variant quantity (increment/decrement)
+   */
+  static async changeVariantQuantity(subscriptionId: string, variantId: string, change: number): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.patch(`/subscriptions/${subscriptionId}/products/quantity`, {
+        variant_id: variantId,
+        change: change
+      });
+      return response;
+    });
+  }
+
+  /**
+   * Get variant quantities
+   */
+  static async getVariantQuantities(subscriptionId: string) {
+    return await apiClient.get(`/subscriptions/${subscriptionId}/products/quantities`);
+  }
+
+  /**
+   * Increment quantity by 1
+   */
+  static async incrementQuantity(subscriptionId: string, variantId: string): Promise<Subscription> {
+    return this.changeVariantQuantity(subscriptionId, variantId, 1);
+  }
+
+  /**
+   * Decrement quantity by 1
+   */
+  static async decrementQuantity(subscriptionId: string, variantId: string): Promise<Subscription> {
+    return this.changeVariantQuantity(subscriptionId, variantId, -1);
+  }
+
+  // === DISCOUNT MANAGEMENT ===
+
+  /**
+   * Apply discount to subscription
+   */
+  static async applyDiscount(subscriptionId: string, discountCode: string): Promise<DiscountResponse> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.post(`/subscriptions/${subscriptionId}/discounts`, {
+        discount_code: discountCode
+      });
+      return response;
+    }, {
+      ...DEFAULT_RETRY_CONFIG,
+      retryCondition: (error) => {
+        // Don't retry on validation errors (400, 422) or not found (404)
+        if (error.statusCode === 400 || error.statusCode === 422 || error.statusCode === 404) {
+          return false;
+        }
+        return DEFAULT_RETRY_CONFIG.retryCondition!(error);
       }
-      return DEFAULT_RETRY_CONFIG.retryCondition!(error);
-    }
-  });
-};
+    });
+  }
 
-// Remove discount from subscription (new method)
-export const removeDiscount = async (subscriptionId: string, discountId: string): Promise<Subscription> => {
-  return withErrorHandling(async () => {
-    const response = await apiClient.delete(`/subscriptions/${subscriptionId}/discounts/${discountId}`, {});
-    return response;
-  });
-};
+  /**
+   * Remove discount from subscription
+   */
+  static async removeDiscount(subscriptionId: string, discountId: string): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.delete(`/subscriptions/${subscriptionId}/discounts/${discountId}`);
+      return response;
+    });
+  }
 
-// === QUANTITY MANAGEMENT ===
+  // === AUTO-RENEW MANAGEMENT ===
 
-// Update variant quantity (set specific amount)
-export const updateQuantity = async (id: string, variantId: string, quantity: number) => {
-  const response = await apiClient.put(`/subscriptions/${id}/products/quantity`, {
-    variant_id: variantId,
-    quantity: quantity
-  }, {});
-  return response;
-};
+  /**
+   * Toggle auto-renew
+   */
+  static async toggleAutoRenew(subscriptionId: string, autoRenew: boolean): Promise<Subscription> {
+    return withErrorHandling(async () => {
+      const response = await apiClient.patch(`/subscriptions/${subscriptionId}/auto-renew`, { 
+        auto_renew: autoRenew 
+      });
+      return response;
+    });
+  }
 
-// Change variant quantity (increment/decrement)
-export const changeQuantity = async (id: string, variantId: string, change: number) => {
-  const response = await apiClient.patch(`/subscriptions/${id}/products/quantity`, {
-    variant_id: variantId,
-    change: change
-  }, {});
-  return response;
-};
+  // === ORDERS & SHIPMENTS ===
 
-// Get all variant quantities
-export const getQuantities = async (id: string) => {
-  const response = await apiClient.get(`/subscriptions/${id}/products/quantities`, {});
-  return response;
-};
+  /**
+   * Get subscription orders
+   */
+  static async getSubscriptionOrders(subscriptionId: string, params?: {
+    page?: number;
+    limit?: number;
+  }) {
+    const queryParams = {
+      page: params?.page || 1,
+      limit: params?.limit || 10
+    };
 
-// === AUTO-RENEW MANAGEMENT ===
+    return await apiClient.get(`/subscriptions/${subscriptionId}/orders`, { params: queryParams });
+  }
 
-// Toggle auto-renew
-export const toggleAutoRenew = async (id: string, autoRenew: boolean) => {
-  const response = await apiClient.patch(`/subscriptions/${id}/auto-renew`, {}, { 
-    params: { auto_renew: autoRenew } 
-  });
-  return response;
-};
+  /**
+   * Process subscription shipment manually
+   */
+  static async processShipment(subscriptionId: string) {
+    return await apiClient.post(`/subscriptions/${subscriptionId}/process-shipment`, {});
+  }
+}
 
-// === SUBSCRIPTION LIFECYCLE ===
+// === FUNCTIONAL API EXPORTS (for backward compatibility) ===
 
-// Pause subscription
-export const pauseSubscription = async (id: string, reason?: string) => {
-  const params = reason ? { pause_reason: reason } : {};
-  const response = await apiClient.post(`/subscriptions/${id}/pause`, {}, { params });
-  return response;
-};
+// Admin functions
+export const triggerOrderProcessing = SubscriptionAPI.triggerOrderProcessing;
+export const triggerNotifications = SubscriptionAPI.triggerNotifications;
 
-// Resume subscription
-export const resumeSubscription = async (id: string) => {
-  const response = await apiClient.post(`/subscriptions/${id}/resume`, {}, {});
-  return response;
-};
+// Cost calculation
+export const calculateCost = SubscriptionAPI.calculateCost;
 
-// === ORDERS & SHIPMENTS ===
+// CRUD operations
+export const createSubscription = SubscriptionAPI.createSubscription;
+export const getSubscriptions = SubscriptionAPI.getSubscriptions;
+export const getUserSubscriptions = SubscriptionAPI.getSubscriptions; // Alias
+export const getSubscription = SubscriptionAPI.getSubscription;
+export const updateSubscription = SubscriptionAPI.updateSubscription;
+export const cancelSubscription = SubscriptionAPI.cancelSubscription;
 
-// Process subscription shipment
-export const processShipment = async (id: string) => {
-  const response = await apiClient.post(`/subscriptions/${id}/process-shipment`, {}, {});
-  return response;
-};
+// Lifecycle management
+export const pauseSubscription = SubscriptionAPI.pauseSubscription;
+export const resumeSubscription = SubscriptionAPI.resumeSubscription;
+export const activateSubscription = SubscriptionAPI.activateSubscription;
 
-// Get subscription orders
-export const getOrders = async (id: string, page: number = 1, limit: number = 10) => {
-  const response = await apiClient.get(`/subscriptions/${id}/orders`, { params: { page, limit } });
-  return response;
-};
+// Product management
+export const addProducts = SubscriptionAPI.addProducts;
+export const removeProducts = SubscriptionAPI.removeProducts;
+export const removeProduct = SubscriptionAPI.removeProduct;
+export const getSubscriptionDetails = SubscriptionAPI.getSubscriptionDetails;
 
-// === CONVENIENCE FUNCTIONS ===
+// Deprecated aliases (for backward compatibility)
+export const addProductsToSubscription = SubscriptionAPI.addProducts;
+export const removeProductsFromSubscription = SubscriptionAPI.removeProducts;
 
-// Increment quantity by 1
-export const incrementQuantity = async (id: string, variantId: string) => {
-  return changeQuantity(id, variantId, 1);
-};
+// Quantity management
+export const updateQuantity = SubscriptionAPI.updateVariantQuantity;
+export const updateVariantQuantity = SubscriptionAPI.updateVariantQuantity;
+export const changeQuantity = SubscriptionAPI.changeVariantQuantity;
+export const changeVariantQuantity = SubscriptionAPI.changeVariantQuantity;
+export const getQuantities = SubscriptionAPI.getVariantQuantities;
+export const getVariantQuantities = SubscriptionAPI.getVariantQuantities;
+export const incrementQuantity = SubscriptionAPI.incrementQuantity;
+export const decrementQuantity = SubscriptionAPI.decrementQuantity;
 
-// Decrement quantity by 1
-export const decrementQuantity = async (id: string, variantId: string) => {
-  return changeQuantity(id, variantId, -1);
-};
+// Discount management
+export const applyDiscount = SubscriptionAPI.applyDiscount;
+export const removeDiscount = SubscriptionAPI.removeDiscount;
 
-// Default export for backwards compatibility
-const SubscriptionAPI = {
-  // Admin
-  triggerOrderProcessing,
-  triggerNotifications,
-  
-  // Cost calculation
-  calculateCost,
-  
-  // CRUD
-  createSubscription,
-  getSubscriptions,
-  getUserSubscriptions,
-  getSubscription,
-  updateSubscription,
-  cancelSubscription,
-  activateSubscription,
-  
-  // Products
-  addProducts,
-  removeProducts,
-  addProductsToSubscription,
-  removeProductsFromSubscription,
-  removeProduct, // New method
-  getSubscriptionDetails, // New method
-  
-  // Discounts
-  applyDiscount, // New method
-  removeDiscount, // New method
-  
-  // Quantities
-  updateQuantity,
-  changeQuantity,
-  getQuantities,
-  incrementQuantity,
-  decrementQuantity,
-  
-  // Auto-renew
-  toggleAutoRenew,
-  
-  // Lifecycle
-  pauseSubscription,
-  resumeSubscription,
-  
-  // Orders
-  processShipment,
-  getOrders,
-};
+// Auto-renew management
+export const toggleAutoRenew = SubscriptionAPI.toggleAutoRenew;
 
-export { SubscriptionAPI };
+// Orders and shipments
+export const getOrders = SubscriptionAPI.getSubscriptionOrders;
+export const getSubscriptionOrders = SubscriptionAPI.getSubscriptionOrders;
+export const processShipment = SubscriptionAPI.processShipment;
+
+// Default export
 export default SubscriptionAPI;

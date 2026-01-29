@@ -15,7 +15,7 @@ export class SearchAPI {
       limit: limit.toString()
     });
     
-    return await apiClient.get(`/search/autocomplete?${params.toString()}`);
+    return await apiClient.get(`/v1/search/autocomplete?${params.toString()}`);
   }
 
   /**
@@ -34,7 +34,7 @@ export class SearchAPI {
     if (filters?.max_price !== undefined) params.append('max_price', filters.max_price.toString());
     if (filters?.limit) params.append('limit', filters.limit.toString());
     
-    return await apiClient.get(`/products/search?${params.toString()}`);
+    return await apiClient.get(`/v1/products/search?${params.toString()}`);
   }
 
   /**
@@ -49,7 +49,7 @@ export class SearchAPI {
     if (filters?.role) params.append('role', filters.role);
     if (filters?.limit) params.append('limit', filters.limit.toString());
     
-    return await apiClient.get(`/users/search?${params.toString()}`);
+    return await apiClient.get(`/v1/users/search?${params.toString()}`);
   }
 
   /**
@@ -61,7 +61,7 @@ export class SearchAPI {
       limit: limit.toString()
     });
     
-    return await apiClient.get(`/products/categories/search?${params.toString()}`);
+    return await apiClient.get(`/v1/products/categories/search?${params.toString()}`);
   }
 
   /**

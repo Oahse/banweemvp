@@ -1,27 +1,40 @@
 /**
- * Refund API endpoints for painless refund processing
+ * Refunds API endpoints
  */
+
 import { apiClient } from './client';
+
+export interface RefundRequest {
+  reason: string;
+  items?: Array<{
+    order_item_id: string;
+    quantity: number;
+    reason?: string;
+  }>;
+  amount?: number;
+  return_required?: boolean;
+  customer_notes?: string;
+}
 
 export class RefundsAPI {
   /**
-   * Check if an order is eligible for refund
+   * Check refund eligibility for an order
    */
   static async checkRefundEligibility(orderId: string) {
-    return await apiClient.get(`/refunds/orders/${orderId}/eligibility`);
+    return await apiClient.get(`/v1/refunds/orders/${orderId}/eligibility`);
   }
 
   /**
    * Request a refund for an order
    */
-  static async requestRefund(orderId: string, refundData: any) {
-    return await apiClient.post(`/refunds/orders/${orderId}/request`, refundData);
+  static async requestRefund(orderId: string, refundRequest: RefundRequest) {
+    return await apiClient.post(`/v1/refunds/orders/${orderId}/request`, refundRequest);
   }
 
   /**
-   * Get user's refund history
+   * Get user's refunds
    */
-  static async getUserRefunds(params?: {
+  static async getRefunds(params?: {
     status?: string;
     page?: number;
     limit?: number;
@@ -32,29 +45,29 @@ export class RefundsAPI {
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
 
-    const url = `/refunds${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/v1/refunds${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
 
   /**
-   * Get detailed refund information
+   * Get refund details
    */
-  static async getRefundDetails(refundId: string) {
-    return await apiClient.get(`/refunds/${refundId}`);
+  static async getRefund(refundId: string) {
+    return await apiClient.get(`/v1/refunds/${refundId}`);
   }
 
   /**
-   * Cancel a pending refund request
+   * Cancel a refund request
    */
   static async cancelRefund(refundId: string) {
-    return await apiClient.put(`/refunds/${refundId}/cancel`);
+    return await apiClient.put(`/v1/refunds/${refundId}/cancel`);
   }
 
   /**
-   * Get user's refund statistics
+   * Get refund statistics
    */
   static async getRefundStats() {
-    return await apiClient.get('/refunds/stats/summary');
+    return await apiClient.get('/v1/refunds/stats/summary');
   }
 }
 

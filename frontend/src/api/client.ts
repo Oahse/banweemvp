@@ -518,53 +518,53 @@ class APIClient {
 
   // Auth methods
   async login(credentials) {
-    return this.post('/auth/login', credentials);
+    return this.post('/v1/auth/login', credentials);
   }
 
   async register(userData) {
-    return this.post('/auth/register', userData);
+    return this.post('/v1/auth/register', userData);
   }
 
   async logout() {
-    return this.post('/auth/logout', {});
+    return this.post('/v1/auth/logout', {});
   }
 
   async refreshToken() {
-    return this.post('/auth/refresh', {});
+    return this.post('/v1/auth/refresh', {});
   }
 
   // User methods
   async getCurrentUser() {
-    return this.get('/users/me');
+    return this.get('/v1/users/me');
   }
 
   async updateProfile(updates) {
-    return this.put('/users/me', updates);
+    return this.put('/v1/users/me', updates);
   }
 
   async changePassword(data) {
-    return this.put('/users/me/password', data);
+    return this.put('/v1/users/me/password', data);
   }
 
   // Address methods
   async getUserAddresses() {
-    return this.get('/users/me/addresses');
+    return this.get('/v1/users/me/addresses');
   }
 
   async createAddress(address) {
-    return this.post('/users/me/addresses', address);
+    return this.post('/v1/users/me/addresses', address);
   }
 
   async updateAddress(id, updates) {
-    return this.put(`/users/me/addresses/${id}`, updates);
+    return this.put(`/v1/users/me/addresses/${id}`, updates);
   }
 
   async deleteAddress(id) {
-    return this.delete(`/users/me/addresses/${id}`);
+    return this.delete(`/v1/users/me/addresses/${id}`);
   }
 
   async setDefaultAddress(id) {
-    return this.put(`/users/me/addresses/${id}/default`, {});
+    return this.put(`/v1/users/me/addresses/${id}/default`, {});
   }
 
   // Product methods
@@ -581,47 +581,47 @@ class APIClient {
         }
       });
     }
-    const url = `/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/v1/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return this.get(url);
   }
 
   async getProduct(id) {
-    return this.get(`/products/${id}`);
+    return this.get(`/v1/products/${id}`);
   }
 
   async getProductWithDetails(id) {
-    return this.get(`/products/${id}?include_variants=true&include_reviews=true`);
+    return this.get(`/v1/products/${id}?include_variants=true&include_reviews=true`);
   }
 
   async getFeaturedProducts(limit = 10) {
-    return this.get(`/products/featured?limit=${limit}`);
+    return this.get(`/v1/products/featured?limit=${limit}`);
   }
 
   async searchProducts(query) {
-    return this.get(`/products/search?q=${encodeURIComponent(query)}`);
+    return this.get(`/v1/products/search?q=${encodeURIComponent(query)}`);
   }
 
   // Category methods
 
   // Cart methods
   async getCart() {
-    return this.get('/cart');
+    return this.get('/v1/cart');
   }
 
   async addToCart(variantId, quantity) {
-    return this.post('/cart/add', { variant_id: variantId, quantity });
+    return this.post('/v1/cart/add', { variant_id: variantId, quantity });
   }
 
   async updateCartItem(itemId, quantity) {
-    return this.put(`/cart/items/${itemId}`, { quantity });
+    return this.put(`/v1/cart/items/${itemId}`, { quantity });
   }
 
   async removeFromCart(itemId) {
-    return this.delete(`/cart/items/${itemId}`);
+    return this.delete(`/v1/cart/items/${itemId}`);
   }
 
   async clearCart() {
-    return this.delete('/cart/clear');
+    return this.delete('/v1/cart/clear');
   }
 
   // Order methods

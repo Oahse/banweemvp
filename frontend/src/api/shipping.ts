@@ -24,7 +24,7 @@ class ShippingAPI {
    * Get all active shipping methods
    */
   async getShippingMethods(): Promise<ShippingMethod[]> {
-    const response = await apiClient.get('/shipping/methods', {});
+    const response = await apiClient.get('/v1/shipping/methods', {});
     return response.data.data;
   }
 
@@ -32,7 +32,7 @@ class ShippingAPI {
    * Get a specific shipping method by ID
    */
   async getShippingMethod(methodId: string): Promise<ShippingMethod> {
-    const response = await apiClient.get(`/shipping/methods/${methodId}`, {});
+    const response = await apiClient.get(`/v1/shipping/methods/${methodId}`, {});
     return response.data.data;
   }
 
@@ -51,7 +51,7 @@ class ShippingAPI {
       params.append('shipping_method_id', shippingMethodId);
     }
 
-    const response = await apiClient.post(`/shipping/calculate?${params}`);
+    const response = await apiClient.post(`/v1/shipping/calculate?${params}`);
     return response.data.data;
   }
 
@@ -59,7 +59,7 @@ class ShippingAPI {
    * Create a new shipping method (Admin only)
    */
   async createShippingMethod(methodData: Partial<ShippingMethod>): Promise<ShippingMethod> {
-    const response = await apiClient.post('/shipping/methods', methodData);
+    const response = await apiClient.post('/v1/shipping/methods', methodData);
     return response.data.data;
   }
 
@@ -70,7 +70,7 @@ class ShippingAPI {
     methodId: string,
     methodData: Partial<ShippingMethod>
   ): Promise<ShippingMethod> {
-    const response = await apiClient.put(`/shipping/methods/${methodId}`, methodData);
+    const response = await apiClient.put(`/v1/shipping/methods/${methodId}`, methodData);
     return response.data.data;
   }
 
@@ -78,7 +78,7 @@ class ShippingAPI {
    * Delete a shipping method (Admin only)
    */
   async deleteShippingMethod(methodId: string): Promise<{ deleted: boolean }> {
-    const response = await apiClient.delete(`/shipping/methods/${methodId}`);
+    const response = await apiClient.delete(`/v1/shipping/methods/${methodId}`);
     return response.data.data;
   }
 }

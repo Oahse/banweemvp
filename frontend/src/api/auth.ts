@@ -1,5 +1,9 @@
 /**
  * Authentication API endpoints
+ * 
+ * ACCESS LEVELS:
+ * - Public: Registration, login, password reset, email verification
+ * - Authenticated: Profile management, password change, address management, logout
  */
 
 import { apiClient, TokenManager } from './client';
@@ -36,6 +40,7 @@ interface ResetPasswordData {
 export class AuthAPI {
   /**
    * Register a new user
+   * ACCESS: Public - No authentication required
    */
   static async register(data: RegisterData) {
     const response = await apiClient.post('/v1/auth/register', data);
@@ -48,6 +53,7 @@ export class AuthAPI {
 
   /**
    * Login user
+   * ACCESS: Public - No authentication required
    */
   static async login(data: LoginData) {
     const response = await apiClient.post('/v1/auth/login', data);
@@ -60,6 +66,7 @@ export class AuthAPI {
 
   /**
    * Logout user
+   * ACCESS: Authenticated - Requires user login
    */
   static async logout() {
     try {
@@ -75,6 +82,7 @@ export class AuthAPI {
 
   /**
    * Get current user profile
+   * ACCESS: Authenticated - Requires user login
    */
   static async getProfile() {
     return await apiClient.get('/v1/auth/profile');
@@ -82,6 +90,7 @@ export class AuthAPI {
 
   /**
    * Update user profile
+   * ACCESS: Authenticated - Requires user login
    */
   static async updateProfile(data: ProfileData) {
     const response = await apiClient.put('/v1/auth/profile', data);
@@ -96,6 +105,7 @@ export class AuthAPI {
 
   /**
    * Change password
+   * ACCESS: Authenticated - Requires user login
    */
   static async changePassword(data: ChangePasswordData) {
     return await apiClient.put('/v1/auth/change-password', data);
@@ -103,13 +113,15 @@ export class AuthAPI {
 
   /**
    * Request password reset
+   * ACCESS: Public - No authentication required
    */
   static async requestPasswordReset(email: string) {
-    return await apiClient.post('/auth/forgot-password', { email });
+    return await apiClient.post('/v1/auth/forgot-password', { email });
   }
 
   /**
    * Forgot password - alias for requestPasswordReset
+   * ACCESS: Public - No authentication required
    */
   static async forgotPassword(email: string) {
     return await this.requestPasswordReset(email);
@@ -117,30 +129,34 @@ export class AuthAPI {
 
   /**
    * Reset password with token
+   * ACCESS: Public - No authentication required (uses token)
    */
   static async resetPassword(data: ResetPasswordData) {
-    return await apiClient.post('/auth/reset-password', data);
+    return await apiClient.post('/v1/auth/reset-password', data);
   }
 
   /**
    * Verify email with token
+   * ACCESS: Public - No authentication required (uses token)
    */
   static async verifyEmail(token: string) {
-    return await apiClient.get(`/auth/verify-email?token=${token}`);
+    return await apiClient.get(`/v1/auth/verify-email?token=${token}`);
   }
 
   /**
    * Resend email verification
+   * ACCESS: Authenticated - Requires user login
    */
   static async resendVerification() {
-    return await apiClient.post('/users/resend-verification');
+    return await apiClient.post('/v1/users/resend-verification');
   }
 
   /**
    * Social authentication
+   * ACCESS: Public - No authentication required
    */
   static async socialLogin(token: string, provider: string) {
-    const response = await apiClient.post(`/auth/social/${provider}`, { token });
+    const response = await apiClient.post(`/v1/auth/social/${provider}`, { token });
     
     if (response.data.access_token) {
       TokenManager.setToken(response.data.access_token);
@@ -155,6 +171,7 @@ export class AuthAPI {
 
   /**
    * Refresh access token
+   * ACCESS: Public - Uses refresh token for authentication
    */
   static async refreshToken() {
     try {
@@ -163,7 +180,7 @@ export class AuthAPI {
         throw new Error('No refresh token available');
       }
 
-      const response = await apiClient.post('/auth/refresh', {
+      const response = await apiClient.post('/v1/auth/refresh', {
         refresh_token: refreshToken,
       });
 
@@ -194,9 +211,10 @@ export class AuthAPI {
 
   /**
    * Delete user account
+   * ACCESS: Authenticated - Requires user login and password confirmation
    */
   static async deleteAccount(password: string) {
-    const response = await apiClient.delete('/users', {
+    const response = await apiClient.delete('/v1/users', {
       data: { password }
     });
     
@@ -208,30 +226,34 @@ export class AuthAPI {
 
   /**
    * Get user's addresses
+   * ACCESS: Authenticated - Requires user login
    */
   static async getAddresses() {
-    return await apiClient.get(`/auth/addresses`);
+    return await apiClient.get(`/v1/auth/addresses`);
   }
 
   /**
    * Create new address
+   * ACCESS: Authenticated - Requires user login
    */
   static async createAddress(address: any) {
-    return await apiClient.post('/auth/addresses', address);
+    return await apiClient.post('/v1/auth/addresses', address);
   }
 
   /**
    * Update address
+   * ACCESS: Authenticated - Requires user login
    */
   static async updateAddress(addressId: string, address: any) {
-    return await apiClient.put(`/auth/addresses/${addressId}`, address);
+    return await apiClient.put(`/v1/auth/addresses/${addressId}`, address);
   }
 
   /**
    * Delete address
+   * ACCESS: Authenticated - Requires user login
    */
   static async deleteAddress(addressId: string) {
-    return await apiClient.delete(`/auth/addresses/${addressId}`);
+    return await apiClient.delete(`/v1/auth/addresses/${addressId}`);
   }
 
 

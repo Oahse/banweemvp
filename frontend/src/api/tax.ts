@@ -1,56 +1,14 @@
+/**
+ * Tax API endpoints
+ */
+
 import { apiClient } from './client';
-
-export interface TaxRate {
-  id: string;
-  country_code: string;
-  country_name: string;
-  province_code?: string;
-  province_name?: string;
-  tax_rate: number;
-  tax_percentage: number;
-  tax_name?: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at?: string;
-}
-
-export interface TaxRateCreate {
-  country_code: string;
-  country_name: string;
-  province_code?: string;
-  province_name?: string;
-  tax_rate: number;
-  tax_name?: string;
-  is_active: boolean;
-}
-
-export interface TaxRateUpdate {
-  country_name?: string;
-  province_name?: string;
-  tax_rate?: number;
-  tax_name?: string;
-  is_active?: boolean;
-}
-
-export interface TaxType {
-  value: string;
-  label: string;
-  usage_count: number;
-}
-
-export interface Country {
-  country_code: string;
-  country_name: string;
-  rate_count: number;
-}
 
 export interface TaxCalculationRequest {
   subtotal: number;
-  shipping?: number;
-  shipping_address_id?: string;
+  shipping: number;
   country_code?: string;
   state_code?: string;
-  product_type?: string;
   currency?: string;
 }
 
@@ -65,15 +23,15 @@ export interface TaxCalculationResponse {
 
 export class TaxAPI {
   /**
-   * Calculate tax for checkout
+   * Calculate tax for an order
    */
-  static async calculateTax(taxData: TaxCalculationRequest): Promise<TaxCalculationResponse> {
-    const response = await apiClient.post('/tax/calculate', taxData);
+  static async calculateTax(request: TaxCalculationRequest): Promise<TaxCalculationResponse> {
+    const response = await apiClient.post('/v1/tax/calculate', request);
     return response.data;
   }
 
   /**
-   * Get all tax rates (admin only)
+   * Get tax rates for a location (Admin only)
    */
   static async getTaxRates(params?: {
     country_code?: string;
@@ -82,48 +40,67 @@ export class TaxAPI {
     search?: string;
     page?: number;
     per_page?: number;
-  }): Promise<TaxRate[]> {
-    const response = await apiClient.get('/tax/admin/tax-rates', { params });
-    return response.data;
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.country_code) queryParams.append('country_code', params.country_code);
+    if (params?.province_code) queryParams.append('province_code', params.province_code);
+    if (params?.is_active !== undefined) queryParams.append('is_active', params.is_active.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.per_page) queryParams.append('per_page', params.per_page.toString());
+
+    const url = `/v1/tax/admin/tax-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url);
   }
 
   /**
-   * Get countries with tax rates configured
+   * Create tax rate (Admin only)
    */
-  static async getCountriesWithTaxRates(): Promise<Country[]> {
-    const response = await apiClient.get('/tax/admin/tax-rates/countries');
-    return response.data;
+  static async createTaxRate(data: {
+    country_code: string;
+    country_name: string;
+    province_code?: string;
+    province_name?: string;
+    tax_rate: number;
+    tax_name?: string;
+    is_active?: boolean;
+  }) {
+    return await apiClient.post('/v1/tax/admin/tax-rates', data);
   }
 
   /**
-   * Get available tax types from database
+   * Update tax rate (Admin only)
    */
-  static async getAvailableTaxTypes(): Promise<TaxType[]> {
-    const response = await apiClient.get('/tax/admin/tax-rates/tax-types');
-    return response.data;
+  static async updateTaxRate(taxRateId: string, data: {
+    country_name?: string;
+    province_name?: string;
+    tax_rate?: number;
+    tax_name?: string;
+    is_active?: boolean;
+  }) {
+    return await apiClient.put(`/v1/tax/admin/tax-rates/${taxRateId}`, data);
   }
 
   /**
-   * Create new tax rate
+   * Delete tax rate (Admin only)
    */
-  static async createTaxRate(data: TaxRateCreate): Promise<TaxRate> {
-    const response = await apiClient.post('/tax/admin/tax-rates', data);
-    return response.data;
+  static async deleteTaxRate(taxRateId: string) {
+    return await apiClient.delete(`/v1/tax/admin/tax-rates/${taxRateId}`);
   }
 
   /**
-   * Update existing tax rate
+   * Get countries with tax rates (Admin only)
    */
-  static async updateTaxRate(id: string, data: TaxRateUpdate): Promise<TaxRate> {
-    const response = await apiClient.put(`/tax/admin/tax-rates/${id}`, data);
-    return response.data;
+  static async getCountriesWithTaxRates() {
+    return await apiClient.get('/v1/tax/admin/tax-rates/countries');
   }
 
   /**
-   * Delete tax rate
+   * Get available tax types (Admin only)
    */
-  static async deleteTaxRate(id: string): Promise<void> {
-    await apiClient.delete(`/tax/admin/tax-rates/${id}`);
+  static async getAvailableTaxTypes() {
+    return await apiClient.get('/v1/tax/admin/tax-rates/tax-types');
   }
 }
 
