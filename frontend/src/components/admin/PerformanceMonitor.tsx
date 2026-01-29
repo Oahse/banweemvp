@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { usePerformanceMonitoring } from '../../utils/performance';
+import { extractErrorMessage } from '../../utils/api-response';
 
 /**
  * @typedef {object} PerformanceStats

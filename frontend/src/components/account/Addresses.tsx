@@ -3,6 +3,7 @@ import { PlusCircleIcon, MapPinIcon, HomeIcon, BriefcaseIcon, TrashIcon, PencilI
 import { toast } from 'react-hot-toast';
 import { useApi } from '../../hooks/useAsync';
 import { AuthAPI } from '../../api';
+import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 
 /**
  * Addresses component allows users to manage their saved addresses.
@@ -63,23 +64,28 @@ export const Addresses = () => {
       if (editingAddressId) {
         // If editing an existing address
         const result = await AuthAPI.updateAddress(editingAddressId, formData);
-        if (result?.data) {
+        // Handle wrapped response
+        const data = unwrapResponse(result);
+        if (data) {
           // Update the local state with the modified address
-          setLocalAddresses(localAddresses?.map((a: any) => a.id === editingAddressId ? result.data : a));
+          setLocalAddresses(localAddresses?.map((a: any) => a.id === editingAddressId ? data : a));
           toast.success('Address updated successfully');
         }
       } else {
         // If adding a new address
         const result = await AuthAPI.createAddress(formData);
-        if (result?.data) {
+        // Handle wrapped response
+        const data = unwrapResponse(result);
+        if (data) {
           // Add the new address to the local state
-          setLocalAddresses(localAddresses ? [...localAddresses, result.data] : [result.data]);
+          setLocalAddresses(localAddresses ? [...localAddresses, data] : [data]);
           toast.success('Address added successfully');
         }
       }
       resetForm(); // Reset the form after successful operation
-    } catch (error) {
-      toast.error('Failed to save address');
+    } catch (error: any) {
+      const errorMessage = extractErrorMessage(error);
+      toast.error(errorMessage || 'Failed to save address');
     }
   };
 
@@ -112,8 +118,9 @@ export const Addresses = () => {
       // Remove the deleted address from the local state
       setLocalAddresses(localAddresses?.filter((a: any) => a.id !== id));
       toast.success('Address removed');
-    } catch (error) {
-      toast.error('Failed to remove address');
+    } catch (error: any) {
+      const errorMessage = extractErrorMessage(error);
+      toast.error(errorMessage || 'Failed to remove address');
     }
   };
 

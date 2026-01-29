@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { ExportButton } from '../dashboard/utils/ExportUtils';
 import { exportDataViaAPI } from '../../utils/exportUtils';
+import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 
 const UserManagement = () => {
   const [data, setData] = useState(null);

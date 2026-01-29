@@ -4,6 +4,7 @@ import { Input } from '../components/forms/Input';
 import { toast } from 'react-hot-toast';
 import { validation } from '../utils/validation';
 import { AuthAPI } from '../api';
+import { extractErrorMessage } from '../utils/api-response';
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -28,8 +29,8 @@ export const ForgotPassword = () => {
       toast.success(`Password reset link sent! If an account with ${email} exists, you will receive a password reset link.`);
       setEmail('');
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to send reset link. Please try again.';
-      toast.error(errorMessage);
+      const errorMessage = extractErrorMessage(error);
+      toast.error(errorMessage || 'Failed to send reset link. Please try again.');
     } finally {
       setLoading(false);
     }

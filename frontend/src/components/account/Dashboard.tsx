@@ -7,6 +7,7 @@ import { SkeletonDashboard } from '../ui/SkeletonDashboard';
 import { usePaginatedApi } from '../../hooks/useAsync';
 import OrdersAPI from '../../api/orders';
 import SubscriptionAPI from '../../api/subscription';
+import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 
 interface DashboardProps {
   animation?: 'shimmer' | 'pulse' | 'wave';

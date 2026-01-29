@@ -11,3 +11,12 @@ export const LOCALE_CONFIG = {
     'nb-NO': 'NOK',
   },
 };
+
+// Format currency helper function
+export function formatCurrency(amount: number, currency: string = 'USD'): string {
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+  });
+  return formatter.format(amount);
+}

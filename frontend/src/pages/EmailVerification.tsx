@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { extractErrorMessage } from '../utils/api-response';
 
 export const EmailVerification = () => {
   const [searchParams] = useSearchParams();
@@ -24,11 +25,11 @@ export const EmailVerification = () => {
           setMessage(data.message || 'Email verified successfully!');
         } else {
           setVerificationStatus('error');
-          setMessage(data.detail || 'Failed to verify email.');
+          setMessage(extractErrorMessage(data) || 'Failed to verify email.');
         }
       } catch (error) {
         setVerificationStatus('error');
-        setMessage('An error occurred while verifying your email.');
+        setMessage(extractErrorMessage(error) || 'An error occurred while verifying your email.');
       }
     };
 

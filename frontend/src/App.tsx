@@ -5,6 +5,8 @@ import { AuthProvider } from './store/AuthContext';
 import { CartProvider } from './store/CartContext';
 import { WishlistProvider } from './store/WishlistContext';
 import { SubscriptionProvider } from './store/SubscriptionContext';
+import { CategoryProvider } from './store/CategoryContext';
+import { LocaleProvider } from './store/LocaleContext';
 import { ThemeProvider } from './store/ThemeContext';
 import { FontLoader } from './components/ui/FontLoader';
 import { Toaster } from 'react-hot-toast';
@@ -36,6 +38,9 @@ const EmailVerification = lazy(() => import('./pages/EmailVerification'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const TrackOrder = lazy(() => import('./pages/TrackOrder'));
 const Support = lazy(() => import('./pages/Support'));
+const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
+const AdminDashboardPage = lazy(() => import('./components/admin/AdminDashboard'));
+const SupplierDashboard = lazy(() => import('./components/admin/SupplierDashboard'));
 
 // Loading component
 const PageLoading: React.FC = () => (
@@ -89,17 +94,19 @@ export const App: React.FC = () => {
               v7_relativeSplatPath: true,
             }}
           >
-            <CartProvider>
-              <SubscriptionProvider>
-                <WishlistProvider>
-                  <Elements stripe={stripePromise}>
-                    <Suspense fallback={<PageLoading />}>
-                      <Routes>
+            <CategoryProvider>
+              <LocaleProvider>
+                <CartProvider>
+                  <SubscriptionProvider>
+                    <WishlistProvider>
+                      <Elements stripe={stripePromise}>
+                        <Suspense fallback={<PageLoading />}>
+                          <Routes>
                         <Route path="/" element={<Layout><Home /></Layout>} />
                         <Route path="/products" element={<Layout><Products /></Layout>} />
                         <Route path="/products/search" element={<Layout><Products /></Layout>} />
                         <Route path="/products/:id" element={<Layout><ProductDetails /></Layout>} />
-                        <Route path="/cart" element={<Layout><Cart /></Layout>} />
+                        <Route path="/cart" element={<ProtectedRoute><Layout><Cart /></Layout></ProtectedRoute>} />
                         <Route path="/checkout" element={<ProtectedRoute><Layout><Checkout /></Layout></ProtectedRoute>} />
                         <Route path="/account/*" element={<ProtectedRoute><Layout><Account /></Layout></ProtectedRoute>} />
                         <Route path="/track-order/:orderId" element={<ProtectedRoute><Layout><TrackOrder /></Layout></ProtectedRoute>} />
@@ -117,12 +124,18 @@ export const App: React.FC = () => {
                         <Route path="/privacy" element={<Layout><PrivacyPolicy /></Layout>} />
                         <Route path="/verify-email" element={<Layout><EmailVerification /></Layout>} />
                         <Route path="/reset-password" element={<Layout><ResetPassword /></Layout>} />
+                        <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+                          <Route index element={<AdminDashboardPage />} />
+                        </Route>
+                        <Route path="/supplier/*" element={<ProtectedRoute><SupplierDashboard /></ProtectedRoute>} />
                       </Routes>
                     </Suspense>
                   </Elements>
                 </WishlistProvider>
               </SubscriptionProvider>
             </CartProvider>
+            </LocaleProvider>
+            </CategoryProvider>
           </BrowserRouter>
         </ThemeProvider>
       </AuthProvider>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
+import { ErrorBoundary } from '../ErrorBoundary';
 import {
   LayoutDashboardIcon,
   UsersIcon,
@@ -25,7 +26,7 @@ import {
 } from 'lucide-react';
 
 interface AdminLayoutProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
@@ -165,8 +166,14 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
         </header>
 
         {/* Page content */}
-        <main className="p-4 md:p-6">{children}</main>
+        <main className="p-4 md:p-6">
+          <ErrorBoundary>
+            {children || <Outlet />}
+          </ErrorBoundary>
+        </main>
       </div>
     </div>
   );
 };
+
+export default AdminLayout;

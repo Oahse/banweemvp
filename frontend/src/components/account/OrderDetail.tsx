@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeftIcon, PackageIcon, DownloadIcon, MapPinIcon } from 'lucide-react';
 import { OrdersAPI } from '../../api/orders';
 import { toast } from 'react-hot-toast';
+import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 
 export const OrderDetail = () => {
   const { orderId } = useParams();

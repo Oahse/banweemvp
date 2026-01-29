@@ -3,6 +3,7 @@ import { UserIcon, MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, GlobeIcon, Sav
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../store/AuthContext';
 import { AuthAPI } from '../../api';
+import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 
 /**
  * Profile component allows users to view and edit their personal information.
@@ -57,14 +58,17 @@ export const Profile = () => {
 
     try {
       const result = await AuthAPI.updateProfile(formData);
-      if (result) {
+      // Handle wrapped response
+      const data = unwrapResponse(result);
+      if (data) {
         // Update user in context
-        updateUser(result);
+        updateUser(data);
         toast.success('Profile updated successfully');
         setIsEditing(false);
       }
-    } catch (error) {
-      toast.error('Failed to update profile');
+    } catch (error: any) {
+      const errorMessage = extractErrorMessage(error);
+      toast.error(errorMessage || 'Failed to update profile');
       console.error('Profile update error:', error);
     } finally {
       setLoading(false);

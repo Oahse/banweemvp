@@ -38,3 +38,6 @@ export const useCategory = (): CategoryContextType => {
   }
   return context;
 };
+
+// Export as useCategories for backward compatibility
+export const useCategories = useCategory;

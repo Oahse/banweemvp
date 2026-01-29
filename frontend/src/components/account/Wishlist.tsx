@@ -5,6 +5,7 @@ import { useAuth } from '../../store/AuthContext';
 import { ShoppingCartIcon, TrashIcon, HeartIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 
 export const Wishlist = () => {
   const { defaultWishlist, removeItem, clearWishlist } = useWishlist();

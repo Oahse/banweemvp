@@ -14,7 +14,9 @@ import { validation } from '../utils/validation';
  */
 export const Register = () => {
   // State variables for form fields
-  const [name, setName] = useState('');
+  // FIXED: Split name into firstname and lastname to match backend schema
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -87,9 +89,16 @@ export const Register = () => {
     e.preventDefault(); // Prevent default form submission behavior
 
     // Comprehensive client-side validation using validation utility
-    const nameValidation = validation.name(name);
-    if (!nameValidation.valid) {
-      toast.error(nameValidation.message);
+    // FIXED: Validate firstname and lastname separately
+    const firstnameValidation = validation.name(firstname);
+    if (!firstnameValidation.valid) {
+      toast.error(`First name: ${firstnameValidation.message}`);
+      return;
+    }
+
+    const lastnameValidation = validation.name(lastname);
+    if (!lastnameValidation.valid) {
+      toast.error(`Last name: ${lastnameValidation.message}`);
       return;
     }
 
@@ -125,8 +134,15 @@ export const Register = () => {
 
     try {
       setLoading(true); // Show loading indicator
-      // Attempt to register the user through the AuthContext
-      await register(name.trim(), email.toLowerCase().trim(), password, userType);
+      // FIXED: Pass parameters in correct order: firstname, lastname, email, password
+      // This now matches AuthContext.register signature:
+      // register(firstname: string, lastname: string, email: string, password: string, phone?: string)
+      await register(
+        firstname.trim(),
+        lastname.trim(),
+        email.toLowerCase().trim(),
+        password
+      );
       toast.success('Registration successful! Welcome to Banwee Organics.');
       // Navigation to dashboard/home is handled by the useEffect hook based on authentication status
     } catch (error) {
@@ -148,14 +164,24 @@ export const Register = () => {
       <div className="max-w-md mx-auto bg-surface p-8 rounded-lg shadow-sm border border-border-light">
         <h1 className="text-2xl font-bold text-main mb-6 text-center">Create an Account</h1>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          {/* Full Name Input */}
+          {/* FIXED: First Name Input */}
           <Input
-            label="Full Name"
-            id="name"
+            label="First Name"
+            id="firstname"
             type="text"
-            placeholder="John Doe"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="John"
+            value={firstname}
+            onChange={(e) => setFirstname(e.target.value)}
+            required
+          />
+          {/* FIXED: Last Name Input */}
+          <Input
+            label="Last Name"
+            id="lastname"
+            type="text"
+            placeholder="Doe"
+            value={lastname}
+            onChange={(e) => setLastname(e.target.value)}
             required
           />
           {/* Email Address Input */}

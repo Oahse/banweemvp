@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { OrdersAPI } from '../api/orders';
 import { toast } from 'react-hot-toast';
+import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
 
 interface TrackingEvent {
   id: string;
@@ -48,10 +49,10 @@ export const TrackOrder = () => {
         setLoading(true);
         // Use public tracking endpoint (no authentication required)
         const response = await OrdersAPI.trackOrderPublic(orderId);
-        const trackingData = response?.data || response;
+        const trackingData = unwrapResponse(response);
         setTracking(trackingData);
       } catch (error) {
-        toast.error('Order not found or tracking information unavailable');
+        toast.error(extractErrorMessage(error) || 'Order not found or tracking information unavailable');
         console.error('Error fetching tracking:', error);
       } finally {
         setLoading(false);

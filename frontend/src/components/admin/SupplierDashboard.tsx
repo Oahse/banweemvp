@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../store/AuthContext';
+import { ErrorBoundary } from '../ErrorBoundary';
 import { 
   Package, 
   ShoppingCart, 
@@ -39,6 +42,15 @@ const SupplierDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const { user, isLoading: authLoading } = useAuth();
+
+  // Check if user is Supplier
+  useEffect(() => {
+    if (!authLoading && (!user || (user as any).role !== 'Supplier')) {
+      navigate('/', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     fetchSupplierData();
@@ -352,4 +364,10 @@ const SupplierDashboard = () => {
   );
 };
 
-export default SupplierDashboard;
+const SupplierDashboardWithErrorBoundary = () => (
+  <ErrorBoundary>
+    <SupplierDashboard />
+  </ErrorBoundary>
+);
+
+export default SupplierDashboardWithErrorBoundary;

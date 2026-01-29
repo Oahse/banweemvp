@@ -4,6 +4,7 @@ import * as z from 'zod';
 import { Input } from '../../forms/Input';
 import { Textarea } from '../../forms/Textarea';
 import { Button } from '../../ui/Button';
+import { unwrapResponse, extractErrorMessage } from '../../../utils/api-response';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),

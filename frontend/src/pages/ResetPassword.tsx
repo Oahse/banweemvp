@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { extractErrorMessage } from '../utils/api-response';
 
 export const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -37,11 +38,11 @@ export const ResetPassword = () => {
         setError('');
         setTimeout(() => navigate('/login'), 3000);
       } else {
-        setError(data.detail || 'Failed to reset password.');
+        setError(extractErrorMessage(data) || 'Failed to reset password.');
         setMessage('');
       }
     } catch (error) {
-      setError('An error occurred while resetting your password.');
+      setError(extractErrorMessage(error) || 'An error occurred while resetting your password.');
       setMessage('');
     }
   };

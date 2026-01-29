@@ -562,15 +562,15 @@ class APIClient {
   }
 
   async updateAddress(id, updates) {
-    return this.put(`/v1/users/me/addresses/${id}`, updates);
+    return this.put(`/users/me/addresses/${id}`, updates);
   }
 
   async deleteAddress(id) {
-    return this.delete(`/v1/users/me/addresses/${id}`);
+    return this.delete(`/users/me/addresses/${id}`);
   }
 
   async setDefaultAddress(id) {
-    return this.put(`/v1/users/me/addresses/${id}/default`, {});
+    return this.put(`/users/me/addresses/${id}/default`, {});
   }
 
   // Product methods
@@ -587,24 +587,24 @@ class APIClient {
         }
       });
     }
-    const url = `/v1/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return this.get(url);
   }
 
   async getProduct(id) {
-    return this.get(`/v1/products/${id}`);
+    return this.get(`/products/${id}`);
   }
 
   async getProductWithDetails(id) {
-    return this.get(`/v1/products/${id}?include_variants=true&include_reviews=true`);
+    return this.get(`/products/${id}?include_variants=true&include_reviews=true`);
   }
 
   async getFeaturedProducts(limit = 10) {
-    return this.get(`/v1/products/featured?limit=${limit}`);
+    return this.get(`/products/featured?limit=${limit}`);
   }
 
   async searchProducts(query) {
-    return this.get(`/v1/products/search?q=${encodeURIComponent(query)}`);
+    return this.get(`/products/search?q=${encodeURIComponent(query)}`);
   }
 
   // Category methods
@@ -619,11 +619,11 @@ class APIClient {
   }
 
   async updateCartItem(itemId, quantity) {
-    return this.put(`/v1/cart/items/${itemId}`, { quantity });
+    return this.put(`/cart/items/${itemId}`, { quantity });
   }
 
   async removeFromCart(itemId) {
-    return this.delete(`/v1/cart/items/${itemId}`);
+    return this.delete(`/cart/items/${itemId}`);
   }
 
   async clearCart() {

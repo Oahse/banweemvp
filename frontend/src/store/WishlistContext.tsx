@@ -60,13 +60,18 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
           toast.error(errorMsg);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       const errorMsg = 'Failed to load wishlists.';
       console.error('Failed to fetch wishlists:', error);
       setError(errorMsg);
       
-      // Retry mechanism: retry up to 2 times with exponential backoff
-      if (retryCount < 2) {
+      // Don't retry on 404 (endpoint doesn't exist) - just set empty wishlists
+      if (error?.response?.status === 404) {
+        setWishlists([]);
+        setDefaultWishlist(undefined);
+        setError(null); // Clear error for 404 since it's expected if feature doesn't exist
+      } else if (retryCount < 2) {
+        // Retry mechanism: retry up to 2 times with exponential backoff (for network errors)
         const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s
         setTimeout(() => fetchWishlists(retryCount + 1), delay);
       } else {

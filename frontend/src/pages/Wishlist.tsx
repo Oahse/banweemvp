@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { HeartIcon, ShoppingCartIcon, XCircleIcon, RefreshCwIcon, AlertCircleIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { PLACEHOLDER_IMAGES } from '../utils/placeholderImage';
+import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
 
 export const Wishlist = () => {
   const { defaultWishlist, removeItem, fetchWishlists, loading, error } = useWishlist();

@@ -74,8 +74,10 @@ export const Login = ({ isInitialLoading = false }) => {
       }
     }
     
-    // Fourth priority: role-based default (only if no other redirect is specified)
-    if (user?.role === 'Admin' || user?.role === 'Supplier') return '/admin';
+    // Fourth priority: role-based default (ONLY if no other redirect is specified)
+    // FIXED: Check Admin first, then Supplier, then default
+    if (user?.role === 'Admin') return '/admin';
+    if (user?.role === 'Supplier') return '/account/products';
     return '/account';
   }, [location.search, location.state, intendedDestination]);
 

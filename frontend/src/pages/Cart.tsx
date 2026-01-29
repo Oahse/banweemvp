@@ -9,6 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CartSkeleton } from '../components/ui/CartSkeleton';
 import { validation } from '../utils/validation';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
+import { CartAPI } from '../api/cart';
+import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
 
 export const Cart = () => {
   const { 
@@ -215,21 +217,14 @@ export const Cart = () => {
     }
 
     try {
-      // TODO: Replace with actual API call
-      // await CartAPI.applyPromocode(couponCode.trim().toUpperCase(), access_token);
+      // Call actual backend API for coupon validation
+      const response = await CartAPI.applyPromocode(couponCode.trim().toUpperCase());
+      const data = unwrapResponse(response);
       
-      // Mock coupon application logic for now
-      const validCoupons = ['SAVE10', 'WELCOME5', 'FREESHIP'];
-      const normalizedCode = couponCode.trim().toUpperCase();
-      
-      if (validCoupons.includes(normalizedCode)) {
-        toast.success(`Coupon ${normalizedCode} applied successfully!`);
-        setCouponCode('');
-      } else {
-        toast.error('Invalid coupon code. Please check and try again.');
-      }
+      toast.success(`Coupon applied! You saved ${formatCurrency(data.discount_amount || 0)}`);
+      setCouponCode('');
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to apply coupon. Please try again.';
+      const errorMessage = extractErrorMessage(error);
       toast.error(errorMessage);
     }
   };
@@ -366,6 +361,7 @@ export const Cart = () => {
               </Link>
               <button
                 onClick={() => handleRemoveItem(item.id)}
+                aria-label={`Remove ${item.variant?.product_name || 'item'} from cart`}
                 className="text-sm text-error hover:text-error-dark flex items-center mt-1">
                 <TrashIcon size={14} className="mr-1" />
                 Remove
@@ -389,7 +385,7 @@ export const Cart = () => {
               <button
                 onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                 className="px-2 py-1 text-copy-light hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Decrease quantity">
+                aria-label={`Decrease ${item.variant?.product_name || 'item'} quantity`}>
                 <MinusIcon size={14} />
               </button>
               <input
@@ -400,13 +396,14 @@ export const Cart = () => {
                 onChange={(e) =>
                   handleQuantityChange(item.id, parseInt(e.target.value) || 1)
                 }
-                className="w-10 text-center border-none focus:outline-none bg-transparent"
+                className="w-10 text-center border-none focus:outline-none focus:ring-1 focus:ring-primary bg-transparent"
+                aria-label={`Quantity for ${item.variant?.product_name || 'item'}`}
               />
               <button
                 onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                 disabled={item.variant?.stock !== undefined && item.quantity >= item.variant.stock}
                 className="px-2 py-1 text-copy-light hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Increase quantity">
+                aria-label={`Increase ${item.variant?.product_name || 'item'} quantity`}>
                 <PlusIcon size={14} />
               </button>
             </div>
@@ -516,16 +513,20 @@ export const Cart = () => {
                 </div>
               </div>
               <form onSubmit={handleApplyCoupon} className="mb-6">
+                <label htmlFor="coupon-code" className="block text-sm font-medium mb-2 text-copy">Promo Code (Optional)</label>
                 <div className="flex">
                   <input
+                    id="coupon-code"
                     type="text"
-                    placeholder="Coupon code"
-                    className="flex-grow px-4 py-2 border border-border rounded-l-md focus:outline-none focus:ring-1 focus:ring-primary bg-transparent"
+                    placeholder="Enter coupon code"
+                    className="flex-grow px-4 py-2 border border-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary bg-transparent"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
+                    aria-label="Coupon code"
                   />
                   <button
                     type="submit"
+                    aria-label="Apply coupon code"
                     className="bg-primary text-white px-4 py-2 rounded-r-md hover:bg-primary-dark transition-colors">
                     Apply
                   </button>

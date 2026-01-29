@@ -52,12 +52,16 @@ export const Checkout = () => {
           quantity: item.quantity
         })));
 
-        const stockCheck = stockCheckRes.data;
-        const stockIssues = stockCheck?.items?.filter(item => !item.available) || [];
+        // FIXED: Handle wrapped response structure
+        // Response might be: { success: true, data: { items: [...], all_available: boolean } }
+        const stockCheckData = stockCheckRes.data || stockCheckRes;
+        const stockCheck = stockCheckData?.data || stockCheckData;
+        
+        const stockIssues = stockCheck?.items?.filter((item: any) => !item.available) || [];
 
         setStockValidation({
-          valid: stockCheck?.all_available || false,
-          issues: stockIssues.map(issue => ({
+          valid: stockCheck?.all_available || (stockIssues.length === 0),
+          issues: stockIssues.map((issue: any) => ({
             variant_id: issue.variant_id,
             message: issue.message || 'Out of stock',
             current_stock: issue.current_stock || 0,
@@ -85,8 +89,21 @@ export const Checkout = () => {
   }, [cart?.items, authLoading, isAuthenticated]);
 
   // Checkout handler
+  // FIXED: SmartCheckoutForm success handler - properly clear cart and navigate
   const handleSmartCheckoutSuccess = (orderId: string) => {
-    navigate(`/account/orders/${orderId}`);
+    clearCart().then(() => {
+      navigate(`/account/orders/${orderId}`, {
+        replace: true,
+        state: { fromCheckout: true }
+      });
+    }).catch((error) => {
+      console.error('Failed to clear cart:', error);
+      // Still navigate even if cart clearing fails
+      navigate(`/account/orders/${orderId}`, {
+        replace: true,
+        state: { fromCheckout: true }
+      });
+    });
   };
 
   // Show loading state while checking authentication or loading cart
