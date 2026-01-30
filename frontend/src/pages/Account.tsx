@@ -25,6 +25,7 @@ const Addresses = lazy(() => import('../components/account/Addresses'));
 const MySubscriptions = lazy(() => import('../components/account/MySubscriptions').then(module => ({ default: module.MySubscriptions })));
 const SubscriptionEdit = lazy(() => import('../pages/SubscriptionEdit'));
 const SubscriptionOrders = lazy(() => import('../components/account/SubscriptionOrders').then(module => ({ default: module.SubscriptionOrders })));
+const SubscriptionDetails = lazy(() => import('../pages/account/SubscriptionDetails'));
 const PaymentMethods = lazy(() => import('../components/account/PaymentMethods').then(module => ({ default: module.PaymentMethods })));
 
 // Loading Spinner
@@ -65,6 +66,7 @@ export const Account = () => {
         <Route path="/addresses" element={<Addresses />} />
         <Route path="/payment-methods" element={<PaymentMethods />} />
         <Route path="/subscriptions" element={<MySubscriptions /> } />
+        <Route path="/subscriptions/:subscriptionId" element={<SubscriptionDetails />} />
         <Route path="/subscriptions/:subscriptionId/edit" element={<SubscriptionEdit />} />
         <Route path="/subscriptions/:subscriptionId/orders" element={<SubscriptionOrders />} />
         

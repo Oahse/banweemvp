@@ -191,17 +191,20 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
             </div>
           ) : (
             <>
-              <h3 className={combineThemeClasses(themeClasses.text.heading, 'text-lg font-semibold')}>
-                {subscription.plan_id.charAt(0).toUpperCase() + subscription.plan_id.slice(1)} Subscription
+              <h3 className={combineThemeClasses(themeClasses.text.primary, 'text-xs font-medium')}>
+                {subscription.plan_id?.charAt(0).toUpperCase() + subscription.plan_id?.slice(1)} Plan
               </h3>
               <div className="flex items-center gap-2 mt-1">
-                <span className={combineThemeClasses(themeClasses.text.primary, 'font-medium')}>
+                <span className={combineThemeClasses(themeClasses.text.primary, 'font-medium text-xs')}>
                   {formatCurrency(subscription.price, subscription.currency)}
                 </span>
                 <span className={themeClasses.text.secondary}>
                   / {subscription.billing_cycle}
                 </span>
               </div>
+              <p className={combineThemeClasses(themeClasses.text.secondary, 'text-xs mb-1')}>
+                {subscription.products?.length || 0} products • {subscription.billing_cycle}
+              </p>
             </>
           )}
         </div>
@@ -256,8 +259,8 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       {subscription.next_billing_date && subscription.status === 'active' && (
         <div className="flex items-center gap-2">
           <CalendarIcon className={combineThemeClasses(themeClasses.text.muted, 'w-4 h-4')} />
-          <span className={combineThemeClasses(themeClasses.text.secondary, 'text-sm')}>
-            Next billing date: {formatDate(subscription.next_billing_date)}
+          <span className={combineThemeClasses(themeClasses.text.secondary, 'text-xs')}>
+            Next billing: {formatDate(subscription.next_billing_date)}
           </span>
         </div>
       )}
@@ -558,13 +561,13 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
             </button>
 
             <div className="min-w-0">
-              <span className={combineThemeClasses(themeClasses.text.primary, 'font-medium')}>
+              <span className={combineThemeClasses(themeClasses.text.primary, 'font-medium text-xs')}>
                 Automatic Renewal
               </span>
               <p
                 className={combineThemeClasses(
                   themeClasses.text.secondary,
-                  'text-sm break-words'
+                  'text-xs break-words'
                 )}
               >
                 {subscription.auto_renew
@@ -590,10 +593,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   onClick={() => onPause(subscription.id)}
                   className={combineThemeClasses(
                     getButtonClasses('outline'),
-                    'text-sm flex items-center gap-1'
+                    'text-xs flex items-center gap-1'
                   )}
                 >
-                  <PauseIcon className="w-4 h-4" />
+                  <PauseIcon className="w-3 h-3" />
                   Pause
                 </button>
               )}
@@ -601,10 +604,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 <button
                   onClick={() => onCancel(subscription.id)}
                   className={combineThemeClasses(
-                    'px-3 py-1 text-sm rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors flex items-center gap-1'
+                    'px-3 py-1 text-xs rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors flex items-center gap-1'
                   )}
                 >
-                  <XIcon className="w-4 h-4" />
+                  <XIcon className="w-3 h-3" />
                   Cancel
                 </button>
               )}
@@ -616,10 +619,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               onClick={() => onResume(subscription.id)}
               className={combineThemeClasses(
                 getButtonClasses('primary'),
-                'text-sm flex items-center gap-1'
+                'text-xs flex items-center gap-1'
               )}
             >
-              <PlayIcon className="w-4 h-4" />
+              <PlayIcon className="w-3 h-3" />
               Resume
             </button>
           )}
@@ -629,10 +632,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               onClick={() => onActivate(subscription.id)}
               className={combineThemeClasses(
                 getButtonClasses('primary'),
-                'text-sm flex items-center gap-1'
+                'text-xs flex items-center gap-1'
               )}
             >
-              <PlayIcon className="w-4 h-4" />
+              <PlayIcon className="w-3 h-3" />
               Reactivate
             </button>
           )}

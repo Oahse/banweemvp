@@ -12,6 +12,7 @@ import {
 import { toast } from 'react-hot-toast';
 import { SubscriptionCard } from '../subscription/SubscriptionCard';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
+import { AutoRenewToggle } from '../subscription/AutoRenewToggle';
 import ProductsAPI from '../../api/products';
 import { Product } from '../../types';
 
@@ -328,16 +329,12 @@ export const MySubscriptions = () => {
                   </div>
 
                   <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="auto_renew"
-                      checked={newSubscriptionData.auto_renew}
-                      onChange={(e) => setNewSubscriptionData({...newSubscriptionData, auto_renew: e.target.checked})}
-                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    <AutoRenewToggle
+                      isEnabled={newSubscriptionData.auto_renew}
+                      onToggle={(enabled) => setNewSubscriptionData({...newSubscriptionData, auto_renew: enabled})}
+                      showDetails={false}
+                      size="sm"
                     />
-                    <label htmlFor="auto_renew" className="ml-2 block text-xs text-gray-700 dark:text-gray-300">
-                      Enable auto-renewal
-                    </label>
                   </div>
                 </div>
 
@@ -345,7 +342,7 @@ export const MySubscriptions = () => {
                 <div>
                   <div className="flex justify-between items-center mb-3">
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
-                      Select Products ({selectedProducts.size} selected)
+                      Select Product Variants ({selectedProducts.size} selected)
                     </label>
                     <div className="relative">
                       <SearchIcon size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -362,7 +359,7 @@ export const MySubscriptions = () => {
                     </div>
                   </div>
 
-                  <div className="border border-gray-200 dark:border-gray-600 rounded-lg max-h-60 overflow-y-auto">
+                  <div className="border border-gray-200 dark:border-gray-600 rounded-lg max-h-80 overflow-y-auto">
                     {availableProducts.length === 0 ? (
                       <div className="text-center py-8">
                         <PackageIcon size={32} className="text-gray-400 mx-auto mb-2" />
@@ -371,31 +368,120 @@ export const MySubscriptions = () => {
                     ) : (
                       <div className="divide-y divide-gray-200 dark:divide-gray-600">
                         {availableProducts.map((product) => (
-                          <div key={product.id} className="p-3">
-                            <label className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
-                              <input
-                                type="checkbox"
-                                checked={selectedProducts.has(product.id)}
-                                onChange={(e) => {
-                                  const newSelected = new Set(selectedProducts);
-                                  if (e.target.checked) {
-                                    newSelected.add(product.id);
-                                  } else {
-                                    newSelected.delete(product.id);
-                                  }
-                                  setSelectedProducts(newSelected);
-                                }}
-                                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                                  {product.name}
+                          <div key={product.id} className="p-4">
+                            {/* Product Header */}
+                            <div className="mb-3">
+                              <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                                {product.name}
+                              </h4>
+                              {product.description && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                  {product.description}
                                 </p>
-                                <p className="text-xs text-gray-500">
-                                  {product.price ? `$${product.price}` : 'Price not available'}
+                              )}
+                            </div>
+
+                            {/* Variants */}
+                            {product.variants && product.variants.length > 0 ? (
+                              <div className="space-y-2">
+                                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                  Available Variants:
                                 </p>
+                                {product.variants.map((variant: any) => (
+                                  <label
+                                    key={variant.id}
+                                    className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedProducts.has(variant.id)}
+                                      onChange={(e) => {
+                                        const newSelected = new Set(selectedProducts);
+                                        if (e.target.checked) {
+                                          newSelected.add(variant.id);
+                                        } else {
+                                          newSelected.delete(variant.id);
+                                        }
+                                        setSelectedProducts(newSelected);
+                                      }}
+                                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded flex-shrink-0 dark:border-gray-600 dark:bg-gray-700"
+                                    />
+
+                                    {/* Variant Image */}
+                                    {variant.images && variant.images.length > 0 ? (
+                                      <img
+                                        src={variant.images[0].url}
+                                        alt={variant.name || 'Variant'}
+                                        className="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0"
+                                      />
+                                    ) : (
+                                      <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                                        <PackageIcon size={16} className="text-gray-400" />
+                                      </div>
+                                    )}
+
+                                    {/* Variant Info */}
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                          {variant.name || 'Default Variant'}
+                                        </span>
+                                        <span className="text-sm font-bold text-primary">
+                                          {variant.current_price || variant.base_price || variant.price || product.price
+                                            ? `$${variant.current_price || variant.base_price || variant.price || product.price}`
+                                            : 'Price not available'
+                                          }
+                                        </span>
+                                      </div>
+                                      {variant.sku && (
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                          SKU: {variant.sku}
+                                        </p>
+                                      )}
+                                      {variant.attributes && Object.keys(variant.attributes).length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                          {Object.entries(variant.attributes).map(([key, value]) => (
+                                            <span key={key} className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded">
+                                              {key}: {String(value)}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </label>
+                                ))}
                               </div>
-                            </label>
+                            ) : (
+                              // Fallback for products without variants
+                              <label className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedProducts.has(product.id)}
+                                  onChange={(e) => {
+                                    const newSelected = new Set(selectedProducts);
+                                    if (e.target.checked) {
+                                      newSelected.add(product.id);
+                                    } else {
+                                      newSelected.delete(product.id);
+                                    }
+                                    setSelectedProducts(newSelected);
+                                  }}
+                                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded flex-shrink-0 dark:border-gray-600 dark:bg-gray-700"
+                                />
+
+                                {/* Product Info */}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                      Default Variant
+                                    </span>
+                                    <span className="text-sm font-bold text-primary">
+                                      {product.price ? `$${product.price}` : 'Price not available'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </label>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -458,7 +544,7 @@ export const MySubscriptions = () => {
                   disabled={isLoading || selectedProducts.size === 0}
                   className="px-4 py-2 text-xs font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? 'Creating...' : `Create Subscription (${selectedProducts.size} products)`}
+                  {isLoading ? 'Creating...' : `Create Subscription (${selectedProducts.size} variants)`}
                 </button>
               </div>
             </div>

@@ -49,10 +49,10 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
           ${sizeClasses[size]}
           ${disabled || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${isEnabled 
-            ? 'bg-green-500 hover:bg-green-600' 
+            ? 'bg-primary hover:bg-primary-dark' 
             : 'bg-gray-300 hover:bg-gray-400'
           }
-          focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+          focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
         `}
         aria-pressed={isEnabled}
         aria-label={`Auto-renew ${isEnabled ? 'enabled' : 'disabled'}`}
@@ -72,7 +72,7 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
             />
           ) : isEnabled ? (
             <RefreshCwIcon 
-              className={`text-green-500 ${
+              className={`text-primary ${
                 size === 'sm' ? 'w-2 h-2' : size === 'lg' ? 'w-4 h-4' : 'w-3 h-3'
               }`}
             />
@@ -95,7 +95,7 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
           <span className={`
             px-2 py-1 rounded-full text-xs font-medium
             ${isEnabled 
-              ? 'bg-green-100 text-green-800' 
+              ? 'bg-primary/10 text-primary' 
               : 'bg-gray-100 text-gray-600'
             }
           `}>
