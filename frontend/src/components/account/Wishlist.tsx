@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../store/WishlistContext';
 import { useCart } from '../../store/CartContext';
 import { useAuth } from '../../store/AuthContext';
+import { toast } from 'react-hot-toast';
 import { 
   HeartIcon, 
   ShoppingCartIcon, 
@@ -11,9 +12,10 @@ import {
   PackageIcon,
   EditIcon,
   EyeIcon,
-  ShareIcon
+  ShareIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon
 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
 import { ProductCard } from '../../components/product/ProductCard';
 import { Product, ProductVariant } from '../../types';
@@ -43,26 +45,21 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
   const [showClearModal, setShowClearModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 6;
 
   // Use items directly from defaultWishlist for real-time updates
   const items = defaultWishlist?.items || [];
 
-  // Debug: Log items data to see what we're working with
-  console.log('Wishlist items debug:', {
-    itemsCount: items.length,
-    items: items,
-    defaultWishlist: defaultWishlist,
-    hasDefaultWishlist: !!defaultWishlist,
-    itemsKeys: items.map(item => ({
-      id: item.id,
-      hasProduct: !!item.product,
-      hasVariant: !!item.variant,
-      productId: item.product_id,
-      variantId: item.variant_id,
-      productKeys: item.product ? Object.keys(item.product) : [],
-      variantKeys: item.variant ? Object.keys(item.variant) : []
-    }))
-  });
+  // Pagination calculations
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = items.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   useEffect(() => {
     // Set loading to false once we have defaultWishlist (even if empty)

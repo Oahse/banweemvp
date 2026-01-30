@@ -37,10 +37,10 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-background px-4">
-          <div className="max-w-md w-full bg-surface rounded-lg shadow-lg p-8 text-center">
-            <div className="mb-4">
+          <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 text-center">
+            <div className="mb-3">
               <svg
-                className="mx-auto h-16 w-16 text-error"
+                className="mx-auto h-12 w-12 text-red-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -53,25 +53,25 @@ class ErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-copy mb-2">
+            <h1 className="text-base font-medium text-main dark:text-white mb-1">
               Oops! Something went wrong
             </h1>
-            <p className="text-copy-light mb-6">
+            <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
               We encountered an unexpected error. Please try reloading the page.
             </p>
             {this.state.error && (
-              <details className="mb-6 text-left">
-                <summary className="cursor-pointer text-sm text-copy-muted hover:text-copy">
+              <details className="mb-3 text-left">
+                <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:text-main dark:hover:text-white">
                   Error details
                 </summary>
-                <pre className="mt-2 text-xs bg-surface-elevated p-3 rounded overflow-auto max-h-40">
+                <pre className="mt-2 text-xs bg-gray-50 dark:bg-gray-700 p-3 rounded overflow-auto max-h-40">
                   {this.state.error.toString()}
                 </pre>
               </details>
             )}
             <button
               onClick={this.handleReload}
-              className="w-full bg-primary hover:bg-primary-dark text-copy-inverse font-medium py-2 px-4 rounded-lg transition-colors"
+              className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition-colors text-xs"
             >
               Reload Page
             </button>
