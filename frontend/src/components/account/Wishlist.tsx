@@ -235,50 +235,102 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
-            {items.map((item) => {
-              const product = item.product;
-              const selectedVariant = item.variant || product?.variants?.find(v => v.id === item.variant_id) || product?.variants?.[0];
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
+              {currentItems.map((item) => {
+                const product = item.product;
+                const selectedVariant = item.variant || product?.variants?.find(v => v.id === item.variant_id) || product?.variants?.[0];
 
-              // If no product data, show a simple placeholder
-              if (!product) {
+                // If no product data, show a simple placeholder
+                if (!product) {
+                  return (
+                    <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700">
+                      <div className="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg mb-3 flex items-center justify-center">
+                        <PackageIcon size={24} className="text-gray-400" />
+                      </div>
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1 line-clamp-2">
+                        Loading product...
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Product ID: {item.product_id}
+                      </p>
+                      <div className="mt-3">
+                        <button
+                          onClick={() => handleRemoveFromWishlist(item.id)}
+                          className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                        >
+                          <TrashIcon size={12} />
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
-                  <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700">
-                    <div className="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg mb-3 flex items-center justify-center">
-                      <PackageIcon size={24} className="text-gray-400" />
-                    </div>
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1 line-clamp-2">
-                      Loading product...
-                    </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Product ID: {item.product_id}
-                    </p>
-                    <div className="mt-3">
-                      <button
-                        onClick={() => handleRemoveFromWishlist(item.id)}
-                        className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                      >
-                        <TrashIcon size={12} />
-                        Remove
-                      </button>
-                    </div>
-                  </div>
+                  <ProductCard
+                    key={item.id}
+                    product={product}
+                    selectedVariant={selectedVariant}
+                    className=""
+                    showSubscriptionButton={false}
+                    subscriptionId={null}
+                    wishlistMode={true}
+                  />
                 );
-              }
+              })}
+            </div>
 
-              return (
-                <ProductCard
-                  key={item.id}
-                  product={product}
-                  selectedVariant={selectedVariant}
-                  className=""
-                  showSubscriptionButton={false}
-                  subscriptionId={null}
-                  wishlistMode={true}
-                />
-              );
-            })}
-          </div>
+            {/* Pagination */}
+            <div className="flex justify-center items-center space-x-2 pt-4">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeftIcon size={14} className="mr-1" />
+                Previous
+              </button>
+              
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 text-xs rounded transition-colors ${
+                        currentPage === pageNum
+                          ? 'bg-primary text-white'
+                          : 'border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+              
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+                <ChevronRightIcon size={14} className="ml-1" />
+              </button>
+            </div>
+          </>
         )}
 
         {/* Clear Wishlist Modal */}
