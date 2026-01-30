@@ -462,7 +462,8 @@ export class SubscriptionAPI {
    */
   static async toggleAutoRenew(subscriptionId: string, autoRenew: boolean): Promise<Subscription> {
     return withErrorHandling(async () => {
-      const response = await apiClient.patch(`/subscriptions/${subscriptionId}/auto-renew`, { 
+      // Use the updateSubscription endpoint since it supports auto_renew
+      const response = await apiClient.put(`/subscriptions/${subscriptionId}`, { 
         auto_renew: autoRenew 
       });
       return response;

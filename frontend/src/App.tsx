@@ -137,7 +137,6 @@ export const App: React.FC = () => {
                         <Route path="/cart" element={<ProtectedRoute><Layout><Suspense fallback={<CartSkeleton />}><Cart /></Suspense></Layout></ProtectedRoute>} />
                         <Route path="/checkout" element={<ProtectedRoute><Layout><Suspense fallback={<CheckoutSkeleton />}><Checkout /></Suspense></Layout></ProtectedRoute>} />
                         <Route path="/account/*" element={<ProtectedRoute><Layout><Suspense fallback={<AccountSkeleton />}><Account /></Suspense></Layout></ProtectedRoute>} />
-                        <Route path="/track-order/:orderId" element={<ProtectedRoute><Layout><Suspense fallback={<PageSkeleton />}><TrackOrder /></Suspense></Layout></ProtectedRoute>} />
                         <Route path="/login" element={<Layout><Login /></Layout>} />
                         <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
                         <Route path="/register" element={<Layout><Register /></Layout>} />

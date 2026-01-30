@@ -6,6 +6,7 @@ export interface ThemeClasses {
   success: string;
   warning: string;
   error: string;
+  destructive: string;
   info: string;
   light: string;
   dark: string;
@@ -53,28 +54,30 @@ export const themeClasses: ThemeClasses = {
   success: 'bg-green-600 hover:bg-green-700 text-white',
   warning: 'bg-yellow-600 hover:bg-yellow-700 text-white',
   error: 'bg-red-600 hover:bg-red-700 text-white',
+  destructive: 'bg-red-600 hover:bg-red-700 text-white',
   info: 'bg-cyan-600 hover:bg-cyan-700 text-white',
   light: 'bg-gray-100 hover:bg-gray-200 text-gray-900',
   dark: 'bg-gray-900 hover:bg-gray-800 text-white',
   text: {
-    primary: 'text-gray-900',
-    secondary: 'text-gray-700',
-    muted: 'text-gray-500',
-    heading: 'text-gray-900 font-semibold',
-    error: 'text-red-600',
+    primary: 'text-gray-900 dark:text-gray-100',
+    secondary: 'text-gray-700 dark:text-gray-300',
+    muted: 'text-gray-500 dark:text-gray-400',
+    heading: 'text-gray-900 dark:text-gray-100 font-semibold',
+    error: 'text-red-600 dark:text-red-400',
+    destructive: 'text-red-600 dark:text-red-400',
     inverse: 'text-white',
   },
   background: {
-    surface: 'bg-white',
-    elevated: 'bg-gray-50',
+    surface: 'bg-white dark:bg-gray-800',
+    elevated: 'bg-gray-50 dark:bg-gray-900',
     primary: 'bg-blue-600',
   },
   input: {
     base: 'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-    default: 'border-gray-300',
+    default: 'border-gray-300 dark:border-gray-600',
   },
   card: {
-    base: 'bg-white rounded-lg border border-gray-200 shadow-sm',
+    base: 'bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm',
   },
   loading: {
     spinner: 'animate-spin border-4 border-blue-600 border-t-transparent rounded-full',
@@ -105,7 +108,7 @@ export function getInputClasses(error?: string): string {
 }
 
 export function getButtonClasses(
-  variant: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'light' | 'dark' | 'outline' = 'primary',
+  variant: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'destructive' | 'info' | 'light' | 'dark' | 'outline' = 'primary',
   size: 'sm' | 'md' | 'lg' = 'md',
   disabled = false
 ): string {
@@ -125,10 +128,11 @@ export function getButtonClasses(
     success: themeClasses.success,
     warning: themeClasses.warning,
     error: themeClasses.error,
+    destructive: themeClasses.destructive,
     info: themeClasses.info,
     light: themeClasses.light,
     dark: themeClasses.dark,
-    outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+    outline: 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700',
   };
   
   return combineThemeClasses(
@@ -140,7 +144,7 @@ export function getButtonClasses(
 }
 
 export function getCardClasses(elevated = false): string {
-  const baseClasses = 'bg-white rounded-lg border border-gray-200';
+  const baseClasses = 'bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700';
   const elevatedClasses = elevated ? 'shadow-lg' : 'shadow-sm';
   return combineThemeClasses(baseClasses, elevatedClasses);
 }
@@ -150,12 +154,12 @@ export function getTextClasses(
   size: 'xs' | 'sm' | 'base' | 'lg' | 'xl' = 'base'
 ): string {
   const variantClasses = {
-    primary: 'text-gray-900',
-    secondary: 'text-gray-700',
-    muted: 'text-gray-500',
-    success: 'text-green-600',
-    warning: 'text-yellow-600',
-    error: 'text-red-600',
+    primary: 'text-gray-900 dark:text-gray-100',
+    secondary: 'text-gray-700 dark:text-gray-300',
+    muted: 'text-gray-500 dark:text-gray-400',
+    success: 'text-green-600 dark:text-green-400',
+    warning: 'text-yellow-600 dark:text-yellow-400',
+    error: 'text-red-600 dark:text-red-400',
   };
 
   const sizeClasses = {

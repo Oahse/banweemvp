@@ -21,7 +21,8 @@ export const MySubscriptions = () => {
     subscriptions, 
     loading, 
     error, 
-    refreshSubscriptions, 
+    refreshSubscriptions,
+    manualRefresh,
     createSubscription, 
     updateSubscription, 
     cancelSubscription,
@@ -46,10 +47,6 @@ export const MySubscriptions = () => {
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [productSearchQuery, setProductSearchQuery] = useState<string>('');
   const itemsPerPage = 6;
-
-  useEffect(() => {
-    refreshSubscriptions();
-  }, [refreshSubscriptions]);
 
   useEffect(() => {
     if (showCreateModal) {
@@ -92,9 +89,50 @@ export const MySubscriptions = () => {
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <div className="animate-spin w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-400 mt-4">Loading your subscriptions...</p>
+      <div className="space-y-3">
+        {/* Header Skeleton */}
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
+          </div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
+        </div>
+
+        {/* Tabs Skeleton */}
+        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+          <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded flex-1 animate-pulse"></div>
+          <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded flex-1 animate-pulse"></div>
+          <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded flex-1 animate-pulse"></div>
+          <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded flex-1 animate-pulse"></div>
+        </div>
+
+        {/* Subscription Cards Skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 space-y-2 animate-pulse">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                </div>
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-6"></div>
+              </div>
+              <div className="space-y-1">
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+              </div>
+              <div className="flex gap-2">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -125,13 +163,25 @@ export const MySubscriptions = () => {
             Manage your active and past subscriptions
           </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors flex items-center text-xs"
-        >
-          <PlusIcon size={16} className="mr-2" />
-          Create
-        </button>
+        <div className="flex gap-2">
+          {/* Debug button */}
+          <button
+            onClick={() => {
+              console.log('Debug: Manual refresh triggered');
+              manualRefresh();
+            }}
+            className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded-md transition-colors flex items-center text-xs"
+          >
+            Debug Refresh
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors flex items-center text-xs"
+          >
+            <PlusIcon size={16} className="mr-2" />
+            Create
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -175,34 +225,42 @@ export const MySubscriptions = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {currentSubscriptions.map((subscription: any) => (
               <SubscriptionCard
                 key={subscription.id}
                 subscription={subscription}
-                onUpdate={async (subscriptionId: any, data: any) => {
-                  await updateSubscription(subscriptionId, data);
+                onUpdate={(subscriptionId: any, data: any) => {
+                  updateSubscription(subscriptionId, data);
+                  // Don't refresh - let the subscription update naturally
                 }}
-                onCancel={async (subscriptionId: any, reason?: string) => {
-                  await cancelSubscription(subscriptionId, reason);
+                onCancel={(subscriptionId: any, reason?: string) => {
+                  cancelSubscription(subscriptionId, reason);
+                  refreshSubscriptions();
                 }}
-                onActivate={async (subscriptionId: any) => {
-                  await activateSubscription(subscriptionId);
+                onActivate={(subscriptionId: any) => {
+                  activateSubscription(subscriptionId);
+                  refreshSubscriptions();
                 }}
-                onPause={async (subscriptionId: any, reason?: string) => {
-                  await pauseSubscription(subscriptionId, reason);
+                onPause={(subscriptionId: any, reason?: string) => {
+                  pauseSubscription(subscriptionId, reason);
+                  refreshSubscriptions();
                 }}
-                onResume={async (subscriptionId: any) => {
-                  await resumeSubscription(subscriptionId);
+                onResume={(subscriptionId: any) => {
+                  resumeSubscription(subscriptionId);
+                  refreshSubscriptions();
                 }}
-                onAddProducts={async (subscriptionId: any, productIds: any) => {
-                  await addProductsToSubscription(subscriptionId, productIds);
+                onAddProducts={(subscription: any) => {
+                  // Extract subscriptionId and productIds from the subscription object
+                  const subscriptionId = subscription.id;
+                  const productIds = subscription.products?.map((p: any) => p.id) || [];
+                  addProductsToSubscription(subscriptionId, productIds);
                 }}
-                onRemoveProducts={async (subscriptionId: any, productIds: any) => {
-                  await removeProductsFromSubscription(subscriptionId, productIds);
-                }}
-                onToggleAutoRenew={async (subscriptionId: any, autoRenew: any) => {
-                  await updateSubscription(subscriptionId, { auto_renew: autoRenew });
+                onRemoveProduct={(subscription: any) => {
+                  // Extract subscriptionId and productIds from the subscription object
+                  const subscriptionId = subscription.id;
+                  const productIds = subscription.products?.map((p: any) => p.id) || [];
+                  removeProductsFromSubscription(subscriptionId, productIds);
                 }}
               />
             ))}

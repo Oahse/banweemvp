@@ -375,7 +375,7 @@ export const ProductCard = ({
                 : 'bg-surface text-copy hover:bg-primary hover:text-white'
                 }`}
               aria-label={isInCart ? "Remove from cart" : "Add to cart"}>
-              {isInCart ? <CheckIcon size={16} /> : <ShoppingCartIcon size={16} />}
+              {isInCart ? <ShoppingCartIcon size={16} /> : <ShoppingCartIcon size={16} />}
             </button>
             <button
               onClick={handleAddToWishlist}
@@ -423,14 +423,7 @@ export const ProductCard = ({
           </div>
         </div>
         
-        {/* Subscription Icon - Show above buttons for users with active subscriptions */}
-        {isAuthenticated && hasActiveSubscriptions && (
-          <div className="flex justify-center pt-2 pb-1">
-            <div className="inline-flex items-center justify-center w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full hover:bg-green-200 dark:hover:bg-green-800 transition-colors cursor-pointer group">
-              <CalendarIcon size={16} className="text-green-600 dark:text-green-300 group-hover:scale-110 transition-transform" />
-            </div>
-          </div>
-        )}
+        
         
         <div className="mt-auto pt-1.5 sm:pt-2 space-y-1.5 sm:space-y-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
@@ -467,7 +460,7 @@ export const ProductCard = ({
                 onClick={handleAddToCart}
                 disabled={(displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0}
                 className={cn(
-                  'flex items-center justify-center px-1.5 py-1.5 rounded-md text-xs font-medium transition-colors',
+                  'flex items-center justify-center px-1 py-1.5 rounded-md text-xs font-medium transition-colors',
                   (displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0 
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : isInCart
@@ -477,7 +470,7 @@ export const ProductCard = ({
                 aria-label={isInCart ? "In cart" : "Add to cart"}>
                 {isInCart ? (
                   <>
-                    <CheckIcon size={10} />
+                    <ShoppingCartIcon size={10} />
                   </>
                 ) : (
                   <>
@@ -521,7 +514,7 @@ export const ProductCard = ({
               onClick={handleAddToCart}
               disabled={(displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0}
               className={cn(
-                'flex items-center justify-center px-2 py-1.5 rounded-md text-xs font-medium transition-colors min-w-[80px] sm:min-w-[100px] whitespace-nowrap',
+                'flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors min-w-[40px]',
                 (displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0 
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : isInCart
@@ -531,8 +524,7 @@ export const ProductCard = ({
               aria-label={isInCart ? "In cart" : "Add to cart"}>
               {isInCart ? (
                 <>
-                  <CheckIcon size={12} />
-                  <span className="ml-1 text-xs">In Cart</span>
+                  <ShoppingCartIcon size={12} />
                 </>
               ) : (
                 <>
@@ -559,10 +551,9 @@ export const ProductCard = ({
             {isAuthenticated && hasActiveSubscriptions && (
               <button
                 onClick={handleAddToSubscription}
-                className="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-2 py-1.5 rounded-md text-xs font-medium transition-colors min-w-[70px] sm:min-w-[90px] whitespace-nowrap"
+                className="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors min-w-[40px]"
                 aria-label="Add to subscription">
                 <CalendarIcon size={12} />
-                <span className="ml-1 text-xs">Sub</span>
               </button>
             )}
           </div>
