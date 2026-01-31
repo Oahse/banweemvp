@@ -6,7 +6,7 @@ import { AuthAPI } from '../../api';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 import { SkeletonAddresses } from '../ui/SkeletonAddresses';
 import { Dropdown } from '../ui/Dropdown';
-import { countries, getCountryOptions, getProvinceOptions, getCountryByCode, getProvincesByCountry } from '../../data/countries';
+import { countries, getCountryOptions, getProvinceOptions, getCountryByCode, getProvincesByCountry, getCityOptions, getCitiesByProvince } from '../../data/countries';
 
 /**
  * Addresses component allows users to manage their saved addresses.
@@ -264,7 +264,19 @@ export const Addresses = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     City
                   </label>
-                  <input type="text" name="city" value={formData.city} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white" required />
+                  {getCitiesByProvince(formData.country, formData.state).length > 0 ? (
+                    <Dropdown
+                      options={getCityOptions(formData.country, formData.state)}
+                      value={formData.city}
+                      placeholder="Select a city..."
+                      onChange={(value) => setFormData({ ...formData, city: value })}
+                      className="w-full"
+                      searchable={true}
+                      searchPlaceholder="Search cities..."
+                    />
+                  ) : (
+                    <input type="text" name="city" value={formData.city} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white" placeholder="Enter city" required />
+                  )}
                 </div>
                 {/* State/Province Input */}
                 <div>
