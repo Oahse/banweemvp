@@ -447,7 +447,7 @@ class APIClient {
   }
 
   // HTTP Methods
-  async get(url, config) {
+  async get(url: string, config?: any) {
     // Check cache for GET requests to reduce API calls
     const cacheKey = requestCache.getCacheKey('GET', url, config?.params);
     const cachedData = requestCache.get(cacheKey);

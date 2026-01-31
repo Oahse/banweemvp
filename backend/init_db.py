@@ -168,14 +168,50 @@ PRODUCT_VARIANTS = [
 ]
 
 PRODUCT_IMAGES = [
-    {"product_name": "Organic Wheat", "url": "https://example.com/images/wheat.jpg", "alt_text": "Organic wheat grains", "is_primary": True},
-    {"product_name": "Basmati Rice", "url": "https://example.com/images/rice.jpg", "alt_text": "Basmati rice grains", "is_primary": True},
-    {"product_name": "Soybeans", "url": "https://example.com/images/soybeans.jpg", "alt_text": "Soybeans", "is_primary": True},
-    {"product_name": "Fresh Tomatoes", "url": "https://example.com/images/tomatoes.jpg", "alt_text": "Fresh tomatoes", "is_primary": True},
-    {"product_name": "Coffee Beans", "url": "https://example.com/images/coffee.jpg", "alt_text": "Coffee beans", "is_primary": True},
-    {"product_name": "Turmeric Powder", "url": "https://example.com/images/turmeric.jpg", "alt_text": "Turmeric powder", "is_primary": True},
-    {"product_name": "Almonds", "url": "https://example.com/images/almonds.jpg", "alt_text": "Almonds", "is_primary": True},
-    {"product_name": "Raw Honey", "url": "https://example.com/images/honey.jpg", "alt_text": "Raw honey", "is_primary": True},
+    # Organic Wheat - Multiple images for different variants
+    {"product_name": "Organic Wheat", "variant_sku": "WHT-ORG-5KG", "url": "https://images.unsplash.com/photo-1596217784236-2a4b8c1c8231?w=800&h=600&fit=crop", "alt_text": "Organic wheat grains 5kg bag", "is_primary": True, "sort_order": 1},
+    {"product_name": "Organic Wheat", "variant_sku": "WHT-ORG-5KG", "url": "https://images.unsplash.com/photo-1586028969761-44fa731c0a6c?w=800&h=600&fit=crop", "alt_text": "Organic wheat close-up", "is_primary": False, "sort_order": 2},
+    {"product_name": "Organic Wheat", "variant_sku": "WHT-ORG-5KG", "url": "https://images.unsplash.com/photo-1571260899303-26959c86b5a5?w=800&h=600&fit=crop", "alt_text": "Wheat field harvest", "is_primary": False, "sort_order": 3},
+    
+    {"product_name": "Organic Wheat", "variant_sku": "WHT-ORG-10KG", "url": "https://images.unsplash.com/photo-1596217784236-2a4b8c1c8231?w=800&h=600&fit=crop", "alt_text": "Organic wheat grains 10kg bag", "is_primary": True, "sort_order": 1},
+    {"product_name": "Organic Wheat", "variant_sku": "WHT-ORG-10KG", "url": "https://images.unsplash.com/photo-1586028969761-44fa731c0a6c?w=800&h=600&fit=crop", "alt_text": "Organic wheat grains close-up", "is_primary": False, "sort_order": 2},
+    {"product_name": "Organic Wheat", "variant_sku": "WHT-ORG-10KG", "url": "https://images.unsplash.com/photo-1571260899303-26959c86b5a5?w=800&h=600&fit=crop", "alt_text": "Wheat field landscape", "is_primary": False, "sort_order": 3},
+    
+    {"product_name": "Organic Wheat", "variant_sku": "WHT-ORG-25KG", "url": "https://images.unsplash.com/photo-1596217784236-2a4b8c1c8231?w=800&h=600&fit=crop", "alt_text": "Organic wheat grains 25kg bag", "is_primary": True, "sort_order": 1},
+    {"product_name": "Organic Wheat", "variant_sku": "WHT-ORG-25KG", "url": "https://images.unsplash.com/photo-1586028969761-44fa731c0a6c?w=800&h=600&fit=crop", "alt_text": "Premium organic wheat", "is_primary": False, "sort_order": 2},
+    {"product_name": "Organic Wheat", "variant_sku": "WHT-ORG-25KG", "url": "https://images.unsplash.com/photo-1571260899303-26959c86b5a5?w=800&h=600&fit=crop", "alt_text": "Organic wheat farming", "is_primary": False, "sort_order": 3},
+
+    # Basmati Rice - Multiple images for different variants
+    {"product_name": "Basmati Rice", "variant_sku": "RICE-BSM-5KG", "url": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&h=600&fit=crop", "alt_text": "Basmati rice 5kg package", "is_primary": True, "sort_order": 1},
+    {"product_name": "Basmati Rice", "variant_sku": "RICE-BSM-5KG", "url": "https://images.unsplash.com/photo-1536627457993-8c6bfc17a8d6?w=800&h=600&fit=crop", "alt_text": "Basmati rice grains close-up", "is_primary": False, "sort_order": 2},
+    {"product_name": "Basmati Rice", "variant_sku": "RICE-BSM-5KG", "url": "https://images.unsplash.com/photo-1512058565366-79b16d96508a?w=800&h=600&fit=crop", "alt_text": "Cooked basmati rice", "is_primary": False, "sort_order": 3},
+    
+    {"product_name": "Basmati Rice", "variant_sku": "RICE-BSM-10KG", "url": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&h=600&fit=crop", "alt_text": "Basmati rice 10kg package", "is_primary": True, "sort_order": 1},
+    {"product_name": "Basmati Rice", "variant_sku": "RICE-BSM-10KG", "url": "https://images.unsplash.com/photo-1536627457993-8c6bfc17a8d6?w=800&h=600&fit=crop", "alt_text": "Premium basmati rice", "is_primary": False, "sort_order": 2},
+    {"product_name": "Basmati Rice", "variant_sku": "RICE-BSM-10KG", "url": "https://images.unsplash.com/photo-1512058565366-79b16d96508a?w=800&h=600&fit=crop", "alt_text": "Basmati rice bowl", "is_primary": False, "sort_order": 3},
+    
+    {"product_name": "Basmati Rice", "variant_sku": "RICE-BSM-25KG", "url": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&h=600&fit=crop", "alt_text": "Basmati rice 25kg package", "is_primary": True, "sort_order": 1},
+    {"product_name": "Basmati Rice", "variant_sku": "RICE-BSM-25KG", "url": "https://images.unsplash.com/photo-1536627457993-8c6bfc17a8d6?w=800&h=600&fit=crop", "alt_text": "Long grain basmati rice", "is_primary": False, "sort_order": 2},
+    {"product_name": "Basmati Rice", "variant_sku": "RICE-BSM-25KG", "url": "https://images.unsplash.com/photo-1512058565366-79b16d96508a?w=800&h=600&fit=crop", "alt_text": "Basmati rice cooking", "is_primary": False, "sort_order": 3},
+
+    # Soybeans - Multiple images for different variants
+    {"product_name": "Soybeans", "variant_sku": "SOY-ORG-5KG", "url": "https://images.unsplash.com/photo-1599502851242-15d9fdbbeded?w=800&h=600&fit=crop", "alt_text": "Organic soybeans 5kg bag", "is_primary": True, "sort_order": 1},
+    {"product_name": "Soybeans", "variant_sku": "SOY-ORG-5KG", "url": "https://images.unsplash.com/photo-1621266177648-d4f2f1f65b09?w=800&h=600&fit=crop", "alt_text": "Soybeans close-up", "is_primary": False, "sort_order": 2},
+    {"product_name": "Soybeans", "variant_sku": "SOY-ORG-5KG", "url": "https://images.unsplash.com/photo-1572025448864-6836b834c9aa?w=800&h=600&fit=crop", "alt_text": "Soybean plants", "is_primary": False, "sort_order": 3},
+    
+    {"product_name": "Soybeans", "variant_sku": "SOY-ORG-10KG", "url": "https://images.unsplash.com/photo-1599502851242-15d9fdbbeded?w=800&h=600&fit=crop", "alt_text": "Organic soybeans 10kg bag", "is_primary": True, "sort_order": 1},
+    {"product_name": "Soybeans", "variant_sku": "SOY-ORG-10KG", "url": "https://images.unsplash.com/photo-1621266177648-d4f2f1f65b09?w=800&h=600&fit=crop", "alt_text": "Fresh soybeans", "is_primary": False, "sort_order": 2},
+    {"product_name": "Soybeans", "variant_sku": "SOY-ORG-10KG", "url": "https://images.unsplash.com/photo-1572025448864-6836b834c9aa?w=800&h=600&fit=crop", "alt_text": "Soybean harvest", "is_primary": False, "sort_order": 3},
+    
+    {"product_name": "Soybeans", "variant_sku": "SOY-ORG-25KG", "url": "https://images.unsplash.com/photo-1599502851242-15d9fdbbeded?w=800&h=600&fit=crop", "alt_text": "Organic soybeans 25kg bag", "is_primary": True, "sort_order": 1},
+    {"product_name": "Soybeans", "variant_sku": "SOY-ORG-25KG", "url": "https://images.unsplash.com/photo-1621266177648-d4f2f1f65b09?w=800&h=600&fit=crop", "alt_text": "Premium soybeans", "is_primary": False, "sort_order": 2},
+    {"product_name": "Soybeans", "variant_sku": "SOY-ORG-25KG", "url": "https://images.unsplash.com/photo-1572025448864-6836b834c9aa?w=800&h=600&fit=crop", "alt_text": "Soybean field", "is_primary": False, "sort_order": 3},
+
+    # Coffee Beans - Multiple images for different variants
+    {"product_name": "Coffee Beans", "variant_sku": "COF-1KG", "url": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop", "alt_text": "Coffee beans 1kg bag", "is_primary": True, "sort_order": 1},
+    {"product_name": "Coffee Beans", "variant_sku": "COF-1KG", "url": "https://images.unsplash.com/photo-1447912702728-d4f2f1f65b09?w=800&h=600&fit=crop", "alt_text": "Coffee beans close-up", "is_primary": False, "sort_order": 2},
+    {"product_name": "Coffee Beans", "variant_sku": "COF-1KG", "url": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop", "alt_text": "Roasted coffee beans", "is_primary": False, "sort_order": 3},
+    {"product_name": "Coffee Beans", "variant_sku": "COF-1KG", "url": "https://images.unsplash.com/photo-1415239673538-0990d59a5f5c?w=800&h=600&fit=crop", "alt_text": "Coffee cup with beans", "is_primary": False, "sort_order": 4},
 ]
 
 USERS = [
@@ -355,9 +391,9 @@ PRICING_CONFIGS = [
 ]
 
 SUBSCRIPTIONS = [
-    {"user_email": "buyer.sarah@agrihub.com", "plan_type": "monthly", "status": "active", "product_name": "Organic Wheat - 5kg", "quantity": 2},
-    {"user_email": "distributor.mike@agrihub.com", "plan_type": "quarterly", "status": "active", "product_name": "Basmati Rice - 5kg", "quantity": 5},
-    {"user_email": "retailer.jane@agrihub.com", "plan_type": "monthly", "status": "active", "product_name": "Coffee Beans - 500g", "quantity": 3},
+    {"user_email": "buyer.sarah@agrihub.com", "name": "Premium Wheat Subscription", "status": "active", "product_name": "Organic Wheat - 5kg", "quantity": 2, "billing_cycle": "monthly"},
+    {"user_email": "distributor.mike@agrihub.com", "name": "Bulk Rice Supply", "status": "active", "product_name": "Basmati Rice - 5kg", "quantity": 5, "billing_cycle": "quarterly"},
+    {"user_email": "retailer.jane@agrihub.com", "name": "Coffee Club Monthly", "status": "active", "product_name": "Coffee Beans - 500g", "quantity": 3, "billing_cycle": "monthly"},
 ]
 
 PAYMENT_METHODS = [
@@ -636,30 +672,30 @@ async def seed_product_images(session: AsyncSession):
         products_result = await session.execute(select(Product))
         products = {prod.name: prod for prod in products_result.scalars()}
         
-        variants_result = await session.execute(select(ProductVariant))
+        variants_result = await session.execute(select(ProductVariant).options(selectinload(ProductVariant.product)))
         variants = list(variants_result.scalars())
         
-        # Create a mapping from product name to first variant
-        product_to_variant = {}
+        # Create a mapping from SKU to variant
+        sku_to_variant = {}
         for variant in variants:
-            if variant.product and variant.product.name not in product_to_variant:
-                product_to_variant[variant.product.name] = variant
+            sku_to_variant[variant.sku] = variant
         
         images = []
         for image_data in PRODUCT_IMAGES:
-            product = products.get(image_data["product_name"])
-            variant = product_to_variant.get(image_data["product_name"])
+            variant = sku_to_variant.get(image_data["variant_sku"])
             
-            if product and variant:
+            if variant:
                 image = ProductImage(
                     variant_id=variant.id,
                     url=image_data["url"],
                     alt_text=image_data["alt_text"],
                     is_primary=image_data["is_primary"],
-                    sort_order=1,
+                    sort_order=image_data["sort_order"],
                     format="jpg"
                 )
                 images.append(image)
+            else:
+                print(f"⚠️ Warning: Variant with SKU '{image_data['variant_sku']}' not found")
         
         session.add_all(images)
         await session.commit()
@@ -1389,6 +1425,96 @@ async def seed_sample_orders(session: AsyncSession):
         await session.rollback()
         raise
 
+async def seed_subscriptions(session: AsyncSession):
+    """Seed subscriptions using models"""
+    models = get_models()
+    Subscription = models['Subscription']
+    SubscriptionProduct = models['SubscriptionProduct']
+    User = models['User']
+    ProductVariant = models['ProductVariant']
+    
+    try:
+        # Check if subscriptions already exist
+        result = await session.execute(select(Subscription).limit(1))
+        existing = result.scalar_one_or_none()
+        
+        if existing:
+            print("✅ Subscriptions already exist. Skipping...")
+            return
+        
+        print(f"🔄 Seeding {len(SUBSCRIPTIONS)} subscriptions...")
+        
+        # Get users and variants
+        users_result = await session.execute(select(User))
+        users = {user.email: user for user in users_result.scalars()}
+        
+        variants_result = await session.execute(select(ProductVariant))
+        variants = list(variants_result.scalars())
+        
+        # Create a mapping from product name to first variant
+        product_to_variant = {}
+        for variant in variants:
+            if variant.product and variant.product.name not in product_to_variant:
+                product_to_variant[variant.product.name] = variant
+        
+        subscriptions = []
+        subscription_products = []
+        
+        for sub_data in SUBSCRIPTIONS:
+            user = users.get(sub_data["user_email"])
+            variant = product_to_variant.get(sub_data["product_name"])
+            
+            if user and variant:
+                # Create subscription
+                subscription = Subscription(
+                    user_id=user.id,
+                    name=sub_data["name"],
+                    status=sub_data["status"],
+                    price=variant.base_price * sub_data["quantity"],
+                    currency="USD",
+                    billing_cycle=sub_data["billing_cycle"],
+                    auto_renew=True,
+                    current_period_start=datetime.utcnow(),
+                    current_period_end=datetime.utcnow() + timedelta(days=30 if sub_data["billing_cycle"] == "monthly" else 90),
+                    next_billing_date=datetime.utcnow() + timedelta(days=30 if sub_data["billing_cycle"] == "monthly" else 90),
+                    variant_ids=[str(variant.id)],
+                    subtotal=variant.base_price * sub_data["quantity"],
+                    shipping_cost=5.0,
+                    tax_amount=(variant.base_price * sub_data["quantity"]) * 0.08,
+                    total=(variant.base_price * sub_data["quantity"]) * 1.08 + 5.0
+                )
+                subscriptions.append(subscription)
+        
+        # Save subscriptions first to get IDs
+        session.add_all(subscriptions)
+        await session.flush()
+        
+        # Create subscription products
+        for i, sub_data in enumerate(SUBSCRIPTIONS):
+            subscription = subscriptions[i]
+            variant = product_to_variant.get(sub_data["product_name"])
+            
+            if variant:
+                subscription_product = SubscriptionProduct(
+                    subscription_id=subscription.id,
+                    product_id=variant.product_id,
+                    variant_id=variant.id,
+                    name=sub_data["product_name"],
+                    quantity=sub_data["quantity"],
+                    unit_price=variant.base_price,
+                    total_price=variant.base_price * sub_data["quantity"]
+                )
+                subscription_products.append(subscription_product)
+        
+        session.add_all(subscription_products)
+        await session.commit()
+        print(f"✅ Successfully seeded {len(subscriptions)} subscriptions with {len(subscription_products)} products")
+        
+    except Exception as e:
+        print(f"❌ Error seeding subscriptions: {e}")
+        await session.rollback()
+        raise
+
 async def count_records(session: AsyncSession):
     """Count records in all tables for verification"""
     models = get_models()
@@ -1480,6 +1606,7 @@ async def main():
                 await seed_promo_codes(session)
                 await seed_warehouses(session)
                 await seed_inventory(session)
+                await seed_subscriptions(session)
                 # Create a completely fresh connection for orders to avoid cached statements
                 from core.db import DatabaseManager
                 fresh_db_manager = DatabaseManager()

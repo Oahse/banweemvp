@@ -34,8 +34,68 @@ import ErrorMessage from '../components/Error';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 
+// TypeScript interfaces
+interface ProductVariant {
+  id: string;
+  product_id: string;
+  sku: string;
+  name: string;
+  base_price: number;
+  sale_price: number | null;
+  stock: number;
+  barcode: string;
+  qr_code: string;
+  attributes: Record<string, any>;
+  images: ProductImage[];
+  is_active?: boolean;
+  created_at?: string;
+}
+
+interface ProductImage {
+  id: string;
+  url: string;
+  alt_text: string;
+  is_primary: boolean;
+  sort_order: number;
+  format: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  longDescription?: string;
+  price: number;
+  discountPrice?: number | null;
+  rating: number;
+  reviewCount: number;
+  sku: string;
+  variants: ProductVariant[];
+  features?: string[];
+  specifications?: Record<string, any>;
+  brand?: string | null;
+  category?: string | null;
+  stock?: number;
+  images?: string[];
+  reviews?: any[];
+}
+
+interface SelectedVariant {
+  id: string;
+  name: string;
+  base_price: number;
+  sale_price: number | null;
+  current_price: number;
+  discount_percentage: number;
+  stock: number;
+  sku: string;
+  attributes: Record<string, any>;
+  barcode: string;
+  qr_code: string;
+}
+
 // Transform API product data with null checks
-const transformProduct = (product, averageRating, reviewCount) => {
+const transformProduct = (product: any, averageRating: number, reviewCount: number): Product | null => {
   if (!product) return null;
   
   return {
@@ -51,15 +111,19 @@ const transformProduct = (product, averageRating, reviewCount) => {
     brand: product.supplier ? `${product.supplier.firstname || ''} ${product.supplier.lastname || ''}`.trim() : null,
     sku: product.variants?.[0]?.sku,
     stock: product.variants?.[0]?.stock || 0,
-    images: product.variants?.[0]?.images?.map(img => img?.url).filter(Boolean) || [],
-    variants: product.variants?.map(variant => ({
+    images: product.variants?.[0]?.images?.map((img: any) => img?.url).filter(Boolean) || [],
+    variants: product.variants?.map((variant: any): ProductVariant => ({
       id: variant.id,
+      product_id: variant.product_id || product.id,
+      sku: variant.sku || '',
       name: variant.name || '',
       base_price: variant.base_price || 0,
       sale_price: variant.sale_price || null,
       stock: variant.stock || 0,
-      sku: variant.sku || '',
-      attributes: variant.attributes || {}
+      barcode: variant.barcode || '',
+      qr_code: variant.qr_code || '',
+      attributes: variant.attributes || {},
+      images: variant.images || []
     })) || [],
     features: [
       'High Quality Product',
@@ -81,17 +145,19 @@ export const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedVariant, setSelectedVariant] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState('description');
-  const [showQR, setShowQR] = useState(false);
-  const [showBarcode, setShowBarcode] = useState(false);
-  const [showSubscriptionSelector, setShowSubscriptionSelector] = useState(false);
-  const [minRating, setMinRating] = useState(undefined);
-  const [maxRating, setMaxRating] = useState(undefined);
-  const [sortBy, setSortBy] = useState(undefined);
-  const [reviewsPage, setReviewsPage] = useState(1);
+  const [selectedVariant, setSelectedVariant] = useState<SelectedVariant | null>(null);
+  const [selectedImage, setSelectedImage] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [activeTab, setActiveTab] = useState<string>('description');
+  const [showQR, setShowQR] = useState<boolean>(false);
+  const [showBarcode, setShowBarcode] = useState<boolean>(false);
+  const [showSubscriptionSelector, setShowSubscriptionSelector] = useState<boolean>(false);
+  const [minRating, setMinRating] = useState<number | undefined>(undefined);
+  const [maxRating, setMaxRating] = useState<number | undefined>(undefined);
+  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+  const [reviewsPage, setReviewsPage] = useState<number>(1);
+  const [isCartUpdating, setIsCartUpdating] = useState<boolean>(false);
+  const [isWishlistUpdating, setIsWishlistUpdating] = useState<boolean>(false);
 
   const { addItem: addToCart, removeItem: removeFromCart, updateQuantity, cart, refreshCart } = useCart();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist, defaultWishlist } = useWishlist();
@@ -250,40 +316,69 @@ export const ProductDetails = () => {
   );
   const cartQuantity = cartItem?.quantity || 0;
 
-  // Helper function to handle cart operations with better error handling
+  // Helper function to handle cart operations with better error handling and real-time updates
   const handleCartOperation = async (operation: 'increment' | 'decrement') => {
     if (!selectedVariant) {
       toast.error('Please select a variant');
       return;
     }
 
-    if (!cartItem) {
-      toast.error('Item not found in cart. Refreshing...');
-      await refreshCart();
+    if (isCartUpdating) {
+      toast.error('Please wait, updating cart...');
       return;
     }
 
+    setIsCartUpdating(true);
+
     try {
       console.log(`Cart ${operation}:`, { 
-        cartItemId: cartItem.id, 
+        cartItemId: cartItem?.id, 
         currentQuantity: cartQuantity, 
-        variantId: selectedVariant.id 
+        variantId: selectedVariant.id,
+        stock: selectedVariant.stock
       });
 
       if (operation === 'decrement') {
         const newQuantity = Math.max(0, cartQuantity - 1);
         if (newQuantity === 0) {
-          await removeFromCart(cartItem.id);
+          if (cartItem) {
+            await removeFromCart(cartItem.id);
+            toast.success('Item removed from cart');
+          } else {
+            toast.error('Item not found in cart');
+          }
         } else {
-          await updateQuantity(cartItem.id, newQuantity);
+          if (cartItem) {
+            await updateQuantity(cartItem.id, newQuantity);
+            toast.success('Cart updated');
+          } else {
+            toast.error('Cart item not found');
+          }
         }
       } else {
-        await updateQuantity(cartItem.id, cartQuantity + 1);
+        // Check stock availability
+        if (cartQuantity >= selectedVariant.stock) {
+          toast.error('Cannot add more items than available in stock');
+          return;
+        }
+
+        if (cartItem) {
+          await updateQuantity(cartItem.id, cartQuantity + 1);
+          toast.success('Cart updated');
+        } else {
+          // Add new item to cart
+          await addToCart({ variant_id: String(selectedVariant.id), quantity: 1 });
+          toast.success('Item added to cart');
+        }
       }
+      
+      // Refresh cart to ensure real-time sync
+      await refreshCart();
+      
     } catch (error: any) {
       console.error(`Failed to ${operation} cart:`, error);
       
-      // Handle 404 errors (item not found)
+      // Handle different error types
       if (error?.status === 404 || error?.statusCode === 404 || error?.message?.includes('not found')) {
         toast.error('Cart item not found. Refreshing cart...');
         await refreshCart();
@@ -293,14 +388,21 @@ export const ProductDetails = () => {
           try {
             await addToCart({ variant_id: String(selectedVariant.id), quantity: 1 });
             toast.success('Item re-added to cart');
+            await refreshCart();
           } catch (addError) {
             console.error('Failed to re-add item:', addError);
             toast.error('Failed to add item to cart');
           }
         }
+      } else if (error?.status === 400 || error?.statusCode === 400) {
+        toast.error('Invalid request. Please try again.');
+      } else if (error?.message?.includes('stock')) {
+        toast.error('Not enough stock available');
       } else {
         toast.error(error?.message || `Failed to ${operation} cart item`);
       }
+    } finally {
+      setIsCartUpdating(false);
     }
   };
 
@@ -327,15 +429,22 @@ export const ProductDetails = () => {
           {/* Product Images */}
           <div className="space-y-4">
             <ProductImageGallery
-              images={selectedVariant 
-                ? (actualProductData.variants?.find(v => v.id === selectedVariant.id)?.images || [])
-                : (actualProductData.variants?.[0]?.images || [])
-              }
+              images={actualProductData.variants?.flatMap((variant: ProductVariant) => variant.images || []) || []}
               selectedImageIndex={selectedImage}
               onImageSelect={setSelectedImage}
               showThumbnails={true}
               zoomEnabled={true}
+              className=""
             />
+            
+            {/* Debug: Show image count */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="text-xs text-gray-500 mt-2">
+                Total Images: {actualProductData.variants?.flatMap((variant: ProductVariant) => variant.images || [])?.length || 0} | 
+                Selected Variant: {selectedVariant?.name || 'None'} | 
+                Selected Variant Images: {actualProductData.variants?.find((v: ProductVariant) => v.id === selectedVariant?.id)?.images?.length || 0}
+              </div>
+            )}
             
             {/* QR Code and Barcode Section - Mobile Optimized */}
             {selectedVariant && (
@@ -369,9 +478,9 @@ export const ProductDetails = () => {
 
             {/* QR Code Modal */}
             <QRCodeModal
-              data={selectedVariant?.qr_code || `${window.location.origin}/products/${id}`}
+              data={`${window.location.origin}/products/${id}`}
               title={`${product.name} - QR Code`}
-              description={`QR Code for ${product.name} (${selectedVariant?.sku || product.sku})`}
+              description={`Scan to view ${product.name} product page`}
               isOpen={showQR}
               onClose={() => setShowQR(false)}
             />
@@ -387,12 +496,21 @@ export const ProductDetails = () => {
                   base_price: selectedVariant.base_price,
                   sale_price: selectedVariant.sale_price,
                   stock: selectedVariant.stock,
-                  images: actualProductData.variants?.find(v => v.id === selectedVariant.id)?.images || [],
                   product_name: product.name,
-                  barcode: selectedVariant.barcode,
+                  barcode: JSON.stringify({
+                    url: `${window.location.origin}/products/${id}`,
+                    productId: actualProductData.id,
+                    sku: selectedVariant.sku,
+                    variantId: selectedVariant.id,
+                    variantName: selectedVariant.name,
+                    supplier: actualProductData.supplier ? `${actualProductData.supplier.firstname || ''} ${actualProductData.supplier.lastname || ''}`.trim() : 'Unknown',
+                    price: selectedVariant.sale_price || selectedVariant.base_price,
+                    stock: selectedVariant.stock,
+                    attributes: selectedVariant.attributes
+                  }),
                   qr_code: selectedVariant.qr_code
                 }}
-                title={`${product.name} - Product Codes`}
+                title={`${product.name} - Barcode`}
                 isOpen={showBarcode}
                 onClose={() => setShowBarcode(false)}
                 canGenerate={false} // Set to true if user has admin permissions
@@ -403,119 +521,122 @@ export const ProductDetails = () => {
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-main mb-2">{product.name}</h1>
+              <h1 className="text-xl font-bold text-main mb-2">{product.name}</h1>
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center">
                   <div className="flex text-yellow-400">
                     {Array.from({ length: 5 }, (_, i) => (
                       <StarIcon
                         key={i}
-                        size={16}
+                        size={14}
                         className={i < Math.floor(product.rating) ? 'fill-current' : ''}
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-copy-light ml-2">
+                  <span className="text-xs text-copy-light ml-2">
                     ({product.reviewCount} reviews)
                   </span>
                 </div>
-                <span className="text-sm text-copy-light">SKU: {product.sku}</span>
+                <span className="text-xs text-copy-light">SKU: {product.sku}</span>
               </div>
 
               <div className="flex items-center space-x-4 mb-4">
                 {selectedVariant?.sale_price && selectedVariant.sale_price < selectedVariant.base_price ? (
                   <>
-                    <span className="text-3xl font-bold text-primary">
+                    <span className="text-xl font-bold text-primary">
                       {formatCurrency(selectedVariant.sale_price)}
                     </span>
-                    <span className="text-xl text-copy-light line-through">
+                    <span className="text-sm text-copy-light line-through">
                       {formatCurrency(selectedVariant.base_price)}
                     </span>
-                    <span className="bg-error-100 text-error-600 px-2 py-1 rounded text-sm font-medium">
+                    <span className="bg-error-100 text-error-600 px-2 py-1 rounded text-xs font-medium">
                       {Math.round(((selectedVariant.base_price - selectedVariant.sale_price) / selectedVariant.base_price) * 100)}% OFF
                     </span>
                   </>
                 ) : (
-                  <span className="text-3xl font-bold text-primary">
+                  <span className="text-xl font-bold text-primary">
                     {formatCurrency(selectedVariant?.sale_price || selectedVariant?.base_price || product.price)}
                   </span>
                 )}
               </div>
 
-              <p className="text-copy-light mb-6">{product.description}</p>
+              <p className="text-sm text-copy-light mb-6">{product.description}</p>
+              
+              {/* Variant Selection - Moved under description */}
+              {actualProductData?.variants && product.variants && product.variants.length > 1 && selectedVariant && (
+                <div className="mb-6">
+                  <VariantSelector
+                    variants={actualProductData.variants.map(variant => ({
+                      id: variant.id,
+                      product_id: variant.product_id || actualProductData.id,
+                      sku: variant.sku || '',
+                      name: variant.name || '',
+                      base_price: variant.base_price || 0,
+                      sale_price: variant.sale_price || null,
+                      stock: variant.stock || 0,
+                      barcode: variant.barcode || '',
+                      qr_code: variant.qr_code || '',
+                      attributes: variant.attributes ? Object.entries(variant.attributes).map(([name, value]) => ({
+                        id: `${variant.id}-${name}`,
+                        name,
+                        value: String(value)
+                      })) : [],
+                      images: variant.images || []
+                    }))}
+                    selectedVariant={{
+                      id: selectedVariant.id,
+                      product_id: actualProductData.id,
+                      sku: selectedVariant.sku || '',
+                      name: selectedVariant.name || '',
+                      base_price: selectedVariant.base_price || 0,
+                      sale_price: selectedVariant.sale_price || null,
+                      stock: selectedVariant.stock || 0,
+                      barcode: selectedVariant.barcode || '',
+                      qr_code: selectedVariant.qr_code || '',
+                      attributes: selectedVariant.attributes ? Object.entries(selectedVariant.attributes).map(([name, value]) => ({
+                        id: `${selectedVariant.id}-${name}`,
+                        name,
+                        value: String(value)
+                      })) : [],
+                      images: actualProductData.variants?.find(v => v.id === selectedVariant.id)?.images || []
+                    }}
+                    onVariantChange={(variant) => {
+                      const originalVariant = actualProductData.variants?.find(v => v.id === variant.id);
+                      if (originalVariant) {
+                        setSelectedVariant({
+                          id: originalVariant.id,
+                          name: originalVariant.name,
+                          base_price: originalVariant.base_price,
+                          sale_price: originalVariant.sale_price,
+                          current_price: originalVariant.current_price,
+                          discount_percentage: originalVariant.discount_percentage,
+                          stock: originalVariant.stock,
+                          sku: originalVariant.sku,
+                          attributes: originalVariant.attributes,
+                          barcode: originalVariant.barcode,
+                          qr_code: originalVariant.qr_code,
+                        });
+                      }
+                    }}
+                    showImages={false}
+                    showPrice={true}
+                    showStock={true}
+                    layout="grid"
+                    className=""
+                  />
+                </div>
+              )}
             </div>
-
-            {/* Variant Selection */}
-            {actualProductData?.variants && product.variants && product.variants.length > 1 && selectedVariant && (
-              <VariantSelector
-                variants={actualProductData.variants.map(variant => ({
-                  id: variant.id,
-                  product_id: variant.product_id || actualProductData.id,
-                  sku: variant.sku || '',
-                  name: variant.name || '',
-                  base_price: variant.base_price || 0,
-                  sale_price: variant.sale_price || null,
-                  stock: variant.stock || 0,
-                  barcode: variant.barcode || '',
-                  qr_code: variant.qr_code || '',
-                  attributes: variant.attributes ? Object.entries(variant.attributes).map(([name, value]) => ({
-                    id: `${variant.id}-${name}`,
-                    name,
-                    value: String(value)
-                  })) : [],
-                  images: variant.images || []
-                }))}
-                selectedVariant={{
-                  id: selectedVariant.id,
-                  product_id: actualProductData.id,
-                  sku: selectedVariant.sku || '',
-                  name: selectedVariant.name || '',
-                  base_price: selectedVariant.base_price || 0,
-                  sale_price: selectedVariant.sale_price || null,
-                  stock: selectedVariant.stock || 0,
-                  barcode: selectedVariant.barcode || '',
-                  qr_code: selectedVariant.qr_code || '',
-                  attributes: selectedVariant.attributes ? Object.entries(selectedVariant.attributes).map(([name, value]) => ({
-                    id: `${selectedVariant.id}-${name}`,
-                    name,
-                    value: String(value)
-                  })) : [],
-                  images: actualProductData.variants?.find(v => v.id === selectedVariant.id)?.images || []
-                }}
-                onVariantChange={(variant) => {
-                  const originalVariant = actualProductData.variants?.find(v => v.id === variant.id);
-                  if (originalVariant) {
-                    setSelectedVariant({
-                      id: originalVariant.id,
-                      name: originalVariant.name,
-                      base_price: originalVariant.base_price,
-                      sale_price: originalVariant.sale_price,
-                      current_price: originalVariant.current_price,
-                      discount_percentage: originalVariant.discount_percentage,
-                      stock: originalVariant.stock,
-                      sku: originalVariant.sku,
-                      attributes: originalVariant.attributes,
-                      barcode: originalVariant.barcode,
-                      qr_code: originalVariant.qr_code,
-                    });
-                  }
-                }}
-                showImages={false}
-                showPrice={true}
-                showStock={true}
-                layout="grid"
-              />
-            )}
 
             {/* Stock Status */}
             {selectedVariant && (
               <div className="mb-4">
                 {selectedVariant.stock > 0 ? (
-                  <span className="text-sm text-success-600 font-medium">
+                  <span className="text-xs text-success-600 font-medium">
                     ✓ In Stock ({selectedVariant.stock} available)
                   </span>
                 ) : (
-                  <span className="text-sm text-error-600 font-medium">
+                  <span className="text-xs text-error-600 font-medium">
                     ✗ Out of Stock
                   </span>
                 )}
@@ -525,22 +646,22 @@ export const ProductDetails = () => {
             {/* Quantity Selection */}
             {selectedVariant && selectedVariant.stock > 0 && (
               <div>
-                <h3 className="font-medium text-main mb-3">Quantity:</h3>
-                <div className="flex items-center space-x-3">
+                <h3 className="text-xs font-medium text-main mb-3">Quantity:</h3>
+                <div className="flex items-center space-x-2">
                   <button
                     onClick={() => handleQuantityChange(quantity - 1)}
                     disabled={quantity <= 1}
-                    className="w-10 h-10 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                   >
-                    <MinusIcon size={16} />
+                    <MinusIcon size={12} />
                   </button>
-                  <span className="w-16 text-center font-medium">{quantity}</span>
+                  <span className="w-12 text-center font-medium text-sm">{quantity}</span>
                   <button
                     onClick={() => handleQuantityChange(quantity + 1)}
                     disabled={selectedVariant && quantity >= selectedVariant.stock}
-                    className="w-10 h-10 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                   >
-                    <PlusIcon size={16} />
+                    <PlusIcon size={12} />
                   </button>
                 </div>
               </div>
@@ -549,41 +670,71 @@ export const ProductDetails = () => {
             {/* Action Buttons */}
             <div className="space-y-4 mb-6">
               {/* Cart Button with Quantity */}
-              <div className="flex space-x-4">
+              <div className="flex space-x-3">
                 <div className="flex-1">
                   {cartQuantity > 0 ? (
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => handleCartOperation('decrement')}
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-md transition-colors"
+                        disabled={isCartUpdating}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1.5 rounded-md transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <MinusIcon size={16} />
+                        {isCartUpdating ? (
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+                        ) : (
+                          <MinusIcon size={12} />
+                        )}
                       </button>
-                      <span className="bg-primary text-white px-4 py-2 rounded-md font-medium min-w-[120px] text-center">
+                      <span className="bg-primary text-white px-3 py-2 rounded-md font-medium min-w-[100px] text-center text-xs">
                         In Cart ({cartQuantity})
                       </span>
                       <button
                         onClick={() => handleCartOperation('increment')}
-                        disabled={selectedVariant && cartQuantity >= selectedVariant.stock}
-                        className="bg-primary hover:bg-primary-dark text-white p-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isCartUpdating || (selectedVariant ? cartQuantity >= selectedVariant.stock : true)}
+                        className="bg-primary hover:bg-primary-dark text-white p-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                       >
-                        <PlusIcon size={16} />
+                        {isCartUpdating ? (
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                        ) : (
+                          <PlusIcon size={12} />
+                        )}
                       </button>
                     </div>
                   ) : (
                     <button
                       onClick={async () => {
                         if (!selectedVariant) return;
+                        if (isCartUpdating) return;
+                        
+                        setIsCartUpdating(true);
                         await executeWithAuth(async () => {
-                          await addToCart({ variant_id: String(selectedVariant.id), quantity: quantity });
-                          return true;
+                          try {
+                            await addToCart({ variant_id: String(selectedVariant.id), quantity: quantity });
+                            toast.success(`${quantity} item(s) added to cart`);
+                            await refreshCart();
+                            return true;
+                          } catch (error: any) {
+                            console.error('Failed to add to cart:', error);
+                            toast.error(error?.message || 'Failed to add item to cart');
+                            return false;
+                          }
                         }, 'cart');
+                        setIsCartUpdating(false);
                       }}
-                      disabled={!selectedVariant || selectedVariant.stock <= 0}
-                      className="w-full bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!selectedVariant || selectedVariant.stock <= 0 || isCartUpdating}
+                      className="w-full bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-xs"
                     >
-                      <ShoppingCartIcon size={20} className="mr-2" />
-                      {selectedVariant && selectedVariant.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                      {isCartUpdating ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Adding...
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingCartIcon size={16} className="mr-2" />
+                          {selectedVariant && selectedVariant.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                        </>
+                      )}
                     </button>
                   )}
                 </div>
@@ -591,41 +742,74 @@ export const ProductDetails = () => {
                 {/* Wishlist Button */}
                 <button
                   onClick={async () => {
+                    if (isWishlistUpdating) {
+                      toast.error('Please wait, updating wishlist...');
+                      return;
+                    }
+
+                    setIsWishlistUpdating(true);
+                    
                     await executeWithAuth(async () => {
                       if (!defaultWishlist) {
                         toast.error("No default wishlist found.");
                         return false;
                       }
-                      if (isInWishlistState) {
-                        const wishlistItem = defaultWishlist.items?.find(
-                          item => item?.product_id === product.id && (selectedVariant ? item?.variant_id === selectedVariant.id : true)
-                        );
-                        if (wishlistItem) {
-                          await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
+                      
+                      try {
+                        if (isInWishlistState) {
+                          const wishlistItem = defaultWishlist.items?.find(
+                            item => item?.product_id === product.id && (selectedVariant ? item?.variant_id === selectedVariant.id : true)
+                          );
+                          if (wishlistItem) {
+                            await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
+                            toast.success('Item removed from wishlist');
+                          }
+                        } else {
+                          await addToWishlist(product.id, selectedVariant?.id, quantity);
+                          toast.success('Item added to wishlist');
                         }
-                      } else {
-                        await addToWishlist(product.id, selectedVariant?.id, quantity);
+                        return true;
+                      } catch (error: any) {
+                        console.error('Wishlist operation failed:', error);
+                        toast.error(error?.message || 'Failed to update wishlist');
+                        return false;
                       }
-                      return true;
                     }, 'wishlist');
+                    
+                    setIsWishlistUpdating(false);
                   }}
-                  className={`px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center min-w-[60px] ${isInWishlistState
+                  disabled={isWishlistUpdating}
+                  className={`px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center min-w-[50px] text-xs disabled:opacity-50 disabled:cursor-not-allowed ${isInWishlistState
                     ? 'bg-error-100 text-error-600 hover:bg-error-200'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   title={isInWishlistState ? 'Remove from Wishlist' : 'Add to Wishlist'}
                 >
-                  <HeartIcon size={20} className={isInWishlistState ? 'fill-current' : ''} />
+                  {isWishlistUpdating ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                  ) : (
+                    <HeartIcon size={16} className={isInWishlistState ? 'fill-current' : ''} />
+                  )}
                 </button>
               </div>
 
               {/* Subscription Button */}
               {isAuthenticated && hasActiveSubscriptions && selectedVariant && selectedVariant.stock > 0 && (
                 <button
-                  onClick={() => setShowSubscriptionSelector(true)}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-colors flex items-center justify-center text-sm sm:text-base"
+                  onClick={() => {
+                    if (!selectedVariant) {
+                      toast.error('Please select a variant first');
+                      return;
+                    }
+                    if (selectedVariant.stock <= 0) {
+                      toast.error('This variant is out of stock');
+                      return;
+                    }
+                    setShowSubscriptionSelector(true);
+                  }}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-xs"
                 >
-                  <CalendarIcon size={18} className="mr-1 sm:mr-2 flex-shrink-0" />
+                  <CalendarIcon size={14} className="mr-1 sm:mr-2 flex-shrink-0" />
                   <span className="truncate">Add to Subscription</span>
                 </button>
               )}
@@ -634,32 +818,32 @@ export const ProductDetails = () => {
             {/* Product Features */}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
-                <TruckIcon size={20} className="text-primary" />
-                <span className="text-sm">Standard Shipping Available</span>
+                <TruckIcon size={16} className="text-primary" />
+                <span className="text-xs">Standard Shipping Available</span>
               </div>
               <div className="flex items-center space-x-2">
-                <ShieldCheckIcon size={20} className="text-primary" />
-                <span className="text-sm">Secure Payment</span>
+                <ShieldCheckIcon size={16} className="text-primary" />
+                <span className="text-xs">Secure Payment</span>
               </div>
               <div className="flex items-center space-x-2">
-                <RefreshCwIcon size={20} className="text-primary" />
-                <span className="text-sm">Easy Returns</span>
+                <RefreshCwIcon size={16} className="text-primary" />
+                <span className="text-xs">Easy Returns</span>
               </div>
               <div className="flex items-center space-x-2">
-                <ShareIcon size={20} className="text-primary" />
-                <span className="text-sm">Share Product</span>
+                <ShareIcon size={16} className="text-primary" />
+                <span className="text-xs">Share Product</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Product Details Tabs */}
-        <div className="mb-12">
-          <div className="border-b border-gray-200 mb-6">
-            <nav className="flex space-x-8">
+        <div className="mb-8">
+          <div className="border-b border-gray-200 mb-4">
+            <nav className="flex space-x-6">
               <button
                 onClick={() => setActiveTab('description')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'description'
+                className={`py-2 px-1 border-b-2 font-medium text-xs ${activeTab === 'description'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-copy-light hover:text-copy'
                   }`}
@@ -668,7 +852,7 @@ export const ProductDetails = () => {
               </button>
               <button
                 onClick={() => setActiveTab('specifications')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'specifications'
+                className={`py-2 px-1 border-b-2 font-medium text-xs ${activeTab === 'specifications'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-copy-light hover:text-copy'
                   }`}
@@ -677,7 +861,7 @@ export const ProductDetails = () => {
               </button>
               <button
                 onClick={() => setActiveTab('reviews')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'reviews'
+                className={`py-2 px-1 border-b-2 font-medium text-xs ${activeTab === 'reviews'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-copy-light hover:text-copy'
                   }`}
@@ -690,11 +874,11 @@ export const ProductDetails = () => {
           <div className="prose max-w-none">
             {activeTab === 'description' && (
               <div>
-                <p className="text-copy-light mb-4">{product.longDescription}</p>
-                <h4 className="font-medium text-main mb-2">Features:</h4>
+                <p className="text-sm text-copy-light mb-4">{product.longDescription}</p>
+                <h4 className="text-sm font-medium text-main mb-2">Features:</h4>
                 <ul className="list-disc list-inside space-y-1">
-                  {product.features.map((feature, index) => (
-                    <li key={index} className="text-copy-light">{feature}</li>
+                  {product.features?.map((feature: string, index: number) => (
+                    <li key={index} className="text-sm text-copy-light">{feature}</li>
                   ))}
                 </ul>
               </div>
@@ -703,10 +887,10 @@ export const ProductDetails = () => {
             {activeTab === 'specifications' && (
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(product.specifications).map(([key, value]) => (
+                  {Object.entries(product.specifications || {}).map(([key, value]) => (
                     <div key={key} className="flex justify-between py-2 border-b border-gray-100">
-                      <span className="font-medium text-main">{key}:</span>
-                      <span className="text-copy-light">{value}</span>
+                      <span className="text-sm font-medium text-main">{key}:</span>
+                      <span className="text-sm text-copy-light">{value}</span>
                     </div>
                   ))}
                 </div>
@@ -718,7 +902,7 @@ export const ProductDetails = () => {
                 <div className="flex items-center space-x-4 mb-6">
                   {/* Min Rating Filter */}
                   <div>
-                    <label htmlFor="minRating" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Min Rating</label>
+                    <label htmlFor="minRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Min Rating</label>
                     <select
                       id="minRating"
                       value={minRating || ''}
@@ -732,7 +916,7 @@ export const ProductDetails = () => {
 
                   {/* Max Rating Filter */}
                   <div>
-                    <label htmlFor="maxRating" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Max Rating</label>
+                    <label htmlFor="maxRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Max Rating</label>
                     <select
                       id="maxRating"
                       value={maxRating || ''}
@@ -746,7 +930,7 @@ export const ProductDetails = () => {
 
                   {/* Sort By */}
                   <div>
-                    <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Sort By</label>
+                    <label htmlFor="sortBy" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Sort By</label>
                     <select
                       id="sortBy"
                       value={sortBy || ''}
@@ -782,24 +966,24 @@ export const ProductDetails = () => {
                       <div key={review.id} className="border-b border-gray-100 pb-6">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
-                            <span className="font-medium text-main">
+                            <span className="text-sm font-medium text-main">
                               {review.user?.firstname || 'Anonymous'} {review.user?.lastname || ''}
                             </span>
                             <div className="flex text-yellow-400">
                               {Array.from({ length: 5 }, (_, i) => (
                                 <StarIcon
                                   key={i}
-                                  size={14}
+                                  size={12}
                                   className={i < (review.rating || 0) ? 'fill-current' : ''}
                                 />
                               ))}
                             </div>
                           </div>
-                          <span className="text-sm text-copy-light">
+                          <span className="text-xs text-copy-light">
                             {review.created_at ? new Date(review.created_at).toLocaleDateString() : ''}
                           </span>
                         </div>
-                        <p className="text-copy-light">{review.comment || ''}</p>
+                        <p className="text-sm text-copy-light">{review.comment || ''}</p>
                       </div>
                     ))}
 
@@ -862,9 +1046,9 @@ export const ProductDetails = () => {
         </div>
 
         {/* Related Products */}
-        <section className="py-12 bg-surface">
+        <section className="py-8 bg-surface">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-main mb-8">Related Products</h2>
+            <h2 className="text-lg font-bold text-main mb-6">Related Products</h2>
 
             {relatedError && (
               <ErrorMessage
@@ -874,7 +1058,7 @@ export const ProductDetails = () => {
               />
             )}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {relatedLoading ? (
                 Array(4).fill(0).map((_, index) => (
                   <div key={index} className="animate-pulse">
@@ -905,12 +1089,8 @@ export const ProductDetails = () => {
                     <ProductCard
                       key={relatedProduct.id}
                       product={transformedProduct}
-                      addToCart={addToCart}
-                      removeFromCart={removeFromCart}
-                      isInCart={cart?.items?.some(item => item?.variant?.product_id === relatedProduct.id)}
-                      addToWishlist={addToWishlist}
-                      removeFromWishlist={removeFromWishlist}
-                      isInWishlist={isInWishlist(relatedProduct.id)}
+                      selectedVariant={transformedProduct.variants?.[0]}
+                      className=""
                     />
                   );
                 }).filter(Boolean)
@@ -928,7 +1108,7 @@ export const ProductDetails = () => {
           <SubscriptionSelector
             isOpen={showSubscriptionSelector}
             onClose={() => setShowSubscriptionSelector(false)}
-            productName={product.name}
+            product={product}
             variantId={selectedVariant.id}
             quantity={quantity}
             onSuccess={() => {

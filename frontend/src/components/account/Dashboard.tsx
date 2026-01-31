@@ -262,7 +262,7 @@ export const Dashboard = ({
               <div key={subscription.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-xs font-medium text-main dark:text-white">
-                    {subscription.plan_id} Plan
+                    {subscription.name}
                   </h3>
                   <span className="px-2 py-1 text-xs rounded-full bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light">
                     Active

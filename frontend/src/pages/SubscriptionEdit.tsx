@@ -83,6 +83,7 @@ export const SubscriptionEdit = () => {
 
   // Form state
   const [formData, setFormData] = useState({
+    name: '',
     delivery_address: {
       street: '',
       city: '',
@@ -156,6 +157,7 @@ export const SubscriptionEdit = () => {
 
       setSubscription(mockSubscription);
       setFormData({
+        name: mockSubscription.subscription_plan?.name || 'My Subscription',
         delivery_address: mockSubscription.delivery_address,
         auto_renew: mockSubscription.auto_renew,
         billing_cycle: mockSubscription.subscription_plan?.billing_interval || 'monthly'
@@ -320,91 +322,184 @@ export const SubscriptionEdit = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         {/* Details Tab */}
         {activeTab === 'details' && (
-          <div className="p-6 space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Subscription Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Plan
-                  </label>
-                  <select
-                    value={subscription.subscription_plan?.id || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, plan_id: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="basic">Basic Plan - $29.99/month</option>
-                    <option value="premium">Premium Plan - $49.99/month</option>
-                    <option value="enterprise">Enterprise Plan - $99.99/month</option>
-                  </select>
+          <div className="p-6 space-y-8">
+            {/* Main Subscription Info */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-6 border border-blue-100 dark:border-gray-600">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Subscription Information
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+                    Subscription Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Enter subscription name (e.g., Premium Coffee Plan)"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium transition-all duration-200"
+                    maxLength={255}
+                  />
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Give your subscription a descriptive name
+                    </p>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                      {formData.name.length}/255
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
                     Billing Cycle
                   </label>
                   <select
                     value={formData.billing_cycle}
                     onChange={(e) => setFormData(prev => ({ ...prev, billing_cycle: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium transition-all duration-200"
                   >
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
                     <option value="yearly">Yearly</option>
                   </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Choose how often you're billed
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              </div>
+            </div>
+
+            {/* Settings Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                Settings & Status
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">
                     Auto-renew
                   </label>
-                  <div className="flex items-center">
-                    <button
-                      onClick={() => setFormData(prev => ({ ...prev, auto_renew: !prev.auto_renew }))}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        formData.auto_renew ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-600'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          formData.auto_renew ? 'translate-x-6' : 'translate-x-1'
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setFormData(prev => ({ ...prev, auto_renew: !prev.auto_renew }))}
+                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                          formData.auto_renew ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-500'
                         }`}
-                      />
-                    </button>
-                    <span className="ml-3 text-sm text-gray-700 dark:text-gray-300">
-                      {formData.auto_renew ? 'Enabled' : 'Disabled'}
-                    </span>
+                      >
+                        <span
+                          className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 ${
+                            formData.auto_renew ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                      <div>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {formData.auto_renew ? 'Enabled' : 'Disabled'}
+                        </span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {formData.auto_renew ? 'Automatically renew subscription' : 'Manual renewal required'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Status
+                
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                    Current Status
                   </label>
-                  <div className="p-2">
+                  <div className="flex items-center justify-center">
                     {getStatusBadge(subscription.status)}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Timeline</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Created:</span>
-                  <span className="text-sm text-gray-900 dark:text-white">
-                    {new Date(subscription.created_at).toLocaleDateString()}
+            {/* Timeline Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                Timeline & Important Dates
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-600 rounded-xl border border-purple-100 dark:border-gray-600">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">Created</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Subscription start date</p>
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {new Date(subscription.created_at).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Current Period:</span>
-                  <span className="text-sm text-gray-900 dark:text-white">
+                
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-gray-700 dark:to-gray-600 rounded-xl border border-blue-100 dark:border-gray-600">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">Current Period</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Billing period dates</p>
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {new Date(subscription.current_period_start).toLocaleDateString()} - {new Date(subscription.current_period_end).toLocaleDateString()}
                   </span>
                 </div>
+                
                 {subscription.next_billing_date && (
-                  <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Next Billing:</span>
-                    <span className="text-sm text-gray-900 dark:text-white">
-                      {new Date(subscription.next_billing_date).toLocaleDateString()}
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-600 rounded-xl border border-green-100 dark:border-gray-600">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Next Billing</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Upcoming charge date</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {new Date(subscription.next_billing_date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
                     </span>
                   </div>
                 )}

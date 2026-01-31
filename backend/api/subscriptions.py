@@ -179,7 +179,7 @@ async def create_subscription(
         # Create subscription with quantities
         subscription = await subscription_service.create_subscription(
             user_id=current_user.id,
-            plan_id=subscription_data.plan_id,
+            name=subscription_data.name,
             product_variant_ids=product_variant_ids,
             variant_quantities=variant_quantities,
             delivery_type=subscription_data.delivery_type,
@@ -193,8 +193,8 @@ async def create_subscription(
             message="Subscription created successfully! Orders will be placed automatically based on your billing cycle."
         )
         
-    except APIException:
-        raise
+    except APIException as e:
+        raise e
     except Exception as e:
         logger.error(f"Error creating subscription: {e}")
         raise APIException(
@@ -229,7 +229,10 @@ async def get_subscriptions(
             "has_more": end_idx < len(subscriptions)
         })
     except APIException:
-        raise
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message="Failed to get subscriptions"
+        )
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -265,7 +268,10 @@ async def add_products_to_subscription(
         )
     except APIException as e:
         print(e,'====error')
-        raise
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to add products to subscription: {str(e)}"
+        )
     except Exception as e:
         print(e,'====error')
         raise APIException(
@@ -301,7 +307,10 @@ async def remove_products_from_subscription(
             message="Products removed from subscription successfully"
         )
     except APIException:
-        raise
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message="Failed to remove products from subscription"
+        )
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -327,7 +336,10 @@ async def update_variant_quantity(
             message=f"Variant quantity updated to {request.quantity} successfully"
         )
     except APIException:
-        raise
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message="Failed to update variant quantity"
+        )
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -355,7 +367,10 @@ async def change_variant_quantity(
             message=f"Variant quantity {action} by {abs(request.change)} successfully"
         )
     except APIException:
-        raise
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message="Failed to change variant quantity"
+        )
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -380,7 +395,10 @@ async def get_subscription_variant_quantities(
             message="Variant quantities retrieved successfully"
         )
     except APIException:
-        raise
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message="Failed to get variant quantities"
+        )
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -424,8 +442,11 @@ async def toggle_auto_renew(
             },
             message=f"Auto-renew {'enabled' if auto_renew else 'disabled'}"
         )
-    except APIException:
-        raise
+    except APIException as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to update auto-renew: {str(e)}"
+        )
     except Exception as e:
         logger.error(f"Error updating auto-renew: {e}")
         raise APIException(
@@ -450,8 +471,11 @@ async def get_subscription(
                 message="Subscription not found"
             )
         return Response.success(data=subscription.to_dict(include_products=True))
-    except APIException:
-        raise
+    except APIException as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to fetch subscription: {str(e)}"
+        )
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -488,12 +512,42 @@ async def update_subscription(
             # Add other fields here as needed
         )
         return Response.success(data=subscription.to_dict(include_products=True), message="Subscription updated successfully")
-    except APIException:
-        raise
+    except APIException as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to update subscription: {str(e)}"
+        )
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to update subscription: {str(e)}"
+        )
+
+
+@router.post("/{subscription_id}/cancel")
+async def cancel_subscription_endpoint(
+    subscription_id: UUID,
+    reason: str = None,
+    current_user: User = Depends(get_current_auth_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Cancel a subscription (soft delete - status update only)."""
+    try:
+        subscription_service = SubscriptionService(db)
+        subscription = await subscription_service.cancel_subscription(subscription_id, current_user.id, reason)
+        return Response.success(
+            data=subscription.to_dict(include_products=True), 
+            message="Subscription cancelled successfully"
+        )
+    except APIException as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to cancel subscription: {str(e)}"
+        )
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to cancel subscription: {str(e)}"
         )
 
 
@@ -506,14 +560,17 @@ async def delete_subscription(
     """Delete a subscription."""
     try:
         subscription_service = SubscriptionService(db)
-        await subscription_service.cancel_subscription(subscription_id, current_user.id)
-        return Response.success(message="Subscription cancelled successfully")
-    except APIException:
-        raise
+        await subscription_service.delete_subscription(subscription_id, current_user.id)
+        return Response.success(message="Subscription deleted successfully")
+    except APIException as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to delete subscription: {str(e)}"
+        )
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to cancel subscription: {str(e)}"
+            message=f"Failed to delete subscription: {str(e)}"
         )
 
 

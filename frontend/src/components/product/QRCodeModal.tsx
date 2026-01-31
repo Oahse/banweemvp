@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { QrCodeIcon, DownloadIcon, ShareIcon, XIcon } from 'lucide-react';
 import { NotificationModal } from '../ui/NotificationModal';
+import QRCode from 'qrcode';
 
 export const QRCodeModal = ({
   data,
@@ -14,19 +15,40 @@ export const QRCodeModal = ({
 }) => {
   const canvasRef = useRef(null);
   const [showNotification, setShowNotification] = React.useState(false);
+  const [isSharing, setIsSharing] = React.useState(false);
+  const [isDownloading, setIsDownloading] = React.useState(false);
 
-  const generateQRCode = (text, canvas) => {
+  useEffect(() => {
+    if (isOpen && canvasRef.current && data) {
+      QRCode.toCanvas(canvasRef.current, data, {
+        width: size,
+        margin: 2,
+        color: {
+          dark: getComputedStyle(document.documentElement).getPropertyValue('--color-copy') || '#000000',
+          light: getComputedStyle(document.documentElement).getPropertyValue('--color-surface') || '#FFFFFF',
+        },
+      }, (error) => {
+        if (error) {
+          console.error('Error generating QR code:', error);
+          // Fallback to simple pattern if QR code generation fails
+          generateFallbackQRCode(data, canvasRef.current);
+        }
+      });
+    }
+  }, [data, size, isOpen]);
+
+  const generateFallbackQRCode = (text, canvas) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     canvas.width = size;
     canvas.height = size;
 
-    ctx.fillStyle = 'var(--color-surface)';
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-surface') || '#FFFFFF';
     ctx.fillRect(0, 0, size, size);
 
     const moduleSize = size / 25;
-    ctx.fillStyle = 'var(--color-copy)';
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-copy') || '#000000';
 
     const hash = text.split('').reduce((a, b) => {
       a = ((a << 5) - a) + b.charCodeAt(0);
@@ -50,61 +72,140 @@ export const QRCodeModal = ({
     ];
 
     positions.forEach(([x, y]) => {
-      ctx.fillStyle = 'var(--color-copy)';
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-copy') || '#000000';
       ctx.fillRect(x, y, markerSize, markerSize);
-      ctx.fillStyle = 'var(--color-surface)';
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-surface') || '#FFFFFF';
       ctx.fillRect(x + moduleSize, y + moduleSize, markerSize - 2 * moduleSize, markerSize - 2 * moduleSize);
-      ctx.fillStyle = 'var(--color-copy)';
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-copy') || '#000000';
       ctx.fillRect(x + 2 * moduleSize, y + 2 * moduleSize, markerSize - 4 * moduleSize, markerSize - 4 * moduleSize);
     });
   };
 
-  useEffect(() => {
-    if (isOpen && canvasRef.current) {
-      generateQRCode(data, canvasRef.current);
+  const handleDownload = async () => {
+    if (isDownloading) return;
+    
+    if (!canvasRef.current) {
+      console.error('Canvas not available for download');
+      return;
     }
-  }, [data, size, isOpen, generateQRCode]);
 
-  const handleDownload = () => {
-    if (canvasRef.current) {
+    setIsDownloading(true);
+    
+    try {
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvasRef.current!.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Failed to create blob from canvas'));
+          }
+        }, 'image/png');
+      });
+
+      // Create download link
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
+      link.href = url;
       link.download = `qr-code-${Date.now()}.png`;
-      link.href = canvasRef.current.toDataURL();
+      
+      // Trigger download
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      
+      // Clean up URL
+      URL.revokeObjectURL(url);
+      
+      // Show success feedback
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 2000);
+      
+    } catch (error) {
+      console.error('Error downloading QR code:', error);
+      // Fallback: try direct data URL method
+      try {
+        const dataUrl = canvasRef.current.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `qr-code-${Date.now()}.png`;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (fallbackError) {
+        console.error('Fallback download also failed:', fallbackError);
+      }
+    } finally {
+      setIsDownloading(false);
     }
   };
 
   const handleShare = async () => {
-    if (navigator.share && canvasRef.current) {
+    if (isSharing) return;
+    
+    if (!canvasRef.current) {
+      console.error('Canvas not available for sharing');
+      return;
+    }
+
+    setIsSharing(true);
+    
+    try {
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvasRef.current!.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Failed to create blob from canvas'));
+          }
+        }, 'image/png');
+      });
+
+      // Try native share API first (mobile devices)
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'qr-code.png', { type: 'image/png' })] })) {
+        try {
+          const file = new File([blob], 'qr-code.png', { type: 'image/png' });
+          await navigator.share({
+            title: title,
+            text: description || 'Check out this QR code',
+            files: [file],
+          });
+          return;
+        } catch (shareError) {
+          console.log('Native share failed, trying clipboard:', shareError);
+        }
+      }
+
+      // Fallback to clipboard copy
       try {
-        canvasRef.current.toBlob(async (blob) => {
-          if (blob) {
-            const file = new File([blob], 'qr-code.png', { type: 'image/png' });
-            await navigator.share({
-              title: title,
-              text: description || 'Check out this QR code',
-              files: [file],
-            });
-          }
-        });
-      } catch (error) {
-        console.error('Error sharing QR code:', error);
+        // Try clipboard API with image
+        if (navigator.clipboard && window.ClipboardItem) {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          setShowNotification(true);
+        } else {
+          // Fallback: copy data URL to clipboard
+          const dataUrl = canvasRef.current.toDataURL('image/png');
+          await navigator.clipboard.writeText(dataUrl);
+          setShowNotification(true);
+        }
+      } catch (clipboardError) {
+        console.error('Clipboard copy failed:', clipboardError);
+        // Final fallback: open in new tab
+        const dataUrl = canvasRef.current.toDataURL('image/png');
+        const newWindow = window.open();
+        if (newWindow) {
+          newWindow.document.write(`<img src="${dataUrl}" alt="QR Code" />`);
+          setShowNotification(true);
+        }
       }
-    } else {
-      if (canvasRef.current) {
-        canvasRef.current.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ 'image/png': blob })
-              ]);
-              setShowNotification(true);
-            } catch (error) {
-              console.error('Error copying to clipboard:', error);
-            }
-          }
-        });
-      }
+      
+    } catch (error) {
+      console.error('Error sharing QR code:', error);
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -162,17 +263,37 @@ export const QRCodeModal = ({
         <div className="flex space-x-2">
           <button
             onClick={handleDownload}
-            className="flex-1 flex items-center justify-center space-x-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+            disabled={isDownloading}
+            className="flex-1 flex items-center justify-center space-x-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <DownloadIcon size={16} />
-            <span>Download</span>
+            {isDownloading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Downloading...</span>
+              </>
+            ) : (
+              <>
+                <DownloadIcon size={16} />
+                <span>Download</span>
+              </>
+            )}
           </button>
           <button
             onClick={handleShare}
-            className="flex-1 flex items-center justify-center space-x-2 bg-surface-hover text-copy px-4 py-2 rounded-md hover:bg-surface-active transition-colors"
+            disabled={isSharing}
+            className="flex-1 flex items-center justify-center space-x-2 bg-surface-hover text-copy px-4 py-2 rounded-md hover:bg-surface-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ShareIcon size={16} />
-            <span>Share</span>
+            {isSharing ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                <span>Sharing...</span>
+              </>
+            ) : (
+              <>
+                <ShareIcon size={16} />
+                <span>Share</span>
+              </>
+            )}
           </button>
         </div>
       </motion.div>
@@ -182,7 +303,7 @@ export const QRCodeModal = ({
         isOpen={showNotification}
         onClose={() => setShowNotification(false)}
         title="Success"
-        message="QR code copied to clipboard!"
+        message={isDownloading ? "QR code downloaded successfully!" : "QR code copied to clipboard!"}
         variant="success"
         autoClose={true}
         autoCloseDelay={3000}

@@ -79,7 +79,7 @@ class Subscription(BaseModel):
     __table_args__ = (
         # Indexes for search and performance
         Index('idx_subscriptions_user_id', 'user_id'),
-        Index('idx_subscriptions_plan_id', 'plan_id'),
+        Index('idx_subscriptions_name', 'name'),
         Index('idx_subscriptions_status', 'status'),
         Index('idx_subscriptions_billing_cycle', 'billing_cycle'),
         Index('idx_subscriptions_auto_renew', 'auto_renew'),
@@ -90,12 +90,12 @@ class Subscription(BaseModel):
         # Composite indexes for common queries
         Index('idx_subscriptions_user_status', 'user_id', 'status'),
         Index('idx_subscriptions_status_billing', 'status', 'next_billing_date'),
-        Index('idx_subscriptions_plan_status', 'plan_id', 'status'),
+        Index('idx_subscriptions_name_status', 'name', 'status'),
         {'extend_existing': True}
     )
 
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
-    plan_id = Column(String(100), nullable=False)  # basic, premium, enterprise
+    name = Column(String(255), nullable=False)  # Subscription name (e.g., "Premium Plan", "Basic Plan")
     status = Column(String(50), default="active")  # active, cancelled, expired, paused
     price = Column(Float, nullable=True)
     currency = Column(String(3), default="USD")
@@ -147,7 +147,7 @@ class Subscription(BaseModel):
         data = {
             "id": str(self.id),
             "user_id": str(self.user_id),
-            "plan_id": self.plan_id,
+            "name": self.name,
             "status": self.status,
             "price": self.price,
             "currency": self.currency,

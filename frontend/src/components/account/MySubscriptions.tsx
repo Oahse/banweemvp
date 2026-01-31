@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../store/SubscriptionContext';
 import { useLocale } from '../../store/LocaleContext';
 import { 
@@ -7,7 +8,9 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   XIcon,
-  SearchIcon
+  SearchIcon,
+  EyeIcon,
+  PauseIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { SubscriptionCard } from '../subscription/SubscriptionCard';
@@ -17,6 +20,7 @@ import ProductsAPI from '../../api/products';
 import { Product } from '../../types';
 
 export const MySubscriptions = () => {
+  const navigate = useNavigate();
   const { 
     subscriptions, 
     loading, 
@@ -26,6 +30,7 @@ export const MySubscriptions = () => {
     createSubscription, 
     updateSubscription, 
     cancelSubscription,
+    deleteSubscription,
     activateSubscription,
     pauseSubscription,
     resumeSubscription,
@@ -38,7 +43,7 @@ export const MySubscriptions = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [newSubscriptionData, setNewSubscriptionData] = useState({
-    plan_id: 'basic',
+    name: '',
     billing_cycle: 'monthly',
     delivery_type: 'standard',
     auto_renew: true
@@ -164,16 +169,6 @@ export const MySubscriptions = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          {/* Debug button */}
-          <button
-            onClick={() => {
-              console.log('Debug: Manual refresh triggered');
-              manualRefresh();
-            }}
-            className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded-md transition-colors flex items-center text-xs"
-          >
-            Debug Refresh
-          </button>
           <button
             onClick={() => setShowCreateModal(true)}
             className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors flex items-center text-xs"
@@ -230,25 +225,26 @@ export const MySubscriptions = () => {
               <SubscriptionCard
                 key={subscription.id}
                 subscription={subscription}
-                onUpdate={(subscriptionId: any, data: any) => {
-                  updateSubscription(subscriptionId, data);
-                  // Don't refresh - let the subscription update naturally
+                onUpdate={async (subscriptionId: any, data: any) => {
+                  await updateSubscription(subscriptionId, data);
                 }}
-                onCancel={(subscriptionId: any, reason?: string) => {
-                  cancelSubscription(subscriptionId, reason);
-                  refreshSubscriptions();
+                onToggleAutoRenew={async (subscriptionId: any, enabled: boolean) => {
+                  await updateSubscription(subscriptionId, { auto_renew: enabled });
                 }}
-                onActivate={(subscriptionId: any) => {
-                  activateSubscription(subscriptionId);
-                  refreshSubscriptions();
+                onCancel={async (subscriptionId: any, reason?: string) => {
+                  await cancelSubscription(subscriptionId, reason);
                 }}
-                onPause={(subscriptionId: any, reason?: string) => {
-                  pauseSubscription(subscriptionId, reason);
-                  refreshSubscriptions();
+                onDelete={async (subscriptionId: any) => {
+                  await deleteSubscription(subscriptionId);
                 }}
-                onResume={(subscriptionId: any) => {
-                  resumeSubscription(subscriptionId);
-                  refreshSubscriptions();
+                onActivate={async (subscriptionId: any) => {
+                  await activateSubscription(subscriptionId);
+                }}
+                onPause={async (subscriptionId: any, reason?: string) => {
+                  await pauseSubscription(subscriptionId, reason);
+                }}
+                onResume={async (subscriptionId: any) => {
+                  await resumeSubscription(subscriptionId);
                 }}
                 onAddProducts={(subscription: any) => {
                   // Extract subscriptionId and productIds from the subscription object
@@ -343,17 +339,19 @@ export const MySubscriptions = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Subscription Plan
+                      Subscription Name
                     </label>
-                    <select
-                      value={newSubscriptionData.plan_id}
-                      onChange={(e) => setNewSubscriptionData({...newSubscriptionData, plan_id: e.target.value})}
+                    <input
+                      type="text"
+                      value={newSubscriptionData.name}
+                      onChange={(e) => setNewSubscriptionData({...newSubscriptionData, name: e.target.value})}
+                      placeholder="Enter subscription name (e.g., Premium Coffee Plan)"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs"
-                    >
-                      <option value="basic">Basic Plan</option>
-                      <option value="premium">Premium Plan</option>
-                      <option value="enterprise">Enterprise Plan</option>
-                    </select>
+                      maxLength={255}
+                    />
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Give your subscription a descriptive name (max 255 characters)
+                    </p>
                   </div>
 
                   <div>
@@ -554,7 +552,7 @@ export const MySubscriptions = () => {
                     setShowCreateModal(false);
                     setSelectedProducts(new Set());
                     setNewSubscriptionData({
-                      plan_id: 'basic',
+                      name: '',
                       billing_cycle: 'monthly',
                       delivery_type: 'standard',
                       auto_renew: true
@@ -584,7 +582,7 @@ export const MySubscriptions = () => {
                         setShowCreateModal(false);
                         setSelectedProducts(new Set());
                         setNewSubscriptionData({
-                          plan_id: 'basic',
+                          name: '',
                           billing_cycle: 'monthly',
                           delivery_type: 'standard',
                           auto_renew: true

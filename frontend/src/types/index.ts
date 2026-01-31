@@ -342,7 +342,7 @@ export interface PaymentIntent {
 export interface Subscription {
   id: string;
   user_id: string;
-  plan_id: string;
+  name: string;
   status: 'active' | 'cancelled' | 'expired' | 'paused';
   start_date: string;
   end_date?: string;

@@ -99,7 +99,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
     setIsLoading(true);
     try {
       const subscriptionData = {
-        plan_id: 'basic',
+        name: 'New Subscription',
         billing_cycle: 'monthly',
         product_variant_ids: variantIds,
         delivery_type: 'standard',

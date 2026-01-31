@@ -66,7 +66,7 @@ class SubscriptionService:
     async def create_subscription(
         self,
         user_id: UUID,
-        plan_id: str,
+        name: str,
         product_variant_ids: List[UUID],
         variant_quantities: Optional[Dict[str, int]] = None,
         delivery_type: str = "standard",
@@ -121,7 +121,7 @@ class SubscriptionService:
         # Create subscription with simplified fields
         subscription = Subscription(
             user_id=user_id,
-            plan_id=plan_id,
+            name=name,
             status="active",
             price=cost_breakdown["total_amount"],
             currency=currency,
@@ -824,6 +824,54 @@ class SubscriptionService:
         
         
         return subscription
+
+    async def delete_subscription(
+        self,
+        subscription_id: UUID,
+        user_id: UUID
+    ) -> None:
+        """Permanently delete a subscription"""
+        subscription = await self.get_subscription_by_id(subscription_id, user_id, for_update=True)
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        try:
+            # Import here to avoid circular imports
+            from sqlalchemy import delete as sql_delete, update as sql_update
+            from models.orders import Order
+            from models.subscriptions import SubscriptionProduct, subscription_product_association
+
+            # Detach orders first (nullable FK, not ON DELETE CASCADE)
+            await self.db.execute(
+                sql_update(Order)
+                .where(Order.subscription_id == subscription_id)
+                .values(subscription_id=None)
+            )
+
+            # Delete subscription-related rows (some may also be ON DELETE CASCADE, but we delete
+            # explicitly to ensure a deterministic hard delete)
+            await self.db.execute(
+                sql_delete(SubscriptionProduct).where(SubscriptionProduct.subscription_id == subscription_id)
+            )
+            await self.db.execute(
+                sql_delete(subscription_product_association)
+                .where(subscription_product_association.c.subscription_id == subscription_id)
+            )
+
+            # Delete the subscription itself
+            await self.db.delete(subscription)
+            await self.db.commit()
+        except Exception as e:
+            await self.db.rollback()
+            # Log the full error for debugging
+            import logging
+            logging.exception("Failed to delete subscription")
+            # Re-raise with more context
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to delete subscription: {str(e)}"
+            ) from e
 
     async def pause_subscription(
         self,

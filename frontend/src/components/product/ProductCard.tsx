@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon, CalendarIcon } from 'lucide-react';
+import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from '../../store/CartContext';
 import { useWishlist } from '../../store/WishlistContext';
 import { useAuth } from '../../hooks/useAuth';
-import { useSubscriptionAction } from '../../hooks/useSubscription';
 import { useLocale } from '../../store/LocaleContext';
 import { SkeletonCard } from '../ui/SkeletonCard';
 import { QRCodeDisplay } from './QRCodeDisplay';
 import { BarcodeDisplay } from './BarcodeDisplay';
-import { SubscriptionSelector } from '../subscription/SubscriptionSelector';
-import SubscriptionAPI from '../../api/subscription';
 import { toast } from 'react-hot-toast';
 import { cn } from '../../utils/utils';
 
@@ -66,8 +63,6 @@ import { cn } from '../../utils/utils';
  * @property {string} [className]
  * @property {boolean} [isLoading=false]
  * @property {string} [animation='shimmer']
- * @property {boolean} [showSubscriptionButton=false]
- * @property {string} [subscriptionId]
  * @property {boolean} [wishlistMode=false]
  */
 
@@ -80,17 +75,12 @@ export const ProductCard = ({
   className,
   isLoading = false,
   animation = 'shimmer',
-  showSubscriptionButton = false,
-  subscriptionId,
   wishlistMode = false,
 }) => {
   const { addItem: addToCart, removeItem: removeFromCart, cart } = useCart();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist, defaultWishlist, fetchWishlists } = useWishlist();
   const { executeWithAuth } = useAuth();
-  const { isAuthenticated, hasActiveSubscriptions } = useSubscriptionAction();
   const { formatCurrency } = useLocale();
-  const [isAddingToSubscription, setIsAddingToSubscription] = useState(false);
-  const [showSubscriptionSelector, setShowSubscriptionSelector] = useState(false);
 
   if (isLoading) { // <--- Add this check
     return <SkeletonCard viewMode={viewMode} animation={animation} />;
@@ -217,28 +207,6 @@ export const ProductCard = ({
           }
         }
       };
-
-  const handleAddToSubscription = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (!displayVariant) {
-      toast.error("This product has no variants available.");
-      return;
-    }
-    
-    if (!isAuthenticated) {
-      toast.error('Please log in to add products to subscriptions');
-      return;
-    }
-    
-    if (!hasActiveSubscriptions) {
-      toast.error('You need an active subscription to add products');
-      return;
-    }
-    
-    setShowSubscriptionSelector(true);
-  };
 
       const handleAddToWishlist = async (e) => {
         e.preventDefault();
@@ -386,15 +354,6 @@ export const ProductCard = ({
               aria-label={isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
               <HeartIcon size={16} />
             </button>
-            {/* Add to Subscription button */}
-            {isAuthenticated && hasActiveSubscriptions && (
-              <button
-                onClick={handleAddToSubscription}
-                className="w-9 h-9 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors flex-shrink-0"
-                aria-label="Add to subscription">
-                <CalendarIcon size={16} />
-              </button>
-            )}
             <Link
               to={`/products/${product.id}`}
               className="w-9 h-9 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
@@ -492,16 +451,6 @@ export const ProductCard = ({
                 <HeartIcon size={10} fill={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? 'currentColor' : 'none'} />
               </button>
             </div>
-            
-            {/* Mobile subscription button - full width */}
-            {isAuthenticated && hasActiveSubscriptions && (
-              <button
-                onClick={handleAddToSubscription}
-                className="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-1.5 py-1.5 rounded-md text-xs font-medium transition-colors"
-                aria-label="Subscribe">
-                <CalendarIcon size={10} />
-              </button>
-            )}
           </div>
 
           {/* Desktop buttons (hidden on mobile) */}
@@ -546,51 +495,8 @@ export const ProductCard = ({
               aria-label={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
               <HeartIcon size={12} fill={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? 'currentColor' : 'none'} />
             </button>
-            
-            {/* Desktop subscription button */}
-            {isAuthenticated && hasActiveSubscriptions && (
-              <button
-                onClick={handleAddToSubscription}
-                className="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors min-w-[40px]"
-                aria-label="Add to subscription">
-                <CalendarIcon size={12} />
-              </button>
-            )}
           </div>
-          
-          {/* Subscription Button (legacy - keeping for compatibility) */}
-          {showSubscriptionButton && subscriptionId && (
-            <button
-              onClick={handleAddToSubscription}
-              disabled={isAddingToSubscription}
-              className={cn(
-                'ml-2 flex items-center text-white bg-green-600 hover:bg-green-700 px-2 sm:px-3 py-2 rounded-md transition-colors flex-shrink-0',
-                isAddingToSubscription && 'opacity-50 cursor-not-allowed'
-              )}
-              aria-label="Add to subscription">
-              {isAddingToSubscription ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              ) : (
-                <PlusIcon size={16} className="flex-shrink-0" />
-              )}
-              <span className="ml-1 text-xs sm:text-sm whitespace-nowrap">Subscribe</span>
-            </button>
-          )}
         </div>
-
-        {/* Subscription Selector Modal */}
-        {showSubscriptionSelector && displayVariant && (
-          <SubscriptionSelector
-            isOpen={showSubscriptionSelector}
-            onClose={() => setShowSubscriptionSelector(false)}
-            productName={product.name}
-            variantId={displayVariant.id}
-            quantity={1}
-            onSuccess={() => {
-              setShowSubscriptionSelector(false);
-            }}
-          />
-        )}
 
         {/* QR Code and Barcode Display */}
         {(showQRCode || showBarcode) && displayVariant && (

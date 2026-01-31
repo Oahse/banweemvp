@@ -61,12 +61,14 @@ export const VariantSelector = ({
     const groups = {};
     
     variants.forEach(variant => {
-      variant.attributes.forEach(attr => {
-        if (!groups[attr.name]) {
-          groups[attr.name] = new Set();
-        }
-        groups[attr.name].add(attr.value);
-      });
+      if (Array.isArray(variant.attributes)) {
+        variant.attributes.forEach(attr => {
+          if (!groups[attr.name]) {
+            groups[attr.name] = new Set();
+          }
+          groups[attr.name].add(attr.value);
+        });
+      }
     });
     
     return groups;
@@ -84,10 +86,12 @@ export const VariantSelector = ({
   };
 
   const getVariantPrice = (variant) => {
+    if (!variant) return 0;
     return variant.sale_price || variant.base_price;
   };
 
   const formatAttributes = (variant) => {
+    if (!Array.isArray(variant.attributes)) return '';
     return variant.attributes
       .map(attr => `${attr.name}: ${attr.value}`)
       .join(', ');
@@ -207,130 +211,72 @@ export const VariantSelector = ({
   return (
     <div className={cn('space-y-4', className)}>
       {/* Attribute-based selection */}
-      {Object.entries(attributeGroups).map(([attributeName, values]) => (
-        <div key={attributeName} className="space-y-2">
-          <h3 className="text-sm font-medium text-copy capitalize">
-            {attributeName === 'variant_index' ? 'Option' : attributeName}
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {Array.from(values).map(value => {
-              // Find variant with this attribute value
-              const variantWithValue = variants.find(variant =>
-                variant.attributes.some(attr => 
+      <div className="space-y-3">
+        {Object.entries(attributeGroups).map(([attributeName, values]) => (
+          <div key={attributeName} className="space-y-2">
+            <h3 className="text-sm font-medium text-copy capitalize">
+              {attributeName === 'variant_index' ? 'Option' : attributeName}
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {Array.from(values).map(value => {
+                // Find variant with this attribute value
+                const variantWithValue = variants.find(variant =>
+                  variant.attributes.some(attr => 
+                    attr.name === attributeName && attr.value === value
+                  )
+                );
+                
+                if (!variantWithValue) return null;
+                
+                const isSelected = selectedVariant.attributes.some(attr =>
                   attr.name === attributeName && attr.value === value
-                )
-              );
-              
-              if (!variantWithValue) return null;
-              
-              const isSelected = selectedVariant.attributes.some(attr =>
-                attr.name === attributeName && attr.value === value
-              );
-              const isAvailable = isVariantAvailable(variantWithValue);
+                );
+                const isAvailable = isVariantAvailable(variantWithValue);
 
-              return (
-                <button
-                  key={value}
-                  onClick={() => isAvailable && onVariantChange(variantWithValue)}
-                  disabled={!isAvailable}
-                  className={cn(
-                    'px-4 py-2 border rounded-md text-sm font-medium transition-all',
-                    isSelected
-                      ? 'border-primary bg-primary text-white'
-                      : 'border-border text-copy hover:border-border-strong',
-                    !isAvailable && 'opacity-50 cursor-not-allowed line-through'
-                  )}
-                >
-                  {value}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={value}
+                    onClick={() => isAvailable && onVariantChange(variantWithValue)}
+                    disabled={!isAvailable}
+                    className={cn(
+                      'px-4 py-2 border rounded-md text-sm font-medium transition-all',
+                      isSelected
+                        ? 'border-primary bg-primary text-white'
+                        : 'border-border text-copy hover:border-border-strong',
+                      !isAvailable && 'opacity-50 cursor-not-allowed line-through'
+                    )}
+                  >
+                    {value}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
-      {/* Variant cards with images */}
-      {showImages && (
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium text-gray-700">Variants</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {variants.map(variant => {
-              const isSelected = selectedVariant.id === variant.id;
-              const isAvailable = isVariantAvailable(variant);
-              const primaryImage = getPrimaryImage(variant);
-
-              return (
-                <button
-                  key={variant.id}
-                  onClick={() => isAvailable && onVariantChange(variant)}
-                  disabled={!isAvailable}
-                  className={cn(
-                    'p-2 border rounded-lg transition-all text-left',
-                    isSelected
-                      ? 'border-primary ring-2 ring-primary/20'
-                      : 'border-gray-200 hover:border-gray-300',
-                    !isAvailable && 'opacity-50 cursor-not-allowed'
-                  )}
-                >
-                  {primaryImage && (
-                    <img
-                      src={primaryImage.url}
-                      alt={primaryImage.alt_text || variant.name}
-                      className="w-full h-20 object-cover rounded-md mb-2"
-                    />
-                  )}
-                  
-                  <div className="text-xs font-medium text-gray-900 truncate">
-                    {variant.name}
-                  </div>
-                  
-                  {showPrice && (
-                    <div className="text-xs text-primary font-semibold">
-                      ${getVariantPrice(variant).toFixed(2)}
-                    </div>
-                  )}
-                  
-                  {showStock && (
-                    <div className={cn(
-                      'text-xs mt-1',
-                      isAvailable ? 'text-success-600' : 'text-error-600'
-                    )}>
-                      {isAvailable ? `${variant.stock} left` : 'Out of stock'}
-                    </div>
-                  )}
-                  
-                  {isSelected && (
-                    <div className="absolute top-1 right-1 bg-primary text-white rounded-full p-1">
-                      <CheckIcon size={12} />
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Selected variant info */}
+      {/* Selected variant info at the bottom */}
       <div className="p-3 bg-surface rounded-lg">
         <div className="flex items-center justify-between">
           <div>
             <span className="text-sm font-medium text-copy">Selected:</span>
-            <span className="ml-2 text-sm text-copy">1kg Bag</span>
+            <span className="ml-2 text-sm text-copy">{selectedVariant?.name || 'Default'}</span>
           </div>
-          {showPrice && (
+          {showPrice && selectedVariant && (
             <div className="text-right">
               <div className="text-lg font-bold text-primary">
                 ${getVariantPrice(selectedVariant).toFixed(2)}
               </div>
               {selectedVariant.sale_price && (
-          <div className="text-sm text-copy-light line-through">$137.02</div>
+                <div className="text-sm text-copy-light line-through">
+                  ${selectedVariant.base_price.toFixed(2)}
+                </div>
               )}
             </div>
           )}
         </div>
         
-        {showStock && (
+        {showStock && selectedVariant && (
           <div className="mt-2 text-sm">
             <span className={cn(
               'px-2 py-1 rounded-full text-xs',

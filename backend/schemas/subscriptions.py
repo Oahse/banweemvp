@@ -21,7 +21,7 @@ class CostBreakdownSchema(BaseModel):
 
 class SubscriptionBase(BaseModel):
     user_id: Optional[UUID] = None
-    plan_id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
     status: str = Field(..., min_length=1)
     price: Optional[float] = None
     currency: str = Field(default="USD", min_length=3, max_length=3)
@@ -37,7 +37,7 @@ class SubscriptionBase(BaseModel):
 
 class SubscriptionCreate(BaseModel):
     """Schema for creating a new subscription"""
-    plan_id: str = Field(..., min_length=1, description="Subscription plan identifier")
+    name: str = Field(..., min_length=1, description="Subscription name")
     product_variant_ids: List[UUID] = Field(..., min_items=1, description="List of product variant IDs to include")
     variant_quantities: Optional[Dict[str, int]] = Field(None, description="Quantities for each variant (variant_id: quantity)")
     delivery_type: str = Field(default="standard", pattern="^(standard|express|overnight)$")
@@ -65,7 +65,7 @@ class SubscriptionCreate(BaseModel):
 
 class SubscriptionUpdate(BaseModel):
     """Schema for updating an existing subscription"""
-    plan_id: Optional[str] = Field(None, min_length=1)
+    name: Optional[str] = Field(None, min_length=1)
     product_variant_ids: Optional[List[UUID]] = None
     delivery_type: Optional[str] = Field(None, pattern="^(standard|express|overnight)$")
     delivery_address_id: Optional[UUID] = None
@@ -208,7 +208,7 @@ class SubscriptionRenewalScheduleResponse(BaseModel):
     subscription_id: UUID
     user_id: UUID
     user_email: Optional[str] = None
-    plan_id: str
+    name: str
     next_billing_date: datetime
     amount: float
     currency: str

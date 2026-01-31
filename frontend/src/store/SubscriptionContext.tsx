@@ -3,28 +3,7 @@ import { useAuth } from './AuthContext';
 import * as SubscriptionAPI from '../api/subscription';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-
-// Enhanced subscription interface with product management support
-interface Subscription {
-  id: string;
-  plan_id: string;
-  status: string;
-  price: number;
-  currency: string;
-  billing_cycle: string;
-  auto_renew: boolean;
-  current_period_start: string;
-  current_period_end: string;
-  next_billing_date: string;
-  products: SubscriptionProduct[];
-  discounts?: AppliedDiscount[];
-  subtotal?: number;
-  total?: number;
-  tax_amount?: number;
-  shipping_cost?: number;
-  created_at: string;
-  updated_at: string;
-}
+import type { Subscription } from '../api/subscription';
 
 // Subscription product interface
 interface SubscriptionProduct {
@@ -74,6 +53,7 @@ interface SubscriptionContextType {
   createSubscription: (data: any) => Promise<Subscription | null>;
   updateSubscription: (subscriptionId: string, data: any) => Promise<Subscription | null>;
   cancelSubscription: (subscriptionId: string, reason?: string) => Promise<boolean>;
+  deleteSubscription: (subscriptionId: string) => Promise<boolean>;
   activateSubscription: (subscriptionId: string) => Promise<boolean>;
   pauseSubscription: (subscriptionId: string, reason?: string) => Promise<boolean>;
   resumeSubscription: (subscriptionId: string) => Promise<boolean>;
@@ -164,11 +144,12 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
     try {
       console.log('RefreshSubscriptions: Calling API...');
       const response = await SubscriptionAPI.getUserSubscriptions();
-      console.log('RefreshSubscriptions: API response:', response);
+      console.log('RefreshSubscriptions: API response:', response?.data);
       
-      // API returns SubscriptionListResponse directly with subscriptions property
-      const subscriptionsData = response?.subscriptions || [];
+      // API returns SubscriptionListResponse with subscriptions property
+      const subscriptionsData = response?.data?.subscriptions || [];
       console.log('RefreshSubscriptions: Setting subscriptions:', subscriptionsData.length, 'items');
+      console.log('RefreshSubscriptions: Total available:', response?.data?.total, 'subscriptions');
       
       setSubscriptions(subscriptionsData);
       console.log('RefreshSubscriptions: Successfully loaded', subscriptionsData.length, 'subscriptions');
@@ -228,8 +209,11 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
 
     try {
       const response = await SubscriptionAPI.updateSubscription(subscriptionId, data);
-      // Handle response structure - API returns Subscription directly
-      const updatedSubscription = response;
+      const updatedSubscription = (response as any)?.data ?? response;
+
+      if (updatedSubscription && typeof updatedSubscription === 'object') {
+        setSubscriptions(prev => prev.map(sub => (sub.id === subscriptionId ? { ...sub, ...updatedSubscription } : sub)));
+      }
       return updatedSubscription;
     } catch (error) {
       console.error('Failed to update subscription:', error);
@@ -247,10 +231,29 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
     try {
       await SubscriptionAPI.cancelSubscription(subscriptionId, reason);
       toast.success('Subscription cancelled successfully');
+      setSubscriptions(prev => prev.map(sub => (sub.id === subscriptionId ? { ...sub, status: 'cancelled', auto_renew: false } : sub)));
       return true;
     } catch (error) {
       console.error('Failed to cancel subscription:', error);
       toast.error('Failed to cancel subscription');
+      return false;
+    }
+  };
+
+  const deleteSubscription = async (subscriptionId: string): Promise<boolean> => {
+    if (!isAuthenticated) {
+      toast.error('Please log in to delete subscription');
+      return false;
+    }
+
+    try {
+      await SubscriptionAPI.deleteSubscription(subscriptionId);
+      toast.success('Subscription deleted successfully');
+      setSubscriptions(prev => prev.filter(sub => sub.id !== subscriptionId));
+      return true;
+    } catch (error) {
+      console.error('Failed to delete subscription:', error);
+      toast.error('Failed to delete subscription');
       return false;
     }
   };
@@ -264,6 +267,7 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
     try {
       await SubscriptionAPI.activateSubscription(subscriptionId);
       toast.success('Subscription activated successfully');
+      setSubscriptions(prev => prev.map(sub => (sub.id === subscriptionId ? { ...sub, status: 'active' } : sub)));
       return true;
     } catch (error) {
       console.error('Failed to activate subscription:', error);
@@ -281,6 +285,7 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
     try {
       await SubscriptionAPI.pauseSubscription(subscriptionId, reason);
       toast.success('Subscription paused successfully');
+      setSubscriptions(prev => prev.map(sub => (sub.id === subscriptionId ? { ...sub, status: 'paused' } : sub)));
       return true;
     } catch (error) {
       console.error('Failed to pause subscription:', error);
@@ -298,6 +303,7 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
     try {
       await SubscriptionAPI.resumeSubscription(subscriptionId);
       toast.success('Subscription resumed successfully');
+      setSubscriptions(prev => prev.map(sub => (sub.id === subscriptionId ? { ...sub, status: 'active' } : sub)));
       return true;
     } catch (error) {
       console.error('Failed to resume subscription:', error);
@@ -314,8 +320,10 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
 
     try {
       const response = await SubscriptionAPI.addProductsToSubscription(subscriptionId, variantIds);
-      // Handle response structure - API returns Subscription directly
-      const updatedSubscription = response;
+      const updatedSubscription = (response as any)?.data ?? response;
+      if (updatedSubscription && typeof updatedSubscription === 'object') {
+        setSubscriptions(prev => prev.map(sub => (sub.id === subscriptionId ? { ...sub, ...updatedSubscription } : sub)));
+      }
       toast.success(`Added ${variantIds.length} product(s) to subscription!`);
       return true;
     } catch (error) {
@@ -333,8 +341,10 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
 
     try {
       const response = await SubscriptionAPI.removeProductsFromSubscription(subscriptionId, variantIds);
-      // Handle response structure - API returns Subscription directly
-      const updatedSubscription = response;
+      const updatedSubscription = (response as any)?.data ?? response;
+      if (updatedSubscription && typeof updatedSubscription === 'object') {
+        setSubscriptions(prev => prev.map(sub => (sub.id === subscriptionId ? { ...sub, ...updatedSubscription } : sub)));
+      }
       toast.success(`Removed ${variantIds.length} product(s) from subscription!`);
       return true;
     } catch (error) {
@@ -592,6 +602,7 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
     createSubscription,
     updateSubscription,
     cancelSubscription,
+    deleteSubscription,
     activateSubscription,
     pauseSubscription,
     resumeSubscription,

@@ -35,7 +35,7 @@ interface RetryConfig {
 // Enhanced subscription interface with product management support
 export interface Subscription {
   id: string;
-  plan_id: string;
+  name: string;
   status: 'active' | 'cancelled' | 'paused';
   price: number;
   currency: string;
@@ -102,7 +102,7 @@ export interface AppliedDiscount {
 
 // Request interfaces
 export interface CreateSubscriptionRequest {
-  plan_id: string;
+  name: string;
   product_variant_ids: string[];
   variant_quantities?: { [variantId: string]: number };
   delivery_type?: 'standard' | 'express' | 'overnight';
@@ -114,7 +114,7 @@ export interface CreateSubscriptionRequest {
 }
 
 export interface UpdateSubscriptionRequest {
-  plan_id?: string;
+  name?: string;
   product_variant_ids?: string[];
   delivery_type?: 'standard' | 'express' | 'overnight';
   delivery_address_id?: string;
@@ -145,11 +145,15 @@ export interface DiscountResponse {
 }
 
 export interface SubscriptionListResponse {
-  subscriptions: Subscription[];
-  total: number;
-  page: number;
-  limit: number;
-  has_more: boolean;
+  data:{
+    subscriptions: Subscription[];
+    total: number;
+    page: number;
+    limit: number;
+    has_more: boolean
+  };
+  message?: string;
+  success: boolean;
 }
 
 // === UTILITY FUNCTIONS ===
@@ -248,7 +252,7 @@ export class SubscriptionAPI {
   }): Promise<SubscriptionListResponse> {
     const queryParams = {
       page: params?.page || 1,
-      limit: params?.limit || 10
+      limit: params?.limit || 100  // Increased limit to get all subscriptions
     };
 
     return await apiClient.get('/subscriptions', { params: queryParams });
@@ -283,7 +287,14 @@ export class SubscriptionAPI {
   static async cancelSubscription(subscriptionId: string, reason?: string) {
     return withErrorHandling(async () => {
       const data = reason ? { reason } : {};
-      const response = await apiClient.delete(`/subscriptions/${subscriptionId}`, { data });
+      const response = await apiClient.post(`/subscriptions/${subscriptionId}/cancel`, data);
+      return response;
+    });
+  }
+
+  static async deleteSubscription(subscriptionId: string) {
+    return withErrorHandling(async () => {
+      const response = await apiClient.delete(`/subscriptions/${subscriptionId}`);
       return response;
     });
   }
@@ -513,6 +524,7 @@ export const getUserSubscriptions = SubscriptionAPI.getSubscriptions; // Alias
 export const getSubscription = SubscriptionAPI.getSubscription;
 export const updateSubscription = SubscriptionAPI.updateSubscription;
 export const cancelSubscription = SubscriptionAPI.cancelSubscription;
+export const deleteSubscription = SubscriptionAPI.deleteSubscription;
 
 // Lifecycle management
 export const pauseSubscription = SubscriptionAPI.pauseSubscription;

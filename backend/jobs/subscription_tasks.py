@@ -293,7 +293,7 @@ class SubscriptionTaskManager:
                 "subscription_id": str(subscription.id),
                 "user_id": str(subscription.user_id),
                 "user_email": subscription.user.email if subscription.user else None,
-                "plan_id": subscription.plan_id,
+                "name": subscription.name,
                 "next_billing_date": subscription.next_billing_date.isoformat(),
                 "amount": subscription.price,
                 "currency": subscription.currency,

@@ -7,6 +7,7 @@ import {
   pauseSubscription as pauseSubscriptionAPI,
   resumeSubscription as resumeSubscriptionAPI,
   cancelSubscription as cancelSubscriptionAPI,
+  deleteSubscription as deleteSubscriptionAPI,
   type Subscription
 } from '../../api/subscription';
 import { useAuth } from '../../store/AuthContext';
@@ -42,7 +43,7 @@ export const SubscriptionList: React.FC = () => {
     setError(null);
     try {
       const data = await getSubscriptions();
-      setSubscriptions(data.subscriptions || []);
+      setSubscriptions(data.data?.subscriptions || []);
     } catch (error: any) {
       console.error('Failed to load subscriptions:', error);
       if (error.statusCode === 401) {
@@ -102,6 +103,21 @@ export const SubscriptionList: React.FC = () => {
     } catch (error) {
       console.error('Failed to cancel subscription:', error);
       toast.error('Failed to cancel subscription');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this subscription permanently? This cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      await deleteSubscriptionAPI(id);
+      setSubscriptions(prev => prev.filter(sub => sub.id !== id));
+      toast.success('Subscription deleted permanently');
+    } catch (error) {
+      console.error('Failed to delete subscription:', error);
+      toast.error('Failed to delete subscription');
     }
   };
 
@@ -234,6 +250,7 @@ export const SubscriptionList: React.FC = () => {
               onPause={handlePause}
               onResume={handleResume}
               onCancel={handleCancel}
+              onDelete={handleDelete}
             />
           ))}
         </div>
