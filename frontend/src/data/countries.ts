@@ -41,7 +41,12 @@ export interface ProvinceOption {
   label: string;
 }
 
-// Helper functions for country and tax management
+export interface CityOption {
+  value: string;
+  label: string;
+}
+
+// Helper functions for country, province, and city management
 export const getCountryByCode = (code: string): Country | undefined => {
   return countries.find(country => country.code === code);
 };
@@ -53,6 +58,12 @@ export const getCountryByName = (name: string): Country | undefined => {
 export const getProvincesByCountry = (countryCode: string): Province[] => {
   const country = getCountryByCode(countryCode);
   return country?.provinces || [];
+};
+
+export const getCitiesByProvince = (countryCode: string, provinceCode: string): City[] => {
+  const country = getCountryByCode(countryCode);
+  const province = country?.provinces?.find(p => p.code === provinceCode);
+  return province?.cities || [];
 };
 
 export const getTaxInfo = (countryCode: string, provinceCode?: string): TaxInfo | null => {
@@ -95,6 +106,14 @@ export const getProvinceOptions = (countryCode: string): ProvinceOption[] => {
   })).sort((a, b) => a.label.localeCompare(b.label));
 };
 
+export const getCityOptions = (countryCode: string, provinceCode: string): CityOption[] => {
+  const cities = getCitiesByProvince(countryCode, provinceCode);
+  return cities.map(city => ({
+    value: city.code,
+    label: city.name
+  })).sort((a, b) => a.label.localeCompare(b.label));
+};
+
 export const countries: Country[] = [
   // North America
   {
@@ -105,11 +124,66 @@ export const countries: Country[] = [
       { code: 'AK', name: 'Alaska' },
       { code: 'AZ', name: 'Arizona' },
       { code: 'AR', name: 'Arkansas' },
-      { code: 'CA', name: 'California', taxInfo: { standardRate: 8.75, taxName: 'Sales Tax', currency: 'USD', region: 'NA' } },
+      { code: 'CA', name: 'California', 
+        taxInfo: { standardRate: 8.75, taxName: 'Sales Tax', currency: 'USD', region: 'NA' },
+        cities: [
+          { code: 'LA', name: 'Los Angeles' },
+          { code: 'SF', name: 'San Francisco' },
+          { code: 'SD', name: 'San Diego' },
+          { code: 'SJ', name: 'San Jose' },
+          { code: 'SA', name: 'Sacramento' },
+          { code: 'FR', name: 'Fresno' },
+          { code: 'LB', name: 'Long Beach' },
+          { code: 'OA', name: 'Oakland' },
+          { code: 'BK', name: 'Bakersfield' },
+          { code: 'AN', name: 'Anaheim' }
+        ]
+      },
+      { code: 'NY', name: 'New York',
+        cities: [
+          { code: 'NYC', name: 'New York City' },
+          { code: 'BU', name: 'Buffalo' },
+          { code: 'RO', name: 'Rochester' },
+          { code: 'YO', name: 'Yonkers' },
+          { code: 'SY', name: 'Syracuse' },
+          { code: 'AL', name: 'Albany' },
+          { code: 'NR', name: 'New Rochelle' },
+          { code: 'MT', name: 'Mount Vernon' },
+          { code: 'SC', name: 'Schenectady' },
+          { code: 'UT', name: 'Utica' }
+        ]
+      },
+      { code: 'TX', name: 'Texas',
+        cities: [
+          { code: 'HO', name: 'Houston' },
+          { code: 'DA', name: 'Dallas' },
+          { code: 'SA', name: 'San Antonio' },
+          { code: 'AU', name: 'Austin' },
+          { code: 'FO', name: 'Fort Worth' },
+          { code: 'EL', name: 'El Paso' },
+          { code: 'AR', name: 'Arlington' },
+          { code: 'CO', name: 'Corpus Christi' },
+          { code: 'PL', name: 'Plano' },
+          { code: 'LI', name: 'Laredo' }
+        ]
+      },
+      { code: 'FL', name: 'Florida',
+        cities: [
+          { code: 'MI', name: 'Miami' },
+          { code: 'TA', name: 'Tampa' },
+          { code: 'OR', name: 'Orlando' },
+          { code: 'JA', name: 'Jacksonville' },
+          { code: 'ST', name: 'St. Petersburg' },
+          { code: 'HI', name: 'Hialeah' },
+          { code: 'TA2', name: 'Tallahassee' },
+          { code: 'FO', name: 'Fort Lauderdale' },
+          { code: 'PO', name: 'Port St. Lucie' },
+          { code: 'CA', name: 'Cape Coral' }
+        ]
+      },
       { code: 'CO', name: 'Colorado', taxInfo: { standardRate: 2.9, taxName: 'Sales Tax', currency: 'USD', region: 'NA' } },
       { code: 'CT', name: 'Connecticut', taxInfo: { standardRate: 6.35, taxName: 'Sales Tax', currency: 'USD', region: 'NA' } },
       { code: 'DE', name: 'Delaware' },
-      { code: 'FL', name: 'Florida' },
       { code: 'GA', name: 'Georgia' },
       { code: 'HI', name: 'Hawaii' },
       { code: 'ID', name: 'Idaho' },
