@@ -65,7 +65,7 @@ export const Contact = () => {
 
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-copy mb-4">Get In Touch</h1>
+          <h1 className="text-xl md:text-2xl font-semibold text-copy mb-4">Get In Touch</h1>
           <p className="text-copy-light max-w-2xl mx-auto">
             Have questions about our products, shipping, or anything else? We're here to help. Fill out the form
             below or contact us directly.
@@ -76,7 +76,7 @@ export const Contact = () => {
           {/* Contact Form */}
           <div className="lg:w-2/3">
             <div className="bg-surface rounded-lg shadow-sm p-6 md:p-8">
-              <h2 className="text-xl font-bold text-copy mb-6">Send Us a Message</h2>
+              <h2 className="text-lg font-semibold text-copy mb-6">Send Us a Message</h2>
               {formSubmitted ? (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                   <CheckCircleIcon size={48} className="text-green-500 mx-auto mb-4" />
@@ -141,7 +141,7 @@ export const Contact = () => {
           {/* Contact Info */}
           <div className="lg:w-1/3">
             <div className="bg-surface rounded-lg shadow-sm p-6 md:p-8 mb-6">
-              <h2 className="text-xl font-bold text-copy mb-6">Contact Information</h2>
+              <h2 className="text-lg font-semibold text-copy mb-6">Contact Information</h2>
               <div className="space-y-6">
                 <div className="flex">
                   <div className="mr-4">
@@ -231,7 +231,7 @@ export const Contact = () => {
         {/* Map */}
         <div className="mt-12">
           <div className="bg-surface rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-bold text-copy mb-6">Find Us</h2>
+            <h2 className="text-lg font-semibold text-copy mb-6">Find Us</h2>
             <div className="h-80 bg-border rounded-lg overflow-hidden">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.9663095343008!2d-74.00425872418978!3d40.74076097138946!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1685290225594!5m2!1sen!2sus"

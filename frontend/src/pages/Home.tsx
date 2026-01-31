@@ -566,8 +566,8 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <span className="text-primary font-medium">Best deals</span>
-              <h2 className="text-2xl md:text-3xl font-bold text-main mt-1">Top Deals of the Day</h2>
+              <span className="text-primary text-sm font-medium">Best deals</span>
+              <h2 className="text-lg md:text-xl font-semibold text-main mt-1">Top Deals of the Day</h2>
             </div>
             <Link to="/products?sale=true" className="inline-flex items-center text-primary hover:underline mt-4 md:mt-0">
               All Deals

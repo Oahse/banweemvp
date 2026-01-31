@@ -39,7 +39,7 @@ export const FAQ = () => {
 
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-copy mb-4">Frequently Asked Questions</h1>
+          <h1 className="text-xl md:text-2xl font-semibold text-copy mb-4">Frequently Asked Questions</h1>
           <p className="text-copy-light max-w-2xl mx-auto">
             Find answers to common questions about our products, shipping, returns, and more. Can't find what you're
             looking for? Contact our support team.
@@ -117,7 +117,7 @@ export const FAQ = () => {
 
         {/* Contact section */}
         <div className="mt-16 bg-primary/10 rounded-lg p-6 md:p-8 text-center">
-          <h2 className="text-xl font-bold text-copy mb-4">Still have questions?</h2>
+          <h2 className="text-lg font-semibold text-copy mb-4">Still have questions?</h2>
           <p className="text-copy-light mb-6 max-w-md mx-auto">
             If you couldn't find the answer you were looking for, our support team is here to help.
           </p>

@@ -1,8 +1,24 @@
-import { Link } from 'react-router-dom';
-import { MapPinIcon, MailIcon, PhoneIcon, ArrowRightIcon, FacebookIcon, TwitterIcon, InstagramIcon, YoutubeIcon, LinkedinIcon } from 'lucide-react';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { 
+  FacebookIcon, 
+  TwitterIcon, 
+  InstagramIcon, 
+  LinkedinIcon,
+  YoutubeIcon,
+  MailIcon,
+  PhoneIcon,
+  MapPinIcon,
+  ArrowRightIcon
+} from 'lucide-react';
 import { SOCIAL_MEDIA_LINKS } from '../../utils/social-media-config';
 
 export const Footer = () => {
+  const location = useLocation();
+  
+  // Check if current page is subscription-related
+  const isSubscriptionPage = location.pathname.includes('/subscriptions');
+  
   // Categories for quick links - matching backend API query parameters
   const categories = [
     { name: 'Cereal Crops', path: '/products?category=Cereal Crops' },
@@ -33,23 +49,25 @@ export const Footer = () => {
     <footer className="bg-surface pt-12 pb-16 md:pb-10 border-t border-border-light mt-12 text-copy">
       <div className="container mx-auto px-4 max-w-[1400px]">
         {/* Subscriptions */}
-        <div className="bg-background rounded-lg p-6 md:p-10 mb-12">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div className="mb-6 md:mb-0 md:mr-8">
-              <h3 className="text-2xl font-bold text-main mb-3">Manage Your Subscriptions</h3>
-              <p className="text-copy-light">Explore, set up, and manage your recurring orders and subscriptions.</p>
-            </div>
-            <div className="flex-shrink-0 w-full md:w-auto">
-              <Link
-                to="/account/subscriptions"
-                className="bg-primary text-copy-inverse px-6 py-3 rounded-md hover:bg-primary-dark transition-colors flex items-center justify-center whitespace-nowrap"
-              >
-                Go to Subscriptions
-                <ArrowRightIcon size={16} className="ml-2" />
-              </Link>
+        {!isSubscriptionPage && (
+          <div className="bg-background rounded-lg p-6 md:p-10 mb-12">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+              <div className="mb-6 md:mb-0 md:mr-8">
+                <h3 className="text-lg font-semibold text-main mb-2">Manage Your Subscriptions</h3>
+                <p className="text-copy-light text-sm">Explore, set up, and manage your recurring orders and subscriptions.</p>
+              </div>
+              <div className="flex-shrink-0 w-full md:w-auto">
+                <Link
+                  to="/account/subscriptions"
+                  className="bg-primary text-copy-inverse px-4 py-2 text-sm rounded-md hover:bg-primary-dark transition-colors flex items-center justify-center whitespace-nowrap"
+                >
+                  Go to Subscriptions
+                  <ArrowRightIcon size={14} className="ml-2" />
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Main Footer */}
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-6 gap-6 md:gap-8 lg:gap-12">
@@ -60,30 +78,30 @@ export const Footer = () => {
                 <img src="/banwee_logo_text_green.png" alt="Banwee" className="h-6" />
               </div>
             </Link>
-            <p className="text-copy-light mb-6 max-w-md">
+            <p className="text-copy-light text-sm mb-6 max-w-md">
               Banwee brings you the finest organic products from Africa, ethically sourced and sustainably
               produced.
             </p>
             <div className="space-y-4">
               <div className="flex items-start">
                 <MapPinIcon size={20} className="text-primary flex-shrink-0 mr-3 mt-1" />
-                <p className="text-copy-light">
+                <p className="text-copy-light text-sm">
                   1234 Fashion Street, Suite 567, New York, NY 10001
                 </p>
               </div>
               <div className="flex items-center">
                 <MailIcon size={20} className="text-primary flex-shrink-0 mr-3" />
-                <a href="mailto:info@banwee.com" className="text-copy-light hover:text-primary">
+                <a href="mailto:info@banwee.com" className="text-copy-light text-sm hover:text-primary">
                   info@banwee.com
                 </a>
               </div>
               <div className="flex items-center">
                 <PhoneIcon size={20} className="text-primary flex-shrink-0 mr-3" />
-                <a href="tel:+12125551234" className="text-copy-light hover:text-primary">
+                <a href="tel:+12125551234" className="text-copy-light text-sm hover:text-primary">
                   (212) 555-1234
                 </a>
               </div>
-              <Link to="/contact" className="inline-flex items-center text-primary hover:underline">
+              <Link to="/contact" className="inline-flex items-center text-primary text-sm hover:underline">
                 Get direction
                 <ArrowRightIcon size={16} className="ml-2" />
               </Link>
@@ -92,11 +110,11 @@ export const Footer = () => {
 
           {/* Categories */}
           <div>
-            <h5 className="text-lg font-semibold text-main mb-5">Shop Categories</h5>
+            <h5 className="text-sm font-semibold text-main mb-3">Shop Categories</h5>
             <ul className="space-y-3">
               {categories.map((category, index) => (
                 <li key={index}>
-                  <Link to={category.path} className="text-copy-light hover:text-primary">
+                  <Link to={category.path} className="text-copy-light text-sm hover:text-primary">
                     {category.name}
                   </Link>
                 </li>
@@ -106,11 +124,11 @@ export const Footer = () => {
 
           {/* Help */}
           <div>
-            <h5 className="text-lg font-semibold text-main mb-5">Help</h5>
+            <h5 className="text-sm font-semibold text-main mb-3">Help</h5>
             <ul className="space-y-3">
               {helpLinks.map((link, index) => (
                 <li key={index}>
-                  <Link to={link.path} className="text-copy-light hover:text-primary">
+                  <Link to={link.path} className="text-copy-light text-sm hover:text-primary">
                     {link.name}
                   </Link>
                 </li>
@@ -120,11 +138,11 @@ export const Footer = () => {
 
           {/* Account */}
           <div>
-            <h5 className="text-lg font-semibold text-main mb-5">My Account</h5>
+            <h5 className="text-sm font-semibold text-main mb-3">My Account</h5>
             <ul className="space-y-3">
               {accountLinks.map((link, index) => (
                 <li key={index}>
-                  <Link to={link.path} className="text-copy-light hover:text-primary">
+                  <Link to={link.path} className="text-copy-light text-sm hover:text-primary">
                     {link.name}
                   </Link>
                 </li>
@@ -134,7 +152,7 @@ export const Footer = () => {
 
           {/* Mobile App */}
           <div>
-            <h5 className="text-lg font-semibold text-main mb-5">Get Our App</h5>
+            <h5 className="text-sm font-semibold text-main mb-3">Follow Us</h5>
             <div className="space-y-3">
               <a
                 href="#"

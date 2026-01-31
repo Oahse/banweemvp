@@ -63,7 +63,7 @@ export const About = () => {
           />
           <div className="relative z-20 container mx-auto px-4 h-full flex items-center">
             <div className="max-w-2xl text-white">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">Our Story</h1>
+              <h1 className="text-xl md:text-2xl font-semibold mb-4">Our Story</h1>
               <p className="text-lg">
                 Connecting African producers with global markets through ethical, sustainable, and transparent trade.
               </p>
@@ -75,12 +75,12 @@ export const About = () => {
       {/* Mission & Vision */}
       <div className="max-w-4xl mx-auto mb-16">
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-copy mb-4">Our Mission & Vision</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Our Mission & Vision</h2>
           <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-surface p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-bold text-copy mb-4">Our Mission</h3>
+            <h3 className="text-lg font-semibold text-copy mb-4">Our Mission</h3>
             <p className="text-copy-light mb-4">
               Banwee exists to create sustainable economic opportunities for African producers by connecting them with
               global markets through ethical trade practices.
@@ -91,7 +91,7 @@ export const About = () => {
             </p>
           </div>
           <div className="bg-surface p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-bold text-copy mb-4">Our Vision</h3>
+            <h3 className="text-lg font-semibold text-copy mb-4">Our Vision</h3>
             <p className="text-copy-light mb-4">
               We envision a world where African products are recognized globally for their exceptional quality and where
               the people who create them prosper through fair and direct trade relationships.
@@ -107,12 +107,12 @@ export const About = () => {
       {/* Our Story */}
       <div className="max-w-4xl mx-auto mb-16">
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-copy mb-4">The Banwee Journey</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">The Banwee Journey</h2>
           <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
         </div>
         <div className="bg-surface p-8 rounded-lg shadow-sm">
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-copy mb-3">The Beginning</h3>
+            <h3 className="text-lg font-semibold text-copy mb-3">The Beginning</h3>
             <p className="text-copy-light mb-4">
               Banwee began in 2019 when our founder, Amara Okafor, returned to her ancestral home in Ghana and
               witnessed the incredible quality of local products that struggled to reach international markets.
@@ -124,7 +124,7 @@ export const About = () => {
             </p>
           </div>
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-copy mb-3">Growth & Impact</h3>
+            <h3 className="text-lg font-semibold text-copy mb-3">Growth & Impact</h3>
             <p className="text-copy-light mb-4">
               What started with a single cooperative of women producing shea butter has grown into partnerships with
               over 25 producer groups across 8 African countries. Today, Banwee offers a diverse range of products,
@@ -137,7 +137,7 @@ export const About = () => {
             </p>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-copy mb-3">Looking Forward</h3>
+            <h3 className="text-lg font-semibold text-copy mb-3">Looking Forward</h3>
             <p className="text-copy-light mb-4">
               As we continue to grow, we're expanding our impact through educational initiatives, infrastructure
               development, and increased market access for our producer partners.
@@ -153,7 +153,7 @@ export const About = () => {
       {/* Our Values */}
       <div className="max-w-4xl mx-auto mb-16">
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-copy mb-4">Our Values</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Our Values</h2>
           <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -176,7 +176,7 @@ export const About = () => {
       {/* Our Team */}
       <div className="max-w-4xl mx-auto mb-16">
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-copy mb-4">Meet Our Team</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Meet Our Team</h2>
           <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
           <p className="text-copy-light max-w-2xl mx-auto">
             Our diverse team brings together expertise in sustainable development, international trade, product
@@ -205,20 +205,20 @@ export const About = () => {
       <div className="bg-primary/10 py-12 mb-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-copy mb-4">Our Impact</h2>
+            <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Our Impact</h2>
             <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>
-              <div className="text-4xl font-bold text-primary mb-2">1,000+</div>
+              <div className="text-2xl font-semibold text-primary mb-2">1,000+</div>
               <p className="text-copy-light font-medium">Producers Supported</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-primary mb-2">8</div>
+              <div className="text-2xl font-semibold text-primary mb-2">8</div>
               <p className="text-copy-light font-medium">African Countries</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-primary mb-2">12</div>
+              <div className="text-2xl font-semibold text-primary mb-2">12</div>
               <p className="text-copy-light font-medium">Community Projects</p>
             </div>
           </div>
@@ -227,7 +227,7 @@ export const About = () => {
 
       {/* Join Us CTA */}
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-copy mb-4">Join Our Journey</h2>
+        <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Join Our Journey</h2>
         <p className="text-copy-light mb-6 max-w-2xl mx-auto">
           Be part of our mission to support sustainable development in Africa while enjoying exceptional products with
           authentic stories.
