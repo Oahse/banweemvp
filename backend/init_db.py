@@ -91,25 +91,57 @@ def get_models():
         'TaxValidationRule': TaxValidationRule, 'ShippingValidationRule': ShippingValidationRule,
     }
 
-# Global tax rates data
+# Global tax rates data - Comprehensive list matching frontend
 GLOBAL_TAX_RATES = [
+    # North America
     {"country_code": "US", "country_name": "United States", "province_code": None, "province_name": None, "tax_rate": 0.0, "tax_name": "No Tax"},
+    {"country_code": "US", "country_name": "United States", "province_code": "CA", "province_name": "California", "tax_rate": 0.0875, "tax_name": "Sales Tax"},
+    {"country_code": "US", "country_name": "United States", "province_code": "CO", "province_name": "Colorado", "tax_rate": 0.029, "tax_name": "Sales Tax"},
+    {"country_code": "US", "country_name": "United States", "province_code": "CT", "province_name": "Connecticut", "tax_rate": 0.0635, "tax_name": "Sales Tax"},
+    {"country_code": "US", "country_name": "United States", "province_code": "NY", "province_name": "New York", "tax_rate": 0.08, "tax_name": "Sales Tax"},
+    {"country_code": "US", "country_name": "United States", "province_code": "TX", "province_name": "Texas", "tax_rate": 0.0625, "tax_name": "Sales Tax"},
+    {"country_code": "US", "country_name": "United States", "province_code": "WA", "province_name": "Washington", "tax_rate": 0.065, "tax_name": "Sales Tax"},
+    {"country_code": "CA", "country_name": "Canada", "province_code": None, "province_name": None, "tax_rate": 0.05, "tax_name": "GST"},
     {"country_code": "CA", "country_name": "Canada", "province_code": "ON", "province_name": "Ontario", "tax_rate": 0.13, "tax_name": "HST"},
     {"country_code": "CA", "country_name": "Canada", "province_code": "QC", "province_name": "Quebec", "tax_rate": 0.14975, "tax_name": "GST + QST"},
     {"country_code": "CA", "country_name": "Canada", "province_code": "BC", "province_name": "British Columbia", "tax_rate": 0.12, "tax_name": "GST + PST"},
+    {"country_code": "CA", "country_name": "Canada", "province_code": "AB", "province_name": "Alberta", "tax_rate": 0.05, "tax_name": "GST"},
+    {"country_code": "MX", "country_name": "Mexico", "province_code": None, "province_name": None, "tax_rate": 0.16, "tax_name": "IVA"},
+    
+    # Europe
     {"country_code": "GB", "country_name": "United Kingdom", "province_code": None, "province_name": None, "tax_rate": 0.20, "tax_name": "VAT"},
     {"country_code": "DE", "country_name": "Germany", "province_code": None, "province_name": None, "tax_rate": 0.19, "tax_name": "MwSt"},
     {"country_code": "FR", "country_name": "France", "province_code": None, "province_name": None, "tax_rate": 0.20, "tax_name": "TVA"},
     {"country_code": "IT", "country_name": "Italy", "province_code": None, "province_name": None, "tax_rate": 0.22, "tax_name": "IVA"},
     {"country_code": "ES", "country_name": "Spain", "province_code": None, "province_name": None, "tax_rate": 0.21, "tax_name": "IVA"},
     {"country_code": "NL", "country_name": "Netherlands", "province_code": None, "province_name": None, "tax_rate": 0.21, "tax_name": "BTW"},
-    {"country_code": "AU", "country_name": "Australia", "province_code": None, "province_name": None, "tax_rate": 0.10, "tax_name": "GST"},
-    {"country_code": "JP", "country_name": "Japan", "province_code": None, "province_name": None, "tax_rate": 0.10, "tax_name": "Consumption Tax"},
-    {"country_code": "CN", "country_name": "China", "province_code": None, "province_name": None, "tax_rate": 0.13, "tax_name": "VAT"},
-    {"country_code": "IN", "country_name": "India", "province_code": None, "province_name": None, "tax_rate": 0.18, "tax_name": "GST"},
-    {"country_code": "BR", "country_name": "Brazil", "province_code": None, "province_name": None, "tax_rate": 0.17, "tax_name": "ICMS"},
-    {"country_code": "MX", "country_name": "Mexico", "province_code": None, "province_name": None, "tax_rate": 0.16, "tax_name": "IVA"},
-]
+    {"country_code": "BE", "country_name": "Belgium", "province_code": None, "province_name": None, "tax_rate": 0.21, "tax_name": "BTW"},
+    {"country_code": "AT", "country_name": "Austria", "province_code": None, "province_name": None, "tax_rate": 0.20, "tax_name": "MwSt"},
+    {"country_code": "PT", "country_name": "Portugal", "province_code": None, "province_name": None, "tax_rate": 0.23, "tax_name": "IVA"},
+    {"country_code": "SE", "country_name": "Sweden", "province_code": None, "province_name": None, "tax_rate": 0.25, "tax_name": "Moms"},
+    {"country_code": "DK", "country_name": "Denmark", "province_code": None, "province_name": None, "tax_rate": 0.25, "tax_name": "Moms"},
+    {"country_code": "NO", "country_name": "Norway", "province_code": None, "province_name": None, "tax_rate": 0.25, "tax_name": "MVA"},
+    {"country_code": "FI", "country_name": "Finland", "province_code": None, "province_name": None, "tax_rate": 0.255, "tax_name": "ALV"},
+    {"country_code": "CH", "country_name": "Switzerland", "province_code": None, "province_name": None, "tax_rate": 0.077, "tax_name": "MWST"},
+    {"country_code": "IE", "country_name": "Ireland", "province_code": None, "province_name": None, "tax_rate": 0.23, "tax_name": "VAT"},
+    {"country_code": "IS", "country_name": "Iceland", "province_code": None, "province_name": None, "tax_rate": 0.24, "tax_name": "VAT"},
+    {"country_code": "EE", "country_name": "Estonia", "province_code": None, "province_name": None, "tax_rate": 0.22, "tax_name": "VAT"},
+    {"country_code": "LV", "country_name": "Latvia", "province_code": None, "province_name": None, "tax_rate": 0.21, "tax_name": "VAT"},
+    {"country_code": "LT", "country_name": "Lithuania", "province_code": None, "province_name": None, "tax_rate": 0.21, "tax_name": "VAT"},
+    {"country_code": "PL", "country_name": "Poland", "province_code": None, "province_name": None, "tax_rate": 0.23, "tax_name": "VAT"},
+    {"country_code": "CZ", "country_name": "Czechia", "province_code": None, "province_name": None, "tax_rate": 0.21, "tax_name": "VAT"},
+    {"country_code": "SK", "country_name": "Slovakia", "province_code": None, "province_name": None, "tax_rate": 0.20, "tax_name": "VAT"},
+    {"country_code": "HU", "country_name": "Hungary", "province_code": None, "province_name": None, "tax_rate": 0.27, "tax_name": "VAT"},
+    {"country_code": "SI", "country_name": "Slovenia", "province_code": None, "province_name": None, "tax_rate": 0.22, "tax_name": "VAT"},
+    {"country_code": "HR", "country_name": "Croatia", "province_code": None, "province_name": None, "tax_rate": 0.25, "tax_name": "VAT"},
+    {"country_code": "GR", "country_name": "Greece", "province_code": None, "province_name": None, "tax_rate": 0.24, "tax_name": "VAT"},
+    {"country_code": "MT", "country_name": "Malta", "province_code": None, "province_name": None, "tax_rate": 0.18, "tax_name": "VAT"},
+    {"country_code": "CY", "country_name": "Cyprus", "province_code": None, "province_name": None, "tax_rate": 0.19, "tax_name": "VAT"},
+    {"country_code": "BG", "country_name": "Bulgaria", "province_code": None, "province_name": None, "tax_rate": 0.20, "tax_name": "VAT"},
+    {"country_code": "RO", "country_name": "Romania", "province_code": None, "province_name": None, "tax_rate": 0.19, "tax_name": "VAT"},
+    {"country_code": "RU", "country_name": "Russia", "province_code": None, "province_name": None, "tax_rate": 0.20, "tax_name": "VAT"},
+    {"country_code": "UA", "country_name": "Ukraine", "province_code": None, "province_name": None, "tax_rate": 0.20, "tax_name": "VAT"},
+    {"country_code": "TR", "country_name": "Turkey", "province_code": None, "province_name": None, "tax_rate": 0.18, "tax_name": "VAT"},
 
 # Sample data constants for Agricultural E-commerce
 CATEGORIES = [

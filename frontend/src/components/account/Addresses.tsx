@@ -5,6 +5,8 @@ import { useApi } from '../../hooks/useAsync';
 import { AuthAPI } from '../../api';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 import { SkeletonAddresses } from '../ui/SkeletonAddresses';
+import { Dropdown } from '../ui/Dropdown';
+import { countries, getCountryOptions, getProvinceOptions, getCountryByCode, getProvincesByCountry } from '../../data/countries';
 
 /**
  * Addresses component allows users to manage their saved addresses.
@@ -25,7 +27,7 @@ export const Addresses = () => {
     city: '',
     state: '',
     post_code: '',
-    country: 'United States',
+    country: 'US', // Use country code instead of country name
     kind: 'Shipping',
   });
 
@@ -101,7 +103,7 @@ export const Addresses = () => {
       city: address.city,
       state: address.state,
       post_code: address.post_code,
-      country: address.country,
+      country: address.country || 'US', // Handle existing addresses
       kind: address.kind,
     });
     setEditingAddressId(address.id);
@@ -134,7 +136,7 @@ export const Addresses = () => {
       city: '',
       state: '',
       post_code: '',
-      country: 'United States',
+      country: 'US', // Use country code
       kind: 'Shipping',
     });
     setEditingAddressId(null);
@@ -215,7 +217,7 @@ export const Addresses = () => {
                   {address.city}, {address.state} {address.post_code}
                 </p>
                 <p className="text-gray-600 dark:text-gray-300 text-xs">
-                  {address.country}
+                  {getCountryByCode(address.country)?.name || address.country}
                 </p>
                 <div className="flex mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                   {/* Edit and Delete buttons for each address */}
@@ -269,7 +271,26 @@ export const Addresses = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     State / Province
                   </label>
-                  <input type="text" name="state" value={formData.state} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white" required />
+                  {getProvincesByCountry(formData.country).length > 0 ? (
+                    <Dropdown
+                      options={getProvinceOptions(formData.country)}
+                      value={formData.state}
+                      placeholder="Select a state/province..."
+                      onChange={(value) => setFormData({ ...formData, state: value })}
+                      className="w-full"
+                      searchable={true}
+                      searchPlaceholder="Search states/provinces..."
+                    />
+                  ) : (
+                    <input 
+                      type="text" 
+                      name="state" 
+                      value={formData.state} 
+                      onChange={handleInputChange} 
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white" 
+                      placeholder="Enter state/province"
+                    />
+                  )}
                 </div>
                 {/* Postal/Zip Code Input */}
                 <div>
@@ -278,22 +299,38 @@ export const Addresses = () => {
                   </label>
                   <input type="text" name="post_code" value={formData.post_code} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white" required />
                 </div>
-                {/* Country Input */}
+                {/* Country Dropdown */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Country
                   </label>
-                  <input type="text" name="country" value={formData.country} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white" required />
+                  <Dropdown
+                    options={getCountryOptions()}
+                    value={formData.country}
+                    placeholder="Select a country..."
+                    onChange={(value) => setFormData({ ...formData, country: value, state: '' })} // Clear state when country changes
+                    className="w-full"
+                    searchable={true}
+                    searchPlaceholder="Search countries..."
+                  />
                 </div>
-                 {/* Address Type Select */}
+                 {/* Address Type Dropdown */}
                  <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Address Type
                   </label>
-                  <select name="kind" value={formData.kind} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white">
-                    <option value="Shipping">Shipping</option>
-                    <option value="Billing">Billing</option>
-                  </select>
+                  <Dropdown
+                    options={[
+                      { value: 'Shipping', label: 'Shipping Address' },
+                      { value: 'Billing', label: 'Billing Address' }
+                    ]}
+                    value={formData.kind}
+                    placeholder="Select address type..."
+                    onChange={(value) => setFormData({ ...formData, kind: value })}
+                    className="w-full"
+                    searchable={true}
+                    searchPlaceholder="Search address types..."
+                  />
                 </div>
               </div>
               {/* Form Action Buttons */}

@@ -239,16 +239,11 @@ class SubscriptionService:
                 state = customer_address.get('state', '')
                 
                 # Calculate tax on the subtotal (before shipping)
-                tax_result = await tax_service.calculate_tax(
-                    amount=float(subtotal),
-                    country=country,
-                    state=state,
-                    product_type="subscription"
-                )
+                tax_rate_value = await tax_service.get_tax_rate(country, state)
+                tax_amount = float(subtotal) * tax_rate_value
+                tax_rate = Decimal(str(tax_rate_value))
                 
-                if tax_result:
-                    tax_amount = Decimal(str(tax_result.get("tax_amount", 0.0)))
-                    tax_rate = Decimal(str(tax_result.get("tax_rate", 0.0)))
+                logger.info(f"Calculated tax for subscription: ${float(subtotal):.2f} × {tax_rate_value * 100}% = ${tax_amount:.2f}")
                     
                 # TODO: Add loyalty discount calculation here in the future
                 # For now, discount_amount remains 0.0

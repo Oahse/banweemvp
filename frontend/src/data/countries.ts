@@ -10,9 +10,15 @@ export interface Country {
   taxInfo?: TaxInfo;
 }
 
+export interface City {
+  code: string;
+  name: string;
+}
+
 export interface Province {
   code: string;
   name: string;
+  cities?: City[];
   taxInfo?: TaxInfo;
 }
 
@@ -35,6 +41,60 @@ export interface ProvinceOption {
   label: string;
 }
 
+// Helper functions for country and tax management
+export const getCountryByCode = (code: string): Country | undefined => {
+  return countries.find(country => country.code === code);
+};
+
+export const getCountryByName = (name: string): Country | undefined => {
+  return countries.find(country => country.name.toLowerCase() === name.toLowerCase());
+};
+
+export const getProvincesByCountry = (countryCode: string): Province[] => {
+  const country = getCountryByCode(countryCode);
+  return country?.provinces || [];
+};
+
+export const getTaxInfo = (countryCode: string, provinceCode?: string): TaxInfo | null => {
+  const country = getCountryByCode(countryCode);
+  
+  // First check province-specific tax
+  if (provinceCode && country?.provinces) {
+    const province = country.provinces.find(p => p.code === provinceCode);
+    if (province?.taxInfo) {
+      return province.taxInfo;
+    }
+  }
+  
+  // Fall back to country tax
+  return country?.taxInfo || null;
+};
+
+export const getTaxRate = (countryCode: string, provinceCode?: string): number => {
+  const taxInfo = getTaxInfo(countryCode, provinceCode);
+  return taxInfo?.standardRate ? taxInfo.standardRate / 100 : 0;
+};
+
+export const getCurrency = (countryCode: string): string => {
+  const taxInfo = getTaxInfo(countryCode);
+  return taxInfo?.currency || 'USD';
+};
+
+export const getCountryOptions = (): CountryOption[] => {
+  return countries.map(country => ({
+    value: country.code,
+    label: country.name
+  })).sort((a, b) => a.label.localeCompare(b.label));
+};
+
+export const getProvinceOptions = (countryCode: string): ProvinceOption[] => {
+  const provinces = getProvincesByCountry(countryCode);
+  return provinces.map(province => ({
+    value: province.code,
+    label: province.name
+  })).sort((a, b) => a.label.localeCompare(b.label));
+};
+
 export const countries: Country[] = [
   // North America
   {
@@ -45,9 +105,9 @@ export const countries: Country[] = [
       { code: 'AK', name: 'Alaska' },
       { code: 'AZ', name: 'Arizona' },
       { code: 'AR', name: 'Arkansas' },
-      { code: 'CA', name: 'California' },
-      { code: 'CO', name: 'Colorado' },
-      { code: 'CT', name: 'Connecticut' },
+      { code: 'CA', name: 'California', taxInfo: { standardRate: 8.75, taxName: 'Sales Tax', currency: 'USD', region: 'NA' } },
+      { code: 'CO', name: 'Colorado', taxInfo: { standardRate: 2.9, taxName: 'Sales Tax', currency: 'USD', region: 'NA' } },
+      { code: 'CT', name: 'Connecticut', taxInfo: { standardRate: 6.35, taxName: 'Sales Tax', currency: 'USD', region: 'NA' } },
       { code: 'DE', name: 'Delaware' },
       { code: 'FL', name: 'Florida' },
       { code: 'GA', name: 'Georgia' },
@@ -97,16 +157,17 @@ export const countries: Country[] = [
   {
     code: 'CA',
     name: 'Canada',
+    taxInfo: { standardRate: 5, taxName: 'GST', currency: 'CAD', region: 'NA' },
     provinces: [
-      { code: 'AB', name: 'Alberta' },
-      { code: 'BC', name: 'British Columbia' },
-      { code: 'MB', name: 'Manitoba' },
-      { code: 'NB', name: 'New Brunswick' },
-      { code: 'NL', name: 'Newfoundland and Labrador' },
-      { code: 'NS', name: 'Nova Scotia' },
-      { code: 'ON', name: 'Ontario' },
-      { code: 'PE', name: 'Prince Edward Island' },
-      { code: 'QC', name: 'Quebec' },
+      { code: 'AB', name: 'Alberta', taxInfo: { standardRate: 5, taxName: 'GST', currency: 'CAD', region: 'NA' } },
+      { code: 'BC', name: 'British Columbia', taxInfo: { standardRate: 12, taxName: 'GST + PST', currency: 'CAD', region: 'NA' } },
+      { code: 'MB', name: 'Manitoba', taxInfo: { standardRate: 12, taxName: 'GST + PST', currency: 'CAD', region: 'NA' } },
+      { code: 'NB', name: 'New Brunswick', taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' } },
+      { code: 'NL', name: 'Newfoundland and Labrador', taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' } },
+      { code: 'NS', name: 'Nova Scotia', taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' } },
+      { code: 'ON', name: 'Ontario', taxInfo: { standardRate: 13, taxName: 'HST', currency: 'CAD', region: 'NA' } },
+      { code: 'PE', name: 'Prince Edward Island', taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' } },
+      { code: 'QC', name: 'Quebec', taxInfo: { standardRate: 14.975, taxName: 'GST + QST', currency: 'CAD', region: 'NA' } },
       { code: 'SK', name: 'Saskatchewan' },
       { code: 'NT', name: 'Northwest Territories' },
       { code: 'NU', name: 'Nunavut' },
@@ -172,6 +233,66 @@ export const countries: Country[] = [
   { code: 'LC', name: 'Saint Lucia' },
   { code: 'VC', name: 'Saint Vincent and the Grenadines' },
   { code: 'AG', name: 'Antigua and Barbuda' },
+
+  // Africa - Comprehensive list with tax information
+  { code: 'NG', name: 'Nigeria', taxInfo: { standardRate: 7.5, taxName: 'VAT', currency: 'NGN', region: 'MEA' } },
+  { code: 'ZA', name: 'South Africa', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'ZAR', region: 'MEA' } },
+  { code: 'EG', name: 'Egypt', taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'EGP', region: 'MEA' } },
+  { code: 'KE', name: 'Kenya', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'KES', region: 'MEA' } },
+  { code: 'GH', name: 'Ghana', taxInfo: { standardRate: 12.5, taxName: 'VAT', currency: 'GHS', region: 'MEA' } },
+  { code: 'MA', name: 'Morocco', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'MAD', region: 'MEA' } },
+  { code: 'TN', name: 'Tunisia', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'TND', region: 'MEA' } },
+  { code: 'DZ', name: 'Algeria', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'DZD', region: 'MEA' } },
+  { code: 'ET', name: 'Ethiopia', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'ETB', region: 'MEA' } },
+  { code: 'TZ', name: 'Tanzania', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'TZS', region: 'MEA' } },
+  { code: 'UG', name: 'Uganda', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'UGX', region: 'MEA' } },
+  { code: 'ZM', name: 'Zambia', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'ZMW', region: 'MEA' } },
+  { code: 'ZW', name: 'Zimbabwe', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'ZWL', region: 'MEA' } },
+  { code: 'BW', name: 'Botswana', taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'BWP', region: 'MEA' } },
+  { code: 'MW', name: 'Malawi', taxInfo: { standardRate: 16.5, taxName: 'VAT', currency: 'MWK', region: 'MEA' } },
+  { code: 'MZ', name: 'Mozambique', taxInfo: { standardRate: 17, taxName: 'VAT', currency: 'MZN', region: 'MEA' } },
+  { code: 'NA', name: 'Namibia', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'NAD', region: 'MEA' } },
+  { code: 'SZ', name: 'Eswatini', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SZL', region: 'MEA' } },
+  { code: 'LS', name: 'Lesotho', taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'LSL', region: 'MEA' } },
+  { code: 'AO', name: 'Angola', taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'AOA', region: 'MEA' } },
+  { code: 'CM', name: 'Cameroon', taxInfo: { standardRate: 19.25, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
+  { code: 'CF', name: 'Central African Republic', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
+  { code: 'TD', name: 'Chad', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
+  { code: 'CG', name: 'Congo - Brazzaville', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
+  { code: 'CD', name: 'Congo - Kinshasa', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'CDF', region: 'MEA' } },
+  { code: 'GA', name: 'Gabon', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
+  { code: 'GQ', name: 'Equatorial Guinea', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
+  { code: 'ST', name: 'São Tomé and Príncipe', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'STN', region: 'MEA' } },
+  { code: 'CV', name: 'Cabo Verde', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'CVE', region: 'MEA' } },
+  { code: 'GW', name: 'Guinea-Bissau', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
+  { code: 'GN', name: 'Guinea', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'GNF', region: 'MEA' } },
+  { code: 'SL', name: 'Sierra Leone', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SLL', region: 'MEA' } },
+  { code: 'LR', name: 'Liberia', taxInfo: { standardRate: 7, taxName: 'VAT', currency: 'LRD', region: 'MEA' } },
+  { code: 'CI', name: "Côte d'Ivoire", taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
+  { code: 'BF', name: 'Burkina Faso', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
+  { code: 'ML', name: 'Mali', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
+  { code: 'NE', name: 'Niger', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
+  { code: 'SN', name: 'Senegal', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
+  { code: 'TG', name: 'Togo', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
+  { code: 'BJ', name: 'Benin', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
+  { code: 'MU', name: 'Mauritius', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'MUR', region: 'MEA' } },
+  { code: 'SC', name: 'Seychelles', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SCR', region: 'MEA' } },
+  { code: 'KM', name: 'Comoros', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'KMF', region: 'MEA' } },
+  { code: 'YT', name: 'Mayotte', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'MEA' } },
+  { code: 'RE', name: 'Réunion', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'MEA' } },
+  { code: 'MG', name: 'Madagascar', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'MGA', region: 'MEA' } },
+  { code: 'ER', name: 'Eritrea' },
+  { code: 'DJ', name: 'Djibouti', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'DJF', region: 'MEA' } },
+  { code: 'SO', name: 'Somalia' },
+  { code: 'SD', name: 'Sudan', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SDG', region: 'MEA' } },
+  { code: 'SS', name: 'South Sudan', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SSP', region: 'MEA' } },
+  { code: 'LY', name: 'Libya', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'LYD', region: 'MEA' } },
+  { code: 'EH', name: 'Western Sahara' },
+  { code: 'MR', name: 'Mauritania', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'MRU', region: 'MEA' } },
+  { code: 'GM', name: 'Gambia', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'GMD', region: 'MEA' } },
+  { code: 'RW', name: 'Rwanda', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'RWF', region: 'MEA' } },
+  { code: 'BI', name: 'Burundi', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'BIF', region: 'MEA' } },
+  { code: 'SO', name: 'Somalia' },
 
   // South America
   {
@@ -254,6 +375,7 @@ export const countries: Country[] = [
   {
     code: 'GB',
     name: 'United Kingdom',
+    taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'GBP', region: 'EU' },
     provinces: [
       { code: 'ENG', name: 'England' },
       { code: 'SCT', name: 'Scotland' },
@@ -261,54 +383,95 @@ export const countries: Country[] = [
       { code: 'NIR', name: 'Northern Ireland' }
     ]
   },
-  { code: 'IE', name: 'Ireland' },
-  { code: 'IS', name: 'Iceland' },
-  { code: 'NO', name: 'Norway' },
-  { code: 'SE', name: 'Sweden' },
-  { code: 'FI', name: 'Finland' },
-  { code: 'DK', name: 'Denmark' },
-  { code: 'EE', name: 'Estonia' },
-  { code: 'LV', name: 'Latvia' },
-  { code: 'LT', name: 'Lithuania' },
-  { code: 'PL', name: 'Poland' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'NL', name: 'Netherlands' },
-  { code: 'BE', name: 'Belgium' },
-  { code: 'LU', name: 'Luxembourg' },
-  { code: 'FR', name: 'France' },
-  { code: 'CH', name: 'Switzerland' },
-  { code: 'AT', name: 'Austria' },
-  { code: 'LI', name: 'Liechtenstein' },
-  { code: 'IT', name: 'Italy' },
-  { code: 'SM', name: 'San Marino' },
-  { code: 'VA', name: 'Vatican City' },
-  { code: 'MT', name: 'Malta' },
-  { code: 'ES', name: 'Spain' },
-  { code: 'AD', name: 'Andorra' },
-  { code: 'PT', name: 'Portugal' },
-  { code: 'MC', name: 'Monaco' },
-  { code: 'SI', name: 'Slovenia' },
-  { code: 'HR', name: 'Croatia' },
-  { code: 'BA', name: 'Bosnia and Herzegovina' },
-  { code: 'ME', name: 'Montenegro' },
-  { code: 'RS', name: 'Serbia' },
-  { code: 'XK', name: 'Kosovo' },
-  { code: 'AL', name: 'Albania' },
-  { code: 'MK', name: 'North Macedonia' },
-  { code: 'BG', name: 'Bulgaria' },
-  { code: 'RO', name: 'Romania' },
-  { code: 'MD', name: 'Moldova' },
-  { code: 'UA', name: 'Ukraine' },
-  { code: 'BY', name: 'Belarus' },
-  { code: 'RU', name: 'Russia' },
-  { code: 'GE', name: 'Georgia' },
-  { code: 'AM', name: 'Armenia' },
-  { code: 'AZ', name: 'Azerbaijan' },
-  { code: 'TR', name: 'Turkey' },
-  { code: 'CY', name: 'Cyprus' },
-  { code: 'GR', name: 'Greece' },
-  { code: 'CZ', name: 'Czech Republic' },
-  { code: 'SK', name: 'Slovakia' },
+  { code: 'IE', name: 'Ireland', taxInfo: { standardRate: 23, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'FR', name: 'France', taxInfo: { standardRate: 20, taxName: 'TVA', currency: 'EUR', region: 'EU' } },
+  { code: 'DE', name: 'Germany', taxInfo: { standardRate: 19, taxName: 'MwSt', currency: 'EUR', region: 'EU' } },
+  { code: 'IT', name: 'Italy', taxInfo: { standardRate: 22, taxName: 'IVA', currency: 'EUR', region: 'EU' } },
+  { code: 'ES', name: 'Spain', taxInfo: { standardRate: 21, taxName: 'IVA', currency: 'EUR', region: 'EU' } },
+  { code: 'NL', name: 'Netherlands', taxInfo: { standardRate: 21, taxName: 'BTW', currency: 'EUR', region: 'EU' } },
+  { code: 'BE', name: 'Belgium', taxInfo: { standardRate: 21, taxName: 'BTW', currency: 'EUR', region: 'EU' } },
+  { code: 'AT', name: 'Austria', taxInfo: { standardRate: 20, taxName: 'MwSt', currency: 'EUR', region: 'EU' } },
+  { code: 'PT', name: 'Portugal', taxInfo: { standardRate: 23, taxName: 'IVA', currency: 'EUR', region: 'EU' } },
+  { code: 'SE', name: 'Sweden', taxInfo: { standardRate: 25, taxName: 'Moms', currency: 'SEK', region: 'EU' } },
+  { code: 'DK', name: 'Denmark', taxInfo: { standardRate: 25, taxName: 'Moms', currency: 'DKK', region: 'EU' } },
+  { code: 'NO', name: 'Norway', taxInfo: { standardRate: 25, taxName: 'MVA', currency: 'NOK', region: 'EU' } },
+  { code: 'FI', name: 'Finland', taxInfo: { standardRate: 25.5, taxName: 'ALV', currency: 'EUR', region: 'EU' } },
+  { code: 'CH', name: 'Switzerland', taxInfo: { standardRate: 7.7, taxName: 'MWST', currency: 'CHF', region: 'EU' } },
+  { code: 'IE', name: 'Ireland', taxInfo: { standardRate: 23, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'IS', name: 'Iceland', taxInfo: { standardRate: 24, taxName: 'VAT', currency: 'ISK', region: 'EU' } },
+  { code: 'NO', name: 'Norway', taxInfo: { standardRate: 25, taxName: 'MVA', currency: 'NOK', region: 'EU' } },
+  { code: 'SE', name: 'Sweden', taxInfo: { standardRate: 25, taxName: 'Moms', currency: 'SEK', region: 'EU' } },
+  { code: 'FI', name: 'Finland', taxInfo: { standardRate: 25.5, taxName: 'ALV', currency: 'EUR', region: 'EU' } },
+  { code: 'DK', name: 'Denmark', taxInfo: { standardRate: 25, taxName: 'Moms', currency: 'DKK', region: 'EU' } },
+  { code: 'EE', name: 'Estonia', taxInfo: { standardRate: 22, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'LV', name: 'Latvia', taxInfo: { standardRate: 21, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'LT', name: 'Lithuania', taxInfo: { standardRate: 21, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'PL', name: 'Poland', taxInfo: { standardRate: 23, taxName: 'VAT', currency: 'PLN', region: 'EU' } },
+  { code: 'CZ', name: 'Czechia', taxInfo: { standardRate: 21, taxName: 'VAT', currency: 'CZK', region: 'EU' } },
+  { code: 'SK', name: 'Slovakia', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'HU', name: 'Hungary', taxInfo: { standardRate: 27, taxName: 'VAT', currency: 'HUF', region: 'EU' } },
+  { code: 'SI', name: 'Slovenia', taxInfo: { standardRate: 22, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'HR', name: 'Croatia', taxInfo: { standardRate: 25, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'BA', name: 'Bosnia and Herzegovina', taxInfo: { standardRate: 17, taxName: 'VAT', currency: 'BAM', region: 'EU' } },
+  { code: 'RS', name: 'Serbia', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'RSD', region: 'EU' } },
+  { code: 'ME', name: 'Montenegro', taxInfo: { standardRate: 21, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'MK', name: 'North Macedonia', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'MKD', region: 'EU' } },
+  { code: 'AL', name: 'Albania', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'ALL', region: 'EU' } },
+  { code: 'GR', name: 'Greece', taxInfo: { standardRate: 24, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'MT', name: 'Malta', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'CY', name: 'Cyprus', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'BG', name: 'Bulgaria', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'BGN', region: 'EU' } },
+  { code: 'RO', name: 'Romania', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'RON', region: 'EU' } },
+  { code: 'MD', name: 'Moldova', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'MDL', region: 'EU' } },
+  { code: 'UA', name: 'Ukraine', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'UAH', region: 'EU' } },
+  { code: 'BY', name: 'Belarus', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'BYN', region: 'EU' } },
+  { code: 'RU', name: 'Russia', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'RUB', region: 'EU' } },
+  { code: 'SM', name: 'San Marino', taxInfo: { standardRate: 17, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'VA', name: 'Vatican City', taxInfo: { standardRate: 22, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'AD', name: 'Andorra', taxInfo: { standardRate: 4.5, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'MC', name: 'Monaco', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'LI', name: 'Liechtenstein', taxInfo: { standardRate: 7.7, taxName: 'VAT', currency: 'CHF', region: 'EU' } },
+  { code: 'LU', name: 'Luxembourg', taxInfo: { standardRate: 17, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+
+  // Latin America - Comprehensive list
+  { code: 'AR', name: 'Argentina', taxInfo: { standardRate: 21, taxName: 'IVA', currency: 'ARS', region: 'LATAM' } },
+  { code: 'BO', name: 'Bolivia', taxInfo: { standardRate: 13, taxName: 'IVA', currency: 'BOB', region: 'LATAM' } },
+  { code: 'CL', name: 'Chile', taxInfo: { standardRate: 19, taxName: 'IVA', currency: 'CLP', region: 'LATAM' } },
+  { code: 'CO', name: 'Colombia', taxInfo: { standardRate: 19, taxName: 'IVA', currency: 'COP', region: 'LATAM' } },
+  { code: 'EC', name: 'Ecuador', taxInfo: { standardRate: 12, taxName: 'IVA', currency: 'USD', region: 'LATAM' } },
+  { code: 'PY', name: 'Paraguay', taxInfo: { standardRate: 10, taxName: 'IVA', currency: 'PYG', region: 'LATAM' } },
+  { code: 'PE', name: 'Peru', taxInfo: { standardRate: 18, taxName: 'IVA', currency: 'PEN', region: 'LATAM' } },
+  { code: 'UY', name: 'Uruguay', taxInfo: { standardRate: 22, taxName: 'IVA', currency: 'UYU', region: 'LATAM' } },
+  { code: 'VE', name: 'Venezuela' },
+  { code: 'GY', name: 'Guyana', taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'GYD', region: 'LATAM' } },
+  { code: 'SR', name: 'Suriname', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'SRD', region: 'LATAM' } },
+  { code: 'GF', name: 'French Guiana', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'LATAM' } },
+
+  // Caribbean - Comprehensive list
+  { code: 'JM', name: 'Jamaica', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'JMD', region: 'LATAM' } },
+  { code: 'HT', name: 'Haiti' },
+  { code: 'DO', name: 'Dominican Republic', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'DOP', region: 'LATAM' } },
+  { code: 'TT', name: 'Trinidad and Tobago', taxInfo: { standardRate: 12.5, taxName: 'VAT', currency: 'TTD', region: 'LATAM' } },
+  { code: 'BB', name: 'Barbados', taxInfo: { standardRate: 17.5, taxName: 'VAT', currency: 'BBD', region: 'LATAM' } },
+  { code: 'BS', name: 'Bahamas', taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'BSD', region: 'LATAM' } },
+  { code: 'DM', name: 'Dominica', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XCD', region: 'LATAM' } },
+  { code: 'GD', name: 'Grenada', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XCD', region: 'LATAM' } },
+  { code: 'KN', name: 'Saint Kitts and Nevis', taxInfo: { standardRate: 17, taxName: 'VAT', currency: 'XCD', region: 'LATAM' } },
+  { code: 'LC', name: 'Saint Lucia', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XCD', region: 'LATAM' } },
+  { code: 'VC', name: 'Saint Vincent and the Grenadines', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'XCD', region: 'LATAM' } },
+  { code: 'AG', name: 'Antigua and Barbuda', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XCD', region: 'LATAM' } },
+  { code: 'CU', name: 'Cuba' },
+  { code: 'GP', name: 'Guadeloupe', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'LATAM' } },
+  { code: 'MQ', name: 'Martinique', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'LATAM' } },
+  { code: 'BL', name: 'Saint Barthélemy', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'LATAM' } },
+  { code: 'MF', name: 'Saint Martin', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'LATAM' } },
+  { code: 'PM', name: 'Saint Pierre and Miquelon', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'EUR', region: 'NA' } },
+  { code: 'AW', name: 'Aruba', taxInfo: { standardRate: 6, taxName: 'VAT', currency: 'AWG', region: 'LATAM' } },
+  { code: 'CW', name: 'Curaçao', taxInfo: { standardRate: 6, taxName: 'VAT', currency: 'CWG', region: 'LATAM' } },
+  { code: 'SX', name: 'Sint Maarten', taxInfo: { standardRate: 6, taxName: 'VAT', currency: 'ANG', region: 'LATAM' } },
+  { code: 'BQ', name: 'Caribbean Netherlands', taxInfo: { standardRate: 6, taxName: 'VAT', currency: 'USD', region: 'LATAM' } },
+  { code: 'VI', name: 'U.S. Virgin Islands' },
+  { code: 'PR', name: 'Puerto Rico', taxInfo: { standardRate: 11.5, taxName: 'VAT', currency: 'USD', region: 'LATAM' } },
   { code: 'HU', name: 'Hungary' },
 
   // Africa
@@ -368,20 +531,25 @@ export const countries: Country[] = [
   { code: 'CV', name: 'Cape Verde' },
 
   // Middle East
-  { code: 'IL', name: 'Israel' },
-  { code: 'PS', name: 'Palestine' },
-  { code: 'LB', name: 'Lebanon' },
+  { code: 'IL', name: 'Israel', taxInfo: { standardRate: 17, taxName: 'VAT', currency: 'ILS', region: 'MEA' } },
+  { code: 'PS', name: 'Palestine', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'ILS', region: 'MEA' } },
+  { code: 'LB', name: 'Lebanon', taxInfo: { standardRate: 11, taxName: 'VAT', currency: 'LBP', region: 'MEA' } },
   { code: 'SY', name: 'Syria' },
-  { code: 'JO', name: 'Jordan' },
-  { code: 'IQ', name: 'Iraq' },
+  { code: 'JO', name: 'Jordan', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'JOD', region: 'MEA' } },
+  { code: 'IQ', name: 'Iraq', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'IQD', region: 'MEA' } },
   { code: 'KW', name: 'Kuwait' },
-  { code: 'SA', name: 'Saudi Arabia' },
-  { code: 'BH', name: 'Bahrain' },
-  { code: 'QA', name: 'Qatar' },
-  { code: 'AE', name: 'United Arab Emirates' },
-  { code: 'OM', name: 'Oman' },
+  { code: 'SA', name: 'Saudi Arabia', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SAR', region: 'MEA' } },
+  { code: 'BH', name: 'Bahrain', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'BHD', region: 'MEA' } },
+  { code: 'QA', name: 'Qatar', taxInfo: { standardRate: 5, taxName: 'VAT', currency: 'QAR', region: 'MEA' } },
+  { code: 'AE', name: 'United Arab Emirates', taxInfo: { standardRate: 5, taxName: 'VAT', currency: 'AED', region: 'MEA' } },
+  { code: 'OM', name: 'Oman', taxInfo: { standardRate: 5, taxName: 'VAT', currency: 'OMR', region: 'MEA' } },
   { code: 'YE', name: 'Yemen' },
-  { code: 'IR', name: 'Iran' },
+  { code: 'IR', name: 'Iran', taxInfo: { standardRate: 9, taxName: 'VAT', currency: 'IRR', region: 'MEA' } },
+  { code: 'TR', name: 'Turkey', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'TRY', region: 'MEA' } },
+  { code: 'CY', name: 'Cyprus', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
+  { code: 'AZ', name: 'Azerbaijan', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'AZN', region: 'MEA' } },
+  { code: 'AM', name: 'Armenia', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'AMD', region: 'MEA' } },
+  { code: 'GE', name: 'Georgia', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'GEL', region: 'MEA' } },
 
   // Asia
   { code: 'AF', name: 'Afghanistan' },
@@ -428,40 +596,61 @@ export const countries: Country[] = [
       { code: 'PY', name: 'Puducherry' }
     ]
   },
-  { code: 'LK', name: 'Sri Lanka' },
-  { code: 'MV', name: 'Maldives' },
+  { code: 'LK', name: 'Sri Lanka', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'LKR', region: 'APAC' } },
+  { code: 'MV', name: 'Maldives', taxInfo: { standardRate: 6, taxName: 'GST', currency: 'MVR', region: 'APAC' } },
   { code: 'NP', name: 'Nepal' },
   { code: 'BT', name: 'Bhutan' },
-  { code: 'BD', name: 'Bangladesh' },
+  { code: 'BD', name: 'Bangladesh', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'BDT', region: 'APAC' } },
   { code: 'MM', name: 'Myanmar' },
-  { code: 'TH', name: 'Thailand' },
+  { code: 'TH', name: 'Thailand', taxInfo: { standardRate: 7, taxName: 'VAT', currency: 'THB', region: 'APAC' } },
   { code: 'LA', name: 'Laos' },
-  { code: 'VN', name: 'Vietnam' },
-  { code: 'KH', name: 'Cambodia' },
-  { code: 'MY', name: 'Malaysia' },
-  { code: 'SG', name: 'Singapore' },
+  { code: 'VN', name: 'Vietnam', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'VND', region: 'APAC' } },
+  { code: 'KH', name: 'Cambodia', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'KHR', region: 'APAC' } },
+  { code: 'MY', name: 'Malaysia', taxInfo: { standardRate: 6, taxName: 'GST', currency: 'MYR', region: 'APAC' } },
+  { code: 'SG', name: 'Singapore', taxInfo: { standardRate: 8, taxName: 'GST', currency: 'SGD', region: 'APAC' } },
   { code: 'BN', name: 'Brunei' },
-  { code: 'ID', name: 'Indonesia' },
+  { code: 'ID', name: 'Indonesia', taxInfo: { standardRate: 11, taxName: 'VAT', currency: 'IDR', region: 'APAC' } },
   { code: 'TL', name: 'East Timor' },
-  { code: 'PH', name: 'Philippines' },
-  { code: 'TW', name: 'Taiwan' },
-  { code: 'CN', name: 'China' },
+  { code: 'PH', name: 'Philippines', taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'PHP', region: 'APAC' } },
+  { code: 'TW', name: 'Taiwan', taxInfo: { standardRate: 5, taxName: 'VAT', currency: 'TWD', region: 'APAC' } },
+  { code: 'CN', name: 'China', taxInfo: { standardRate: 13, taxName: 'VAT', currency: 'CNY', region: 'APAC' } },
   { code: 'HK', name: 'Hong Kong' },
   { code: 'MO', name: 'Macau' },
   { code: 'MN', name: 'Mongolia' },
+  { code: 'KR', name: 'South Korea', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'KRW', region: 'APAC' } },
+  { code: 'JP', name: 'Japan', taxInfo: { standardRate: 10, taxName: 'Consumption Tax', currency: 'JPY', region: 'APAC' } },
+  { code: 'AU', name: 'Australia', taxInfo: { standardRate: 10, taxName: 'GST', currency: 'AUD', region: 'APAC' } },
+  { code: 'NZ', name: 'New Zealand', taxInfo: { standardRate: 15, taxName: 'GST', currency: 'NZD', region: 'APAC' } },
   { code: 'KP', name: 'North Korea' },
-  { code: 'KR', name: 'South Korea' },
-  { code: 'JP', name: 'Japan' },
-  { code: 'KZ', name: 'Kazakhstan' },
-  { code: 'KG', name: 'Kyrgyzstan' },
-  { code: 'TJ', name: 'Tajikistan' },
-  { code: 'UZ', name: 'Uzbekistan' },
-  { code: 'TM', name: 'Turkmenistan' },
+  { code: 'KZ', name: 'Kazakhstan', taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'KZT', region: 'APAC' } },
+  { code: 'KG', name: 'Kyrgyzstan', taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'KGS', region: 'APAC' } },
+  { code: 'TJ', name: 'Tajikistan', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'TJS', region: 'APAC' } },
+  { code: 'UZ', name: 'Uzbekistan', taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'UZS', region: 'APAC' } },
+  { code: 'TM', name: 'Turkmenistan', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'TMT', region: 'APAC' } },
+  { code: 'MN', name: 'Mongolia', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'MNT', region: 'APAC' } },
+  { code: 'NP', name: 'Nepal', taxInfo: { standardRate: 13, taxName: 'VAT', currency: 'NPR', region: 'APAC' } },
+  { code: 'BT', name: 'Bhutan', taxInfo: { standardRate: 7, taxName: 'VAT', currency: 'BTN', region: 'APAC' } },
+  { code: 'LK', name: 'Sri Lanka', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'LKR', region: 'APAC' } },
+  { code: 'MV', name: 'Maldives', taxInfo: { standardRate: 6, taxName: 'GST', currency: 'MVR', region: 'APAC' } },
+  { code: 'MM', name: 'Myanmar', taxInfo: { standardRate: 5, taxName: 'VAT', currency: 'MMK', region: 'APAC' } },
+  { code: 'LA', name: 'Laos', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'LAK', region: 'APAC' } },
+  { code: 'KH', name: 'Cambodia', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'KHR', region: 'APAC' } },
+  { code: 'BN', name: 'Brunei', taxInfo: { standardRate: 0, taxName: 'No Tax', currency: 'BND', region: 'APAC' } },
+  { code: 'SG', name: 'Singapore', taxInfo: { standardRate: 8, taxName: 'GST', currency: 'SGD', region: 'APAC' } },
+  { code: 'MY', name: 'Malaysia', taxInfo: { standardRate: 6, taxName: 'GST', currency: 'MYR', region: 'APAC' } },
+  { code: 'TH', name: 'Thailand', taxInfo: { standardRate: 7, taxName: 'VAT', currency: 'THB', region: 'APAC' } },
+  { code: 'VN', name: 'Vietnam', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'VND', region: 'APAC' } },
+  { code: 'PH', name: 'Philippines', taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'PHP', region: 'APAC' } },
+  { code: 'ID', name: 'Indonesia', taxInfo: { standardRate: 11, taxName: 'VAT', currency: 'IDR', region: 'APAC' } },
+  { code: 'TL', name: 'East Timor', taxInfo: { standardRate: 2.5, taxName: 'VAT', currency: 'USD', region: 'APAC' } },
+  { code: 'HK', name: 'Hong Kong' },
+  { code: 'MO', name: 'Macau' },
 
   // Oceania
   {
     code: 'AU',
     name: 'Australia',
+    taxInfo: { standardRate: 10, taxName: 'GST', currency: 'AUD', region: 'APAC' },
     provinces: [
       { code: 'NSW', name: 'New South Wales' },
       { code: 'VIC', name: 'Victoria' },
@@ -473,15 +662,15 @@ export const countries: Country[] = [
       { code: 'NT', name: 'Northern Territory' }
     ]
   },
-  { code: 'NZ', name: 'New Zealand' },
-  { code: 'FJ', name: 'Fiji' },
-  { code: 'PG', name: 'Papua New Guinea' },
-  { code: 'SB', name: 'Solomon Islands' },
-  { code: 'VU', name: 'Vanuatu' },
-  { code: 'NC', name: 'New Caledonia' },
-  { code: 'PF', name: 'French Polynesia' },
-  { code: 'WS', name: 'Samoa' },
-  { code: 'TO', name: 'Tonga' },
+  { code: 'NZ', name: 'New Zealand', taxInfo: { standardRate: 15, taxName: 'GST', currency: 'NZD', region: 'APAC' } },
+  { code: 'FJ', name: 'Fiji', taxInfo: { standardRate: 9, taxName: 'VAT', currency: 'FJD', region: 'APAC' } },
+  { code: 'PG', name: 'Papua New Guinea', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'PGK', region: 'APAC' } },
+  { code: 'SB', name: 'Solomon Islands', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SBD', region: 'APAC' } },
+  { code: 'VU', name: 'Vanuatu', taxInfo: { standardRate: 12.5, taxName: 'VAT', currency: 'VUV', region: 'APAC' } },
+  { code: 'NC', name: 'New Caledonia', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'XPF', region: 'APAC' } },
+  { code: 'PF', name: 'French Polynesia', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'XPF', region: 'APAC' } },
+  { code: 'WS', name: 'Samoa', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'WST', region: 'APAC' } },
+  { code: 'TO', name: 'Tonga', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'TOP', region: 'APAC' } },
   { code: 'TV', name: 'Tuvalu' },
   { code: 'KI', name: 'Kiribati' },
   { code: 'NR', name: 'Nauru' },
@@ -491,6 +680,11 @@ export const countries: Country[] = [
   { code: 'CK', name: 'Cook Islands' },
   { code: 'NU', name: 'Niue' },
   { code: 'TK', name: 'Tokelau' },
+  { code: 'WF', name: 'Wallis and Futuna' },
+  { code: 'AS', name: 'American Samoa' },
+  { code: 'GU', name: 'Guam' },
+  { code: 'MP', name: 'Northern Mariana Islands' },
+  { code: 'PR', name: 'Puerto Rico' },
   { code: 'AS', name: 'American Samoa' },
   { code: 'GU', name: 'Guam' },
   { code: 'MP', name: 'Northern Mariana Islands' },
@@ -1321,29 +1515,6 @@ export const countries: Country[] = [
     ]
   }
 ];
-
-export const getCountryOptions = (): CountryOption[] => {
-  return countries.map(country => ({
-    value: country.code,
-    label: country.name
-  }));
-};
-
-export const getProvinceOptions = (countryCode: string): ProvinceOption[] => {
-  const country = countries.find(c => c.code === countryCode);
-  if (!country || !country.provinces) {
-    return [];
-  }
-  
-  return country.provinces.map(province => ({
-    value: province.code,
-    label: province.name
-  }));
-};
-
-export const getCountryByCode = (code: string): Country | undefined => {
-  return countries.find(country => country.code === code);
-};
 
 export const getProvinceByCode = (countryCode: string, provinceCode: string): Province | undefined => {
   const country = getCountryByCode(countryCode);
