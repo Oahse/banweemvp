@@ -288,7 +288,7 @@ export const Addresses = () => {
                       options={getProvinceOptions(formData.country)}
                       value={formData.state}
                       placeholder="Select a state/province..."
-                      onChange={(value) => setFormData({ ...formData, state: value })}
+                      onChange={(value) => setFormData({ ...formData, state: value, city: '' })} // Clear city when province changes
                       className="w-full"
                       searchable={true}
                       searchPlaceholder="Search states/provinces..."
