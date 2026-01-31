@@ -120,23 +120,412 @@ export const countries: Country[] = [
     code: 'US',
     name: 'United States',
     provinces: [
-      { code: 'AL', name: 'Alabama' },
-      { code: 'AK', name: 'Alaska' },
-      { code: 'AZ', name: 'Arizona' },
-      { code: 'AR', name: 'Arkansas' },
-      { code: 'CA', name: 'California', 
-        taxInfo: { standardRate: 8.75, taxName: 'Sales Tax', currency: 'USD', region: 'NA' },
+      { code: 'AL', name: 'Alabama',
         cities: [
-          { code: 'LA', name: 'Los Angeles' },
-          { code: 'SF', name: 'San Francisco' },
-          { code: 'SD', name: 'San Diego' },
-          { code: 'SJ', name: 'San Jose' },
-          { code: 'SA', name: 'Sacramento' },
-          { code: 'FR', name: 'Fresno' },
-          { code: 'LB', name: 'Long Beach' },
-          { code: 'OA', name: 'Oakland' },
-          { code: 'BK', name: 'Bakersfield' },
-          { code: 'AN', name: 'Anaheim' }
+          { code: 'BH', name: 'Birmingham' },
+          { code: 'MO', name: 'Montgomery' },
+          { code: 'MB', name: 'Mobile' },
+          { code: 'HU', name: 'Huntsville' },
+          { code: 'TA', name: 'Tuscaloosa' },
+          { code: 'HO', name: 'Hoover' },
+          { code: 'DO', name: 'Dothan' },
+          { code: 'DE', name: 'Decatur' },
+          { code: 'AU', name: 'Auburn' },
+          { code: 'MA', name: 'Madison' }
+        ]
+      },
+      { code: 'AK', name: 'Alaska',
+        cities: [
+          { code: 'AN', name: 'Anchorage' },
+          { code: 'FA', name: 'Fairbanks' },
+          { code: 'JU', name: 'Juneau' },
+          { code: 'SI', name: 'Sitka' },
+          { code: 'KE', name: 'Ketchikan' },
+          { code: 'PA', name: 'Petersburg' },
+          { code: 'KE2', name: 'Kenai' },
+          { code: 'KO', name: 'Kodiak' },
+          { code: 'BE', name: 'Bethel' },
+          { code: 'PO', name: 'Palmer' }
+        ]
+      },
+      { code: 'AZ', name: 'Arizona',
+        cities: [
+          { code: 'PH', name: 'Phoenix' },
+          { code: 'TU', name: 'Tucson' },
+          { code: 'ME', name: 'Mesa' },
+          { code: 'CH', name: 'Chandler' },
+          { code: 'GL', name: 'Glendale' },
+          { code: 'SC', name: 'Scottsdale' },
+          { code: 'GI', name: 'Gilbert' },
+          { code: 'TE', name: 'Tempe' },
+          { code: 'PE', name: 'Peoria' },
+          { code: 'SU', name: 'Surprise' }
+        ]
+      },
+      { code: 'AR', name: 'Arkansas',
+        cities: [
+          { code: 'LI', name: 'Little Rock' },
+          { code: 'FT', name: 'Fort Smith' },
+          { code: 'FA', name: 'Fayetteville' },
+          { code: 'SP', name: 'Springdale' },
+          { code: 'JO', name: 'Jonesboro' },
+          { code: 'NL', name: 'North Little Rock' },
+          { code: 'CO', name: 'Conway' },
+          { code: 'RO', name: 'Rogers' },
+          { code: 'PI', name: 'Pine Bluff' },
+          { code: 'BE', name: 'Bentonville' }
+        ]
+      },
+      { code: 'CO', name: 'Colorado', 
+        taxInfo: { standardRate: 2.9, taxName: 'Sales Tax', currency: 'USD', region: 'NA' },
+        cities: [
+          { code: 'DE', name: 'Denver' },
+          { code: 'CO2', name: 'Colorado Springs' },
+          { code: 'AU', name: 'Aurora' },
+          { code: 'FO', name: 'Fort Collins' },
+          { code: 'LA', name: 'Lakewood' },
+          { code: 'TH', name: 'Thornton' },
+          { code: 'AR', name: 'Arvada' },
+          { code: 'WE', name: 'Westminster' },
+          { code: 'PR', name: 'Pueblo' },
+          { code: 'BO', name: 'Boulder' }
+        ]
+      },
+      { code: 'CT', name: 'Connecticut', 
+        taxInfo: { standardRate: 6.35, taxName: 'Sales Tax', currency: 'USD', region: 'NA' },
+        cities: [
+          { code: 'BR', name: 'Bridgeport' },
+          { code: 'NE', name: 'New Haven' },
+          { code: 'HA', name: 'Hartford' },
+          { code: 'ST', name: 'Stamford' },
+          { code: 'WA', name: 'Waterbury' },
+          { code: 'NO', name: 'Norwalk' },
+          { code: 'DA', name: 'Danbury' },
+          { code: 'NE2', name: 'New Britain' },
+          { code: 'ME', name: 'Meriden' },
+          { code: 'MI', name: 'Middletown' }
+        ]
+      },
+      { code: 'DE', name: 'Delaware',
+        cities: [
+          { code: 'WI', name: 'Wilmington' },
+          { code: 'DO', name: 'Dover' },
+          { code: 'NE', name: 'Newark' },
+          { code: 'MI', name: 'Middletown' },
+          { code: 'SE', name: 'Seaford' },
+          { code: 'DE2', name: 'Delaware City' },
+          { code: 'SM', name: 'Smyrna' },
+          { code: 'MI2', name: 'Milford' },
+          { code: 'EL', name: 'Elsmere' },
+          { code: 'GE', name: 'Georgetown' }
+        ]
+      },
+      { code: 'GA', name: 'Georgia',
+        cities: [
+          { code: 'AT', name: 'Atlanta' },
+          { code: 'AU', name: 'Augusta' },
+          { code: 'CO', name: 'Columbus' },
+          { code: 'SA', name: 'Savannah' },
+          { code: 'AT2', name: 'Athens' },
+          { code: 'SA2', name: 'Sandy Springs' },
+          { code: 'RO', name: 'Roswell' },
+          { code: 'MA', name: 'Macon' },
+          { code: 'AL', name: 'Albany' },
+          { code: 'WA', name: 'Warner Robins' }
+        ]
+      },
+      { code: 'HI', name: 'Hawaii',
+        cities: [
+          { code: 'HO', name: 'Honolulu' },
+          { code: 'PI', name: 'Pearl City' },
+          { code: 'HI2', name: 'Hilo' },
+          { code: 'KA', name: 'Kailua' },
+          { code: 'WA', name: 'Waipahu' },
+          { code: 'KA2', name: 'Kaneohe' },
+          { code: 'MI', name: 'Mililani Town' },
+          { code: 'KA3', name: 'Kahului' },
+          { code: 'KI', name: 'Kailua-Kona' },
+          { code: 'LI', name: 'Lihue' }
+        ]
+      },
+      { code: 'ID', name: 'Idaho',
+        cities: [
+          { code: 'BO', name: 'Boise' },
+          { code: 'NE', name: 'Nampa' },
+          { code: 'ME', name: 'Meridian' },
+          { code: 'ID', name: 'Idaho Falls' },
+          { code: 'PO', name: 'Pocatello' },
+          { code: 'CO', name: 'Coeur d\'Alene' },
+          { code: 'TW', name: 'Twin Falls' },
+          { code: 'CA', name: 'Caldwell' },
+          { code: 'LE', name: 'Lewiston' },
+          { code: 'RE', name: 'Rexburg' }
+        ]
+      },
+      { code: 'IL', name: 'Illinois',
+        cities: [
+          { code: 'CH', name: 'Chicago' },
+          { code: 'AU', name: 'Aurora' },
+          { code: 'RO', name: 'Rockford' },
+          { code: 'JO', name: 'Joliet' },
+          { code: 'NA', name: 'Naperville' },
+          { code: 'SP', name: 'Springfield' },
+          { code: 'PE', name: 'Peoria' },
+          { code: 'EL', name: 'Elgin' },
+          { code: 'WA', name: 'Waukegan' },
+          { code: 'CI', name: 'Cicero' }
+        ]
+      },
+      { code: 'IN', name: 'Indiana',
+        cities: [
+          { code: 'IN', name: 'Indianapolis' },
+          { code: 'FO', name: 'Fort Wayne' },
+          { code: 'EV', name: 'Evansville' },
+          { code: 'SO', name: 'South Bend' },
+          { code: 'CA', name: 'Carmel' },
+          { code: 'FI', name: 'Fishers' },
+          { code: 'BL', name: 'Bloomington' },
+          { code: 'HA', name: 'Hammond' },
+          { code: 'GA', name: 'Gary' },
+          { code: 'LA', name: 'Lafayette' }
+        ]
+      },
+      { code: 'IA', name: 'Iowa',
+        cities: [
+          { code: 'DE', name: 'Des Moines' },
+          { code: 'CE', name: 'Cedar Rapids' },
+          { code: 'DA', name: 'Davenport' },
+          { code: 'SI', name: 'Sioux City' },
+          { code: 'WA', name: 'Waterloo' },
+          { code: 'IO', name: 'Iowa City' },
+          { code: 'AM', name: 'Ames' },
+          { code: 'WE', name: 'West Des Moines' },
+          { code: 'AN', name: 'Ankeny' },
+          { code: 'UR', name: 'Urbandale' }
+        ]
+      },
+      { code: 'KS', name: 'Kansas',
+        cities: [
+          { code: 'WI', name: 'Wichita' },
+          { code: 'OV', name: 'Overland Park' },
+          { code: 'KA', name: 'Kansas City' },
+          { code: 'TO', name: 'Topeka' },
+          { code: 'OL', name: 'Olathe' },
+          { code: 'LA', name: 'Lawrence' },
+          { code: 'SH', name: 'Shawnee' },
+          { code: 'MA', name: 'Manhattan' },
+          { code: 'LE', name: 'Lenexa' },
+          { code: 'SA', name: 'Salina' }
+        ]
+      },
+      { code: 'KY', name: 'Kentucky',
+        cities: [
+          { code: 'LO', name: 'Louisville' },
+          { code: 'LE', name: 'Lexington' },
+          { code: 'BO', name: 'Bowling Green' },
+          { code: 'OV', name: 'Owensboro' },
+          { code: 'CO', name: 'Covington' },
+          { code: 'HO', name: 'Hopkinsville' },
+          { code: 'RI', name: 'Richmond' },
+          { code: 'FI', name: 'Florence' },
+          { code: 'GE', name: 'Georgetown' },
+          { code: 'HI', name: 'Henderson' }
+        ]
+      },
+      { code: 'LA', name: 'Louisiana',
+        cities: [
+          { code: 'NE', name: 'New Orleans' },
+          { code: 'BA', name: 'Baton Rouge' },
+          { code: 'SH', name: 'Shreveport' },
+          { code: 'LA', name: 'Lafayette' },
+          { code: 'LA2', name: 'Lake Charles' },
+          { code: 'KE', name: 'Kenner' },
+          { code: 'BO', name: 'Bossier City' },
+          { code: 'MO', name: 'Monroe' },
+          { code: 'AL', name: 'Alexandria' },
+          { code: 'NE2', name: 'New Iberia' }
+        ]
+      },
+      { code: 'ME', name: 'Maine',
+        cities: [
+          { code: 'PO', name: 'Portland' },
+          { code: 'LE', name: 'Lewiston' },
+          { code: 'BA', name: 'Bangor' },
+          { code: 'SO', name: 'South Portland' },
+          { code: 'AU', name: 'Auburn' },
+          { code: 'BI', name: 'Biddeford' },
+          { code: 'SA', name: 'Sanford' },
+          { code: 'BR', name: 'Brunswick' },
+          { code: 'SC', name: 'Scarborough' },
+          { code: 'WE', name: 'Westbrook' }
+        ]
+      },
+      { code: 'MD', name: 'Maryland',
+        cities: [
+          { code: 'BA', name: 'Baltimore' },
+          { code: 'FR', name: 'Frederick' },
+          { code: 'RO', name: 'Rockville' },
+          { code: 'GA', name: 'Gaithersburg' },
+          { code: 'BO', name: 'Bowie' },
+          { code: 'HA', name: 'Hagerstown' },
+          { code: 'AN', name: 'Annapolis' },
+          { code: 'CO', name: 'College Park' },
+          { code: 'ES', name: 'Ellicott City' },
+          { code: 'SI', name: 'Silver Spring' }
+        ]
+      },
+      { code: 'MA', name: 'Massachusetts',
+        cities: [
+          { code: 'BO', name: 'Boston' },
+          { code: 'WO', name: 'Worcester' },
+          { code: 'SP', name: 'Springfield' },
+          { code: 'LO', name: 'Lowell' },
+          { code: 'CA', name: 'Cambridge' },
+          { code: 'NE', name: 'New Bedford' },
+          { code: 'BR', name: 'Brockton' },
+          { code: 'QU', name: 'Quincy' },
+          { code: 'LY', name: 'Lynn' },
+          { code: 'FA', name: 'Fall River' }
+        ]
+      },
+      { code: 'MI', name: 'Michigan',
+        cities: [
+          { code: 'DE', name: 'Detroit' },
+          { code: 'GR', name: 'Grand Rapids' },
+          { code: 'WA', name: 'Warren' },
+          { code: 'ST', name: 'Sterling Heights' },
+          { code: 'LA', name: 'Lansing' },
+          { code: 'AN', name: 'Ann Arbor' },
+          { code: 'FL', name: 'Flint' },
+          { code: 'DE2', name: 'Dearborn' },
+          { code: 'LI', name: 'Livonia' },
+          { code: 'CL', name: 'Clinton' }
+        ]
+      },
+      { code: 'MN', name: 'Minnesota',
+        cities: [
+          { code: 'MI', name: 'Minneapolis' },
+          { code: 'SA', name: 'Saint Paul' },
+          { code: 'RO', name: 'Rochester' },
+          { code: 'DU', name: 'Duluth' },
+          { code: 'BL', name: 'Bloomington' },
+          { code: 'BR', name: 'Brooklyn Park' },
+          { code: 'PI', name: 'Plymouth' },
+          { code: 'EA', name: 'Eagan' },
+          { code: 'ST', name: 'St. Cloud' },
+          { code: 'BU', name: 'Burnsville' }
+        ]
+      },
+      { code: 'MS', name: 'Mississippi',
+        cities: [
+          { code: 'JA', name: 'Jackson' },
+          { code: 'GU', name: 'Gulfport' },
+          { code: 'SO', name: 'Southaven' },
+          { code: 'HA', name: 'Hattiesburg' },
+          { code: 'BI', name: 'Biloxi' },
+          { code: 'ME', name: 'Meridian' },
+          { code: 'TU', name: 'Tupelo' },
+          { code: 'OL', name: 'Olive Branch' },
+          { code: 'GR', name: 'Greenville' },
+          { code: 'HO', name: 'Horn Lake' }
+        ]
+      },
+      { code: 'MO', name: 'Missouri',
+        cities: [
+          { code: 'KA', name: 'Kansas City' },
+          { code: 'SA', name: 'St. Louis' },
+          { code: 'SP', name: 'Springfield' },
+          { code: 'IN', name: 'Independence' },
+          { code: 'CO', name: 'Columbia' },
+          { code: 'OL', name: 'O\'Fallon' },
+          { code: 'SA2', name: 'St. Joseph' },
+          { code: 'ST', name: 'St. Charles' },
+          { code: 'ST2', name: 'St. Peters' },
+          { code: 'FL', name: 'Florissant' }
+        ]
+      },
+      { code: 'MT', name: 'Montana',
+        cities: [
+          { code: 'BI', name: 'Billings' },
+          { code: 'MI', name: 'Missoula' },
+          { code: 'GR', name: 'Great Falls' },
+          { code: 'BO', name: 'Bozeman' },
+          { code: 'HE', name: 'Helena' },
+          { code: 'KA', name: 'Kalispell' },
+          { code: 'AN', name: 'Anaconda' },
+          { code: 'HA', name: 'Havre' },
+          { code: 'LI', name: 'Livingston' },
+          { code: 'BU', name: 'Butte' }
+        ]
+      },
+      { code: 'NE', name: 'Nebraska',
+        cities: [
+          { code: 'OM', name: 'Omaha' },
+          { code: 'LI', name: 'Lincoln' },
+          { code: 'BE', name: 'Bellevue' },
+          { code: 'GR', name: 'Grand Island' },
+          { code: 'KE', name: 'Kearney' },
+          { code: 'FR', name: 'Fremont' },
+          { code: 'NO', name: 'Norfolk' },
+          { code: 'HA', name: 'Hastings' },
+          { code: 'NO2', name: 'North Platte' },
+          { code: 'CO', name: 'Columbus' }
+        ]
+      },
+      { code: 'NV', name: 'Nevada',
+        cities: [
+          { code: 'LA', name: 'Las Vegas' },
+          { code: 'RE', name: 'Reno' },
+          { code: 'HE', name: 'Henderson' },
+          { code: 'SP', name: 'Sparks' },
+          { code: 'CA', name: 'Carson City' },
+          { code: 'EL', name: 'Elko' },
+          { code: 'NO', name: 'North Las Vegas' },
+          { code: 'ME', name: 'Mesquite' },
+          { code: 'BO', name: 'Boulder City' },
+          { code: 'FE', name: 'Fernley' }
+        ]
+      },
+      { code: 'NH', name: 'New Hampshire',
+        cities: [
+          { code: 'MA', name: 'Manchester' },
+          { code: 'NA', name: 'Nashua' },
+          { code: 'CO', name: 'Concord' },
+          { code: 'DO', name: 'Derry' },
+          { code: 'DO2', name: 'Dover' },
+          { code: 'RO', name: 'Rochester' },
+          { code: 'SA', name: 'Salem' },
+          { code: 'ME', name: 'Merrimack' },
+          { code: 'LO', name: 'Londonderry' },
+          { code: 'HU', name: 'Hudson' }
+        ]
+      },
+      { code: 'NJ', name: 'New Jersey',
+        cities: [
+          { code: 'NE', name: 'Newark' },
+          { code: 'JE', name: 'Jersey City' },
+          { code: 'PA', name: 'Paterson' },
+          { code: 'EL', name: 'Elizabeth' },
+          { code: 'ED', name: 'Edison' },
+          { code: 'WO', name: 'Woodbridge' },
+          { code: 'LA', name: 'Lakewood' },
+          { code: 'HA', name: 'Hamilton' },
+          { code: 'TO', name: 'Toms River' },
+          { code: 'CL', name: 'Clifton' }
+        ]
+      },
+      { code: 'NM', name: 'New Mexico',
+        cities: [
+          { code: 'AL', name: 'Albuquerque' },
+          { code: 'LA', name: 'Las Cruces' },
+          { code: 'RO', name: 'Rio Rancho' },
+          { code: 'SA', name: 'Santa Fe' },
+          { code: 'RO2', name: 'Roswell' },
+          { code: 'FA', name: 'Farmington' },
+          { code: 'HO', name: 'Hobbs' },
+          { code: 'AL2', name: 'Alamogordo' },
+          { code: 'PO', name: 'Portales' },
+          { code: 'AR', name: 'Artesia' }
         ]
       },
       { code: 'NY', name: 'New York',
@@ -153,6 +542,146 @@ export const countries: Country[] = [
           { code: 'UT', name: 'Utica' }
         ]
       },
+      { code: 'NC', name: 'North Carolina',
+        cities: [
+          { code: 'CH', name: 'Charlotte' },
+          { code: 'RA', name: 'Raleigh' },
+          { code: 'GR', name: 'Greensboro' },
+          { code: 'DU', name: 'Durham' },
+          { code: 'WI', name: 'Winston-Salem' },
+          { code: 'FA', name: 'Fayetteville' },
+          { code: 'CA', name: 'Cary' },
+          { code: 'WI2', name: 'Wilmington' },
+          { code: 'HI', name: 'High Point' },
+          { code: 'GR2', name: 'Greenville' }
+        ]
+      },
+      { code: 'ND', name: 'North Dakota',
+        cities: [
+          { code: 'FA', name: 'Fargo' },
+          { code: 'BI', name: 'Bismarck' },
+          { code: 'GR', name: 'Grand Forks' },
+          { code: 'MI', name: 'Minot' },
+          { code: 'WE', name: 'West Fargo' },
+          { code: 'DI', name: 'Dickinson' },
+          { code: 'MO', name: 'Mandan' },
+          { code: 'WI', name: 'Williston' },
+          { code: 'PO', name: 'Port of Dakota' },
+          { code: 'JA', name: 'Jamestown' }
+        ]
+      },
+      { code: 'OH', name: 'Ohio',
+        cities: [
+          { code: 'CO', name: 'Columbus' },
+          { code: 'CL', name: 'Cleveland' },
+          { code: 'CI', name: 'Cincinnati' },
+          { code: 'TO', name: 'Toledo' },
+          { code: 'AK', name: 'Akron' },
+          { code: 'DA', name: 'Dayton' },
+          { code: 'PA', name: 'Parma' },
+          { code: 'YO', name: 'Youngstown' },
+          { code: 'CA', name: 'Canton' },
+          { code: 'LI', name: 'Lorain' }
+        ]
+      },
+      { code: 'OK', name: 'Oklahoma',
+        cities: [
+          { code: 'OK', name: 'Oklahoma City' },
+          { code: 'TU', name: 'Tulsa' },
+          { code: 'NO', name: 'Norman' },
+          { code: 'BR', name: 'Broken Arrow' },
+          { code: 'LA', name: 'Lawton' },
+          { code: 'ED', name: 'Edmond' },
+          { code: 'MO', name: 'Moore' },
+          { code: 'MI', name: 'Midwest City' },
+          { code: 'EN', name: 'Enid' },
+          { code: 'ST', name: 'Stillwater' }
+        ]
+      },
+      { code: 'OR', name: 'Oregon',
+        cities: [
+          { code: 'PO', name: 'Portland' },
+          { code: 'EU', name: 'Eugene' },
+          { code: 'SA', name: 'Salem' },
+          { code: 'GR', name: 'Gresham' },
+          { code: 'HI', name: 'Hillsboro' },
+          { code: 'BE', name: 'Beaverton' },
+          { code: 'BE2', name: 'Bend' },
+          { code: 'ME', name: 'Medford' },
+          { code: 'SP', name: 'Springfield' },
+          { code: 'CO', name: 'Corvallis' }
+        ]
+      },
+      { code: 'PA', name: 'Pennsylvania',
+        cities: [
+          { code: 'PH', name: 'Philadelphia' },
+          { code: 'PI', name: 'Pittsburgh' },
+          { code: 'AL', name: 'Allentown' },
+          { code: 'ER', name: 'Erie' },
+          { code: 'RE', name: 'Reading' },
+          { code: 'SC', name: 'Scranton' },
+          { code: 'BE', name: 'Bethlehem' },
+          { code: 'LA', name: 'Lancaster' },
+          { code: 'HA', name: 'Harrisburg' },
+          { code: 'AL2', name: 'Altoona' }
+        ]
+      },
+      { code: 'RI', name: 'Rhode Island',
+        cities: [
+          { code: 'PR', name: 'Providence' },
+          { code: 'WA', name: 'Warwick' },
+          { code: 'CR', name: 'Cranston' },
+          { code: 'PA', name: 'Pawtucket' },
+          { code: 'EA', name: 'East Providence' },
+          { code: 'WO', name: 'Woonsocket' },
+          { code: 'ME', name: 'Middletown' },
+          { code: 'NE', name: 'Newport' },
+          { code: 'CE', name: 'Central Falls' },
+          { code: 'WE', name: 'West Warwick' }
+        ]
+      },
+      { code: 'SC', name: 'South Carolina',
+        cities: [
+          { code: 'CO', name: 'Columbia' },
+          { code: 'CH', name: 'Charleston' },
+          { code: 'NO', name: 'North Charleston' },
+          { code: 'MO', name: 'Mount Pleasant' },
+          { code: 'RO', name: 'Rock Hill' },
+          { code: 'GR', name: 'Greenville' },
+          { code: 'SP', name: 'Spartanburg' },
+          { code: 'SU', name: 'Sumter' },
+          { code: 'FL', name: 'Florence' },
+          { code: 'AN', name: 'Anderson' }
+        ]
+      },
+      { code: 'SD', name: 'South Dakota',
+        cities: [
+          { code: 'SI', name: 'Sioux Falls' },
+          { code: 'RA', name: 'Rapid City' },
+          { code: 'AB', name: 'Aberdeen' },
+          { code: 'BR', name: 'Brookings' },
+          { code: 'WA', name: 'Watertown' },
+          { code: 'MI', name: 'Mitchell' },
+          { code: 'PI', name: 'Pierre' },
+          { code: 'YO', name: 'Yankton' },
+          { code: 'HU', name: 'Huron' },
+          { code: 'VE', name: 'Vermillion' }
+        ]
+      },
+      { code: 'TN', name: 'Tennessee',
+        cities: [
+          { code: 'NA', name: 'Nashville' },
+          { code: 'ME', name: 'Memphis' },
+          { code: 'KN', name: 'Knoxville' },
+          { code: 'CH', name: 'Chattanooga' },
+          { code: 'CL', name: 'Clarksville' },
+          { code: 'MO', name: 'Murfreesboro' },
+          { code: 'JA', name: 'Jackson' },
+          { code: 'JO', name: 'Johnson City' },
+          { code: 'FR', name: 'Franklin' },
+          { code: 'HO', name: 'Hendersonville' }
+        ]
+      },
       { code: 'TX', name: 'Texas',
         cities: [
           { code: 'HO', name: 'Houston' },
@@ -167,65 +696,118 @@ export const countries: Country[] = [
           { code: 'LI', name: 'Laredo' }
         ]
       },
-      { code: 'FL', name: 'Florida',
+      { code: 'UT', name: 'Utah',
         cities: [
-          { code: 'MI', name: 'Miami' },
-          { code: 'TA', name: 'Tampa' },
-          { code: 'OR', name: 'Orlando' },
-          { code: 'JA', name: 'Jacksonville' },
-          { code: 'ST', name: 'St. Petersburg' },
-          { code: 'HI', name: 'Hialeah' },
-          { code: 'TA2', name: 'Tallahassee' },
-          { code: 'FO', name: 'Fort Lauderdale' },
-          { code: 'PO', name: 'Port St. Lucie' },
-          { code: 'CA', name: 'Cape Coral' }
+          { code: 'SA', name: 'Salt Lake City' },
+          { code: 'WE', name: 'West Valley City' },
+          { code: 'PR', name: 'Provo' },
+          { code: 'WE2', name: 'West Jordan' },
+          { code: 'OR', name: 'Orem' },
+          { code: 'SA2', name: 'Sandy' },
+          { code: 'OG', name: 'Ogden' },
+          { code: 'ST', name: 'St. George' },
+          { code: 'LA', name: 'Layton' },
+          { code: 'HI', name: 'Hill Air Force Base' }
         ]
       },
-      { code: 'CO', name: 'Colorado', taxInfo: { standardRate: 2.9, taxName: 'Sales Tax', currency: 'USD', region: 'NA' } },
-      { code: 'CT', name: 'Connecticut', taxInfo: { standardRate: 6.35, taxName: 'Sales Tax', currency: 'USD', region: 'NA' } },
-      { code: 'DE', name: 'Delaware' },
-      { code: 'GA', name: 'Georgia' },
-      { code: 'HI', name: 'Hawaii' },
-      { code: 'ID', name: 'Idaho' },
-      { code: 'IL', name: 'Illinois' },
-      { code: 'IN', name: 'Indiana' },
-      { code: 'IA', name: 'Iowa' },
-      { code: 'KS', name: 'Kansas' },
-      { code: 'KY', name: 'Kentucky' },
-      { code: 'LA', name: 'Louisiana' },
-      { code: 'ME', name: 'Maine' },
-      { code: 'MD', name: 'Maryland' },
-      { code: 'MA', name: 'Massachusetts' },
-      { code: 'MI', name: 'Michigan' },
-      { code: 'MN', name: 'Minnesota' },
-      { code: 'MS', name: 'Mississippi' },
-      { code: 'MO', name: 'Missouri' },
-      { code: 'MT', name: 'Montana' },
-      { code: 'NE', name: 'Nebraska' },
-      { code: 'NV', name: 'Nevada' },
-      { code: 'NH', name: 'New Hampshire' },
-      { code: 'NJ', name: 'New Jersey' },
-      { code: 'NM', name: 'New Mexico' },
-      { code: 'NY', name: 'New York' },
-      { code: 'NC', name: 'North Carolina' },
-      { code: 'ND', name: 'North Dakota' },
-      { code: 'OH', name: 'Ohio' },
-      { code: 'OK', name: 'Oklahoma' },
-      { code: 'OR', name: 'Oregon' },
-      { code: 'PA', name: 'Pennsylvania' },
-      { code: 'RI', name: 'Rhode Island' },
-      { code: 'SC', name: 'South Carolina' },
-      { code: 'SD', name: 'South Dakota' },
-      { code: 'TN', name: 'Tennessee' },
-      { code: 'TX', name: 'Texas' },
-      { code: 'UT', name: 'Utah' },
-      { code: 'VT', name: 'Vermont' },
-      { code: 'VA', name: 'Virginia' },
-      { code: 'WA', name: 'Washington' },
-      { code: 'WV', name: 'West Virginia' },
-      { code: 'WI', name: 'Wisconsin' },
-      { code: 'WY', name: 'Wyoming' },
-      { code: 'DC', name: 'District of Columbia' }
+      { code: 'VT', name: 'Vermont',
+        cities: [
+          { code: 'BU', name: 'Burlington' },
+          { code: 'ES', name: 'Essex' },
+          { code: 'SO', name: 'South Burlington' },
+          { code: 'CO', name: 'Colchester' },
+          { code: 'RU', name: 'Rutland' },
+          { code: 'BE', name: 'Bennington' },
+          { code: 'BR', name: 'Brattleboro' },
+          { code: 'MI', name: 'Milton' },
+          { code: 'BA', name: 'Barre' },
+          { code: 'WI', name: 'Williston' }
+        ]
+      },
+      { code: 'VA', name: 'Virginia',
+        cities: [
+          { code: 'VI', name: 'Virginia Beach' },
+          { code: 'NO', name: 'Norfolk' },
+          { code: 'CH', name: 'Chesapeake' },
+          { code: 'RI', name: 'Richmond' },
+          { code: 'NE', name: 'Newport News' },
+          { code: 'AL', name: 'Alexandria' },
+          { code: 'HA', name: 'Hampton' },
+          { code: 'PO', name: 'Portsmouth' },
+          { code: 'SU', name: 'Suffolk' },
+          { code: 'RO', name: 'Roanoke' }
+        ]
+      },
+      { code: 'WA', name: 'Washington',
+        cities: [
+          { code: 'SE', name: 'Seattle' },
+          { code: 'SP', name: 'Spokane' },
+          { code: 'TA', name: 'Tacoma' },
+          { code: 'VA', name: 'Vancouver' },
+          { code: 'BE', name: 'Bellevue' },
+          { code: 'KE', name: 'Kent' },
+          { code: 'EV', name: 'Everett' },
+          { code: 'RE', name: 'Renton' },
+          { code: 'FE', name: 'Federal Way' },
+          { code: 'SP2', name: 'Spokane Valley' }
+        ]
+      },
+      { code: 'WV', name: 'West Virginia',
+        cities: [
+          { code: 'CH', name: 'Charleston' },
+          { code: 'HU', name: 'Huntington' },
+          { code: 'PA', name: 'Parkersburg' },
+          { code: 'MO', name: 'Morgantown' },
+          { code: 'WE', name: 'Wheeling' },
+          { code: 'FA', name: 'Fairmont' },
+          { code: 'CL', name: 'Clarksburg' },
+          { code: 'MA', name: 'Martinsburg' },
+          { code: 'VI', name: 'Vienna' },
+          { code: 'BE', name: 'Berkeley Springs' }
+        ]
+      },
+      { code: 'WI', name: 'Wisconsin',
+        cities: [
+          { code: 'MI', name: 'Milwaukee' },
+          { code: 'MA', name: 'Madison' },
+          { code: 'GR', name: 'Green Bay' },
+          { code: 'KE', name: 'Kenosha' },
+          { code: 'RA', name: 'Racine' },
+          { code: 'AP', name: 'Appleton' },
+          { code: 'WA', name: 'Waukesha' },
+          { code: 'EA', name: 'Eau Claire' },
+          { code: 'JA', name: 'Janesville' },
+          { code: 'WE', name: 'West Allis' }
+        ]
+      },
+      { code: 'WY', name: 'Wyoming',
+        cities: [
+          { code: 'CH', name: 'Cheyenne' },
+          { code: 'CA', name: 'Casper' },
+          { code: 'LA', name: 'Laramie' },
+          { code: 'GI', name: 'Gillette' },
+          { code: 'RO', name: 'Rock Springs' },
+          { code: 'SH', name: 'Sheridan' },
+          { code: 'GR', name: 'Green River' },
+          { code: 'EV', name: 'Evanston' },
+          { code: 'RI', name: 'Riverton' },
+          { code: 'JA', name: 'Jackson' }
+        ]
+      },
+      { code: 'DC', name: 'District of Columbia',
+        cities: [
+          { code: 'WA', name: 'Washington' },
+          { code: 'GE', name: 'Georgetown' },
+          { code: 'AD', name: 'Adams Morgan' },
+          { code: 'CA', name: 'Capitol Hill' },
+          { code: 'DU', name: 'Dupont Circle' },
+          { code: 'FO', name: 'Foggy Bottom' },
+          { code: 'CH', name: 'Chinatown' },
+          { code: 'SW', name: 'Southwest' },
+          { code: 'NE', name: 'Northeast' },
+          { code: 'NW', name: 'Northwest' }
+        ]
+      }
     ]
   },
   {
@@ -263,6 +845,66 @@ export const countries: Country[] = [
           { code: 'LA', name: 'Langley' }
         ]
       },
+      { code: 'MB', name: 'Manitoba', 
+        taxInfo: { standardRate: 12, taxName: 'GST + PST', currency: 'CAD', region: 'NA' },
+        cities: [
+          { code: 'WI', name: 'Winnipeg' },
+          { code: 'BR', name: 'Brandon' },
+          { code: 'ST', name: 'Steinbach' },
+          { code: 'TH', name: 'Thompson' },
+          { code: 'PO', name: 'Portage la Prairie' },
+          { code: 'SE', name: 'Selkirk' },
+          { code: 'MO', name: 'Morden' },
+          { code: 'DA', name: 'Dauphin' },
+          { code: 'FL', name: 'Flin Flon' },
+          { code: 'SW', name: 'Swan River' }
+        ]
+      },
+      { code: 'NB', name: 'New Brunswick', 
+        taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' },
+        cities: [
+          { code: 'MO', name: 'Moncton' },
+          { code: 'SA', name: 'Saint John' },
+          { code: 'FR', name: 'Fredericton' },
+          { code: 'DA', name: 'Dieppe' },
+          { code: 'MI', name: 'Miramichi' },
+          { code: 'BA', name: 'Bathurst' },
+          { code: 'ED', name: 'Edmundston' },
+          { code: 'CA', name: 'Campbellton' },
+          { code: 'SU', name: 'Sackville' },
+          { code: 'RO', name: 'Rothesay' }
+        ]
+      },
+      { code: 'NL', name: 'Newfoundland and Labrador', 
+        taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' },
+        cities: [
+          { code: 'ST', name: 'St. John\'s' },
+          { code: 'CO', name: 'Corner Brook' },
+          { code: 'GA', name: 'Gander' },
+          { code: 'MA', name: 'Mount Pearl' },
+          { code: 'PA', name: 'Paradise' },
+          { code: 'CO2', name: 'Conception Bay South' },
+          { code: 'GR', name: 'Grand Falls-Windsor' },
+          { code: 'DE', name: 'Deer Lake' },
+          { code: 'CA', name: 'Carbonear' },
+          { code: 'HA', name: 'Harbour Grace' }
+        ]
+      },
+      { code: 'NS', name: 'Nova Scotia', 
+        taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' },
+        cities: [
+          { code: 'HA', name: 'Halifax' },
+          { code: 'DA', name: 'Dartmouth' },
+          { code: 'SY', name: 'Sydney' },
+          { code: 'TR', name: 'Truro' },
+          { code: 'NE', name: 'New Glasgow' },
+          { code: 'GL', name: 'Glace Bay' },
+          { code: 'CA', name: 'Cape Breton' },
+          { code: 'AM', name: 'Amherst' },
+          { code: 'KE', name: 'Kentville' },
+          { code: 'YO', name: 'Yarmouth' }
+        ]
+      },
       { code: 'ON', name: 'Ontario', 
         taxInfo: { standardRate: 13, taxName: 'HST', currency: 'CAD', region: 'NA' },
         cities: [
@@ -276,6 +918,21 @@ export const countries: Country[] = [
           { code: 'WI', name: 'Windsor' },
           { code: 'KI', name: 'Kitchener' },
           { code: 'VA2', name: 'Vaughan' }
+        ]
+      },
+      { code: 'PE', name: 'Prince Edward Island', 
+        taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' },
+        cities: [
+          { code: 'CH', name: 'Charlottetown' },
+          { code: 'SU', name: 'Summerside' },
+          { code: 'ST', name: 'Stratford' },
+          { code: 'CO', name: 'Cornwall' },
+          { code: 'MO', name: 'Montague' },
+          { code: 'AL', name: 'Alberton' },
+          { code: 'SO', name: 'Souris' },
+          { code: 'TY', name: 'Tyne Valley' },
+          { code: 'WE', name: 'Wellington' },
+          { code: 'BR', name: 'Borden-Carleton' }
         ]
       },
       { code: 'QC', name: 'Quebec', 
@@ -293,10 +950,62 @@ export const countries: Country[] = [
           { code: 'TE', name: 'Terrebonne' }
         ]
       },
-      { code: 'SK', name: 'Saskatchewan' },
-      { code: 'NT', name: 'Northwest Territories' },
-      { code: 'NU', name: 'Nunavut' },
-      { code: 'YT', name: 'Yukon' }
+      { code: 'SK', name: 'Saskatchewan',
+        cities: [
+          { code: 'SA', name: 'Saskatoon' },
+          { code: 'RE', name: 'Regina' },
+          { code: 'PA', name: 'Prince Albert' },
+          { code: 'MO', name: 'Moose Jaw' },
+          { code: 'SW', name: 'Swift Current' },
+          { code: 'YO', name: 'Yorkton' },
+          { code: 'NO', name: 'North Battleford' },
+          { code: 'ES', name: 'Estevan' },
+          { code: 'WA', name: 'Warman' },
+          { code: 'HU', name: 'Humboldt' }
+        ]
+      },
+      { code: 'NT', name: 'Northwest Territories',
+        cities: [
+          { code: 'YE', name: 'Yellowknife' },
+          { code: 'HA', name: 'Hay River' },
+          { code: 'IN', name: 'Inuvik' },
+          { code: 'FO', name: 'Fort Smith' },
+          { code: 'NO', name: 'Norman Wells' },
+          { code: 'IQ', name: 'Iqaluit' },
+          { code: 'RA', name: 'Rankin Inlet' },
+          { code: 'BA', name: 'Baker Lake' },
+          { code: 'TU', name: 'Tuktoyaktuk' },
+          { code: 'PA', name: 'Paulatuk' }
+        ]
+      },
+      { code: 'NU', name: 'Nunavut',
+        cities: [
+          { code: 'IQ', name: 'Iqaluit' },
+          { code: 'RA', name: 'Rankin Inlet' },
+          { code: 'AR', name: 'Arviat' },
+          { code: 'BA', name: 'Baker Lake' },
+          { code: 'PU', name: 'Pond Inlet' },
+          { code: 'CI', name: 'Clyde River' },
+          { code: 'KI', name: 'Kugluktuk' },
+          { code: 'PA', name: 'Pangnirtung' },
+          { code: 'IG', name: 'Igloolik' },
+          { code: 'TA', name: 'Taloyoak' }
+        ]
+      },
+      { code: 'YT', name: 'Yukon',
+        cities: [
+          { code: 'WH', name: 'Whitehorse' },
+          { code: 'DA', name: 'Dawson City' },
+          { code: 'WA', name: 'Watson Lake' },
+          { code: 'HI', name: 'Haines Junction' },
+          { code: 'MA', name: 'Mayo' },
+          { code: 'CA', name: 'Carmacks' },
+          { code: 'PE', name: 'Pelly Crossing' },
+          { code: 'BE', name: 'Beaver Creek' },
+          { code: 'OL', name: 'Old Crow' },
+          { code: 'TE', name: 'Teslin' }
+        ]
+      }
     ]
   },
   {
@@ -337,21 +1046,348 @@ export const countries: Country[] = [
       { code: 'CMX', name: 'Ciudad de México' }
     ]
   },
-  { code: 'GT', name: 'Guatemala' },
-  { code: 'BZ', name: 'Belize' },
-  { code: 'SV', name: 'El Salvador' },
-  { code: 'HN', name: 'Honduras' },
-  { code: 'NI', name: 'Nicaragua' },
-  { code: 'CR', name: 'Costa Rica' },
-  { code: 'PA', name: 'Panama' },
-  { code: 'CU', name: 'Cuba' },
-  { code: 'JM', name: 'Jamaica' },
-  { code: 'HT', name: 'Haiti' },
-  { code: 'DO', name: 'Dominican Republic' },
-  { code: 'PR', name: 'Puerto Rico' },
-  { code: 'TT', name: 'Trinidad and Tobago' },
-  { code: 'BB', name: 'Barbados' },
-  { code: 'BS', name: 'Bahamas' },
+  {
+  code: 'GT',
+  name: 'Guatemala',
+  provinces: [
+    { code: 'GUATEMALA', name: 'Guatemala',
+      cities: [
+        { code: 'GUA', name: 'Guatemala City' },
+        { code: 'MIXCO', name: 'Mixco' },
+        { code: 'VILLA', name: 'Villa Nueva' },
+        { code: 'PETAPA', name: 'Petapa' },
+        { code: 'SAN', name: 'San Miguel Petapa' },
+        { code: 'QUETZAL', name: 'Puerto Quetzal' },
+        { code: 'ANTIGUA', name: 'Antigua Guatemala' },
+        { code: 'ESCUINTLA', name: 'Escuintla' },
+        { code: 'MADRID', name: 'Ciudad de Madrid' },
+        { code: 'SANTA', name: 'Santa Catarina Pinula' }
+      ]
+    },
+    { code: 'QUICHE', name: 'Quiché',
+      cities: [
+        { code: 'SANTA', name: 'Santa Cruz del Quiché' },
+        { code: 'CHICHICASTENANGO', name: 'Chichicastenango' },
+        { code: 'NEBAJ', name: 'Nebaj' },
+        { code: 'SACAPULAS', name: 'Sacapulas' },
+        { code: 'CUNEN', name: 'Cunén' },
+        { code: 'JOYABAJ', name: 'Joyabaj' },
+        { code: 'ZACAPA', name: 'Zacapa' },
+        { code: 'CHICAMAN', name: 'Chicamán' },
+        { code: 'IXCAN', name: 'Ixcan' },
+        { code: 'UCU', name: 'Uspantán' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'BZ',
+  name: 'Belize',
+  provinces: [
+    { code: 'BELIZE', name: 'Belize District',
+      cities: [
+        { code: 'BELIZE', name: 'Belize City' },
+        { code: 'BELMOPAN', name: 'Belmopan' },
+        { code: 'SAN', name: 'San Pedro' },
+        { code: 'CAYE', name: 'Caye Caulker' },
+        { code: 'BISTAR', name: 'Biscayne' },
+        { code: 'LADY', name: 'Ladyville' },
+        { code: 'HATTIE', name: 'Hattieville' },
+        { code: 'BEMBOCK', name: 'Bembock' },
+        { code: 'CROOKED', name: 'Crooked Tree' },
+        { code: 'GALLEN', name: 'Gallen Junction' }
+      ]
+    },
+    { code: 'ORANGE', name: 'Orange Walk District',
+      cities: [
+        { code: 'ORANGE', name: 'Orange Walk Town' },
+        { code: 'COROZAL', name: 'Corozal Town' },
+        { code: 'SAN', name: 'San Pablo' },
+        { code: 'SAN2', name: 'San Jose' },
+        { code: 'SAN3', name: 'San Roman' },
+        { code: 'DOUGLAS', name: 'Douglas' },
+        { code: 'SHIPYARD', name: 'Shipyard' },
+        { code: 'INDIAN', name: 'Indian Church' },
+        { code: 'GOLDEN', name: 'Golden Stream' },
+        { code: 'TRIANGLE', name: 'Triangle' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'SV',
+  name: 'El Salvador',
+  provinces: [
+    { code: 'SAN', name: 'San Salvador',
+      cities: [
+        { code: 'SAN', name: 'San Salvador' },
+        { code: 'SANTA', name: 'Santa Tecla' },
+        { code: 'SOYAPANGO', name: 'Soyapango' },
+        { code: 'MEJICANOS', name: 'Mejicanos' },
+        { code: 'SAN2', name: 'San Marcos' },
+        { code: 'ILOPANGO', name: 'Ilopango' },
+        { code: 'APOPA', name: 'Apopa' },
+        { code: 'SANTIAGO', name: 'Santiago Texacuangos' },
+        { code: 'CUSCATLAN', name: 'Cuscatancingo' },
+        { code: 'DELGADO', name: 'Delgado' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'HN',
+  name: 'Honduras',
+  provinces: [
+    { code: 'FRANCISCO', name: 'Francisco Morazán',
+      cities: [
+        { code: 'TEGUCIGALPA', name: 'Tegucigalpa' },
+        { code: 'COMAYAGUA', name: 'Comayagua' },
+        { code: 'SIGUATEPEQUE', name: 'Siguatepeque' },
+        { code: 'TALANGA', name: 'Talanga' },
+        { code: 'SAN', name: 'San Antonio de Oriente' },
+        { code: 'SANTA', name: 'Santa Lucía' },
+        { code: 'VALLE', name: 'Valle de Ángeles' },
+        { code: 'SAN2', name: 'San Juan de Flores' },
+        { code: 'SAN3', name: 'San Miguelito' },
+        { code: 'LEPA', name: 'Lepaterique' }
+      ]
+    },
+    { code: 'CORTES', name: 'Cortés',
+      cities: [
+        { code: 'SAN', name: 'San Pedro Sula' },
+        { code: 'CHOLUTECA', name: 'Choloma' },
+        { code: 'LA', name: 'La Lima' },
+        { code: 'VILLANUEVA', name: 'Villanueva' },
+        { code: 'PROGRESO', name: 'El Progreso' },
+        { code: 'POTRERILLOS', name: 'Potrerillos' },
+        { code: 'SAN2', name: 'San Manuel' },
+        { code: 'SAN3', name: 'San Antonio' },
+        { code: 'SANTA', name: 'Santa Cruz de Yojoa' },
+        { code: 'OLANCHO', name: 'Olancho' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'NI',
+  name: 'Nicaragua',
+  provinces: [
+    { code: 'MANAGUA', name: 'Managua',
+      cities: [
+        { code: 'MANAGUA', name: 'Managua' },
+        { code: 'MASAYA', name: 'Masaya' },
+        { code: 'GRANADA', name: 'Granada' },
+        { code: 'LEON', name: 'León' },
+        { code: 'CHINANDEGA', name: 'Chinandega' },
+        { code: 'ESTELI', name: 'Estelí' },
+        { code: 'MATAGALPA', name: 'Matagalpa' },
+        { code: 'JINOTEGA', name: 'Jinotega' },
+        { code: 'RIVAS', name: 'Rivas' },
+        { code: 'BLUEFIELDS', name: 'Bluefields' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'CR',
+  name: 'Costa Rica',
+  provinces: [
+    { code: 'SAN', name: 'San José',
+      cities: [
+        { code: 'SAN', name: 'San José' },
+        { code: 'ALAJUELA', name: 'Alajuela' },
+        { code: 'CARTAGO', name: 'Cartago' },
+        { code: 'HEREDIA', name: 'Heredia' },
+        { code: 'PUNTARENAS', name: 'Puntarenas' },
+        { code: 'LIMON', name: 'Limón' },
+        { code: 'LIBERIA', name: 'Liberia' },
+        { code: 'QUEPOS', name: 'Quepos' },
+        { code: 'SAN2', name: 'San Isidro' },
+        { code: 'GOLFITO', name: 'Golfito' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'PA',
+  name: 'Panama',
+  provinces: [
+    { code: 'PANAMA', name: 'Panamá',
+      cities: [
+        { code: 'PANAMA', name: 'Panama City' },
+        { code: 'COLON', name: 'Colón' },
+        { code: 'DAVID', name: 'David' },
+        { code: 'SANTIAGO', name: 'Santiago' },
+        { code: 'CHITRE', name: 'Chitré' },
+        { code: 'BOCAS', name: 'Bocas del Toro' },
+        { code: 'PENONOME', name: 'Penonomé' },
+        { code: 'TOLE', name: 'Tolé' },
+        { code: 'SAN', name: 'San Miguelito' },
+        { code: 'ARRAIJAN', name: 'Arraiján' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'CU',
+  name: 'Cuba',
+  provinces: [
+    { code: 'HAVANA', name: 'La Habana',
+      cities: [
+        { code: 'HAVANA', name: 'Havana' },
+        { code: 'SANTIAGO', name: 'Santiago de Cuba' },
+        { code: 'CAMAGUEY', name: 'Camagüey' },
+        { code: 'HOLGUIN', name: 'Holguín' },
+        { code: 'GUANTANAMO', name: 'Guantánamo' },
+        { code: 'SANTA', name: 'Santa Clara' },
+        { code: 'BAYAMO', name: 'Bayamo' },
+        { code: 'CIENFUEGOS', name: 'Cienfuegos' },
+        { code: 'MATANZAS', name: 'Matanzas' },
+        { code: 'PINAR', name: 'Pinar del Río' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'JM',
+  name: 'Jamaica',
+  provinces: [
+    { code: 'KINGSTON', name: 'Kingston',
+      cities: [
+        { code: 'KINGSTON', name: 'Kingston' },
+        { code: 'SPANISH', name: 'Spanish Town' },
+        { code: 'PORTMORE', name: 'Portmore' },
+        { code: 'MONTEGO', name: 'Montego Bay' },
+        { code: 'MAY', name: 'May Pen' },
+        { code: 'MANDEVILLE', name: 'Mandeville' },
+        { code: 'SAVANNA', name: 'Savanna-la-Mar' },
+        { code: 'PORT', name: 'Port Antonio' },
+        { code: 'ST', name: 'St. Ann\'s Bay' },
+        { code: 'OLD', name: 'Old Harbour' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'HT',
+  name: 'Haiti',
+  provinces: [
+    { code: 'PORT', name: 'Port-au-Prince',
+      cities: [
+        { code: 'PORT', name: 'Port-au-Prince' },
+        { code: 'CAP', name: 'Cap-Haïtien' },
+        { code: 'GONAIVES', name: 'Gonaïves' },
+        { code: 'DELMAS', name: 'Delmas' },
+        { code: 'PETION', name: 'Pétionville' },
+        { code: 'JACMEL', name: 'Jacmel' },
+        { code: 'LES', name: 'Les Cayes' },
+        { code: 'JEREMIE', name: 'Jérémie' },
+        { code: 'MIREBALAIS', name: 'Mirebalais' },
+        { code: 'THOMAS', name: 'Saint-Marc' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'DO',
+  name: 'Dominican Republic',
+  provinces: [
+    { code: 'SANTO', name: 'Santo Domingo',
+      cities: [
+        { code: 'SANTO', name: 'Santo Domingo' },
+        { code: 'SANTIAGO', name: 'Santiago de los Caballeros' },
+        { code: 'LA', name: 'La Romana' },
+        { code: 'SAN', name: 'San Pedro de Macorís' },
+        { code: 'SAN2', name: 'San Cristóbal' },
+        { code: 'LA2', name: 'La Vega' },
+        { code: 'PUERTO', name: 'Puerto Plata' },
+        { code: 'DUARTE', name: 'San Francisco de Macorís' },
+        { code: 'PERAVIA', name: 'Baní' },
+        { code: 'AZUA', name: 'Azua' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'PR',
+  name: 'Puerto Rico',
+  provinces: [
+    { code: 'SAN', name: 'San Juan',
+      cities: [
+        { code: 'SAN', name: 'San Juan' },
+        { code: 'BAYAMON', name: 'Bayamón' },
+        { code: 'CAROLINA', name: 'Carolina' },
+        { code: 'PONCE', name: 'Ponce' },
+        { code: 'CAGUAS', name: 'Caguas' },
+        { code: 'GUAYNABO', name: 'Guaynabo' },
+        { code: 'MAYAGUEZ', name: 'Mayagüez' },
+        { code: 'ARECIBO', name: 'Arecibo' },
+        { code: 'TOA', name: 'Toa Baja' },
+        { code: 'CANOVANAS', name: 'Canóvanas' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'TT',
+  name: 'Trinidad and Tobago',
+  provinces: [
+    { code: 'PORT', name: 'Port of Spain',
+      cities: [
+        { code: 'PORT', name: 'Port of Spain' },
+        { code: 'SAN', name: 'San Fernando' },
+        { code: 'CHAGUANAS', name: 'Chaguanas' },
+        { code: 'ARIMA', name: 'Arima' },
+        { code: 'POINT', name: 'Point Fortin' },
+        { code: 'COUVA', name: 'Couva' },
+        { code: 'TOBAGO', name: 'Scarborough' },
+        { code: 'DIEGO', name: 'Diego Martin' },
+        { code: 'SANGRE', name: 'Sangre Grande' },
+        { code: 'SIPARIA', name: 'Siparia' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'BB',
+  name: 'Barbados',
+  provinces: [
+    { code: 'BRIDGETOWN', name: 'Bridgetown',
+      cities: [
+        { code: 'BRIDGETOWN', name: 'Bridgetown' },
+        { code: 'SPRING', name: 'Spring Garden' },
+        { code: 'HASTINGS', name: 'Hastings' },
+        { code: 'OISTINS', name: 'Oistins' },
+        { code: 'HOLETOWN', name: 'Holetown' },
+        { code: 'PAYNES', name: 'Paynes Bay' },
+        { code: 'BATH', name: 'Bathsheba' },
+        { code: 'SPEIGHTSTOWN', name: 'Speightstown' },
+        { code: 'ST', name: 'St. Lawrence' },
+        { code: 'ST2', name: 'St. James' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'BS',
+  name: 'Bahamas',
+  provinces: [
+    { code: 'NEW', name: 'New Providence',
+      cities: [
+        { code: 'NASSAU', name: 'Nassau' },
+        { code: 'FREEPORT', name: 'Freeport' },
+        { code: 'WEST', name: 'West End' },
+        { code: 'COOPER', name: 'Cooper\'s Town' },
+        { code: 'MARSH', name: 'Marsh Harbour' },
+        { code: 'GEORGE', name: 'George Town' },
+        { code: 'HIGH', name: 'High Rock' },
+        { code: 'ANDROS', name: 'Andros Town' },
+        { code: 'ELEUTHERA', name: 'Eleuthera' },
+        { code: 'ABACO', name: 'Abaco' }
+      ]
+    }
+  ]
+},
   { code: 'DM', name: 'Dominica' },
   { code: 'GD', name: 'Grenada' },
   { code: 'KN', name: 'Saint Kitts and Nevis' },
@@ -360,38 +1396,766 @@ export const countries: Country[] = [
   { code: 'AG', name: 'Antigua and Barbuda' },
 
   // Africa - Comprehensive list with tax information
-  { code: 'NG', name: 'Nigeria', taxInfo: { standardRate: 7.5, taxName: 'VAT', currency: 'NGN', region: 'MEA' } },
-  { code: 'ZA', name: 'South Africa', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'ZAR', region: 'MEA' } },
-  { code: 'EG', name: 'Egypt', taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'EGP', region: 'MEA' } },
-  { code: 'KE', name: 'Kenya', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'KES', region: 'MEA' } },
-  { code: 'GH', name: 'Ghana', taxInfo: { standardRate: 12.5, taxName: 'VAT', currency: 'GHS', region: 'MEA' } },
-  { code: 'MA', name: 'Morocco', taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'MAD', region: 'MEA' } },
-  { code: 'TN', name: 'Tunisia', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'TND', region: 'MEA' } },
-  { code: 'DZ', name: 'Algeria', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'DZD', region: 'MEA' } },
-  { code: 'ET', name: 'Ethiopia', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'ETB', region: 'MEA' } },
-  { code: 'TZ', name: 'Tanzania', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'TZS', region: 'MEA' } },
-  { code: 'UG', name: 'Uganda', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'UGX', region: 'MEA' } },
-  { code: 'ZM', name: 'Zambia', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'ZMW', region: 'MEA' } },
-  { code: 'ZW', name: 'Zimbabwe', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'ZWL', region: 'MEA' } },
-  { code: 'BW', name: 'Botswana', taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'BWP', region: 'MEA' } },
-  { code: 'MW', name: 'Malawi', taxInfo: { standardRate: 16.5, taxName: 'VAT', currency: 'MWK', region: 'MEA' } },
-  { code: 'MZ', name: 'Mozambique', taxInfo: { standardRate: 17, taxName: 'VAT', currency: 'MZN', region: 'MEA' } },
-  { code: 'NA', name: 'Namibia', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'NAD', region: 'MEA' } },
-  { code: 'SZ', name: 'Eswatini', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SZL', region: 'MEA' } },
-  { code: 'LS', name: 'Lesotho', taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'LSL', region: 'MEA' } },
-  { code: 'AO', name: 'Angola', taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'AOA', region: 'MEA' } },
-  { code: 'CM', name: 'Cameroon', taxInfo: { standardRate: 19.25, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
-  { code: 'CF', name: 'Central African Republic', taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
-  { code: 'TD', name: 'Chad', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
-  { code: 'CG', name: 'Congo - Brazzaville', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
-  { code: 'CD', name: 'Congo - Kinshasa', taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'CDF', region: 'MEA' } },
-  { code: 'GA', name: 'Gabon', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
-  { code: 'GQ', name: 'Equatorial Guinea', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XAF', region: 'MEA' } },
-  { code: 'ST', name: 'São Tomé and Príncipe', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'STN', region: 'MEA' } },
-  { code: 'CV', name: 'Cabo Verde', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'CVE', region: 'MEA' } },
-  { code: 'GW', name: 'Guinea-Bissau', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
-  { code: 'GN', name: 'Guinea', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'GNF', region: 'MEA' } },
-  { code: 'SL', name: 'Sierra Leone', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SLL', region: 'MEA' } },
+  {
+  code: 'NG',
+  name: 'Nigeria',
+  taxInfo: { standardRate: 7.5, taxName: 'VAT', currency: 'NGN', region: 'MEA' },
+  provinces: [
+    { code: 'LAGOS', name: 'Lagos',
+      cities: [
+        { code: 'LAGOS', name: 'Lagos' },
+        { code: 'IKEJA', name: 'Ikeja' },
+        { code: 'BADAGRY', name: 'Badagry' },
+        { code: 'EPE', name: 'Epe' },
+        { code: 'IKORODU', name: 'Ikorodu' },
+        { code: 'MUSHIN', name: 'Mushin' },
+        { code: 'OSHODI', name: 'Oshodi' },
+        { code: 'SURULERE', name: 'Surulere' },
+        { code: 'FESTAC', name: 'Festac Town' },
+        { code: 'VI', name: 'Victoria Island' }
+      ]
+    },
+    { code: 'ABUJA', name: 'Federal Capital Territory',
+      cities: [
+        { code: 'ABUJA', name: 'Abuja' },
+        { code: 'GWARINPA', name: 'Gwarinpa' },
+        { code: 'WUSE', name: 'Wuse' },
+        { code: 'MABUSHI', name: 'Mabushi' },
+        { code: 'ASOKORO', name: 'Asokoro' },
+        { code: 'GARKI', name: 'Garki' },
+        { code: 'JABI', name: 'Jabi' },
+        { code: 'LIFE', name: 'Life Camp' },
+        { code: 'KUBWA', name: 'Kubwa' },
+        { code: 'BWARO', name: 'Bwari' }
+      ]
+    },
+    { code: 'KANO', name: 'Kano',
+      cities: [
+        { code: 'KANO', name: 'Kano' },
+        { code: 'DUTSE', name: 'Dutse' },
+        { code: 'GAYA', name: 'Gaya' },
+        { code: 'WUDIL', name: 'Wudil' },
+        { code: 'RANO', name: 'Rano' },
+        { code: 'BICHI', name: 'Bichi' },
+        { code: 'GARKO', name: 'Garko' },
+        { code: 'TAKAI', name: 'Takai' },
+        { code: 'SUMAILA', name: 'Sumaila' },
+        { code: 'SHANONO', name: 'Shanono' }
+      ]
+    },
+    { code: 'IBADAN', name: 'Oyo',
+      cities: [
+        { code: 'IBADAN', name: 'Ibadan' },
+        { code: 'IBADAN2', name: 'Ibadan North' },
+        { code: 'OYO', name: 'Oyo' },
+        { code: 'OGO', name: 'Ogbomoso' },
+        { code: 'ISEYIN', name: 'Iseyin' },
+        { code: 'SAKI', name: 'Saki' },
+        { code: 'OGBOMOSO', name: 'Ogbomoso' },
+        { code: 'IGBOHO', name: 'Igboho' },
+        { code: 'EDE', name: 'Ede' },
+        { code: 'OSHOGBO', name: 'Osogbo' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'ZA',
+  name: 'South Africa',
+  taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'ZAR', region: 'MEA' },
+  provinces: [
+    { code: 'GP', name: 'Gauteng',
+      cities: [
+        { code: 'JHB', name: 'Johannesburg' },
+        { code: 'PTA', name: 'Pretoria' },
+        { code: 'SOWETO', name: 'Soweto' },
+        { code: 'BENONI', name: 'Benoni' },
+        { code: 'BOKSBURG', name: 'Boksburg' },
+        { code: 'GERMISTON', name: 'Germiston' },
+        { code: 'KEMPTON', name: 'Kempton Park' },
+        { code: 'ROODEPOORT', name: 'Roodepoort' },
+        { code: 'RANDBURG', name: 'Randburg' },
+        { code: 'MIDRAND', name: 'Midrand' }
+      ]
+    },
+    { code: 'WC', name: 'Western Cape',
+      cities: [
+        { code: 'CPT', name: 'Cape Town' },
+        { code: 'STELLENBOSCH', name: 'Stellenbosch' },
+        { code: 'PAARL', name: 'Paarl' },
+        { code: 'WORCESTER', name: 'Worcester' },
+        { code: 'GEORGE', name: 'George' },
+        { code: 'MOSSEL', name: 'Mossel Bay' },
+        { code: 'SOMERSET', name: 'Somerset West' },
+        { code: 'HERMANUS', name: 'Hermanus' },
+        { code: 'VREDENDAL', name: 'Vredendal' },
+        { code: 'MALMESBURY', name: 'Malmesbury' }
+      ]
+    },
+    { code: 'KZN', name: 'KwaZulu-Natal',
+      cities: [
+        { code: 'DBN', name: 'Durban' },
+        { code: 'PMB', name: 'Pietermaritzburg' },
+        { code: 'RICHARDS', name: 'Richards Bay' },
+        { code: 'UMHLANGA', name: 'Umhlanga' },
+        { code: 'BALLITO', name: 'Ballito' },
+        { code: 'NEWCASTLE', name: 'Newcastle' },
+        { code: 'LADYSMITH', name: 'Ladysmith' },
+        { code: 'PINETOWN', name: 'Pinetown' },
+        { code: 'ULUNDI', name: 'Ulundi' },
+        { code: 'MARGATE', name: 'Margate' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'EG',
+  name: 'Egypt',
+  taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'EGP', region: 'MEA' },
+  provinces: [
+    { code: 'CAIRO', name: 'Cairo',
+      cities: [
+        { code: 'CAIRO', name: 'Cairo' },
+        { code: 'GIZA', name: 'Giza' },
+        { code: 'SHUBRA', name: 'Shubra' },
+        { code: 'NASR', name: 'Nasr City' },
+        { code: 'HELIOPOLIS', name: 'Heliopolis' },
+        { code: 'MAADI', name: 'Maadi' },
+        { code: 'ZAMALEK', name: 'Zamalek' },
+        { code: 'DOQQI', name: 'Dokki' },
+        { code: 'AGOUZA', name: 'Agouza' },
+        { code: 'MOHANDESEEN', name: 'Mohandessin' }
+      ]
+    },
+    { code: 'ALEXANDRIA', name: 'Alexandria',
+      cities: [
+        { code: 'ALEX', name: 'Alexandria' },
+        { code: 'SMOUHA', name: 'Smouha' },
+        { code: 'SIDI', name: 'Sidi Gaber' },
+        { code: 'MANSHEYA', name: 'Mansheya' },
+        { code: 'KA', name: 'Kafr Abdu' },
+        { code: 'BORG', name: 'Borg El Arab' },
+        { code: 'EL', name: 'El Max' },
+        { code: 'ABU', name: 'Abu Qir' },
+        { code: 'EDKO', name: 'Edko' },
+        { code: 'RASHID', name: 'Rashid' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'KE',
+  name: 'Kenya',
+  taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'KES', region: 'MEA' },
+  provinces: [
+    { code: 'NAIROBI', name: 'Nairobi',
+      cities: [
+        { code: 'NBI', name: 'Nairobi' },
+        { code: 'KAREN', name: 'Karen' },
+        { code: 'LANGATA', name: 'Langata' },
+        { code: 'KASARANI', name: 'Kasarani' },
+        { code: 'EMBAKASI', name: 'Embakasi' },
+        { code: 'KIBERA', name: 'Kibera' },
+        { code: 'WESTLANDS', name: 'Westlands' },
+        { code: 'DAGORETTI', name: 'Dagoretti' },
+        { code: 'KAMUKUNJI', name: 'Kamukunji' },
+        { code: 'MATHARE', name: 'Mathare' }
+      ]
+    },
+    { code: 'MOMBASA', name: 'Mombasa',
+      cities: [
+        { code: 'MBA', name: 'Mombasa' },
+        { code: 'NYALI', name: 'Nyali' },
+        { code: 'DIANI', name: 'Diani' },
+        { code: 'KILIFI', name: 'Kilifi' },
+        { code: 'MALINDI', name: 'Malindi' },
+        { code: 'LAMU', name: 'Lamu' },
+        { code: 'KWALE', name: 'Kwale' },
+        { code: 'VOI', name: 'Voi' },
+        { code: 'TAVETA', name: 'Taveta' },
+        { code: 'WUNDANYI', name: 'Wundanyi' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'GH',
+  name: 'Ghana',
+  taxInfo: { standardRate: 12.5, taxName: 'VAT', currency: 'GHS', region: 'MEA' },
+  provinces: [
+    { code: 'ACCRA', name: 'Greater Accra',
+      cities: [
+        { code: 'ACCRA', name: 'Accra' },
+        { code: 'TEMA', name: 'Tema' },
+        { code: 'ASHAIMAN', name: 'Ashaiman' },
+        { code: 'LEKMA', name: 'La' },
+        { code: 'TESHIE', name: 'Teshie' },
+        { code: 'NUNGUA', name: 'Nungua' },
+        { code: 'DANFA', name: 'Danfa' },
+        { code: 'MADINA', name: 'Madina' },
+        { code: 'ABOKOBI', name: 'Abokobi' },
+        { code: 'PRASTEO', name: 'Praso' }
+      ]
+    },
+    { code: 'KUMASI', name: 'Ashanti',
+      cities: [
+        { code: 'KUMASI', name: 'Kumasi' },
+        { code: 'OBUASI', name: 'Obuasi' },
+        { code: 'MAMPONG', name: 'Mampong' },
+        { code: 'KONONGO', name: 'Konongo' },
+        { code: 'BEKWAI', name: 'Bekwai' },
+        { code: 'EJISU', name: 'Ejisu' },
+        { code: 'JUABEN', name: 'Juaben' },
+        { code: 'AGONA', name: 'Agona' },
+        { code: 'OFFINSO', name: 'Offinso' },
+        { code: 'BASOFI', name: 'Basofi' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'MA',
+  name: 'Morocco',
+  taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'MAD', region: 'MEA' },
+  provinces: [
+    { code: 'CASABLANCA', name: 'Casablanca-Settat',
+      cities: [
+        { code: 'CASA', name: 'Casablanca' },
+        { code: 'RABAT', name: 'Rabat' },
+        { code: 'MARRAKECH', name: 'Marrakech' },
+        { code: 'FEZ', name: 'Fez' },
+        { code: 'TANGIER', name: 'Tangier' },
+        { code: 'SALE', name: 'Salé' },
+        { code: 'MEKNES', name: 'Meknes' },
+        { code: 'OUJDA', name: 'Oujda' },
+        { code: 'KENITRA', name: 'Kenitra' },
+        { code: 'TETOUAN', name: 'Tetouan' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'TN',
+  name: 'Tunisia',
+  taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'TND', region: 'MEA' },
+  provinces: [
+    { code: 'TUNIS', name: 'Tunis',
+      cities: [
+        { code: 'TUNIS', name: 'Tunis' },
+        { code: 'SFAX', name: 'Sfax' },
+        { code: 'Sousse', name: 'Sousse' },
+        { code: 'KAIROUAN', name: 'Kairouan' },
+        { code: 'BIZERTE', name: 'Bizerte' },
+        { code: 'GABES', name: 'Gabès' },
+        { code: 'ARIANA', name: 'Ariana' },
+        { code: 'BEN', name: 'Ben Arous' },
+        { code: 'MONASTIR', name: 'Monastir' },
+        { code: 'NABEUL', name: 'Nabeul' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'DZ',
+  name: 'Algeria',
+  taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'DZD', region: 'MEA' },
+  provinces: [
+    { code: 'ALGIERS', name: 'Algiers',
+      cities: [
+        { code: 'ALGIER', name: 'Algiers' },
+        { code: 'ORAN', name: 'Oran' },
+        { code: 'CONSTANTINE', name: 'Constantine' },
+        { code: 'ANNABA', name: 'Annaba' },
+        { code: 'BLIDA', name: 'Blida' },
+        { code: 'BATNA', name: 'Batna' },
+        { code: 'DJELFA', name: 'Djelfa' },
+        { code: 'SETIF', name: 'Sétif' },
+        { code: 'SIDI', name: 'Sidi Bel Abbès' },
+        { code: 'SKIKDA', name: 'Skikda' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'ET',
+  name: 'Ethiopia',
+  taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'ETB', region: 'MEA' },
+  provinces: [
+    { code: 'ADDIS', name: 'Addis Ababa',
+      cities: [
+        { code: 'ADDIS', name: 'Addis Ababa' },
+        { code: 'DIRE', name: 'Dire Dawa' },
+        { code: 'MEKELE', name: 'Mekelle' },
+        { code: 'BAHIR', name: 'Bahir Dar' },
+        { code: 'GONDAR', name: 'Gondar' },
+        { code: 'JIMMA', name: 'Jimma' },
+        { code: 'HAWASSA', name: 'Hawassa' },
+        { code: 'ADAMA', name: 'Adama' },
+        { code: 'SHASHAMENE', name: 'Shashamene' },
+        { code: 'DEBRE', name: 'Debre Berhan' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'TZ',
+  name: 'Tanzania',
+  taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'TZS', region: 'MEA' },
+  provinces: [
+    { code: 'DAR', name: 'Dar es Salaam',
+      cities: [
+        { code: 'DAR', name: 'Dar es Salaam' },
+        { code: 'MWANZA', name: 'Mwanza' },
+        { code: 'ARUSHA', name: 'Arusha' },
+        { code: 'DODOMA', name: 'Dodoma' },
+        { code: 'MBEYA', name: 'Mbeya' },
+        { code: 'TANGA', name: 'Tanga' },
+        { code: 'MOROGORO', name: 'Morogoro' },
+        { code: 'IRINGA', name: 'Iringa' },
+        { code: 'KIGOMA', name: 'Kigoma' },
+        { code: 'TABORA', name: 'Tabora' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'UG',
+  name: 'Uganda',
+  taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'UGX', region: 'MEA' },
+  provinces: [
+    { code: 'KAMPALA', name: 'Kampala',
+      cities: [
+        { code: 'KAMPALA', name: 'Kampala' },
+        { code: 'JINJA', name: 'Jinja' },
+        { code: 'GULU', name: 'Gulu' },
+        { code: 'MBARARA', name: 'Mbarara' },
+        { code: 'ENTEBBE', name: 'Entebbe' },
+        { code: 'KABALE', name: 'Kabale' },
+        { code: 'FORT', name: 'Fort Portal' },
+        { code: 'MASAKA', name: 'Masaka' },
+        { code: 'LIRA', name: 'Lira' },
+        { code: 'ARUA', name: 'Arua' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'ZM',
+  name: 'Zambia',
+  taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'ZMW', region: 'MEA' },
+  provinces: [
+    { code: 'LUSAKA', name: 'Lusaka',
+      cities: [
+        { code: 'LUSAKA', name: 'Lusaka' },
+        { code: 'KITWE', name: 'Kitwe' },
+        { code: 'NDOLA', name: 'Ndola' },
+        { code: 'KABWE', name: 'Kabwe' },
+        { code: 'CHINGOLA', name: 'Chingola' },
+        { code: 'MUFULIRA', name: 'Mufulira' },
+        { code: 'LIVINGSTONE', name: 'Livingstone' },
+        { code: 'LUANSHYA', name: 'Luanshya' },
+        { code: 'KASAMA', name: 'Kasama' },
+        { code: 'CHIPATA', name: 'Chipata' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'ZW',
+  name: 'Zimbabwe',
+  taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'ZWL', region: 'MEA' },
+  provinces: [
+    { code: 'HARARE', name: 'Harare',
+      cities: [
+        { code: 'HARARE', name: 'Harare' },
+        { code: 'BULAWAYO', name: 'Bulawayo' },
+        { code: 'CHITUNGWIZA', name: 'Chitungwiza' },
+        { code: 'MUTARE', name: 'Mutare' },
+        { code: 'GWERU', name: 'Gweru' },
+        { code: 'KWEKWE', name: 'Kwekwe' },
+        { code: 'KADOMA', name: 'Kadoma' },
+        { code: 'MASVINGO', name: 'Masvingo' },
+        { code: 'MARONDERA', name: 'Marondera' },
+        { code: 'RUSAPE', name: 'Rusape' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'BW',
+  name: 'Botswana',
+  taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'BWP', region: 'MEA' },
+  provinces: [
+    { code: 'GABORONE', name: 'Gaborone',
+      cities: [
+        { code: 'GABORONE', name: 'Gaborone' },
+        { code: 'FRANCISTOWN', name: 'Francistown' },
+        { code: 'MAUN', name: 'Maun' },
+        { code: 'SELEBI', name: 'Selebi-Phikwe' },
+        { code: 'SEROWE', name: 'Serowe' },
+        { code: 'MAHALAPYE', name: 'Mahalapye' },
+        { code: 'MOCHUDI', name: 'Mochudi' },
+        { code: 'KANYE', name: 'Kanye' },
+        { code: 'LOBATSE', name: 'Lobatse' },
+        { code: 'PALAPYE', name: 'Palapye' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'MW',
+  name: 'Malawi',
+  taxInfo: { standardRate: 16.5, taxName: 'VAT', currency: 'MWK', region: 'MEA' },
+  provinces: [
+    { code: 'LILONGWE', name: 'Lilongwe',
+      cities: [
+        { code: 'LILONGWE', name: 'Lilongwe' },
+        { code: 'BLANTYRE', name: 'Blantyre' },
+        { code: 'MZUZU', name: 'Mzuzu' },
+        { code: 'ZOMBA', name: 'Zomba' },
+        { code: 'KARONGA', name: 'Karonga' },
+        { code: 'MANGOCHI', name: 'Mangochi' },
+        { code: 'SALIMA', name: 'Salima' },
+        { code: 'NKHOTAKOTA', name: 'Nkhota Kota' },
+        { code: 'LIWONDE', name: 'Liwonde' },
+        { code: 'BALAKA', name: 'Balaka' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'MZ',
+  name: 'Mozambique',
+  taxInfo: { standardRate: 17, taxName: 'VAT', currency: 'MZN', region: 'MEA' },
+  provinces: [
+    { code: 'MAPUTO', name: 'Maputo',
+      cities: [
+        { code: 'MAPUTO', name: 'Maputo' },
+        { code: 'MATOLA', name: 'Matola' },
+        { code: 'NAMPULA', name: 'Nampula' },
+        { code: 'BEIRA', name: 'Beira' },
+        { code: 'CHIMOIO', name: 'Chimoio' },
+        { code: 'QUELIMANE', name: 'Quelimane' },
+        { code: 'TETE', name: 'Tete' },
+        { code: 'XAI', name: 'Xai-Xai' },
+        { code: 'LICHINGA', name: 'Lichinga' },
+        { code: 'PEMBA', name: 'Pemba' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'NA',
+  name: 'Namibia',
+  taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'NAD', region: 'MEA' },
+  provinces: [
+    { code: 'WINDHOEK', name: 'Windhoek',
+      cities: [
+        { code: 'WINDHOEK', name: 'Windhoek' },
+        { code: 'SWAKOPMUND', name: 'Swakopmund' },
+        { code: 'WALVIS', name: 'Walvis Bay' },
+        { code: 'OTJIWARONGO', name: 'Otjiwarongo' },
+        { code: 'RUNDU', name: 'Rundu' },
+        { code: 'WITVLEI', name: 'Witvlei' },
+        { code: 'OKAHANDJA', name: 'Okahandja' },
+        { code: 'KEETMANSHOOP', name: 'Keetmanshoop' },
+        { code: 'MARIENTAL', name: 'Mariental' },
+        { code: 'LUDERITZ', name: 'Lüderitz' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'SZ',
+  name: 'Eswatini',
+  taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SZL', region: 'MEA' },
+  provinces: [
+    { code: 'MBABANE', name: 'Hhohho',
+      cities: [
+        { code: 'MBABANE', name: 'Mbabane' },
+        { code: 'MANZINI', name: 'Manzini' },
+        { code: 'BIG', name: 'Big Bend' },
+        { code: 'SITEKI', name: 'Siteki' },
+        { code: 'NHLANGANO', name: 'Nhlangano' },
+        { code: 'PIGGS', name: 'Piggs Peak' },
+        { code: 'SIMUNYE', name: 'Simunye' },
+        { code: 'MATSAPHA', name: 'Matsapha' },
+        { code: 'MALKERNS', name: 'Malkerns' },
+        { code: 'EZULWINI', name: 'Ezulwini' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'LS',
+  name: 'Lesotho',
+  taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'LSL', region: 'MEA' },
+  provinces: [
+    { code: 'MASERU', name: 'Maseru',
+      cities: [
+        { code: 'MASERU', name: 'Maseru' },
+        { code: 'MAFETENG', name: 'Mafeteng' },
+        { code: 'LERIBE', name: 'Leribe' },
+        { code: 'MOHALE', name: 'Mohale\'s Hoek' },
+        { code: 'QUTHING', name: 'Quthing' },
+        { code: 'BUTHA', name: 'Butha-Buthe' },
+        { code: 'MOKHOTLONG', name: 'Mokhotlong' },
+        { code: 'THABA', name: 'Thaba-Tseka' },
+        { code: 'QACHAS', name: 'Qacha\'s Nek' },
+        { code: 'ROMA', name: 'Roma' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'AO',
+  name: 'Angola',
+  taxInfo: { standardRate: 14, taxName: 'VAT', currency: 'AOA', region: 'MEA' },
+  provinces: [
+    { code: 'LUANDA', name: 'Luanda',
+      cities: [
+        { code: 'LUANDA', name: 'Luanda' },
+        { code: 'HUAMBO', name: 'Huambo' },
+        { code: 'LOBITO', name: 'Lobito' },
+        { code: 'KUITO', name: 'Kuito' },
+        { code: 'LUBANGO', name: 'Lubango' },
+        { code: 'MALANJE', name: 'Malanje' },
+        { code: 'NAMIBE', name: 'Namibe' },
+        { code: 'SOYO', name: 'Soyo' },
+        { code: 'CABINDA', name: 'Cabinda' },
+        { code: 'SUMBE', name: 'Sumbe' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'CM',
+  name: 'Cameroon',
+  taxInfo: { standardRate: 19.25, taxName: 'VAT', currency: 'XAF', region: 'MEA' },
+  provinces: [
+    { code: 'DOUALA', name: 'Littoral',
+      cities: [
+        { code: 'DOUALA', name: 'Douala' },
+        { code: 'YAOUNDE', name: 'Yaoundé' },
+        { code: 'BAFOUSSAM', name: 'Bafoussam' },
+        { code: 'GAROUA', name: 'Garoua' },
+        { code: 'MAROUA', name: 'Maroua' },
+        { code: 'BAFANG', name: 'Bafang' },
+        { code: 'KUMBA', name: 'Kumba' },
+        { code: 'NGAOUNDERE', name: 'Ngaoundéré' },
+        { code: 'BERTOUA', name: 'Bertoua' },
+        { code: 'EDEA', name: 'Edéa' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'CF',
+  name: 'Central African Republic',
+  taxInfo: { standardRate: 19, taxName: 'VAT', currency: 'XAF', region: 'MEA' },
+  provinces: [
+    { code: 'BANGUI', name: 'Bangui',
+      cities: [
+        { code: 'BANGUI', name: 'Bangui' },
+        { code: 'BERBERATI', name: 'Berberati' },
+        { code: 'BOSSANGOA', name: 'Bossangoa' },
+        { code: 'BAMBERI', name: 'Bambari' },
+        { code: 'BOUAR', name: 'Bouar' },
+        { code: 'BAMBARI', name: 'Bambari' },
+        { code: 'KAGA', name: 'Kaga-Bandoro' },
+        { code: 'MONGOU', name: 'Mongoumba' },
+        { code: 'SIBUT', name: 'Sibut' },
+        { code: 'BANGASSOU', name: 'Bangassou' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'TD',
+  name: 'Chad',
+  taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' },
+  provinces: [
+    { code: 'NDJAMENA', name: 'N\'Djamena',
+      cities: [
+        { code: 'NDJAMENA', name: 'N\'Djamena' },
+        { code: 'MOUNDOU', name: 'Moundou' },
+        { code: 'SARH', name: 'Sarh' },
+        { code: 'ABECHE', name: 'Abéché' },
+        { code: 'DOBA', name: 'Doba' },
+        { code: 'KELLO', name: 'Kéllé' },
+        { code: 'BILTINE', name: 'Biltine' },
+        { code: 'FAYA', name: 'Faya-Largeau' },
+        { code: 'BONGOR', name: 'Bongor' },
+        { code: 'MASSAGUET', name: 'Massaguet' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'CG',
+  name: 'Congo - Brazzaville',
+  taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' },
+  provinces: [
+    { code: 'BRAZZAVILLE', name: 'Brazzaville',
+      cities: [
+        { code: 'BRAZZAVILLE', name: 'Brazzaville' },
+        { code: 'POINTE', name: 'Pointe-Noire' },
+        { code: 'DOLISIE', name: 'Dolisie' },
+        { code: 'NKAYI', name: 'Nkayi' },
+        { code: 'MADINGOU', name: 'Madingou' },
+        { code: 'OYO', name: 'Oyo' },
+        { code: 'GAMBOMA', name: 'Gamboma' },
+        { code: 'MOUNZA', name: 'Mounza' },
+        { code: 'KINKALA', name: 'Kinkala' },
+        { code: 'SIBITI', name: 'Sibiti' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'CD',
+  name: 'Congo - Kinshasa',
+  taxInfo: { standardRate: 16, taxName: 'VAT', currency: 'CDF', region: 'MEA' },
+  provinces: [
+    { code: 'KINSHASA', name: 'Kinshasa',
+      cities: [
+        { code: 'KINSHASA', name: 'Kinshasa' },
+        { code: 'LUBUMBASHI', name: 'Lubumbashi' },
+        { code: 'KISANGANI', name: 'Kisangani' },
+        { code: 'MBUJI', name: 'Mbuji-Mayi' },
+        { code: 'KANANGA', name: 'Kananga' },
+        { code: 'LIKASI', name: 'Likasi' },
+        { code: 'TSHIKAPA', name: 'Tshikapa' },
+        { code: 'KOLWEZI', name: 'Kol'}]
+    }
+  ]
+},
+  { code: 'GA', name: 'Gabon', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' },
+  provinces: [
+    { code: 'LIBREVILLE', name: 'Libreville',
+      cities: [
+        { code: 'LIBREVILLE', name: 'Libreville' },
+        { code: 'PORT', name: 'Port-Gentil' },
+        { code: 'FRANCEVILLE', name: 'Franceville' },
+        { code: 'OYEM', name: 'Oyem' },
+        { code: 'MOANDA', name: 'Moanda' },
+        { code: 'LAMBARÉNÉ', name: 'Lambaréné' },
+        { code: 'TCHIBANGA', name: 'Tchibanga' },
+        { code: 'KOULAMOUTOU', name: 'Koulamoutou' },
+        { code: 'MAKOKOU', name: 'Makokou' },
+        { code: 'BITAM', name: 'Bitam' }
+      ]
+    }
+  ]
+},
+  { code: 'GQ', name: 'Equatorial Guinea', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XAF', region: 'MEA' },
+  provinces: [
+    { code: 'MALABO', name: 'Bioko',
+      cities: [
+        { code: 'MALABO', name: 'Malabo' },
+        { code: 'BATA', name: 'Bata' },
+        { code: 'EVINAYONG', name: 'Evinayong' },
+        { code: 'MONGOMO', name: 'Mongomo' },
+        { code: 'ANNOBON', name: 'San Antonio de Palé' },
+        { code: 'LUBA', name: 'Luba' },
+        { code: 'EIBEYIN', name: 'Eibeyín' },
+        { code: 'ACUREN', name: 'Acureñ' },
+        { code: 'MONGOMEYEN', name: 'Mongomeyén' },
+        { code: 'NSOM', name: 'Nsom' }
+      ]
+    }
+  ]
+},
+  { code: 'ST', name: 'São Tomé and Príncipe', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'STN', region: 'MEA' },
+  provinces: [
+    { code: 'SAO', name: 'São Tomé',
+      cities: [
+        { code: 'SAO', name: 'São Tomé' },
+        { code: 'PRINCIPE', name: 'São Tomé' },
+        { code: 'TRINDADE', name: 'Trindade' },
+        { code: 'NEVES', name: 'Neves' },
+        { code: 'SANTANA', name: 'Santana' },
+        { code: 'GUADALUPE', name: 'Guadalupe' },
+        { code: 'CANTAGALO', name: 'Cantagalo' },
+        { code: 'ME', name: 'Me-Zóchi' },
+        { code: 'CAUE', name: 'Caué' },
+        { code: 'LEME', name: 'Lembá' }
+      ]
+    }
+  ]
+},
+  { code: 'CV', name: 'Cabo Verde', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'CVE', region: 'MEA' },
+  provinces: [
+    { code: 'PRAIA', name: 'Santiago',
+      cities: [
+        { code: 'PRAIA', name: 'Praia' },
+        { code: 'MINDELO', name: 'Mindelo' },
+        { code: 'SANTAMARIA', name: 'Santa Maria' },
+        { code: 'PEDRA', name: 'Pedra Badejo' },
+        { code: 'ASSOMADA', name: 'Assomada' },
+        { code: 'TARRAFAL', name: 'Tarrafal' },
+        { code: 'CITY', name: 'Cidade Velha' },
+        { code: 'CALHETA', name: 'Calheta' },
+        { code: 'PORTO', name: 'Porto Novo' },
+        { code: 'RIBEIRA', name: 'Ribeira Grande' }
+      ]
+    }
+  ]
+},
+  { code: 'GW', name: 'Guinea-Bissau', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XOF', region: 'MEA' },
+  provinces: [
+    { code: 'BISSAU', name: 'Bissau',
+      cities: [
+        { code: 'BISSAU', name: 'Bissau' },
+        { code: 'BULA', name: 'Bula' },
+        { code: 'GABU', name: 'Gabú' },
+        { code: 'BATA', name: 'Bafatá' },
+        { code: 'CACHEU', name: 'Cacheu' },
+        { code: 'BOMBA', name: 'Bombo' },
+        { code: 'OIO', name: 'Oio' },
+        { code: 'QUINARA', name: 'Quinara' },
+        { code: 'TOMBOALI', name: 'Tombali' },
+        { code: 'BIOMBO', name: 'Biombo' }
+      ]
+    }
+  ]
+},
+  { code: 'GN', name: 'Guinea', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'GNF', region: 'MEA' },
+  provinces: [
+    { code: 'CONAKRY', name: 'Conakry',
+      cities: [
+        { code: 'CONAKRY', name: 'Conakry' },
+        { code: 'NZEREKORE', name: 'Nzérékoré' },
+        { code: 'KANKAN', name: 'Kankan' },
+        { code: 'KINDIA', name: 'Kindia' },
+        { code: 'LABE', name: 'Labé' },
+        { code: 'BOKE', name: 'Boké' },
+        { code: 'MAMOU', name: 'Mamou' },
+        { code: 'FARANAH', name: 'Faranah' },
+        { code: 'SIGUIRI', name: 'Siguiri' },
+        { code: 'DABOLA', name: 'Dabola' }
+      ]
+    }
+  ]
+},
+  { code: 'SL', name: 'Sierra Leone', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'SLL', region: 'MEA' },
+  provinces: [
+    { code: 'FREETOWN', name: 'Freetown',
+      cities: [
+        { code: 'FREETOWN', name: 'Freetown' },
+        { code: 'KENEMA', name: 'Kenema' },
+        { code: 'BO', name: 'Bo' },
+        { code: 'MAKENI', name: 'Makeni' },
+        { code: 'KOIDU', name: 'Koidu' },
+        { code: 'PORT', name: 'Port Loko' },
+        { code: 'PANGUMA', name: 'Panguma' },
+        { code: 'KABALA', name: 'Kabala' },
+        { code: 'MAGBURAKA', name: 'Magburaka' },
+        { code: 'WATERLOO', name: 'Waterloo' }
+      ]
+    }
+  ]
+},
   { code: 'LR', name: 'Liberia', taxInfo: { standardRate: 7, taxName: 'VAT', currency: 'LRD', region: 'MEA' } },
   { code: 'CI', name: "Côte d'Ivoire", taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
   { code: 'BF', name: 'Burkina Faso', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XOF', region: 'MEA' } },
