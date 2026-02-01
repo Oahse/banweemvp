@@ -2,14 +2,45 @@
  * Bhutan country data with districts, cities, and tax information
  */
 
-import { Country } from './index';
+export interface City {
+  code: string;
+  name: string;
+}
+
+export interface District {
+  code: string;
+  name: string;
+  cities?: City[];
+  taxInfo?: TaxInfo;
+}
+
+export interface TaxInfo {
+  standardRate?: number;
+  reducedRates?: number[];
+  taxName: string;
+  taxTypes?: string[];
+  currency: string;
+  region: 'EU' | 'NA' | 'APAC' | 'LATAM' | 'MEA' | 'Other';
+}
+
+export interface Country {
+  code: string;
+  name: string;
+  taxInfo?: TaxInfo;
+  divisions: Array<{
+    code: string;
+    name: string;
+    type: string;
+    cities?: City[];
+  }>;
+}
 
 export const bhutan: Country = {
   code: 'BT',
   name: 'Bhutan',
   taxInfo: { taxName: 'No VAT', currency: 'BTN', region: 'APAC' },
-  provinces: [
-    { code: 'TH', name: 'Thimphu',
+  divisions: [
+    { code: 'TH', name: 'Thimphu', type: 'district',
       cities: [
         { code: 'THIMPHU', name: 'Thimphu' },
         { code: 'BABESA', name: 'Babesa' },
@@ -23,11 +54,11 @@ export const bhutan: Country = {
         { code: 'SOE', name: 'Soe' }
       ]
     },
-    { code: 'PU', name: 'Punakha',
+    { code: 'PU', name: 'Punakha', type: 'district',
       cities: [
         { code: 'PUNAKHA', name: 'Punakha' },
         { code: 'BARP', name: 'Barp' },
-        { code: 'CHIMM', name: 'Chhimmony' },
+        { code: 'CHIMM', name: 'Chimmmony' },
         { code: 'GASA', name: 'Gasa' },
         { code: 'GOENSHARI', name: 'Goenshari' },
         { code: 'KABJISA', name: 'Kabjisa' },
@@ -37,7 +68,7 @@ export const bhutan: Country = {
         { code: 'TOEDPANG', name: 'Toedpang' }
       ]
     },
-    { code: 'GA', name: 'Gasa',
+    { code: 'GA', name: 'Gasa', type: 'district',
       cities: [
         { code: 'GASA_TOWN', name: 'Gasa Town' },
         { code: 'KHAMED', name: 'Khamed' },
@@ -46,7 +77,7 @@ export const bhutan: Country = {
         { code: 'TSHECHU', name: 'Tshechu' }
       ]
     },
-    { code: 'WO', name: 'Wangdue Phodrang',
+    { code: 'WO', name: 'Wangdue Phodrang', type: 'district',
       cities: [
         { code: 'WANGDUE', name: 'Wangdue Phodrang' },
         { code: 'ATHANG', name: 'Athang' },
@@ -60,7 +91,7 @@ export const bhutan: Country = {
         { code: 'RUEPISA', name: 'Ruepisa' }
       ]
     },
-    { code: 'TR', name: 'Trongsa',
+    { code: 'TR', name: 'Trongsa', type: 'district',
       cities: [
         { code: 'TRONGSA', name: 'Trongsa' },
         { code: 'DRANGME', name: 'Drangme' },
@@ -71,7 +102,7 @@ export const bhutan: Country = {
         { code: 'TANGSIBJI', name: 'Tangsibji' }
       ]
     },
-    { code: 'BZ', name: 'Bumthang',
+    { code: 'BZ', name: 'Bumthang', type: 'district',
       cities: [
         { code: 'BUMTHANG', name: 'Jakar' },
         { code: 'CHHUME', name: 'Chhume' },
@@ -82,7 +113,7 @@ export const bhutan: Country = {
         { code: 'KIZOM', name: 'Kizom' }
       ]
     },
-    { code: 'ZG', name: 'Zhemgang',
+    { code: 'ZG', name: 'Zhemgang', type: 'district',
       cities: [
         { code: 'ZHEMGANG', name: 'Zhemgang' },
         { code: 'BARDHO', name: 'Bardho' },
@@ -96,7 +127,7 @@ export const bhutan: Country = {
         { code: 'TALANG', name: 'Talang' }
       ]
     },
-    { code: 'SL', name: 'Sarpang',
+    { code: 'SL', name: 'Sarpang', type: 'district',
       cities: [
         { code: 'SARPANG', name: 'Sarpang' },
         { code: 'CHHUZOM', name: 'Chhuzom' },
@@ -110,7 +141,7 @@ export const bhutan: Country = {
         { code: 'TARETHANG', name: 'Tarethang' }
       ]
     },
-    { code: 'SG', name: 'Samtse',
+    { code: 'SG', name: 'Samtse', type: 'district',
       cities: [
         { code: 'SAMTSE', name: 'Samtse' },
         { code: 'CHENGTA', name: 'Chengta' },
@@ -124,10 +155,10 @@ export const bhutan: Country = {
         { code: 'TADING', name: 'Tading' }
       ]
     },
-    { code: 'CH', name: 'Chhukha',
+    { code: 'CH', name: 'Chhukha', type: 'district',
       cities: [
         { code: 'CHHUKHA', name: 'Chhukha' },
-        { code: 'BONDEY', name: 'Bondey' },
+        { code: 'BONDEY', name: 'Bondoy' },
         { code: 'CHAPCHA', name: 'Chapcha' },
         { code: 'DALA', name: 'Dala' },
         { code: 'GELPO', name: 'Gelpo' },
@@ -138,7 +169,7 @@ export const bhutan: Country = {
         { code: 'TSIRANG', name: 'Tsirang' }
       ]
     },
-    { code: 'HA', name: 'Haa',
+    { code: 'HA', name: 'Haa', type: 'district',
       cities: [
         { code: 'HAA', name: 'Haa' },
         { code: 'BJI', name: 'Bji' },
@@ -149,7 +180,7 @@ export const bhutan: Country = {
         { code: 'UESU', name: 'Uesu' }
       ]
     },
-    { code: 'TY', name: 'Trashiyangtse',
+    { code: 'TY', name: 'Trashiyangtse', type: 'district',
       cities: [
         { code: 'TRASHIYANGTSE', name: 'Trashiyangtse' },
         { code: 'BOMDELING', name: 'Bomdeling' },
@@ -161,11 +192,11 @@ export const bhutan: Country = {
         { code: 'YALANG', name: 'Yalang' }
       ]
     },
-    { code: 'MT', name: 'Mongar',
+    { code: 'MT', name: 'Mongar', type: 'district',
       cities: [
         { code: 'MONGAR', name: 'Mongar' },
         { code: 'CHASKAR', name: 'Chaskar' },
-        { code: 'CHHIMMONG', name: 'Chhimmong' },
+        { code: 'CHIMMONG', name: 'Chhimmong' },
         { code: 'DRAMETSE', name: 'Drametse' },
         { code: 'JURMENI', name: 'Jurmeni' },
         { code: 'KENGKHAR', name: 'Kengkhar' },
@@ -176,13 +207,13 @@ export const bhutan: Country = {
         { code: 'TASHIPA', name: 'Tashipa' }
       ]
     },
-    { code: 'TS', name: 'Trashigang',
+    { code: 'TS', name: 'Trashigang', type: 'district',
       cities: [
         { code: 'TRASHIGANG', name: 'Trashigang' },
         { code: 'BARTSHAM', name: 'Bartsham' },
         { code: 'KANGCHUNG', name: 'Kangchung' },
-        { code: 'KANGPAR', name: 'Kangpar' },
         { code: 'KHALING', name: 'Khaling' },
+        { code: 'RAMJAR', name: 'Ramjar' },
         { code: 'RANGJUNG', name: 'Rangjung' },
         { code: 'SAMKHAR', name: 'Samkhar' },
         { code: 'SHERICHU', name: 'Sherichu' },
@@ -190,10 +221,10 @@ export const bhutan: Country = {
         { code: 'WAMRONG', name: 'Wamrong' }
       ]
     },
-    { code: 'PD', name: 'Pemagatshel',
+    { code: 'PD', name: 'Pemagatshel', type: 'district',
       cities: [
         { code: 'PEMAGATSHEL', name: 'Pemagatshel' },
-        { code: 'CHHIMMONG', name: 'Chhimmong' },
+        { code: 'CHIMMONG', name: 'Chhimmong' },
         { code: 'DENCHI', name: 'Denchhi' },
         { code: 'DUNGME', name: 'Dungme' },
         { code: 'KILAR', name: 'Kilar' },
@@ -202,7 +233,7 @@ export const bhutan: Country = {
         { code: 'ZUNGLEN', name: 'Zunglen' }
       ]
     },
-    { code: 'SN', name: 'Samdrup Jongkhar',
+    { code: 'SN', name: 'Samdrup Jongkhar', type: 'district',
       cities: [
         { code: 'SAMDRUP', name: 'Samdrup Jongkhar' },
         { code: 'DEOTHANG', name: 'Deothang' },

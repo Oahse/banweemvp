@@ -7,8 +7,15 @@ import { Country } from './index';
 export const unitedStates: Country = {
     code: 'US',
     name: 'United States',
-    provinces: [
-      { code: 'AL', name: 'Alabama',
+    flag: '🇺🇸',
+    capital: 'Washington, D.C.',
+    area: 9833517,
+    currencySymbol: '$',
+    officialLanguages: ['English'],
+    demonym: 'American',
+    taxInfo: { standardRate: 0, taxName: 'Sales Tax', currency: 'USD', region: 'NA' },
+    divisions: [
+      { code: 'AL', name: 'Alabama', type: 'state',
         cities: [
           { code: 'BH', name: 'Birmingham' },
           { code: 'MO', name: 'Montgomery' },
@@ -22,7 +29,7 @@ export const unitedStates: Country = {
           { code: 'MA', name: 'Madison' }
         ]
       },
-      { code: 'AK', name: 'Alaska',
+      { code: 'AK', name: 'Alaska', type: 'state',
         cities: [
           { code: 'AN', name: 'Anchorage' },
           { code: 'FA', name: 'Fairbanks' },
@@ -36,7 +43,7 @@ export const unitedStates: Country = {
           { code: 'PO', name: 'Palmer' }
         ]
       },
-      { code: 'AZ', name: 'Arizona',
+      { code: 'AZ', name: 'Arizona', type: 'state',
         cities: [
           { code: 'PH', name: 'Phoenix' },
           { code: 'TU', name: 'Tucson' },
@@ -50,7 +57,22 @@ export const unitedStates: Country = {
           { code: 'SU', name: 'Surprise' }
         ]
       },
-      { code: 'AR', name: 'Arkansas',
+      { code: 'CA', name: 'California', type: 'state',
+        taxInfo: { standardRate: 7.25, taxName: 'Sales Tax', currency: 'USD', region: 'NA' },
+        cities: [
+          { code: 'LA', name: 'Los Angeles' },
+          { code: 'SD', name: 'San Diego' },
+          { code: 'SJ', name: 'San Jose' },
+          { code: 'SF', name: 'San Francisco' },
+          { code: 'FR', name: 'Fresno' },
+          { code: 'SC', name: 'Sacramento' },
+          { code: 'LB', name: 'Long Beach' },
+          { code: 'OA', name: 'Oakland' },
+          { code: 'BK', name: 'Bakersfield' },
+          { code: 'AN', name: 'Anaheim' }
+        ]
+      },
+      { code: 'AR', name: 'Arkansas', type: 'state',
         cities: [
           { code: 'LI', name: 'Little Rock' },
           { code: 'FT', name: 'Fort Smith' },
@@ -64,7 +86,7 @@ export const unitedStates: Country = {
           { code: 'BE', name: 'Bentonville' }
         ]
       },
-      { code: 'CO', name: 'Colorado', 
+      { code: 'CO', name: 'Colorado', type: 'state', 
         taxInfo: { standardRate: 2.9, taxName: 'Sales Tax', currency: 'USD', region: 'NA' },
         cities: [
           { code: 'DE', name: 'Denver' },
@@ -79,7 +101,7 @@ export const unitedStates: Country = {
           { code: 'BO', name: 'Boulder' }
         ]
       },
-      { code: 'CT', name: 'Connecticut', 
+      { code: 'CT', name: 'Connecticut', type: 'state', 
         taxInfo: { standardRate: 6.35, taxName: 'Sales Tax', currency: 'USD', region: 'NA' },
         cities: [
           { code: 'BR', name: 'Bridgeport' },
@@ -94,7 +116,7 @@ export const unitedStates: Country = {
           { code: 'MI', name: 'Middletown' }
         ]
       },
-      { code: 'DE', name: 'Delaware',
+      { code: 'DE', name: 'Delaware', type: 'state',
         cities: [
           { code: 'WI', name: 'Wilmington' },
           { code: 'DO', name: 'Dover' },
@@ -108,7 +130,7 @@ export const unitedStates: Country = {
           { code: 'GE', name: 'Georgetown' }
         ]
       },
-      { code: 'GA', name: 'Georgia',
+      { code: 'GA', name: 'Georgia', type: 'state',
         cities: [
           { code: 'AT', name: 'Atlanta' },
           { code: 'AU', name: 'Augusta' },
@@ -122,7 +144,22 @@ export const unitedStates: Country = {
           { code: 'WA', name: 'Warner Robins' }
         ]
       },
-      { code: 'HI', name: 'Hawaii',
+      { code: 'FL', name: 'Florida', type: 'state',
+        taxInfo: { standardRate: 6, taxName: 'Sales Tax', currency: 'USD', region: 'NA' },
+        cities: [
+          { code: 'JA', name: 'Jacksonville' },
+          { code: 'MI', name: 'Miami' },
+          { code: 'TA', name: 'Tampa' },
+          { code: 'OR', name: 'Orlando' },
+          { code: 'ST', name: 'St. Petersburg' },
+          { code: 'HE', name: 'Hialeah' },
+          { code: 'TA2', name: 'Tallahassee' },
+          { code: 'FO', name: 'Fort Lauderdale' },
+          { code: 'PO', name: 'Port St. Lucie' },
+          { code: 'CA', name: 'Cape Coral' }
+        ]
+      },
+      { code: 'HI', name: 'Hawaii', type: 'state',
         cities: [
           { code: 'HO', name: 'Honolulu' },
           { code: 'PI', name: 'Pearl City' },
@@ -136,7 +173,7 @@ export const unitedStates: Country = {
           { code: 'LI', name: 'Lihue' }
         ]
       },
-      { code: 'ID', name: 'Idaho',
+      { code: 'ID', name: 'Idaho', type: 'state',
         cities: [
           { code: 'BO', name: 'Boise' },
           { code: 'NE', name: 'Nampa' },
@@ -150,7 +187,7 @@ export const unitedStates: Country = {
           { code: 'RE', name: 'Rexburg' }
         ]
       },
-      { code: 'IL', name: 'Illinois',
+      { code: 'IL', name: 'Illinois', type: 'state',
         cities: [
           { code: 'CH', name: 'Chicago' },
           { code: 'AU', name: 'Aurora' },
@@ -164,7 +201,7 @@ export const unitedStates: Country = {
           { code: 'CI', name: 'Cicero' }
         ]
       },
-      { code: 'IN', name: 'Indiana',
+      { code: 'IN', name: 'Indiana', type: 'state',
         cities: [
           { code: 'IN', name: 'Indianapolis' },
           { code: 'FO', name: 'Fort Wayne' },
@@ -178,7 +215,7 @@ export const unitedStates: Country = {
           { code: 'LA', name: 'Lafayette' }
         ]
       },
-      { code: 'IA', name: 'Iowa',
+      { code: 'IA', name: 'Iowa', type: 'state',
         cities: [
           { code: 'DE', name: 'Des Moines' },
           { code: 'CE', name: 'Cedar Rapids' },
@@ -192,7 +229,7 @@ export const unitedStates: Country = {
           { code: 'UR', name: 'Urbandale' }
         ]
       },
-      { code: 'KS', name: 'Kansas',
+      { code: 'KS', name: 'Kansas', type: 'state',
         cities: [
           { code: 'WI', name: 'Wichita' },
           { code: 'OV', name: 'Overland Park' },
@@ -206,7 +243,7 @@ export const unitedStates: Country = {
           { code: 'SA', name: 'Salina' }
         ]
       },
-      { code: 'KY', name: 'Kentucky',
+      { code: 'KY', name: 'Kentucky', type: 'state',
         cities: [
           { code: 'LO', name: 'Louisville' },
           { code: 'LE', name: 'Lexington' },
@@ -220,7 +257,7 @@ export const unitedStates: Country = {
           { code: 'HI', name: 'Henderson' }
         ]
       },
-      { code: 'LA', name: 'Louisiana',
+      { code: 'LA', name: 'Louisiana', type: 'state',
         cities: [
           { code: 'NE', name: 'New Orleans' },
           { code: 'BA', name: 'Baton Rouge' },
@@ -234,7 +271,7 @@ export const unitedStates: Country = {
           { code: 'NE2', name: 'New Iberia' }
         ]
       },
-      { code: 'ME', name: 'Maine',
+      { code: 'ME', name: 'Maine', type: 'state',
         cities: [
           { code: 'PO', name: 'Portland' },
           { code: 'LE', name: 'Lewiston' },
@@ -248,7 +285,7 @@ export const unitedStates: Country = {
           { code: 'WE', name: 'Westbrook' }
         ]
       },
-      { code: 'MD', name: 'Maryland',
+      { code: 'MD', name: 'Maryland', type: 'state',
         cities: [
           { code: 'BA', name: 'Baltimore' },
           { code: 'FR', name: 'Frederick' },
@@ -262,7 +299,7 @@ export const unitedStates: Country = {
           { code: 'SI', name: 'Silver Spring' }
         ]
       },
-      { code: 'MA', name: 'Massachusetts',
+      { code: 'MA', name: 'Massachusetts', type: 'state',
         cities: [
           { code: 'BO', name: 'Boston' },
           { code: 'WO', name: 'Worcester' },
@@ -276,7 +313,7 @@ export const unitedStates: Country = {
           { code: 'FA', name: 'Fall River' }
         ]
       },
-      { code: 'MI', name: 'Michigan',
+      { code: 'MI', name: 'Michigan', type: 'state',
         cities: [
           { code: 'DE', name: 'Detroit' },
           { code: 'GR', name: 'Grand Rapids' },
@@ -290,7 +327,7 @@ export const unitedStates: Country = {
           { code: 'CL', name: 'Clinton' }
         ]
       },
-      { code: 'MN', name: 'Minnesota',
+      { code: 'MN', name: 'Minnesota', type: 'state',
         cities: [
           { code: 'MI', name: 'Minneapolis' },
           { code: 'SA', name: 'Saint Paul' },
@@ -304,7 +341,7 @@ export const unitedStates: Country = {
           { code: 'BU', name: 'Burnsville' }
         ]
       },
-      { code: 'MS', name: 'Mississippi',
+      { code: 'MS', name: 'Mississippi', type: 'state',
         cities: [
           { code: 'JA', name: 'Jackson' },
           { code: 'GU', name: 'Gulfport' },
@@ -318,7 +355,7 @@ export const unitedStates: Country = {
           { code: 'HO', name: 'Horn Lake' }
         ]
       },
-      { code: 'MO', name: 'Missouri',
+      { code: 'MO', name: 'Missouri', type: 'state',
         cities: [
           { code: 'KA', name: 'Kansas City' },
           { code: 'SA', name: 'St. Louis' },
@@ -332,7 +369,7 @@ export const unitedStates: Country = {
           { code: 'FL', name: 'Florissant' }
         ]
       },
-      { code: 'MT', name: 'Montana',
+      { code: 'MT', name: 'Montana', type: 'state',
         cities: [
           { code: 'BI', name: 'Billings' },
           { code: 'MI', name: 'Missoula' },
@@ -346,7 +383,7 @@ export const unitedStates: Country = {
           { code: 'BU', name: 'Butte' }
         ]
       },
-      { code: 'NE', name: 'Nebraska',
+      { code: 'NE', name: 'Nebraska', type: 'state',
         cities: [
           { code: 'OM', name: 'Omaha' },
           { code: 'LI', name: 'Lincoln' },
@@ -360,7 +397,7 @@ export const unitedStates: Country = {
           { code: 'CO', name: 'Columbus' }
         ]
       },
-      { code: 'NV', name: 'Nevada',
+      { code: 'NV', name: 'Nevada', type: 'state',
         cities: [
           { code: 'LA', name: 'Las Vegas' },
           { code: 'RE', name: 'Reno' },
@@ -374,7 +411,7 @@ export const unitedStates: Country = {
           { code: 'FE', name: 'Fernley' }
         ]
       },
-      { code: 'NH', name: 'New Hampshire',
+      { code: 'NH', name: 'New Hampshire', type: 'state',
         cities: [
           { code: 'MA', name: 'Manchester' },
           { code: 'NA', name: 'Nashua' },
@@ -388,7 +425,7 @@ export const unitedStates: Country = {
           { code: 'HU', name: 'Hudson' }
         ]
       },
-      { code: 'NJ', name: 'New Jersey',
+      { code: 'NJ', name: 'New Jersey', type: 'state',
         cities: [
           { code: 'NE', name: 'Newark' },
           { code: 'JE', name: 'Jersey City' },
@@ -402,7 +439,7 @@ export const unitedStates: Country = {
           { code: 'CL', name: 'Clifton' }
         ]
       },
-      { code: 'NM', name: 'New Mexico',
+      { code: 'NM', name: 'New Mexico', type: 'state',
         cities: [
           { code: 'AL', name: 'Albuquerque' },
           { code: 'LA', name: 'Las Cruces' },
@@ -416,7 +453,7 @@ export const unitedStates: Country = {
           { code: 'AR', name: 'Artesia' }
         ]
       },
-      { code: 'NY', name: 'New York',
+      { code: 'NY', name: 'New York', type: 'state',
         cities: [
           { code: 'NYC', name: 'New York City' },
           { code: 'BU', name: 'Buffalo' },
@@ -430,7 +467,7 @@ export const unitedStates: Country = {
           { code: 'UT', name: 'Utica' }
         ]
       },
-      { code: 'NC', name: 'North Carolina',
+      { code: 'NC', name: 'North Carolina', type: 'state',
         cities: [
           { code: 'CH', name: 'Charlotte' },
           { code: 'RA', name: 'Raleigh' },
@@ -444,7 +481,7 @@ export const unitedStates: Country = {
           { code: 'GR2', name: 'Greenville' }
         ]
       },
-      { code: 'ND', name: 'North Dakota',
+      { code: 'ND', name: 'North Dakota', type: 'state',
         cities: [
           { code: 'FA', name: 'Fargo' },
           { code: 'BI', name: 'Bismarck' },
@@ -458,7 +495,7 @@ export const unitedStates: Country = {
           { code: 'JA', name: 'Jamestown' }
         ]
       },
-      { code: 'OH', name: 'Ohio',
+      { code: 'OH', name: 'Ohio', type: 'state',
         cities: [
           { code: 'CO', name: 'Columbus' },
           { code: 'CL', name: 'Cleveland' },
@@ -472,7 +509,7 @@ export const unitedStates: Country = {
           { code: 'LI', name: 'Lorain' }
         ]
       },
-      { code: 'OK', name: 'Oklahoma',
+      { code: 'OK', name: 'Oklahoma', type: 'state',
         cities: [
           { code: 'OK', name: 'Oklahoma City' },
           { code: 'TU', name: 'Tulsa' },
@@ -486,7 +523,7 @@ export const unitedStates: Country = {
           { code: 'ST', name: 'Stillwater' }
         ]
       },
-      { code: 'OR', name: 'Oregon',
+      { code: 'OR', name: 'Oregon', type: 'state',
         cities: [
           { code: 'PO', name: 'Portland' },
           { code: 'EU', name: 'Eugene' },
@@ -500,7 +537,7 @@ export const unitedStates: Country = {
           { code: 'CO', name: 'Corvallis' }
         ]
       },
-      { code: 'PA', name: 'Pennsylvania',
+      { code: 'PA', name: 'Pennsylvania', type: 'state',
         cities: [
           { code: 'PH', name: 'Philadelphia' },
           { code: 'PI', name: 'Pittsburgh' },
@@ -514,7 +551,7 @@ export const unitedStates: Country = {
           { code: 'AL2', name: 'Altoona' }
         ]
       },
-      { code: 'RI', name: 'Rhode Island',
+      { code: 'RI', name: 'Rhode Island', type: 'state',
         cities: [
           { code: 'PR', name: 'Providence' },
           { code: 'WA', name: 'Warwick' },
@@ -528,7 +565,7 @@ export const unitedStates: Country = {
           { code: 'WE', name: 'West Warwick' }
         ]
       },
-      { code: 'SC', name: 'South Carolina',
+      { code: 'SC', name: 'South Carolina', type: 'state',
         cities: [
           { code: 'CO', name: 'Columbia' },
           { code: 'CH', name: 'Charleston' },
@@ -542,7 +579,7 @@ export const unitedStates: Country = {
           { code: 'AN', name: 'Anderson' }
         ]
       },
-      { code: 'SD', name: 'South Dakota',
+      { code: 'SD', name: 'South Dakota', type: 'state',
         cities: [
           { code: 'SI', name: 'Sioux Falls' },
           { code: 'RA', name: 'Rapid City' },
@@ -556,7 +593,7 @@ export const unitedStates: Country = {
           { code: 'VE', name: 'Vermillion' }
         ]
       },
-      { code: 'TN', name: 'Tennessee',
+      { code: 'TN', name: 'Tennessee', type: 'state',
         cities: [
           { code: 'NA', name: 'Nashville' },
           { code: 'ME', name: 'Memphis' },
@@ -570,7 +607,7 @@ export const unitedStates: Country = {
           { code: 'HO', name: 'Hendersonville' }
         ]
       },
-      { code: 'TX', name: 'Texas',
+      { code: 'TX', name: 'Texas', type: 'state',
         cities: [
           { code: 'HO', name: 'Houston' },
           { code: 'DA', name: 'Dallas' },
@@ -584,7 +621,7 @@ export const unitedStates: Country = {
           { code: 'LI', name: 'Laredo' }
         ]
       },
-      { code: 'UT', name: 'Utah',
+      { code: 'UT', name: 'Utah', type: 'state',
         cities: [
           { code: 'SA', name: 'Salt Lake City' },
           { code: 'WE', name: 'West Valley City' },
@@ -598,7 +635,7 @@ export const unitedStates: Country = {
           { code: 'HI', name: 'Hill Air Force Base' }
         ]
       },
-      { code: 'VT', name: 'Vermont',
+      { code: 'VT', name: 'Vermont', type: 'state',
         cities: [
           { code: 'BU', name: 'Burlington' },
           { code: 'ES', name: 'Essex' },
@@ -612,7 +649,7 @@ export const unitedStates: Country = {
           { code: 'WI', name: 'Williston' }
         ]
       },
-      { code: 'VA', name: 'Virginia',
+      { code: 'VA', name: 'Virginia', type: 'state',
         cities: [
           { code: 'VI', name: 'Virginia Beach' },
           { code: 'NO', name: 'Norfolk' },
@@ -626,7 +663,7 @@ export const unitedStates: Country = {
           { code: 'RO', name: 'Roanoke' }
         ]
       },
-      { code: 'WA', name: 'Washington',
+      { code: 'WA', name: 'Washington', type: 'state',
         cities: [
           { code: 'SE', name: 'Seattle' },
           { code: 'SP', name: 'Spokane' },
@@ -640,7 +677,7 @@ export const unitedStates: Country = {
           { code: 'SP2', name: 'Spokane Valley' }
         ]
       },
-      { code: 'WV', name: 'West Virginia',
+      { code: 'WV', name: 'West Virginia', type: 'state',
         cities: [
           { code: 'CH', name: 'Charleston' },
           { code: 'HU', name: 'Huntington' },
@@ -654,7 +691,7 @@ export const unitedStates: Country = {
           { code: 'BE', name: 'Berkeley Springs' }
         ]
       },
-      { code: 'WI', name: 'Wisconsin',
+      { code: 'WI', name: 'Wisconsin', type: 'state',
         cities: [
           { code: 'MI', name: 'Milwaukee' },
           { code: 'MA', name: 'Madison' },
@@ -668,7 +705,7 @@ export const unitedStates: Country = {
           { code: 'WE', name: 'West Allis' }
         ]
       },
-      { code: 'WY', name: 'Wyoming',
+      { code: 'WY', name: 'Wyoming', type: 'state',
         cities: [
           { code: 'CH', name: 'Cheyenne' },
           { code: 'CA', name: 'Casper' },
@@ -682,7 +719,7 @@ export const unitedStates: Country = {
           { code: 'JA', name: 'Jackson' }
         ]
       },
-      { code: 'DC', name: 'District of Columbia',
+      { code: 'DC', name: 'District of Columbia', type: 'federal district',
         cities: [
           { code: 'WA', name: 'Washington' },
           { code: 'GE', name: 'Georgetown' },

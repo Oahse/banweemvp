@@ -7,10 +7,16 @@ import { Country } from './index';
 export const india: Country = {
   code: 'IN',
   name: 'India',
+  flag: '🇮🇳',
+  capital: 'New Delhi',
+  area: 3287263,
+  currencySymbol: '₹',
+  officialLanguages: ['Hindi', 'English'],
+  demonym: 'Indian',
   taxInfo: { standardRate: 18, taxName: 'GST', currency: 'INR', region: 'APAC' },
-  provinces: [
+  divisions: [
     // Major States
-    { code: 'UP', name: 'Uttar Pradesh',
+    { code: 'UP', name: 'Uttar Pradesh', type: 'state',
       cities: [
         { code: 'LUCKNOW', name: 'Lucknow' },
         { code: 'KANPUR', name: 'Kanpur' },
@@ -24,7 +30,7 @@ export const india: Country = {
         { code: 'ALIGARH', name: 'Aligarh' }
       ]
     },
-    { code: 'MH', name: 'Maharashtra',
+    { code: 'MH', name: 'Maharashtra', type: 'state',
       cities: [
         { code: 'MUMBAI', name: 'Mumbai' },
         { code: 'PUNE', name: 'Pune' },
@@ -38,7 +44,7 @@ export const india: Country = {
         { code: 'NAGPUR2', name: 'Nagpur' }
       ]
     },
-    { code: 'BR', name: 'Bihar',
+    { code: 'BR', name: 'Bihar', type: 'state',
       cities: [
         { code: 'PATNA', name: 'Patna' },
         { code: 'GAYA', name: 'Gaya' },
@@ -52,7 +58,7 @@ export const india: Country = {
         { code: 'DEHRADUN', name: 'Dehradun' }
       ]
     },
-    { code: 'WB', name: 'West Bengal',
+    { code: 'WB', name: 'West Bengal', type: 'state',
       cities: [
         { code: 'KOLKATA', name: 'Kolkata' },
         { code: 'HOWRAH', name: 'Howrah' },
@@ -66,7 +72,7 @@ export const india: Country = {
         { code: 'HOOGHLY', name: 'Hooghly' }
       ]
     },
-    { code: 'MP', name: 'Madhya Pradesh',
+    { code: 'MP', name: 'Madhya Pradesh', type: 'state',
       cities: [
         { code: 'BHOPAL', name: 'Bhopal' },
         { code: 'INDORE', name: 'Indore' },
@@ -80,7 +86,7 @@ export const india: Country = {
         { code: 'KHANDWA', name: 'Khandwa' }
       ]
     },
-    { code: 'TN', name: 'Tamil Nadu',
+    { code: 'TN', name: 'Tamil Nadu', type: 'state',
       cities: [
         { code: 'CHENNAI', name: 'Chennai' },
         { code: 'COIMBATORE', name: 'Coimbatore' },
@@ -94,7 +100,7 @@ export const india: Country = {
         { code: 'ERODE', name: 'Erode' }
       ]
     },
-    { code: 'RJ', name: 'Rajasthan',
+    { code: 'RJ', name: 'Rajasthan', type: 'state',
       cities: [
         { code: 'JAIPUR', name: 'Jaipur' },
         { code: 'JODHPUR', name: 'Jodhpur' },
@@ -108,7 +114,7 @@ export const india: Country = {
         { code: 'PUSHPAK', name: 'Pushkar' }
       ]
     },
-    { code: 'KA', name: 'Karnataka',
+    { code: 'KA', name: 'Karnataka', type: 'state',
       cities: [
         { code: 'BENGALURU', name: 'Bengaluru' },
         { code: 'MYSURU', name: 'Mysuru' },
@@ -122,7 +128,7 @@ export const india: Country = {
         { code: 'SHIVAMOGGA', name: 'Shivamogga' }
       ]
     },
-    { code: 'GJ', name: 'Gujarat',
+    { code: 'GJ', name: 'Gujarat', type: 'state',
       cities: [
         { code: 'AHMEDABAD', name: 'Ahmedabad' },
         { code: 'SURAT', name: 'Surat' },
@@ -136,7 +142,7 @@ export const india: Country = {
         { code: 'MEHSANA', name: 'Mehsana' }
       ]
     },
-    { code: 'AP', name: 'Andhra Pradesh',
+    { code: 'AP', name: 'Andhra Pradesh', type: 'state',
       cities: [
         { code: 'VISAKHAPATNAM', name: 'Visakhapatnam' },
         { code: 'VIJAYAWADA', name: 'Vijayawada' },
@@ -150,7 +156,7 @@ export const india: Country = {
         { code: 'ELURU', name: 'Eluru' }
       ]
     },
-    { code: 'OR', name: 'Odisha',
+    { code: 'OR', name: 'Odisha', type: 'state',
       cities: [
         { code: 'BHUBANESWAR', name: 'Bhubaneswar' },
         { code: 'CUTTACK', name: 'Cuttack' },
@@ -164,7 +170,7 @@ export const india: Country = {
         { code: 'BHADRAK', name: 'Bhadrak' }
       ]
     },
-    { code: 'TS', name: 'Telangana',
+    { code: 'TS', name: 'Telangana', type: 'state',
       cities: [
         { code: 'HYDERABAD', name: 'Hyderabad' },
         { code: 'WARANGAL', name: 'Warangal' },
@@ -178,7 +184,7 @@ export const india: Country = {
         { code: 'SIDDIPET', name: 'Siddipet' }
       ]
     },
-    { code: 'KL', name: 'Kerala',
+    { code: 'KL', name: 'Kerala', type: 'state',
       cities: [
         { code: 'THIRUVANANTHAPURAM', name: 'Thiruvananthapuram' },
         { code: 'KOCHI', name: 'Kochi' },
@@ -192,7 +198,7 @@ export const india: Country = {
         { code: 'KASARGOD', name: 'Kasaragod' }
       ]
     },
-    { code: 'JH', name: 'Jharkhand',
+    { code: 'JH', name: 'Jharkhand', type: 'state',
       cities: [
         { code: 'RANCHI', name: 'Ranchi' },
         { code: 'JAMSHEDPUR', name: 'Jamshedpur' },
@@ -206,7 +212,7 @@ export const india: Country = {
         { code: 'CHAIBASA', name: 'Chaibasa' }
       ]
     },
-    { code: 'AS', name: 'Assam',
+    { code: 'AS', name: 'Assam', type: 'state',
       cities: [
         { code: 'GUWAHATI', name: 'Guwahati' },
         { code: 'SILCHAR', name: 'Silchar' },
@@ -220,7 +226,7 @@ export const india: Country = {
         { code: 'SUALKUCHI', name: 'Sualkuchi' }
       ]
     },
-    { code: 'PB', name: 'Punjab',
+    { code: 'PB', name: 'Punjab', type: 'state',
       cities: [
         { code: 'CHANDIGARH', name: 'Chandigarh' },
         { code: 'LUDHIANA', name: 'Ludhiana' },
@@ -234,7 +240,7 @@ export const india: Country = {
         { code: 'PATHANKOT', name: 'Pathankot' }
       ]
     },
-    { code: 'CH', name: 'Chhattisgarh',
+    { code: 'CH', name: 'Chhattisgarh', type: 'state',
       cities: [
         { code: 'RAIPUR', name: 'Raipur' },
         { code: 'Bhilai', name: 'Bhilai' },
@@ -248,7 +254,7 @@ export const india: Country = {
         { code: 'DANTEWADA', name: 'Dantewada' }
       ]
     },
-    { code: 'HR', name: 'Haryana',
+    { code: 'HR', name: 'Haryana', type: 'state',
       cities: [
         { code: 'GURUGRAM', name: 'Gurugram' },
         { code: 'FARIDABAD', name: 'Faridabad' },
@@ -262,7 +268,7 @@ export const india: Country = {
         { code: 'PANCHKULA', name: 'Panchkula' }
       ]
     },
-    { code: 'UK', name: 'Uttarakhand',
+    { code: 'UK', name: 'Uttarakhand', type: 'state',
       cities: [
         { code: 'DEHRADUN', name: 'Dehradun' },
         { code: 'HARIDWAR', name: 'Haridwar' },
@@ -276,7 +282,7 @@ export const india: Country = {
         { code: 'MUSSOORIE', name: 'Mussoorie' }
       ]
     },
-    { code: 'HP', name: 'Himachal Pradesh',
+    { code: 'HP', name: 'Himachal Pradesh', type: 'state',
       cities: [
         { code: 'SHIMLA', name: 'Shimla' },
         { code: 'DHARAMSHALA', name: 'Dharamshala' },
@@ -290,7 +296,7 @@ export const india: Country = {
         { code: 'BILASPUR', name: 'Bilaspur' }
       ]
     },
-    { code: 'TR', name: 'Tripura',
+    { code: 'TR', name: 'Tripura', type: 'state',
       cities: [
         { code: 'AGARTALA', name: 'Agartala' },
         { code: 'UDAIPUR', name: 'Udaipur' },
@@ -304,7 +310,7 @@ export const india: Country = {
         { code: 'TELIAMURA', name: 'Teliamura' }
       ]
     },
-    { code: 'ML', name: 'Meghalaya',
+    { code: 'ML', name: 'Meghalaya', type: 'state',
       cities: [
         { code: 'SHILLONG', name: 'Shillong' },
         { code: 'TURA', name: 'Tura' },
@@ -318,7 +324,7 @@ export const india: Country = {
         { code: 'CHERRAPUNJI', name: 'Cherrapunji' }
       ]
     },
-    { code: 'MN', name: 'Manipur',
+    { code: 'MN', name: 'Manipur', type: 'state',
       cities: [
         { code: 'IMPHAL', name: 'Imphal' },
         { code: 'THOUBAL', name: 'Thoubal' },
@@ -332,7 +338,7 @@ export const india: Country = {
         { code: 'UKHRUL', name: 'Ukhrul' }
       ]
     },
-    { code: 'MZ', name: 'Mizoram',
+    { code: 'MZ', name: 'Mizoram', type: 'state',
       cities: [
         { code: 'AIZAWL', name: 'Aizawl' },
         { code: 'LUNGLEH', name: 'Lungleh' },
@@ -346,7 +352,7 @@ export const india: Country = {
         { code: 'SAITUAL', name: 'Saitual' }
       ]
     },
-    { code: 'NL', name: 'Nagaland',
+    { code: 'NL', name: 'Nagaland', type: 'state',
       cities: [
         { code: 'KOHIMA', name: 'Kohima' },
         { code: 'DIMAPUR', name: 'Dimapur' },
@@ -360,7 +366,7 @@ export const india: Country = {
         { code: 'PEREN', name: 'Peren' }
       ]
     },
-    { code: 'GA', name: 'Goa',
+    { code: 'GA', name: 'Goa', type: 'state',
       cities: [
         { code: 'PANAJI', name: 'Panaji' },
         { code: 'MARGAO', name: 'Margao' },
@@ -374,7 +380,7 @@ export const india: Country = {
         { code: 'CANACONA', name: 'Canacona' }
       ]
     },
-    { code: 'SK', name: 'Sikkim',
+    { code: 'SK', name: 'Sikkim', type: 'state',
       cities: [
         { code: 'GANGTOK', name: 'Gangtok' },
         { code: 'GANGTOK2', name: 'Gangtok North' },
@@ -389,7 +395,7 @@ export const india: Country = {
       ]
     },
     // Union Territories
-    { code: 'DL', name: 'Delhi',
+    { code: 'DL', name: 'Delhi', type: 'union territory',
       cities: [
         { code: 'DELHI', name: 'Delhi' },
         { code: 'NEW', name: 'New Delhi' },
@@ -403,7 +409,7 @@ export const india: Country = {
         { code: 'NORTHEAST', name: 'North East Delhi' }
       ]
     },
-    { code: 'JK', name: 'Jammu & Kashmir',
+    { code: 'JK', name: 'Jammu & Kashmir', type: 'union territory',
       cities: [
         { code: 'SRINAGAR', name: 'Srinagar' },
         { code: 'JAMMU', name: 'Jammu' },
@@ -417,7 +423,7 @@ export const india: Country = {
         { code: 'SHOPAIN', name: 'Shopian' }
       ]
     },
-    { code: 'LA', name: 'Ladakh',
+    { code: 'LA', name: 'Ladakh', type: 'union territory',
       cities: [
         { code: 'LEH', name: 'Leh' },
         { code: 'KARGIL', name: 'Kargil' },
@@ -431,7 +437,7 @@ export const india: Country = {
         { code: 'CHANGTHANG', name: 'Changthang' }
       ]
     },
-    { code: 'PY', name: 'Puducherry',
+    { code: 'PY', name: 'Puducherry', type: 'union territory',
       cities: [
         { code: 'PONDICHERRY', name: 'Pondicherry' },
         { code: 'KARAIKAL', name: 'Karaikal' },
@@ -445,7 +451,7 @@ export const india: Country = {
         { code: 'YANAM2', name: 'Yanam South' }
       ]
     },
-    { code: 'CT', name: 'Chandigarh',
+    { code: 'CT', name: 'Chandigarh', type: 'union territory',
       cities: [
         { code: 'CHANDIGARH', name: 'Chandigarh' },
         { code: 'SECTOR', name: 'Sector 17' },
@@ -459,7 +465,7 @@ export const india: Country = {
         { code: 'SECTOR9', name: 'Sector 43' }
       ]
     },
-    { code: 'AN', name: 'Andaman & Nicobar',
+    { code: 'AN', name: 'Andaman & Nicobar', type: 'union territory',
       cities: [
         { code: 'PORT', name: 'Port Blair' },
         { code: 'CAR', name: 'Car Nicobar' },
@@ -473,7 +479,7 @@ export const india: Country = {
         { code: 'RANGAT', name: 'Rangat' }
       ]
     },
-    { code: 'LD', name: 'Lakshadweep',
+    { code: 'LD', name: 'Lakshadweep', type: 'union territory',
       cities: [
         { code: 'KAVARATTI', name: 'Kavaratti' },
         { code: 'AGATTI', name: 'Agatti' },
@@ -487,7 +493,7 @@ export const india: Country = {
         { code: 'ANDROTH', name: 'Androth' }
       ]
     },
-    { code: 'DN', name: 'Dadra & Nagar Haveli',
+    { code: 'DN', name: 'Dadra & Nagar Haveli', type: 'union territory',
       cities: [
         { code: 'SILVASSA', name: 'Silvassa' },
         { code: 'DADRA', name: 'Dadra' },
@@ -501,7 +507,7 @@ export const india: Country = {
         { code: 'SILVASSA2', name: 'Silvassa North' }
       ]
     },
-    { code: 'DD', name: 'Daman & Diu',
+    { code: 'DD', name: 'Daman & Diu', type: 'union territory',
       cities: [
         { code: 'DIU', name: 'Diu' },
         { code: 'DAMAN', name: 'Daman' },

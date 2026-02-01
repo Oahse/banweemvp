@@ -1,5 +1,5 @@
 /**
- * South Korea country data with provinces, cities, and tax information
+ * South Korea country data with provinces and special cities
  */
 
 import { Country } from './index';
@@ -7,9 +7,15 @@ import { Country } from './index';
 export const southkorea: Country = {
   code: 'KR',
   name: 'South Korea',
+  flag: '🇰🇷',
+  capital: 'Seoul',
+  area: 100210,
+  currencySymbol: '₩',
+  officialLanguages: ['Korean'],
+  demonym: 'South Korean',
   taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'KRW', region: 'APAC' },
-  provinces: [
-    { code: 'SEOUL', name: 'Seoul',
+  divisions: [
+    { code: 'SEOUL', name: 'Seoul', type: 'special city',
       cities: [
         { code: 'SEOUL', name: 'Seoul' },
         { code: 'GANGNAM', name: 'Gangnam' },
@@ -23,7 +29,7 @@ export const southkorea: Country = {
         { code: 'DONGDAEMUN', name: 'Dongdaemun' }
       ]
     },
-    { code: 'BUSAN', name: 'Busan',
+    { code: 'BUSAN', name: 'Busan', type: 'metropolitan city',
       cities: [
         { code: 'BUSAN', name: 'Busan' },
         { code: 'HAEUNDAE', name: 'Haeundae' },
@@ -37,7 +43,7 @@ export const southkorea: Country = {
         { code: 'JUNG', name: 'Jung' }
       ]
     },
-    { code: 'INCHEON', name: 'Incheon',
+    { code: 'INCHEON', name: 'Incheon', type: 'metropolitan city',
       cities: [
         { code: 'INCHEON', name: 'Incheon' },
         { code: 'BUPYEONG', name: 'Bupyeong' },
@@ -49,7 +55,7 @@ export const southkorea: Country = {
         { code: 'SEOGU', name: 'Seogu' }
       ]
     },
-    { code: 'DAEGU', name: 'Daegu',
+    { code: 'DAEGU', name: 'Daegu', type: 'metropolitan city',
       cities: [
         { code: 'DAEGU', name: 'Daegu' },
         { code: 'JUNG', name: 'Jung' },
@@ -61,7 +67,7 @@ export const southkorea: Country = {
         { code: 'DALSEONG', name: 'Dalseong' }
       ]
     },
-    { code: 'DAEJEON', name: 'Daejeon',
+    { code: 'DAEJEON', name: 'Daejeon', type: 'metropolitan city',
       cities: [
         { code: 'DAEJEON', name: 'Daejeon' },
         { code: 'JUNG', name: 'Jung' },
@@ -71,7 +77,7 @@ export const southkorea: Country = {
         { code: 'DAEDUK', name: 'Daedeok' }
       ]
     },
-    { code: 'GWANGJU', name: 'Gwangju',
+    { code: 'GWANGJU', name: 'Gwangju', type: 'metropolitan city',
       cities: [
         { code: 'GWANGJU', name: 'Gwangju' },
         { code: 'DONG', name: 'Dong' },
@@ -81,7 +87,26 @@ export const southkorea: Country = {
         { code: 'GWANGSAN', name: 'Gwangsan' }
       ]
     },
-    { code: 'GYEONGGI', name: 'Gyeonggi',
+    { code: 'ULSAN', name: 'Ulsan', type: 'metropolitan city',
+      cities: [
+        { code: 'ULSAN', name: 'Ulsan' },
+        { code: 'NAM', name: 'Nam' },
+        { code: 'BUK', name: 'Buk' },
+        { code: 'DONG', name: 'Dong' },
+        { code: 'JUNG', name: 'Jung' },
+        { code: 'ULJU', name: 'Ulju' }
+      ]
+    },
+    { code: 'SEJONG', name: 'Sejong', type: 'special self-governing city',
+      cities: [
+        { code: 'SEJONG', name: 'Sejong' },
+        { code: 'SEJONG', name: 'Sejong City' },
+        { code: 'HANSOL', name: 'Hansol' },
+        { code: 'BOMUN', name: 'Bomun' },
+        { code: 'SOCHON', name: 'Sochon' }
+      ]
+    },
+    { code: 'GYEONGGI', name: 'Gyeonggi', type: 'province',
       cities: [
         { code: 'SUWON', name: 'Suwon' },
         { code: 'SEONGNAM', name: 'Seongnam' },
@@ -97,7 +122,7 @@ export const southkorea: Country = {
         { code: 'NAMYANGJU', name: 'Namyangju' }
       ]
     },
-    { code: 'GANGWON', name: 'Gangwon',
+    { code: 'GANGWON', name: 'Gangwon', type: 'province',
       cities: [
         { code: 'CHUNCHEON', name: 'Chuncheon' },
         { code: 'WONJU', name: 'Wonju' },
@@ -112,9 +137,8 @@ export const southkorea: Country = {
         { code: 'YEONGWOL', name: 'Yeongwol' }
       ]
     },
-    { code: 'CHUNGBUK', name: 'North Chungcheong',
+    { code: 'CHUNGBUK', name: 'North Chungcheong', type: 'province',
       cities: [
-        { code: 'CHEONGJU', name: 'Cheongju' },
         { code: 'CHEONGJU', name: 'Cheongju' },
         { code: 'CHUNGJU', name: 'Chungju' },
         { code: 'JEONGEUP', name: 'Jeongeup' },
@@ -124,11 +148,11 @@ export const southkorea: Country = {
         { code: 'JECHON', name: 'Jecheon' },
         { code: 'EUMSEONG', name: 'Eumseong' },
         { code: 'DANYANG', name: 'Danyang' },
-        { code: 'JINCHUN', name: 'Jincheon' },
+        { code: 'JINCHUN', name: 'Jinchun' },
         { code: 'GOESAN', name: 'Goesan' }
       ]
     },
-    { code: 'CHUNGNAM', name: 'South Chungcheong',
+    { code: 'CHUNGNAM', name: 'South Chungcheong', type: 'province',
       cities: [
         { code: 'DAEJEON', name: 'Daejeon' },
         { code: 'CHEONAN', name: 'Cheonan' },
@@ -137,16 +161,10 @@ export const southkorea: Country = {
         { code: 'GONGJU', name: 'Gongju' },
         { code: 'NONSAN', name: 'Nonsan' },
         { code: 'GYERYONG', name: 'Gyeryong' },
-        { code: 'BORYEONG', name: 'Boryeong' },
-        { code: 'JEONJU', name: 'Jeonju' },
-        { code: 'MOKEPO', name: 'Mokpo' },
-        { code: 'YEOSU', name: 'Yeosu' },
-        { code: 'SUNCHANG', name: 'Sunchang' },
-        { code: 'NAMWON', name: 'Namwon' },
-        { code: 'JANGSU', name: 'Jangsu' }
+        { code: 'BORYEONG', name: 'Boryeong' }
       ]
     },
-    { code: 'JEONBUK', name: 'North Jeolla',
+    { code: 'JEONBUK', name: 'North Jeolla', type: 'province',
       cities: [
         { code: 'JEONJU', name: 'Jeonju' },
         { code: 'GIMJE', name: 'Gimje' },
@@ -160,7 +178,7 @@ export const southkorea: Country = {
         { code: 'BORYEONG', name: 'Boryeong' }
       ]
     },
-    { code: 'JEONNAM', name: 'South Jeolla',
+    { code: 'JEONNAM', name: 'South Jeolla', type: 'province',
       cities: [
         { code: 'GWANGJU', name: 'Gwangju' },
         { code: 'MOKEPO', name: 'Mokpo' },
@@ -179,7 +197,7 @@ export const southkorea: Country = {
         { code: 'SINAN', name: 'Sinan' }
       ]
     },
-    { code: 'GYEONGBUK', name: 'North Gyeongsang',
+    { code: 'GYEONGBUK', name: 'North Gyeongsang', type: 'province',
       cities: [
         { code: 'DAEGU', name: 'Daegu' },
         { code: 'POHANG', name: 'Pohang' },
@@ -191,11 +209,10 @@ export const southkorea: Country = {
         { code: 'SANGJU', name: 'Sangju' },
         { code: 'MUNGYEONG', name: 'Mungyeong' },
         { code: 'UIJEONG', name: 'Uijeongbu' },
-        { code: 'GUMI', name: 'Gumi' },
-        { code: 'POHANG', name: 'Pohang' }
+        { code: 'GUMI', name: 'Gumi' }
       ]
     },
-    { code: 'GYEONGNAM', name: 'South Gyeongsang',
+    { code: 'GYEONGNAM', name: 'South Gyeongsang', type: 'province',
       cities: [
         { code: 'BUSAN', name: 'Busan' },
         { code: 'ULSAN', name: 'Ulsan' },
@@ -210,15 +227,12 @@ export const southkorea: Country = {
         { code: 'HAMAN', name: 'Haman' },
         { code: 'CHANGNYEONG', name: 'Changnyeong' },
         { code: 'GIMHAE', name: 'Gimhae' },
-        { code: 'SUNGCHEON', name: 'Sungcheon' },
-        { code: 'TONGYEONG', name: 'Tongyeong' }
+        { code: 'SUNGCHEON', name: 'Sungcheon' }
       ]
     },
-    { code: 'JEJU', name: 'Jeju',
+    { code: 'JEJU', name: 'Jeju', type: 'special self-governing province',
       cities: [
         { code: 'JEJU', name: 'Jeju City' },
-        { code: 'SEOGWIPO', name: 'Seogwipo' },
-        { code: 'JEJU', name: 'Jeju' },
         { code: 'SEOGWIPO', name: 'Seogwipo' },
         { code: 'JEJU', name: 'Jeju' },
         { code: 'SEOGWIPO', name: 'Seogwipo' },

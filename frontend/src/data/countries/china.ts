@@ -1,5 +1,5 @@
 /**
- * China country data with provinces, cities, and tax information
+ * China country data with provinces, municipalities, and cities
  */
 
 import { Country } from './index';
@@ -7,146 +7,156 @@ import { Country } from './index';
 export const china: Country = {
     code: 'CN',
     name: 'China',
+    flag: '🇨🇳',
+    capital: 'Beijing',
+    area: 9596961,
+    currencySymbol: '¥',
+    officialLanguages: ['Mandarin'],
+    demonym: 'Chinese',
     taxInfo: { standardRate: 13, taxName: 'VAT', currency: 'CNY', region: 'APAC' },
-    provinces: [
-      { code: 'BEIJING', name: 'Beijing',
+    divisions: [
+      { code: 'BJ', name: 'Beijing', type: 'municipality',
         cities: [
           { code: 'BEIJING', name: 'Beijing' },
-          { code: 'SHANGHAI', name: 'Shanghai' },
-          { code: 'GUANGZHOU', name: 'Guangzhou' },
-          { code: 'SHENZHEN', name: 'Shenzhen' },
-          { code: 'CHENGDU', name: 'Chengdu' },
-          { code: 'HANGZHOU', name: 'Hangzhou' },
-          { code: 'WUHAN', name: 'Wuhan' },
-          { code: 'XIAN', name: 'Xian' },
-          { code: 'CHONGQING', name: 'Chongqing' },
-          { code: 'TIANJIN', name: 'Tianjin' }
+          { code: 'DONGCHENG', name: 'Dongcheng' },
+          { code: 'XICHENG', name: 'Xicheng' },
+          { code: 'CHAOYANG', name: 'Chaoyang' },
+          { code: 'FENGTAI', name: 'Fengtai' }
         ]
       },
-      { code: 'SHANGHAI', name: 'Shanghai',
+      { code: 'SH', name: 'Shanghai', type: 'municipality',
         cities: [
           { code: 'SHANGHAI', name: 'Shanghai' },
-          { code: 'BEIJING', name: 'Beijing' },
-          { code: 'GUANGZHOU', name: 'Guangzhou' },
-          { code: 'SHENZHEN', name: 'Shenzhen' },
-          { code: 'CHENGDU', name: 'Chengdu' },
-          { code: 'HANGZHOU', name: 'Hangzhou' },
-          { code: 'WUHAN', name: 'Wuhan' },
-          { code: 'XIAN', name: 'Xian' },
-          { code: 'CHONGQING', name: 'Chongqing' },
-          { code: 'TIANJIN', name: 'Tianjin' }
+          { code: 'HUANGPU', name: 'Huangpu' },
+          { code: 'XUHUI', name: 'Xuhui' },
+          { code: 'CHANGNING', name: 'Changning' },
+          { code: 'JINGAN', name: 'Jingan' }
         ]
       },
-      { code: 'GUANGDONG', name: 'Guangdong',
+      { code: 'TJ', name: 'Tianjin', type: 'municipality',
+        cities: [
+          { code: 'TIANJIN', name: 'Tianjin' },
+          { code: 'HEPING', name: 'Heping' },
+          { code: 'HEXI', name: 'Hexi' },
+          { code: 'NANKAI', name: 'Nankai' },
+          { code: 'HEBEI', name: 'Hebei' }
+        ]
+      },
+      { code: 'CQ', name: 'Chongqing', type: 'municipality',
+        cities: [
+          { code: 'CHONGQING', name: 'Chongqing' },
+          { code: 'YUZHONG', name: 'Yuzhong' },
+          { code: 'JIANGBEI', name: 'Jiangbei' },
+          { code: 'SHAPINGBA', name: 'Shapingba' },
+          { code: 'JIULONGPO', name: 'Jiulongpo' }
+        ]
+      },
+      { code: 'GD', name: 'Guangdong', type: 'province',
         cities: [
           { code: 'GUANGZHOU', name: 'Guangzhou' },
           { code: 'SHENZHEN', name: 'Shenzhen' },
           { code: 'DONGGUAN', name: 'Dongguan' },
           { code: 'FOSHAN', name: 'Foshan' },
-          { code: 'ZHONGSHAN', name: 'Zhongshan' },
-          { code: 'ZHUHAI', name: 'Zhuhai' },
-          { code: 'JIANGMEN', name: 'Jiangmen' },
-          { code: 'ZHAOQING', name: 'Zhaoqing' },
-          { code: 'HUZHOU', name: 'Huizhou' },
-          { code: 'MEIZHOU', name: 'Meizhou' }
+          { code: 'ZHONGSHAN', name: 'Zhongshan' }
         ]
       },
-      { code: 'JIANGSU', name: 'Jiangsu',
+      { code: 'JS', name: 'Jiangsu', type: 'province',
         cities: [
           { code: 'NANJING', name: 'Nanjing' },
           { code: 'SUZHOU', name: 'Suzhou' },
           { code: 'WUXI', name: 'Wuxi' },
           { code: 'CHANGZHOU', name: 'Changzhou' },
-          { code: 'NANTONG', name: 'Nantong' },
-          { code: 'YANGZHOU', name: 'Yangzhou' },
-          { code: 'TAIZHOU', name: 'Taizhou' },
-          { code: 'ZHENJIANG', name: 'Zhenjiang' },
-          { code: 'LIANYUNGANG', name: 'Lianyungang' },
-          { code: 'XUZHOU', name: 'Xuzhou' }
+          { code: 'NANTONG', name: 'Nantong' }
         ]
       },
-      { code: 'ZHEJIANG', name: 'Zhejiang',
+      { code: 'ZJ', name: 'Zhejiang', type: 'province',
         cities: [
           { code: 'HANGZHOU', name: 'Hangzhou' },
           { code: 'NINGBO', name: 'Ningbo' },
           { code: 'WENZHOU', name: 'Wenzhou' },
           { code: 'JINHUA', name: 'Jinhua' },
-          { code: 'JIAO', name: 'Jiaxing' },
-          { code: 'TAIZHOU', name: 'Taizhou' },
-          { code: 'SHAOXING', name: 'Shaoxing' },
-          { code: 'QUZHOU', name: 'Quzhou' },
-          { code: 'ZHoushan', name: 'Zhoushan' },
-          { code: 'LISHUI', name: 'Lishui' }
+          { code: 'JIAO', name: 'Jiaxing' }
         ]
       },
-      { code: 'SHANDONG', name: 'Shandong',
+      { code: 'SD', name: 'Shandong', type: 'province',
         cities: [
           { code: 'JINAN', name: 'Jinan' },
           { code: 'QINGDAO', name: 'Qingdao' },
           { code: 'ZIBO', name: 'Zibo' },
           { code: 'ZAOZHUANG', name: 'Zaozhuang' },
-          { code: 'DONGING', name: 'Dongying' },
-          { code: 'YANTAI', name: 'Yantai' },
-          { code: 'WEIHAI', name: 'Weihai' },
-          { code: 'RIZHAO', name: 'Rizhao' },
-          { code: 'LAIWU', name: 'Laiwu' },
-          { code: 'LINYI', name: 'Linyi' }
+          { code: 'DONGING', name: 'Dongying' }
         ]
       },
-      { code: 'HENAN', name: 'Henan',
+      { code: 'HN', name: 'Henan', type: 'province',
         cities: [
           { code: 'ZHENGZHOU', name: 'Zhengzhou' },
           { code: 'LUOYANG', name: 'Luoyang' },
           { code: 'KAIFENG', name: 'Kaifeng' },
           { code: 'ANYANG', name: 'Anyang' },
-          { code: 'XINXIANG', name: 'Xinxiang' },
-          { code: 'JIAOZUO', name: 'Jiaozuo' },
-          { code: 'Puyang', name: 'Puyang' },
-          { code: 'XUCHANG', name: 'Xuchang' },
-          { code: 'LUOHE', name: 'Luohe' },
-          { code: 'SANMENXIA', name: 'Sanmenxia' }
+          { code: 'XINXIANG', name: 'Xinxiang' }
         ]
       },
-      { code: 'SICHUAN', name: 'Sichuan',
+      { code: 'SC', name: 'Sichuan', type: 'province',
         cities: [
           { code: 'CHENGDU', name: 'Chengdu' },
           { code: 'MIANYANG', name: 'Mianyang' },
           { code: 'DEYANG', name: 'Deyang' },
           { code: 'NANCHONG', name: 'Nanchong' },
-          { code: 'YIBIN', name: 'Yibin' },
-          { code: 'GUANGYUAN', name: 'Guangyuan' },
-          { code: 'DAZHOU', name: 'Dazhou' },
-          { code: 'LESHAN', name: 'Leshan' },
-          { code: 'NEIJIANG', name: 'Neijiang' },
-          { code: 'ZIGONG', name: 'Zigong' }
+          { code: 'YIBIN', name: 'Yibin' }
         ]
       },
-      { code: 'HUBEI', name: 'Hubei',
+      { code: 'HB', name: 'Hubei', type: 'province',
         cities: [
           { code: 'WUHAN', name: 'Wuhan' },
           { code: 'HUANGSHI', name: 'Huangshi' },
           { code: 'SHIYAN', name: 'Shiyan' },
           { code: 'YICHANG', name: 'Yichang' },
-          { code: 'XIANGYANG', name: 'Xiangyang' },
-          { code: 'EZHOU', name: 'Ezhou' },
-          { code: 'JINGMEN', name: 'Jingmen' },
-          { code: 'XIAOGAN', name: 'Xiaogan' },
-          { code: 'JINGZHOU', name: 'Jingzhou' },
-          { code: 'HUANGGANG', name: 'Huanggang' }
+          { code: 'XIANGYANG', name: 'Xiangyang' }
         ]
       },
-      { code: 'HUNAN', name: 'Hunan',
+      { code: 'XJ', name: 'Xinjiang', type: 'autonomous region',
         cities: [
-          { code: 'CHANGSHA', name: 'Changsha' },
-          { code: 'ZHUZHOU', name: 'Zhuzhou' },
-          { code: 'XIANGTAN', name: 'Xiangtan' },
-          { code: 'HENGYANG', name: 'Hengyang' },
-          { code: 'SHAoyang', name: 'Shaoyang' },
-          { code: 'YUEYANG', name: 'Yueyang' },
-          { code: 'CHANGDE', name: 'Changde' },
-          { code: 'ZHANGJIAJIE', name: 'Zhangjiajie' },
-          { code: 'YIYANG', name: 'Yiyang' },
-          { code: 'CHENZHOU', name: 'Chenzhou' }
+          { code: 'URUMQI', name: 'Urumqi' },
+          { code: 'KARAMAY', name: 'Karamay' },
+          { code: 'TURPAN', name: 'Turpan' },
+          { code: 'HAMI', name: 'Hami' },
+          { code: 'KASHGAR', name: 'Kashgar' }
+        ]
+      },
+      { code: 'GX', name: 'Guangxi', type: 'autonomous region',
+        cities: [
+          { code: 'NANNING', name: 'Nanning' },
+          { code: 'LIUZHOU', name: 'Liuzhou' },
+          { code: 'GUILIN', name: 'Guilin' },
+          { code: 'WUZHOU', name: 'Wuzhou' },
+          { code: 'BEIHAI', name: 'Beihai' }
+        ]
+      },
+      { code: 'NM', name: 'Inner Mongolia', type: 'autonomous region',
+        cities: [
+          { code: 'HOHHOT', name: 'Hohhot' },
+          { code: 'BAOTOU', name: 'Baotou' },
+          { code: 'ORDOS', name: 'Ordos' },
+          { code: 'WUHAI', name: 'Wuhai' },
+          { code: 'CHIFENG', name: 'Chifeng' }
+        ]
+      },
+      { code: 'NX', name: 'Ningxia', type: 'autonomous region',
+        cities: [
+          { code: 'YINCHUAN', name: 'Yinchuan' },
+          { code: 'SHIZUISHAN', name: 'Shizuishan' },
+          { code: 'WUZHONG', name: 'Wuzhong' },
+          { code: 'ZHONGWEI', name: 'Zhongwei' },
+          { code: 'GUYUAN', name: 'Guyuan' }
+        ]
+      },
+      { code: 'XZ', name: 'Tibet', type: 'autonomous region',
+        cities: [
+          { code: 'LHASA', name: 'Lhasa' },
+          { code: 'SHIGATSE', name: 'Shigatse' },
+          { code: 'CHAMDO', name: 'Chamdo' },
+          { code: 'NYINGCHI', name: 'Nyingchi' },
+          { code: 'QAMDO', name: 'Qamdo' }
         ]
       }
     ]

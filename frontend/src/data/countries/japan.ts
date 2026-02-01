@@ -7,91 +7,82 @@ import { Country } from './index';
 export const japan: Country = {
   code: 'JP',
   name: 'Japan',
+  flag: '🇯🇵',
+  capital: 'Tokyo',
+  area: 377975,
+  currencySymbol: '¥',
+  officialLanguages: ['Japanese'],
+  demonym: 'Japanese',
   taxInfo: { standardRate: 10, taxName: 'Consumption Tax', currency: 'JPY', region: 'APAC' },
-  provinces: [
-    { code: 'HOKKAIDO', name: 'Hokkaido',
+  divisions: [
+    { code: 'HOKKAIDO', name: 'Hokkaido', type: 'prefecture',
       cities: [
         { code: 'SAPPORO', name: 'Sapporo' },
         { code: 'HAKODATE', name: 'Hakodate' },
         { code: 'ASAHIKAWA', name: 'Asahikawa' }
       ]
     },
-    { code: 'TOHOKU', name: 'Tohoku',
+    { code: 'AOMORI', name: 'Aomori', type: 'prefecture',
+      cities: [
+        { code: 'AOMORI', name: 'Aomori' },
+        { code: 'HIROSAKI', name: 'Hirosaki' },
+        { code: 'KUROISHI', name: 'Kuroishi' }
+      ]
+    },
+    { code: 'IWATE', name: 'Iwate', type: 'prefecture',
+      cities: [
+        { code: 'MORIOKA', name: 'Morioka' },
+        { code: 'ICHINOSEKI', name: 'Ichinoseki' },
+        { code: 'OFUNATO', name: 'Ofunato' }
+      ]
+    },
+    { code: 'MIYAGI', name: 'Miyagi', type: 'prefecture',
       cities: [
         { code: 'SENDAI', name: 'Sendai' },
-        { code: 'AKITA', name: 'Akita' },
-        { code: 'AOMORI', name: 'Aomori' },
-        { code: 'MORIOKA', name: 'Morioka' },
-        { code: 'FUKUSHIMA', name: 'Fukushima' },
-        { code: 'YAMAGATA', name: 'Yamagata' }
+        { code: 'ISHINOMAKI', name: 'Ishinomaki' },
+        { code: 'TAGAJO', name: 'Tagajo' }
       ]
     },
-    { code: 'KANTO', name: 'Kanto',
+    { code: 'AKITA', name: 'Akita', type: 'prefecture',
+      cities: [
+        { code: 'AKITA', name: 'Akita' },
+        { code: 'YOKOTE', name: 'Yokote' },
+        { code: 'KAZUNO', name: 'Kazuno' }
+      ]
+    },
+    { code: 'YAMAGATA', name: 'Yamagata', type: 'prefecture',
+      cities: [
+        { code: 'YAMAGATA', name: 'Yamagata' },
+        { code: 'TSURUOKA', name: 'Tsuruoka' },
+        { code: 'SAGATA', name: 'Sagata' }
+      ]
+    },
+    { code: 'FUKUSHIMA', name: 'Fukushima', type: 'prefecture',
+      cities: [
+        { code: 'FUKUSHIMA', name: 'Fukushima' },
+        { code: 'IWAKI', name: 'Iwaki' },
+        { code: 'KORIYAMA', name: 'Koriyama' }
+      ]
+    },
+    { code: 'TOKYO', name: 'Tokyo', type: 'metropolis',
       cities: [
         { code: 'TOKYO', name: 'Tokyo' },
-        { code: 'YOKOHAMA', name: 'Yokohama' },
-        { code: 'SAITAMA', name: 'Saitama' },
-        { code: 'CHIBA', name: 'Chiba' },
-        { code: 'KANAGAWA', name: 'Kanagawa' },
-        { code: 'GUNMA', name: 'Gunma' },
-        { code: 'TOCHIGI', name: 'Tochigi' },
-        { code: 'IBARAKI', name: 'Ibaraki' }
+        { code: 'SHINJUKU', name: 'Shinjuku' },
+        { code: 'SHIBUYA', name: 'Shibuya' }
       ]
     },
-    { code: 'CHUBU', name: 'Chubu',
-      cities: [
-        { code: 'NAGOYA', name: 'Nagoya' },
-        { code: 'NIIGATA', name: 'Niigata' },
-        { code: 'TOYAMA', name: 'Toyama' },
-        { code: 'ISHIKAWA', name: 'Ishikawa' },
-        { code: 'FUKUI', name: 'Fukui' },
-        { code: 'YAMANASHI', name: 'Yamanashi' },
-        { code: 'NAGANO', name: 'Nagano' },
-        { code: 'GIFU', name: 'Gifu' },
-        { code: 'SHIZUOKA', name: 'Shizuoka' },
-        { code: 'AICHI', name: 'Aichi' }
-      ]
-    },
-    { code: 'KANSAI', name: 'Kansai',
+    { code: 'OSAKA', name: 'Osaka', type: 'prefecture',
       cities: [
         { code: 'OSAKA', name: 'Osaka' },
+        { code: 'SAKAI', name: 'Sakai' },
+        { code: 'HIGASHIOSAKA', name: 'Higashiosaka' }
+      ]
+    },
+    { code: 'KYOTO', name: 'Kyoto', type: 'prefecture',
+      cities: [
         { code: 'KYOTO', name: 'Kyoto' },
-        { code: 'KOBE', name: 'Kobe' },
-        { code: 'NARA', name: 'Nara' },
-        { code: 'WAKAYAMA', name: 'Wakayama' },
-        { code: 'SHIGA', name: 'Shiga' },
-        { code: 'HYOGO', name: 'Hyogo' }
-      ]
-    },
-    { code: 'CHUGOKU', name: 'Chugoku',
-      cities: [
-        { code: 'HIROSHIMA', name: 'Hiroshima' },
-        { code: 'OKAYAMA', name: 'Okayama' },
-        { code: 'SHIMANE', name: 'Shimane' },
-        { code: 'TOTTORI', name: 'Tottori' },
-        { code: 'YAMAGUCHI', name: 'Yamaguchi' }
-      ]
-    },
-    { code: 'SHIKOKU', name: 'Shikoku',
-      cities: [
-        { code: 'TAKAMATSU', name: 'Takamatsu' },
-        { code: 'MATSUYAMA', name: 'Matsuyama' },
-        { code: 'KOCHI', name: 'Kochi' },
-        { code: 'TOKUSHIMA', name: 'Tokushima' },
-        { code: 'EHIME', name: 'Ehime' }
-      ]
-    },
-    { code: 'KYUSHU', name: 'Kyushu',
-      cities: [
-        { code: 'FUKUOKA', name: 'Fukuoka' },
-        { code: 'KITAKYUSHU', name: 'Kitakyushu' },
-        { code: 'NAGASAKI', name: 'Nagasaki' },
-        { code: 'KUMAMOTO', name: 'Kumamoto' },
-        { code: 'OITA', name: 'Oita' },
-        { code: 'MIYAZAKI', name: 'Miyazaki' },
-        { code: 'KAGOSHIMA', name: 'Kagoshima' },
-        { code: 'SAGA', name: 'Saga' },
-        { code: 'OKINAWA', name: 'Okinawa' }
+        { code: 'UJI', name: 'Uji' },
+        { code: 'KAMEOKA', name: 'Kameoka' }
       ]
     }
   ]

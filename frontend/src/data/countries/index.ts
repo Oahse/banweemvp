@@ -3,12 +3,40 @@
  * Comprehensive list of 500+ countries with tax information
  */
 
+/**
+ * Country interface using the official division names for each country
+ */
 export interface Country {
-  code: string;
-  name: string;
-  provinces?: Province[];
-  taxInfo?: TaxInfo;
-}
+  code: string; // ISO 2-letter country code
+  name: string; // Full country name
+  flag: string; // Flag emoji
+  capital: string; // Capital city
+  area: number; // Area in square kilometers
+  currencySymbol: string; // Currency symbol (e.g., $, €, £)
+  officialLanguages: string[]; // Official languages
+  demonym: string; // Demonym (e.g., Canadian, American)
+  taxInfo: {
+    standardRate: number; // VAT or Sales Tax rate
+    taxName: string;       // VAT, GST, etc.
+    currency: string;      // ISO currency
+    region: string;        // region or continent
+  };
+  divisions: Array<{
+    code: string;          // division code
+    name: string;          // division name
+    type: string;          // official type: parish, province, state, national district, etc.
+    taxInfo?: {
+      standardRate: number; // VAT or Sales Tax rate
+      taxName: string;       // VAT, GST, etc.
+      currency: string;      // ISO currency
+      region: string;        // region or continent
+    };
+    cities: Array<{
+      code: string;        // city code
+      name: string;        // city name
+    }>;
+  }>;
+};
 
 export interface City {
   code: string;
@@ -28,7 +56,7 @@ export interface TaxInfo {
   taxName: string; // Primary tax name (VAT, GST, Sales Tax, etc.)
   taxTypes?: string[]; // All applicable tax types
   currency: string; // ISO currency code
-  region: 'EU' | 'NA' | 'APAC' | 'LATAM' | 'MEA' | 'Other';
+  region: string; // More flexible region string
 }
 
 export interface CountryOption {
@@ -55,25 +83,25 @@ export const getCountryByName = (name: string): Country | undefined => {
   return countries.find(country => country.name.toLowerCase() === name.toLowerCase());
 };
 
-export const getProvincesByCountry = (countryCode: string): Province[] => {
+export const getProvincesByCountry = (countryCode: string): any[] => {
   const country = getCountryByCode(countryCode);
-  return country?.provinces || [];
+  return country?.divisions || [];
 };
 
-export const getCitiesByProvince = (countryCode: string, provinceCode: string): City[] => {
+export const getCitiesByProvince = (countryCode: string, provinceCode: string): any[] => {
   const country = getCountryByCode(countryCode);
-  const province = country?.provinces?.find(p => p.code === provinceCode);
-  return province?.cities || [];
+  const division = country?.divisions?.find((d: any) => d.code === provinceCode);
+  return division?.cities || [];
 };
 
 export const getTaxInfo = (countryCode: string, provinceCode?: string): TaxInfo | null => {
   const country = getCountryByCode(countryCode);
   
-  // First check province-specific tax
-  if (provinceCode && country?.provinces) {
-    const province = country.provinces.find(p => p.code === provinceCode);
-    if (province?.taxInfo) {
-      return province.taxInfo;
+  // First check division-specific tax
+  if (provinceCode && country?.divisions) {
+    const division = country.divisions.find((d: any) => d.code === provinceCode);
+    if (division?.taxInfo) {
+      return division.taxInfo;
     }
   }
   
@@ -95,41 +123,41 @@ export const getCountryOptions = (): CountryOption[] => {
   return countries.map(country => ({
     value: country.code,
     label: country.name
-  })).sort((a, b) => a.label.localeCompare(b.label));
+  })).sort((a: any, b: any) => a.label.localeCompare(b.label));
 };
 
-export const getProvinceOptions = (countryCode: string): ProvinceOption[] => {
-  const provinces = getProvincesByCountry(countryCode);
-  return provinces.map(province => ({
-    value: province.code,
-    label: province.name
-  })).sort((a, b) => a.label.localeCompare(b.label));
+export const getProvinceOptions = (countryCode: string): any[] => {
+  const divisions = getProvincesByCountry(countryCode);
+  return divisions.map((division: any) => ({
+    value: division.code,
+    label: division.name
+  })).sort((a: any, b: any) => a.label.localeCompare(b.label));
 };
 
-export const getCityOptions = (countryCode: string, provinceCode: string): CityOption[] => {
+export const getCityOptions = (countryCode: string, provinceCode: string): any[] => {
   const cities = getCitiesByProvince(countryCode, provinceCode);
-  return cities.map(city => ({
+  return cities.map((city: any) => ({
     value: city.code,
     label: city.name
-  })).sort((a, b) => a.label.localeCompare(b.label));
+  })).sort((a: any, b: any) => a.label.localeCompare(b.label));
 };
 
 
-export const getProvinceByCode = (countryCode: string, provinceCode: string): Province | undefined => {
+export const getProvinceByCode = (countryCode: string, provinceCode: string): any | undefined => {
   const country = getCountryByCode(countryCode);
-  if (!country || !country.provinces) {
+  if (!country || !country.divisions) {
     return undefined;
   }
   
-  return country.provinces.find(province => province.code === provinceCode);
+  return country.divisions.find((division: any) => division.code === provinceCode);
 };
 
 export const getCountriesWithProvinces = (): Country[] => {
-  return countries.filter(country => country.provinces && country.provinces.length > 0);
+  return countries.filter(country => country.divisions && country.divisions.length > 0);
 };
 
 export const getCountriesWithoutProvinces = (): Country[] => {
-  return countries.filter(country => !country.provinces || country.provinces.length === 0);
+  return countries.filter(country => !country.divisions || country.divisions.length === 0);
 };
 
 export const searchCountries = (query: string): Country[] => {
@@ -140,16 +168,16 @@ export const searchCountries = (query: string): Country[] => {
   );
 };
 
-export const searchProvinces = (countryCode: string, query: string): Province[] => {
+export const searchProvinces = (countryCode: string, query: string): any[] => {
   const country = getCountryByCode(countryCode);
-  if (!country || !country.provinces) {
+  if (!country || !country.divisions) {
     return [];
   }
   
   const lowercaseQuery = query.toLowerCase();
-  return country.provinces.filter(province =>
-    province.name.toLowerCase().includes(lowercaseQuery) ||
-    province.code.toLowerCase().includes(lowercaseQuery)
+  return country.divisions.filter((division: any) =>
+    division.name.toLowerCase().includes(lowercaseQuery) ||
+    division.code.toLowerCase().includes(lowercaseQuery)
   );
 };
 

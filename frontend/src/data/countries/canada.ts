@@ -7,9 +7,15 @@ import { Country } from './index';
 export const canada: Country = {
     code: 'CA',
     name: 'Canada',
+    flag: '🇨🇦',
+    capital: 'Ottawa',
+    area: 9984670,
+    currencySymbol: '$',
+    officialLanguages: ['English', 'French'],
+    demonym: 'Canadian',
     taxInfo: { standardRate: 5, taxName: 'GST', currency: 'CAD', region: 'NA' },
-    provinces: [
-      { code: 'AB', name: 'Alberta', 
+    divisions: [
+      { code: 'AB', name: 'Alberta', type: 'province',
         taxInfo: { standardRate: 5, taxName: 'GST', currency: 'CAD', region: 'NA' },
         cities: [
           { code: 'CG', name: 'Calgary' },
@@ -24,7 +30,7 @@ export const canada: Country = {
           { code: 'VE', name: 'Vermilion' }
         ]
       },
-      { code: 'BC', name: 'British Columbia', 
+      { code: 'BC', name: 'British Columbia', type: 'province',
         taxInfo: { standardRate: 12, taxName: 'GST + PST', currency: 'CAD', region: 'NA' },
         cities: [
           { code: 'VA', name: 'Vancouver' },
@@ -39,7 +45,7 @@ export const canada: Country = {
           { code: 'LA', name: 'Langley' }
         ]
       },
-      { code: 'MB', name: 'Manitoba', 
+      { code: 'MB', name: 'Manitoba', type: 'province',
         taxInfo: { standardRate: 12, taxName: 'GST + PST', currency: 'CAD', region: 'NA' },
         cities: [
           { code: 'WI', name: 'Winnipeg' },
@@ -54,7 +60,7 @@ export const canada: Country = {
           { code: 'SW', name: 'Swan River' }
         ]
       },
-      { code: 'NB', name: 'New Brunswick', 
+      { code: 'NB', name: 'New Brunswick', type: 'province',
         taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' },
         cities: [
           { code: 'MO', name: 'Moncton' },
@@ -69,7 +75,7 @@ export const canada: Country = {
           { code: 'RO', name: 'Rothesay' }
         ]
       },
-      { code: 'NL', name: 'Newfoundland and Labrador', 
+      { code: 'NL', name: 'Newfoundland and Labrador', type: 'province',
         taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' },
         cities: [
           { code: 'ST', name: 'St. John\'s' },
@@ -84,7 +90,7 @@ export const canada: Country = {
           { code: 'HA', name: 'Harbour Grace' }
         ]
       },
-      { code: 'NS', name: 'Nova Scotia', 
+      { code: 'NS', name: 'Nova Scotia', type: 'province',
         taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' },
         cities: [
           { code: 'HA', name: 'Halifax' },
@@ -99,7 +105,7 @@ export const canada: Country = {
           { code: 'YO', name: 'Yarmouth' }
         ]
       },
-      { code: 'ON', name: 'Ontario', 
+      { code: 'ON', name: 'Ontario', type: 'province',
         taxInfo: { standardRate: 13, taxName: 'HST', currency: 'CAD', region: 'NA' },
         cities: [
           { code: 'TO', name: 'Toronto' },
@@ -114,7 +120,7 @@ export const canada: Country = {
           { code: 'VA2', name: 'Vaughan' }
         ]
       },
-      { code: 'PE', name: 'Prince Edward Island', 
+      { code: 'PE', name: 'Prince Edward Island', type: 'province',
         taxInfo: { standardRate: 15, taxName: 'HST', currency: 'CAD', region: 'NA' },
         cities: [
           { code: 'CH', name: 'Charlottetown' },
@@ -129,7 +135,7 @@ export const canada: Country = {
           { code: 'BR', name: 'Borden-Carleton' }
         ]
       },
-      { code: 'QC', name: 'Quebec', 
+      { code: 'QC', name: 'Quebec', type: 'province',
         taxInfo: { standardRate: 14.975, taxName: 'GST + QST', currency: 'CAD', region: 'NA' },
         cities: [
           { code: 'MO', name: 'Montreal' },
@@ -144,7 +150,7 @@ export const canada: Country = {
           { code: 'TE', name: 'Terrebonne' }
         ]
       },
-      { code: 'SK', name: 'Saskatchewan',
+      { code: 'SK', name: 'Saskatchewan', type: 'province',
         cities: [
           { code: 'SA', name: 'Saskatoon' },
           { code: 'RE', name: 'Regina' },
@@ -158,7 +164,7 @@ export const canada: Country = {
           { code: 'HU', name: 'Humboldt' }
         ]
       },
-      { code: 'NT', name: 'Northwest Territories',
+      { code: 'NT', name: 'Northwest Territories', type: 'territory',
         cities: [
           { code: 'YE', name: 'Yellowknife' },
           { code: 'HA', name: 'Hay River' },
@@ -172,7 +178,7 @@ export const canada: Country = {
           { code: 'PA', name: 'Paulatuk' }
         ]
       },
-      { code: 'NU', name: 'Nunavut',
+      { code: 'NU', name: 'Nunavut', type: 'territory',
         cities: [
           { code: 'IQ', name: 'Iqaluit' },
           { code: 'RA', name: 'Rankin Inlet' },
@@ -186,7 +192,7 @@ export const canada: Country = {
           { code: 'TA', name: 'Taloyoak' }
         ]
       },
-      { code: 'YT', name: 'Yukon',
+      { code: 'YT', name: 'Yukon', type: 'territory',
         cities: [
           { code: 'WH', name: 'Whitehorse' },
           { code: 'DA', name: 'Dawson City' },
