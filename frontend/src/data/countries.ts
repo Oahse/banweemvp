@@ -1401,21 +1401,8 @@ export const countries: Country[] = [
   name: 'Nigeria',
   taxInfo: { standardRate: 7.5, taxName: 'VAT', currency: 'NGN', region: 'MEA' },
   provinces: [
-    { code: 'LAGOS', name: 'Lagos',
-      cities: [
-        { code: 'LAGOS', name: 'Lagos' },
-        { code: 'IKEJA', name: 'Ikeja' },
-        { code: 'BADAGRY', name: 'Badagry' },
-        { code: 'EPE', name: 'Epe' },
-        { code: 'IKORODU', name: 'Ikorodu' },
-        { code: 'MUSHIN', name: 'Mushin' },
-        { code: 'OSHODI', name: 'Oshodi' },
-        { code: 'SURULERE', name: 'Surulere' },
-        { code: 'FESTAC', name: 'Festac Town' },
-        { code: 'VI', name: 'Victoria Island' }
-      ]
-    },
-    { code: 'ABUJA', name: 'Federal Capital Territory',
+    // Federal Capital Territory
+    { code: 'FCT', name: 'Federal Capital Territory',
       cities: [
         { code: 'ABUJA', name: 'Abuja' },
         { code: 'GWARINPA', name: 'Gwarinpa' },
@@ -1426,10 +1413,181 @@ export const countries: Country[] = [
         { code: 'JABI', name: 'Jabi' },
         { code: 'LIFE', name: 'Life Camp' },
         { code: 'KUBWA', name: 'Kubwa' },
-        { code: 'BWARO', name: 'Bwari' }
+        { code: 'BWARI', name: 'Bwari' }
       ]
     },
-    { code: 'KANO', name: 'Kano',
+    // North Central States
+    { code: 'KW', name: 'Kwara',
+      cities: [
+        { code: 'ILORIN', name: 'Ilorin' },
+        { code: 'OFFA', name: 'Offa' },
+        { code: 'OKE', name: 'Oke-Ode' },
+        { code: 'JEBBA', name: 'Jebba' },
+        { code: 'PATIGI', name: 'Patigi' },
+        { code: 'KAIMA', name: 'Kaima' },
+        { code: 'LAFIAGI', name: 'Lafiagi' },
+        { code: 'SHAO', name: 'Shao' },
+        { code: 'OYUN', name: 'Oyun' },
+        { code: 'EDIDI', name: 'Edidi' }
+      ]
+    },
+    { code: 'KO', name: 'Kogi',
+      cities: [
+        { code: 'LOKOJA', name: 'Lokoja' },
+        { code: 'OKENE', name: 'Okene' },
+        { code: 'KABBA', name: 'Kabba' },
+        { code: 'IDAH', name: 'Idah' },
+        { code: 'OGORI', name: 'Ogori' },
+        { code: 'DEKINA', name: 'Dekina' },
+        { code: 'ANYIGBA', name: 'Anyigba' },
+        { code: 'AJAOKUTA', name: 'Ajaokuta' },
+        { code: 'OBAJANA', name: 'Obajana' },
+        { code: 'BASSA', name: 'Bassa' }
+      ]
+    },
+    { code: 'BN', name: 'Benue',
+      cities: [
+        { code: 'MAKURDI', name: 'Makurdi' },
+        { code: 'GBOKO', name: 'Gboko' },
+        { code: 'OTUKPO', name: 'Otukpo' },
+        { code: 'KATSINA', name: 'Katsina-Ala' },
+        { code: 'VANDIKYA', name: 'Vandikya' },
+        { code: 'KONSHISHA', name: 'Konshisha' },
+        { code: 'GBOR', name: 'Gborko' },
+        { code: 'UKUM', name: 'Ukum' },
+        { code: 'LOGO', name: 'Logo' },
+        { code: 'TARKA', name: 'Tarka' }
+      ]
+    },
+    { code: 'PL', name: 'Plateau',
+      cities: [
+        { code: 'JOS', name: 'Jos' },
+        { code: 'BUKURU', name: 'Bukuru' },
+        { code: 'PANKSHIN', name: 'Pankshin' },
+        { code: 'SHENDAM', name: 'Shendam' },
+        { code: 'WASE', name: 'Wase' },
+        { code: 'LANGTANG', name: 'Langtang' },
+        { code: 'KANAM', name: 'Kanam' },
+        { code: 'KANKE', name: 'Kanke' },
+        { code: 'BARKIN', name: 'Barkin Ladi' },
+        { code: 'BOKKOS', name: 'Bokkos' }
+      ]
+    },
+    { code: 'NS', name: 'Nasarawa',
+      cities: [
+        { code: 'LAFIA', name: 'Lafia' },
+        { code: 'Keffi', name: 'Keffi' },
+        { code: 'AKWANGA', name: 'Akwanga' },
+        { code: 'KARU', name: 'Karu' },
+        { code: 'Doma', name: 'Doma' },
+        { code: 'NASSARAWA', name: 'Nassarawa' },
+        { code: 'OB', name: 'Obi' },
+        { code: 'WAMBA', name: 'Wamba' },
+        { code: 'TOTO', name: 'Toto' },
+        { code: 'KOKONA', name: 'Kokona' }
+      ]
+    },
+    { code: 'NI', name: 'Niger',
+      cities: [
+        { code: 'MINNA', name: 'Minna' },
+        { code: 'BIDA', name: 'Bida' },
+        { code: 'SULEJA', name: 'Suleja' },
+        { code: 'KONTAGORA', name: 'Kontagora' },
+        { code: 'LAPAI', name: 'Lapai' },
+        { code: 'AGAIE', name: 'Agaie' },
+        { code: 'MOKWA', name: 'Mokwa' },
+        { code: 'BORGU', name: 'Borgu' },
+        { code: 'MASHEGU', name: 'Mashegu' },
+        { code: 'RAFI', name: 'Rafi' }
+      ]
+    },
+    // North East States
+    { code: 'GM', name: 'Gombe',
+      cities: [
+        { code: 'GOMBE', name: 'Gombe' },
+        { code: 'KALTUNGO', name: 'Kaltungo' },
+        { code: 'BALANGA', name: 'Balanga' },
+        { code: 'FUNAKAYE', name: 'Funakaye' },
+        { code: 'BILLIRI', name: 'Billiri' },
+        { code: 'AKKO', name: 'Akko' },
+        { code: 'KWAMI', name: 'Kwami' },
+        { code: 'SHONGOM', name: 'Shongom' },
+        { code: 'DUKKU', name: 'Dukku' },
+        { code: 'NAFADA', name: 'Nafada' }
+      ]
+    },
+    { code: 'YB', name: 'Yobe',
+      cities: [
+        { code: 'DAMATURU', name: 'Damaturu' },
+        { code: 'POTISKUM', name: 'Potiskum' },
+        { code: 'GASHUA', name: 'Gashua' },
+        { code: 'NGURU', name: 'Nguru' },
+        { code: 'GEIDAM', name: 'Geidam' },
+        { code: 'BAYAMARI', name: 'Bayamari' },
+        { code: 'BUNI', name: 'Buni Yadi' },
+        { code: 'GULANI', name: 'Gulani' },
+        { code: 'GUJBA', name: 'Gujba' },
+        { code: 'TARMUWA', name: 'Tarmuwa' }
+      ]
+    },
+    { code: 'BO', name: 'Borno',
+      cities: [
+        { code: 'MAIDUGURI', name: 'Maiduguri' },
+        { code: 'BIU', name: 'Biu' },
+        { code: 'BAMA', name: 'Bama' },
+        { code: 'GWOZA', name: 'Gwoza' },
+        { code: 'DAMBOA', name: 'Damboa' },
+        { code: 'MONGUNO', name: 'Monguno' },
+        { code: 'KUKAWA', name: 'Kukawa' },
+        { code: 'KAGA', name: 'Kaga' },
+        { code: 'HAWUL', name: 'Hawul' },
+        { code: 'SHANI', name: 'Shani' }
+      ]
+    },
+    { code: 'AD', name: 'Adamawa',
+      cities: [
+        { code: 'YOLA', name: 'Yola' },
+        { code: 'JIMETA', name: 'Jimeta' },
+        { code: 'MUBI', name: 'Mubi' },
+        { code: 'NUMAN', name: 'Numan' },
+        { code: 'GIREI', name: 'Girei' },
+        { code: 'MAYO', name: 'Mayo-Belwa' },
+        { code: 'TOUNGO', name: 'Toungo' },
+        { code: 'DEMO', name: 'Demsa' },
+        { code: 'SHELL', name: 'Shelleng' },
+        { code: 'VERE', name: 'Vere' }
+      ]
+    },
+    { code: 'TR', name: 'Taraba',
+      cities: [
+        { code: 'JALINGO', name: 'Jalingo' },
+        { code: 'WUKARI', name: 'Wukari' },
+        { code: 'TAKUM', name: 'Takum' },
+        { code: 'BELLO', name: 'Bello' },
+        { code: 'GASHAKA', name: 'Gashaka' },
+        { code: 'KARIM', name: 'Karim Lamido' },
+        { code: 'ARDO', name: 'Ardo Kola' },
+        { code: 'SARDAUNA', name: 'Sardauna' },
+        { code: 'YORRO', name: 'Yorro' },
+        { code: 'IBI', name: 'Ibi' }
+      ]
+    },
+    { code: 'BA', name: 'Bauchi',
+      cities: [
+        { code: 'BAUCHI', name: 'Bauchi' },
+        { code: 'AZARE', name: 'Azare' },
+        { code: 'MISAU', name: 'Misau' },
+        { code: 'JAMA', name: 'Jama\'are' },
+        { code: 'KATAGUM', name: 'Katagum' },
+        { code: 'GANJUWA', name: 'Ganjuwa' },
+        { code: 'TAFAWA', name: 'Tafawa Balewa' },
+        { code: 'DARAZO', name: 'Darazo' },
+        { code: 'BOGORO', name: 'Bogoro' },
+        { code: 'KIRFI', name: 'Kirfi' }
+      ]
+    },
+    // North West States
+    { code: 'KN', name: 'Kano',
       cities: [
         { code: 'KANO', name: 'Kano' },
         { code: 'DUTSE', name: 'Dutse' },
@@ -1443,18 +1601,329 @@ export const countries: Country[] = [
         { code: 'SHANONO', name: 'Shanono' }
       ]
     },
-    { code: 'IBADAN', name: 'Oyo',
+    { code: 'KT', name: 'Katsina',
+      cities: [
+        { code: 'KATSINA', name: 'Katsina' },
+        { code: 'DAURA', name: 'Daura' },
+        { code: 'FUNTUA', name: 'Funtua' },
+        { code: 'MALUMFASHI', name: 'Malumfashi' },
+        { code: 'BAURE', name: 'Baure' },
+        { code: 'BINDAWA', name: 'Bindawa' },
+        { code: 'DANJA', name: 'Danja' },
+        { code: 'DUTSI', name: 'Dutsi' },
+        { code: 'INGAWA', name: 'Ingawa' },
+        { code: 'JIBIYA', name: 'Jibiya' }
+      ]
+    },
+    { code: 'KD', name: 'Kaduna',
+      cities: [
+        { code: 'KADUNA', name: 'Kaduna' },
+        { code: 'ZARIA', name: 'Zaria' },
+        { code: 'KAFANCHAN', name: 'Kafanchan' },
+        { code: 'KAGORO', name: 'Kagoro' },
+        { code: 'ZONKWA', name: 'Zonkwa' },
+        { code: 'KACHIA', name: 'Kachia' },
+        { code: 'KAGARKO', name: 'Kagarko' },
+        { code: 'BIRNIN', name: 'Birnin Gwari' },
+        { code: 'GIWA', name: 'Giwa' },
+        { code: 'IKARA', name: 'Ikara' }
+      ]
+    },
+    { code: 'SO', name: 'Sokoto',
+      cities: [
+        { code: 'SOKOTO', name: 'Sokoto' },
+        { code: 'TAMBUWAL', name: 'Tambuwal' },
+        { code: 'GWADABAWA', name: 'Gwadabawa' },
+        { code: 'BINJI', name: 'Binji' },
+        { code: 'ILLELA', name: 'Illela' },
+        { code: 'GADA', name: 'Gada' },
+        { code: 'TANGAZA', name: 'Tangaza' },
+        { code: 'SABON', name: 'Sabon Birni' },
+        { code: 'ISA', name: 'Isa' },
+        { code: 'RABAH', name: 'Rabah' }
+      ]
+    },
+    { code: 'ZM', name: 'Zamfara',
+      cities: [
+        { code: 'GUSAU', name: 'Gusau' },
+        { code: 'TALATA', name: 'Talata Mafara' },
+        { code: 'Kaura', name: 'Kaura Namoda' },
+        { code: 'BUNGUDU', name: 'Bungudu' },
+        { code: 'MARU', name: 'Maru' },
+        { code: 'MARADUN', name: 'Maradun' },
+        { code: 'SHINKAFI', name: 'Shinkafi' },
+        { code: 'BIRNIN', name: 'Birnin Magaji' },
+        { code: 'ANKA', name: 'Anka' },
+        { code: 'Bukkuyum', name: 'Bukkuyum' }
+      ]
+    },
+    { code: 'KB', name: 'Kebbi',
+      cities: [
+        { code: 'BIRNIN', name: 'Birnin Kebbi' },
+        { code: 'ARGUNGU', name: 'Argungu' },
+        { code: 'YELWA', name: 'Yelwa' },
+        { code: 'BUNZA', name: 'Bunza' },
+        { code: 'GANDU', name: 'Gandu' },
+        { code: 'KALGO', name: 'Kalgo' },
+        { code: 'KOKE', name: 'Koke' },
+        { code: 'MAIYAMA', name: 'Maiyama' },
+        { code: 'NGASKI', name: 'Ngaski' },
+        { code: 'SAKABA', name: 'Sakaba' }
+      ]
+    },
+    { code: 'JI', name: 'Jigawa',
+      cities: [
+        { code: 'DUTSE', name: 'Dutse' },
+        { code: 'HADEJIA', name: 'Hadejia' },
+        { code: 'KAZAURE', name: 'Kazaure' },
+        { code: 'RINGIM', name: 'Ringim' },
+        { code: 'BIRNIN', name: 'Birnin Kudu' },
+        { code: 'KIRI', name: 'Kiri Kasama' },
+        { code: 'GUMEL', name: 'Gumel' },
+        { code: 'GURI', name: 'Guri' },
+        { code: 'GWARZO', name: 'Gwarzo' },
+        { code: 'Taura', name: 'Taura' }
+      ]
+    },
+    // South West States
+    { code: 'LA', name: 'Lagos',
+      cities: [
+        { code: 'LAGOS', name: 'Lagos' },
+        { code: 'IKEJA', name: 'Ikeja' },
+        { code: 'BADAGRY', name: 'Badagry' },
+        { code: 'EPE', name: 'Epe' },
+        { code: 'IKORODU', name: 'Ikorodu' },
+        { code: 'MUSHIN', name: 'Mushin' },
+        { code: 'OSHODI', name: 'Oshodi' },
+        { code: 'SURULERE', name: 'Surulere' },
+        { code: 'FESTAC', name: 'Festac Town' },
+        { code: 'VI', name: 'Victoria Island' }
+      ]
+    },
+    { code: 'OG', name: 'Ogun',
+      cities: [
+        { code: 'ABEOKUTA', name: 'Abeokuta' },
+        { code: 'IJEBU', name: 'Ijebu-Ode' },
+        { code: 'SAGAMU', name: 'Sagamu' },
+        { code: 'OTTA', name: 'Otta' },
+        { code: 'ILARO', name: 'Ilaro' },
+        { code: 'IJEBU', name: 'Ijebu-Igbo' },
+        { code: 'OGO', name: 'Ogo-Oluwa' },
+        { code: 'REMO', name: 'Remo' },
+        { code: 'IPERU', name: 'Iperu' },
+        { code: 'SHAGAMU', name: 'Shagamu' }
+      ]
+    },
+    { code: 'OY', name: 'Oyo',
       cities: [
         { code: 'IBADAN', name: 'Ibadan' },
-        { code: 'IBADAN2', name: 'Ibadan North' },
         { code: 'OYO', name: 'Oyo' },
-        { code: 'OGO', name: 'Ogbomoso' },
-        { code: 'ISEYIN', name: 'Iseyin' },
-        { code: 'SAKI', name: 'Saki' },
         { code: 'OGBOMOSO', name: 'Ogbomoso' },
+        { code: 'ISEYIN', name: 'Iseyin' },
+        { code: 'OKEHO', name: 'Okeho' },
         { code: 'IGBOHO', name: 'Igboho' },
+        { code: 'SAKI', name: 'Saki' },
         { code: 'EDE', name: 'Ede' },
-        { code: 'OSHOGBO', name: 'Osogbo' }
+        { code: 'OSHOGBO', name: 'Osogbo' },
+        { code: 'IBADAN2', name: 'Ibadan North' }
+      ]
+    },
+    { code: 'OS', name: 'Osun',
+      cities: [
+        { code: 'OSOGBO', name: 'Osogbo' },
+        { code: 'ILE', name: 'Ile-Ife' },
+        { code: 'EDE', name: 'Ede' },
+        { code: 'IKEJI', name: 'Ikeji-Arakeji' },
+        { code: 'ILESHA', name: 'Ilesha' },
+        { code: 'IKIRUN', name: 'Ikirun' },
+        { code: 'IKIRE', name: 'Ikire' },
+        { code: 'EJIGBO', name: 'Ejigbo' },
+        { code: 'IFON', name: 'Ifon' },
+        { code: 'ILA', name: 'Ila' }
+      ]
+    },
+    { code: 'ON', name: 'Ondo',
+      cities: [
+        { code: 'AKURE', name: 'Akure' },
+        { code: 'ONDO', name: 'Ondo' },
+        { code: 'OKITIPUPA', name: 'Okitipupa' },
+        { code: 'ADO', name: 'Ado-Ekiti' },
+        { code: 'IKARE', name: 'Ikare' },
+        { code: 'OBA', name: 'Oba-Akoko' },
+        { code: 'OKE', name: 'Oke-Igbo' },
+        { code: 'IGBOKODA', name: 'Igbokoda' },
+        { code: 'IRAGBIJI', name: 'Iragbiji' },
+        { code: 'ORE', name: 'Ore' }
+      ]
+    },
+    { code: 'EK', name: 'Ekiti',
+      cities: [
+        { code: 'ADO', name: 'Ado-Ekiti' },
+        { code: 'IKERE', name: 'Ikere-Ekiti' },
+        { code: 'OTUN', name: 'Otun-Ekiti' },
+        { code: 'OYE', name: 'Oye-Ekiti' },
+        { code: 'EMURE', name: 'Emure-Ekiti' },
+        { code: 'IJERO', name: 'Ijero-Ekiti' },
+        { code: 'IDO', name: 'Ido-Osi' },
+        { code: 'MOPA', name: 'Mopa' },
+        { code: 'ARAMOKO', name: 'Aramoko-Ekiti' },
+        { code: 'ISE', name: 'Ise-Ekiti' }
+      ]
+    },
+    // South East States
+    { code: 'EN', name: 'Enugu',
+      cities: [
+        { code: 'ENUGU', name: 'Enugu' },
+        { code: 'NSUKKA', name: 'Nsukka' },
+        { code: 'AWKA', name: 'Awka' },
+        { code: 'ONITSHA', name: 'Onitsha' },
+        { code: 'OJI', name: 'Oji River' },
+        { code: 'UDI', name: 'Udi' },
+        { code: 'AGBANI', name: 'Agbani' },
+        { code: 'EKWULOBIA', name: 'Ekwulobia' },
+        { code: 'IGBO', name: 'Igbo-Ukwu' },
+        { code: 'NNEWI', name: 'Nnewi' }
+      ]
+    },
+    { code: 'AN', name: 'Anambra',
+      cities: [
+        { code: 'AWKA', name: 'Awka' },
+        { code: 'ONITSHA', name: 'Onitsha' },
+        { code: 'NNEWI', name: 'Nnewi' },
+        { code: 'EKWULOBIA', name: 'Ekwulobia' },
+        { code: 'OBA', name: 'Oba' },
+        { code: 'IHIALA', name: 'Ihiala' },
+        { code: 'AGULERI', name: 'Aguleri' },
+        { code: 'UMU', name: 'Umuahia' },
+        { code: 'OGIDI', name: 'Ogidi' },
+        { code: 'ADAZI', name: 'Adazi' }
+      ]
+    },
+    { code: 'IM', name: 'Imo',
+      cities: [
+        { code: 'OWERRI', name: 'Owerri' },
+        { code: 'ORLU', name: 'Orlu' },
+        { code: 'OKIGWE', name: 'Okigwe' },
+        { code: 'MBANO', name: 'Mbano' },
+        { code: 'MBAISE', name: 'Mbaise' },
+        { code: 'OGUTA', name: 'Oguta' },
+        { code: 'IHITTE', name: 'Ihitte' },
+        { code: 'NKWERRE', name: 'Nkwerre' },
+        { code: 'ORU', name: 'Oru' },
+        { code: 'IDEATO', name: 'Ideato' }
+      ]
+    },
+    { code: 'AB', name: 'Abia',
+      cities: [
+        { code: 'UMUAHIA', name: 'Umuahia' },
+        { code: 'ABA', name: 'Aba' },
+        { code: 'OHAFIA', name: 'Ohafia' },
+        { code: 'AFIKPO', name: 'Afikpo' },
+        { code: 'ISU', name: 'Isu' },
+        { code: 'AKWETE', name: 'Akwete' },
+        { code: 'BENDE', name: 'Bende' },
+        { code: 'IHEO', name: 'Iheo' },
+        { code: 'OBINGO', name: 'Obingo' },
+        { code: 'UKWA', name: 'Ukwa' }
+      ]
+    },
+    { code: 'EB', name: 'Ebonyi',
+      cities: [
+        { code: 'ABAKALIKI', name: 'Abakaliki' },
+        { code: 'AFIKPO', name: 'Afikpo' },
+        { code: 'ONUEKE', name: 'Onueke' },
+        { code: 'EBONYI', name: 'Ebonyi' },
+        { code: 'IKWO', name: 'Ikwo' },
+        { code: 'IZZI', name: 'Izzi' },
+        { code: 'ISHIELU', name: 'Ishielu' },
+        { code: 'OHAOZARA', name: 'Ohaozara' },
+        { code: 'ONICHA', name: 'Onicha' },
+        { code: 'EZZA', name: 'Ezza' }
+      ]
+    },
+    // South South States
+    { code: 'RI', name: 'Rivers',
+      cities: [
+        { code: 'PORT', name: 'Port Harcourt' },
+        { code: 'BONNY', name: 'Bonny' },
+        { code: 'OMOKU', name: 'Omoku' },
+        { code: 'ELELE', name: 'Elele' },
+        { code: 'DEGEMA', name: 'Degema' },
+        { code: 'AHOADA', name: 'Ahoada' },
+        { code: 'OBIO', name: 'Obio-Akpor' },
+        { code: 'OKRIKA', name: 'Okrika' },
+        { code: 'OGU', name: 'Ogu-Bolo' },
+        { code: 'ANDONI', name: 'Andoni' }
+      ]
+    },
+    { code: 'BY', name: 'Bayelsa',
+      cities: [
+        { code: 'YENAGOA', name: 'Yenagoa' },
+        { code: 'KAIAMA', name: 'Kaiama' },
+        { code: 'SAGBAMA', name: 'Sagbama' },
+        { code: 'BRASS', name: 'Brass' },
+        { code: 'NEMBE', name: 'Nembe' },
+        { code: 'OGBIA', name: 'Ogbia' },
+        { code: 'EKEREMOR', name: 'Ekeremor' },
+        { code: 'SOUTHERN', name: 'Southern Ijaw' },
+        { code: 'KOLOKUMA', name: 'Kolokuma-Opokuma' },
+        { code: 'YENAGOA2', name: 'Yenagoa North' }
+      ]
+    },
+    { code: 'DE', name: 'Delta',
+      cities: [
+        { code: 'ASABA', name: 'Asaba' },
+        { code: 'WARRI', name: 'Warri' },
+        { code: 'UGHELLI', name: 'Ughelli' },
+        { code: 'SAPELE', name: 'Sapele' },
+        { code: 'AGBOR', name: 'Agbor' },
+        { code: 'OBIARUKU', name: 'Obiaruku' },
+        { code: 'KOKORI', name: 'Kokori' },
+        { code: 'OZORO', name: 'Ozoro' },
+        { code: 'KOKORI2', name: 'Kokori' },
+        { code: 'IDUMUJE', name: 'Idumuje-Ugboko' }
+      ]
+    },
+    { code: 'ED', name: 'Edo',
+      cities: [
+        { code: 'BENIN', name: 'Benin City' },
+        { code: 'EKPO', name: 'Ekpoma' },
+        { code: 'UBIAJA', name: 'Ubiaja' },
+        { code: 'IGUEBEN', name: 'Igueben' },
+        { code: 'AFUZE', name: 'Afuze' },
+        { code: 'FUGAR', name: 'Fugar' },
+        { code: 'IRRUA', name: 'Irrua' },
+        { code: 'SABONGIDA', name: 'Sabongida-Ora' },
+        { code: 'USAGBE', name: 'Usagbe' },
+        { code: 'UGBOKHA', name: 'Ugbokha' }
+      ]
+    },
+    { code: 'AK', name: 'Akwa Ibom',
+      cities: [
+        { code: 'UYO', name: 'Uyo' },
+        { code: 'IKOT', name: 'Ikot Ekpene' },
+        { code: 'ETINAN', name: 'Etinan' },
+        { code: 'IKOT', name: 'Ikot Abasi' },
+        { code: 'IBENO', name: 'Ibeno' },
+        { code: 'ORON', name: 'Oron' },
+        { code: 'EKET', name: 'Eket' },
+        { code: 'ABAK', name: 'Abak' },
+        { code: 'ITU', name: 'Itu' },
+        { code: 'NSIT', name: 'Nsit' }
+      ]
+    },
+    { code: 'CR', name: 'Cross River',
+      cities: [
+        { code: 'CALABAR', name: 'Calabar' },
+        { code: 'IKOM', name: 'Ikom' },
+        { code: 'OGOJA', name: 'Ogoja' },
+        { code: 'OBUBRA', name: 'Obubra' },
+        { code: 'UGEP', name: 'Ugep' },
+        { code: 'BIASE', name: 'Biase' },
+        { code: 'AKAMKPA', name: 'Akamkpa' },
+        { code: 'YAKURR', name: 'Yakurr' },
+        { code: 'BOKI', name: 'Boki' },
+        { code: 'OBANLIKU', name: 'Obanliku' }
       ]
     }
   ]
