@@ -606,7 +606,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   )}
                   <span className={`text-sm font-medium ${
                     realTimeValidation.can_proceed ? 'text-success dark:text-success-dark' : 'text-destructive dark:text-destructive-dark'
-                  }`}>
+                  `}>
                     {realTimeValidation.can_proceed ? 'Ready to place order' : 'Cannot proceed'}
                   </span>
                 </div>
