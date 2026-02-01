@@ -2731,16 +2731,68 @@ export const countries: Country[] = [
 
   // Europe
   {
-    code: 'GB',
-    name: 'United Kingdom',
-    taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'GBP', region: 'EU' },
-    provinces: [
-      { code: 'ENG', name: 'England' },
-      { code: 'SCT', name: 'Scotland' },
-      { code: 'WLS', name: 'Wales' },
-      { code: 'NIR', name: 'Northern Ireland' }
-    ]
-  },
+  code: 'GB',
+  name: 'United Kingdom',
+  taxInfo: { standardRate: 20, taxName: 'VAT', currency: 'GBP', region: 'EMEA' },
+  provinces: [
+    { code: 'ENG', name: 'England',
+      cities: [
+        { code: 'LON', name: 'London' },
+        { code: 'MAN', name: 'Manchester' },
+        { code: 'BIR', name: 'Birmingham' },
+        { code: 'LEE', name: 'Leeds' },
+        { code: 'LIV', name: 'Liverpool' },
+        { code: 'SHE', name: 'Sheffield' },
+        { code: 'BRI', name: 'Bristol' },
+        { code: 'NEW', name: 'Newcastle upon Tyne' },
+        { code: 'NOT', name: 'Nottingham' },
+        { code: 'LEI', name: 'Leicester' }
+      ]
+    },
+    { code: 'SCT', name: 'Scotland',
+      cities: [
+        { code: 'EDI', name: 'Edinburgh' },
+        { code: 'GLA', name: 'Glasgow' },
+        { code: 'ABE', name: 'Aberdeen' },
+        { code: 'DUN', name: 'Dundee' },
+        { code: 'INV', name: 'Inverness' },
+        { code: 'PER', name: 'Perth' },
+        { code: 'STI', name: 'Stirling' },
+        { code: 'DUM', name: 'Dumfries' },
+        { code: 'AYR', name: 'Ayr' },
+        { code: 'DUN2', name: 'Dundee' }
+      ]
+    },
+    { code: 'WLS', name: 'Wales',
+      cities: [
+        { code: 'CAR', name: 'Cardiff' },
+        { code: 'SWA', name: 'Swansea' },
+        { code: 'NEW', name: 'Newport' },
+        { code: 'BAN', name: 'Bangor' },
+        { code: 'WRE', name: 'Wrexham' },
+        { code: 'BRI', name: 'Bridgend' },
+        { code: 'LLA', name: 'Llandudno' },
+        { code: 'MER', name: 'Merthyr Tydfil' },
+        { code: 'BARRY', name: 'Barry' },
+        { code: 'NEATH', name: 'Neath' }
+      ]
+    },
+    { code: 'NIR', name: 'Northern Ireland',
+      cities: [
+        { code: 'BEL', name: 'Belfast' },
+        { code: 'DER', name: 'Derry' },
+        { code: 'LIS', name: 'Lisburn' },
+        { code: 'NEW', name: 'Newtownabbey' },
+        { code: 'BAN', name: 'Bangor' },
+        { code: 'CRA', name: 'Craigavon' },
+        { code: 'ARM', name: 'Armagh' },
+        { code: 'COL', name: 'Coleraine' },
+        { code: 'LAR', name: 'Larne' },
+        { code: 'NEW2', name: 'Newry' }
+      ]
+    }
+  ]
+},
   { code: 'IE', name: 'Ireland', taxInfo: { standardRate: 23, taxName: 'VAT', currency: 'EUR', region: 'EU' } },
   { code: 'FR', name: 'France', taxInfo: { standardRate: 20, taxName: 'TVA', currency: 'EUR', region: 'EU' } },
   { code: 'DE', name: 'Germany', taxInfo: { standardRate: 19, taxName: 'MwSt', currency: 'EUR', region: 'EU' } },
