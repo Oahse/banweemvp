@@ -22,6 +22,8 @@ import { QRCodeModal } from '../components/product/QRCodeModal';
 import { BarcodeModal } from '../components/product/BarcodeModal';
 import { ProductCard } from '../components/product/ProductCard';
 import { SubscriptionSelector } from '../components/subscription/SubscriptionSelector';
+import ReviewForm from '../components/product/ReviewForm';
+import { Dropdown } from '../components/ui/Dropdown';
 import { useCart } from '../store/CartContext';
 import { useWishlist } from '../store/WishlistContext';
 import { useLocale } from '../store/LocaleContext';
@@ -899,49 +901,69 @@ export const ProductDetails = () => {
 
             {activeTab === 'reviews' && (
               <div>
-                <div className="flex items-center space-x-4 mb-6">
+                {/* Review Form */}
+                <ReviewForm 
+                  productId={id} 
+                  onReviewSubmitted={() => {
+                    // Refresh reviews when a new review is submitted
+                    fetchReviews(() => ReviewsAPI.getProductReviews(id, reviewsPage, 10, minRating, maxRating, sortBy));
+                  }}
+                />
+
+                <div className="flex items-center space-x-4 mb-6 mt-8">
                   {/* Min Rating Filter */}
                   <div>
                     <label htmlFor="minRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Min Rating</label>
-                    <select
-                      id="minRating"
-                      value={minRating || ''}
-                      onChange={(e) => setMinRating(e.target.value ? Number(e.target.value) : undefined)}
-                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    >
-                      <option value="">Any</option>
-                      {[1, 2, 3, 4, 5].map(r => <option key={r} value={r}>{r} Star{r > 1 ? 's' : ''}</option>)}
-                    </select>
+                    <Dropdown
+                      options={[
+                        { value: '', label: 'Any' },
+                        { value: '1', label: '1 Star' },
+                        { value: '2', label: '2 Stars' },
+                        { value: '3', label: '3 Stars' },
+                        { value: '4', label: '4 Stars' },
+                        { value: '5', label: '5 Stars' }
+                      ]}
+                      value={minRating?.toString() || ''}
+                      onChange={(value) => setMinRating(value ? Number(value) : undefined)}
+                      placeholder="Any"
+                      className="mt-1"
+                    />
                   </div>
 
                   {/* Max Rating Filter */}
                   <div>
                     <label htmlFor="maxRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Max Rating</label>
-                    <select
-                      id="maxRating"
-                      value={maxRating || ''}
-                      onChange={(e) => setMaxRating(e.target.value ? Number(e.target.value) : undefined)}
-                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    >
-                      <option value="">Any</option>
-                      {[1, 2, 3, 4, 5].map(r => <option key={r} value={r}>{r} Star{r > 1 ? 's' : ''}</option>)}
-                    </select>
+                    <Dropdown
+                      options={[
+                        { value: '', label: 'Any' },
+                        { value: '1', label: '1 Star' },
+                        { value: '2', label: '2 Stars' },
+                        { value: '3', label: '3 Stars' },
+                        { value: '4', label: '4 Stars' },
+                        { value: '5', label: '5 Stars' }
+                      ]}
+                      value={maxRating?.toString() || ''}
+                      onChange={(value) => setMaxRating(value ? Number(value) : undefined)}
+                      placeholder="Any"
+                      className="mt-1"
+                    />
                   </div>
 
                   {/* Sort By */}
                   <div>
                     <label htmlFor="sortBy" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Sort By</label>
-                    <select
-                      id="sortBy"
+                    <Dropdown
+                      options={[
+                        { value: '', label: 'Newest' },
+                        { value: 'rating_desc', label: 'Rating (High to Low)' },
+                        { value: 'rating_asc', label: 'Rating (Low to High)' },
+                        { value: 'created_at_asc', label: 'Oldest' }
+                      ]}
                       value={sortBy || ''}
-                      onChange={(e) => setSortBy(e.target.value || undefined)}
-                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    >
-                      <option value="">Newest</option>
-                      <option value="rating_desc">Rating (High to Low)</option>
-                      <option value="rating_asc">Rating (Low to High)</option>
-                      <option value="created_at_asc">Oldest</option>
-                    </select>
+                      onChange={(value) => setSortBy(value || undefined)}
+                      placeholder="Newest"
+                      className="mt-1"
+                    />
                   </div>
                 </div>
 
@@ -1048,7 +1070,7 @@ export const ProductDetails = () => {
         {/* Related Products */}
         <section className="py-8 bg-surface">
           <div className="container mx-auto px-4">
-            <h2 className="text-lg font-bold text-main mb-6">Related Products</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-main mb-6">Related Products</h2>
 
             {relatedError && (
               <ErrorMessage
@@ -1076,13 +1098,16 @@ export const ProductDetails = () => {
                     name: relatedProduct.name,
                     price: relatedProduct.variants?.[0]?.base_price || 0,
                     discountPrice: relatedProduct.variants?.[0]?.sale_price || null,
-                    rating: relatedProduct.rating || 0,
-                    reviewCount: relatedProduct.review_count || 0,
-                    image: relatedProduct.variants?.[0]?.images?.[0]?.url,
-                    category: relatedProduct.category?.name,
-                    isNew: false,
-                    isFeatured: false,
-                    variants: relatedProduct.variants || [], // Add missing variants field
+                    rating: relatedProduct.rating_average || relatedProduct.rating || 0,
+                    reviewCount: relatedProduct.review_count || relatedProduct.rating_count || 0,
+                    image: relatedProduct.variants?.[0]?.images?.[0]?.url || relatedProduct.image,
+                    category: relatedProduct.category?.name || 'Uncategorized',
+                    isNew: relatedProduct.is_new || false,
+                    isFeatured: relatedProduct.is_featured || false,
+                    variants: relatedProduct.variants || [],
+                    sku: relatedProduct.variants?.[0]?.sku || relatedProduct.sku,
+                    description: relatedProduct.description || relatedProduct.short_description,
+                    stock: relatedProduct.variants?.[0]?.stock || relatedProduct.variants?.[0]?.inventory_quantity_available || 0,
                   };
 
                   return (

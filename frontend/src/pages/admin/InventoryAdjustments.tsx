@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Loader, AlertCircle, Plus, Filter, ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import AdminAPI from '@/api/admin';
+import { Dropdown } from '../../components/ui/Dropdown';
 import toast from 'react-hot-toast';
 
 const LIMIT = 20;
@@ -144,16 +145,18 @@ export const AdminInventoryAdjustments = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-copy-light mb-1">Adjustment Type</label>
-            <select
+            <Dropdown
+              options={[
+                { value: '', label: 'All Types' },
+                { value: 'increase', label: 'Increase' },
+                { value: 'decrease', label: 'Decrease' },
+                { value: 'transfer', label: 'Transfer' }
+              ]}
               value={filters.adjustment_type}
-              onChange={(e) => handleFilterChange('adjustment_type', e.target.value)}
-              className="w-full px-3 py-2 border border-border-light rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="">All Types</option>
-              <option value="increase">Increase</option>
-              <option value="decrease">Decrease</option>
-              <option value="transfer">Transfer</option>
-            </select>
+              onChange={(value) => handleFilterChange('adjustment_type', value)}
+              placeholder="All Types"
+              className="w-full"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-copy-light mb-1">From Date</label>

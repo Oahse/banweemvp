@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, ArrowLeft, DownloadIcon, MapPin, Truck, Package, DollarSign, Clock, CheckCircle } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import apiClient from '@/api/client';
+import { Dropdown } from '../../components/ui/Dropdown';
 import toast from 'react-hot-toast';
 
 interface OrderDetail {
@@ -203,8 +204,8 @@ export const AdminOrderDetail = () => {
     const key = String(status || '').toUpperCase();
     const statusMap: Record<string, string> = {
       'PENDING': 'bg-yellow-100 text-yellow-800',
-      'PROCESSING': 'bg-blue-100 text-blue-800',
-      'SHIPPED': 'bg-indigo-100 text-indigo-800',
+      'PROCESSING': 'bg-green-100 text-green-800',
+      'SHIPPED': 'bg-green-100 text-green-800',
       'DELIVERED': 'bg-green-100 text-green-800',
       'CANCELLED': 'bg-red-100 text-red-800',
       'RETURNED': 'bg-gray-100 text-gray-800',
@@ -218,7 +219,7 @@ export const AdminOrderDetail = () => {
       'PAID': 'bg-green-100 text-green-800',
       'PENDING': 'bg-yellow-100 text-yellow-800',
       'FAILED': 'bg-red-100 text-red-800',
-      'REFUNDED': 'bg-blue-100 text-blue-800',
+      'REFUNDED': 'bg-green-100 text-green-800',
     };
     return statusMap[key] || 'bg-gray-100 text-gray-800';
   };
@@ -509,17 +510,13 @@ export const AdminOrderDetail = () => {
             <div className="bg-surface rounded-lg border border-border-light p-6">
               <h3 className="text-lg font-bold text-copy mb-4">Update Status</h3>
               <div className="space-y-4">
-                <select
+                <Dropdown
+                  options={statusOptions.map(status => ({ value: status, label: status }))}
                   value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-border-light rounded-lg bg-surface text-copy focus:outline-none focus:border-primary"
-                >
-                  {statusOptions.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => setNewStatus(value)}
+                  placeholder="Select Status"
+                  className="w-full"
+                />
 
                 <button
                   onClick={handleStatusUpdate}

@@ -91,6 +91,11 @@ export const ProductCard = ({
     return null; // Or throw an error, or render a placeholder
   }
 
+  // Helper function to show single toast
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    toast[type](message, { id: 'product-card-action' });
+  };
+
   // Get the display variant (selected variant or first variant or fallback to product)
   const displayVariant = selectedVariant || (product.variants && Array.isArray(product.variants) && product.variants.length > 0 ? product.variants[0] : null);
 
@@ -149,7 +154,7 @@ export const ProductCard = ({
         e.stopPropagation();
     
         if (!product) {
-          toast.error("Product data is not available.");
+          showToast("Product data is not available.", 'error');
           return;
         }
 
@@ -157,11 +162,11 @@ export const ProductCard = ({
         if (!displayVariant) {
           // More specific error message
           if (!product.variants || !Array.isArray(product.variants)) {
-            toast.error("Product variants are not loaded yet. Please try again.");
+            showToast("Product variants are not loaded yet. Please try again.", 'error');
           } else if (product.variants.length === 0) {
-            toast.error("This product has no variants available.");
+            showToast("This product has no variants available.", 'error');
           } else {
-            toast.error("Unable to select a variant for this product.");
+            showToast("Unable to select a variant for this product.", 'error');
           }
           return;
         }
@@ -174,13 +179,13 @@ export const ProductCard = ({
               const cartItem = cart?.items?.find(item => item.variant?.id === displayVariant?.id);
               if (cartItem) {
                 await removeFromCart(cartItem.id);
-                toast.success('Item removed from cart');
+                showToast('Item removed from cart');
               }
               return true;
             }, 'cart');
           } catch (error) {
             console.error('Remove from cart error:', error);
-            toast.error(error?.message || 'Failed to remove item from cart. Please try again.');
+            showToast(error?.message || 'Failed to remove item from cart. Please try again.', 'error');
           }
         } else {
           try {
@@ -197,13 +202,13 @@ export const ProductCard = ({
               const success = await addToCart(payload);
               
               if (success) {
-                toast.success('Item added to cart!');
+                showToast('Item added to cart!');
               }
               return success;
             }, 'cart');
           } catch (error) {
             console.error('Add to cart error:', error);
-            toast.error(error?.message || 'Failed to add item to cart. Please try again.');
+            showToast(error?.message || 'Failed to add item to cart. Please try again.', 'error');
           }
         }
       };
@@ -213,13 +218,13 @@ export const ProductCard = ({
         e.stopPropagation();
     
         if (!product) {
-          toast.error("Product data is not available.");
+          showToast("Product data is not available.", 'error');
           return;
         }
 
         // Check if we have a valid variant to add
         if (!displayVariant) {
-          toast.error("This product has no variants available.");
+          showToast("This product has no variants available.", 'error');
           return;
         }
     
@@ -253,7 +258,7 @@ export const ProductCard = ({
                   // The WishlistContext will handle the actual API call
                   const success = await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
                   if (success) {
-                    toast.success('Item removed from wishlist');
+                    showToast('Item removed from wishlist');
                   }
                   return true;
                 }
@@ -265,17 +270,16 @@ export const ProductCard = ({
                 
                 const success = await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
                 if (success) {
-                  toast.success('Item removed from wishlist');
+                  showToast('Item removed from wishlist');
+                } else {
+                  console.warn('Wishlist item not found');
+                  showToast('Item not found in wishlist. Please try again.', 'error');
                 }
-              } else {
-                console.warn('Wishlist item not found');
-                toast.error('Item not found in wishlist. Please try again.');
-              }
               return true;
             }, 'wishlist');
           } catch (error) {
             console.error('Remove from wishlist error:', error);
-            toast.error(error?.message || 'Failed to remove item from wishlist. Please try again.');
+            showToast(error?.message || 'Failed to remove item from wishlist. Please try again.', 'error');
           }
         } else {
           await executeWithAuth(async () => {

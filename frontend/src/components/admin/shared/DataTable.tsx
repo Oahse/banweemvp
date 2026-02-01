@@ -246,18 +246,13 @@ export const AdminDataTable = <T extends Record<string, any>>({
               {filterable && filters.map((filter) => (
                 <div key={filter.key} className="min-w-[150px]">
                   {filter.type === 'select' ? (
-                    <select
+                    <Dropdown
+                      options={filter.options || []}
                       value={activeFilters[filter.key] || ''}
-                      onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="">{filter.placeholder || `Select ${filter.label}`}</option>
-                      {filter.options?.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(value) => handleFilterChange(filter.key, value)}
+                      placeholder={filter.placeholder || 'Select...'}
+                      className="w-full"
+                    />
                   ) : (
                     <input
                       type="text"

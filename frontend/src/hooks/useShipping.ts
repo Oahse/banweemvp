@@ -1,10 +1,13 @@
 import { useState, useCallback } from 'react';
+import { apiClient } from '../api/client';
 
 export interface ShippingMethod {
   id: string;
   name: string;
   cost: number;
   estimatedDays: number;
+  carrier?: string;
+  description?: string;
 }
 
 interface UseShippingOptions {
@@ -15,20 +18,18 @@ export const useShipping = (options?: UseShippingOptions) => {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([
-    { id: 'standard', name: 'Standard Shipping', cost: 5.99, estimatedDays: 7 },
-    { id: 'express', name: 'Express Shipping', cost: 14.99, estimatedDays: 2 },
-    { id: 'overnight', name: 'Overnight Shipping', cost: 24.99, estimatedDays: 1 },
-  ]);
+  const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([]);
 
   const loadShippingMethods = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // Simulate API call - replace with actual API when ready
-      console.log('Loading shipping methods...');
+      const response = await apiClient.get('/shipping-methods');
+      setShippingMethods(response.data || []);
     } catch (err: any) {
       setError(err.message || 'Failed to load shipping methods');
+      // Set empty array on error to prevent issues
+      setShippingMethods([]);
     } finally {
       setLoading(false);
     }
@@ -40,6 +41,11 @@ export const useShipping = (options?: UseShippingOptions) => {
       method.cost < cheapest.cost ? method : cheapest
     );
   }, [shippingMethods]);
+
+  // Auto-load if option is set
+  if (options?.autoLoad && !loading && !error && shippingMethods.length === 0) {
+    loadShippingMethods();
+  }
 
   return {
     selectedMethod,

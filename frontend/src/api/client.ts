@@ -443,6 +443,11 @@ class APIClient {
       return true; // Let the auth interceptor handle 401s
     }
 
+    // Suppress server errors (5xx)
+    if (error.statusCode && error.statusCode >= 500) {
+      return true; // Don't show toasts for server errors
+    }
+
     return false;
   }
 

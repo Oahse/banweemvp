@@ -108,8 +108,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
         onClick={handleToggleDropdown}
         disabled={disabled}
         className={cn(
-          'w-full px-3 py-2 text-left border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors flex items-center justify-between',
-          'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white',
+          'w-full px-2 py-1.5 text-left border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors flex items-center justify-between',
+          'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm',
           'hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
         )}
       >
@@ -120,7 +120,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           {displayText}
         </span>
         <ChevronDownIcon 
-          className={`w-4 h-4 transition-transform flex-shrink-0 ml-2 ${isOpen ? 'rotate-180' : ''}`} 
+          className={`w-3 h-3 transition-transform flex-shrink-0 ml-1 ${isOpen ? 'rotate-180' : ''}`} 
         />
       </button>
 
@@ -166,7 +166,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   onClick={() => handleSelect(option)}
                   disabled={option.disabled}
                   className={cn(
-                    'w-full text-left px-3 py-2 text-sm transition-colors',
+                    'w-full text-left px-2 py-1.5 text-xs transition-colors',
                     option.disabled
                       ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
@@ -176,7 +176,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   <div className="flex items-center justify-between">
                     <span className="truncate">{option.label}</span>
                     {value === option.value && (
-                      <CheckIcon className="w-4 h-4 text-primary flex-shrink-0 ml-2" />
+                      <CheckIcon className="w-3 h-3 text-primary flex-shrink-0 ml-1" />
                     )}
                   </div>
                 </button>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Loader, AlertCircle, Eye, ChevronLeft, ChevronRight, Calendar, DollarSign, User, Package, SearchIcon, DownloadIcon } from 'lucide-react';
+import { Dropdown } from '../../components/ui/Dropdown';
 import AdminAPI from '../../api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '../../store/ThemeContext';
@@ -163,18 +164,20 @@ export const AdminSubscriptions = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-copy-light mb-1">Status</label>
-            <select
+            <Dropdown
+              options={[
+                { value: '', label: 'All Status' },
+                { value: 'active', label: 'Active' },
+                { value: 'paused', label: 'Paused' },
+                { value: 'cancelled', label: 'Cancelled' },
+                { value: 'expired', label: 'Expired' },
+                { value: 'pending', label: 'Pending' }
+              ]}
               value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full px-3 py-2 border border-border-light rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="">All Status</option>
-              <option value="active">Active</option>
-              <option value="paused">Paused</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="expired">Expired</option>
-              <option value="pending">Pending</option>
-            </select>
+              onChange={(value) => handleFilterChange('status', value)}
+              placeholder="All Status"
+              className="w-full"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-copy-light mb-1">Search</label>

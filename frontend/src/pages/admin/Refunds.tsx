@@ -78,7 +78,7 @@ export const Refunds = () => {
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value === 'processed' ? 'bg-green-100 text-green-800' :
           value === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-          value === 'approved' ? 'bg-blue-100 text-blue-800' :
+          value === 'approved' ? 'bg-green-100 text-green-800' :
           value === 'rejected' ? 'bg-red-100 text-red-800' :
           'bg-gray-100 text-gray-800'
         }`}>
