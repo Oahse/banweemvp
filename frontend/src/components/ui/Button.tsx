@@ -1,7 +1,6 @@
 import { forwardRef } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../utils/utils';
-import { themeClasses } from '../../utils/theme';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'success' | 'warning' | 'info';
@@ -84,7 +83,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       ref={ref}
       className={cn(
         // Base styles
-        themeClasses.button.base,
+        'inline-flex items-center justify-center',
         'font-medium select-none',
         'transform transition-all duration-200 ease-in-out',
         'active:scale-95',

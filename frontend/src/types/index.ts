@@ -174,6 +174,7 @@ export interface CartItem {
   id: string;
   cart_id: string;
   variant_id: string;
+  product_id: string;
   variant: ProductVariant;
   quantity: number;
   price_per_unit: number;

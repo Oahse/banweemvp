@@ -238,7 +238,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                     placeholder={searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                   />
                 </div>
               )}
@@ -249,7 +249,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                     <select
                       value={activeFilters[filter.key] || ''}
                       onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white"
                     >
                       <option value="">{filter.placeholder || `Select ${filter.label}`}</option>
                       {filter.options?.map((option) => (
@@ -264,7 +264,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                       placeholder={filter.placeholder || `Filter by ${filter.label}`}
                       value={activeFilters[filter.key] || ''}
                       onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     />
                   )}
                 </div>
@@ -291,7 +291,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <Loader className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400 mr-2" />
+          <Loader className="h-6 w-6 animate-spin text-green-600 dark:text-green-400 mr-2" />
           <span className="text-gray-600 dark:text-gray-400">Loading...</span>
         </div>
       )}
@@ -326,7 +326,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                           type="checkbox"
                           checked={selectedRows.size === data.length}
                           onChange={handleSelectAll}
-                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 focus:ring-blue-400"
+                          className="rounded border-gray-300 dark:border-gray-600 text-green-600 dark:text-green-400 focus:ring-green-500 focus:ring-green-400"
                         />
                       </th>
                     )}
@@ -370,7 +370,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                             type="checkbox"
                             checked={selectedRows.has(row.id)}
                             onChange={() => handleRowSelect(row.id)}
-                            className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 focus:ring-blue-400"
+                            className="rounded border-gray-300 dark:border-gray-600 text-green-600 dark:text-green-400 focus:ring-green-500 focus:ring-green-400"
                           />
                         </td>
                       )}
@@ -396,7 +396,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                                 className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                                 title="View"
                               >
-                                <EyeIcon className="h-4 w-4" />
+                                <Eye className="h-4 w-4" />
                               </button>
                             )}
                             {onEdit && (

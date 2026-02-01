@@ -19,7 +19,9 @@ import {
   TrendingUpIcon,
   GlobeIcon,
   UserIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  CreditCardIcon,
+  RefreshCwIcon
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -52,6 +54,8 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { title: 'Products', path: '/admin/products', icon: <PackageIcon size={18} /> },
     { title: 'Users', path: '/admin/users', icon: <UsersIcon size={18} /> },
     { title: 'Subscriptions', path: '/admin/subscriptions', icon: <FileTextIcon size={18} /> },
+    { title: 'Payments', path: '/admin/payments', icon: <CreditCardIcon size={18} /> },
+    { title: 'Refunds', path: '/admin/refunds', icon: <RefreshCwIcon size={18} /> },
     { title: 'Shipping', path: '/admin/shipping-methods', icon: <TruckIcon size={18} /> },
     { title: 'Tax Rates', path: '/admin/tax-rates', icon: <Percent size={18} /> },
     { title: 'Inventory', path: '/admin/inventory', icon: <BoxesIcon size={18} /> },
@@ -114,7 +118,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                   <Link
                     to={item.path}
                     className={`flex items-center px-3 py-2 text-xs ${isActive(item.path)
-                        ? 'bg-blue-600 text-white font-medium'
+                        ? 'bg-green-600 text-white font-medium'
                         : theme === 'dark' ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-100'
                       }`}
                     onClick={() => setSidebarOpen(false)}>
@@ -164,7 +168,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                       : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                  <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">
                     {(user as any)?.full_name?.charAt(0) || (user as any)?.firstname?.charAt(0) || 'A'}
                   </div>
                   <span className="text-sm font-medium hidden md:block">
