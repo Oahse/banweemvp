@@ -1,5 +1,5 @@
 /**
- * Equatorial Guinea country data with provinces, cities, and tax information
+ * Equatorial Guinea country data with provinces and cities
  */
 
 import { Country } from './index';
@@ -7,93 +7,75 @@ import { Country } from './index';
 export const equatorialGuinea: Country = {
     code: 'GQ',
     name: 'Equatorial Guinea',
+    flag: '🇬🇶',
+    capital: 'Malabo',
+    area: 28051,
+    currencySymbol: 'FCFA',
+    officialLanguages: ['Spanish', 'French', 'Portuguese'],
+    demonym: 'Equatoguinean',
     taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XAF', region: 'MEA' },
-    provinces: [
-      { code: 'AN', name: 'Annobón',
+    divisions: [
+      { code: 'AN', name: 'Annobón', type: 'province',
         cities: [
+          { code: 'SAN', name: 'San Antonio de Palé' },
           { code: 'MAL', name: 'Malabo' },
           { code: 'EVI', name: 'Evinayong' },
           { code: 'MIC', name: 'Micomeseng' },
-          { code: 'MUS', name: 'Moka' },
-          { code: 'BATA', name: 'Bata' },
-          { code: 'NUE', name: 'Niefang' },
-          { code: 'SAG', name: 'Sagay' },
-          { code: 'AKON', name: 'Akonibe' },
-          { code: 'MVO', name: 'Mvo' },
-          { code: 'BIS', name: 'Bisogo' }
+          { code: 'MUS', name: 'Moka' }
         ]
       },
-      { code: 'BI', name: 'Bioko',
+      { code: 'BI', name: 'Bioko Norte', type: 'province',
         cities: [
           { code: 'MAL', name: 'Malabo' },
-          { code: 'EVI', name: 'Evinayong' },
-          { code: 'MIC', name: 'Micomeseng' },
-          { code: 'MUS', name: 'Moka' },
-          { code: 'BATA', name: 'Bata' },
-          { code: 'NUE', name: 'Niefang' },
-          { code: 'SAG', name: 'Sagay' },
-          { code: 'AKON', name: 'Akonibe' },
-          { code: 'MVO', name: 'Mvo' },
-          { code: 'BIS', name: 'Bisogo' }
+          { code: 'REBOLA', name: 'Rebola' },
+          { code: 'BASUPU', name: 'Basupu' },
+          { code: 'SANTIAGO', name: 'Santiago de Baney' },
+          { code: 'RIO', name: 'Río Campo' }
         ]
       },
-      { code: 'CS', name: 'Centro Sur',
+      { code: 'BS', name: 'Bioko Sur', type: 'province',
         cities: [
-          { code: 'EVI', name: 'Evinayong' },
-          { code: 'MIC', name: 'Micomeseng' },
-          { code: 'BUE', name: 'Buea' },
-          { code: 'SAG', name: 'Sagay' },
-          { code: 'AKON', name: 'Akonibe' },
-          { code: 'MVO', name: 'Mvo' },
-          { code: 'BIS', name: 'Bisogo' },
-          { code: 'MAL', name: 'Malabo' },
-          { code: 'MUS', name: 'Moka' },
-          { code: 'BATA', name: 'Bata' },
-          { code: 'NUE', name: 'Niefang' }
+          { code: 'LUBA', name: 'Luba' },
+          { code: 'RIABALA', name: 'Riaba' },
+          { code: 'MOCHA', name: 'Mocha' },
+          { code: 'BOLANDO', name: 'Bolondo' },
+          { code: 'BALACHA', name: 'Balacha' }
         ]
       },
-      { code: 'KN', name: 'Kié-Ntem',
+      { code: 'CS', name: 'Centro Sur', type: 'province',
         cities: [
           { code: 'EVI', name: 'Evinayong' },
           { code: 'MIC', name: 'Micomeseng' },
           { code: 'BUE', name: 'Buea' },
           { code: 'SAG', name: 'Sagay' },
-          { code: 'AKON', name: 'Akonibe' },
-          { code: 'MVO', name: 'Mvo' },
-          { code: 'BIS', name: 'Bisogo' },
-          { code: 'MAL', name: 'Malabo' },
-          { code: 'MUS', name: 'Moka' },
-          { code: 'BATA', name: 'Bata' },
-          { code: 'NUE', name: 'Niefang' }
+          { code: 'AKON', name: 'Akonibe' }
         ]
       },
-      { code: 'LI', name: 'Litoral',
+      { code: 'KN', name: 'Kié-Ntem', type: 'province',
+        cities: [
+          { code: 'EVI', name: 'Evinayong' },
+          { code: 'MIC', name: 'Micomeseng' },
+          { code: 'BUE', name: 'Buea' },
+          { code: 'SAG', name: 'Sagay' },
+          { code: 'AKON', name: 'Akonibe' }
+        ]
+      },
+      { code: 'LI', name: 'Litoral', type: 'province',
         cities: [
           { code: 'BATA', name: 'Bata' },
           { code: 'MBO', name: 'Mbini' },
           { code: 'MUS', name: 'Moka' },
           { code: 'BIS', name: 'Bisogo' },
-          { code: 'MAL', name: 'Malabo' },
-          { code: 'EVI', name: 'Evinayong' },
-          { code: 'MIC', name: 'Micomeseng' },
-          { code: 'BUE', name: 'Buea' },
-          { code: 'SAG', name: 'Sagay' },
-          { code: 'AKON', name: 'Akonibe' },
-          { code: 'MVO', name: 'Mvo' }
+          { code: 'MAL', name: 'Malabo' }
         ]
       },
-      { code: 'WE', name: 'Wele-Nzas',
+      { code: 'WE', name: 'Wele-Nzas', type: 'province',
         cities: [
-          { code: 'MBO', name: 'Mbini' },
-          { code: 'MUS', name: 'Moka' },
-          { code: 'BIS', name: 'Bisogo' },
-          { code: 'MAL', name: 'Malabo' },
-          { code: 'EVI', name: 'Evinayong' },
-          { code: 'MIC', name: 'Micomeseng' },
-          { code: 'BUE', name: 'Buea' },
-          { code: 'SAG', name: 'Sagay' },
-          { code: 'AKON', name: 'Akonibe' },
-          { code: 'MVO', name: 'Mvo' }
+          { code: 'MONGOMO', name: 'Mongomo' },
+          { code: 'AYENE', name: 'Ayene' },
+          { code: 'ANISOC', name: 'Anisoc' },
+          { code: 'NSOK', name: 'Nsok' },
+          { code: 'ACUREN', name: 'Acurenam' }
         ]
       }
     ]

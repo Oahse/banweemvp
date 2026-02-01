@@ -5,6 +5,8 @@
 
 /**
  * Country interface using the official division names for each country
+ * Uses real administrative division types (e.g., "parish", "province", "state", "national district")
+ * No generic terms like "province" unless that's the actual official designation
  */
 export interface Country {
   code: string; // ISO 2-letter country code

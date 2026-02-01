@@ -1,5 +1,5 @@
 /**
- * Ghana country data with provinces, cities, and tax information
+ * Ghana country data with regions and cities
  */
 
 import { Country } from './index';
@@ -7,9 +7,15 @@ import { Country } from './index';
 export const ghana: Country = {
   code: 'GH',
   name: 'Ghana',
+  flag: '🇬🇭',
+  capital: 'Accra',
+  area: 238533,
+  currencySymbol: 'GH₵',
+  officialLanguages: ['English'],
+  demonym: 'Ghanaian',
   taxInfo: { standardRate: 12.5, taxName: 'VAT', currency: 'GHS', region: 'MEA' },
-  provinces: [
-    { code: 'ACCRA', name: 'Greater Accra',
+  divisions: [
+    { code: 'GAR', name: 'Greater Accra', type: 'region',
       cities: [
         { code: 'ACCRA', name: 'Accra' },
         { code: 'TEMA', name: 'Tema' },
@@ -23,7 +29,7 @@ export const ghana: Country = {
         { code: 'PRASTEO', name: 'Praso' }
       ]
     },
-    { code: 'ASHANTI', name: 'Ashanti',
+    { code: 'ASH', name: 'Ashanti', type: 'region',
       cities: [
         { code: 'KUMASI', name: 'Kumasi' },
         { code: 'OBUASI', name: 'Obuasi' },
@@ -37,7 +43,7 @@ export const ghana: Country = {
         { code: 'BASOFI', name: 'Basofi' }
       ]
     },
-    { code: 'BONO', name: 'Bono',
+    { code: 'BON', name: 'Bono', type: 'region',
       cities: [
         { code: 'SUNYANI', name: 'Sunyani' },
         { code: 'TECHIMAN', name: 'Techiman' },
@@ -51,7 +57,7 @@ export const ghana: Country = {
         { code: 'SUNYANI2', name: 'Sunyani North' }
       ]
     },
-    { code: 'BONO', name: 'Bono East',
+    { code: 'BOE', name: 'Bono East', type: 'region',
       cities: [
         { code: 'TECHIMAN', name: 'Techiman' },
         { code: 'KINTAMPO', name: 'Kintampo' },
@@ -65,7 +71,7 @@ export const ghana: Country = {
         { code: 'PRU2', name: 'Pru West' }
       ]
     },
-    { code: 'CENTRAL', name: 'Central',
+    { code: 'CEN', name: 'Central', type: 'region',
       cities: [
         { code: 'CAPE', name: 'Cape Coast' },
         { code: 'ELMINA', name: 'Elmina' },
@@ -79,7 +85,7 @@ export const ghana: Country = {
         { code: 'AWUTU', name: 'Awutu Breku' }
       ]
     },
-    { code: 'EASTERN', name: 'Eastern',
+    { code: 'EAS', name: 'Eastern', type: 'region',
       cities: [
         { code: 'KOFORIDUA', name: 'Koforidua' },
         { code: 'AKIM', name: 'Akim Oda' },
@@ -93,21 +99,7 @@ export const ghana: Country = {
         { code: 'EASTERN2', name: 'Eastern North' }
       ]
     },
-    { code: 'GREATER', name: 'Greater Accra',
-      cities: [
-        { code: 'ACCRA', name: 'Accra' },
-        { code: 'TEMA', name: 'Tema' },
-        { code: 'ASHAIMAN', name: 'Ashaiman' },
-        { code: 'LEKMA', name: 'La' },
-        { code: 'TESHIE', name: 'Teshie' },
-        { code: 'NUNGUA', name: 'Nungua' },
-        { code: 'DANFA', name: 'Danfa' },
-        { code: 'MADINA', name: 'Madina' },
-        { code: 'ABOKOBI', name: 'Abokobi' },
-        { code: 'PRASTEO', name: 'Praso' }
-      ]
-    },
-    { code: 'NORTH', name: 'North',
+    { code: 'NOR', name: 'North', type: 'region',
       cities: [
         { code: 'TAMALE', name: 'Tamale' },
         { code: 'SALAGA', name: 'Salaga' },
@@ -121,7 +113,7 @@ export const ghana: Country = {
         { code: 'MION', name: 'Mion' }
       ]
     },
-    { code: 'NORTH', name: 'North East',
+    { code: 'NE', name: 'North East', type: 'region',
       cities: [
         { code: 'NALERIGU', name: 'Nalerigu' },
         { code: 'BUNKPURUGU', name: 'Bunkpurugu' },
@@ -135,7 +127,7 @@ export const ghana: Country = {
         { code: 'NALERIGU2', name: 'Nalerigu North' }
       ]
     },
-    { code: 'OTI', name: 'Oti',
+    { code: 'OTI', name: 'Oti', type: 'region',
       cities: [
         { code: 'DAMBA', name: 'Damba' },
         { code: 'JASIKAN', name: 'Jasikan' },
@@ -149,7 +141,7 @@ export const ghana: Country = {
         { code: 'KRACHI2', name: 'Krachi East' }
       ]
     },
-    { code: 'SAVANNAH', name: 'Savannah',
+    { code: 'SAV', name: 'Savannah', type: 'region',
       cities: [
         { code: 'DAMONGO', name: 'Damongo' },
         { code: 'BUIPE', name: 'Buipe' },
@@ -163,7 +155,7 @@ export const ghana: Country = {
         { code: 'SAWLA2', name: 'Sawla-Tuna-Kalba' }
       ]
     },
-    { code: 'UPPER', name: 'Upper East',
+    { code: 'UE', name: 'Upper East', type: 'region',
       cities: [
         { code: 'BOLGATANGA', name: 'Bolgatanga' },
         { code: 'NAVONGO', name: 'Navrongo' },
@@ -177,7 +169,7 @@ export const ghana: Country = {
         { code: 'GARU', name: 'Garu' }
       ]
     },
-    { code: 'UPPER', name: 'Upper West',
+    { code: 'UW', name: 'Upper West', type: 'region',
       cities: [
         { code: 'WA', name: 'Wa' },
         { code: 'TAMALE', name: 'Tamale' },
@@ -191,7 +183,7 @@ export const ghana: Country = {
         { code: 'WA2', name: 'Wa East' }
       ]
     },
-    { code: 'WESTERN', name: 'Western',
+    { code: 'WES', name: 'Western', type: 'region',
       cities: [
         { code: 'SEKONDI', name: 'Sekondi-Takoradi' },
         { code: 'TARKWA', name: 'Tarkwa' },
@@ -205,7 +197,7 @@ export const ghana: Country = {
         { code: 'JOMORO2', name: 'Jomoro South' }
       ]
     },
-    { code: 'WESTERN', name: 'Western North',
+    { code: 'WN', name: 'Western North', type: 'region',
       cities: [
         { code: 'SEFWI', name: 'Sefwi Wiawso' },
         { code: 'BIBIANI', name: 'Bibiani' },
@@ -219,7 +211,7 @@ export const ghana: Country = {
         { code: 'ENCHI2', name: 'Enchi North' }
       ]
     },
-    { code: 'VOLTA', name: 'Volta',
+    { code: 'VOL', name: 'Volta', type: 'region',
       cities: [
         { code: 'HO', name: 'Ho' },
         { code: 'KETA', name: 'Keta' },

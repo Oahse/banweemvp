@@ -1,5 +1,5 @@
 /**
- * India country data with provinces, cities, and tax information
+ * India country data with states, union territories, and cities
  */
 
 import { Country } from './index';

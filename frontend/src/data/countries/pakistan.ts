@@ -1,5 +1,5 @@
 /**
- * Pakistan country data with provinces, cities, and tax information
+ * Pakistan country data with provinces, federal territory, and autonomous regions
  */
 
 import { Country } from './index';
@@ -7,23 +7,29 @@ import { Country } from './index';
 export const pakistan: Country = {
   code: 'PK',
   name: 'Pakistan',
+  flag: '🇵🇰',
+  capital: 'Islamabad',
+  area: 881913,
+  currencySymbol: '₨',
+  officialLanguages: ['Urdu', 'English'],
+  demonym: 'Pakistani',
   taxInfo: { standardRate: 17, taxName: 'GST', currency: 'PKR', region: 'APAC' },
-  provinces: [
-    { code: 'PUN', name: 'Punjab',
+  divisions: [
+    { code: 'PUN', name: 'Punjab', type: 'province',
       cities: [
         { code: 'LAHORE', name: 'Lahore' },
         { code: 'FAISALABAD', name: 'Faisalabad' },
         { code: 'RAWALPINDI', name: 'Rawalpindi' },
         { code: 'GUJRANWALA', name: 'Gujranwala' },
-        { code: 'PESHAWAR', name: 'Peshawar' },
         { code: 'MULTAN', name: 'Multan' },
-        { code: 'ISLAMABAD', name: 'Islamabad' },
         { code: 'SIALKOT', name: 'Sialkot' },
         { code: 'GUJRAT', name: 'Gujrat' },
-        { code: 'BAHAWALPUR', name: 'Bahawalpur' }
+        { code: 'BAHAWALPUR', name: 'Bahawalpur' },
+        { code: 'SAHIWAL', name: 'Sahiwal' },
+        { code: 'SARGODHA', name: 'Sargodha' }
       ]
     },
-    { code: 'SND', name: 'Sindh',
+    { code: 'SND', name: 'Sindh', type: 'province',
       cities: [
         { code: 'KARACHI', name: 'Karachi' },
         { code: 'HYDERABAD', name: 'Hyderabad' },
@@ -37,7 +43,7 @@ export const pakistan: Country = {
         { code: 'THATTA', name: 'Thatta' }
       ]
     },
-    { code: 'KPK', name: 'Khyber Pakhtunkhwa',
+    { code: 'KPK', name: 'Khyber Pakhtunkhwa', type: 'province',
       cities: [
         { code: 'PESHAWAR', name: 'Peshawar' },
         { code: 'MARDAN', name: 'Mardan' },
@@ -51,7 +57,7 @@ export const pakistan: Country = {
         { code: 'HARIPUR', name: 'Haripur' }
       ]
     },
-    { code: 'BAL', name: 'Balochistan',
+    { code: 'BAL', name: 'Balochistan', type: 'province',
       cities: [
         { code: 'QUETTA', name: 'Quetta' },
         { code: 'GWADAR', name: 'Gwadar' },
@@ -65,7 +71,7 @@ export const pakistan: Country = {
         { code: 'PISHIN', name: 'Pishin' }
       ]
     },
-    { code: 'GB', name: 'Gilgit-Baltistan',
+    { code: 'GB', name: 'Gilgit-Baltistan', type: 'autonomous territory',
       cities: [
         { code: 'GILGIT', name: 'Gilgit' },
         { code: 'SKARDU', name: 'Skardu' },
@@ -79,7 +85,7 @@ export const pakistan: Country = {
         { code: 'NAGAR', name: 'Nagar' }
       ]
     },
-    { code: 'AJK', name: 'Azad Kashmir',
+    { code: 'AJK', name: 'Azad Kashmir', type: 'autonomous territory',
       cities: [
         { code: 'MUZAFFARABAD', name: 'Muzaffarabad' },
         { code: 'MIRPUR', name: 'Mirpur' },
@@ -93,7 +99,7 @@ export const pakistan: Country = {
         { code: 'PALANDRI', name: 'Palandri' }
       ]
     },
-    { code: 'ICT', name: 'Islamabad Capital Territory',
+    { code: 'ICT', name: 'Islamabad Capital Territory', type: 'federal territory',
       cities: [
         { code: 'ISLAMABAD', name: 'Islamabad' },
         { code: 'G', name: 'G-10' },
