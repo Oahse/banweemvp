@@ -128,13 +128,16 @@ export const Home = () => {
           name: product.name,
           price: product.variants?.[0]?.base_price || 0,
           discountPrice: product.variants?.[0]?.sale_price || null,
-          rating: product.rating || 0,
-          reviewCount: product.review_count || 0,
-          image: product.variants?.[0]?.images?.[0]?.url,
-          category: product.category?.name,
-          isNew: false,
-          isFeatured: product.featured,
-          variants: product.variants || [], // Ensure variants is always an array
+          rating: product.rating_average || product.rating || 0,
+          reviewCount: product.review_count || product.rating_count || 0,
+          image: product.variants?.[0]?.images?.[0]?.url || product.image,
+          category: product.category?.name || 'Uncategorized',
+          isNew: product.is_new || false,
+          isFeatured: product.featured || product.is_featured || false,
+          variants: product.variants || [],
+          sku: product.variants?.[0]?.sku || product.sku,
+          description: product.description || product.short_description,
+          stock: product.variants?.[0]?.stock || product.variants?.[0]?.inventory_quantity_available || 0,
         };
         
         return converted;
@@ -446,7 +449,7 @@ export const Home = () => {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  selectedVariant={null}
+                  selectedVariant={product.variants?.[0] || null}
                   className=""
                 />
               ))
@@ -546,7 +549,7 @@ export const Home = () => {
                   >
                     <ProductCard
                       product={product}
-                      selectedVariant={null}
+                      selectedVariant={product.variants?.[0] || null}
                       className=""
                     />
                   </motion.div>

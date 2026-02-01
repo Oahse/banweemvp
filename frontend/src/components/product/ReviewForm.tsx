@@ -14,23 +14,23 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      toast.error('You must be logged in to submit a review.');
+      toast.error('You must be logged in to submit a review.', { id: 'review-form-action' });
       return;
     }
     if (rating === 0) {
-      toast.error('Please provide a rating.');
+      toast.error('Please provide a rating.', { id: 'review-form-action' });
       return;
     }
 
     setLoading(true);
     try {
       await ReviewsAPI.createReview(productId, rating, comment);
-      toast.success('Review submitted successfully!');
+      toast.success('Review submitted successfully!', { id: 'review-form-action' });
       setRating(0);
       setComment('');
       onReviewSubmitted();
     } catch (error) {
-      toast.error('Failed to submit review.');
+      toast.error('Failed to submit review.', { id: 'review-form-action' });
       console.error('Review submission error:', error);
     } finally {
       setLoading(false);
