@@ -306,7 +306,7 @@ export const Cart = () => {
             </div>
             <div className="ml-4">
               <Link
-                to={`/products/${item.variant?.product_slug || ''}`}
+                to={`/products/${item.id || ''}`}
                 className="font-medium text-copy hover:text-primary block"
               >
                 {(item.variant?.product_name || (item.variant as any)?.product?.name) && (
