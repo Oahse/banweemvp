@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon } from 'lucide-react';
+import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon, StarIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from '../../store/CartContext';
 import { useWishlist } from '../../store/WishlistContext';
@@ -107,16 +107,28 @@ export const ProductCard = ({
 
   // Get the primary image from variant or fallback to product image
   const getPrimaryImage = () => {
+    // Try variant images first
     if (displayVariant && displayVariant.images && Array.isArray(displayVariant.images) && displayVariant.images.length > 0) {
       const primaryImage = displayVariant.images.find(img => img.is_primary);
       return primaryImage?.url || displayVariant.images[0]?.url;
     }
-    if (safeProduct.images && Array.isArray(safeProduct.images) && safeProduct.images.length > 0) {
-      const primaryImage = safeProduct.images.find(img => img.is_primary);
-      return primaryImage?.url || safeProduct.images[0]?.url;
+    
+    // Try product image
+    if (safeProduct.image) {
+      return safeProduct.image;
     }
-    // Use a simple SVG placeholder instead of image file
-    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iNTAiIHk9IjUwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IiM5ZjVmNjYiIGZpbGw9IiNmZjdmNjYiIHJ4PSI1IiByeT0iNSIvPjxwZyBmaWxsPSIjkwOTA5YSIgc3Ryb2tlLWRhc2hlcnJheSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2UtbWl0ZXJsaW1pdD0iMiIvPjxwZyBmaWxsPSIjZmZmIiBkPSJNNTAgMTAwaDh2bS0xMCAxMGgtMTAgMTAtMTB6Ii8+PC9zdmc+';
+    
+    // Try variant images array directly
+    if (safeProduct.variants && Array.isArray(safeProduct.variants) && safeProduct.variants.length > 0) {
+      const firstVariant = safeProduct.variants[0];
+      if (firstVariant.images && Array.isArray(firstVariant.images) && firstVariant.images.length > 0) {
+        const primaryImage = firstVariant.images.find(img => img.is_primary);
+        return primaryImage?.url || firstVariant.images[0]?.url;
+      }
+    }
+    
+    // Fallback to placeholder
+    return 'https://via.placeholder.com/300x300/f3f4f6/9ca3af?text=No+Image';
   };
 
   // Get the display price (variant price or product price)
@@ -306,6 +318,9 @@ export const ProductCard = ({
           <img
             src={displayImage}
             alt={displayVariant ? `${product.name} - ${displayVariant.name}` : product.name}
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/300x300/f3f4f6/9ca3af?text=No+Image';
+            }}
             className={cn(
               'w-full object-cover group-hover:scale-105 transition-transform duration-300',
               viewMode === 'grid' && 'h-32 sm:h-36 md:h-40',
@@ -381,10 +396,15 @@ export const ProductCard = ({
           </Link>
           <div className="flex items-center space-x-1">
             <div className="flex text-yellow-400 text-xs">
-              {'★'.repeat(Math.floor(Number(safeProduct.rating_average) || Number(safeProduct.average_rating) || Number(safeProduct.rating) || 0))}
-              {'☆'.repeat(5 - Math.floor(Number(safeProduct.rating_average) || Number(safeProduct.average_rating) || Number(safeProduct.rating) || 0))}
+              {Array.from({ length: 5 }, (_, i) => (
+                <StarIcon
+                  key={i}
+                  size={12}
+                  className={i < Math.floor(Number(safeProduct.rating) || 0) ? 'fill-current' : ''}
+                />
+              ))}
             </div>
-            <span className="text-xs text-copy-light dark:text-gray-400">({Number(safeProduct.rating_count) || Number(safeProduct.review_count) || 0})</span>
+            <span className="text-xs text-copy-light dark:text-gray-400">({Number(safeProduct.reviewCount) || 0})</span>
           </div>
         </div>
         

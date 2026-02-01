@@ -1090,7 +1090,7 @@ export const ProductDetails = () => {
                   </div>
                 ))
               ) : actualRelatedData && Array.isArray(actualRelatedData) && actualRelatedData.length > 0 ? (
-                actualRelatedData.map((relatedProduct) => {
+                actualRelatedData.slice(0, 4).map((relatedProduct) => {
                   if (!relatedProduct) return null;
                   
                   const transformedProduct = {
