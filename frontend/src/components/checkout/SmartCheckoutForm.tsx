@@ -423,7 +423,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <div className="bg-white border rounded-lg p-6">
               <div className="flex items-center mb-4">
                 <Truck className="h-5 w-5 text-blue-600 mr-2" />
-                <h2 className="text-base font-semibold">Shipping Method</h2>
+                <h2 className="text-sm font-semibold">Shipping Method</h2>
               </div>
               
               {shippingLoading ? (
@@ -464,7 +464,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <div className="bg-white border rounded-lg p-6">
               <div className="flex items-center mb-4">
                 <CreditCard className="h-5 w-5 text-blue-600 mr-2" />
-                <h2 className="text-base font-semibold">Payment Method</h2>
+                <h2 className="text-sm font-semibold">Payment Method</h2>
               </div>
               
               {paymentMethods.length > 0 ? (
