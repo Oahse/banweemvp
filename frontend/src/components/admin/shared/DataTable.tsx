@@ -393,7 +393,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                                   e.stopPropagation();
                                   onView(row);
                                 }}
-                                className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
                                 title="View"
                               >
                                 <Eye className="h-4 w-4" />
