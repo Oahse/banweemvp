@@ -99,9 +99,9 @@
     --color-secondary-dark: #e6b843;
     
     /* Semantic Colors */
-    --color-success: #10b981;
-    --color-success-light: #34d399;
-    --color-success-dark: #059669;
+    --color-success: #61b482;
+    --color-success-light: #8fd4a5;
+    --color-success-dark: #4c9066;
     --color-warning: #f59e0b;
     --color-warning-light: #fbbf24;
     --color-warning-dark: #d97706;
@@ -114,6 +114,9 @@
     --color-purple: #8b5cf6;
     --color-purple-light: #a78bfa;
     --color-purple-dark: #7c3aed;
+    --color-orange: #f97316;
+    --color-orange-light: #fb923c;
+    --color-orange-dark: #ea580c;
     
     /* Surface Colors */
     --color-background: #f8fafc;
@@ -153,8 +156,8 @@
     /* Brand Colors - Adjusted for dark mode */
     --color-main: #ffffff;
     --color-primary: #61b482;
-    --color-primary-light: #8fd4a5;
-    --color-primary-dark: #4c9066;
+    --color-primary-light: #a3ddb8;
+    --color-primary-dark: #3d7552;
     --color-secondary: #f2c94c;
     --color-secondary-light: #f5d563;
     --color-secondary-dark: #e6b843;
@@ -162,19 +165,22 @@
     /* Semantic Colors - Dark mode variants */
     --color-success: #10b981;
     --color-success-light: #34d399;
-    --color-success-dark: #059669;
-    --color-warning: #f59e0b;
-    --color-warning-light: #fbbf24;
-    --color-warning-dark: #d97706;
-    --color-error: #ef4444;
-    --color-error-light: #f87171;
+    --color-success-dark: #047857;
+    --color-warning: #fbbf24;
+    --color-warning-light: #fcd34d;
+    --color-warning-dark: #f59e0b;
+    --color-error: #f87171;
+    --color-error-light: #fca5a5;
     --color-error-dark: #dc2626;
-    --color-info: #3b82f6;
-    --color-info-light: #60a5fa;
+    --color-info: #60a5fa;
+    --color-info-light: #93c5fd;
     --color-info-dark: #2563eb;
-    --color-purple: #8b5cf6;
-    --color-purple-light: #a78bfa;
+    --color-purple: #a78bfa;
+    --color-purple-light: #c4b5fd;
     --color-purple-dark: #7c3aed;
+    --color-orange: #fb923c;
+    --color-orange-light: #fdba74;
+    --color-orange-dark: #f97316;
     
     /* Surface Colors - Dark mode */
     --color-background: #0f172a;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SearchIcon, FilterIcon, XIcon, CalendarIcon } from 'lucide-react';
 import Dropdown from '../../ui/Dropdown';
+import { useTheme } from '../../../store/ThemeContext';
 
 export interface FilterOption {
   value: string;
@@ -37,6 +38,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
   searchPlaceholder = 'Search...',
   className = ''
 }) => {
+  const { theme } = useTheme();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const hasActiveFilters = Object.keys(values).some(key => values[key]);
   const hasActiveSearch = searchValue.trim().length > 0;
@@ -59,7 +61,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'select':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <label className="block text-xs font-medium text-gray-700 mb-1">
+            <label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
             </label>
             <Dropdown
@@ -75,7 +77,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'text':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <label className="block text-xs font-medium text-gray-700 mb-1">
+            <label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
             </label>
             <input
@@ -91,14 +93,14 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'date':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <label className="block text-xs font-medium text-gray-700 mb-1">
+            <label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
             </label>
             <input
               type="date"
               value={value}
               onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
             />
           </div>
         );
@@ -106,7 +108,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'daterange':
         return (
           <div key={filter.key} className="min-w-[200px]">
-            <label className="block text-xs font-medium text-gray-700 mb-1">
+            <label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
             </label>
             <div className="flex items-center space-x-2">
@@ -117,10 +119,10 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                   const endDate = value.split(',')[1] || '';
                   handleFilterChange(filter.key, `${e.target.value},${endDate}`);
                 }}
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className={`flex-1 px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
                 placeholder="Start"
               />
-              <span className="text-gray-500">-</span>
+              <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>-</span>
               <input
                 type="date"
                 value={value.split(',')[1] || ''}
@@ -128,7 +130,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                   const startDate = value.split(',')[0] || '';
                   handleFilterChange(filter.key, `${startDate},${e.target.value}`);
                 }}
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className={`flex-1 px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
                 placeholder="End"
               />
             </div>

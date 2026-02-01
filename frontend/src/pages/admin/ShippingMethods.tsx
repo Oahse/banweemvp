@@ -114,7 +114,7 @@ export const AdminShippingMethods = () => {
         <div className="flex gap-2">
           <button
             onClick={() => handleDownloadShippingMethods('csv')}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <DownloadIcon size={20} />
             Download CSV
@@ -219,7 +219,7 @@ export const AdminShippingMethods = () => {
                 <tbody>
                   {shippingMethods.map((method: any) => (
                     <tr key={method.id} className={`border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <td className="px-6 py-4 text-sm font-mono text-green-600">{String(method.id).slice(0, 8)}</td>
+                      <td className="px-6 py-4 text-sm font-mono text-primary">{String(method.id).slice(0, 8)}</td>
                       <td className={`px-6 py-4 text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{method.name}</td>
                       <td className={`px-6 py-4 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{method.carrier}</td>
                       <td className={`px-6 py-4 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>${method.cost}</td>
@@ -227,7 +227,7 @@ export const AdminShippingMethods = () => {
                       <td className="px-6 py-4 text-sm">
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           method.is_active 
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                            ? 'bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light' 
                             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                         }`}>
                           {method.is_active ? 'Active' : 'Inactive'}
@@ -236,7 +236,7 @@ export const AdminShippingMethods = () => {
                       <td className="px-6 py-4 text-sm">
                         <div className="flex gap-2">
                           <button
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                           >
                             <EditIcon size={16} />
                           </button>
@@ -262,10 +262,10 @@ export const AdminShippingMethods = () => {
                   className={`p-4 flex flex-col gap-2 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-mono text-green-600">{String(method.id).slice(0, 8)}</span>
+                    <span className="text-sm font-mono text-primary">{String(method.id).slice(0, 8)}</span>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       method.is_active 
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                        ? 'bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light' 
                         : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                     }`}>
                       {method.is_active ? 'Active' : 'Inactive'}
@@ -276,7 +276,7 @@ export const AdminShippingMethods = () => {
                   <div className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>${method.cost} - {method.delivery_time}</div>
                   <div className="flex gap-2 mt-2">
                     <button
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                     >
                       <EditIcon size={16} />
                       Edit

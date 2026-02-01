@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from typing import Optional
+import logging
 from core.db import get_db
 from core.utils.response import Response
 from core.errors import APIException
@@ -16,6 +17,8 @@ from models.payments import PaymentMethod
 from services.auth import AuthService
 from schemas.orders import OrderCreate, CheckoutRequest
 from core.dependencies import get_current_auth_user, get_order_service
+
+logger = logging.getLogger(__name__)
 
 from fastapi.security import OAuth2PasswordBearer
 

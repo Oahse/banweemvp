@@ -87,7 +87,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex text-copy">
+    <div className="min-h-screen bg-white dark:bg-gray-950 flex text-gray-900 dark:text-gray-100">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -98,16 +98,16 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-30 h-full w-56 transition-transform duration-300 transform flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-          } ${theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} border-r`}>
+          } bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700`}>
         {/* Logo */}
-        <div className={`p-3 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+        <div className="p-3 border-b border-gray-200 dark:border-gray-700">
           <Link 
             to="/admin" 
             className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
             aria-label="Navigate to admin home page"
           >
             <img src="/banwee_logo_green.png" alt="Banwee Logo" className="h-6 mr-2" />
-            <span className={`text-base font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Admin</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">Admin</span>
           </Link>
         </div>
         <div className="py-3 flex-1 overflow-y-auto">
@@ -117,9 +117,9 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 <li key={item.path}>
                   <Link
                     to={item.path}
-                    className={`flex items-center px-3 py-2 text-xs ${isActive(item.path)
-                        ? 'bg-green-600 text-white font-medium'
-                        : theme === 'dark' ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-100'
+                    className={`flex items-center px-3 py-2 text-sm ${isActive(item.path)
+                        ? 'bg-primary text-white font-medium'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                       }`}
                     onClick={() => setSidebarOpen(false)}>
                     <span className="mr-2">{item.icon}</span>
@@ -130,14 +130,10 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             </ul>
           </nav>
         </div>
-        <div className={`absolute bottom-0 left-0 right-0 p-3 border-t ${theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
           <button
             onClick={handleLogout}
-            className={`flex items-center w-full px-3 py-2 text-xs rounded-md ${
-              theme === 'dark' 
-                ? 'text-red-400 hover:bg-red-900/20' 
-                : 'text-red-600 hover:bg-red-50'
-            }`}>
+            className="flex items-center w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md">
             <LogOutIcon size={14} className="mr-2" />
             <span>Logout</span>
           </button>
@@ -147,28 +143,21 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
       {/* Main content */}
       <div className="flex-1 md:ml-56">
         {/* Header */}
-        <header className={`sticky top-0 z-10 ${theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
+        <header className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center">
-              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1 mr-3 md:hidden">
+              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1 mr-3 md:hidden text-gray-900 dark:text-gray-300">
                 <MenuIcon size={20} />
               </button>
-              <h1 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} hidden md:block`}>
-                {menuItems.find((item) => isActive(item.path))?.title || 'Admin'}
-              </h1>
             </div>
             <div className="flex items-center space-x-4">
               {/* User Profile Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg border ${
-                    theme === 'dark' 
-                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700' 
-                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'
-                  }`}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
                     {(user as any)?.full_name?.charAt(0) || (user as any)?.firstname?.charAt(0) || 'A'}
                   </div>
                   <span className="text-sm font-medium hidden md:block">
@@ -178,18 +167,10 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 </button>
                 
                 {profileDropdownOpen && (
-                  <div className={`absolute right-0 mt-2 w-48 rounded-lg border shadow-lg z-50 ${
-                    theme === 'dark' 
-                      ? 'bg-gray-800 border-gray-700' 
-                      : 'bg-white border-gray-200'
-                  }`}>
+                  <div className="absolute right-0 mt-2 w-48 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg z-50 bg-white dark:bg-gray-800">
                     <Link
                       to="/account/profile"
-                      className={`block px-4 py-2 text-sm ${
-                        theme === 'dark' 
-                          ? 'text-gray-300 hover:bg-gray-700' 
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <div className="flex items-center space-x-2">
@@ -199,11 +180,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                     </Link>
                     <Link
                       to="/account"
-                      className={`block px-4 py-2 text-sm ${
-                        theme === 'dark' 
-                          ? 'text-gray-300 hover:bg-gray-700' 
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <div className="flex items-center space-x-2">
@@ -211,17 +188,13 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                         <span>My Account</span>
                       </div>
                     </Link>
-                    <div className={`border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}></div>
+                    <div className="border-t border-gray-200 dark:border-gray-700"></div>
                     <button
                       onClick={() => {
                         handleLogout();
                         setProfileDropdownOpen(false);
                       }}
-                      className={`block w-full text-left px-4 py-2 text-sm ${
-                        theme === 'dark' 
-                          ? 'text-red-400 hover:bg-red-900/20' 
-                          : 'text-red-600 hover:bg-red-50'
-                      }`}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
                       <div className="flex items-center space-x-2">
                         <LogOutIcon size={16} />
@@ -236,7 +209,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
         </header>
 
         {/* Page content */}
-        <main className="p-4 md:p-6">
+        <main className="p-4 md:p-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
           <ErrorBoundary>
             {children || <Outlet />}
           </ErrorBoundary>

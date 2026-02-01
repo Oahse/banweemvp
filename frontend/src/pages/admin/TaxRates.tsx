@@ -113,7 +113,7 @@ export const AdminTaxRates = () => {
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
         isActive 
-          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+          ? 'bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light' 
           : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
       }`}>
         {isActive ? 'Active' : 'Inactive'}
@@ -139,12 +139,12 @@ export const AdminTaxRates = () => {
         <div className="flex gap-2">
           <button
             onClick={() => handleDownloadTaxRates('csv')}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <DownloadIcon size={20} />
             Download CSV
           </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
             <PlusIcon size={20} />
             Add Tax Rate
           </button>
@@ -209,7 +209,7 @@ export const AdminTaxRates = () => {
                 <tbody>
                   {taxRates.map((taxRate: any) => (
                     <tr key={taxRate.id} className={`border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <td className="px-6 py-4 text-sm font-mono text-green-600">{String(taxRate.id).slice(0, 8)}</td>
+                      <td className="px-6 py-4 text-sm font-mono text-primary">{String(taxRate.id).slice(0, 8)}</td>
                       <td className={`px-6 py-4 text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{taxRate.country_name} ({taxRate.country_code})</td>
                       <td className={`px-6 py-4 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                         {taxRate.province_name ? `${taxRate.province_name} (${taxRate.province_code})` : '-'}
@@ -246,7 +246,7 @@ export const AdminTaxRates = () => {
                   className={`p-4 flex flex-col gap-2 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-mono text-green-600">{String(taxRate.id).slice(0, 8)}</span>
+                    <span className="text-sm font-mono text-primary">{String(taxRate.id).slice(0, 8)}</span>
                     {statusBadge(taxRate.is_active)}
                   </div>
                   <div className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>

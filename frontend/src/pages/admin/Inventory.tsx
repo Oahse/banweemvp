@@ -97,7 +97,7 @@ export const AdminInventory = () => {
         <div className="flex gap-2">
           <button
             onClick={() => {/* TODO: Add download functionality */}}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <DownloadIcon size={20} />
             Download CSV

@@ -203,25 +203,37 @@ export const AdminOrderDetail = () => {
   const getStatusColor = (status: string) => {
     const key = String(status || '').toUpperCase();
     const statusMap: Record<string, string> = {
-      'PENDING': 'bg-yellow-100 text-yellow-800',
-      'PROCESSING': 'bg-green-100 text-green-800',
-      'SHIPPED': 'bg-green-100 text-green-800',
-      'DELIVERED': 'bg-green-100 text-green-800',
-      'CANCELLED': 'bg-red-100 text-red-800',
-      'RETURNED': 'bg-gray-100 text-gray-800',
+      'PENDING': 'bg-orange text-black dark:bg-orange-dark dark:text-white',
+      'PROCESSING': 'bg-info text-black dark:bg-info-dark dark:text-white',
+      'SHIPPED': 'bg-purple text-black dark:bg-purple-dark dark:text-white',
+      'DELIVERED': 'bg-success text-black dark:bg-success-dark dark:text-white',
+      'CANCELLED': 'bg-error text-black dark:bg-error-dark dark:text-white',
+      'RETURNED': 'bg-warning text-black dark:bg-warning-dark dark:text-white',
     };
-    return statusMap[key] || 'bg-gray-100 text-gray-800';
+    return statusMap[key] || 'bg-gray-100 text-black dark:bg-gray-700 dark:text-white';
   };
 
   const getPaymentStatusColor = (status: string) => {
     const key = String(status || '').toUpperCase();
     const statusMap: Record<string, string> = {
-      'PAID': 'bg-green-100 text-green-800',
-      'PENDING': 'bg-yellow-100 text-yellow-800',
-      'FAILED': 'bg-red-100 text-red-800',
-      'REFUNDED': 'bg-green-100 text-green-800',
+      'PAID': 'bg-success text-black dark:bg-success-dark dark:text-white',
+      'PENDING': 'bg-orange text-black dark:bg-orange-dark dark:text-white',
+      'FAILED': 'bg-error text-black dark:bg-error-dark dark:text-white',
+      'REFUNDED': 'bg-purple text-black dark:bg-purple-dark dark:text-white',
     };
-    return statusMap[key] || 'bg-gray-100 text-gray-800';
+    return statusMap[key] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+  };
+
+  const getFulfillmentStatusColor = (status: string) => {
+    const key = String(status || '').toUpperCase();
+    const statusMap: Record<string, string> = {
+      'FULFILLED': 'bg-success text-dark dark:bg-success-dark dark:text-white',
+      'UNFULFILLED': 'bg-orange text-dark dark:bg-orange-dark dark:text-white',
+      'PARTIALLY_FULFILLED': 'bg-warning text-dark dark:bg-warning-dark dark:text-white',
+      'PENDING': 'bg-orange text-dark dark:bg-orange-dark dark:text-white',
+      'PROCESSING': 'bg-info text-dark dark:bg-info-dark dark:text-white',
+    };
+    return statusMap[key] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
   };
 
   const formatStatus = (status?: string) => {
@@ -354,9 +366,11 @@ export const AdminOrderDetail = () => {
         <div className="bg-surface rounded-lg border border-border-light p-4">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-copy-light">Fulfillment</p>
-            <CheckCircle className="w-4 h-4 text-warning" />
+            <CheckCircle className="w-4 h-4 text-success" />
           </div>
-          <p className="text-sm font-semibold text-copy">{formatStatus(order.fulfillment_status || order.fulfillment_status)}</p>
+          <p className={`px-3 py-1 rounded-full text-xs font-small w-fit ${getFulfillmentStatusColor(order.fulfillment_status)}`}>
+            {formatStatus(order.fulfillment_status)}
+          </p>
         </div>
 
         {/* Order Total */}

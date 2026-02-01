@@ -14,6 +14,7 @@ import {
   AlertCircle,
   X
 } from 'lucide-react';
+import { useTheme } from '../../store/ThemeContext';
 import AdminAPI from '../../api/admin';
 import { CategoriesAPI } from '../../api';
 import toast from 'react-hot-toast';
@@ -57,6 +58,7 @@ interface ProductFormData {
 
 export const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState<ProductFormData>({
@@ -380,10 +382,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => 
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
             <div className="flex items-center gap-2 mb-4">
-              <Info className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
+              <Info className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+              <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Basic Information</h2>
             </div>
             
             <div className="space-y-4">
@@ -452,15 +454,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => 
           </div>
 
           {/* Specifications */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
             <div className="flex items-center gap-2 mb-4">
-              <Package className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Specifications</h2>
+              <Package className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+              <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Specifications</h2>
             </div>
             
             <div className="space-y-3">
               {Object.entries(formData.specifications).map(([key, value]) => (
-                <div key={key} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                <div key={key} className={`flex items-center gap-2 p-2 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                   <span className="font-medium text-sm text-gray-700 flex-1">{key}:</span>
                   <span className="text-sm text-gray-600 flex-1">{String(value)}</span>
                   <button
@@ -500,16 +502,16 @@ export const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => 
           </div>
 
           {/* Product Variants */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-gray-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Product Variants</h2>
+                <Package className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Product Variants</h2>
               </div>
               <button
                 type="button"
                 onClick={addVariant}
-                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
               >
                 <Plus className="w-4 h-4" />
                 Add Variant
@@ -660,17 +662,18 @@ export const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Category & Origin */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Category & Origin</h2>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
+            <h2 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Category & Origin</h2>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formData.category_id}
-                  onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }})}
+                  className={`w-full px-3 py-2 border rounded-md ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
@@ -697,10 +700,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => 
           </div>
 
           {/* Tags */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
             <div className="flex items-center gap-2 mb-4">
-              <Tag className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Tags</h2>
+              <Tag className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+              <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Tags</h2>
             </div>
             
             <div className="space-y-3">
@@ -743,8 +746,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => 
           </div>
 
           {/* Dietary Tags */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Dietary Tags</h2>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border p-6`}>
+            <h2 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Dietary Tags</h2>
             
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">

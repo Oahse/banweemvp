@@ -86,7 +86,7 @@ export const Users = () => {
       label: 'Role',
       render: (value: string) => {
         const roleColors = {
-          Admin: 'bg-purple-100 text-purple-800',
+          Admin: 'bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light',
           Customer: 'bg-blue-100 text-blue-800',
           Supplier: 'bg-green-100 text-green-800'
         };
@@ -105,14 +105,14 @@ export const Users = () => {
       label: 'Status',
       render: (value: string) => {
         const statusColors = {
-          active: 'bg-green-100 text-green-800',
-          inactive: 'bg-red-100 text-red-800',
-          suspended: 'bg-yellow-100 text-yellow-800'
+          active: 'bg-success text-success-dark dark:bg-success-dark dark:text-success-light',
+          inactive: 'bg-error text-error-dark dark:bg-error-dark dark:text-error-light',
+          suspended: 'bg-orange text-orange-dark dark:bg-orange-dark dark:text-orange-light'
         };
         
         return (
           <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-            statusColors[value as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'
+            statusColors[value as keyof typeof statusColors] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
           }`}>
             {value}
           </span>

@@ -433,9 +433,9 @@ export const AdminProductDetail = () => {
                 ).map((tag: string, index: number) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-green-100 text-green-800 rounded-md text-sm font-medium inline-flex items-center gap-1"
+                    className="px-3 py-1 bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light rounded-md text-sm font-medium inline-flex items-center gap-1"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-600"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     {tag.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </span>
                 ))}

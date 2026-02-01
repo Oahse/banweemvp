@@ -76,9 +76,9 @@ export const Refunds = () => {
       width: '100px',
       render: (value: string) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value === 'processed' ? 'bg-green-100 text-green-800' :
+          value === 'processed' ? 'bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light' :
           value === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-          value === 'approved' ? 'bg-green-100 text-green-800' :
+          value === 'approved' ? 'bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light' :
           value === 'rejected' ? 'bg-red-100 text-red-800' :
           'bg-gray-100 text-gray-800'
         }`}>
@@ -110,7 +110,7 @@ export const Refunds = () => {
           </div>
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400">Processed</p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-primary">
               {refunds.filter(r => r.status === 'processed').length}
             </p>
           </div>

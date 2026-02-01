@@ -38,7 +38,7 @@ const TrackingTimeline = ({
       case 'processing':
         return 'text-blue-600 bg-blue-100';
       case 'shipped':
-        return 'text-purple-600 bg-purple-100';
+        return 'text-primary bg-primary-light dark:bg-primary-dark dark:text-primary-light';
       case 'out for delivery':
         return 'text-orange-600 bg-orange-100';
       case 'delivered':

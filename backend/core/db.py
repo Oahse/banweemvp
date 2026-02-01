@@ -521,7 +521,14 @@ class DatabaseManager:
                             metadata={"attempt": attempt + 1,
                                       "max_retries": max_retries}
                         )
-                    yield session
+                    try:
+                        yield session
+                    except GeneratorExit:
+                        # Normal generator exit, let it propagate
+                        raise
+                    finally:
+                        # Ensure session is properly cleaned up after yield
+                        await session.rollback()
                     return
 
             except (SQLAlchemyError, DisconnectionError, OperationalError) as e:
@@ -597,24 +604,26 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             structured_logger.info(
                 message="Database session created successfully",
             )
-            yield session
-
+            try:
+                yield session
+            except GeneratorExit:
+                # Normal generator exit
+                raise
+            except Exception:
+                # Let exceptions from the calling code propagate
+                raise
     except DatabaseException:
         # Re-raise database exceptions (already logged)
         raise
-
     except HTTPException:
         # Re-raise HTTP exceptions (like 401, 403, etc.) without wrapping
         raise
-
     except APIException:
         # Re-raise API exceptions without wrapping
         raise
-
     except (ValueError, ValidationError, RequestValidationError) as e:
         # Re-raise validation errors (including Pydantic validation errors)
         raise
-
     except SQLAlchemyError as e:
         # Handle database-specific errors
         structured_logger.error(
@@ -624,7 +633,6 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         raise DatabaseException(
             message=f"Database error: {str(e)}",
         )
-
     except Exception as e:
         # Handle any other unexpected exceptions (but not HTTP/API exceptions)
         structured_logger.error(

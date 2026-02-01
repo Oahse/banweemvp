@@ -158,21 +158,21 @@ export const Dashboard = () => {
       key: 'id',
       label: 'Order ID',
       render: (value: string) => (
-        <span className="font-mono text-sm">#{value.slice(-8)}</span>
+        <span className="font-mono text-sm text-primary dark:text-primary-light">#{value.slice(-8)}</span>
       )
     },
     {
       key: 'user_email',
       label: 'Customer',
       render: (value: string) => (
-        <span className="text-sm text-gray-900">{value}</span>
+        <span className="text-sm text-gray-900 dark:text-white">{value}</span>
       )
     },
     {
       key: 'total_amount',
       label: 'Amount',
       render: (value: number) => (
-        <span className="text-sm font-medium text-gray-900">
+        <span className="text-sm font-medium text-gray-900 dark:text-white">
           {formatCurrency(value)}
         </span>
       ),
@@ -183,16 +183,16 @@ export const Dashboard = () => {
       label: 'Status',
       render: (value: string) => {
         const statusColors = {
-          pending: 'bg-yellow-100 text-yellow-800',
-          confirmed: 'bg-blue-100 text-blue-800',
-          shipped: 'bg-purple-100 text-purple-800',
-          delivered: 'bg-green-100 text-green-800',
-          cancelled: 'bg-red-100 text-red-800'
+          pending: 'bg-orange text-dark dark:bg-orange-dark dark:text-white',
+          confirmed: 'bg-info text-dark dark:bg-info-dark dark:text-white',
+          shipped: 'bg-purple text-dark dark:bg-purple-dark dark:text-white',
+          delivered: 'bg-success text-dark dark:bg-success-dark dark:text-white',
+          cancelled: 'bg-error text-dark dark:bg-error-dark dark:text-white'
         };
         
         return (
-          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-            statusColors[value as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'
+          <span className={`inline-flex px-2 py-1 text-xs font-small rounded-full ${
+            statusColors[value as keyof typeof statusColors] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
           }`}>
             {value}
           </span>
@@ -203,7 +203,7 @@ export const Dashboard = () => {
       key: 'created_at',
       label: 'Date',
       render: (value: string) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-600 dark:text-gray-400">
           {new Date(value).toLocaleDateString()}
         </span>
       )
@@ -215,29 +215,10 @@ export const Dashboard = () => {
   };
 
   return (
-    <PageLayout
-      title="Dashboard"
-      subtitle="Welcome back to your admin dashboard"
-      description="Here's what's happening with your business today"
-      icon={BarChart3Icon}
-      actions={
-        <button
-          onClick={() => window.location.reload()}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          <ActivityIcon className="h-4 w-4" />
-          Refresh
-        </button>
-      }
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Admin' },
-        { label: 'Dashboard' }
-      ]}
-    >
+    <PageLayout>
       <div className="space-y-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {statsCards.map((card, index) => (
             <StatsCard
               key={index}

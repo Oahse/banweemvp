@@ -128,10 +128,10 @@ export const Products = () => {
       render: (value: number) => (
         <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
           value > 10 
-            ? 'bg-green-100 text-green-800' 
+            ? 'bg-success text-success-dark dark:bg-success-dark dark:text-success-light' 
             : value > 0 
-            ? 'bg-yellow-100 text-yellow-800' 
-            : 'bg-red-100 text-red-800'
+            ? 'bg-warning text-warning-dark dark:bg-warning-dark dark:text-warning-light' 
+            : 'bg-error text-error-dark dark:bg-error-dark dark:text-error-light'
         }`}>
           {value} units
         </span>
@@ -143,14 +143,14 @@ export const Products = () => {
       label: 'Status',
       render: (value: string) => {
         const statusColors = {
-          active: 'bg-green-100 text-green-800',
-          inactive: 'bg-red-100 text-red-800',
-          draft: 'bg-gray-100 text-gray-800'
+          active: 'bg-success text-success-dark dark:bg-success-dark dark:text-success-light',
+          inactive: 'bg-error text-error-dark dark:bg-error-dark dark:text-error-light',
+          draft: 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
         };
         
         return (
           <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-            statusColors[value as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'
+            statusColors[value as keyof typeof statusColors] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
           }`}>
             {value}
           </span>

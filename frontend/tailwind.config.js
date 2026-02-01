@@ -54,6 +54,11 @@ export default {
           light: 'var(--color-purple-light)',
           dark: 'var(--color-purple-dark)',
         },
+        orange: {
+          DEFAULT: 'var(--color-orange)',
+          light: 'var(--color-orange-light)',
+          dark: 'var(--color-orange-dark)',
+        },
         
         // Surface colors
         background: 'var(--color-background)',
