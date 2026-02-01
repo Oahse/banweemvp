@@ -221,19 +221,19 @@ export const AdminOrderDetail = () => {
       'FAILED': 'bg-error text-black dark:bg-error-dark dark:text-white',
       'REFUNDED': 'bg-purple text-black dark:bg-purple-dark dark:text-white',
     };
-    return statusMap[key] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    return statusMap[key] || 'bg-gray-100 text-black dark:bg-gray-700 dark:text-white';
   };
 
   const getFulfillmentStatusColor = (status: string) => {
     const key = String(status || '').toUpperCase();
     const statusMap: Record<string, string> = {
-      'FULFILLED': 'bg-success text-dark dark:bg-success-dark dark:text-white',
-      'UNFULFILLED': 'bg-orange text-dark dark:bg-orange-dark dark:text-white',
-      'PARTIALLY_FULFILLED': 'bg-warning text-dark dark:bg-warning-dark dark:text-white',
-      'PENDING': 'bg-orange text-dark dark:bg-orange-dark dark:text-white',
-      'PROCESSING': 'bg-info text-dark dark:bg-info-dark dark:text-white',
+      'FULFILLED': 'bg-success text-black dark:bg-success-dark dark:text-white',
+      'UNFULFILLED': 'bg-orange text-black dark:bg-orange-dark dark:text-white',
+      'PARTIALLY_FULFILLED': 'bg-warning text-black dark:bg-warning-dark dark:text-white',
+      'PENDING': 'bg-orange text-black dark:bg-orange-dark dark:text-white',
+      'PROCESSING': 'bg-info text-black dark:bg-info-dark dark:text-white',
     };
-    return statusMap[key] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    return statusMap[key] || 'bg-gray-100 text-black dark:bg-gray-700 dark:text-white';
   };
 
   const formatStatus = (status?: string) => {
@@ -610,14 +610,14 @@ export const AdminOrderDetail = () => {
           {order.items && order.items.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-surface-dark border-b border-border-light">
+                <thead className="bg-surface-dark border-b border-border-light sticky top-0">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Image</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Product</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Variant</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Quantity</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Unit Price</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Total</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-copy-light">Image</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-copy-light">Product</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-copy-light">Variant</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-copy-light">Quantity</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-copy-light">Unit Price</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-copy-light">Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -628,27 +628,32 @@ export const AdminOrderDetail = () => {
                     const primaryImage = item.variant?.images?.find((img: { is_primary?: boolean }) => img.is_primary) || item.variant?.images?.[0];
                     const imageUrl = primaryImage?.url;
                     return (
-                      <tr key={item.id || index} className="border-b border-border-light hover:bg-surface-light">
+                      <tr key={item.id || index} className="border-b border-border-light hover:bg-surface-light transition-colors">
                         <td className="px-6 py-4">
                           {imageUrl ? (
                             <img
                               src={imageUrl}
                               alt={primaryImage?.alt_text || item.product_name || 'Product'}
-                              className="w-12 h-12 object-cover rounded border border-border-light"
+                              className="w-16 h-16 object-cover rounded border border-border-light"
                             />
                           ) : (
-                            <div className="w-12 h-12 rounded border border-border-light bg-surface-dark flex items-center justify-center text-copy-light text-xs">—</div>
+                            <div className="w-16 h-16 rounded border border-border-light bg-surface-dark flex items-center justify-center text-copy-light text-xs">—</div>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-sm text-copy font-semibold">
-                          {item.product_name ?? item.product?.name ?? 'N/A'}
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-semibold text-copy">
+                            {item.product_name ?? item.product?.name ?? 'N/A'}
+                          </div>
+                          <div className="text-xs text-copy-light mt-1">
+                            ID: {item.product_id ?? 'N/A'}
+                          </div>
                         </td>
                         <td className="px-6 py-4 text-sm text-copy-light">
                           {item.variant_name ?? item.sku ?? item.variant?.sku ?? 'N/A'}
                         </td>
-                        <td className="px-6 py-4 text-sm text-copy">{item.quantity}</td>
+                        <td className="px-6 py-4 text-sm font-medium text-copy">{qty}</td>
                         <td className="px-6 py-4 text-sm text-copy">{formatCurrency(unitPrice)}</td>
-                        <td className="px-6 py-4 text-sm font-semibold text-copy">{formatCurrency(total)}</td>
+                        <td className="px-6 py-4 text-sm font-bold text-copy">{formatCurrency(total)}</td>
                       </tr>
                     );
                   })}
@@ -656,7 +661,36 @@ export const AdminOrderDetail = () => {
               </table>
             </div>
           ) : (
-            <div className="p-6 text-center text-copy-light">No items in this order</div>
+            <div className="p-12 text-center">
+              <p className="text-copy-light text-lg">No items in this order</p>
+            </div>
+          )}
+
+          {/* Items Summary */}
+          {order.items && order.items.length > 0 && (
+            <div className="px-6 py-4 bg-surface-light border-t border-border-light">
+              <div className="grid grid-cols-3 gap-4 text-right">
+                <div>
+                  <p className="text-xs text-copy-light mb-1">Total Items</p>
+                  <p className="text-lg font-bold text-copy">{order.items.reduce((sum, item) => sum + (item.quantity || 0), 0)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-copy-light mb-1">Total Cost</p>
+                  <p className="text-lg font-bold text-copy">
+                    {formatCurrency(order.items.reduce((sum, item) => sum + (Number(item.total_price) || 0), 0))}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-copy-light mb-1">Average Price</p>
+                  <p className="text-lg font-bold text-copy">
+                    {formatCurrency(
+                      (order.items.reduce((sum, item) => sum + (Number(item.total_price) || 0), 0)) /
+                      (order.items.length || 1)
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       )}

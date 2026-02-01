@@ -428,16 +428,16 @@ export const AdminDataTable = <T extends Record<string, any>>({
             </div>
           )}
 
-          {/* Pagination */}
-          {paginated && pagination.pages > 1 && (
-            <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+          {/* Pagination - Always show if paginated is true */}
+          {paginated && (
+            <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="text-sm text-gray-700 dark:text-gray-300">
                   <span className="block sm:hidden">
-                    Page {pagination.page} of {pagination.pages}
+                    Page {pagination.page} of {pagination.pages || 1}
                   </span>
                   <span className="hidden sm:block">
-                    Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
+                    Showing {pagination.total === 0 ? 0 : ((pagination.page - 1) * pagination.limit) + 1} to{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                     {pagination.total} results
                   </span>
@@ -446,19 +446,19 @@ export const AdminDataTable = <T extends Record<string, any>>({
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page <= 1}
-                    className="p-2 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                    className="p-2 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
                   
-                  <span className="text-sm text-gray-700 dark:text-gray-300 hidden sm:block">
-                    Page {pagination.page} of {pagination.pages}
+                  <span className="text-sm text-gray-700 dark:text-gray-300 hidden sm:block min-w-[100px] text-center">
+                    Page {pagination.page} of {pagination.pages || 1}
                   </span>
                   
                   <button
                     onClick={() => handlePageChange(pagination.page + 1)}
-                    disabled={pagination.page >= pagination.pages}
-                    className="p-2 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                    disabled={pagination.page >= (pagination.pages || 1)}
+                    className="p-2 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </button>
