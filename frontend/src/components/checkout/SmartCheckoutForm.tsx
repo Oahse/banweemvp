@@ -306,7 +306,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
     return (
       <div className="bg-white border rounded-lg p-4 space-y-3">
-        <h3 className="font-semibold text-lg">Order Summary</h3>
+        <h3 className="font-semibold text-base">Order Summary</h3>
         
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
@@ -333,7 +333,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
           
           <hr className="my-2" />
           
-          <div className="flex justify-between font-semibold text-lg">
+          <div className="flex justify-between font-semibold text-base">
             <span>Total:</span>
             <span>{formatCurrency(pricingData.total)}</span>
           </div>
@@ -373,7 +373,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <div className="bg-white border rounded-lg p-6">
               <div className="flex items-center mb-4">
                 <MapPin className="h-5 w-5 text-blue-600 mr-2" />
-                <h2 className="text-lg font-semibold">Shipping Address</h2>
+                <h2 className="text-base font-semibold">Shipping Address</h2>
               </div>
               
               {addresses.length > 0 ? (
@@ -423,7 +423,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <div className="bg-white border rounded-lg p-6">
               <div className="flex items-center mb-4">
                 <Truck className="h-5 w-5 text-blue-600 mr-2" />
-                <h2 className="text-lg font-semibold">Shipping Method</h2>
+                <h2 className="text-base font-semibold">Shipping Method</h2>
               </div>
               
               {shippingLoading ? (
@@ -464,7 +464,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <div className="bg-white border rounded-lg p-6">
               <div className="flex items-center mb-4">
                 <CreditCard className="h-5 w-5 text-blue-600 mr-2" />
-                <h2 className="text-lg font-semibold">Payment Method</h2>
+                <h2 className="text-base font-semibold">Payment Method</h2>
               </div>
               
               {paymentMethods.length > 0 ? (
@@ -496,7 +496,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
             {/* Discount Code Section */}
             <div className="bg-white border rounded-lg p-6">
-              <h2 className="text-lg font-semibold mb-4">Discount Code</h2>
+              <h2 className="text-base font-semibold mb-4">Discount Code</h2>
               <Input
                 type="text"
                 placeholder="Enter discount code"
@@ -507,7 +507,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
             {/* Order Notes */}
             <div className="bg-white border rounded-lg p-6">
-              <h2 className="text-lg font-semibold mb-4">Order Notes (Optional)</h2>
+              <h2 className="text-base font-semibold mb-4">Order Notes (Optional)</h2>
               <textarea
                 className="w-full p-3 border rounded-lg resize-none"
                 rows={3}
@@ -536,7 +536,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <Button
               type="submit"
               disabled={!realTimeValidation.can_proceed || processingPayment}
-              className="w-full py-3 text-lg"
+              className="w-full py-2 text-base"
             >
               {processingPayment ? (
                 <>

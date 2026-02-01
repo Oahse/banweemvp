@@ -25,7 +25,6 @@ export const Cart = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [couponCode, setCouponCode] = useState('');
-  const [taxLocation, setTaxLocation] = useState<{ country: string; province?: string }>({ country: 'US' });
   const [clearingCart, setClearingCart] = useState(false);
   const [showRemoveItemModal, setShowRemoveItemModal] = useState(false);
   const [showClearCartModal, setShowClearCartModal] = useState(false);
@@ -64,28 +63,21 @@ export const Cart = () => {
   
   // Calculate cart summary locally
   const getCartSummary = () => {
-  const subtotal = cart?.subtotal || cartItems.reduce((sum, item) => sum + item.total_price, 0);
-  const tax = cart?.tax_amount || 0;
+    const subtotal = cart?.subtotal || cartItems.reduce((sum, item) => {
+      const itemTotal = !isNaN(item.total_price) && item.total_price > 0 
+        ? item.total_price 
+        : (item.quantity || 1) * (
+            !isNaN(item.price_per_unit) && item.price_per_unit > 0 
+              ? item.price_per_unit 
+              : item.variant?.current_price || item.variant?.sale_price || item.variant?.base_price || 0
+          );
+      return sum + itemTotal;
+    }, 0);
   
-  // Use shipping_cost first, fallback to shipping_amount for backward compatibility
-  const shipping = cart?.shipping_cost || cart?.shipping_amount || 0;
-    
-    // Always prefer backend total when available
-    const total = cart?.total_amount || (subtotal + tax + shipping);
-    
-    return { subtotal, tax, shipping, total };
+    return { subtotal };
   };
   
-  const { subtotal, tax, shipping, total } = getCartSummary();
-
-  
-  // Get tax location info
-  useEffect(() => {
-    const country = localStorage.getItem('detected_country') || 'US';
-    const province = localStorage.getItem('detected_province') || undefined;
-    setTaxLocation({ country, province });
-    
-  }, [cart]); // Update when cart changes (which includes tax recalculation)
+  const { subtotal } = getCartSummary();
   
   // Enhanced remove item handler
   const handleRemoveItem = useCallback(async (id: string) => {
@@ -314,51 +306,51 @@ export const Cart = () => {
             </div>
             <div className="ml-4">
               <Link
-                to={`/products/${item.variant?.product_id}`}
-                className="font-medium text-copy hover:text-primary">
-                <div>
-                  {(item.variant?.product_name || (item.variant as any)?.product?.name) && (
-                    <div className="font-medium">{item.variant?.product_name || (item.variant as any)?.product?.name}</div>
-                  )}
-                  <div className="text-sm text-copy-light">{item.variant?.name || 'Product'}</div>
-                  
-                  {/* Show variant attributes if available */}
-                  {item.variant?.attributes && Object.keys(item.variant.attributes).length > 0 && (
-                    <div className="mt-1">
-                      {Object.entries(item.variant.attributes).slice(0, 2).map(([key, value]) => (
-                        <span 
-                          key={key}
-                          className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded mr-1 mb-1"
-                        >
-                          {key}: {value}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Stock status indicator */}
-                  {item.variant?.stock !== undefined && (
-                    <div className="mt-1">
-                      {item.variant.stock > 10 ? (
-                        <span className="text-green-600 text-xs flex items-center">
-                          <CheckCircle size={12} className="mr-1" />
-                          In Stock
-                        </span>
-                      ) : item.variant.stock > 0 ? (
-                        <span className="text-orange-600 text-xs flex items-center">
-                          <AlertCircle size={12} className="mr-1" />
-                          Only {item.variant.stock} left
-                        </span>
-                      ) : (
-                        <span className="text-red-600 text-xs flex items-center">
-                          <AlertCircle size={12} className="mr-1" />
-                          Out of Stock
-                        </span>
-                      )}
-                    </div>
+                to={`/products/${item.variant?.product_id || ''}`}
+                className="font-medium text-copy hover:text-primary block"
+              >
+                {(item.variant?.product_name || (item.variant as any)?.product?.name) && (
+                  <div className="text-sm font-medium">{item.variant?.product_name || (item.variant as any)?.product?.name}</div>
+                )}
+                <div className="text-xs text-copy-light">{item.variant?.name || 'Product'}</div>
+              </Link>
+              
+              {/* Show variant attributes if available */}
+              {item.variant?.attributes && Object.keys(item.variant.attributes).length > 0 && (
+                <div className="mt-1">
+                  {Object.entries(item.variant.attributes).slice(0, 2).map(([key, value]) => (
+                    <span 
+                      key={key}
+                      className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded mr-1 mb-1"
+                    >
+                      {key}: {value}
+                    </span>
+                  ))}
+                </div>
+              )}
+              
+              {/* Stock status indicator */}
+              {item.variant?.stock !== undefined && (
+                <div className="mt-1">
+                  {item.variant.stock > 10 ? (
+                    <span className="text-green-600 text-xs flex items-center">
+                      <CheckCircle size={12} className="mr-1" />
+                      In Stock
+                    </span>
+                  ) : item.variant.stock > 0 ? (
+                    <span className="text-orange-600 text-xs flex items-center">
+                      <AlertCircle size={12} className="mr-1" />
+                      Only {item.variant.stock} left
+                    </span>
+                  ) : (
+                    <span className="text-red-600 text-xs flex items-center">
+                      <AlertCircle size={12} className="mr-1" />
+                      Out of Stock
+                    </span>
                   )}
                 </div>
-              </Link>
+              )}
+              
               <button
                 onClick={() => handleRemoveItem(item.id)}
                 aria-label={`Remove ${item.variant?.product_name || 'item'} from cart`}
@@ -371,11 +363,17 @@ export const Cart = () => {
           <div className="col-span-2 text-center">
             <span className="md:hidden font-medium text-copy">Price: </span>
             <div>
-              <span className="font-medium text-primary">{formatCurrency(item.price_per_unit)}</span>
+              <span className="font-medium text-primary">
+                {formatCurrency(
+                  !isNaN(item.price_per_unit) && item.price_per_unit > 0 
+                    ? item.price_per_unit 
+                    : item.variant?.current_price || item.variant?.sale_price || item.variant?.base_price || 0
+                )}
+              </span>
               {/* Show discount if applicable */}
               {item.variant?.discount_percentage && item.variant.discount_percentage > 0 && (
                 <div className="text-xs text-gray-500 line-through">
-                  {formatCurrency(item.variant.base_price)}
+                  {formatCurrency(item.variant.base_price || 0)}
                 </div>
               )}
             </div>
@@ -410,7 +408,17 @@ export const Cart = () => {
           </div>
           <div className="col-span-2 text-center">
             <span className="md:hidden font-medium text-copy">Subtotal: </span>
-            <span className="font-medium text-copy">{formatCurrency(item.total_price)}</span>
+            <span className="font-medium text-copy">
+              {formatCurrency(
+                !isNaN(item.total_price) && item.total_price > 0 
+                  ? item.total_price 
+                  : (item.quantity || 1) * (
+                      !isNaN(item.price_per_unit) && item.price_per_unit > 0 
+                        ? item.price_per_unit 
+                        : item.variant?.current_price || item.variant?.sale_price || item.variant?.base_price || 0
+                    )
+              )}
+            </span>
           </div>
         </div>
       </motion.div>
@@ -428,7 +436,7 @@ export const Cart = () => {
         <span className="text-copy">Shopping Cart</span>
       </nav>
 
-      <h1 className="text-2xl md:text-3xl font-bold text-copy mb-6 flex items-center justify-between">
+      <h1 className="text-xl font-bold text-copy mb-6 flex items-center justify-between">
         <span>Your Shopping Cart</span>
       </h1>
 
@@ -437,11 +445,11 @@ export const Cart = () => {
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-background flex items-center justify-center">
             <ShoppingCartIcon size={32} className="text-copy-lighter" />
           </div>
-          <h2 className="text-xl font-medium text-copy mb-2">Your cart is empty</h2>
+          <h2 className="text-base font-medium text-copy mb-2">Your cart is empty</h2>
           <p className="text-copy-light mb-6">Looks like you haven't added any products to your cart yet.</p>
           <Link
             to="/products"
-            className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md transition-colors">
+            className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors">
             Continue Shopping
           </Link>
         </div>
@@ -488,28 +496,15 @@ export const Cart = () => {
           {/* Order Summary */}
           <div className="lg:w-1/3">
             <div className="bg-surface rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-copy mb-4">Order Summary</h2>
+              <h2 className="text-base font-semibold text-copy mb-4">Order Summary</h2>
               
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
-                  <span className="text-copy-light">Subtotal</span>
+                  <span className="text-copy-light">Total</span>
                   <span className="font-medium text-copy">{formatCurrency(subtotal)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-copy-light">Shipping</span>
-                  <span className="font-medium text-copy">
-                    {formatCurrency(shipping)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-copy-light">
-                    Tax {taxLocation.province ? `(${taxLocation.province}, ${taxLocation.country})` : `(${taxLocation.country})`}
-                  </span>
-                  <span className="font-medium text-copy">{formatCurrency(tax)}</span>
-                </div>
-                <div className="border-t border-border-light pt-3 flex justify-between">
-                  <span className="text-lg font-semibold text-copy">Total</span>
-                  <span className="text-lg font-bold text-primary">{formatCurrency(total)}</span>
+                <div className="text-xs text-copy-light mt-2">
+                  Tax and shipping will be calculated at checkout
                 </div>
               </div>
               <form onSubmit={handleApplyCoupon} className="mb-6">
@@ -535,7 +530,7 @@ export const Cart = () => {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <button
                   onClick={handleCheckout}
-                  className="block w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-md transition-colors text-center font-medium">
+                  className="w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md transition-colors flex items-center justify-center">
                   {isAuthenticated ? 'Proceed to Checkout' : 'Login to Checkout'}
                 </button>
               </motion.div>
