@@ -1101,7 +1101,7 @@ export const ProductDetails = () => {
                     rating: relatedProduct.rating_average || relatedProduct.rating || 0,
                     reviewCount: relatedProduct.review_count || relatedProduct.rating_count || 0,
                     image: relatedProduct.variants?.[0]?.images?.[0]?.url || relatedProduct.image,
-                    category: relatedProduct.category?.name || 'Uncategorized',
+                    category: relatedProduct.category?.name ? { name: relatedProduct.category.name } : (relatedProduct.category ? { name: relatedProduct.category } : { name: 'Uncategorized' }),
                     isNew: relatedProduct.is_new || false,
                     isFeatured: relatedProduct.is_featured || false,
                     variants: relatedProduct.variants || [],

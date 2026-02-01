@@ -39,13 +39,13 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
 
   return (
     <div className="mt-8 p-6 bg-surface rounded-lg shadow-sm">
-      <h3 className="text-lg font-medium text-main mb-4">Write a Review</h3>
+      <h3 className="text-lg font-semibold text-main mb-4">Write a Review</h3>
       {!isAuthenticated ? (
         <p className="text-copy-light">Please log in to submit a review.</p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-main mb-2">Your Rating</label>
+            <label className="block text-xs font-medium text-main mb-2">Your Rating</label>
             <div className="flex items-center">
               {[1, 2, 3, 4, 5].map((star) => (
                                   <Star
@@ -60,7 +60,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
             </div>
           </div>
           <div>
-            <label htmlFor="comment" className="block text-sm font-medium text-main mb-2">Your Comment</label>
+            <label htmlFor="comment" className="block text-xs font-medium text-main mb-2">Your Comment</label>
             <textarea
               id="comment"
               rows={4}
@@ -72,7 +72,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
           </div>
           <button
             type="submit"
-            className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors"
+            className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors text-xs font-medium"
             disabled={loading}
           >
             {loading ? 'Submitting...' : 'Submit Review'}

@@ -131,7 +131,7 @@ export const Home = () => {
           rating: product.rating_average || product.rating || 0,
           reviewCount: product.review_count || product.rating_count || 0,
           image: product.variants?.[0]?.images?.[0]?.url || product.image,
-          category: product.category?.name || 'Uncategorized',
+          category: product.category?.name ? { name: product.category?.name } : (product.category ? { name: product.category } : { name: 'Uncategorized' }),
           isNew: product.is_new || false,
           isFeatured: product.featured || product.is_featured || false,
           variants: product.variants || [],
