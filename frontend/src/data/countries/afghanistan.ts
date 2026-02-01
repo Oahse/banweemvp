@@ -60,7 +60,7 @@ export const afghanistan: Country = {
         { code: 'CHIST', name: 'Chishti Sharif' }
       ]
     },
-    { code: 'KAN', name: 'Kandahar',
+    { code: 'KAN', name: 'Kandahar', type: 'province',
       cities: [
         { code: 'KANDAHAR', name: 'Kandahar' },
         { code: 'ARGHANDAB', name: 'Arghandab' },
@@ -74,7 +74,7 @@ export const afghanistan: Country = {
         { code: 'NESH', name: 'Nesh' }
       ]
     },
-    { code: 'NAN', name: 'Nangarhar',
+    { code: 'NAN', name: 'Nangarhar', type: 'province',
       cities: [
         { code: 'JALALABAD', name: 'Jalalabad' },
         { code: 'ACHIN', name: 'Achin' },
@@ -88,7 +88,7 @@ export const afghanistan: Country = {
         { code: 'LALPURA', name: 'Lalpura' }
       ]
     },
-    { code: 'BAG', name: 'Baghlan',
+    { code: 'BAG', name: 'Baghlan', type: 'province',
       cities: [
         { code: 'PULI', name: 'Puli Khumri' },
         { code: 'BAGHLAN', name: 'Baghlan' },
@@ -102,7 +102,7 @@ export const afghanistan: Country = {
         { code: 'KHINJAN', name: 'Khinjan' }
       ]
     },
-    { code: 'BAL', name: 'Balkh',
+    { code: 'BAL', name: 'Balkh', type: 'province',
       cities: [
         { code: 'MAZAR', name: 'Mazar-i-Sharif' },
         { code: 'BALKH', name: 'Balkh' },
@@ -116,7 +116,7 @@ export const afghanistan: Country = {
         { code: 'NAMAK', name: 'Namak Ab' }
       ]
     },
-    { code: 'BAM', name: 'Bamyan',
+    { code: 'BAM', name: 'Bamyan', type: 'province',
       cities: [
         { code: 'BAMYAN', name: 'Bamyan' },
         { code: 'BAMYAN2', name: 'Bamyan City' },
@@ -130,7 +130,7 @@ export const afghanistan: Country = {
         { code: 'BAND', name: 'Band-e Amir' }
       ]
     },
-    { code: 'DAI', name: 'Daykundi',
+    { code: 'DAI', name: 'Daykundi', type: 'province',
       cities: [
         { code: 'NILI', name: 'Nili' },
         { code: 'ASHTAR', name: 'Ashtarlay' },
@@ -144,7 +144,7 @@ export const afghanistan: Country = {
         { code: 'UNGOOR', name: 'Ungo' }
       ]
     },
-    { code: 'FAR', name: 'Farah',
+    { code: 'FAR', name: 'Farah', type: 'province',
       cities: [
         { code: 'FARAH', name: 'Farah' },
         { code: 'ANAR', name: 'Anar Darah' },
@@ -158,7 +158,7 @@ export const afghanistan: Country = {
         { code: 'SHIB', name: 'Shib Koh' }
       ]
     },
-    { code: 'FARY', name: 'Faryab',
+    { code: 'FARY', name: 'Faryab', type: 'province',
       cities: [
         { code: 'MAIMANA', name: 'Maimana' },
         { code: 'ALMAR', name: 'Almar' },
@@ -172,7 +172,7 @@ export const afghanistan: Country = {
         { code: 'QAYSAR', name: 'Qaysar' }
       ]
     },
-    { code: 'GHA', name: 'Ghazni',
+    { code: 'GHA', name: 'Ghazni', type: 'province',
       cities: [
         { code: 'GHAZNI', name: 'Ghazni' },
         { code: 'AB', name: 'Ab Band' },
@@ -186,7 +186,7 @@ export const afghanistan: Country = {
         { code: 'KHOGYANI', name: 'Khogyani' }
       ]
     },
-    { code: 'GHO', name: 'Ghor',
+    { code: 'GHO', name: 'Ghor', type: 'province',
       cities: [
         { code: 'CHAGHCHARAN', name: 'Chaghcharan' },
         { code: 'CHAGHCHARAN2', name: 'Chaghcharan City' },
@@ -200,7 +200,7 @@ export const afghanistan: Country = {
         { code: 'TULAK', name: 'Tulak' }
       ]
     },
-    { code: 'HEL', name: 'Helmand',
+    { code: 'HEL', name: 'Helmand', type: 'province',
       cities: [
         { code: 'LASHKAR', name: 'Lashkar Gah' },
         { code: 'BAGHRAN', name: 'Baghran' },
@@ -214,7 +214,7 @@ export const afghanistan: Country = {
         { code: 'SANGIN', name: 'Sangin' }
       ]
     },
-    { code: 'HIL', name: 'Hilmand',
+    { code: 'HIL', name: 'Hilmand', type: 'province',
       cities: [
         { code: 'LASHKAR', name: 'Lashkar Gah' },
         { code: 'NAWA', name: 'Nawa' },
@@ -228,7 +228,7 @@ export const afghanistan: Country = {
         { code: 'NAD', name: 'Nad Ali' }
       ]
     },
-    { code: 'JOW', name: 'Jowzjan',
+    { code: 'JOW', name: 'Jowzjan', type: 'province',
       cities: [
         { code: 'SHEBERGHAN', name: 'Sheberghan' },
         { code: 'AQCHA', name: 'Aqcha' },
@@ -242,7 +242,7 @@ export const afghanistan: Country = {
         { code: 'MANGAN', name: 'Mangan' }
       ]
     },
-    { code: 'KAP', name: 'Kapisa',
+    { code: 'KAP', name: 'Kapisa', type: 'province',
       cities: [
         { code: 'MAHMUD', name: 'Mahmud-i-Raqi' },
         { code: 'ALASAI', name: 'Alasai' },
@@ -256,7 +256,7 @@ export const afghanistan: Country = {
         { code: 'ALASAI2', name: 'Alasai' }
       ]
     },
-    { code: 'KHO', name: 'Khost',
+    { code: 'KHO', name: 'Khost', type: 'province',
       cities: [
         { code: 'KHOST', name: 'Khost' },
         { code: 'BAK', name: 'Bak' },
@@ -270,7 +270,7 @@ export const afghanistan: Country = {
         { code: 'SPERA', name: 'Spera' }
       ]
     },
-    { code: 'KUN', name: 'Kunar',
+    { code: 'KUN', name: 'Kunar', type: 'province',
       cities: [
         { code: 'ASADABAD', name: 'Asadabad' },
         { code: 'BAR', name: 'Bar Kunar' },
@@ -284,7 +284,7 @@ export const afghanistan: Country = {
         { code: 'NARANG', name: 'Narang' }
       ]
     },
-    { code: 'KUN2', name: 'Kunduz',
+    { code: 'KUN2', name: 'Kunduz', type: 'province',
       cities: [
         { code: 'KUNDUZ', name: 'Kunduz' },
         { code: 'ALI', name: 'Ali Abad' },
@@ -298,7 +298,7 @@ export const afghanistan: Country = {
         { code: 'ZAR', name: 'Zar' }
       ]
     },
-    { code: 'LAG', name: 'Laghman',
+    { code: 'LAG', name: 'Laghman', type: 'province',
       cities: [
         { code: 'MEHTAR', name: 'Mehtar Lam' },
         { code: 'ALINGAR', name: 'Alingar' },
@@ -312,7 +312,7 @@ export const afghanistan: Country = {
         { code: 'QARGHAYI2', name: 'Qarghayi' }
       ]
     },
-    { code: 'LOG', name: 'Logar',
+    { code: 'LOG', name: 'Logar', type: 'province',
       cities: [
         { code: 'PULI', name: 'Puli Alam' },
         { code: 'BARAKI', name: 'Baraki Barak' },
@@ -326,7 +326,7 @@ export const afghanistan: Country = {
         { code: 'CHARKH2', name: 'Charkh' }
       ]
     },
-    { code: 'NAN2', name: 'Nangrahar',
+    { code: 'NAN2', name: 'Nangrahar', type: 'province',
       cities: [
         { code: 'JALALABAD', name: 'Jalalabad' },
         { code: 'ACHIN', name: 'Achin' },
@@ -340,7 +340,7 @@ export const afghanistan: Country = {
         { code: 'LALPURA', name: 'Lalpura' }
       ]
     },
-    { code: 'NIM', name: 'Nimruz',
+    { code: 'NIM', name: 'Nimruz', type: 'province',
       cities: [
         { code: 'ZARANJ', name: 'Zaranj' },
         { code: 'CHAHAR', name: 'Chahar Burjak' },
@@ -354,7 +354,7 @@ export const afghanistan: Country = {
         { code: 'KANG2', name: 'Kang' }
       ]
     },
-    { code: 'NUR', name: 'Nuristan',
+    { code: 'NUR', name: 'Nuristan', type: 'province',
       cities: [
         { code: 'PARUN', name: 'Parun' },
         { code: 'BAR', name: 'Bar Kunar' },
@@ -368,7 +368,7 @@ export const afghanistan: Country = {
         { code: 'BARGI', name: 'Bargi Matal' }
       ]
     },
-    { code: 'PAN', name: 'Panjshir',
+    { code: 'PAN', name: 'Panjshir', type: 'province',
       cities: [
         { code: 'BASARAK', name: 'Bazarak' },
         { code: 'ANABAH', name: 'Anabah' },
@@ -382,7 +382,7 @@ export const afghanistan: Country = {
         { code: 'PANJSHIR2', name: 'Panjshir City' }
       ]
     },
-    { code: 'PAR', name: 'Parwan',
+    { code: 'PAR', name: 'Parwan', type: 'province',
       cities: [
         { code: 'CHARIKAR', name: 'Charikar' },
         { code: 'BAHI', name: 'Bahi' },
@@ -396,7 +396,7 @@ export const afghanistan: Country = {
         { code: 'CHARIKAR3', name: 'Charikar' }
       ]
     },
-    { code: 'SAM', name: 'Samangan',
+    { code: 'SAM', name: 'Samangan', type: 'province',
       cities: [
         { code: 'AYBAK', name: 'Aybak' },
         { code: 'AIBAK', name: 'Aibak' },
@@ -410,7 +410,7 @@ export const afghanistan: Country = {
         { code: 'AYBAK2', name: 'Aybak City' }
       ]
     },
-    { code: 'SAR', name: 'Sar-e Pul',
+    { code: 'SAR', name: 'Sar-e Pul', type: 'province',
       cities: [
         { code: 'SAR', name: 'Sar-e Pul' },
         { code: 'BALKHAB', name: 'Balkhab' },
@@ -424,7 +424,7 @@ export const afghanistan: Country = {
         { code: 'GOZARGAH2', name: 'Gozargah' }
       ]
     },
-    { code: 'TAK', name: 'Takhar',
+    { code: 'TAK', name: 'Takhar', type: 'province',
       cities: [
         { code: 'TALEQAN', name: 'Taluqan' },
         { code: 'BANGI', name: 'Bangi' },
@@ -438,7 +438,7 @@ export const afghanistan: Country = {
         { code: 'NAMAK', name: 'Namak Ab' }
       ]
     },
-    { code: 'URU', name: 'Uruzgan',
+    { code: 'URU', name: 'Uruzgan', type: 'province',
       cities: [
         { code: 'TARIN', name: 'Tarin Kowt' },
         { code: 'CHORA', name: 'Chora' },
@@ -452,7 +452,7 @@ export const afghanistan: Country = {
         { code: 'GIZAB2', name: 'Gizab' }
       ]
     },
-    { code: 'WAR', name: 'Wardak',
+    { code: 'WAR', name: 'Wardak', type: 'province',
       cities: [
         { code: 'MEIDAN', name: 'Maidan Shahr' },
         { code: 'CHAK', name: 'Chak' },
@@ -466,7 +466,7 @@ export const afghanistan: Country = {
         { code: 'MEIDAN2', name: 'Maidan Shahr City' }
       ]
     },
-    { code: 'ZAB', name: 'Zabul',
+    { code: 'ZAB', name: 'Zabul', type: 'province',
       cities: [
         { code: 'QALAT', name: 'Qalat' },
         { code: 'ARGHANDAB', name: 'Arghandab' },
