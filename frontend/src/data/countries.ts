@@ -2066,7 +2066,7 @@ export const countries: Country[] = [
         { code: 'PRASTEO', name: 'Praso' }
       ]
     },
-    { code: 'KUMASI', name: 'Ashanti',
+    { code: 'ASHANTI', name: 'Ashanti',
       cities: [
         { code: 'KUMASI', name: 'Kumasi' },
         { code: 'OBUASI', name: 'Obuasi' },
@@ -2078,6 +2078,202 @@ export const countries: Country[] = [
         { code: 'AGONA', name: 'Agona' },
         { code: 'OFFINSO', name: 'Offinso' },
         { code: 'BASOFI', name: 'Basofi' }
+      ]
+    },
+    { code: 'BONO', name: 'Bono',
+      cities: [
+        { code: 'SUNYANI', name: 'Sunyani' },
+        { code: 'TECHIMAN', name: 'Techiman' },
+        { code: 'BREMAN', name: 'Berekum' },
+        { code: 'DORMAA', name: 'Dormaa Ahenkro' },
+        { code: 'SEFWI', name: 'Sefwi Wiawso' },
+        { code: 'WENCHI', name: 'Wenchi' },
+        { code: 'JAMAN', name: 'Jaman' },
+        { code: 'BANDA', name: 'Banda' },
+        { code: 'ASUNAFO', name: 'Asunafo' },
+        { code: 'SUNYANI2', name: 'Sunyani North' }
+      ]
+    },
+    { code: 'BONO', name: 'Bono East',
+      cities: [
+        { code: 'TECHIMAN', name: 'Techiman' },
+        { code: 'KINTAMPO', name: 'Kintampo' },
+        { code: 'SEFWI', name: 'Sefwi Akontombra' },
+        { code: 'NKORANZA', name: 'Nkoranza' },
+        { code: 'PRU', name: 'Pru' },
+        { code: 'ASEM', name: 'Asem' },
+        { code: 'TECHIMAN2', name: 'Techiman North' },
+        { code: 'KINTAMPO2', name: 'Kintampo South' },
+        { code: 'NKORANZA2', name: 'Nkoranza South' },
+        { code: 'PRU2', name: 'Pru West' }
+      ]
+    },
+    { code: 'CENTRAL', name: 'Central',
+      cities: [
+        { code: 'CAPE', name: 'Cape Coast' },
+        { code: 'ELMINA', name: 'Elmina' },
+        { code: 'MANKESIM', name: 'Mankessim' },
+        { code: 'KASOA', name: 'Kasoa' },
+        { code: 'WINNEBA', name: 'Winneba' },
+        { code: 'SWEDRU', name: 'Swedru' },
+        { code: 'AGONA', name: 'Agona Swedru' },
+        { code: 'ASSIN', name: 'Assin Fosu' },
+        { code: 'GOMOA', name: 'Gomoa Fetteh' },
+        { code: 'AWUTU', name: 'Awutu Breku' }
+      ]
+    },
+    { code: 'EASTERN', name: 'Eastern',
+      cities: [
+        { code: 'KOFORIDUA', name: 'Koforidua' },
+        { code: 'AKIM', name: 'Akim Oda' },
+        { code: 'NSAWAM', name: 'Nsawam' },
+        { code: 'ABURI', name: 'Aburi' },
+        { code: 'KROBO', name: 'Krobo Odumase' },
+        { code: 'AKWAPIM', name: 'Akuapem' },
+        { code: 'NEW', name: 'New Juaben' },
+        { code: 'MANYA', name: 'Manya Krobo' },
+        { code: 'AKIM2', name: 'Akim Swedru' },
+        { code: 'EASTERN2', name: 'Eastern North' }
+      ]
+    },
+    { code: 'GREATER', name: 'Greater Accra',
+      cities: [
+        { code: 'ACCRA', name: 'Accra' },
+        { code: 'TEMA', name: 'Tema' },
+        { code: 'ASHAIMAN', name: 'Ashaiman' },
+        { code: 'LEKMA', name: 'La' },
+        { code: 'TESHIE', name: 'Teshie' },
+        { code: 'NUNGUA', name: 'Nungua' },
+        { code: 'DANFA', name: 'Danfa' },
+        { code: 'MADINA', name: 'Madina' },
+        { code: 'ABOKOBI', name: 'Abokobi' },
+        { code: 'PRASTEO', name: 'Praso' }
+      ]
+    },
+    { code: 'NORTH', name: 'North',
+      cities: [
+        { code: 'TAMALE', name: 'Tamale' },
+        { code: 'SALAGA', name: 'Salaga' },
+        { code: 'BIMBINLA', name: 'Bimbila' },
+        { code: 'WALEWALE', name: 'Walewale' },
+        { code: 'SABON', name: 'Saboba' },
+        { code: 'KARAGA', name: 'Karaga' },
+        { code: 'GUSHEGU', name: 'Gushegu' },
+        { code: 'ZABZUGU', name: 'Zabzugu' },
+        { code: 'CHEREPONI', name: 'Chereponi' },
+        { code: 'MION', name: 'Mion' }
+      ]
+    },
+    { code: 'NORTH', name: 'North East',
+      cities: [
+        { code: 'NALERIGU', name: 'Nalerigu' },
+        { code: 'BUNKPURUGU', name: 'Bunkpurugu' },
+        { code: 'WALEWALE', name: 'Walewale' },
+        { code: 'YUNYOO', name: 'Yunyoo' },
+        { code: 'CHEREPONI', name: 'Chereponi' },
+        { code: 'GAMBAGA', name: 'Gambaga' },
+        { code: 'NASUANI', name: 'Nasuan' },
+        { code: 'JANGO', name: 'Jango' },
+        { code: 'TATI', name: 'Tatiga' },
+        { code: 'NALERIGU2', name: 'Nalerigu North' }
+      ]
+    },
+    { code: 'OTI', name: 'Oti',
+      cities: [
+        { code: 'DAMBA', name: 'Damba' },
+        { code: 'JASIKAN', name: 'Jasikan' },
+        { code: 'KPASSA', name: 'Kpassa' },
+        { code: 'NCHUMURU', name: 'Nchumuru' },
+        { code: 'KRACHI', name: 'Krachi' },
+        { code: 'GUOMAN', name: 'Guaman' },
+        { code: 'BAFI', name: 'Bafi' },
+        { code: 'NKOWDA', name: 'Nkawkaw' },
+        { code: 'DAMBA2', name: 'Damba North' },
+        { code: 'KRACHI2', name: 'Krachi East' }
+      ]
+    },
+    { code: 'SAVANNAH', name: 'Savannah',
+      cities: [
+        { code: 'DAMONGO', name: 'Damongo' },
+        { code: 'BUIPE', name: 'Buipe' },
+        { code: 'SAWLA', name: 'Sawla' },
+        { code: 'BOLE', name: 'Bole' },
+        { code: 'WEST', name: 'West Gonja' },
+        { code: 'CENTRAL', name: 'Central Gonja' },
+        { code: 'EAST', name: 'East Gonja' },
+        { code: 'NORTH', name: 'North Gonja' },
+        { code: 'SOUTH', name: 'South Gonja' },
+        { code: 'SAWLA2', name: 'Sawla-Tuna-Kalba' }
+      ]
+    },
+    { code: 'UPPER', name: 'Upper East',
+      cities: [
+        { code: 'BOLGATANGA', name: 'Bolgatanga' },
+        { code: 'NAVONGO', name: 'Navrongo' },
+        { code: 'BONGO', name: 'Bongo' },
+        { code: 'TONGO', name: 'Tongo' },
+        { code: 'ZEBILLA', name: 'Zebilla' },
+        { code: 'BASSE', name: 'Basse' },
+        { code: 'PAGA', name: 'Paga' },
+        { code: 'SANDEMA', name: 'Sandema' },
+        { code: 'TEMPEL', name: 'Tempane' },
+        { code: 'GARU', name: 'Garu' }
+      ]
+    },
+    { code: 'UPPER', name: 'Upper West',
+      cities: [
+        { code: 'WA', name: 'Wa' },
+        { code: 'TAMALE', name: 'Tamale' },
+        { code: 'JIRAPA', name: 'Jirapa' },
+        { code: 'LAMBUSIE', name: 'Lambussie' },
+        { code: 'NANDOM', name: 'Nandom' },
+        { code: 'TULE', name: 'Tule' },
+        { code: 'FUNSI', name: 'Funsi' },
+        { code: 'WECHIAU', name: 'Wechiau' },
+        { code: 'ISSA', name: 'Issa' },
+        { code: 'WA2', name: 'Wa East' }
+      ]
+    },
+    { code: 'WESTERN', name: 'Western',
+      cities: [
+        { code: 'SEKONDI', name: 'Sekondi-Takoradi' },
+        { code: 'TARKWA', name: 'Tarkwa' },
+        { code: 'PRESTEA', name: 'Prestea' },
+        { code: 'BIBIANI', name: 'Bibiani' },
+        { code: 'AXIM', name: 'Axim' },
+        { code: 'SHAMA', name: 'Shama' },
+        { code: 'JOMORO', name: 'Jomoro' },
+        { code: 'AHANTA', name: 'Ahanta West' },
+        { code: 'WASSA', name: 'Wassa East' },
+        { code: 'JOMORO2', name: 'Jomoro South' }
+      ]
+    },
+    { code: 'WESTERN', name: 'Western North',
+      cities: [
+        { code: 'SEFWI', name: 'Sefwi Wiawso' },
+        { code: 'BIBIANI', name: 'Bibiani' },
+        { code: 'ENCHI', name: 'Enchi' },
+        { code: 'BIA', name: 'Bia' },
+        { code: 'SUAMAN', name: 'Suaman' },
+        { code: 'AKONTOMBRA', name: 'Akontombra' },
+        { code: 'BIA', name: 'Bia East' },
+        { code: 'BIA2', name: 'Bia West' },
+        { code: 'SUAMAN2', name: 'Suaman North' },
+        { code: 'ENCHI2', name: 'Enchi North' }
+      ]
+    },
+    { code: 'VOLTA', name: 'Volta',
+      cities: [
+        { code: 'HO', name: 'Ho' },
+        { code: 'KETA', name: 'Keta' },
+        { code: 'AKATSI', name: 'Akatsi' },
+        { code: 'DENU', name: 'Denu' },
+        { code: 'AVE', name: 'Ave' },
+        { code: 'KPANDO', name: 'Kpando' },
+        { code: 'JASIKAN', name: 'Jasikan' },
+        { code: 'AFADZATO', name: 'Afadzato' },
+        { code: 'NORTH', name: 'North Tongu' },
+        { code: 'SOUTH', name: 'South Tongu' }
       ]
     }
   ]
@@ -2962,50 +3158,1079 @@ export const countries: Country[] = [
   { code: 'GE', name: 'Georgia', taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'GEL', region: 'MEA' } },
 
   // Asia
-  { code: 'AF', name: 'Afghanistan' },
-  { code: 'PK', name: 'Pakistan' },
   {
-    code: 'IN',
-    name: 'India',
-    provinces: [
-      { code: 'AP', name: 'Andhra Pradesh' },
-      { code: 'AR', name: 'Arunachal Pradesh' },
-      { code: 'AS', name: 'Assam' },
-      { code: 'BR', name: 'Bihar' },
-      { code: 'CT', name: 'Chhattisgarh' },
-      { code: 'GA', name: 'Goa' },
-      { code: 'GJ', name: 'Gujarat' },
-      { code: 'HR', name: 'Haryana' },
-      { code: 'HP', name: 'Himachal Pradesh' },
-      { code: 'JH', name: 'Jharkhand' },
-      { code: 'KA', name: 'Karnataka' },
-      { code: 'KL', name: 'Kerala' },
-      { code: 'MP', name: 'Madhya Pradesh' },
-      { code: 'MH', name: 'Maharashtra' },
-      { code: 'MN', name: 'Manipur' },
-      { code: 'ML', name: 'Meghalaya' },
-      { code: 'MZ', name: 'Mizoram' },
-      { code: 'NL', name: 'Nagaland' },
-      { code: 'OR', name: 'Odisha' },
-      { code: 'PB', name: 'Punjab' },
-      { code: 'RJ', name: 'Rajasthan' },
-      { code: 'SK', name: 'Sikkim' },
-      { code: 'TN', name: 'Tamil Nadu' },
-      { code: 'TG', name: 'Telangana' },
-      { code: 'TR', name: 'Tripura' },
-      { code: 'UP', name: 'Uttar Pradesh' },
-      { code: 'UT', name: 'Uttarakhand' },
-      { code: 'WB', name: 'West Bengal' },
-      { code: 'AN', name: 'Andaman and Nicobar Islands' },
-      { code: 'CH', name: 'Chandigarh' },
-      { code: 'DN', name: 'Dadra and Nagar Haveli and Daman and Diu' },
-      { code: 'DL', name: 'Delhi' },
-      { code: 'JK', name: 'Jammu and Kashmir' },
-      { code: 'LA', name: 'Ladakh' },
-      { code: 'LD', name: 'Lakshadweep' },
-      { code: 'PY', name: 'Puducherry' }
-    ]
-  },
+  code: 'AF',
+  name: 'Afghanistan',
+  taxInfo: { standardRate: 0, taxName: 'No VAT/GST', currency: 'AFN', region: 'APAC' },
+  provinces: [
+    { code: 'KAB', name: 'Kabul',
+      cities: [
+        { code: 'KABUL', name: 'Kabul' },
+        { code: 'CHARASIAB', name: 'Charasiab' },
+        { code: 'PAGHMAN', name: 'Paghman' },
+        { code: 'BAGRAMI', name: 'Bagrami' },
+        { code: 'SROB', name: 'Surobi' },
+        { code: 'MUSA', name: 'Musa Khel' },
+        { code: 'DEH', name: 'Deh Sabz' },
+        { code: 'ISTALIF', name: 'Istalif' },
+        { code: 'SHAKAR', name: 'Shakar Dara' },
+        { code: 'GULDARA', name: 'Guldara' }
+      ]
+    },
+    { code: 'HER', name: 'Herat',
+      cities: [
+        { code: 'HERAT', name: 'Herat' },
+        { code: 'ENJIL', name: 'Enjil' },
+        { code: 'GHORIAN', name: 'Ghoryan' },
+        { code: 'GULRAN', name: 'Gulran' },
+        { code: 'KARUKH', name: 'Karukh' },
+        { code: 'KUSHK', name: 'Kushk' },
+        { code: 'KUSHKAK', name: 'Kushkak' },
+        { code: 'SHINDAND', name: 'Shindand' },
+        { code: 'ADRESKAN', name: 'Adraskan' },
+        { code: 'CHIST', name: 'Chishti Sharif' }
+      ]
+    },
+    { code: 'KAN', name: 'Kandahar',
+      cities: [
+        { code: 'KANDAHAR', name: 'Kandahar' },
+        { code: 'ARGHANDAB', name: 'Arghandab' },
+        { code: 'ARGHISTAN', name: 'Arghistan' },
+        { code: 'DAMAN', name: 'Daman' },
+        { code: 'GRISHK', name: 'Grishk' },
+        { code: 'KANDAHAR2', name: 'Kandahar City' },
+        { code: 'KHAKREZ', name: 'Khakrez' },
+        { code: 'MARUF', name: 'Maruf' },
+        { code: 'MAYWAND', name: 'Maywand' },
+        { code: 'NESH', name: 'Nesh' }
+      ]
+    },
+    { code: 'NAN', name: 'Nangarhar',
+      cities: [
+        { code: 'JALALABAD', name: 'Jalalabad' },
+        { code: 'ACHIN', name: 'Achin' },
+        { code: 'BATIKOT', name: 'Batikot' },
+        { code: 'BHSUD', name: 'Bhsud' },
+        { code: 'DEH', name: 'Deh Bala' },
+        { code: 'DUR', name: 'Dur Baba' },
+        { code: 'GOSHTA', name: 'Goshta' },
+        { code: 'KAMA', name: 'Kama' },
+        { code: 'KUZ', name: 'Kuz Kunar' },
+        { code: 'LALPURA', name: 'Lalpura' }
+      ]
+    },
+    { code: 'BAG', name: 'Baghlan',
+      cities: [
+        { code: 'PULI', name: 'Puli Khumri' },
+        { code: 'BAGHLAN', name: 'Baghlan' },
+        { code: 'BURKA', name: 'Burka' },
+        { code: 'DAND', name: 'Dand-e Ghori' },
+        { code: 'DAN', name: 'Dana' },
+        { code: 'DIH', name: 'Dih Salah' },
+        { code: 'FARANG', name: 'Farang wa Gharu' },
+        { code: 'GOST', name: 'Gost' },
+        { code: 'KHANJAN', name: 'Khanjan' },
+        { code: 'KHINJAN', name: 'Khinjan' }
+      ]
+    },
+    { code: 'BAL', name: 'Balkh',
+      cities: [
+        { code: 'MAZAR', name: 'Mazar-i-Sharif' },
+        { code: 'BALKH', name: 'Balkh' },
+        { code: 'CHAHAR', name: 'Chahar Bolak' },
+        { code: 'CHARKENT', name: 'Charkent' },
+        { code: 'DADAY', name: 'Daday' },
+        { code: 'KALDAR', name: 'Kaldar' },
+        { code: 'KISHM', name: 'Kishm' },
+        { code: 'KOHDAN', name: 'Kohdan' },
+        { code: 'MAI', name: 'Maimana' },
+        { code: 'NAMAK', name: 'Namak Ab' }
+      ]
+    },
+    { code: 'BAM', name: 'Bamyan',
+      cities: [
+        { code: 'BAMYAN', name: 'Bamyan' },
+        { code: 'BAMYAN2', name: 'Bamyan City' },
+        { code: 'KABUL2', name: 'Kabul' },
+        { code: 'KAHMARD', name: 'Kahmard' },
+        { code: 'PANJAB', name: 'Panjab' },
+        { code: 'SAIGHAN', name: 'Saighan' },
+        { code: 'SHIBAR', name: 'Shibar' },
+        { code: 'WARAS', name: 'Waras' },
+        { code: 'YAKAWLANG', name: 'Yakawlang' },
+        { code: 'BAND', name: 'Band-e Amir' }
+      ]
+    },
+    { code: 'DAI', name: 'Daykundi',
+      cities: [
+        { code: 'NILI', name: 'Nili' },
+        { code: 'ASHTAR', name: 'Ashtarlay' },
+        { code: 'JABR', name: 'Jabr' },
+        { code: 'KHA', name: 'Khadir' },
+        { code: 'KEJ', name: 'Kejran' },
+        { code: 'KITI', name: 'Kitti' },
+        { code: 'MIRAMOR', name: 'Miramor' },
+        { code: 'SANG', name: 'Sangtakht' },
+        { code: 'SHAH', name: 'Shahristan' },
+        { code: 'UNGOOR', name: 'Ungo' }
+      ]
+    },
+    { code: 'FAR', name: 'Farah',
+      cities: [
+        { code: 'FARAH', name: 'Farah' },
+        { code: 'ANAR', name: 'Anar Darah' },
+        { code: 'BALA', name: 'Bala Buluk' },
+        { code: 'BOK', name: 'Bokh' },
+        { code: 'GULISTAN', name: 'Gulistan' },
+        { code: 'KHAK', name: 'Khak Safed' },
+        { code: 'PUR', name: 'Pur Chaman' },
+        { code: 'PUSHT', name: 'Pusht Rod' },
+        { code: 'QALA', name: 'Qala Kah' },
+        { code: 'SHIB', name: 'Shib Koh' }
+      ]
+    },
+    { code: 'FARY', name: 'Faryab',
+      cities: [
+        { code: 'MAIMANA', name: 'Maimana' },
+        { code: 'ALMAR', name: 'Almar' },
+        { code: 'ANDKH', name: 'Andkhoy' },
+        { code: 'DARZAB', name: 'Darzab' },
+        { code: 'GURZIWAN', name: 'Gurziwan' },
+        { code: 'KHWAJA', name: 'Khwaja Sabz Posh' },
+        { code: 'KOHISTAN', name: 'Kohistan' },
+        { code: 'MAYMANA', name: 'Maymana' },
+        { code: 'QARAM', name: 'Qaramqol' },
+        { code: 'QAYSAR', name: 'Qaysar' }
+      ]
+    },
+    { code: 'GHA', name: 'Ghazni',
+      cities: [
+        { code: 'GHAZNI', name: 'Ghazni' },
+        { code: 'AB', name: 'Ab Band' },
+        { code: 'AJRISTAN', name: 'Ajeristan' },
+        { code: 'ANDAR', name: 'Andar' },
+        { code: 'DEH', name: 'Deh Yak' },
+        { code: 'GELAN', name: 'Gelan' },
+        { code: 'GHO', name: 'Ghakhi' },
+        { code: 'JAGHATU', name: 'Jaghatu' },
+        { code: 'JAGHORI', name: 'Jaghori' },
+        { code: 'KHOGYANI', name: 'Khogyani' }
+      ]
+    },
+    { code: 'GHO', name: 'Ghor',
+      cities: [
+        { code: 'CHAGHCHARAN', name: 'Chaghcharan' },
+        { code: 'CHAGHCHARAN2', name: 'Chaghcharan City' },
+        { code: 'DOLINA', name: 'Dolina' },
+        { code: 'DU', name: 'Du Layna' },
+        { code: 'LAL', name: 'Lal Wa Sarjangal' },
+        { code: 'PASSA', name: 'Passa' },
+        { code: 'SAGHAR', name: 'Saghar' },
+        { code: 'SHARAK', name: 'Sharak' },
+        { code: 'TAKHAR', name: 'Takhar' },
+        { code: 'TULAK', name: 'Tulak' }
+      ]
+    },
+    { code: 'HEL', name: 'Helmand',
+      cities: [
+        { code: 'LASHKAR', name: 'Lashkar Gah' },
+        { code: 'BAGHRAN', name: 'Baghran' },
+        { code: 'DISHU', name: 'Dishu' },
+        { code: 'GARM', name: 'Garmsir' },
+        { code: 'GRISHK', name: 'Grishk' },
+        { code: 'KHAH', name: 'Kahak' },
+        { code: 'MUSA', name: 'Musa Qala' },
+        { code: 'NAD', name: 'Nad Ali' },
+        { code: 'NAVA', name: 'Nawa' },
+        { code: 'SANGIN', name: 'Sangin' }
+      ]
+    },
+    { code: 'HIL', name: 'Hilmand',
+      cities: [
+        { code: 'LASHKAR', name: 'Lashkar Gah' },
+        { code: 'NAWA', name: 'Nawa' },
+        { code: 'SANGIN', name: 'Sangin' },
+        { code: 'MUSA', name: 'Musa Qala' },
+        { code: 'GARM', name: 'Garmsir' },
+        { code: 'GRISHK', name: 'Grishk' },
+        { code: 'BAGHRAN', name: 'Baghran' },
+        { code: 'DISHU', name: 'Dishu' },
+        { code: 'KHAH', name: 'Kahak' },
+        { code: 'NAD', name: 'Nad Ali' }
+      ]
+    },
+    { code: 'JOW', name: 'Jowzjan',
+      cities: [
+        { code: 'SHEBERGHAN', name: 'Sheberghan' },
+        { code: 'AQCHA', name: 'Aqcha' },
+        { code: 'DARZAB', name: 'Darzab' },
+        { code: 'FAIZ', name: 'Faizabad' },
+        { code: 'KHAN', name: 'Khan Abad' },
+        { code: 'KHWAJA', name: 'Khwaja Du Koh' },
+        { code: 'MARDYAN', name: 'Mardyan' },
+        { code: 'QUSH', name: 'Qush Tepa' },
+        { code: 'SHEBERGHAN2', name: 'Sheberghan City' },
+        { code: 'MANGAN', name: 'Mangan' }
+      ]
+    },
+    { code: 'KAP', name: 'Kapisa',
+      cities: [
+        { code: 'MAHMUD', name: 'Mahmud-i-Raqi' },
+        { code: 'ALASAI', name: 'Alasai' },
+        { code: 'HESA', name: 'Hesa Awal Kohistan' },
+        { code: 'KOH', name: 'Koh Band' },
+        { code: 'MAHMUD', name: 'Mahmud Raqi' },
+        { code: 'NIDJAB', name: 'Nijrab' },
+        { code: 'TAGAB', name: 'Tagab' },
+        { code: 'KOHISTAN', name: 'Kohistan' },
+        { code: 'KOH', name: 'Koh' },
+        { code: 'ALASAI2', name: 'Alasai' }
+      ]
+    },
+    { code: 'KHO', name: 'Khost',
+      cities: [
+        { code: 'KHOST', name: 'Khost' },
+        { code: 'BAK', name: 'Bak' },
+        { code: 'GUR', name: 'Gurbuz' },
+        { code: 'JERI', name: 'Jaji Maidan' },
+        { code: 'KHOST2', name: 'Khost City' },
+        { code: 'MUSA', name: 'Musa Khel' },
+        { code: 'NADIR', name: 'Nadir Shah Kot' },
+        { code: 'QALANDER', name: 'Qalandar' },
+        { code: 'SABARI', name: 'Sabari' },
+        { code: 'SPERA', name: 'Spera' }
+      ]
+    },
+    { code: 'KUN', name: 'Kunar',
+      cities: [
+        { code: 'ASADABAD', name: 'Asadabad' },
+        { code: 'BAR', name: 'Bar Kunar' },
+        { code: 'CHAPA', name: 'Chapa Dara' },
+        { code: 'DAR', name: 'Dara-i-Pech' },
+        { code: 'GHAS', name: 'Ghasa' },
+        { code: 'KAMA', name: 'Kama' },
+        { code: 'KUNAR', name: 'Kunar' },
+        { code: 'MARAWARA', name: 'Marawara' },
+        { code: 'NARAI', name: 'Narai' },
+        { code: 'NARANG', name: 'Narang' }
+      ]
+    },
+    { code: 'KUN2', name: 'Kunduz',
+      cities: [
+        { code: 'KUNDUZ', name: 'Kunduz' },
+        { code: 'ALI', name: 'Ali Abad' },
+        { code: 'CHAHAR', name: 'Chahar Darreh' },
+        { code: 'DASHT', name: 'Dashti Archi' },
+        { code: 'EMAM', name: 'Emam Sahib' },
+        { code: 'KHAN', name: 'Khan Abad' },
+        { code: 'KUNDUZ2', name: 'Kunduz City' },
+        { code: 'QALA', name: 'Qala-i-Zal' },
+        { code: 'TEP', name: 'Tepa' },
+        { code: 'ZAR', name: 'Zar' }
+      ]
+    },
+    { code: 'LAG', name: 'Laghman',
+      cities: [
+        { code: 'MEHTAR', name: 'Mehtar Lam' },
+        { code: 'ALINGAR', name: 'Alingar' },
+        { code: 'ALISHING', name: 'Alishing' },
+        { code: 'DAWLAT', name: 'Dawlat Shah' },
+        { code: 'MEHTAR', name: 'Mehtar Lam City' },
+        { code: 'QARGHAYI', name: 'Qarghayi' },
+        { code: 'SAID', name: 'Said Karam' },
+        { code: 'ALISHING2', name: 'Alishing' },
+        { code: 'DAWLAT2', name: 'Dawlat Shah' },
+        { code: 'QARGHAYI2', name: 'Qarghayi' }
+      ]
+    },
+    { code: 'LOG', name: 'Logar',
+      cities: [
+        { code: 'PULI', name: 'Puli Alam' },
+        { code: 'BARAKI', name: 'Baraki Barak' },
+        { code: 'CHARKH', name: 'Charkh' },
+        { code: 'KHI', name: 'Khoshi' },
+        { code: 'KHWAS', name: 'Khwash' },
+        { code: 'MUHAMMAD', name: 'Muhammad Agha' },
+        { code: 'PULI', name: 'Puli Alam City' },
+        { code: 'AZRA', name: 'Azra' },
+        { code: 'BARAKI2', name: 'Baraki Barak' },
+        { code: 'CHARKH2', name: 'Charkh' }
+      ]
+    },
+    { code: 'NAN2', name: 'Nangrahar',
+      cities: [
+        { code: 'JALALABAD', name: 'Jalalabad' },
+        { code: 'ACHIN', name: 'Achin' },
+        { code: 'BATIKOT', name: 'Batikot' },
+        { code: 'BHSUD', name: 'Bhsud' },
+        { code: 'DEH', name: 'Deh Bala' },
+        { code: 'DUR', name: 'Dur Baba' },
+        { code: 'GOSHTA', name: 'Goshta' },
+        { code: 'KAMA', name: 'Kama' },
+        { code: 'KUZ', name: 'Kuz Kunar' },
+        { code: 'LALPURA', name: 'Lalpura' }
+      ]
+    },
+    { code: 'NIM', name: 'Nimruz',
+      cities: [
+        { code: 'ZARANJ', name: 'Zaranj' },
+        { code: 'CHAHAR', name: 'Chahar Burjak' },
+        { code: 'CHAKANSUR', name: 'Chakhansur' },
+        { code: 'KHASH', name: 'Khash Rod' },
+        { code: 'KANG', name: 'Kang' },
+        { code: 'ZARANJ2', name: 'Zaranj City' },
+        { code: 'CHAHAR2', name: 'Chahar Burjak' },
+        { code: 'CHAKANSUR2', name: 'Chakhansur' },
+        { code: 'KHASH2', name: 'Khash Rod' },
+        { code: 'KANG2', name: 'Kang' }
+      ]
+    },
+    { code: 'NUR', name: 'Nuristan',
+      cities: [
+        { code: 'PARUN', name: 'Parun' },
+        { code: 'BAR', name: 'Bar Kunar' },
+        { code: 'DU', name: 'Du Ab' },
+        { code: 'KAMDESH', name: 'Kamdesh' },
+        { code: 'MANDOL', name: 'Mandol' },
+        { code: 'NURISTAN', name: 'Nuristan' },
+        { code: 'PARUN2', name: 'Parun City' },
+        { code: 'WAMA', name: 'Wama' },
+        { code: 'WAYGAL', name: 'Waygal' },
+        { code: 'BARGI', name: 'Bargi Matal' }
+      ]
+    },
+    { code: 'PAN', name: 'Panjshir',
+      cities: [
+        { code: 'BASARAK', name: 'Bazarak' },
+        { code: 'ANABAH', name: 'Anabah' },
+        { code: 'BASARAK2', name: 'Bazarak City' },
+        { code: 'DARA', name: 'Dara' },
+        { code: 'KHENJ', name: 'Khenj' },
+        { code: 'PANJSHIR', name: 'Panjshir' },
+        { code: 'RUKHA', name: 'Rukha' },
+        { code: 'SHUTUL', name: 'Shutul' },
+        { code: 'UNABAH', name: 'Unabah' },
+        { code: 'PANJSHIR2', name: 'Panjshir City' }
+      ]
+    },
+    { code: 'PAR', name: 'Parwan',
+      cities: [
+        { code: 'CHARIKAR', name: 'Charikar' },
+        { code: 'BAHI', name: 'Bahi' },
+        { code: 'CHARIKAR2', name: 'Charikar City' },
+        { code: 'GUL', name: 'Gulbahar' },
+        { code: 'JABAL', name: 'Jabal Saraj' },
+        { code: 'SALANG', name: 'Salang' },
+        { code: 'SAYED', name: 'Sayed Khel' },
+        { code: 'SHEIKH', name: 'Sheikh Ali' },
+        { code: 'SURHI', name: 'Surhi Parsa' },
+        { code: 'CHARIKAR3', name: 'Charikar' }
+      ]
+    },
+    { code: 'SAM', name: 'Samangan',
+      cities: [
+        { code: 'AYBAK', name: 'Aybak' },
+        { code: 'AIBAK', name: 'Aibak' },
+        { code: 'DARA', name: 'Dara-i-Suf' },
+        { code: 'FEROZ', name: 'Feroz Nakhchir' },
+        { code: 'HAZAR', name: 'Hazar Sumuch' },
+        { code: 'KHULM', name: 'Khulm' },
+        { code: 'RUYI', name: 'Ruyi Du Ab' },
+        { code: 'SAMANGAN', name: 'Samangan' },
+        { code: 'TAKHT', name: 'Takhar' },
+        { code: 'AYBAK2', name: 'Aybak City' }
+      ]
+    },
+    { code: 'SAR', name: 'Sar-e Pul',
+      cities: [
+        { code: 'SAR', name: 'Sar-e Pul' },
+        { code: 'BALKHAB', name: 'Balkhab' },
+        { code: 'GOZARGAH', name: 'Gozargah' },
+        { code: 'GOSHTA', name: 'Goshta' },
+        { code: 'KOHISTAN', name: 'Kohistan' },
+        { code: 'SANG', name: 'Sangcharak' },
+        { code: 'SAR2', name: 'Sar-e Pul City' },
+        { code: 'SOZMA', name: 'Sozma Qala' },
+        { code: 'BALKHAB2', name: 'Balkhab' },
+        { code: 'GOZARGAH2', name: 'Gozargah' }
+      ]
+    },
+    { code: 'TAK', name: 'Takhar',
+      cities: [
+        { code: 'TALEQAN', name: 'Taluqan' },
+        { code: 'BANGI', name: 'Bangi' },
+        { code: 'CHAH', name: 'Chah Ab' },
+        { code: 'DARQAD', name: 'Darqad' },
+        { code: 'DASHT', name: 'Dashti Qala' },
+        { code: 'FARKHAR', name: 'Farkhar' },
+        { code: 'ISHKASHIM', name: 'Ishkashim' },
+        { code: 'KALAFGAN', name: 'Kalafgan' },
+        { code: 'KHWAJA', name: 'Khwaja Ghar' },
+        { code: 'NAMAK', name: 'Namak Ab' }
+      ]
+    },
+    { code: 'URU', name: 'Uruzgan',
+      cities: [
+        { code: 'TARIN', name: 'Tarin Kowt' },
+        { code: 'CHORA', name: 'Chora' },
+        { code: 'DEH', name: 'Deh Rawod' },
+        { code: 'GIZAB', name: 'Gizab' },
+        { code: 'KHAS', name: 'Khas Uruzgan' },
+        { code: 'SHAH', name: 'Shahidi Hassas' },
+        { code: 'TARIN2', name: 'Tarin Kowt City' },
+        { code: 'CHORA2', name: 'Chora' },
+        { code: 'DEH2', name: 'Deh Rawod' },
+        { code: 'GIZAB2', name: 'Gizab' }
+      ]
+    },
+    { code: 'WAR', name: 'Wardak',
+      cities: [
+        { code: 'MEIDAN', name: 'Maidan Shahr' },
+        { code: 'CHAK', name: 'Chak' },
+        { code: 'DAIMIR', name: 'Daimir' },
+        { code: 'GELAN', name: 'Gelan' },
+        { code: 'HISAR', name: 'Hisar-e-Shahi' },
+        { code: 'JALREZ', name: 'Jalrez' },
+        { code: 'MARKA', name: 'Marka' },
+        { code: 'NARKH', name: 'Narkh' },
+        { code: 'SAYED', name: 'Sayed Abad' },
+        { code: 'MEIDAN2', name: 'Maidan Shahr City' }
+      ]
+    },
+    { code: 'ZAB', name: 'Zabul',
+      cities: [
+        { code: 'QALAT', name: 'Qalat' },
+        { code: 'ARGHANDAB', name: 'Arghandab' },
+        { code: 'ATGHAR', name: 'Atghar' },
+        { code: 'DAIMIR', name: 'Daimir' },
+        { code: 'MIZAN', name: 'Mizan' },
+        { code: 'NAWA', name: 'Nawa' },
+        { code: 'QALAT2', name: 'Qalat City' },
+        { code: 'SHAHJOY', name: 'Shahjoy' },
+        { code: 'SHIN', name: 'Shin' },
+        { code: 'TARN', name: 'Tarnak Wa Jaldak' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'PK',
+  name: 'Pakistan',
+  taxInfo: { standardRate: 17, taxName: 'GST', currency: 'PKR', region: 'APAC' },
+  provinces: [
+    { code: 'PUN', name: 'Punjab',
+      cities: [
+        { code: 'LAHORE', name: 'Lahore' },
+        { code: 'FAISALABAD', name: 'Faisalabad' },
+        { code: 'RAWALPINDI', name: 'Rawalpindi' },
+        { code: 'GUJRANWALA', name: 'Gujranwala' },
+        { code: 'PESHAWAR', name: 'Peshawar' },
+        { code: 'MULTAN', name: 'Multan' },
+        { code: 'ISLAMABAD', name: 'Islamabad' },
+        { code: 'SIALKOT', name: 'Sialkot' },
+        { code: 'GUJRAT', name: 'Gujrat' },
+        { code: 'BAHAWALPUR', name: 'Bahawalpur' }
+      ]
+    },
+    { code: 'SND', name: 'Sindh',
+      cities: [
+        { code: 'KARACHI', name: 'Karachi' },
+        { code: 'HYDERABAD', name: 'Hyderabad' },
+        { code: 'SUKKUR', name: 'Sukkur' },
+        { code: 'LARKANA', name: 'Larkana' },
+        { code: 'NAWABSHAH', name: 'Nawabshah' },
+        { code: 'MIRPUR', name: 'Mirpur Khas' },
+        { code: 'JACOBABAD', name: 'Jacobabad' },
+        { code: 'SHIKARPUR', name: 'Shikarpur' },
+        { code: 'KHAIRPUR', name: 'Khairpur' },
+        { code: 'THATTA', name: 'Thatta' }
+      ]
+    },
+    { code: 'KPK', name: 'Khyber Pakhtunkhwa',
+      cities: [
+        { code: 'PESHAWAR', name: 'Peshawar' },
+        { code: 'MARDAN', name: 'Mardan' },
+        { code: 'MINGORA', name: 'Mingora' },
+        { code: 'ABBOTTABAD', name: 'Abbottabad' },
+        { code: 'KOHAT', name: 'Kohat' },
+        { code: 'MANSEHRA', name: 'Mansehra' },
+        { code: 'DIR', name: 'Dir' },
+        { code: 'BANNU', name: 'Bannu' },
+        { code: 'CHITRAL', name: 'Chitral' },
+        { code: 'HARIPUR', name: 'Haripur' }
+      ]
+    },
+    { code: 'BAL', name: 'Balochistan',
+      cities: [
+        { code: 'QUETTA', name: 'Quetta' },
+        { code: 'GWADAR', name: 'Gwadar' },
+        { code: 'TURBAT', name: 'Turbat' },
+        { code: 'KHUZDAR', name: 'Khuzdar' },
+        { code: 'CHAMAN', name: 'Chaman' },
+        { code: 'SIBI', name: 'Sibi' },
+        { code: 'ZHOB', name: 'Zhob' },
+        { code: 'LASBELA', name: 'Lasbela' },
+        { code: 'KALAT', name: 'Kalat' },
+        { code: 'PISHIN', name: 'Pishin' }
+      ]
+    },
+    { code: 'GB', name: 'Gilgit-Baltistan',
+      cities: [
+        { code: 'GILGIT', name: 'Gilgit' },
+        { code: 'SKARDU', name: 'Skardu' },
+        { code: 'HUNZA', name: 'Hunza' },
+        { code: 'GHAZER', name: 'Ghizer' },
+        { code: 'ASTORE', name: 'Astore' },
+        { code: 'DIAMER', name: 'Diamer' },
+        { code: 'GUPIS', name: 'Gupis' },
+        { code: 'KHAPLU', name: 'Khaplu' },
+        { code: 'SHIGAR', name: 'Shigar' },
+        { code: 'NAGAR', name: 'Nagar' }
+      ]
+    },
+    { code: 'AJK', name: 'Azad Kashmir',
+      cities: [
+        { code: 'MUZAFFARABAD', name: 'Muzaffarabad' },
+        { code: 'MIRPUR', name: 'Mirpur' },
+        { code: 'RAWALAKOT', name: 'Rawalakot' },
+        { code: 'KOTLI', name: 'Kotli' },
+        { code: 'BHIMBER', name: 'Bhimber' },
+        { code: 'BAGH', name: 'Bagh' },
+        { code: 'HAVELI', name: 'Haveli' },
+        { code: 'NEELUM', name: 'Neelum' },
+        { code: 'SUDHNOTI', name: 'Sudhnoti' },
+        { code: 'PALANDRI', name: 'Palandri' }
+      ]
+    },
+    { code: 'ICT', name: 'Islamabad Capital Territory',
+      cities: [
+        { code: 'ISLAMABAD', name: 'Islamabad' },
+        { code: 'G', name: 'G-10' },
+        { code: 'F', name: 'F-11' },
+        { code: 'E', name: 'E-11' },
+        { code: 'D', name: 'D-12' },
+        { code: 'I', name: 'I-8' },
+        { code: 'H', name: 'H-8' },
+        { code: 'B', name: 'B-17' },
+        { code: 'C', name: 'C-15' },
+        { code: 'BLUE', name: 'Blue Area' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'IN',
+  name: 'India',
+  taxInfo: { standardRate: 18, taxName: 'GST', currency: 'INR', region: 'APAC' },
+  provinces: [
+    // Major States
+    { code: 'UP', name: 'Uttar Pradesh',
+      cities: [
+        { code: 'LUCKNOW', name: 'Lucknow' },
+        { code: 'KANPUR', name: 'Kanpur' },
+        { code: 'GHAZIABAD', name: 'Ghaziabad' },
+        { code: 'NOIDA', name: 'Noida' },
+        { code: 'AGRA', name: 'Agra' },
+        { code: 'VARANASI', name: 'Varanasi' },
+        { code: 'ALLAHABAD', name: 'Allahabad' },
+        { code: 'MEERUT', name: 'Meerut' },
+        { code: 'BAREILLY', name: 'Bareilly' },
+        { code: 'ALIGARH', name: 'Aligarh' }
+      ]
+    },
+    { code: 'MH', name: 'Maharashtra',
+      cities: [
+        { code: 'MUMBAI', name: 'Mumbai' },
+        { code: 'PUNE', name: 'Pune' },
+        { code: 'NAGPUR', name: 'Nagpur' },
+        { code: 'THANE', name: 'Thane' },
+        { code: 'NASHIK', name: 'Nashik' },
+        { code: 'AURANGABAD', name: 'Aurangabad' },
+        { code: 'SOLAPUR', name: 'Solapur' },
+        { code: 'AMRAVATI', name: 'Amravati' },
+        { code: 'KOLHAPUR', name: 'Kolhapur' },
+        { code: 'NAGPUR2', name: 'Nagpur' }
+      ]
+    },
+    { code: 'BR', name: 'Bihar',
+      cities: [
+        { code: 'PATNA', name: 'Patna' },
+        { code: 'GAYA', name: 'Gaya' },
+        { code: 'BHAGALPUR', name: 'Bhagalpur' },
+        { code: 'MUZAFFARPUR', name: 'Muzaffarpur' },
+        { code: 'PURNEA', name: 'Purnea' },
+        { code: 'DARBHANGA', name: 'Darbhanga' },
+        { code: 'BIHAR', name: 'Bihar Sharif' },
+        { code: 'ARA', name: 'Ara' },
+        { code: 'CHHAPRA', name: 'Chhapra' },
+        { code: 'DEHRADUN', name: 'Dehradun' }
+      ]
+    },
+    { code: 'WB', name: 'West Bengal',
+      cities: [
+        { code: 'KOLKATA', name: 'Kolkata' },
+        { code: 'HOWRAH', name: 'Howrah' },
+        { code: 'DURGAPUR', name: 'Durgapur' },
+        { code: 'SILIGURI', name: 'Siliguri' },
+        { code: 'ASANSOL', name: 'Asansol' },
+        { code: 'KOLKATA2', name: 'Kolkata North' },
+        { code: 'BARDHAMAN', name: 'Bardhaman' },
+        { code: 'MALDA', name: 'Malda' },
+        { code: 'KOLKATA3', name: 'Kolkata South' },
+        { code: 'HOOGHLY', name: 'Hooghly' }
+      ]
+    },
+    { code: 'MP', name: 'Madhya Pradesh',
+      cities: [
+        { code: 'BHOPAL', name: 'Bhopal' },
+        { code: 'INDORE', name: 'Indore' },
+        { code: 'GWALIOR', name: 'Gwalior' },
+        { code: 'JABALPUR', name: 'Jabalpur' },
+        { code: 'UJJAIN', name: 'Ujjain' },
+        { code: 'SATNA', name: 'Satna' },
+        { code: 'SAGAR', name: 'Sagar' },
+        { code: 'DHAR', name: 'Dhar' },
+        { code: 'RATLAM', name: 'Ratlam' },
+        { code: 'KHANDWA', name: 'Khandwa' }
+      ]
+    },
+    { code: 'TN', name: 'Tamil Nadu',
+      cities: [
+        { code: 'CHENNAI', name: 'Chennai' },
+        { code: 'COIMBATORE', name: 'Coimbatore' },
+        { code: 'MADURAI', name: 'Madurai' },
+        { code: 'TIRUCHIRAPPALLI', name: 'Tiruchirappalli' },
+        { code: 'SALEM', name: 'Salem' },
+        { code: 'TIRUNELVELI', name: 'Tirunelveli' },
+        { code: 'TIRUPPUR', name: 'Tiruppur' },
+        { code: 'VELLORE', name: 'Vellore' },
+        { code: 'THOOTHUKUDI', name: 'Thoothukudi' },
+        { code: 'ERODE', name: 'Erode' }
+      ]
+    },
+    { code: 'RJ', name: 'Rajasthan',
+      cities: [
+        { code: 'JAIPUR', name: 'Jaipur' },
+        { code: 'JODHPUR', name: 'Jodhpur' },
+        { code: 'KOTA', name: 'Kota' },
+        { code: 'BIKANER', name: 'Bikaner' },
+        { code: 'UDAIPUR', name: 'Udaipur' },
+        { code: 'AJMER', name: 'Ajmer' },
+        { code: 'BHILWARA', name: 'Bhilwara' },
+        { code: 'ALWAR', name: 'Alwar' },
+        { code: 'BHARATPUR', name: 'Bharatpur' },
+        { code: 'PUSHPAK', name: 'Pushkar' }
+      ]
+    },
+    { code: 'KA', name: 'Karnataka',
+      cities: [
+        { code: 'BENGALURU', name: 'Bengaluru' },
+        { code: 'MYSURU', name: 'Mysuru' },
+        { code: 'MANGALURU', name: 'Mangaluru' },
+        { code: 'HUBLI', name: 'Hubballi' },
+        { code: 'BELAGAVI', name: 'Belagavi' },
+        { code: 'GULBARGA', name: 'Kalaburagi' },
+        { code: 'DAVANAGERE', name: 'Davangere' },
+        { code: 'BELLARY', name: 'Ballari' },
+        { code: 'VIJAYAPURA', name: 'Vijayapura' },
+        { code: 'SHIVAMOGGA', name: 'Shivamogga' }
+      ]
+    },
+    { code: 'GJ', name: 'Gujarat',
+      cities: [
+        { code: 'AHMEDABAD', name: 'Ahmedabad' },
+        { code: 'SURAT', name: 'Surat' },
+        { code: 'VADODARA', name: 'Vadodara' },
+        { code: 'RAJKOT', name: 'Rajkot' },
+        { code: 'GANDHINAGAR', name: 'Gandhinagar' },
+        { code: 'JAMNAGAR', name: 'Jamnagar' },
+        { code: 'BHARUCH', name: 'Bharuch' },
+        { code: 'PORBANDAR', name: 'Porbandar' },
+        { code: 'JUNAGADH', name: 'Junagadh' },
+        { code: 'MEHSANA', name: 'Mehsana' }
+      ]
+    },
+    { code: 'AP', name: 'Andhra Pradesh',
+      cities: [
+        { code: 'VISAKHAPATNAM', name: 'Visakhapatnam' },
+        { code: 'VIJAYAWADA', name: 'Vijayawada' },
+        { code: 'GUNTUR', name: 'Guntur' },
+        { code: 'NELLORE', name: 'Nellore' },
+        { code: 'KURNOOL', name: 'Kurnool' },
+        { code: 'RAJAHMUNDRY', name: 'Rajahmundry' },
+        { code: 'TIRUPATI', name: 'Tirupati' },
+        { code: 'KAKINADA', name: 'Kakinada' },
+        { code: 'ANANTAPUR', name: 'Anantapur' },
+        { code: 'ELURU', name: 'Eluru' }
+      ]
+    },
+    { code: 'OR', name: 'Odisha',
+      cities: [
+        { code: 'BHUBANESWAR', name: 'Bhubaneswar' },
+        { code: 'CUTTACK', name: 'Cuttack' },
+        { code: 'ROURKELA', name: 'Rourkela' },
+        { code: 'BERHAMPUR', name: 'Berhampur' },
+        { code: 'SAMBALPUR', name: 'Sambalpur' },
+        { code: 'PURI', name: 'Puri' },
+        { code: 'BALASORE', name: 'Balasore' },
+        { code: 'JEYPORE', name: 'Jeypore' },
+        { code: 'ANGUL', name: 'Angul' },
+        { code: 'BHADRAK', name: 'Bhadrak' }
+      ]
+    },
+    { code: 'TS', name: 'Telangana',
+      cities: [
+        { code: 'HYDERABAD', name: 'Hyderabad' },
+        { code: 'WARANGAL', name: 'Warangal' },
+        { code: 'NIZAMABAD', name: 'Nizamabad' },
+        { code: 'KARIMNAGAR', name: 'Karimnagar' },
+        { code: 'KHAMMAM', name: 'Khammam' },
+        { code: 'RAMAGUNDAM', name: 'Ramagundam' },
+        { code: 'MAHBUBNAGAR', name: 'Mahabubnagar' },
+        { code: 'NIZAMABAD2', name: 'Nizamabad' },
+        { code: 'ADILABAD', name: 'Adilabad' },
+        { code: 'SIDDIPET', name: 'Siddipet' }
+      ]
+    },
+    { code: 'KL', name: 'Kerala',
+      cities: [
+        { code: 'THIRUVANANTHAPURAM', name: 'Thiruvananthapuram' },
+        { code: 'KOCHI', name: 'Kochi' },
+        { code: 'KOZHIKODE', name: 'Kozhikode' },
+        { code: 'THRISSUR', name: 'Thrissur' },
+        { code: 'MALAPPURAM', name: 'Malappuram' },
+        { code: 'PALAKKAD', name: 'Palakkad' },
+        { code: 'ALAPPUZHA', name: 'Alappuzha' },
+        { code: 'KOLLAM', name: 'Kollam' },
+        { code: 'KANNUR', name: 'Kannur' },
+        { code: 'KASARGOD', name: 'Kasaragod' }
+      ]
+    },
+    { code: 'JH', name: 'Jharkhand',
+      cities: [
+        { code: 'RANCHI', name: 'Ranchi' },
+        { code: 'JAMSHEDPUR', name: 'Jamshedpur' },
+        { code: 'DHANBAD', name: 'Dhanbad' },
+        { code: 'BOKARO', name: 'Bokaro Steel City' },
+        { code: 'DEOGHAR', name: 'Deoghar' },
+        { code: 'PHULBANI', name: 'Phulbani' },
+        { code: 'GIRIDIH', name: 'Giridih' },
+        { code: 'Hazaribagh', name: 'Hazaribagh' },
+        { code: 'RAMGARH', name: 'Ramgarh' },
+        { code: 'CHAIBASA', name: 'Chaibasa' }
+      ]
+    },
+    { code: 'AS', name: 'Assam',
+      cities: [
+        { code: 'GUWAHATI', name: 'Guwahati' },
+        { code: 'SILCHAR', name: 'Silchar' },
+        { code: 'DIBRUGARH', name: 'Dibrugarh' },
+        { code: 'JORHAT', name: 'Jorhat' },
+        { code: 'NAGAON', name: 'Nagaon' },
+        { code: 'TEZPUR', name: 'Tezpur' },
+        { code: 'TINSUKIA', name: 'Tinsukia' },
+        { code: 'BONGAIGAON', name: 'Bongaigaon' },
+        { code: 'KARIMGANJ', name: 'Karimganj' },
+        { code: 'SUALKUCHI', name: 'Sualkuchi' }
+      ]
+    },
+    { code: 'PB', name: 'Punjab',
+      cities: [
+        { code: 'CHANDIGARH', name: 'Chandigarh' },
+        { code: 'LUDHIANA', name: 'Ludhiana' },
+        { code: 'AMRITSAR', name: 'Amritsar' },
+        { code: 'JALANDHAR', name: 'Jalandhar' },
+        { code: 'PATIALA', name: 'Patiala' },
+        { code: 'BATHINDA', name: 'Bathinda' },
+        { code: 'MOGA', name: 'Moga' },
+        { code: 'FEROZEPUR', name: 'Ferozepur' },
+        { code: 'KAPURTHALA', name: 'Kapurthala' },
+        { code: 'PATHANKOT', name: 'Pathankot' }
+      ]
+    },
+    { code: 'CH', name: 'Chhattisgarh',
+      cities: [
+        { code: 'RAIPUR', name: 'Raipur' },
+        { code: 'Bhilai', name: 'Bhilai' },
+        { code: 'BILASPUR', name: 'Bilaspur' },
+        { code: 'DURG', name: 'Durg' },
+        { code: 'KORBA', name: 'Korba' },
+        { code: 'RAIGARH', name: 'Raigarh' },
+        { code: 'JAGDALPUR', name: 'Jagdalpur' },
+        { code: 'AMBIKAPUR', name: 'Ambikapur' },
+        { code: 'RAJNANDGAON', name: 'Rajnandgaon' },
+        { code: 'DANTEWADA', name: 'Dantewada' }
+      ]
+    },
+    { code: 'HR', name: 'Haryana',
+      cities: [
+        { code: 'GURUGRAM', name: 'Gurugram' },
+        { code: 'FARIDABAD', name: 'Faridabad' },
+        { code: 'PANIPAT', name: 'Panipat' },
+        { code: 'AMBALA', name: 'Ambala' },
+        { code: 'YAMUNANAGAR', name: 'Yamunanagar' },
+        { code: 'ROHTAK', name: 'Rohtak' },
+        { code: 'HISAR', name: 'Hisar' },
+        { code: 'KARNAL', name: 'Karnal' },
+        { code: 'SONIPAT', name: 'Sonipat' },
+        { code: 'PANCHKULA', name: 'Panchkula' }
+      ]
+    },
+    { code: 'UK', name: 'Uttarakhand',
+      cities: [
+        { code: 'DEHRADUN', name: 'Dehradun' },
+        { code: 'HARIDWAR', name: 'Haridwar' },
+        { code: 'ROORKEE', name: 'Roorkee' },
+        { code: 'HALDWANI', name: 'Haldwani' },
+        { code: 'RUDRAPUR', name: 'Rudrapur' },
+        { code: 'KASHIPUR', name: 'Kashipur' },
+        { code: 'UJJAIN', name: 'Ujjain' },
+        { code: 'RANIKHET', name: 'Ranikhet' },
+        { code: 'NAINITAL', name: 'Nainital' },
+        { code: 'MUSSOORIE', name: 'Mussoorie' }
+      ]
+    },
+    { code: 'HP', name: 'Himachal Pradesh',
+      cities: [
+        { code: 'SHIMLA', name: 'Shimla' },
+        { code: 'DHARAMSHALA', name: 'Dharamshala' },
+        { code: 'SOLAN', name: 'Solan' },
+        { code: 'MANDI', name: 'Mandi' },
+        { code: 'PALAMPUR', name: 'Palampur' },
+        { code: 'KULLU', name: 'Kullu' },
+        { code: 'MANALI', name: 'Manali' },
+        { code: 'KANGRA', name: 'Kangra' },
+        { code: 'CHAMBA', name: 'Chamba' },
+        { code: 'BILASPUR', name: 'Bilaspur' }
+      ]
+    },
+    { code: 'TR', name: 'Tripura',
+      cities: [
+        { code: 'AGARTALA', name: 'Agartala' },
+        { code: 'UDAIPUR', name: 'Udaipur' },
+        { code: 'DHARMANAGAR', name: 'Dharmanagar' },
+        { code: 'KAILASHAHAR', name: 'Kailashahar' },
+        { code: 'BELONIA', name: 'Belonia' },
+        { code: 'KHOWAI', name: 'Khowai' },
+        { code: 'SANTIRBAZAR', name: 'Santirbazar' },
+        { code: 'KAMALPUR', name: 'Kamalpur' },
+        { code: 'RANIRBAZAR', name: 'Ranirbazar' },
+        { code: 'TELIAMURA', name: 'Teliamura' }
+      ]
+    },
+    { code: 'ML', name: 'Meghalaya',
+      cities: [
+        { code: 'SHILLONG', name: 'Shillong' },
+        { code: 'TURA', name: 'Tura' },
+        { code: 'NONGSTOIN', name: 'Nongstoin' },
+        { code: 'JOWAI', name: 'Jowai' },
+        { code: 'BAGHMARA', name: 'Baghmara' },
+        { code: 'NONGPOH', name: 'Nongpoh' },
+        { code: 'WILLIAMNAGAR', name: 'Williamnagar' },
+        { code: 'RESUBELPARA', name: 'Resubelpara' },
+        { code: 'MAWSYNRAM', name: 'Mawsynram' },
+        { code: 'CHERRAPUNJI', name: 'Cherrapunji' }
+      ]
+    },
+    { code: 'MN', name: 'Manipur',
+      cities: [
+        { code: 'IMPHAL', name: 'Imphal' },
+        { code: 'THOUBAL', name: 'Thoubal' },
+        { code: 'KAKCHING', name: 'Kakching' },
+        { code: 'LILONG', name: 'Lilong' },
+        { code: 'MAYANG', name: 'Mayang Imphal' },
+        { code: 'SENAPATI', name: 'Senapati' },
+        { code: 'TAMENGLONG', name: 'Tamenglong' },
+        { code: 'CHURACHANDPUR', name: 'Churachandpur' },
+        { code: 'BISHNUPUR', name: 'Bishnupur' },
+        { code: 'UKHRUL', name: 'Ukhrul' }
+      ]
+    },
+    { code: 'MZ', name: 'Mizoram',
+      cities: [
+        { code: 'AIZAWL', name: 'Aizawl' },
+        { code: 'LUNGLEH', name: 'Lungleh' },
+        { code: 'CHAMPHAI', name: 'Champhai' },
+        { code: 'SERCHHIP', name: 'Serchhip' },
+        { code: 'KOLASIB', name: 'Kolasib' },
+        { code: 'SAIHA', name: 'Saiha' },
+        { code: 'MAMIT', name: 'Mamit' },
+        { code: 'LAWNGTLAI', name: 'Lawngtlai' },
+        { code: 'THENZAWL', name: 'Thenzawl' },
+        { code: 'SAITUAL', name: 'Saitual' }
+      ]
+    },
+    { code: 'NL', name: 'Nagaland',
+      cities: [
+        { code: 'KOHIMA', name: 'Kohima' },
+        { code: 'DIMAPUR', name: 'Dimapur' },
+        { code: 'MOKOKCHUNG', name: 'Mokokchung' },
+        { code: 'TUENSANG', name: 'Tuensang' },
+        { code: 'WOKHA', name: 'Wokha' },
+        { code: 'ZUNHEBOTO', name: 'Zunheboto' },
+        { code: 'MON', name: 'Mon' },
+        { code: 'PHEK', name: 'Phek' },
+        { code: 'KIPHIRE', name: 'Kiphire' },
+        { code: 'PEREN', name: 'Peren' }
+      ]
+    },
+    { code: 'GA', name: 'Goa',
+      cities: [
+        { code: 'PANAJI', name: 'Panaji' },
+        { code: 'MARGAO', name: 'Margao' },
+        { code: 'VASCO', name: 'Vasco da Gama' },
+        { code: 'MAPUSA', name: 'Mapusa' },
+        { code: 'PONDA', name: 'Ponda' },
+        { code: 'BICHOLIM', name: 'Bicholim' },
+        { code: 'CURCHOREM', name: 'Curchorem' },
+        { code: 'SANQUELIM', name: 'Sanquelim' },
+        { code: 'QUEPEM', name: 'Quepem' },
+        { code: 'CANACONA', name: 'Canacona' }
+      ]
+    },
+    { code: 'SK', name: 'Sikkim',
+      cities: [
+        { code: 'GANGTOK', name: 'Gangtok' },
+        { code: 'GANGTOK2', name: 'Gangtok North' },
+        { code: 'NAMCHI', name: 'Namchi' },
+        { code: 'GEYZING', name: 'Geyzing' },
+        { code: 'MANGAN', name: 'Mangan' },
+        { code: 'SINGTAM', name: 'Singtam' },
+        { code: 'RANGPO', name: 'Rangpo' },
+        { code: 'JORETHANG', name: 'Jorethang' },
+        { code: 'PAKYONG', name: 'Pakyong' },
+        { code: 'RONGPO', name: 'Rongpo' }
+      ]
+    },
+    // Union Territories
+    { code: 'DL', name: 'Delhi',
+      cities: [
+        { code: 'DELHI', name: 'Delhi' },
+        { code: 'NEW', name: 'New Delhi' },
+        { code: 'SOUTH', name: 'South Delhi' },
+        { code: 'NORTH', name: 'North Delhi' },
+        { code: 'EAST', name: 'East Delhi' },
+        { code: 'WEST', name: 'West Delhi' },
+        { code: 'CENTRAL', name: 'Central Delhi' },
+        { code: 'SOUTHWEST', name: 'South West Delhi' },
+        { code: 'NORTHWEST', name: 'North West Delhi' },
+        { code: 'NORTHEAST', name: 'North East Delhi' }
+      ]
+    },
+    { code: 'JK', name: 'Jammu & Kashmir',
+      cities: [
+        { code: 'SRINAGAR', name: 'Srinagar' },
+        { code: 'JAMMU', name: 'Jammu' },
+        { code: 'ANANTNAG', name: 'Anantnag' },
+        { code: 'BARAMULLA', name: 'Baramulla' },
+        { code: 'KATHUA', name: 'Kathua' },
+        { code: 'POONCH', name: 'Poonch' },
+        { code: 'RAJOURI', name: 'Rajouri' },
+        { code: 'KUPWARA', name: 'Kupwara' },
+        { code: 'PULWAMA', name: 'Pulwama' },
+        { code: 'SHOPAIN', name: 'Shopian' }
+      ]
+    },
+    { code: 'LA', name: 'Ladakh',
+      cities: [
+        { code: 'LEH', name: 'Leh' },
+        { code: 'KARGIL', name: 'Kargil' },
+        { code: 'ZANSKAR', name: 'Zanskar' },
+        { code: 'NUBRA', name: 'Nubra' },
+        { code: 'KHARDUNG', name: 'Khardung' },
+        { code: 'PANGONG', name: 'Pangong' },
+        { code: 'TSOMORIRI', name: 'Tsomoriri' },
+        { code: 'SIACHEN', name: 'Siachen' },
+        { code: 'DRAS', name: 'Dras' },
+        { code: 'CHANGTHANG', name: 'Changthang' }
+      ]
+    },
+    { code: 'PY', name: 'Puducherry',
+      cities: [
+        { code: 'PONDICHERRY', name: 'Pondicherry' },
+        { code: 'KARAIKAL', name: 'Karaikal' },
+        { code: 'YANAM', name: 'Yanam' },
+        { code: 'MAHE', name: 'Mahe' },
+        { code: 'PONDICHERRY2', name: 'Pondicherry North' },
+        { code: 'PONDICHERRY3', name: 'Pondicherry South' },
+        { code: 'AURANGABAD', name: 'Auroville' },
+        { code: 'OOTY', name: 'Ooty' },
+        { code: 'MAHE2', name: 'Mahe North' },
+        { code: 'YANAM2', name: 'Yanam South' }
+      ]
+    },
+    { code: 'CT', name: 'Chandigarh',
+      cities: [
+        { code: 'CHANDIGARH', name: 'Chandigarh' },
+        { code: 'SECTOR', name: 'Sector 17' },
+        { code: 'SECTOR2', name: 'Sector 22' },
+        { code: 'SECTOR3', name: 'Sector 35' },
+        { code: 'SECTOR4', name: 'Sector 45' },
+        { code: 'SECTOR5', name: 'Sector 19' },
+        { code: 'SECTOR6', name: 'Sector 26' },
+        { code: 'SECTOR7', name: 'Sector 30' },
+        { code: 'SECTOR8', name: 'Sector 37' },
+        { code: 'SECTOR9', name: 'Sector 43' }
+      ]
+    },
+    { code: 'AN', name: 'Andaman & Nicobar',
+      cities: [
+        { code: 'PORT', name: 'Port Blair' },
+        { code: 'CAR', name: 'Car Nicobar' },
+        { code: 'GREAT', name: 'Great Nicobar' },
+        { code: 'LITTLE', name: 'Little Andaman' },
+        { code: 'MIDDLE', name: 'Middle Andaman' },
+        { code: 'NORTH', name: 'North Andaman' },
+        { code: 'SOUTH', name: 'South Andaman' },
+        { code: 'HUT', name: 'Hut Bay' },
+        { code: 'MAY', name: 'Mayabunder' },
+        { code: 'RANGAT', name: 'Rangat' }
+      ]
+    },
+    { code: 'LD', name: 'Lakshadweep',
+      cities: [
+        { code: 'KAVARATTI', name: 'Kavaratti' },
+        { code: 'AGATTI', name: 'Agatti' },
+        { code: 'BANGARAM', name: 'Bangaram' },
+        { code: 'KALPENI', name: 'Kalpeni' },
+        { code: 'MINICOY', name: 'Minicoy' },
+        { code: 'KADAMATH', name: 'Kadamath' },
+        { code: 'KILTHAN', name: 'Kilthan' },
+        { code: 'CHETLAT', name: 'Chetlat' },
+        { code: 'BITRA', name: 'Bitra' },
+        { code: 'ANDROTH', name: 'Androth' }
+      ]
+    },
+    { code: 'DN', name: 'Dadra & Nagar Haveli',
+      cities: [
+        { code: 'SILVASSA', name: 'Silvassa' },
+        { code: 'DADRA', name: 'Dadra' },
+        { code: 'NAGAR', name: 'Nagar Haveli' },
+        { code: 'KHANVEL', name: 'Khanvel' },
+        { code: 'AMBOLI', name: 'Amboli' },
+        { code: 'BINDRA', name: 'Bindraban' },
+        { code: 'CHANDRA', name: 'Chandrapur' },
+        { code: 'DAMAN', name: 'Daman' },
+        { code: 'VAPI', name: 'Vapi' },
+        { code: 'SILVASSA2', name: 'Silvassa North' }
+      ]
+    },
+    { code: 'DD', name: 'Daman & Diu',
+      cities: [
+        { code: 'DIU', name: 'Diu' },
+        { code: 'DAMAN', name: 'Daman' },
+        { code: 'DIU2', name: 'Diu Town' },
+        { code: 'DAMAN2', name: 'Daman Town' },
+        { code: 'BHUCHAR', name: 'Buchar' },
+        { code: 'GHOGHLA', name: 'Ghoghla' },
+        { code: 'JAMPOR', name: 'Jampor' },
+        { code: 'VANAKBARDI', name: 'Vanakbari' },
+        { code: 'SASAN', name: 'Sasan' },
+        { code: 'KODINAR', name: 'Kodinar' }
+      ]
+    }
+  ]
+},
   { code: 'LK', name: 'Sri Lanka', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'LKR', region: 'APAC' } },
   { code: 'MV', name: 'Maldives', taxInfo: { standardRate: 6, taxName: 'GST', currency: 'MVR', region: 'APAC' } },
   { code: 'NP', name: 'Nepal' },
@@ -3023,8 +4248,484 @@ export const countries: Country[] = [
   { code: 'TL', name: 'East Timor' },
   { code: 'PH', name: 'Philippines', taxInfo: { standardRate: 12, taxName: 'VAT', currency: 'PHP', region: 'APAC' } },
   { code: 'TW', name: 'Taiwan', taxInfo: { standardRate: 5, taxName: 'VAT', currency: 'TWD', region: 'APAC' } },
-  { code: 'CN', name: 'China', taxInfo: { standardRate: 13, taxName: 'VAT', currency: 'CNY', region: 'APAC' } },
-  { code: 'HK', name: 'Hong Kong' },
+  {
+  code: 'CN',
+  name: 'China',
+  taxInfo: { standardRate: 13, taxName: 'VAT', currency: 'CNY', region: 'APAC' },
+  provinces: [
+    // Municipalities
+    { code: 'BJ', name: 'Beijing',
+      cities: [
+        { code: 'BEIJING', name: 'Beijing' },
+        { code: 'DONGCHENG', name: 'Dongcheng' },
+        { code: 'XICHENG', name: 'Xicheng' },
+        { code: 'CHAOYANG', name: 'Chaoyang' },
+        { code: 'FENGTAI', name: 'Fengtai' },
+        { code: 'SHIJINGSHAN', name: 'Shijingshan' },
+        { code: 'HAIDIAN', name: 'Haidian' },
+        { code: 'MENTOUGOU', name: 'Mentougou' },
+        { code: 'FANGSHAN', name: 'Fangshan' },
+        { code: 'TONGZHOU', name: 'Tongzhou' }
+      ]
+    },
+    { code: 'SH', name: 'Shanghai',
+      cities: [
+        { code: 'SHANGHAI', name: 'Shanghai' },
+        { code: 'HUANGPU', name: 'Huangpu' },
+        { code: 'XUHUI', name: 'Xuhui' },
+        { code: 'CHANGNING', name: 'Changning' },
+        { code: 'JINGAN', name: 'Jingan' },
+        { code: 'PUTUO', name: 'Putuo' },
+        { code: 'HONGKOU', name: 'Hongkou' },
+        { code: 'YANGPU', name: 'Yangpu' },
+        { code: 'MINHANG', name: 'Minhang' },
+        { code: 'BAOSHAN', name: 'Baoshan' }
+      ]
+    },
+    { code: 'TJ', name: 'Tianjin',
+      cities: [
+        { code: 'TIANJIN', name: 'Tianjin' },
+        { code: 'HEPING', name: 'Heping' },
+        { code: 'HEXI', name: 'Hexi' },
+        { code: 'NANKAI', name: 'Nankai' },
+        { code: 'HEBEI', name: 'Hebei' },
+        { code: 'HONGQIAO', name: 'Hongqiao' },
+        { code: 'TANGGU', name: 'Tanggu' },
+        { code: 'HANSHAN', name: 'Hanshan' },
+        { code: 'DONGLI', name: 'Dongli' },
+        { code: 'XIQING', name: 'Xiqing' }
+      ]
+    },
+    { code: 'CQ', name: 'Chongqing',
+      cities: [
+        { code: 'CHONGQING', name: 'Chongqing' },
+        { code: 'YUZHONG', name: 'Yuzhong' },
+        { code: 'JIANGBEI', name: 'Jiangbei' },
+        { code: 'SHAPINGBA', name: 'Shapingba' },
+        { code: 'JIULONGPO', name: 'Jiulongpo' },
+        { code: 'NANAN', name: 'Nanan' },
+        { code: 'BEIBEI', name: 'Beibei' },
+        { code: 'WANZHOU', name: 'Wanzhou' },
+        { code: 'FULING', name: 'Fuling' },
+        { code: 'YUBEI', name: 'Yubei' }
+      ]
+    },
+    // Provinces
+    { code: 'GD', name: 'Guangdong',
+      cities: [
+        { code: 'GUANGZHOU', name: 'Guangzhou' },
+        { code: 'SHENZHEN', name: 'Shenzhen' },
+        { code: 'DONGGUAN', name: 'Dongguan' },
+        { code: 'FOSHAN', name: 'Foshan' },
+        { code: 'ZHUHAI', name: 'Zhuhai' },
+        { code: 'SHANTOU', name: 'Shantou' },
+        { code: 'JIEYANG', name: 'Jieyang' },
+        { code: 'ZHAOQING', name: 'Zhaoqing' },
+        { code: 'JIANGMEN', name: 'Jiangmen' },
+        { code: 'MAOMING', name: 'Maoming' }
+      ]
+    },
+    { code: 'JS', name: 'Jiangsu',
+      cities: [
+        { code: 'NANJING', name: 'Nanjing' },
+        { code: 'SUZHOU', name: 'Suzhou' },
+        { code: 'WUXI', name: 'Wuxi' },
+        { code: 'CHANGZHOU', name: 'Changzhou' },
+        { code: 'NANTONG', name: 'Nantong' },
+        { code: 'YANGZHOU', name: 'Yangzhou' },
+        { code: 'ZHENJIANG', name: 'Zhenjiang' },
+        { code: 'TAIZHOU', name: 'Taizhou' },
+        { code: 'HUAIAN', name: 'Huaian' },
+        { code: 'LIANYUNGANG', name: 'Lianyungang' }
+      ]
+    },
+    { code: 'ZJ', name: 'Zhejiang',
+      cities: [
+        { code: 'HANGZHOU', name: 'Hangzhou' },
+        { code: 'NINGBO', name: 'Ningbo' },
+        { code: 'WENZHOU', name: 'Wenzhou' },
+        { code: 'JINHUA', name: 'Jinhua' },
+        { code: 'JIAOXING', name: 'Jiaxing' },
+        { code: 'TAIZHOU', name: 'Taizhou' },
+        { code: 'SHAOXING', name: 'Shaoxing' },
+        { code: 'HOUZHOU', name: 'Huzhou' },
+        { code: 'QUZHOU', name: 'Quzhou' },
+        { code: 'LISHUI', name: 'Lishui' }
+      ]
+    },
+    { code: 'SD', name: 'Shandong',
+      cities: [
+        { code: 'JINAN', name: 'Jinan' },
+        { code: 'QINGDAO', name: 'Qingdao' },
+        { code: 'ZIBO', name: 'Zibo' },
+        { code: 'ZAOZHUANG', name: 'Zaozhuang' },
+        { code: 'DONGYING', name: 'Dongying' },
+        { code: 'YANTAI', name: 'Yantai' },
+        { code: 'WEIFANG', name: 'Weifang' },
+        { code: 'JINING', name: 'Jining' },
+        { code: 'TAIAN', name: 'Taian' },
+        { code: 'RIZHAO', name: 'Rizhao' }
+      ]
+    },
+    { code: 'HB', name: 'Hubei',
+      cities: [
+        { code: 'WUHAN', name: 'Wuhan' },
+        { code: 'HUANGSHI', name: 'Huangshi' },
+        { code: 'SHIYAN', name: 'Shiyan' },
+        { code: 'YICHANG', name: 'Yichang' },
+        { code: 'XIANGYANG', name: 'Xiangyang' },
+        { code: 'EZHOU', name: 'Ezhou' },
+        { code: 'JINGMEN', name: 'Jingmen' },
+        { code: 'XIAOGAN', name: 'Xiaogan' },
+        { code: 'JINGZHOU', name: 'Jingzhou' },
+        { code: 'HUANGGANG', name: 'Huanggang' }
+      ]
+    },
+    { code: 'HN', name: 'Hunan',
+      cities: [
+        { code: 'CHANGSHA', name: 'Changsha' },
+        { code: 'ZHOUZHOU', name: 'Zhuzhou' },
+        { code: 'XIANGTAN', name: 'Xiangtan' },
+        { code: 'HENGYANG', name: 'Hengyang' },
+        { code: 'SHAOYANG', name: 'Shaoyang' },
+        { code: 'YUEYANG', name: 'Yueyang' },
+        { code: 'CHANGDE', name: 'Changde' },
+        { code: 'ZHANGJIAJIE', name: 'Zhangjiajie' },
+        { code: 'YIYANG', name: 'Yiyang' },
+        { code: 'CHENZHOU', name: 'Chenzhou' }
+      ]
+    },
+    { code: 'AH', name: 'Anhui',
+      cities: [
+        { code: 'HEFEI', name: 'Hefei' },
+        { code: 'WUHU', name: 'Wuhu' },
+        { code: 'BENG', name: 'Bengbu' },
+        { code: 'HUAINAN', name: 'Huainan' },
+        { code: 'MAANSHAN', name: 'Maanshan' },
+        { code: 'HUAIBEI', name: 'Huaibei' },
+        { code: 'SUXIAN', name: 'Suxian' },
+        { code: 'ANQING', name: 'Anqing' },
+        { code: 'HUANGSHAN', name: 'Huangshan' },
+        { code: 'CHUZHOU', name: 'Chuzhou' }
+      ]
+    },
+    { code: 'FJ', name: 'Fujian',
+      cities: [
+        { code: 'FUZHOU', name: 'Fuzhou' },
+        { code: 'XIAMEN', name: 'Xiamen' },
+        { code: 'PUTIAN', name: 'Putian' },
+        { code: 'SANMING', name: 'Sanming' },
+        { code: 'QUANZHOU', name: 'Quanzhou' },
+        { code: 'ZHANGZHOU', name: 'Zhangzhou' },
+        { code: 'NANPING', name: 'Nanping' },
+        { code: 'LONGYAN', name: 'Longyan' },
+        { code: 'NINGDE', name: 'Ningde' },
+        { code: 'JINJIANG', name: 'Jinjiang' }
+      ]
+    },
+    { code: 'JX', name: 'Jiangxi',
+      cities: [
+        { code: 'NANCHANG', name: 'Nanchang' },
+        { code: 'JINGDEZHEN', name: 'Jingdezhen' },
+        { code: 'PINGXIANG', name: 'Pingxiang' },
+        { code: 'JIUJIANG', name: 'Jiujiang' },
+        { code: 'XINYU', name: 'Xinyu' },
+        { code: 'YICHUN', name: 'Yichun' },
+        { code: 'YINGTAN', name: 'Yingtan' },
+        { code: 'GANZHOU', name: 'Ganzhou' },
+        { code: 'JIAN', name: 'Jian' },
+        { code: 'SHANGRAO', name: 'Shangrao' }
+      ]
+    },
+    { code: 'HA', name: 'Henan',
+      cities: [
+        { code: 'ZHENGZHOU', name: 'Zhengzhou' },
+        { code: 'KAIFENG', name: 'Kaifeng' },
+        { code: 'LUOYANG', name: 'Luoyang' },
+        { code: 'PINGDINGSHAN', name: 'Pingdingshan' },
+        { code: 'ANYANG', name: 'Anyang' },
+        { code: 'HEBI', name: 'Hebi' },
+        { code: 'XINXIANG', name: 'Xinxiang' },
+        { code: 'JIAOZUO', name: 'Jiaozuo' },
+        { code: 'PUYANG', name: 'Puyang' },
+        { code: 'XUCHANG', name: 'Xuchang' }
+      ]
+    },
+    { code: 'HL', name: 'Heilongjiang',
+      cities: [
+        { code: 'HARBIN', name: 'Harbin' },
+        { code: 'QIQIHAR', name: 'Qiqihar' },
+        { code: 'JIXI', name: 'Jixi' },
+        { code: 'HEGANG', name: 'Hegang' },
+        { code: 'SHUANGYASHAN', name: 'Shuangyashan' },
+        { code: 'DAQING', name: 'Daqing' },
+        { code: 'YICHUN', name: 'Yichun' },
+        { code: 'JIAMUSI', name: 'Jiamusi' },
+        { code: 'QITAIHE', name: 'Qitaihe' },
+        { code: 'MUDANJIANG', name: 'Mudanjiang' }
+      ]
+    },
+    { code: 'JL', name: 'Jilin',
+      cities: [
+        { code: 'CHANGCHUN', name: 'Changchun' },
+        { code: 'JILIN', name: 'Jilin' },
+        { code: 'SIHAI', name: 'Sihai' },
+        { code: 'LIAOYUAN', name: 'Liaoyuan' },
+        { code: 'TONGHUA', name: 'Tonghua' },
+        { code: 'BAISHAN', name: 'Baishan' },
+        { code: 'SONGYUAN', name: 'Songyuan' },
+        { code: 'BAICHENG', name: 'Baicheng' },
+        { code: 'YANJI', name: 'Yanji' },
+        { code: 'MEIHEKOU', name: 'Meihekou' }
+      ]
+    },
+    { code: 'LN', name: 'Liaoning',
+      cities: [
+        { code: 'SHENYANG', name: 'Shenyang' },
+        { code: 'DALIAN', name: 'Dalian' },
+        { code: 'ANSHAN', name: 'Anshan' },
+        { code: 'FUSHUN', name: 'Fushun' },
+        { code: 'BENXI', name: 'Benxi' },
+        { code: 'DANDONG', name: 'Dandong' },
+        { code: 'JINZHOU', name: 'Jinzhou' },
+        { code: 'YINGKOU', name: 'Yingkou' },
+        { code: 'FUXIN', name: 'Fuxin' },
+        { code: 'LIAOYANG', name: 'Liaoyang' }
+      ]
+    },
+    { code: 'SX', name: 'Shanxi',
+      cities: [
+        { code: 'TAIYUAN', name: 'Taiyuan' },
+        { code: 'DATONG', name: 'Datong' },
+        { code: 'YANGQUAN', name: 'Yangquan' },
+        { code: 'CHANGZHI', name: 'Changzhi' },
+        { code: 'JINZHONG', name: 'Jinzhong' },
+        { code: 'YUNCHENG', name: 'Yuncheng' },
+        { code: 'XINZHOU', name: 'Xinzhou' },
+        { code: 'LINFEN', name: 'Linfen' },
+        { code: 'LULIANG', name: 'Luliang' },
+        { code: 'SHUOZHOU', name: 'Shuozhou' }
+      ]
+    },
+    { code: 'SN', name: 'Shaanxi',
+      cities: [
+        { code: 'XIAN', name: 'Xian' },
+        { code: 'TONGCHUAN', name: 'Tongchuan' },
+        { code: 'BAOJI', name: 'Baoji' },
+        { code: 'XIANYANG', name: 'Xianyang' },
+        { code: 'WEINAN', name: 'Weinan' },
+        { code: 'YANAN', name: 'Yanan' },
+        { code: 'HANZHONG', name: 'Hanzhong' },
+        { code: 'YULIN', name: 'Yulin' },
+        { code: 'ANKANG', name: 'Ankang' },
+        { code: 'SHANGLUO', name: 'Shangluo' }
+      ]
+    },
+    { code: 'GS', name: 'Gansu',
+      cities: [
+        { code: 'LANZHOU', name: 'Lanzhou' },
+        { code: 'JIAYUGUAN', name: 'Jiayuguan' },
+        { code: 'JINCHANG', name: 'Jinchang' },
+        { code: 'BAIYIN', name: 'Baiyin' },
+        { code: 'TIANSHUI', name: 'Tianshui' },
+        { code: 'WUWEI', name: 'Wuwei' },
+        { code: 'ZHANGYE', name: 'Zhangye' },
+        { code: 'PINGLIANG', name: 'Pingliang' },
+        { code: 'JIUQUAN', name: 'Jiuquan' },
+        { code: 'DINGXI', name: 'Dingxi' }
+      ]
+    },
+    { code: 'QH', name: 'Qinghai',
+      cities: [
+        { code: 'XINING', name: 'Xining' },
+        { code: 'HAIDONG', name: 'Haidong' },
+        { code: 'GOLMUD', name: 'Golmud' },
+        { code: 'DELINGHA', name: 'Delingha' },
+        { code: 'YUSHU', name: 'Yushu' },
+        { code: 'GUOLUO', name: 'Guoluo' },
+        { code: 'HAIBEI', name: 'Haibei' },
+        { code: 'HUANGNAN', name: 'Huangnan' },
+        { code: 'HAINAN', name: 'Hainan' },
+        { code: 'HAIXI', name: 'Haixi' }
+      ]
+    },
+    { code: 'SC', name: 'Sichuan',
+      cities: [
+        { code: 'CHENGDU', name: 'Chengdu' },
+        { code: 'ZIGONG', name: 'Zigong' },
+        { code: 'PANZHIHUA', name: 'Panzhihua' },
+        { code: 'LUZHOU', name: 'Luzhou' },
+        { code: 'DEYANG', name: 'Deyang' },
+        { code: 'MIANYANG', name: 'Mianyang' },
+        { code: 'GUANGYUAN', name: 'Guangyuan' },
+        { code: 'SUNGUI', name: 'Suining' },
+        { code: 'NEIJIANG', name: 'Neijiang' },
+        { code: 'LESHAN', name: 'Leshan' }
+      ]
+    },
+    { code: 'YN', name: 'Yunnan',
+      cities: [
+        { code: 'KUNMING', name: 'Kunming' },
+        { code: 'QUJING', name: 'Qujing' },
+        { code: 'YUXI', name: 'Yuxi' },
+        { code: 'BAOSHAN', name: 'Baoshan' },
+        { code: 'ZHAOTONG', name: 'Zhaotong' },
+        { code: 'LIJIANG', name: 'Lijiang' },
+        { code: 'PUER', name: 'Pu\'er' },
+        { code: 'LINCANG', name: 'Lincang' },
+        { code: 'CHUXIONG', name: 'Chuxiong' },
+        { code: 'HONGHE', name: 'Honghe' }
+      ]
+    },
+    { code: 'GX', name: 'Guangxi',
+      cities: [
+        { code: 'NANNING', name: 'Nanning' },
+        { code: 'LIUZHOU', name: 'Liuzhou' },
+        { code: 'GUILIN', name: 'Guilin' },
+        { code: 'WUZHOU', name: 'Wuzhou' },
+        { code: 'BEIHAI', name: 'Beihai' },
+        { code: 'FANGCHENGGANG', name: 'Fangchenggang' },
+        { code: 'QINZHOU', name: 'Qinzhou' },
+        { code: 'GUIGANG', name: 'Guigang' },
+        { code: 'YULIN', name: 'Yulin' },
+        { code: 'HECHI', name: 'Hechi' }
+      ]
+    },
+    { code: 'HI', name: 'Hainan',
+      cities: [
+        { code: 'HAIKOU', name: 'Haikou' },
+        { code: 'SANYA', name: 'Sanya' },
+        { code: 'DANZHOU', name: 'Danzhou' },
+        { code: 'WUZHISHAN', name: 'Wuzhishan' },
+        { code: 'QIONGHAI', name: 'Qionghai' },
+        { code: 'WENCHANG', name: 'Wenchang' },
+        { code: 'WANNING', name: 'Wanning' },
+        { code: 'DONGFANG', name: 'Dongfang' },
+        { code: 'DINGAN', name: 'Ding\'an' },
+        { code: 'TUNCHANG', name: 'Tunchang' }
+      ]
+    },
+    { code: 'NM', name: 'Inner Mongolia',
+      cities: [
+        { code: 'HOHHOT', name: 'Hohhot' },
+        { code: 'BAOTOU', name: 'Baotou' },
+        { code: 'WUHAI', name: 'Wuhai' },
+        { code: 'CHIFENG', name: 'Chifeng' },
+        { code: 'TONGLIAO', name: 'Tongliao' },
+        { code: 'ORDOS', name: 'Ordos' },
+        { code: 'HULUN', name: 'Hulun' },
+        { code: 'BAYAN', name: 'Bayan' },
+        { code: 'ULAN', name: 'Ulan' },
+        { code: 'ALXA', name: 'Alxa' }
+      ]
+    },
+    { code: 'XJ', name: 'Xinjiang',
+      cities: [
+        { code: 'URUMQI', name: 'Urumqi' },
+        { code: 'KARAMAY', name: 'Karamay' },
+        { code: 'TURPAN', name: 'Turpan' },
+        { code: 'HAMI', name: 'Hami' },
+        { code: 'KASHGAR', name: 'Kashgar' },
+        { code: 'AKSU', name: 'Aksu' },
+        { code: 'KIZILSU', name: 'Kizilsu' },
+        { code: 'HOTAN', name: 'Hotan' },
+        { code: 'ILT', name: 'Ili' },
+        { code: 'TACHENG', name: 'Tacheng' }
+      ]
+    },
+    { code: 'XZ', name: 'Tibet',
+      cities: [
+        { code: 'LHASA', name: 'Lhasa' },
+        { code: 'CHAMDO', name: 'Chamdo' },
+        { code: 'SHANNAN', name: 'Shannan' },
+        { code: 'SHIGATSE', name: 'Shigatse' },
+        { code: 'NAGQU', name: 'Nagqu' },
+        { code: 'NGARI', name: 'Ngari' },
+        { code: 'NYINGCHI', name: 'Nyingchi' },
+        { code: 'QAMDO', name: 'Qamdo' },
+        { code: 'GYANGZE', name: 'Gyangze' },
+        { code: 'XIGAZE', name: 'Xigaze' }
+      ]
+    },
+    { code: 'NX', name: 'Ningxia',
+      cities: [
+        { code: 'YINCHUAN', name: 'Yinchuan' },
+        { code: 'SHIZUISHAN', name: 'Shizuishan' },
+        { code: 'WUZHONG', name: 'Wuzhong' },
+        { code: 'GUOYUAN', name: 'Guyuan' },
+        { code: 'ZHONGWEI', name: 'Zhongwei' },
+        { code: 'LINGWU', name: 'Lingwu' },
+        { code: 'QINGTONGXIA', name: 'Qingtongxia' },
+        { code: 'HELAN', name: 'Helan' },
+        { code: 'YONGNING', name: 'Yongning' },
+        { code: 'PINGLUO', name: 'Pingluo' }
+      ]
+    }
+  ]
+},
+  {
+  code: 'HK',
+  name: 'Hong Kong',
+  taxInfo: { standardRate: 0, taxName: 'No VAT/GST', currency: 'HKD', region: 'APAC' },
+  provinces: [
+    { code: 'HKI', name: 'Hong Kong Island',
+      cities: [
+        { code: 'CENTRAL', name: 'Central' },
+        { code: 'ADMIRALTY', name: 'Admiralty' },
+        { code: 'WAN', name: 'Wan Chai' },
+        { code: 'CAUSEWAY', name: 'Causeway Bay' },
+        { code: 'QUARRY', name: 'Quarry Bay' },
+        { code: 'SAI', name: 'Sai Wan Ho' },
+        { code: 'SHAU', name: 'Shau Kei Wan' },
+        { code: 'CHAI', name: 'Chai Wan' },
+        { code: 'ABERDEEN', name: 'Aberdeen' },
+        { code: 'REPULSE', name: 'Repulse Bay' }
+      ]
+    },
+    { code: 'KLN', name: 'Kowloon',
+      cities: [
+        { code: 'TSIM', name: 'Tsim Sha Tsui' },
+        { code: 'JORDAN', name: 'Jordan' },
+        { code: 'YAUMATEI', name: 'Yau Ma Tei' },
+        { code: 'MONG', name: 'Mong Kok' },
+        { code: 'PRINCE', name: 'Prince Edward' },
+        { code: 'HUNG', name: 'Hung Hom' },
+        { code: 'TO', name: 'To Kwa Wan' },
+        { code: 'KOWLOON', name: 'Kowloon City' },
+        { code: 'DIAMOND', name: 'Diamond Hill' },
+        { code: 'WONG', name: 'Wong Tai Sin' }
+      ]
+    },
+    { code: 'NT', name: 'New Territories',
+      cities: [
+        { code: 'TSUEN', name: 'Tsuen Wan' },
+        { code: 'TUEN', name: 'Tuen Mun' },
+        { code: 'YUEN', name: 'Yuen Long' },
+        { code: 'TIN', name: 'Tin Shui Wai' },
+        { code: 'FANLING', name: 'Fanling' },
+        { code: 'TAI', name: 'Tai Po' },
+        { code: 'SHA', name: 'Sha Tin' },
+        { code: 'MA', name: 'Ma On Shan' },
+        { code: 'TUEN2', name: 'Tung Chung' },
+        { code: 'DISCOVERY', name: 'Discovery Bay' }
+      ]
+    },
+    { code: 'OUT', name: 'Outlying Islands',
+      cities: [
+        { code: 'CHEUNG', name: 'Cheung Chau' },
+        { code: 'LAMMA', name: 'Lamma Island' },
+        { code: 'PENG', name: 'Peng Chau' },
+        { code: 'LANTAU', name: 'Lantau Island' },
+        { code: 'SHEK', name: 'Shek Pik' },
+        { code: 'TAI', name: 'Tai O' },
+        { code: 'PO', name: 'Po Toi Islands' },
+        { code: 'MUI', name: 'Mui Wo' },
+        { code: 'PENG2', name: 'Peng Chau' },
+        { code: 'MA', name: 'Ma Wan' }
+      ]
+    }
+  ]
+},
   { code: 'MO', name: 'Macau' },
   { code: 'MN', name: 'Mongolia' },
   { code: 'KR', name: 'South Korea', taxInfo: { standardRate: 10, taxName: 'VAT', currency: 'KRW', region: 'APAC' } },
