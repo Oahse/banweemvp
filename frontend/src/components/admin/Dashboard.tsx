@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { 
   BarChart3Icon, 
   UsersIcon, 
@@ -21,6 +21,8 @@ import {
   StatsCard, 
   DataTable 
 } from './shared';
+import DashboardFilterBar, { DashboardFilters } from './DashboardFilterBar';
+import { CustomLineChart, CustomBarChart, Histogram } from './charts';
 
 // Types
 interface AdminStats {
@@ -54,9 +56,44 @@ export const Dashboard = () => {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<DashboardFilters>({
+    dateRange: 'month',
+  });
   const navigate = useNavigate();
   const { theme } = useTheme();
   const { formatCurrency } = useLocale();
+
+  // Generate mock chart data based on date range
+  const generateChartData = (days: number) => {
+    const data = [];
+    for (let i = days; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      data.push({
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        revenue: Math.floor(Math.random() * 5000) + 1000,
+        orders: Math.floor(Math.random() * 50) + 10,
+        users: Math.floor(Math.random() * 30) + 5,
+      });
+    }
+    return data;
+  };
+
+  const chartData = useMemo(() => {
+    let days = 30;
+    if (filters.dateRange === 'today') days = 0;
+    if (filters.dateRange === 'week') days = 7;
+    if (filters.dateRange === 'year') days = 365;
+    return generateChartData(days);
+  }, [filters.dateRange]);
+
+  const handleFiltersChange = (newFilters: DashboardFilters) => {
+    setFilters(newFilters);
+  };
+
+  const handleResetFilters = () => {
+    setFilters({ dateRange: 'month' });
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -217,6 +254,13 @@ export const Dashboard = () => {
   return (
     <PageLayout>
       <div className="space-y-6">
+        {/* Dashboard Filters */}
+        <DashboardFilterBar
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          onReset={handleResetFilters}
+        />
+
         {/* Stats Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {statsCards.map((card, index) => (
@@ -227,6 +271,95 @@ export const Dashboard = () => {
               error={error || undefined}
             />
           ))}
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Revenue Line Chart */}
+          <CustomLineChart
+            data={chartData}
+            dataKey="revenue"
+            title="Revenue Trend"
+            xAxisKey="date"
+            color="#61b482"
+            height={300}
+          />
+
+          {/* Orders Bar Chart */}
+          <CustomBarChart
+            data={chartData}
+            dataKey="orders"
+            title="Orders Overview"
+            xAxisKey="date"
+            color="#3b82f6"
+            height={300}
+          />
+        </div>
+
+        {/* Additional Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* User Growth Histogram */}
+          <Histogram
+            data={chartData.slice(0, 15)}
+            dataKey="users"
+            title="User Growth Distribution"
+            xAxisKey="date"
+            color="#8b5cf6"
+            height={300}
+          />
+
+          {/* Combined Metrics */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+              Key Metrics Summary
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {formatCurrency(
+                      chartData.reduce((sum, item) => sum + item.revenue, 0)
+                    )}
+                  </p>
+                </div>
+                <DollarSignIcon className="w-8 h-8 text-primary opacity-20" />
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Orders</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {chartData.reduce((sum, item) => sum + item.orders, 0)}
+                  </p>
+                </div>
+                <ShoppingCartIcon className="w-8 h-8 text-primary opacity-20" />
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Users</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {chartData.reduce((sum, item) => sum + item.users, 0)}
+                  </p>
+                </div>
+                <UsersIcon className="w-8 h-8 text-primary opacity-20" />
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Average Order Value</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {formatCurrency(
+                      chartData.reduce((sum, item) => sum + item.revenue, 0) /
+                        (chartData.reduce((sum, item) => sum + item.orders, 0) || 1)
+                    )}
+                  </p>
+                </div>
+                <TrendingUpIcon className="w-8 h-8 text-primary opacity-20" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Recent Orders */}
