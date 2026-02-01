@@ -605,8 +605,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                     <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
                   )}
                   <span className={`text-sm font-medium ${
-                    realTimeValidation.can_proceed ? 'text-success dark:text-success-dark' : 'text-destructive dark:text-destructive-dark'
-                  `}>
+                    realTimeValidation.can_proceed ? 'text-success dark:text-success-dark' : `text-destructive dark:text-destructive-dark`}`}>
                     {realTimeValidation.can_proceed ? 'Ready to place order' : 'Cannot proceed'}
                   </span>
                 </div>
