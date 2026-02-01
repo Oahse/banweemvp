@@ -25,6 +25,13 @@ import DashboardFilterBar, { DashboardFilters } from './DashboardFilterBar';
 import { CustomLineChart, CustomBarChart, Histogram } from './charts';
 
 // Types
+interface ChartDataPoint {
+  date: string;
+  revenue: number;
+  orders: number;
+  users: number;
+}
+
 interface AdminStats {
   overview: {
     total_users: number;
@@ -42,6 +49,7 @@ interface AdminStats {
     revenue_this_month: number;
     currency: string;
   };
+  chart_data: ChartDataPoint[];
   recent_orders: Array<{
     id: string;
     user_email: string;
@@ -63,29 +71,10 @@ export const Dashboard = () => {
   const { theme } = useTheme();
   const { formatCurrency } = useLocale();
 
-  // Generate mock chart data based on date range
-  const generateChartData = (days: number) => {
-    const data = [];
-    for (let i = days; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      data.push({
-        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        revenue: Math.floor(Math.random() * 5000) + 1000,
-        orders: Math.floor(Math.random() * 50) + 10,
-        users: Math.floor(Math.random() * 30) + 5,
-      });
-    }
-    return data;
-  };
-
+  // Use real chart data from the API response
   const chartData = useMemo(() => {
-    let days = 30;
-    if (filters.dateRange === 'today') days = 0;
-    if (filters.dateRange === 'week') days = 7;
-    if (filters.dateRange === 'year') days = 365;
-    return generateChartData(days);
-  }, [filters.dateRange]);
+    return stats?.chart_data || [];
+  }, [stats?.chart_data]);
 
   const handleFiltersChange = (newFilters: DashboardFilters) => {
     setFilters(newFilters);
@@ -95,13 +84,48 @@ export const Dashboard = () => {
     setFilters({ dateRange: 'month' });
   };
 
+  // Fetch stats with filters applied
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        const response = await AdminAPI.getAdminStats();
+        // Build filter parameters for API
+        const filterParams: any = {};
+        
+        if (filters.dateRange !== 'custom') {
+          const today = new Date();
+          let startDate = new Date();
+          
+          switch (filters.dateRange) {
+            case 'today':
+              startDate = new Date(today);
+              startDate.setHours(0, 0, 0, 0);
+              break;
+            case 'week':
+              startDate.setDate(today.getDate() - 7);
+              break;
+            case 'month':
+              startDate.setMonth(today.getMonth() - 1);
+              break;
+            case 'year':
+              startDate.setFullYear(today.getFullYear() - 1);
+              break;
+          }
+          
+          filterParams.date_from = startDate.toISOString().split('T')[0];
+          filterParams.date_to = today.toISOString().split('T')[0];
+        } else {
+          if (filters.startDate) filterParams.date_from = filters.startDate;
+          if (filters.endDate) filterParams.date_to = filters.endDate;
+        }
+        
+        if (filters.status) filterParams.status = filters.status;
+        if (filters.category) filterParams.category = filters.category;
+        
+        // Pass filters to API
+        const response = await AdminAPI.getAdminStats(filterParams);
         
         if (response?.success && response?.data) {
           setStats(response.data);
@@ -118,7 +142,7 @@ export const Dashboard = () => {
     };
 
     fetchStats();
-  }, []);
+  }, [filters]); // Re-fetch when filters change
 
   // Stats cards configuration
   const statsCards = [
@@ -318,9 +342,7 @@ export const Dashboard = () => {
                 <div>
                   <p className="text-xs text-gray-600 dark:text-gray-400">Total Revenue</p>
                   <p className="text-base font-semibold text-gray-900 dark:text-white mt-1">
-                    {formatCurrency(
-                      chartData.reduce((sum, item) => sum + item.revenue, 0)
-                    )}
+                    {formatCurrency(stats?.revenue.total_revenue || 0)}
                   </p>
                 </div>
                 <DollarSignIcon className="w-6 h-6 text-primary opacity-20" />
@@ -330,7 +352,7 @@ export const Dashboard = () => {
                 <div>
                   <p className="text-xs text-gray-600 dark:text-gray-400">Total Orders</p>
                   <p className="text-base font-semibold text-gray-900 dark:text-white mt-1">
-                    {chartData.reduce((sum, item) => sum + item.orders, 0)}
+                    {stats?.overview.total_orders || 0}
                   </p>
                 </div>
                 <ShoppingCartIcon className="w-6 h-6 text-primary opacity-20" />
@@ -340,7 +362,7 @@ export const Dashboard = () => {
                 <div>
                   <p className="text-xs text-gray-600 dark:text-gray-400">Total Users</p>
                   <p className="text-base font-semibold text-gray-900 dark:text-white mt-1">
-                    {chartData.reduce((sum, item) => sum + item.users, 0)}
+                    {stats?.overview.total_users || 0}
                   </p>
                 </div>
                 <UsersIcon className="w-6 h-6 text-primary opacity-20" />
@@ -351,8 +373,9 @@ export const Dashboard = () => {
                   <p className="text-xs text-gray-600 dark:text-gray-400">Average Order Value</p>
                   <p className="text-base font-semibold text-gray-900 dark:text-white mt-1">
                     {formatCurrency(
-                      chartData.reduce((sum, item) => sum + item.revenue, 0) /
-                        (chartData.reduce((sum, item) => sum + item.orders, 0) || 1)
+                      stats?.overview.total_orders && stats.overview.total_orders > 0
+                        ? stats.revenue.total_revenue / stats.overview.total_orders
+                        : 0
                     )}
                   </p>
                 </div>

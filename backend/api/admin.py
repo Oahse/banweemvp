@@ -46,13 +46,22 @@ def require_admin(current_user: User = Depends(get_current_auth_user)):
 # Basic Admin Routes
 @router.get("/stats")
 async def get_admin_stats(
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get admin dashboard statistics."""
+    """Get admin dashboard statistics with filters."""
     try:
         admin_service = AdminService(db)
-        stats = await admin_service.get_dashboard_stats()
+        stats = await admin_service.get_dashboard_stats(
+            date_from=date_from,
+            date_to=date_to,
+            status=status,
+            category=category
+        )
         return Response.success(data=stats)
     except Exception as e:
         raise APIException(

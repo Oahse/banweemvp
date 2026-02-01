@@ -211,6 +211,28 @@ export const AdminDataTable = <T extends Record<string, any>>({
     if (column.render) {
       return column.render(value, row);
     }
+    // Prevent rendering objects directly - React doesn't allow this
+    if (value === null || value === undefined) {
+      return '-';
+    }
+    if (typeof value === 'object') {
+      // Handle common object types
+      if (Array.isArray(value)) {
+        return value.length > 0 ? value.join(', ') : '-';
+      }
+      // If it's an object with full_name or name, show that
+      if ('full_name' in value) {
+        return (value as any).full_name;
+      }
+      if ('name' in value) {
+        return (value as any).name;
+      }
+      if ('email' in value) {
+        return (value as any).email;
+      }
+      // Otherwise show [Object]
+      return '[Object]';
+    }
     return value;
   };
 

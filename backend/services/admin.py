@@ -10,6 +10,9 @@ from uuid import UUID
 from datetime import datetime, timedelta, date
 from typing import Optional, List, Dict, Any
 from decimal import Decimal
+from core.logging import get_structured_logger
+
+logger = get_structured_logger(__name__)
 
 
 
@@ -132,19 +135,42 @@ class AdminService:
         
         return user
 
-    async def get_dashboard_stats(self) -> Dict[str, Any]:
-        """Get admin dashboard statistics"""
+    async def get_dashboard_stats(
+        self,
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None,
+        status: Optional[str] = None,
+        category: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Get admin dashboard statistics with optional filters"""
         try:
             from models.orders import Order
             from models.product import Product
             from models.subscriptions import Subscription
             from datetime import datetime, timedelta
             
-            # Calculate date ranges
+            # Parse date filters
             today = datetime.utcnow().date()
             yesterday = today - timedelta(days=1)
             last_week = today - timedelta(days=7)
             last_month = today - timedelta(days=30)
+            
+            # Parse date_from and date_to
+            if date_from:
+                try:
+                    start_date = datetime.fromisoformat(date_from).date()
+                except:
+                    start_date = last_month
+            else:
+                start_date = last_month
+            
+            if date_to:
+                try:
+                    end_date = datetime.fromisoformat(date_to).date()
+                except:
+                    end_date = today
+            else:
+                end_date = today
             
             # Get total users
             total_users = await self.db.scalar(select(func.count(User.id)))
@@ -152,25 +178,39 @@ class AdminService:
                 select(func.count(User.id)).where(User.is_active == True)
             )
             
-            # Get total orders
-            total_orders = await self.db.scalar(select(func.count(Order.id)))
+            # Get total orders with optional status filter
+            order_conditions = []
+            if status:
+                order_conditions.append(Order.order_status == status)
+            
+            total_orders = await self.db.scalar(
+                select(func.count(Order.id)).where(and_(*order_conditions)) if order_conditions else select(func.count(Order.id))
+            )
             orders_today = await self.db.scalar(
                 select(func.count(Order.id)).where(
                     func.date(Order.created_at) == today
                 )
             )
             
-            # Get total products
-            total_products = await self.db.scalar(select(func.count(Product.id)))
+            # Get total products with optional category filter
+            product_conditions = []
+            if category:
+                product_conditions.append(Product.category == category)
+            
+            total_products = await self.db.scalar(
+                select(func.count(Product.id)).where(and_(*product_conditions)) if product_conditions else select(func.count(Product.id))
+            )
             active_products = await self.db.scalar(
                 select(func.count(Product.id)).where(Product.is_active == True)
             )
             
             # Get revenue data
+            revenue_conditions = [Order.order_status.in_(['DELIVERED', 'SHIPPED', 'PROCESSING'])]
+            if status:
+                revenue_conditions.append(Order.order_status == status)
+            
             total_revenue = await self.db.scalar(
-                select(func.coalesce(func.sum(Order.total_amount), 0)).where(
-                    Order.order_status.in_(['DELIVERED', 'SHIPPED', 'PROCESSING'])
-                )
+                select(func.coalesce(func.sum(Order.total_amount), 0)).where(and_(*revenue_conditions))
             ) or 0
             
             revenue_today = await self.db.scalar(
@@ -203,6 +243,9 @@ class AdminService:
                 # Subscription table might not exist
                 pass
             
+            # Generate chart data for selected date range
+            chart_data = await self._generate_daily_metrics(start_date, end_date, status, category)
+            
             # Recent orders
             recent_orders_result = await self.db.execute(
                 select(Order)
@@ -218,6 +261,37 @@ class AdminService:
                     "active_users": active_users,
                     "total_orders": total_orders,
                     "orders_today": orders_today,
+                    "total_products": total_products,
+                    "active_products": active_products,
+                    "total_subscriptions": total_subscriptions,
+                    "active_subscriptions": active_subscriptions
+                },
+                "revenue": {
+                    "total_revenue": float(total_revenue),
+                    "revenue_today": float(revenue_today),
+                    "revenue_this_month": float(revenue_this_month),
+                    "currency": "USD"
+                },
+                "chart_data": chart_data,
+                "recent_orders": [
+                    {
+                        "id": str(order.id),
+                        "user_email": order.user.email if order.user else "Unknown",
+                        "total_amount": float(order.total_amount),
+                        "status": order.order_status,
+                        "created_at": order.created_at.isoformat() if order.created_at else None
+                    }
+                    for order in recent_orders
+                ],
+                "generated_at": datetime.utcnow().isoformat()
+            }
+            
+        except Exception as e:
+            # Return basic stats on error
+            return {
+                "overview": {
+                    "total_users": 0,
+                    "active_users": 0,
                     "total_products": total_products,
                     "active_products": active_products,
                     "total_subscriptions": total_subscriptions,
@@ -262,9 +336,65 @@ class AdminService:
                     "currency": "USD"
                 },
                 "recent_orders": [],
+                "chart_data": [],
                 "error": f"Failed to fetch complete stats: {str(e)}",
                 "generated_at": datetime.utcnow().isoformat()
             }
+    
+    async def _generate_daily_metrics(
+        self,
+        start_date: date,
+        end_date: date,
+        status: Optional[str] = None,
+        category: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """Generate daily metrics for chart data between date range"""
+        from models.orders import Order
+        from models.product import Product
+        
+        chart_data = []
+        current_date = start_date
+        
+        while current_date <= end_date:
+            next_date = current_date + timedelta(days=1)
+            
+            # Build conditions for this day
+            date_conditions = [
+                func.date(Order.created_at) == current_date,
+                Order.order_status.in_(['DELIVERED', 'SHIPPED', 'PROCESSING'])
+            ]
+            if status:
+                date_conditions.append(Order.order_status == status)
+            
+            # Get daily revenue
+            daily_revenue = await self.db.scalar(
+                select(func.coalesce(func.sum(Order.total_amount), 0)).where(and_(*date_conditions))
+            ) or 0
+            
+            # Get daily orders count
+            daily_orders = await self.db.scalar(
+                select(func.count(Order.id)).where(
+                    func.date(Order.created_at) == current_date
+                )
+            ) or 0
+            
+            # Get daily new users
+            daily_users = await self.db.scalar(
+                select(func.count(User.id)).where(
+                    func.date(User.created_at) == current_date
+                )
+            ) or 0
+            
+            chart_data.append({
+                "date": current_date.strftime('%b %d'),
+                "revenue": float(daily_revenue),
+                "orders": int(daily_orders),
+                "users": int(daily_users)
+            })
+            
+            current_date = next_date
+        
+        return chart_data
 
     async def get_platform_overview(self) -> Dict[str, Any]:
         """Get platform overview statistics"""
@@ -449,6 +579,31 @@ class AdminService:
                 "error": f"Failed to fetch orders: {str(e)}"
             }
 
+    def _calculate_subtotal_from_items(self, items: List) -> float:
+        """
+        Calculate subtotal from order items considering quantity and unit price.
+        
+        IMPORTANT: This is the authoritative subtotal calculation.
+        Formula: SUM(quantity × price_per_unit) for all items
+        
+        This method is called at:
+        1. Order creation time (to ensure subtotal is stored correctly)
+        2. Order retrieval time (to ensure data integrity and audit trail)
+        
+        Args:
+            items: List of OrderItem objects
+            
+        Returns:
+            float: Calculated subtotal
+        """
+        if not items:
+            return 0.0
+        
+        # Explicitly calculate: sum of (quantity * price_per_unit)
+        subtotal = sum(float(item.quantity * item.price_per_unit) for item in items)
+        
+        return subtotal
+
     async def get_order_by_id(self, order_id: str) -> Optional[Dict[str, Any]]:
         """Get a single order by ID with items, product, variant, and variant images"""
         try:
@@ -458,20 +613,25 @@ class AdminService:
             result = await self.db.execute(
                 select(Order)
                 .options(selectinload(Order.user))
-                .options(
-                    selectinload(Order.items)
-                    .selectinload(OrderItem.variant)
-                    .selectinload(ProductVariant.product),
-                    selectinload(Order.items)
-                    .selectinload(OrderItem.variant)
-                    .selectinload(ProductVariant.images),
-                )
+                .options(selectinload(Order.items))
                 .where(Order.id == UUID(order_id))
             )
             order = result.scalar_one_or_none()
             
             if not order:
                 return None
+            
+            # Fetch variants and images separately to avoid circular loading issues
+            if order.items:
+                for item in order.items:
+                    if item.variant_id:
+                        variant_result = await self.db.execute(
+                            select(ProductVariant)
+                            .options(selectinload(ProductVariant.product))
+                            .options(selectinload(ProductVariant.images))
+                            .where(ProductVariant.id == item.variant_id)
+                        )
+                        item.variant = variant_result.scalar_one_or_none()
 
             def serialize_order_item(item) -> dict:
                 variant = getattr(item, "variant", None)
@@ -480,7 +640,7 @@ class AdminService:
                 return {
                     "id": str(item.id),
                     "order_id": str(item.order_id),
-                    "variant_id": str(item.variant_id),
+                    "variant_id": str(item.variant_id) if item.variant_id else None,
                     "product_id": str(product.id) if product else None,
                     "product_name": getattr(product, "name", None) if product else None,
                     "variant_name": getattr(variant, "sku", None) or getattr(variant, "name", None) if variant else None,
@@ -506,6 +666,14 @@ class AdminService:
                     } if variant else None,
                 }
             
+            # Recalculate order totals based on actual items
+            items_list = order.items if order.items else []
+            # Use centralized calculation method for consistency
+            calculated_subtotal = self._calculate_subtotal_from_items(items_list)
+            calculated_shipping = float(order.shipping_cost or 0.0)
+            calculated_tax = float(order.tax_amount or 0.0)
+            calculated_total = calculated_subtotal + calculated_shipping + calculated_tax
+            
             return {
                 "id": str(order.id),
                 "order_number": order.order_number,
@@ -515,11 +683,11 @@ class AdminService:
                     "lastname": order.user.lastname if order.user else None,
                     "email": order.user.email if order.user else "Unknown"
                 } if order.user else None,
-                "total_amount": float(order.total_amount),
-                "sub_total": float(order.subtotal),
-                "subtotal": float(order.subtotal),
-                "shipping_cost": float(order.shipping_cost),
-                "tax_amount": float(order.tax_amount),
+                "total_amount": calculated_total,
+                "sub_total": calculated_subtotal,
+                "subtotal": calculated_subtotal,
+                "shipping_cost": calculated_shipping,
+                "tax_amount": calculated_tax,
                 "tax_rate": float(order.tax_rate or 0),
                 "currency": order.currency,
                 "discount_amount": float(getattr(order, "discount_amount", 0.0)),
@@ -546,7 +714,9 @@ class AdminService:
             }
             
         except Exception as e:
+            import traceback
             print(f"Error fetching order by ID: {e}")
+            print(traceback.format_exc())
             return None
 
 
@@ -708,18 +878,8 @@ class AdminService:
                     "purchase_count": product.purchase_count,
                     "total_stock": total_stock,
                     "stock_status": stock_status,
-                    "category": {
-                        "id": str(product.category.id),
-                        "name": product.category.name,
-                        "description": product.category.description
-                    } if product.category else None,
-                    "supplier": {
-                        "id": str(product.supplier.id),
-                        "email": product.supplier.email,
-                        "firstname": product.supplier.firstname,
-                        "lastname": product.supplier.lastname,
-                        "full_name": f"{product.supplier.firstname} {product.supplier.lastname}".strip()
-                    } if product.supplier else None,
+                    "category": product.category.name if product.category else None,
+                    "supplier": f"{product.supplier.firstname} {product.supplier.lastname}".strip() if product.supplier else None,
                     "variants": variants_data,
                     "primary_variant": variants_data[0] if variants_data else None,
                     "created_at": product.created_at.isoformat() if product.created_at else None,

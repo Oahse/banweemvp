@@ -9,11 +9,24 @@ import { apiClient } from './client';
 
 export class AdminAPI {
   /**
-   * Get admin dashboard statistics
+   * Get admin dashboard statistics with filters
    * ACCESS: Admin Only - Requires admin role
    */
-  static async getAdminStats() {
-    return await apiClient.get('/admin/stats', {});
+  static async getAdminStats(filters?: {
+    date_from?: string;
+    date_to?: string;
+    status?: string;
+    category?: string;
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (filters?.date_from) queryParams.append('date_from', filters.date_from);
+    if (filters?.date_to) queryParams.append('date_to', filters.date_to);
+    if (filters?.status) queryParams.append('status', filters.status);
+    if (filters?.category) queryParams.append('category', filters.category);
+
+    const url = `/admin/stats${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url, {});
   }
 
   /**

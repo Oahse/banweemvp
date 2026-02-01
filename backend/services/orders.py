@@ -58,7 +58,47 @@ class PricingCalculationResult:
 
 
 class OrderService:
-    """Comprehensive order service with advanced pricing and security validation"""
+    """
+    Comprehensive order service with advanced pricing and security validation
+    
+    CRITICAL CALCULATION METHODOLOGY:
+    ================================
+    
+    This service is responsible for ALL order total calculations. All calculations
+    are performed on the backend (NEVER trust frontend prices) and follow this formula:
+    
+    SUBTOTAL = SUM(quantity × price_per_unit) for all items
+    TOTAL = SUBTOTAL + SHIPPING_COST + TAX_AMOUNT - DISCOUNT_AMOUNT
+    
+    Calculation Lifecycle:
+    
+    1. AT ORDER CREATION TIME:
+       - User submits checkout request from frontend (may include incorrect prices)
+       - _validate_and_recalculate_prices() recalculates all item prices from database
+       - _calculate_final_order_total() calculates subtotal = SUM(item.quantity × item.backend_price)
+       - Order is created with calculated_subtotal stored in order.subtotal field
+       - If any price mismatch between frontend and backend is detected, log it for security audit
+    
+    2. AT ORDER RETRIEVAL TIME (for admin dashboard):
+       - Order is fetched from database with all items
+       - AdminService._calculate_subtotal_from_items() recalculates subtotal = SUM(quantity × price_per_unit)
+       - This serves as data integrity check and provides audit trail
+       - If stored subtotal != calculated subtotal, use calculated value (stored may be corrupted)
+    
+    Key Rules:
+    - NEVER calculate prices on frontend (display only)
+    - ALWAYS recalculate on backend before storage
+    - Quantity MUST be multiplied by price_per_unit (not frontend's total_price)
+    - All calculations use backend prices (sale_price if available, else base_price)
+    - Calculations are atomic - all or nothing (transactions)
+    - All price discrepancies are logged for security audit
+    
+    This ensures:
+    ✓ Data integrity: Prices always match database source
+    ✓ Security: Frontend cannot inject false prices
+    ✓ Audit trail: All calculations are traceable to database
+    ✓ Accuracy: Quantity always considered in calculations
+    """
     
     def __init__(self, db: AsyncSession, lock_service=None):
         self.db = db
