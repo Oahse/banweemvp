@@ -1,5 +1,5 @@
 /**
- * Afghanistan country data with provinces, cities, and tax information
+ * Afghanistan country data with provinces and cities
  */
 
 import { Country } from './index';
@@ -7,9 +7,15 @@ import { Country } from './index';
 export const afghanistan: Country = {
   code: 'AF',
   name: 'Afghanistan',
+  flag: '🇦🇫',
+  capital: 'Kabul',
+  area: 652230,
+  currencySymbol: '؋',
+  officialLanguages: ['Dari', 'Pashto'],
+  demonym: 'Afghan',
   taxInfo: { standardRate: 0, taxName: 'No VAT/GST', currency: 'AFN', region: 'APAC' },
-  provinces: [
-    { code: 'KAB', name: 'Kabul',
+  divisions: [
+    { code: 'KAB', name: 'Kabul', type: 'province',
       cities: [
         { code: 'KABUL', name: 'Kabul' },
         { code: 'CHARASIAB', name: 'Charasiab' },
@@ -18,17 +24,34 @@ export const afghanistan: Country = {
         { code: 'SROB', name: 'Surobi' },
         { code: 'MUSA', name: 'Musa Khel' },
         { code: 'DEH', name: 'Deh Sabz' },
-        { code: 'ISTALIF', name: 'Istalif' },
-        { code: 'SHAKAR', name: 'Shakar Dara' },
-        { code: 'GULDARA', name: 'Guldara' }
+        { code: 'MIR', name: 'Mir Bacha Kot' },
+        { code: 'KALAKAN', name: 'Kalakan' },
+        { code: 'ISTALIF', name: 'Istalif' }
       ]
     },
-    { code: 'HER', name: 'Herat',
+    { code: 'NAN', name: 'Nangarhar', type: 'province',
+      cities: [
+        { code: 'JALALABAD', name: 'Jalalabad' },
+        { code: 'KAMA', name: 'Kama' },
+        { code: 'BATIKOT', name: 'Batikot' },
+        { code: 'DAR', name: 'Dar-e Noor' },
+        { code: 'HESARAK', name: 'Hesarak' },
+        { code: 'KHO', name: 'Khojani' },
+        { code: 'LAL', name: 'Lal Pura' },
+        { code: 'MOM', name: 'Momand Dara' },
+        { code: 'SHIN', name: 'Shinwar' },
+        { code: 'SURKH', name: 'Surkh Rod' }
+      ]
+    },
+    { code: 'HER', name: 'Herat', type: 'province',
       cities: [
         { code: 'HERAT', name: 'Herat' },
-        { code: 'ENJIL', name: 'Enjil' },
-        { code: 'GHORIAN', name: 'Ghoryan' },
+        { code: 'ADRA', name: 'Adraskan' },
+        { code: 'CHISHT', name: 'Chishti Sharif' },
+        { code: 'FARSI', name: 'Farsi' },
+        { code: 'GHORIAN', name: 'Ghorian' },
         { code: 'GULRAN', name: 'Gulran' },
+        { code: 'INJIL', name: 'Injil' },
         { code: 'KARUKH', name: 'Karukh' },
         { code: 'KUSHK', name: 'Kushk' },
         { code: 'KUSHKAK', name: 'Kushkak' },
