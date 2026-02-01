@@ -34,7 +34,7 @@ export const algeria: Country = {
           { code: 'AIN2', name: 'Ain Temouchent' },
           { code: 'GHIL', name: 'Ghazaouet' },
           { code: 'BEN2', name: 'Beni Saf' },
-          { code: 'SIDI2', name: 'Sidi M'hamed' }
+          { code: 'SIDI2', name: "Sidi M'hamed" }
         ]
       },
       { code: 'CONST', name: 'Constantine',
@@ -48,7 +48,7 @@ export const algeria: Country = {
           { code: 'MILA', name: 'Mila' },
           { code: 'JIJ', name: 'Jijel' },
           { code: 'SET', name: 'Setif' },
-          { code: 'BAT' name: 'Batna' }
+          { code: 'BAT', name: 'Batna' }
         ]
       },
       { code: 'BLI', name: 'Blida',
