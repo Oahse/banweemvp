@@ -83,7 +83,7 @@ export const saudiArabia: Country = {
         cities: [
           { code: 'TAB', name: 'Tabuk' },
           { code: 'WEJ', name: 'Wejh' },
-          {'code': 'TAY', 'name': 'Tayma' },
+          {          { code: 'TAY', name: 'Tayma' },
           { code: 'DUM', name: 'Dumat al-Jandal' },
           { code: 'HA', name: 'Haql' },
           { code: 'BAD', name: 'Badr' },
