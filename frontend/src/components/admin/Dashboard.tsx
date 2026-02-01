@@ -316,47 +316,47 @@ export const Dashboard = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Total Revenue</p>
+                  <p className="text-base font-semibold text-gray-900 dark:text-white mt-1">
                     {formatCurrency(
                       chartData.reduce((sum, item) => sum + item.revenue, 0)
                     )}
                   </p>
                 </div>
-                <DollarSignIcon className="w-8 h-8 text-primary opacity-20" />
+                <DollarSignIcon className="w-6 h-6 text-primary opacity-20" />
               </div>
 
               <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Orders</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Total Orders</p>
+                  <p className="text-base font-semibold text-gray-900 dark:text-white mt-1">
                     {chartData.reduce((sum, item) => sum + item.orders, 0)}
                   </p>
                 </div>
-                <ShoppingCartIcon className="w-8 h-8 text-primary opacity-20" />
+                <ShoppingCartIcon className="w-6 h-6 text-primary opacity-20" />
               </div>
 
               <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Total Users</p>
+                  <p className="text-base font-semibold text-gray-900 dark:text-white mt-1">
                     {chartData.reduce((sum, item) => sum + item.users, 0)}
                   </p>
                 </div>
-                <UsersIcon className="w-8 h-8 text-primary opacity-20" />
+                <UsersIcon className="w-6 h-6 text-primary opacity-20" />
               </div>
 
               <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Average Order Value</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Average Order Value</p>
+                  <p className="text-base font-semibold text-gray-900 dark:text-white mt-1">
                     {formatCurrency(
                       chartData.reduce((sum, item) => sum + item.revenue, 0) /
                         (chartData.reduce((sum, item) => sum + item.orders, 0) || 1)
                     )}
                   </p>
                 </div>
-                <TrendingUpIcon className="w-8 h-8 text-primary opacity-20" />
+                <TrendingUpIcon className="w-6 h-6 text-primary opacity-20" />
               </div>
             </div>
           </div>
