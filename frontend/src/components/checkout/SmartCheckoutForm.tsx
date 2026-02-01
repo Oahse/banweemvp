@@ -630,6 +630,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
         </div>
       )}
     </div>
+    </div>
   );
 };
 
