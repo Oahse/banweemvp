@@ -275,7 +275,9 @@ export const ProductCard = ({
                   console.warn('Wishlist item not found');
                   showToast('Item not found in wishlist. Please try again.', 'error');
                 }
-              return true;
+                return true;
+              }
+              return false;
             }, 'wishlist');
           } catch (error) {
             console.error('Remove from wishlist error:', error);
