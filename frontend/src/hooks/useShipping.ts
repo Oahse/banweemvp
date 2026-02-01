@@ -26,7 +26,7 @@ export const useShipping = (options?: UseShippingOptions) => {
     setError(null);
     try {
       // Simulate API call - replace with actual API when ready
-      setShippingMethods(response.data);
+      console.log('Loading shipping methods...');
     } catch (err: any) {
       setError(err.message || 'Failed to load shipping methods');
     } finally {
