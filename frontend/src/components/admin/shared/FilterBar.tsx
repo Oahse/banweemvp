@@ -65,7 +65,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
             <select
               value={value}
               onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
             >
               <option value="">{filter.placeholder || `Select ${filter.label}`}</option>
               {filter.options?.map((option) => (
@@ -88,7 +88,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
               placeholder={filter.placeholder || `Filter by ${filter.label}`}
               value={value}
               onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
             />
           </div>
         );
@@ -103,7 +103,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
               type="date"
               value={value}
               onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
             />
           </div>
         );
@@ -122,7 +122,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                   const endDate = value.split(',')[1] || '';
                   handleFilterChange(filter.key, `${e.target.value},${endDate}`);
                 }}
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="Start"
               />
               <span className="text-gray-500">-</span>
@@ -133,7 +133,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                   const startDate = value.split(',')[0] || '';
                   handleFilterChange(filter.key, `${startDate},${e.target.value}`);
                 }}
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="End"
               />
             </div>
@@ -161,7 +161,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                   placeholder={searchPlaceholder}
                   value={searchValue}
                   onChange={(e) => onSearchChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 />
               </div>
             </div>
