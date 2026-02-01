@@ -5,107 +5,109 @@
 import { Country } from './index';
 
 export const pakistan: Country = {
-    code: 'PK',
-    name: 'Pakistan',
-    taxInfo: { standardRate: 17, taxName: 'GST', currency: 'PKR', region: 'APAC' },
-    provinces: [
-      { code: 'PUN', name: 'Punjab',
-        cities: [
-          { code: 'LHR', name: 'Lahore' },
-          { code: 'KHI', name: 'Karachi' },
-          { code: 'ISL', name: 'Islamabad' },
-          { code: 'RWP', name: 'Rawalpindi' },
-          { code: 'FSD', name: 'Faisalabad' },
-          { code: 'MUZ', name: 'Multan' },
-          { code: 'GUJ', name: 'Gujranwala' },
-          { code: 'SARG', name: 'Sargodha' },
-          { code: 'BHA', name: 'Bahawalpur' },
-          { code: 'SAH', name: 'Sahiwal' }
-        ]
-      },
-      { code: 'SIND', name: 'Sindh',
-        cities: [
-          { code: 'KHI', name: 'Karachi' },
-          { code: 'HYD', name: 'Hyderabad' },
-          { code: 'SUK', name: 'Sukkur' },
-          { code: 'LAR', name: 'Larkana' },
-          { code: 'NAB', name: 'Nawabshah' },
-          { code: 'MIR', name: 'Mirpur Khas' },
-          { code: 'JAM', name: 'Jamshoro' },
-          { code: 'THA', name: 'Thatta' },
-          { code: 'KHA', name: 'Khairpur' },
-          { code: 'DAD', name: 'Dadu' }
-        ]
-      },
-      { code: 'KPK', name: 'Khyber Pakhtunkhwa',
-        cities: [
-          { code: 'PES', name: 'Peshawar' },
-          { code: 'MARD', name: 'Mardan' },
-          { code: 'SWA', name: 'Swabi' },
-          { code: 'ABB', name: 'Abbottabad' },
-          { code: 'MAN', name: 'Mansehra' },
-          { code: 'MAL', name: 'Malam Jabba' },
-          { code: 'DIR', name: 'Dir' },
-          { code: 'CHI', name: 'Chitral' },
-          { code: 'BAN', name: 'Bannu' },
-          { code: 'KOH', name: 'Kohat' }
-        ]
-      },
-      { code: 'BAL', name: 'Balochistan',
-        cities: [
-          { code: 'QUET', name: 'Quetta' },
-          { code: 'GWA', name: 'Gwadar' },
-          { code: 'TUR', name: 'Turbat' },
-          { code: 'SIB', name: 'Sibi' },
-          { code: 'KHUZ', name: 'Khuzdar' },
-          { code: 'CHAM', name: 'Chaman' },
-          { code: 'ZHOB', name: 'Zhob' },
-          { code: 'LAS', name: 'Lasbela' },
-          { code: 'KOH', name: 'Kohlu' },
-          { code: 'BARK', name: 'Barkhan' }
-        ]
-      },
-      { code: 'GB', name: 'Gilgit-Baltistan',
-        cities: [
-          { code: 'GIL', name: 'Gilgit' },
-          { code: 'SKA', name: 'Skardu' },
-          { code: 'HUN', name: 'Hunza' },
-          { code: 'GHA', name: 'Ghizer' },
-          { code: 'NAG', name: 'Nagar' },
-          { code: 'AST', name: 'Astore' },
-          { code: 'DIA', name: 'Diamer' },
-          { code: 'GUP', name: 'Gupis' },
-          { code: 'YAS', name: 'Yasin' },
-          { code: 'SHI', name: 'Shigar' }
-        ]
-      },
-      { code: 'AJK', name: 'Azad Jammu and Kashmir',
-        cities: [
-          { code: 'MUZ', name: 'Muzaffarabad' },
-          { code: 'MIR', name: 'Mirpur' },
-          { code: 'RAW', name: 'Rawalakot' },
-          { code: 'BHIM', name: 'Bhimber' },
-          { code: 'BAG', name: 'Bagh' },
-          { code: 'KOT', name: 'Kotli' },
-          { code: 'PAL', name: 'Pallandri' },
-          { code: 'HAV', name: 'Havelian' },
-          { code: 'GAR', name: 'Garhi Dupatta' },
-          { code: 'TRI', name: 'Trarkhal' }
-        ]
-      },
-      { code: 'ICT', name: 'Islamabad Capital Territory',
-        cities: [
-          { code: 'ISL', name: 'Islamabad' },
-          { code: 'RAW', name: 'Rawalpindi' },
-          { code: 'GAK', name: 'Gakhar' },
-          { code: 'TAU', name: 'Taxila' },
-          { code: 'Wah', name: 'Wah Cantonment' },
-          { code: 'HAS', name: 'Hasan Abdal' },
-          { code: 'FAI', name: 'Fateh Jang' },
-          { code: 'ATTO', name: 'Attock' },
-          { code: 'JHEL', name: 'Jhelum' },
-          { code: 'CHAK', name: 'Chakwal' }
-        ]
-      }
-    ]
-  };
+  code: 'PK',
+  name: 'Pakistan',
+  taxInfo: { standardRate: 17, taxName: 'GST', currency: 'PKR', region: 'APAC' },
+  provinces: [
+    { code: 'PUN', name: 'Punjab',
+      cities: [
+        { code: 'LAHORE', name: 'Lahore' },
+        { code: 'FAISALABAD', name: 'Faisalabad' },
+        { code: 'RAWALPINDI', name: 'Rawalpindi' },
+        { code: 'GUJRANWALA', name: 'Gujranwala' },
+        { code: 'PESHAWAR', name: 'Peshawar' },
+        { code: 'MULTAN', name: 'Multan' },
+        { code: 'ISLAMABAD', name: 'Islamabad' },
+        { code: 'SIALKOT', name: 'Sialkot' },
+        { code: 'GUJRAT', name: 'Gujrat' },
+        { code: 'BAHAWALPUR', name: 'Bahawalpur' }
+      ]
+    },
+    { code: 'SND', name: 'Sindh',
+      cities: [
+        { code: 'KARACHI', name: 'Karachi' },
+        { code: 'HYDERABAD', name: 'Hyderabad' },
+        { code: 'SUKKUR', name: 'Sukkur' },
+        { code: 'LARKANA', name: 'Larkana' },
+        { code: 'NAWABSHAH', name: 'Nawabshah' },
+        { code: 'MIRPUR', name: 'Mirpur Khas' },
+        { code: 'JACOBABAD', name: 'Jacobabad' },
+        { code: 'SHIKARPUR', name: 'Shikarpur' },
+        { code: 'KHAIRPUR', name: 'Khairpur' },
+        { code: 'THATTA', name: 'Thatta' }
+      ]
+    },
+    { code: 'KPK', name: 'Khyber Pakhtunkhwa',
+      cities: [
+        { code: 'PESHAWAR', name: 'Peshawar' },
+        { code: 'MARDAN', name: 'Mardan' },
+        { code: 'MINGORA', name: 'Mingora' },
+        { code: 'ABBOTTABAD', name: 'Abbottabad' },
+        { code: 'KOHAT', name: 'Kohat' },
+        { code: 'MANSEHRA', name: 'Mansehra' },
+        { code: 'DIR', name: 'Dir' },
+        { code: 'BANNU', name: 'Bannu' },
+        { code: 'CHITRAL', name: 'Chitral' },
+        { code: 'HARIPUR', name: 'Haripur' }
+      ]
+    },
+    { code: 'BAL', name: 'Balochistan',
+      cities: [
+        { code: 'QUETTA', name: 'Quetta' },
+        { code: 'GWADAR', name: 'Gwadar' },
+        { code: 'TURBAT', name: 'Turbat' },
+        { code: 'KHUZDAR', name: 'Khuzdar' },
+        { code: 'CHAMAN', name: 'Chaman' },
+        { code: 'SIBI', name: 'Sibi' },
+        { code: 'ZHOB', name: 'Zhob' },
+        { code: 'LASBELA', name: 'Lasbela' },
+        { code: 'KALAT', name: 'Kalat' },
+        { code: 'PISHIN', name: 'Pishin' }
+      ]
+    },
+    { code: 'GB', name: 'Gilgit-Baltistan',
+      cities: [
+        { code: 'GILGIT', name: 'Gilgit' },
+        { code: 'SKARDU', name: 'Skardu' },
+        { code: 'HUNZA', name: 'Hunza' },
+        { code: 'GHAZER', name: 'Ghizer' },
+        { code: 'ASTORE', name: 'Astore' },
+        { code: 'DIAMER', name: 'Diamer' },
+        { code: 'GUPIS', name: 'Gupis' },
+        { code: 'KHAPLU', name: 'Khaplu' },
+        { code: 'SHIGAR', name: 'Shigar' },
+        { code: 'NAGAR', name: 'Nagar' }
+      ]
+    },
+    { code: 'AJK', name: 'Azad Kashmir',
+      cities: [
+        { code: 'MUZAFFARABAD', name: 'Muzaffarabad' },
+        { code: 'MIRPUR', name: 'Mirpur' },
+        { code: 'RAWALAKOT', name: 'Rawalakot' },
+        { code: 'KOTLI', name: 'Kotli' },
+        { code: 'BHIMBER', name: 'Bhimber' },
+        { code: 'BAGH', name: 'Bagh' },
+        { code: 'HAVELI', name: 'Haveli' },
+        { code: 'NEELUM', name: 'Neelum' },
+        { code: 'SUDHNOTI', name: 'Sudhnoti' },
+        { code: 'PALANDRI', name: 'Palandri' }
+      ]
+    },
+    { code: 'ICT', name: 'Islamabad Capital Territory',
+      cities: [
+        { code: 'ISLAMABAD', name: 'Islamabad' },
+        { code: 'G', name: 'G-10' },
+        { code: 'F', name: 'F-11' },
+        { code: 'E', name: 'E-11' },
+        { code: 'D', name: 'D-12' },
+        { code: 'I', name: 'I-8' },
+        { code: 'H', name: 'H-8' },
+        { code: 'B', name: 'B-17' },
+        { code: 'C', name: 'C-15' },
+        { code: 'BLUE', name: 'Blue Area' }
+      ]
+    }
+  ]
+};
+
+export default pakistan;

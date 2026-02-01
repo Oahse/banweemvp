@@ -1,5 +1,5 @@
 /**
- * Ghana country data with regions, cities, and tax information
+ * Ghana country data with provinces, cities, and tax information
  */
 
 import { Country } from './index';
@@ -235,3 +235,5 @@ export const ghana: Country = {
     }
   ]
 };
+
+export default ghana;

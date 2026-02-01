@@ -95,7 +95,7 @@ export const getCountryOptions = (): CountryOption[] => {
   return countries.map(country => ({
     value: country.code,
     label: country.name
-  })).sort((a: CountryOption, b: CountryOption) => a.label.localeCompare(b.label));
+  })).sort((a, b) => a.label.localeCompare(b.label));
 };
 
 export const getProvinceOptions = (countryCode: string): ProvinceOption[] => {
@@ -103,7 +103,7 @@ export const getProvinceOptions = (countryCode: string): ProvinceOption[] => {
   return provinces.map(province => ({
     value: province.code,
     label: province.name
-  })).sort((a: ProvinceOption, b: ProvinceOption) => a.label.localeCompare(b.label));
+  })).sort((a, b) => a.label.localeCompare(b.label));
 };
 
 export const getCityOptions = (countryCode: string, provinceCode: string): CityOption[] => {
@@ -111,7 +111,7 @@ export const getCityOptions = (countryCode: string, provinceCode: string): CityO
   return cities.map(city => ({
     value: city.code,
     label: city.name
-  })).sort((a: CityOption, b: CityOption) => a.label.localeCompare(b.label));
+  })).sort((a, b) => a.label.localeCompare(b.label));
 };
 
 
