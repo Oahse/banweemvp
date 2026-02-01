@@ -245,7 +245,11 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
           
           {item.product?.category && (
             <p className="body-text text-xs text-gray-400 mt-1">
-              {item.product.category.name}
+              {(typeof item.product.category === 'object' && item.product.category.name) 
+                ? item.product.category.name 
+                : (typeof item.product.category === 'string' 
+                  ? item.product.category 
+                  : 'Uncategorized')}
             </p>
           )}
         </div>

@@ -64,7 +64,7 @@ class BaseModel(Base):
     # Core fields - always present
     id = Column(GUID(), primary_key=True, default=uuid7, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
     
     # Audit fields - minimal overhead
     created_by = Column(GUID(), nullable=True, index=True)

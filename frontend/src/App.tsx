@@ -60,6 +60,8 @@ const AdminOrders = lazy(() => import('./components/admin/Orders'));
 const AdminOrderDetail = lazy(() => import('./pages/admin/OrderDetail'));
 const AdminProducts = lazy(() => import('./pages/admin/Products'));
 const AdminProductDetail = lazy(() => import('./pages/admin/ProductDetail'));
+const CreateProduct = lazy(() => import('./pages/admin/CreateProduct'));
+const EditProduct = lazy(() => import('./pages/admin/EditProduct'));
 const AdminUsers = lazy(() => import('./components/admin/Users'));
 const AdminTaxRates = lazy(() => import('./pages/admin/TaxRates'));
 const AdminInventoryLocations = lazy(() => import('./pages/admin/InventoryLocations'));
@@ -155,7 +157,9 @@ export const App: React.FC = () => {
                           <Route path="orders" element={<Suspense fallback={<AdminTableSkeleton />}><AdminOrders /></Suspense>} />
                           <Route path="orders/:orderId" element={<Suspense fallback={<PageSkeleton />}><AdminOrderDetail /></Suspense>} />
                           <Route path="products" element={<Suspense fallback={<AdminTableSkeleton />}><AdminProducts /></Suspense>} />
+                          <Route path="products/new" element={<Suspense fallback={<PageSkeleton />}><CreateProduct /></Suspense>} />
                           <Route path="products/:productId" element={<Suspense fallback={<ProductDetailSkeleton />}><AdminProductDetail /></Suspense>} />
+                          <Route path="products/:productId/edit" element={<Suspense fallback={<PageSkeleton />}><EditProduct /></Suspense>} />
                           <Route path="users" element={<Suspense fallback={<AdminTableSkeleton />}><AdminUsers /></Suspense>} />
                           <Route path="tax-rates" element={<Suspense fallback={<AdminTableSkeleton />}><AdminTaxRates /></Suspense>} />
                           <Route path="inventory/locations" element={<Suspense fallback={<AdminTableSkeleton />}><AdminInventoryLocations /></Suspense>} />

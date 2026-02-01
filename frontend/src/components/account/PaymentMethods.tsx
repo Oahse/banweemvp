@@ -6,6 +6,7 @@ import { useApi } from '../../hooks/useAsync';
 import { PaymentsAPI } from '../../api/payments';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 import { TokenManager } from '../../api/client';
+import { StripeCardForm } from '../checkout/StripeCardForm';
 
 
 
@@ -19,14 +20,6 @@ export const PaymentMethods = () => {
   const [localPaymentMethods, setLocalPaymentMethods] = useState<any[]>([]);
   // State to control the visibility of the add card form
   const [showAddCardForm, setShowAddCardForm] = useState(false);
-  // State for new card form data
-  const [newCardData, setNewCardData] = useState({
-    cardNumber: '',
-    cardholderName: '',
-    expiryMonth: '',
-    expiryYear: '',
-    cvv: '',
-  });
   const [addingCard, setAddingCard] = useState(false);
 
   // Check if user came from checkout
@@ -90,94 +83,11 @@ export const PaymentMethods = () => {
   };
 
   /**
-   * Handles adding a new card using modern Stripe API
+   * Handles adding a new card using Stripe Elements
    */
-  const handleAddCard = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate card number (basic validation)
-    if (newCardData.cardNumber.replace(/\s/g, '').length < 13) {
-      toast.error('Please enter a valid card number');
-      return;
-    }
-    
-    if (!newCardData.cardholderName.trim()) {
-      toast.error('Please enter cardholder name');
-      return;
-    }
-    
-    if (!newCardData.expiryMonth || !newCardData.expiryYear) {
-      toast.error('Please enter card expiry date');
-      return;
-    }
-    
-    if (newCardData.cvv.length < 3) {
-      toast.error('Please enter a valid CVV');
-      return;
-    }
-
-    setAddingCard(true);
-
-    try {
-      // Create payment method using modern Stripe API
-      const stripeKey = (import.meta as any).env?.VITE_STRIPE_PUBLIC_KEY;
-      if (!stripeKey) {
-        toast.error('Stripe is not configured');
-        setAddingCard(false);
-        return;
-      }
-      const stripe = (window as any).Stripe(stripeKey);
-      
-      const { paymentMethod, error } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: {
-          number: newCardData.cardNumber.replace(/\s/g, ''),
-          exp_month: parseInt(newCardData.expiryMonth),
-          exp_year: parseInt(newCardData.expiryYear),
-          cvc: newCardData.cvv,
-        },
-        billing_details: {
-          name: newCardData.cardholderName,
-        },
-      });
-
-      if (error) {
-        toast.error(error.message || 'Failed to create payment method');
-        setAddingCard(false);
-        return;
-      }
-
-      if (!paymentMethod) {
-        toast.error('Failed to create payment method');
-        setAddingCard(false);
-        return;
-      }
-
-      // Send payment method to backend
-      const payload = {
-        stripe_payment_method_id: paymentMethod.id,
-        type: 'card',
-        provider: paymentMethod.card?.brand || 'unknown',
-        last_four: paymentMethod.card?.last4 || '',
-        expiry_month: paymentMethod.card?.exp_month || 0,
-        expiry_year: paymentMethod.card?.exp_year || 0,
-        is_default: false,
-      };
-
-      const result = await PaymentsAPI.addPaymentMethod(payload);
-      
-      if (result && (result.success || result.data)) {
-        const newPaymentMethod = result.success ? result.data : result;
-        setLocalPaymentMethods(localPaymentMethods ? [...localPaymentMethods, newPaymentMethod] : [newPaymentMethod]);
-        toast.success('Payment method added successfully');
-        resetForm();
-      }
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to add payment method';
-      toast.error(errorMessage);
-    } finally {
-      setAddingCard(false);
-    }
+  const handleAddCardSuccess = (paymentMethod: any) => {
+    setLocalPaymentMethods(localPaymentMethods ? [...localPaymentMethods, paymentMethod] : [paymentMethod]);
+    resetForm();
   };
 
   /**
@@ -185,13 +95,6 @@ export const PaymentMethods = () => {
    */
   const resetForm = () => {
     setShowAddCardForm(false);
-    setNewCardData({
-      cardNumber: '',
-      cardholderName: '',
-      expiryMonth: '',
-      expiryYear: '',
-      cvv: '',
-    });
   };
 
   /**
@@ -335,128 +238,10 @@ export const PaymentMethods = () => {
             <h3 className="text-base font-medium text-main dark:text-white mb-3">
               Add New Payment Method
             </h3>
-            <form onSubmit={handleAddCard}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Card Number Input */}
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Card Number
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white text-xs"
-                    placeholder="1234 5678 9012 3456"
-                    value={newCardData.cardNumber}
-                    onChange={(e) => {
-                      // Format card number with spaces
-                      const value = e.target.value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
-                      setNewCardData({ ...newCardData, cardNumber: value });
-                    }}
-                    maxLength={19}
-                    required
-                  />
-                </div>
-                
-                {/* Cardholder Name Input */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Cardholder Name
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white"
-                    placeholder="John Doe"
-                    value={newCardData.cardholderName}
-                    onChange={(e) => setNewCardData({ ...newCardData, cardholderName: e.target.value })}
-                    required
-                  />
-                </div>
-                
-                {/* Expiration Month Select */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Expiration Month
-                  </label>
-                  <select
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white"
-                    value={newCardData.expiryMonth}
-                    onChange={(e) => setNewCardData({ ...newCardData, expiryMonth: e.target.value })}
-                    required
-                  >
-                    <option value="">Month</option>
-                    {Array.from({ length: 12 }, (_, i) => {
-                      const month = (i + 1).toString();
-                      return (
-                        <option key={month} value={month}>
-                          {month.padStart(2, '0')}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-                
-                {/* Expiration Year Select */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Expiration Year
-                  </label>
-                  <select
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white"
-                    value={newCardData.expiryYear}
-                    onChange={(e) => setNewCardData({ ...newCardData, expiryYear: e.target.value })}
-                    required
-                  >
-                    <option value="">Year</option>
-                    {Array.from({ length: 10 }, (_, i) => {
-                      const year = new Date().getFullYear() + i;
-                      return (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-                
-                {/* CVV Input */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    CVV
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white"
-                    placeholder="123"
-                    value={newCardData.cvv}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '');
-                      setNewCardData({ ...newCardData, cvv: value });
-                    }}
-                    maxLength={4}
-                    required
-                  />
-                </div>
-              </div>
-              
-              {/* Form Action Buttons */}
-              <div className="mt-6 flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  disabled={addingCard}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={addingCard}
-                >
-                  {addingCard ? 'Adding...' : 'Add Card'}
-                </button>
-              </div>
-            </form>
+            <StripeCardForm
+              onSuccess={handleAddCardSuccess}
+              onCancel={() => resetForm()}
+            />
           </div>
         )}
       </div>

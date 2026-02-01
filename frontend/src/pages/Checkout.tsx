@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../store/CartContext';
 import { useAuth } from '../store/AuthContext';
+import { useTheme } from '../store/ThemeContext';
 import { AuthAPI } from '../api/auth';
 import { CartAPI } from '../api/cart';
 import { toast } from 'react-hot-toast';
@@ -14,6 +15,7 @@ export const Checkout = () => {
   const navigate = useNavigate();
   const { cart, loading: cartLoading, clearCart, refreshCart } = useCart();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { theme } = useTheme();
 
   // UI state
   const [loading, setLoading] = useState(false);
@@ -109,10 +111,10 @@ export const Checkout = () => {
   // Show loading state while checking authentication or loading cart
   if (authLoading || (isAuthenticated && cartLoading)) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-surface-dark">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-copy-light">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-copy-light dark:text-copy-light-dark">
             {authLoading ? 'Checking authentication...' : 'Loading checkout...'}
           </p>
         </div>
@@ -131,32 +133,32 @@ export const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8">
+    <div className="min-h-screen bg-surface dark:bg-surface-dark py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-lg font-semibold text-main mb-2">Checkout</h1>
-          <p className="text-xs text-copy-light">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-copy dark:text-copy-dark mb-2">Checkout</h1>
+          <p className="text-sm text-copy-light dark:text-copy-light-dark">
             Complete your purchase quickly and securely
           </p>
         </div>
 
         {/* Stock Validation Warning */}
         {!stockValidation.valid && stockValidation.issues.length > 0 && (
-          <div className="mb-6 bg-error/10 border border-error/30 rounded-md p-4">
-            <div className="flex">
+          <div className="mb-6 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg p-4">
+            <div className="flex gap-3">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-error" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-5 w-5 text-destructive dark:text-destructive-dark" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-error-dark">
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-destructive dark:text-destructive-dark">
                   Stock Issues Detected
                 </h3>
-                <div className="mt-2 text-sm text-error">
+                <div className="mt-2 text-sm text-destructive dark:text-destructive-dark">
                   <ul className="list-disc pl-5 space-y-1">
                     {stockValidation.issues.map((issue, index) => (
-                      <li key={index}>
+                      <li key={index} className="text-destructive/80 dark:text-destructive-dark/80">
                         {issue.message}
                       </li>
                     ))}
@@ -165,7 +167,7 @@ export const Checkout = () => {
                 <div className="mt-4">
                   <button
                     onClick={() => navigate('/cart')}
-                    className="bg-error text-copy-inverse px-4 py-2 rounded-md text-sm hover:bg-error-dark"
+                    className="bg-destructive dark:bg-destructive-dark text-copy-inverse dark:text-copy-inverse-dark px-4 py-2 rounded-lg text-sm font-medium hover:bg-destructive/90 dark:hover:bg-destructive-dark/90 transition-colors"
                   >
                     Review Cart
                   </button>

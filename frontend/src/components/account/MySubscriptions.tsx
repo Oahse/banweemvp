@@ -483,9 +483,9 @@ export const MySubscriptions = () => {
                                           {variant.name || 'Default Variant'}
                                         </span>
                                         <span className="text-sm font-bold text-primary">
-                                          {variant.current_price || variant.base_price || variant.price || product.price
-                                            ? `$${variant.current_price || variant.base_price || variant.price || product.price}`
-                                            : 'Price not available'
+                                          {variant.current_price || variant.base_price
+                                            ? `$${variant.current_price || variant.base_price}`
+                                            : (product.min_price ? `$${product.min_price}` : 'Price not available')
                                           }
                                         </span>
                                       </div>
@@ -532,7 +532,7 @@ export const MySubscriptions = () => {
                                       Default Variant
                                     </span>
                                     <span className="text-sm font-bold text-primary">
-                                      {product.price ? `$${product.price}` : 'Price not available'}
+                                      {product.min_price ? `$${product.min_price}` : (product.price ? `$${product.price}` : 'Price not available')}
                                     </span>
                                   </div>
                                 </div>

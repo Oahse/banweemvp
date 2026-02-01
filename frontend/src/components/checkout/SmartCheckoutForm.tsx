@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
 import { useCart } from '../../store/CartContext';
 import { useLocale } from '../../store/LocaleContext';
+import { useTheme } from '../../store/ThemeContext';
 import { useShipping } from '../../hooks/useShipping';
 import { OrdersAPI } from '../../api/orders';
 import { AuthAPI } from '../../api/auth';
@@ -63,6 +64,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   const { user } = useAuth();
   const { cart, clearCart, refreshCart } = useCart();
   const { formatCurrency, currency, countryCode } = useLocale();
+  const { theme } = useTheme();
   const { 
     shippingMethods, 
     loading: shippingLoading, 
@@ -208,7 +210,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
     try {
       // Load addresses and payment methods in parallel
       const [addressesRes, paymentMethodsRes] = await Promise.all([
-        AuthAPI.getUserAddresses(),
+        AuthAPI.getAddresses(),
         PaymentsAPI.getPaymentMethods()
       ]);
 
@@ -297,56 +299,65 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   // Render pricing summary
   const renderPricingSummary = () => {
     if (!pricingData) {
+      const missingFields = [];
+      if (!formData.shipping_address_id) missingFields.push('shipping address');
+      if (!formData.shipping_method_id) missingFields.push('shipping method');
+      if (!formData.payment_method_id) missingFields.push('payment method');
+      
+      const message = missingFields.length > 0 
+        ? `Select ${missingFields.join(', ')} to see pricing`
+        : 'Loading pricing information...';
+      
       return (
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <p className="text-gray-500">Select shipping and payment methods to see pricing</p>
+        <div className="bg-surface-elevated dark:bg-surface-elevated-dark border border-border-light dark:border-border-dark p-4 rounded-lg">
+          <p className="text-sm text-copy-light dark:text-copy-light-dark">{message}</p>
         </div>
       );
     }
 
     return (
-      <div className="bg-white border rounded-lg p-4 space-y-3">
-        <h3 className="text-sm font-semibold">Order Summary</h3>
+      <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <h3 className="text-base font-medium text-copy dark:text-copy-dark">Order Summary</h3>
         
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
+        <div className="space-y-2 text-xs">
+          <div className="flex justify-between text-copy dark:text-copy-dark">
             <span>Subtotal:</span>
             <span>{formatCurrency(pricingData.subtotal)}</span>
           </div>
           
-          <div className="flex justify-between">
+          <div className="flex justify-between text-copy dark:text-copy-dark">
             <span>Shipping ({pricingData.shipping.method_name}):</span>
             <span>{formatCurrency(pricingData.shipping.cost)}</span>
           </div>
           
-          <div className="flex justify-between">
+          <div className="flex justify-between text-copy dark:text-copy-dark">
             <span>Tax ({(pricingData.tax.rate * 100).toFixed(2)}%):</span>
             <span>{formatCurrency(pricingData.tax.amount)}</span>
           </div>
           
           {pricingData.discount && (
-            <div className="flex justify-between text-green-600">
+            <div className="flex justify-between text-success dark:text-success-dark">
               <span>Discount ({pricingData.discount.code}):</span>
               <span>-{formatCurrency(pricingData.discount.amount)}</span>
             </div>
           )}
           
-          <hr className="my-2" />
+          <hr className="my-2 border-border-light dark:border-border-dark" />
           
-          <div className="flex justify-between text-sm font-semibold">
+          <div className="flex justify-between text-xs font-medium text-copy dark:text-copy-dark">
             <span>Total:</span>
             <span>{formatCurrency(pricingData.total)}</span>
           </div>
         </div>
         
         {priceValidationErrors.length > 0 && (
-          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
-            <div className="flex items-center">
-              <AlertTriangle className="h-4 w-4 text-yellow-600 mr-2" />
-              <span className="text-sm font-medium text-yellow-800">Price Verification</span>
+          <div className="mt-3 p-3 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
+              <span className="text-xs font-medium text-destructive dark:text-destructive-dark">Price Verification</span>
             </div>
             {priceValidationErrors.map((error, index) => (
-              <p key={index} className="text-sm text-yellow-700 mt-1">{error}</p>
+              <p key={index} className="text-xs text-destructive dark:text-destructive-dark">{error}</p>
             ))}
           </div>
         )}
@@ -364,51 +375,54 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Form */}
-        <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="min-h-screen bg-surface dark:bg-surface-dark">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <h1 className="text-lg font-medium text-copy dark:text-copy-dark mb-6">Checkout</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Main Form */}
+          <div className="lg:col-span-2">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Shipping Address Section */}
-            <div className="bg-white border rounded-lg p-6">
-              <div className="flex items-center mb-4">
-                <MapPin className="h-5 w-5 text-blue-600 mr-2" />
-                <h2 className="text-sm font-semibold">Shipping Address</h2>
+            <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="h-4 w-4 text-primary dark:text-primary-dark" />
+                <h2 className="text-base font-medium text-copy dark:text-copy-dark">Shipping Address</h2>
               </div>
               
               {addresses.length > 0 ? (
                 <div className="space-y-3">
                   {addresses.map((address) => (
-                    <label key={address.id} className="flex items-start space-x-3 p-3 border rounded cursor-pointer hover:bg-gray-50">
+                    <label key={address.id} className="flex items-start gap-2 sm:gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-surface-elevated dark:hover:bg-surface-elevated-dark transition-colors">
                       <input
                         type="radio"
                         name="shipping_address"
                         value={address.id}
                         checked={formData.shipping_address_id === address.id}
                         onChange={(e) => updateFormData('shipping_address_id', e.target.value)}
-                        className="mt-1"
+                        className="mt-1 accent-primary dark:accent-primary-dark"
                       />
-                      <div className="flex-1">
-                        <div className="font-medium">{address.street}</div>
-                        <div className="text-sm text-gray-600">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-copy dark:text-copy-dark truncate">{address.street}</div>
+                        <div className="text-xs sm:text-sm text-copy-light dark:text-copy-light-dark">
                           {address.city}, {address.state} {address.post_code}
                         </div>
-                        <div className="text-sm text-gray-600">{address.country}</div>
+                        <div className="text-xs sm:text-sm text-copy-light dark:text-copy-light-dark">{address.country}</div>
                       </div>
                     </label>
                   ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowAddAddressForm(true)}
-                    className="w-full"
-                  >
-                    Add New Address
-                  </Button>
+                  <Link to="/account/addresses">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                    >
+                      Add New Address
+                    </Button>
+                  </Link>
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <p className="text-gray-600 mb-4">No addresses found</p>
+                  <p className="text-copy-light dark:text-copy-light-dark mb-4">No addresses found</p>
                   <Button
                     type="button"
                     onClick={() => setShowAddAddressForm(true)}
@@ -420,69 +434,95 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             </div>
 
             {/* Shipping Method Section */}
-            <div className="bg-white border rounded-lg p-6">
-              <div className="flex items-center mb-4">
-                <Truck className="h-5 w-5 text-blue-600 mr-2" />
-                <h2 className="text-sm font-semibold">Shipping Method</h2>
+            <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Truck className="h-4 w-4 text-primary dark:text-primary-dark" />
+                <h2 className="text-base font-medium text-copy dark:text-copy-dark">Shipping Method</h2>
               </div>
+              
+              {shippingError && (
+                <div className="mb-4 p-4 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
+                    <span className="font-medium text-destructive dark:text-destructive-dark">Error Loading Shipping Methods</span>
+                  </div>
+                  <p className="text-sm text-destructive dark:text-destructive-dark">{shippingError}</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={loadShippingMethods}
+                    className="mt-2"
+                  >
+                    Retry
+                  </Button>
+                </div>
+              )}
               
               {shippingLoading ? (
                 <div className="animate-pulse space-y-3">
-                  <div className="h-16 bg-gray-200 rounded"></div>
-                  <div className="h-16 bg-gray-200 rounded"></div>
+                  <div className="h-16 bg-surface-elevated dark:bg-surface-elevated-dark rounded"></div>
+                  <div className="h-16 bg-surface-elevated dark:bg-surface-elevated-dark rounded"></div>
                 </div>
               ) : shippingMethods.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {shippingMethods.map((method) => (
-                    <label key={method.id} className="flex items-center justify-between p-3 border rounded cursor-pointer hover:bg-gray-50">
-                      <div className="flex items-center space-x-3">
+                    <label key={method.id} className="flex items-center justify-between gap-2 sm:gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-surface-elevated dark:hover:bg-surface-elevated-dark transition-colors">
+                      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                         <input
                           type="radio"
                           name="shipping_method"
                           value={method.id}
                           checked={formData.shipping_method_id === method.id}
-                          onChange={(e) => updateFormData('shipping_method_id', e.target.value)}
+                          onChange={(e) => {
+                            console.log('✅ Shipping method selected:', method.id, method.name, `$${method.price}`);
+                            updateFormData('shipping_method_id', e.target.value);
+                          }}
+                          className="accent-primary dark:accent-primary-dark flex-shrink-0"
                         />
-                        <div>
-                          <div className="font-medium">{method.name}</div>
-                          <div className="text-sm text-gray-600">{method.description}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-copy dark:text-copy-dark truncate">{method.name}</div>
+                          <div className="text-xs text-copy-light dark:text-copy-light-dark line-clamp-1">{method.description}</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-medium">{formatCurrency(method.price)}</div>
-                        <div className="text-sm text-gray-600">{method.estimated_days} days</div>
+                      <div className="text-right flex-shrink-0">
+                        <div className="font-medium text-copy dark:text-copy-dark whitespace-nowrap">{formatCurrency(method.price)}</div>
+                        <div className="text-xs text-copy-light dark:text-copy-light-dark whitespace-nowrap">{method.estimated_days}d</div>
                       </div>
                     </label>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-600">No shipping methods available</p>
+                <p className="text-copy-light dark:text-copy-light-dark">No shipping methods available</p>
               )}
             </div>
 
             {/* Payment Method Section */}
-            <div className="bg-white border rounded-lg p-6">
-              <div className="flex items-center mb-4">
-                <CreditCard className="h-5 w-5 text-blue-600 mr-2" />
-                <h2 className="text-sm font-semibold">Payment Method</h2>
+            <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <CreditCard className="h-4 w-4 text-primary dark:text-primary-dark" />
+                <h2 className="text-base font-medium text-copy dark:text-copy-dark">Payment Method</h2>
               </div>
               
               {paymentMethods.length > 0 ? (
                 <div className="space-y-3">
                   {paymentMethods.map((method) => (
-                    <label key={method.id} className="flex items-center space-x-3 p-3 border rounded cursor-pointer hover:bg-gray-50">
+                    <label key={method.id} className="flex items-center gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-surface-elevated dark:hover:bg-surface-elevated-dark transition-colors">
                       <input
                         type="radio"
                         name="payment_method"
                         value={method.id}
                         checked={formData.payment_method_id === method.id}
-                        onChange={(e) => updateFormData('payment_method_id', e.target.value)}
+                        onChange={(e) => {
+                          console.log('✅ Payment method selected:', method.id, method.type);
+                          updateFormData('payment_method_id', e.target.value);
+                        }}
+                        className="accent-primary dark:accent-primary-dark flex-shrink-0"
                       />
-                      <div className="flex-1">
-                        <div className="font-medium">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-copy dark:text-copy-dark truncate">
                           {method.type === 'credit_card' ? 'Credit Card' : method.type}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-xs text-copy-light dark:text-copy-light-dark truncate">
                           **** **** **** {method.last_four}
                         </div>
                       </div>
@@ -490,26 +530,22 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-600">No payment methods available</p>
+                <div className="text-center py-4">
+                  <p className="text-copy-light dark:text-copy-light-dark mb-3">No payment methods available</p>
+                  <Link to="/account/payment-methods">
+                    <Button type="button" variant="outline" className="w-full">
+                      Add Payment Method
+                    </Button>
+                  </Link>
+                </div>
               )}
             </div>
 
-            {/* Discount Code Section */}
-            <div className="bg-white border rounded-lg p-6">
-              <h2 className="text-base font-semibold mb-4">Discount Code</h2>
-              <Input
-                type="text"
-                placeholder="Enter discount code"
-                value={formData.discount_code}
-                onChange={(e) => updateFormData('discount_code', e.target.value)}
-              />
-            </div>
-
             {/* Order Notes */}
-            <div className="bg-white border rounded-lg p-6">
-              <h2 className="text-base font-semibold mb-4">Order Notes (Optional)</h2>
+            <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
+              <h2 className="text-base font-medium text-copy dark:text-copy-dark mb-4">Order Notes (Optional)</h2>
               <textarea
-                className="w-full p-3 border rounded-lg resize-none"
+                className="w-full p-3 border border-border-light dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-copy dark:text-copy-dark resize-none focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark"
                 rows={3}
                 placeholder="Special instructions for your order..."
                 value={formData.notes}
@@ -519,12 +555,12 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
             {/* Validation Errors */}
             {realTimeValidation.errors && realTimeValidation.errors.length > 0 && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex items-center mb-2">
-                  <AlertTriangle className="h-4 w-4 text-red-600 mr-2" />
-                  <span className="font-medium text-red-800">Please fix the following issues:</span>
+              <div className="bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
+                  <span className="font-medium text-destructive dark:text-destructive-dark">Please fix the following issues:</span>
                 </div>
-                <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+                <ul className="list-disc list-inside text-sm text-destructive dark:text-destructive-dark space-y-1">
                   {realTimeValidation.errors.map((error, index) => (
                     <li key={index}>{typeof error === 'string' ? error : error.message}</li>
                   ))}
@@ -536,40 +572,40 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <Button
               type="submit"
               disabled={!realTimeValidation.can_proceed || processingPayment}
-              className="w-full py-2 text-base"
+              className="w-full py-2 text-xs font-medium"
             >
               {processingPayment ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
                   Processing Order...
                 </>
               ) : (
                 `Place Order ${pricingData ? formatCurrency(pricingData.total) : ''}`
               )}
             </Button>
-          </form>
-        </div>
+            </form>
+          </div>
 
         {/* Order Summary Sidebar */}
         <div className="lg:col-span-1">
-          <div className="sticky top-6">
+          <div className="sticky top-4 sm:top-6">
             {renderPricingSummary()}
             
             {/* Validation Status */}
             {realTimeValidation.can_proceed !== undefined && (
               <div className={`mt-4 p-3 rounded-lg ${
                 realTimeValidation.can_proceed 
-                  ? 'bg-green-50 border border-green-200' 
-                  : 'bg-red-50 border border-red-200'
+                  ? 'bg-success/10 dark:bg-success-dark/10 border border-success/30 dark:border-success-dark/30' 
+                  : 'bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30'
               }`}>
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                   {realTimeValidation.can_proceed ? (
-                    <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                    <CheckCircle className="h-4 w-4 text-success dark:text-success-dark" />
                   ) : (
-                    <AlertTriangle className="h-4 w-4 text-red-600 mr-2" />
+                    <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
                   )}
                   <span className={`text-sm font-medium ${
-                    realTimeValidation.can_proceed ? 'text-green-800' : 'text-red-800'
+                    realTimeValidation.can_proceed ? 'text-success dark:text-success-dark' : 'text-destructive dark:text-destructive-dark'
                   }`}>
                     {realTimeValidation.can_proceed ? 'Ready to place order' : 'Cannot proceed'}
                   </span>
@@ -582,8 +618,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
       {/* Add Address Modal */}
       {showAddAddressForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-surface dark:bg-surface-dark rounded-lg p-6 max-w-md w-full mx-4 border border-border-light dark:border-border-dark">
             <AddAddressForm
               onSuccess={() => {
                 setShowAddAddressForm(false);

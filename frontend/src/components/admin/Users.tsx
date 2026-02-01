@@ -9,6 +9,7 @@ import {
   DataTable, 
   FilterBar 
 } from './shared';
+import { USER_ROLES, USER_STATUSES } from '../../config/product';
 
 // Types
 interface User {
@@ -52,21 +53,13 @@ export const Users = () => {
       key: 'role',
       label: 'Role',
       type: 'select' as const,
-      options: [
-        { value: 'Admin', label: 'Admin' },
-        { value: 'Customer', label: 'Customer' },
-        { value: 'Supplier', label: 'Supplier' }
-      ]
+      options: USER_ROLES
     },
     {
       key: 'status',
       label: 'Status',
       type: 'select' as const,
-      options: [
-        { value: 'active', label: 'Active' },
-        { value: 'inactive', label: 'Inactive' },
-        { value: 'suspended', label: 'Suspended' }
-      ]
+      options: USER_STATUSES
     }
   ];
 

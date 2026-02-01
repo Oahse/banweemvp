@@ -10,6 +10,7 @@ import {
   DataTable, 
   FilterBar 
 } from './shared';
+import { PRODUCT_STATUSES } from '../../config/product';
 
 // Types
 interface Product {
@@ -57,11 +58,7 @@ export const Products = () => {
       key: 'status',
       label: 'Status',
       type: 'select' as const,
-      options: [
-        { value: 'active', label: 'Active' },
-        { value: 'inactive', label: 'Inactive' },
-        { value: 'draft', label: 'Draft' }
-      ]
+      options: PRODUCT_STATUSES
     },
     {
       key: 'category',

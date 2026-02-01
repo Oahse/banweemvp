@@ -337,7 +337,6 @@ const Products = () => {
               product={product} 
               selectedVariant={product.variants?.[0] || product}
               className=""
-              subscriptionId=""
             />
           ))
         ) : (

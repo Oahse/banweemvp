@@ -10,6 +10,7 @@ import {
   DataTable, 
   FilterBar 
 } from './shared';
+import { ORDER_STATUSES } from '../../config/product';
 
 // Types
 interface Order {
@@ -55,13 +56,7 @@ export const Orders = () => {
       key: 'status',
       label: 'Status',
       type: 'select' as const,
-      options: [
-        { value: 'pending', label: 'Pending' },
-        { value: 'confirmed', label: 'Confirmed' },
-        { value: 'shipped', label: 'Shipped' },
-        { value: 'delivered', label: 'Delivered' },
-        { value: 'cancelled', label: 'Cancelled' }
-      ]
+      options: ORDER_STATUSES
     },
     {
       key: 'date_range',

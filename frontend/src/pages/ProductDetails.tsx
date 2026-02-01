@@ -31,57 +31,13 @@ import { useApi } from '../hooks/useAsync';
 import { useSubscriptionAction } from '../hooks/useSubscription';
 import { ProductsAPI, ReviewsAPI } from '../api';
 import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
+import { Product, ProductVariant, ProductImage } from '../types';
 
 import ErrorMessage from '../components/Error';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 
-// TypeScript interfaces
-interface ProductVariant {
-  id: string;
-  product_id: string;
-  sku: string;
-  name: string;
-  base_price: number;
-  sale_price: number | null;
-  stock: number;
-  barcode: string;
-  qr_code: string;
-  attributes: Record<string, any>;
-  images: ProductImage[];
-  is_active?: boolean;
-  created_at?: string;
-}
-
-interface ProductImage {
-  id: string;
-  url: string;
-  alt_text: string;
-  is_primary: boolean;
-  sort_order: number;
-  format: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  longDescription?: string;
-  price: number;
-  discountPrice?: number | null;
-  rating: number;
-  reviewCount: number;
-  sku: string;
-  variants: ProductVariant[];
-  features?: string[];
-  specifications?: Record<string, any>;
-  brand?: string | null;
-  category?: string | null;
-  stock?: number;
-  images?: string[];
-  reviews?: any[];
-}
-
+// Local interfaces for component state
 interface SelectedVariant {
   id: string;
   name: string;
@@ -96,53 +52,7 @@ interface SelectedVariant {
   qr_code: string;
 }
 
-// Transform API product data with null checks
-const transformProduct = (product: any, averageRating: number, reviewCount: number): Product | null => {
-  if (!product) return null;
-  
-  return {
-    id: product.id,
-    name: product.name,
-    price: product.variants?.[0]?.base_price || 0,
-    discountPrice: product.variants?.[0]?.sale_price || null,
-    rating: averageRating || 0, 
-    reviewCount: reviewCount || 0, 
-    description: product.description,
-    longDescription: product.description, 
-    category: product.category?.name,
-    brand: product.supplier ? `${product.supplier.firstname || ''} ${product.supplier.lastname || ''}`.trim() : null,
-    sku: product.variants?.[0]?.sku,
-    stock: product.variants?.[0]?.stock || 0,
-    images: product.variants?.[0]?.images?.map((img: any) => img?.url).filter(Boolean) || [],
-    variants: product.variants?.map((variant: any): ProductVariant => ({
-      id: variant.id,
-      product_id: variant.product_id || product.id,
-      sku: variant.sku || '',
-      name: variant.name || '',
-      base_price: variant.base_price || 0,
-      sale_price: variant.sale_price || null,
-      stock: variant.stock || 0,
-      barcode: variant.barcode || '',
-      qr_code: variant.qr_code || '',
-      attributes: variant.attributes || {},
-      images: variant.images || []
-    })) || [],
-    features: [
-      'High Quality Product',
-      'Fast Shipping',
-      'Customer Satisfaction Guaranteed',
-      'Secure Payment',
-    ],
-    specifications: {
-      'Product Name': product.name,
-      'Category': product.category?.name,
-      'Supplier': product.supplier ? `${product.supplier.firstname || ''} ${product.supplier.lastname || ''}`.trim() : null,
-      'SKU': product.variants?.[0]?.sku,
-    },
-    reviews: [], 
-  };
-};
-
+// Product Details Component - using backend data directly
 export const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -294,9 +204,10 @@ export const ProductDetails = () => {
     : 0;
   const totalReviews = actualReviewsData.total || 0;
 
-  const product = transformProduct(actualProductData, averageRating, totalReviews);
+  // Use backend data directly without transformation
+  const product = actualProductData;
   
-  // If product transformation failed, show error
+  // If product data is not available, show error
   if (!product) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -531,12 +442,12 @@ export const ProductDetails = () => {
                       <StarIcon
                         key={i}
                         size={14}
-                        className={i < Math.floor(product.rating) ? 'fill-current' : ''}
+                        className={i < Math.floor(product.rating_average || product.rating || averageRating) ? 'fill-current' : ''}
                       />
                     ))}
                   </div>
                   <span className="text-xs text-copy-light ml-2">
-                    ({product.reviewCount} reviews)
+                    ({product.review_count || product.reviewCount || totalReviews} reviews)
                   </span>
                 </div>
                 <span className="text-xs text-copy-light">SKU: {product.sku}</span>
@@ -868,7 +779,7 @@ export const ProductDetails = () => {
                   : 'border-transparent text-copy-light hover:text-copy'
                   }`}
               >
-                Reviews ({product.reviewCount})
+                Reviews ({product.review_count || product.reviewCount || totalReviews})
               </button>
             </nav>
           </div>
@@ -1070,7 +981,7 @@ export const ProductDetails = () => {
         {/* Related Products */}
         <section className="py-8 bg-surface">
           <div className="container mx-auto px-4">
-            <h2 className="text-xl sm:text-2xl font-bold text-main mb-6">Related Products</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-main mb-4">Related Products</h2>
 
             {relatedError && (
               <ErrorMessage
@@ -1080,7 +991,7 @@ export const ProductDetails = () => {
               />
             )}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
               {relatedLoading ? (
                 Array(4).fill(0).map((_, index) => (
                   <div key={index} className="animate-pulse">
@@ -1092,29 +1003,12 @@ export const ProductDetails = () => {
               ) : actualRelatedData && Array.isArray(actualRelatedData) && actualRelatedData.length > 0 ? (
                 actualRelatedData.slice(0, 4).map((relatedProduct) => {
                   if (!relatedProduct) return null;
-                  
-                  const transformedProduct = {
-                    id: relatedProduct.id,
-                    name: relatedProduct.name,
-                    price: relatedProduct.variants?.[0]?.base_price || 0,
-                    discountPrice: relatedProduct.variants?.[0]?.sale_price || null,
-                    rating: relatedProduct.rating_average || relatedProduct.rating || 0,
-                    reviewCount: relatedProduct.review_count || relatedProduct.rating_count || 0,
-                    image: relatedProduct.variants?.[0]?.images?.[0]?.url || relatedProduct.image,
-                    category: relatedProduct.category?.name ? { name: relatedProduct.category.name } : (relatedProduct.category ? { name: relatedProduct.category } : { name: 'Uncategorized' }),
-                    isNew: relatedProduct.is_new || false,
-                    isFeatured: relatedProduct.is_featured || false,
-                    variants: relatedProduct.variants || [],
-                    sku: relatedProduct.variants?.[0]?.sku || relatedProduct.sku,
-                    description: relatedProduct.description || relatedProduct.short_description,
-                    stock: relatedProduct.variants?.[0]?.stock || relatedProduct.variants?.[0]?.inventory_quantity_available || 0,
-                  };
 
                   return (
                     <ProductCard
                       key={relatedProduct.id}
-                      product={transformedProduct}
-                      selectedVariant={transformedProduct.variants?.[0]}
+                      product={relatedProduct}
+                      selectedVariant={relatedProduct.variants?.[0]}
                       className=""
                     />
                   );

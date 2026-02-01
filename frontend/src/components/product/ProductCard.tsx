@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon, StarIcon } from 'lucide-react';
+import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon, StarIcon, PackageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from '../../store/CartContext';
 import { useWishlist } from '../../store/WishlistContext';
@@ -81,6 +81,7 @@ export const ProductCard = ({
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist, defaultWishlist, fetchWishlists } = useWishlist();
   const { executeWithAuth } = useAuth();
   const { formatCurrency } = useLocale();
+  const [imageError, setImageError] = useState(false);
 
   if (isLoading) { // <--- Add this check
     return <SkeletonCard viewMode={viewMode} animation={animation} />;
@@ -99,10 +100,6 @@ export const ProductCard = ({
   // Get the display variant (selected variant or first variant or fallback to product)
   const displayVariant = selectedVariant || (product.variants && Array.isArray(product.variants) && product.variants.length > 0 ? product.variants[0] : null);
 
-  // Ensure we have valid product data
-  const safeProduct = product || {};
-  const safeVariant = displayVariant || {};
-
   const isInCart = cart?.items?.some(item => item.variant?.id === displayVariant?.id) || false;
 
   // Get the primary image from variant or fallback to product image
@@ -114,26 +111,27 @@ export const ProductCard = ({
     }
     
     // Try product image
-    if (safeProduct.image) {
-      return safeProduct.image;
+    if (product.image) {
+      return product.image;
     }
     
     // Try variant images array directly
-    if (safeProduct.variants && Array.isArray(safeProduct.variants) && safeProduct.variants.length > 0) {
-      const firstVariant = safeProduct.variants[0];
+    if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
+      const firstVariant = product.variants[0];
       if (firstVariant.images && Array.isArray(firstVariant.images) && firstVariant.images.length > 0) {
         const primaryImage = firstVariant.images.find(img => img.is_primary);
         return primaryImage?.url || firstVariant.images[0]?.url;
       }
     }
     
-    // Fallback to placeholder
-    return 'https://via.placeholder.com/300x300/f3f4f6/9ca3af?text=No+Image';
+    // Fallback to local SVG
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
   };
 
   // Get the display price (variant price or product price)
   const getDisplayPrice = () => {
     if (displayVariant) {
+      // Use variant prices when available
       const basePrice = Number(displayVariant.base_price) || 0;
       const salePrice = displayVariant.sale_price ? Number(displayVariant.sale_price) : null;
       const currentPrice = salePrice || basePrice;
@@ -147,8 +145,8 @@ export const ProductCard = ({
       };
     }
     // Use product price range when no variant
-    const minPrice = Number(safeProduct.min_price) || Number(safeProduct.price) || 0;
-    const maxPrice = Number(safeProduct.max_price) || minPrice;
+    const minPrice = Number(product.min_price) || Number(product.price) || 0;
+    const maxPrice = Number(product.max_price) || Number(product.price) || minPrice;
     const currentPrice = minPrice; // Use min price as display price
     return {
       basePrice: maxPrice,
@@ -315,18 +313,28 @@ export const ProductCard = ({
       transition={{ duration: 0.2 }}>
       <div className={cn('relative flex-shrink-0', viewMode === 'list' && 'w-48 h-48 mr-4')}>
         <Link to={`/products/${product.id}`}>
-          <img
-            src={displayImage}
-            alt={displayVariant ? `${product.name} - ${displayVariant.name}` : product.name}
-            onError={(e) => {
-              e.target.src = 'https://via.placeholder.com/300x300/f3f4f6/9ca3af?text=No+Image';
-            }}
-            className={cn(
-              'w-full object-cover group-hover:scale-105 transition-transform duration-300',
+          {imageError ? (
+            <div className={cn(
+              'w-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center',
               viewMode === 'grid' && 'h-32 sm:h-36 md:h-40',
               viewMode === 'list' && 'h-32 w-32 rounded-lg'
-            )}
-          />
+            )}>
+              <PackageIcon size={48} className="text-gray-400 dark:text-gray-500" />
+            </div>
+          ) : (
+            <img
+              src={displayImage}
+              alt={displayVariant ? `${product.name} - ${displayVariant.name}` : product.name}
+              onError={(e) => {
+                setImageError(true);
+              }}
+              className={cn(
+                'w-full object-cover group-hover:scale-105 transition-transform duration-300',
+                viewMode === 'grid' && 'h-32 sm:h-36 md:h-40',
+                viewMode === 'list' && 'h-32 w-32 rounded-lg'
+              )}
+            />
+          )}
         </Link>
         {/* Product badges */}
         {product.isNew && (
@@ -339,12 +347,12 @@ export const ProductCard = ({
             Sale
           </span>
         )}
-        {displayVariant && displayVariant.stock <= 5 && displayVariant.stock > 0 && (
+        {displayVariant && displayVariant.inventory && displayVariant.inventory.quantity_available <= 5 && displayVariant.inventory.quantity_available > 0 && (
           <span className="absolute bottom-2 left-2 bg-warning text-white text-xs font-medium px-2 py-1 rounded-full">
-            Only {displayVariant.stock} left
+            Only {displayVariant.inventory.quantity_available} left
           </span>
         )}
-        {displayVariant && displayVariant.stock === 0 && (
+        {displayVariant && (!displayVariant.inventory || displayVariant.inventory.quantity_available === 0) && (
           <span className="absolute bottom-2 left-2 bg-error text-white text-xs font-medium px-2 py-1 rounded-full">
             Out of Stock
           </span>
@@ -387,11 +395,15 @@ export const ProductCard = ({
       <div className={cn('flex flex-col flex-grow p-2 sm:p-3', viewMode === 'list' && 'p-0')}>
         <div className="space-y-1">
           <span className="text-xs text-copy-light dark:text-gray-400 line-clamp-1 uppercase tracking-wide">
-            {(safeProduct.category && safeProduct.category.name) ? safeProduct.category.name : 'Uncategorized'}
+            {(typeof product.category === 'object' && product.category.name) 
+              ? product.category.name 
+              : (typeof product.category === 'string' 
+                ? product.category 
+                : 'Uncategorized')}
           </span>
-          <Link to={`/products/${safeProduct.id || ''}`}>
+          <Link to={`/products/${product.id || ''}`}>
             <h3 className="font-semibold text-xs sm:text-sm text-main dark:text-white hover:text-primary transition-colors line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
-              {safeProduct.name || 'Unknown Product'}
+              {product.name || 'Unknown Product'}
             </h3>
           </Link>
           <div className="flex items-center space-x-1">
@@ -400,16 +412,13 @@ export const ProductCard = ({
                 <StarIcon
                   key={i}
                   size={12}
-                  className={i < Math.floor(Number(safeProduct.rating) || 0) ? 'fill-current' : ''}
+                  className={i < Math.floor(Number(product.rating_average || product.rating) || 0) ? 'fill-current' : ''}
                 />
               ))}
             </div>
-            <span className="text-xs text-copy-light dark:text-gray-400">({Number(safeProduct.reviewCount) || 0})</span>
+            <span className="text-xs text-copy-light dark:text-gray-400">({Number(product.review_count || product.reviewCount) || 0})</span>
           </div>
         </div>
-        
-        
-        
         <div className="mt-auto pt-1.5 sm:pt-2 space-y-1.5 sm:space-y-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
             <div className="space-y-0.5">
@@ -437,16 +446,15 @@ export const ProductCard = ({
               )}
             </div>
           </div>
-          
           {/* Mobile buttons - optimized for smaller cards */}
           <div className="flex flex-col gap-1 sm:hidden">
             <div className="grid grid-cols-2 gap-1">
               <button
                 onClick={handleAddToCart}
-                disabled={(displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0}
+                disabled={!displayVariant?.inventory || displayVariant.inventory.quantity_available === 0}
                 className={cn(
                   'flex items-center justify-center px-1 py-1.5 rounded-md text-xs font-medium transition-colors',
-                  (displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0 
+                  (!displayVariant?.inventory || displayVariant.inventory.quantity_available === 0)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : isInCart
                       ? 'bg-green-600 text-white'

@@ -132,22 +132,27 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
   };
 
   const getProductPrice = (product: Product) => {
-    if (product.price) return formatCurrency(product.price);
-    if (product.min_price !== undefined && product.max_price !== undefined) {
-      if (product.min_price === product.max_price) {
-        return formatCurrency(product.min_price);
+    // Use backend fields: min_price, max_price with legacy fallback
+    const minPrice = product.min_price ?? product.price;
+    const maxPrice = product.max_price ?? product.price;
+    
+    if (minPrice !== undefined && maxPrice !== undefined) {
+      if (minPrice === maxPrice) {
+        return formatCurrency(minPrice);
       }
-      return `${formatCurrency(product.min_price)} - ${formatCurrency(product.max_price)}`;
+      return `${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}`;
     }
     return 'Price not available';
   };
 
   const getVariantPrice = (variant: ProductVariant) => {
+    // Use backend fields with fallback
     const price = variant.current_price || variant.base_price || 0;
     return formatCurrency(price);
   };
 
   const getStockStatus = (variant: ProductVariant) => {
+    // Use backend field: inventory_quantity_available with legacy fallback
     const quantity = variant.inventory_quantity_available || variant.stock || 0;
     if (quantity === 0) return { text: 'Out of Stock', color: 'text-red-600' };
     if (quantity < 5) return { text: `Only ${quantity} left`, color: 'text-yellow-600' };
@@ -273,8 +278,6 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
                     product={product}
                     selectedVariant={selectedVariant}
                     className=""
-                    showSubscriptionButton={false}
-                    subscriptionId={null}
                     wishlistMode={true}
                   />
                 );

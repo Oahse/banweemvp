@@ -48,11 +48,17 @@ const matchesCategory = (product: any, filterKey: string): boolean => {
   if (!category) return false;
 
   // Handle edge cases in product category data
-  if (!product.category || typeof product.category !== 'string') {
+  const productCategoryStr = typeof product.category === 'object' && product.category.name 
+    ? product.category.name 
+    : (typeof product.category === 'string' 
+      ? product.category 
+      : '');
+
+  if (!productCategoryStr) {
     return false;
   }
 
-  const productCategory = product.category.toLowerCase().trim();
+  const productCategory = productCategoryStr.toLowerCase().trim();
 
   // Check exact matches first (case-insensitive)
   if (category.exactMatches?.some((match: string) =>
@@ -121,28 +127,6 @@ export const Home = () => {
     if (homeData && homeData.data) {
       const { categories: categoriesData, featured, popular, deals: dealsData } = homeData.data;
 
-      // Helper function to convert API products to demo format
-      const convertProduct = (product: any) => {
-        const converted = {
-          id: String(product.id),
-          name: product.name,
-          price: product.variants?.[0]?.base_price || 0,
-          discountPrice: product.variants?.[0]?.sale_price || null,
-          rating: product.rating_average || product.rating || 0,
-          reviewCount: product.review_count || product.rating_count || 0,
-          image: product.variants?.[0]?.images?.[0]?.url || product.image,
-          category: product.category?.name ? { name: product.category?.name } : (product.category ? { name: product.category } : { name: 'Uncategorized' }),
-          isNew: product.is_new || false,
-          isFeatured: product.featured || product.is_featured || false,
-          variants: product.variants || [],
-          sku: product.variants?.[0]?.sku || product.sku,
-          description: product.description || product.short_description,
-          stock: product.variants?.[0]?.stock || product.variants?.[0]?.inventory_quantity_available || 0,
-        };
-        
-        return converted;
-      };
-
       // Helper function to convert API categories to demo format
       const convertCategory = (category: any) => ({
         id: category.id,
@@ -157,30 +141,10 @@ export const Home = () => {
         setCategories(convertedCategories);
       }
 
-      // Convert featured products
-      if (featured && Array.isArray(featured)) {
-        const convertedFeatured = featured.map(convertProduct);
-        setFeaturedProducts(convertedFeatured);
-      }
-
-      // Convert popular products
-      if (popular && Array.isArray(popular)) {
-        const convertedPopular = popular.map(convertProduct);
-        setPopularProducts(convertedPopular);
-      }
-
-      // Convert deals
-      if (dealsData && Array.isArray(dealsData)) {
-        const convertedDeals = dealsData.map(p => {
-          const converted = convertProduct(p);
-          return {
-            ...converted,
-            discountPercent: Math.round(((converted.price - (converted.discountPrice || 0)) / converted.price) * 100),
-            endsIn: '2d 15h 22m' // Demo countdown
-          };
-        });
-        setDeals(convertedDeals);
-      }
+      // Use backend data directly without transformation
+      setFeaturedProducts(featured || []);
+      setPopularProducts(popular || []);
+      setDeals(dealsData || []);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [homeData]);
@@ -425,10 +389,10 @@ export const Home = () => {
       {/* Featured Products */}
       <section className="py-10 bg-surface">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <span className="text-primary font-medium">Featured Products</span>
-              <h2 className="text-2xl md:text-3xl font-bold text-main mt-1">Featured Products</h2>
+              <span className="text-primary font-medium text-sm">Featured Products</span>
+              <h2 className="text-lg md:text-xl font-semibold text-main mt-1">Featured Products</h2>
             </div>
             <Link
               to="/products?featured=true"
@@ -438,7 +402,7 @@ export const Home = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
             {(homeLoading || homeError) ? (
               // Loading skeleton
               [...Array(4)].map((_, index) => (
@@ -465,10 +429,10 @@ export const Home = () => {
       {/* Popular Products with Tabs */}
       <section className="py-10 bg-background">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <span className="text-primary font-medium">Best Sellers</span>
-              <h2 className="text-2xl md:text-3xl font-bold text-main mt-1">Popular Products</h2>
+              <span className="text-primary font-medium text-sm">Best Sellers</span>
+              <h2 className="text-lg md:text-xl font-semibold text-main mt-1">Popular Products</h2>
             </div>
             <Link to="/products?popular=true" className="inline-flex items-center text-primary hover:underline mt-4 md:mt-0">
               All Popular
@@ -529,13 +493,13 @@ export const Home = () => {
           >
             {(homeLoading || homeError) ? (
               // Loading skeleton
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
                 {[...Array(4)].map((_, index) => (
                   <ProductCard key={index} isLoading={true} product={{} as any} selectedVariant={null} className="" />
                 ))}
               </div>
             ) : filteredPopularProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
                 {filteredPopularProducts.map((product, index) => (
                   <motion.div
                     key={product.id}
@@ -612,24 +576,30 @@ export const Home = () => {
                       </span>
                     </div>
                     <h3 className="text-lg font-semibold text-main mb-2">{product.name}</h3>
-                    <p className="text-sm text-copy-light mb-4">{product.category}</p>
+                    <p className="text-sm text-copy-light mb-4">
+                      {typeof product.category === 'object' && product.category.name 
+                        ? product.category.name 
+                        : (typeof product.category === 'string' 
+                          ? product.category 
+                          : 'Uncategorized')}
+                    </p>
                     <div className="flex items-center gap-2 mb-4">
                       <div className="flex items-center">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <span
                             key={i}
-                            className={`text-sm ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'
+                            className={`text-sm ${i < Math.floor(product.rating_average || product.rating || 0) ? 'text-yellow-400' : 'text-gray-300'
                               }`}>
                             ★
                           </span>
                         ))}
                       </div>
-                      <span className="text-sm text-copy-light">({product.reviewCount})</span>
+                      <span className="text-sm text-copy-light">({product.review_count || product.reviewCount || 0})</span>
                     </div>
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="text-xl font-bold text-primary">{formatCurrency(product.discountPrice || product.price)}</span>
-                      {product.discountPrice && (
-                        <span className="text-sm text-copy-light line-through">{formatCurrency(product.price)}</span>
+                      <span className="text-xl font-bold text-primary">{formatCurrency(product.variants?.[0]?.sale_price || product.variants?.[0]?.base_price || product.min_price || 0)}</span>
+                      {product.variants?.[0]?.sale_price && (
+                        <span className="text-sm text-copy-light line-through">{formatCurrency(product.variants?.[0]?.base_price || product.min_price || 0)}</span>
                       )}
                     </div>
                     <Link

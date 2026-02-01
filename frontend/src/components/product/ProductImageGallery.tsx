@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, ZoomInIcon, XIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, ZoomInIcon, XIcon, PackageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/utils';
 
@@ -14,6 +14,7 @@ export const ProductImageGallery = ({
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const sortedImages = [...images].sort((a, b) => a.sort_order - b.sort_order);
   
@@ -80,21 +81,28 @@ export const ProductImageGallery = ({
           onMouseMove={handleMouseMove}
           onClick={() => setIsFullscreen(true)}
         >
-          <img
-            src={currentImage.url}
-            alt={currentImage.alt_text || `Product image ${selectedImageIndex + 1}`}
-            className={cn(
-              'w-full h-96 object-cover transition-transform duration-300 ',
-              isZoomed && 'scale-150'
-            )}
-            style={
-              isZoomed
-                ? {
-                    transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                  }
-                : {}
-            }
-          />
+          {imageError ? (
+            <div className="w-full h-96 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+              <PackageIcon size={64} className="text-gray-400 dark:text-gray-500" />
+            </div>
+          ) : (
+            <img
+              src={currentImage.url}
+              alt={currentImage.alt_text || `Product image ${selectedImageIndex + 1}`}
+              onError={() => setImageError(true)}
+              className={cn(
+                'w-full h-96 object-cover transition-transform duration-300 ',
+                isZoomed && 'scale-150'
+              )}
+              style={
+                isZoomed
+                  ? {
+                      transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                    }
+                  : {}
+              }
+            />
+          )}
           
           {zoomEnabled && (
             <div className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">

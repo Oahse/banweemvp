@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader, AlertCircle, ArrowLeft, Package, DollarSign, Tag, User, Image as ImageIcon, Warehouse, RefreshCw } from 'lucide-react';
+import { Loader, AlertCircle, ArrowLeft, Package, DollarSign, Tag, User, Image as ImageIcon, Warehouse, RefreshCw, Edit, FileText, Salad } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 
@@ -98,7 +98,14 @@ export const AdminProductDetail = () => {
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate(`/admin/products/${productId}/edit`)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            <Edit className="w-4 h-4" />
+            Edit Product
+          </button>
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
             product.product_status === 'active' ? 'bg-success/20 text-success' : 
             product.product_status === 'inactive' ? 'bg-warning/20 text-warning' :
@@ -369,19 +376,78 @@ export const AdminProductDetail = () => {
           </div>
 
           {/* Tags */}
-          {product.tags && product.tags.length > 0 && (
+          {product.tags && (typeof product.tags === 'string' ? product.tags.split(',') : product.tags).length > 0 && (
             <div className="bg-surface rounded-lg border border-border-light p-6">
-              <h2 className="text-xl font-bold text-copy mb-4">Tags</h2>
+              <h2 className="text-xl font-bold text-copy mb-4 flex items-center gap-2">
+                <Tag className="w-5 h-5" />
+                Tags
+              </h2>
               <div className="flex flex-wrap gap-2">
-                {product.tags.map((tag: string, index: number) => (
+                {(typeof product.tags === 'string' ? product.tags.split(',') : product.tags).map((tag: string, index: number) => (
                   <span
                     key={index}
-                    className="px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
+                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-md text-sm font-medium"
                   >
-                    {tag}
+                    {tag.trim()}
                   </span>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Specifications */}
+          {product.specifications && Object.keys(product.specifications).length > 0 && (
+            <div className="bg-surface rounded-lg border border-border-light p-6">
+              <h2 className="text-xl font-bold text-copy mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Specifications
+              </h2>
+              <div className="space-y-2">
+                {Object.entries(product.specifications).map(([key, value]: [string, any]) => (
+                  <div key={key} className="flex justify-between items-start py-2 border-b border-border-light last:border-0">
+                    <span className="text-copy-light font-medium capitalize">
+                      {key.replace(/_/g, ' ')}:
+                    </span>
+                    <span className="text-copy text-right max-w-[60%]">
+                      {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Dietary Tags */}
+          {product.dietary_tags && (
+            <div className="bg-surface rounded-lg border border-border-light p-6">
+              <h2 className="text-xl font-bold text-copy mb-4 flex items-center gap-2">
+                <Salad className="w-5 h-5" />
+                Dietary Information
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {(typeof product.dietary_tags === 'object' 
+                  ? Object.keys(product.dietary_tags).filter(key => product.dietary_tags[key])
+                  : Array.isArray(product.dietary_tags) 
+                    ? product.dietary_tags 
+                    : []
+                ).map((tag: string, index: number) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-green-100 text-green-800 rounded-md text-sm font-medium inline-flex items-center gap-1"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-600"></span>
+                    {tag.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Origin */}
+          {product.origin && (
+            <div className="bg-surface rounded-lg border border-border-light p-6">
+              <h2 className="text-xl font-bold text-copy mb-4">Origin</h2>
+              <p className="text-copy">{product.origin}</p>
             </div>
           )}
         </div>

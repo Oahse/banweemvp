@@ -203,7 +203,16 @@ export const ProductDetails = () => {
   const breadcrumbs = [
     { label: 'Home', link: '/' },
     { label: 'Products', link: '/products' },
-    { label: product.category?.name || 'Category', link: `/products?category=${encodeURIComponent(product.category?.name || '')}` },
+    { label: (typeof product.category === 'object' && product.category.name) 
+      ? product.category.name 
+      : (typeof product.category === 'string' 
+        ? product.category 
+        : 'Category'), 
+      link: `/products?category=${encodeURIComponent((typeof product.category === 'object' && product.category.name) 
+        ? product.category.name 
+        : (typeof product.category === 'string' 
+          ? product.category 
+          : ''))}` },
     { label: product.name },
   ];
 
@@ -438,7 +447,11 @@ export const ProductDetails = () => {
             <div className="flex items-center">
               <span className="text-sm">
                 <span className="font-medium text-main">Category:</span>{' '}
-                {product.category?.name}
+                {(typeof product.category === 'object' && product.category.name) 
+                  ? product.category.name 
+                  : (typeof product.category === 'string' 
+                    ? product.category 
+                    : 'Uncategorized')}
               </span>
             </div>
           </div>

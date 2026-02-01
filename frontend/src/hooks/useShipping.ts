@@ -24,10 +24,19 @@ export const useShipping = (options?: UseShippingOptions) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiClient.get('/shipping-methods');
-      setShippingMethods(response.data || []);
+      console.log('🚚 Loading shipping methods from /shipping/methods');
+      const response = await apiClient.get('/shipping/methods');
+      console.log('✅ Shipping methods loaded successfully:', response.data);
+      setShippingMethods(response.data?.data || response.data || []);
     } catch (err: any) {
-      setError(err.message || 'Failed to load shipping methods');
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to load shipping methods';
+      console.error('❌ Error loading shipping methods:', {
+        message: errorMsg,
+        status: err.response?.status,
+        url: err.config?.url,
+        error: err
+      });
+      setError(errorMsg);
       // Set empty array on error to prevent issues
       setShippingMethods([]);
     } finally {
