@@ -277,7 +277,7 @@ export const countries: Country[] = [
   suriname, svalbardandjanmayen, sweden, switzerland, syria, taiwan, tajikistan,
   tanzania, thailand, togo, tokelau, tonga, trinidadandtobago, tunisia, turkey,
   turkmenistan, turksandcaicosislands, tuvalu, usvirginislands, uganda, ukraine,
-  unitedarabemirates, unitedStates, uruguay, usminoroutlyingislands, uzbekistan,
+  unitedarabemirates, unitedStates, uruguay, uzbekistan,
   vanuatu, vaticancity, venezuela, vietnam, wallisandfutuna, westernsahara,
   yemen, zambia, zimbabwe
 ];
