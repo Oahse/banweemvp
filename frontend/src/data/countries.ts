@@ -1230,42 +1230,21 @@ export const countries: Country[] = [
     }
   ]
 },
-  { code: 'GQ', name: 'Equatorial Guinea', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'XAF', region: 'MEA' },
-  provinces: [
-    { code: 'MALABO', name: 'Bioko',
-      cities: [
-        { code: 'MALABO', name: 'Malabo' },
-        { code: 'BATA', name: 'Bata' },
-        { code: 'EVINAYONG', name: 'Evinayong' },
-        { code: 'MONGOMO', name: 'Mongomo' },
-        { code: 'ANNOBON', name: 'San Antonio de Palé' },
-        { code: 'LUBA', name: 'Luba' },
-        { code: 'EIBEYIN', name: 'Eibeyín' },
-        { code: 'ACUREN', name: 'Acureñ' },
-        { code: 'MONGOMEYEN', name: 'Mongomeyén' },
-        { code: 'NSOM', name: 'Nsom' }
-      ]
-    }
-  ]
-},
-  { code: 'ST', name: 'São Tomé and Príncipe', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'STN', region: 'MEA' },
-  provinces: [
-    { code: 'SAO', name: 'São Tomé',
-      cities: [
-        { code: 'SAO', name: 'São Tomé' },
-        { code: 'PRINCIPE', name: 'São Tomé' },
-        { code: 'TRINDADE', name: 'Trindade' },
-        { code: 'NEVES', name: 'Neves' },
-        { code: 'SANTANA', name: 'Santana' },
-        { code: 'GUADALUPE', name: 'Guadalupe' },
-        { code: 'CANTAGALO', name: 'Cantagalo' },
-        { code: 'ME', name: 'Me-Zóchi' },
-        { code: 'CAUE', name: 'Caué' },
-        { code: 'LEME', name: 'Lembá' }
-      ]
-    }
-  ]
-},
+  { code: 'DZ', name: 'Algeria' },
+  { code: 'TN', name: 'Tunisia' },
+  { code: 'LY', name: 'Libya' },
+  { code: 'SD', name: 'Sudan' },
+  { code: 'SS', name: 'South Sudan' },
+  { code: 'DJ', name: 'Djibouti' },
+  { code: 'SO', name: 'Somalia' },
+  { code: 'RW', name: 'Rwanda' },
+  { code: 'BI', name: 'Burundi' },
+  { code: 'MZ', name: 'Mozambique' },
+  { code: 'MG', name: 'Madagascar' },
+  { code: 'MU', name: 'Mauritius' },
+  { code: 'SC', name: 'Seychelles' },
+  { code: 'KM', name: 'Comoros' },
+
   { code: 'CV', name: 'Cabo Verde', taxInfo: { standardRate: 15, taxName: 'VAT', currency: 'CVE', region: 'MEA' },
   provinces: [
     { code: 'PRAIA', name: 'Santiago',
