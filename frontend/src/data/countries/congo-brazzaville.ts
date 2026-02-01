@@ -1,5 +1,5 @@
 /**
- * Congo - Brazzaville country data with departments, cities, and tax information
+ * Congo - Brazzaville country data with departments and cities
  */
 
 import { Country } from './index';
@@ -7,9 +7,15 @@ import { Country } from './index';
 export const congoBrazzaville: Country = {
     code: 'CG',
     name: 'Congo - Brazzaville',
+    flag: '🇨🇬',
+    capital: 'Brazzaville',
+    area: 342000,
+    currencySymbol: 'FCFA',
+    officialLanguages: ['French'],
+    demonym: 'Congolese',
     taxInfo: { standardRate: 18, taxName: 'VAT', currency: 'XAF', region: 'MEA' },
-    provinces: [
-      { code: 'BRA', name: 'Brazzaville',
+    divisions: [
+      { code: 'BRA', name: 'Brazzaville', type: 'department',
         cities: [
           { code: 'BRA', name: 'Brazzaville' },
           { code: 'BAM', name: 'Bamako' },
@@ -23,7 +29,7 @@ export const congoBrazzaville: Country = {
           { code: 'KEL', name: 'Kellé' }
         ]
       },
-      { code: 'POI', name: 'Pointe-Noire',
+      { code: 'POI', name: 'Pointe-Noire', type: 'department',
         cities: [
           { code: 'POI', name: 'Pointe-Noire' },
           { code: 'LOAN', name: 'Loango' },
@@ -37,7 +43,7 @@ export const congoBrazzaville: Country = {
           { code: 'MAD', name: 'Madingou' }
         ]
       },
-      { code: 'CUV', name: 'Cuvette',
+      { code: 'CUV', name: 'Cuvette', type: 'department',
         cities: [
           { code: 'OWA', name: 'Owando' },
           { code: 'MAK', name: 'Makoua' },
@@ -51,7 +57,7 @@ export const congoBrazzaville: Country = {
           { code: 'KIN', name: 'Kinshasa' }
         ]
       },
-      { code: 'CUW', name: 'Cuvette-Ouest',
+      { code: 'CUW', name: 'Cuvette-Ouest', type: 'department',
         cities: [
           { code: 'EWO', name: 'Ewo' },
           { code: 'KEB', name: 'Kellé' },
@@ -65,7 +71,7 @@ export const congoBrazzaville: Country = {
           { code: 'NKA', name: 'Nkayi' }
         ]
       },
-      { code: 'KOU', name: 'Kouilou',
+      { code: 'KOU', name: 'Kouilou', type: 'department',
         cities: [
           { code: 'LOU', name: 'Loukoléla' },
           { code: 'BAM', name: 'Bamako' },
@@ -79,7 +85,7 @@ export const congoBrazzaville: Country = {
           { code: 'KEL', name: 'Kellé' }
         ]
       },
-      { code: 'LIK', name: 'Likouala',
+      { code: 'LIK', name: 'Likouala', type: 'department',
         cities: [
           { code: 'IMP', name: 'Impfondo' },
           { code: 'BET', name: 'Bétou' },
@@ -93,7 +99,7 @@ export const congoBrazzaville: Country = {
           { code: 'POI', name: 'Pointe-Noire' }
         ]
       },
-      { code: 'NIA', name: 'Niari',
+      { code: 'NIA', name: 'Niari', type: 'department',
         cities: [
           { code: 'DOL', name: 'Dolisie' },
           { code: 'NKA', name: 'Nkayi' },
@@ -107,7 +113,7 @@ export const congoBrazzaville: Country = {
           { code: 'LOAN', name: 'Loango' }
         ]
       },
-      { code: 'PLA', name: 'Plateaux',
+      { code: 'PLA', name: 'Plateaux', type: 'department',
         cities: [
           { code: 'DJAM', name: 'Djambala' },
           { code: 'GAMB', name: 'Gamboma' },
@@ -121,7 +127,7 @@ export const congoBrazzaville: Country = {
           { code: 'NKA', name: 'Nkayi' }
         ]
       },
-      { code: 'SAN', name: 'Sangha',
+      { code: 'SAN', name: 'Sangha', type: 'department',
         cities: [
           { code: 'OU', name: 'Ouésso' },
           { code: 'MOK', name: 'Mokéko' },
@@ -135,7 +141,7 @@ export const congoBrazzaville: Country = {
           { code: 'DOL', name: 'Dolisie' }
         ]
       },
-      { code: 'BOL', name: 'Bouenza',
+      { code: 'BOL', name: 'Bouenza', type: 'department',
         cities: [
           { code: 'MAD', name: 'Madingou' },
           { code: 'MOU', name: 'Mouyondzi' },
@@ -149,7 +155,7 @@ export const congoBrazzaville: Country = {
           { code: 'BRA', name: 'Brazzaville' }
         ]
       },
-      { code: 'POO', name: 'Pool',
+      { code: 'POO', name: 'Pool', type: 'department',
         cities: [
           { code: 'KIN', name: 'Kinkala' },
           { code: 'BAM', name: 'Bamako' },
