@@ -1,5 +1,5 @@
 /**
- * El Salvador country data with provinces, cities, and tax information
+ * El Salvador country data with departments and cities
  */
 
 import { Country } from './index';
@@ -7,22 +7,58 @@ import { Country } from './index';
 export const elsalvador: Country = {
   code: 'SV',
   name: 'El Salvador',
-  provinces: [
-    { code: 'SAN', name: 'San Salvador',
+  flag: '🇸🇻',
+  capital: 'San Salvador',
+  area: 21041,
+  currencySymbol: '$',
+  officialLanguages: ['Spanish'],
+  demonym: 'Salvadoran',
+  taxInfo: { standardRate: 13, taxName: 'VAT', currency: 'USD', region: 'NA' },
+  divisions: [
+    { code: 'SAN', name: 'San Salvador', type: 'department',
       cities: [
-        { code: 'SAN', name: 'San Salvador', taxInfo: { taxName: 'No VAT', currency: 'USD', region: 'NA' }},
+        { code: 'SAN', name: 'San Salvador' },
+        { code: 'SANTA', name: 'Santa Tecla' },
+        { code: 'SOYAPANGO', name: 'Soyapango' },
+        { code: 'MEJICANOS', name: 'Mejicanos' },
+        { code: 'SAN2', name: 'San Marcos' }
+      ]
+    },
+    { code: 'SANT', name: 'Santa Tecla', type: 'department',
+      cities: [
         { code: 'SANTA', name: 'Santa Tecla' },
         { code: 'SOYAPANGO', name: 'Soyapango' },
         { code: 'MEJICANOS', name: 'Mejicanos' },
         { code: 'SAN2', name: 'San Marcos' },
-        { code: 'ILOPANGO', name: 'Ilopango' },
-        { code: 'APOPA', name: 'Apopa' },
-        { code: 'SANTIAGO', name: 'Santiago Texacuangos' },
-        { code: 'CUSCATLAN', name: 'Cuscatancingo' },
-        { code: 'DELGADO', name: 'Delgado' }
+        { code: 'SAN', name: 'San Salvador' }
+      ]
+    },
+    { code: 'SOY', name: 'Soyapango', type: 'department',
+      cities: [
+        { code: 'SOYAPANGO', name: 'Soyapango' },
+        { code: 'MEJICANOS', name: 'Mejicanos' },
+        { code: 'SAN2', name: 'San Marcos' },
+        { code: 'SAN', name: 'San Salvador' },
+        { code: 'SANTA', name: 'Santa Tecla' }
+      ]
+    },
+    { code: 'MEJ', name: 'Mejicanos', type: 'department',
+      cities: [
+        { code: 'MEJICANOS', name: 'Mejicanos' },
+        { code: 'SAN2', name: 'San Marcos' },
+        { code: 'SAN', name: 'San Salvador' },
+        { code: 'SANTA', name: 'Santa Tecla' },
+        { code: 'SOYAPANGO', name: 'Soyapango' }
+      ]
+    },
+    { code: 'SAN2', name: 'San Marcos', type: 'department',
+      cities: [
+        { code: 'SAN2', name: 'San Marcos' },
+        { code: 'SAN', name: 'San Salvador' },
+        { code: 'SANTA', name: 'Santa Tecla' },
+        { code: 'SOYAPANGO', name: 'Soyapango' },
+        { code: 'MEJICANOS', name: 'Mejicanos' }
       ]
     }
   ]
 };
-
-export default elsalvador;

@@ -1,5 +1,5 @@
 /**
- * Barbados country data with provinces, cities, and tax information
+ * Barbados country data with parishes and cities
  */
 
 import { Country } from './index';
@@ -7,22 +7,58 @@ import { Country } from './index';
 export const barbados: Country = {
   code: 'BB',
   name: 'Barbados',
-  provinces: [
-    { code: 'BRIDGETOWN', name: 'Bridgetown',
+  flag: '🇧🇧',
+  capital: 'Bridgetown',
+  area: 431,
+  currencySymbol: 'B$',
+  officialLanguages: ['English'],
+  demonym: 'Barbadian',
+  taxInfo: { standardRate: 17, taxName: 'VAT', currency: 'BBD', region: 'NA' },
+  divisions: [
+    { code: 'BRI', name: 'Bridgetown', type: 'parish',
       cities: [
-        { code: 'BRIDGETOWN', name: 'Bridgetown', taxInfo: { taxName: 'No VAT', currency: 'USD', region: 'NA' }},
+        { code: 'BRIDGETOWN', name: 'Bridgetown' },
+        { code: 'SPRING', name: 'Spring Garden' },
+        { code: 'HASTINGS', name: 'Hastings' },
+        { code: 'OISTINS', name: 'Oistins' },
+        { code: 'HOLETOWN', name: 'Holetown' }
+      ]
+    },
+    { code: 'SPR', name: 'Spring Garden', type: 'parish',
+      cities: [
         { code: 'SPRING', name: 'Spring Garden' },
         { code: 'HASTINGS', name: 'Hastings' },
         { code: 'OISTINS', name: 'Oistins' },
         { code: 'HOLETOWN', name: 'Holetown' },
-        { code: 'PAYNES', name: 'Paynes Bay' },
-        { code: 'BATH', name: 'Bathsheba' },
-        { code: 'SPEIGHTSTOWN', name: 'Speightstown' },
-        { code: 'ST', name: 'St. Lawrence' },
-        { code: 'ST2', name: 'St. James' }
+        { code: 'BRIDGETOWN', name: 'Bridgetown' }
+      ]
+    },
+    { code: 'HAS', name: 'Hastings', type: 'parish',
+      cities: [
+        { code: 'HASTINGS', name: 'Hastings' },
+        { code: 'OISTINS', name: 'Oistins' },
+        { code: 'HOLETOWN', name: 'Holetown' },
+        { code: 'BRIDGETOWN', name: 'Bridgetown' },
+        { code: 'SPRING', name: 'Spring Garden' }
+      ]
+    },
+    { code: 'OIS', name: 'Oistins', type: 'parish',
+      cities: [
+        { code: 'OISTINS', name: 'Oistins' },
+        { code: 'HOLETOWN', name: 'Holetown' },
+        { code: 'BRIDGETOWN', name: 'Bridgetown' },
+        { code: 'SPRING', name: 'Spring Garden' },
+        { code: 'HASTINGS', name: 'Hastings' }
+      ]
+    },
+    { code: 'HOL', name: 'Holetown', type: 'parish',
+      cities: [
+        { code: 'HOLETOWN', name: 'Holetown' },
+        { code: 'BRIDGETOWN', name: 'Bridgetown' },
+        { code: 'SPRING', name: 'Spring Garden' },
+        { code: 'HASTINGS', name: 'Hastings' },
+        { code: 'OISTINS', name: 'Oistins' }
       ]
     }
   ]
 };
-
-export default barbados;

@@ -62,25 +62,3 @@ export const guatemala: Country = {
     }
   ]
 };
-        { code: 'MADRID', name: 'Ciudad de Madrid' },
-        { code: 'SANTA', name: 'Santa Catarina Pinula' }
-      ]
-    },
-    { code: 'QUICHE', name: 'Quiché',
-      cities: [
-        { code: 'SANTA', name: 'Santa Cruz del Quiché' },
-        { code: 'CHICHICASTENANGO', name: 'Chichicastenango' },
-        { code: 'NEBAJ', name: 'Nebaj' },
-        { code: 'SACAPULAS', name: 'Sacapulas' },
-        { code: 'CUNEN', name: 'Cunén' },
-        { code: 'JOYABAJ', name: 'Joyabaj' },
-        { code: 'ZACAPA', name: 'Zacapa' },
-        { code: 'CHICAMAN', name: 'Chicamán' },
-        { code: 'IXCAN', name: 'Ixcan' },
-        { code: 'UCU', name: 'Uspantán' }
-      ]
-    }
-  ]
-};
-
-export default guatemala;

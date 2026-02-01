@@ -1,5 +1,5 @@
 /**
- * Jamaica country data with provinces, cities, and tax information
+ * Jamaica country data with parishes and cities
  */
 
 import { Country } from './index';
@@ -7,22 +7,58 @@ import { Country } from './index';
 export const jamaica: Country = {
   code: 'JM',
   name: 'Jamaica',
-  provinces: [
-    { code: 'KINGSTON', name: 'Kingston',
+  flag: '🇯🇲',
+  capital: 'Kingston',
+  area: 10991,
+  currencySymbol: 'J$',
+  officialLanguages: ['English', 'Jamaican Patois'],
+  demonym: 'Jamaican',
+  taxInfo: { standardRate: 15, taxName: 'GCT', currency: 'JMD', region: 'NA' },
+  divisions: [
+    { code: 'KIN', name: 'Kingston', type: 'parish',
       cities: [
-        { code: 'KINGSTON', name: 'Kingston', taxInfo: { taxName: 'No VAT', currency: 'USD', region: 'NA' }},
+        { code: 'KINGSTON', name: 'Kingston' },
+        { code: 'SPANISH', name: 'Spanish Town' },
+        { code: 'PORTMORE', name: 'Portmore' },
+        { code: 'MONTEGO', name: 'Montego Bay' },
+        { code: 'MAY', name: 'May Pen' }
+      ]
+    },
+    { code: 'SPA', name: 'Spanish Town', type: 'parish',
+      cities: [
         { code: 'SPANISH', name: 'Spanish Town' },
         { code: 'PORTMORE', name: 'Portmore' },
         { code: 'MONTEGO', name: 'Montego Bay' },
         { code: 'MAY', name: 'May Pen' },
-        { code: 'MANDEVILLE', name: 'Mandeville' },
-        { code: 'SAVANNA', name: 'Savanna-la-Mar' },
-        { code: 'PORT', name: 'Port Antonio' },
-        { code: 'ST', name: 'St. Ann\'s Bay' },
-        { code: 'OLD', name: 'Old Harbour' }
+        { code: 'KINGSTON', name: 'Kingston' }
+      ]
+    },
+    { code: 'POR', name: 'Portmore', type: 'parish',
+      cities: [
+        { code: 'PORTMORE', name: 'Portmore' },
+        { code: 'MONTEGO', name: 'Montego Bay' },
+        { code: 'MAY', name: 'May Pen' },
+        { code: 'KINGSTON', name: 'Kingston' },
+        { code: 'SPANISH', name: 'Spanish Town' }
+      ]
+    },
+    { code: 'MON', name: 'Montego Bay', type: 'parish',
+      cities: [
+        { code: 'MONTEGO', name: 'Montego Bay' },
+        { code: 'MAY', name: 'May Pen' },
+        { code: 'KINGSTON', name: 'Kingston' },
+        { code: 'SPANISH', name: 'Spanish Town' },
+        { code: 'PORTMORE', name: 'Portmore' }
+      ]
+    },
+    { code: 'MAY', name: 'May Pen', type: 'parish',
+      cities: [
+        { code: 'MAY', name: 'May Pen' },
+        { code: 'KINGSTON', name: 'Kingston' },
+        { code: 'SPANISH', name: 'Spanish Town' },
+        { code: 'PORTMORE', name: 'Portmore' },
+        { code: 'MONTEGO', name: 'Montego Bay' }
       ]
     }
   ]
 };
-
-export default jamaica;

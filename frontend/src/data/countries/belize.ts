@@ -1,5 +1,5 @@
 /**
- * Belize country data with provinces, cities, and tax information
+ * Belize country data with districts and cities
  */
 
 import { Country } from './index';
@@ -7,36 +7,58 @@ import { Country } from './index';
 export const belize: Country = {
   code: 'BZ',
   name: 'Belize',
-  provinces: [
-    { code: 'BELIZE', name: 'Belize District',
+  flag: '🇧🇿',
+  capital: 'Belmopan',
+  area: 22966,
+  currencySymbol: 'BZ$',
+  officialLanguages: ['English'],
+  demonym: 'Belizean',
+  taxInfo: { standardRate: 12, taxName: 'GST', currency: 'BZD', region: 'NA' },
+  divisions: [
+    { code: 'BEL', name: 'Belize District', type: 'district',
       cities: [
-        { code: 'BELIZE', name: 'Belize City', taxInfo: { taxName: 'No VAT', currency: 'USD', region: 'NA' }},
+        { code: 'BELIZE', name: 'Belize City' },
         { code: 'BELMOPAN', name: 'Belmopan' },
         { code: 'SAN', name: 'San Pedro' },
         { code: 'CAYE', name: 'Caye Caulker' },
-        { code: 'BISTAR', name: 'Biscayne' },
-        { code: 'LADY', name: 'Ladyville' },
-        { code: 'HATTIE', name: 'Hattieville' },
-        { code: 'BEMBOCK', name: 'Bembock' },
-        { code: 'CROOKED', name: 'Crooked Tree' },
-        { code: 'GALLEN', name: 'Gallen Junction' }
+        { code: 'LADY', name: 'Ladyville' }
       ]
     },
-    { code: 'ORANGE', name: 'Orange Walk District',
+    { code: 'CAY', name: 'Cayo District', type: 'district',
       cities: [
-        { code: 'ORANGE', name: 'Orange Walk Town' },
+        { code: 'BELMOPAN', name: 'Belmopan' },
+        { code: 'SAN', name: 'San Pedro' },
+        { code: 'CAYE', name: 'Caye Caulker' },
+        { code: 'LADY', name: 'Ladyville' },
+        { code: 'BELIZE', name: 'Belize City' }
+      ]
+    },
+    { code: 'COR', name: 'Corozal District', type: 'district',
+      cities: [
         { code: 'COROZAL', name: 'Corozal Town' },
-        { code: 'SAN', name: 'San Pablo' },
-        { code: 'SAN2', name: 'San Jose' },
-        { code: 'SAN3', name: 'San Roman' },
-        { code: 'DOUGLAS', name: 'Douglas' },
-        { code: 'SHIPYARD', name: 'Shipyard' },
-        { code: 'INDIAN', name: 'Indian Church' },
-        { code: 'GOLDEN', name: 'Golden Stream' },
-        { code: 'TRIANGLE', name: 'Triangle' }
+        { code: 'ORANGE', name: 'Orange Walk' },
+        { code: 'BELIZE', name: 'Belize City' },
+        { code: 'BELMOPAN', name: 'Belmopan' },
+        { code: 'SAN', name: 'San Pedro' }
+      ]
+    },
+    { code: 'ORA', name: 'Orange Walk District', type: 'district',
+      cities: [
+        { code: 'ORANGE', name: 'Orange Walk' },
+        { code: 'BELIZE', name: 'Belize City' },
+        { code: 'BELMOPAN', name: 'Belmopan' },
+        { code: 'SAN', name: 'San Pedro' },
+        { code: 'CAYE', name: 'Caye Caulker' }
+      ]
+    },
+    { code: 'STAN', name: 'Stann Creek District', type: 'district',
+      cities: [
+        { code: 'DANGRIGA', name: 'Dangriga' },
+        { code: 'PLACENCIA', name: 'Placencia' },
+        { code: 'BELIZE', name: 'Belize City' },
+        { code: 'BELMOPAN', name: 'Belmopan' },
+        { code: 'SAN', name: 'San Pedro' }
       ]
     }
   ]
 };
-
-export default belize;

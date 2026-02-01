@@ -204,14 +204,12 @@ export const getCountryRegion = (countryCode: string): string => {
     // North America
     'US': 'NA', 'CA': 'NA', 'MX': 'NA', 'GT': 'NA', 'BZ': 'NA', 'SV': 'NA', 'HN': 'NA', 
     'NI': 'NA', 'CR': 'NA', 'PA': 'NA', 'CU': 'NA', 'JM': 'NA', 'HT': 'NA', 'DO': 'NA', 
-    'PR': 'NA', 'TT': 'NA', 'BB': 'NA', 'BS': 'NA', 'DM': 'NA', 'GD': 'NA', 'KN': 'NA', 
-    'LC': 'NA', 'VC': 'NA', 'AG': 'NA', 'AI': 'NA', 'BM': 'NA', 'VG': 'NA', 'KY': 'NA', 
-    'MS': 'NA', 'TC': 'NA', 'VI': 'NA', 'GL': 'NA',
+    'TT': 'NA', 'BB': 'NA', 'BS': 'NA', 'DM': 'NA', 'GD': 'NA', 'KN': 'NA', 
+    'LC': 'NA', 'VC': 'NA', 'AG': 'NA',
     
     // South America
     'BR': 'LATAM', 'AR': 'LATAM', 'CL': 'LATAM', 'PE': 'LATAM', 'EC': 'LATAM', 'CO': 'LATAM', 
-    'VE': 'LATAM', 'GY': 'LATAM', 'SR': 'LATAM', 'GF': 'LATAM', 'UY': 'LATAM', 'PY': 'LATAM', 
-    'BO': 'LATAM', 'FK': 'LATAM',
+    'VE': 'LATAM', 'GY': 'LATAM', 'SR': 'LATAM', 'UY': 'LATAM', 'PY': 'LATAM', 'BO': 'LATAM',
     
     // Europe
     'GB': 'EU', 'IE': 'EU', 'IS': 'EU', 'NO': 'EU', 'SE': 'EU', 'FI': 'EU', 'DK': 'EU', 
@@ -256,6 +254,7 @@ export const getCountryRegion = (countryCode: string): string => {
     // Caribbean and Other Territories
     'GP': 'LATAM', 'MQ': 'LATAM', 'BL': 'LATAM', 'MF': 'LATAM', 'PM': 'NA', 'AW': 'LATAM', 
     'CW': 'LATAM', 'SX': 'LATAM', 'BQ': 'LATAM', 'IO': 'APAC', 'PN': 'APAC', 'UM': 'APAC',
+    'PR': 'LATAM', 'AI': 'EU', 'BM': 'EU', 'VG': 'EU', 'KY': 'EU', 'MS': 'EU', 'TC': 'EU', 'VI': 'LATAM', 'GL': 'EU', 'GF': 'LATAM', 'FK': 'LATAM',
     
     // Antarctica
     'AQ': 'Other'
