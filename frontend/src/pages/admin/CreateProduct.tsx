@@ -7,6 +7,7 @@ import { CategoriesAPI } from '../../api';
 import toast from 'react-hot-toast';
 import { DIETARY_TAGS } from '../../config/product';
 import Dropdown from '../../components/ui/Dropdown';
+import { getCountryOptions } from '../../data/countries';
 
 interface Category {
   id: string;
@@ -18,8 +19,6 @@ interface ProductVariant {
   sku: string;
   base_price: number;
   sale_price?: number;
-  min_price?: number;
-  max_price?: number;
   stock: number;
   attributes: Record<string, any>;
   dietary_tags: string[];
@@ -49,8 +48,6 @@ const CreateProduct: React.FC = () => {
         sku: '',
         base_price: 0,
         sale_price: undefined as number | undefined,
-        min_price: undefined as number | undefined,
-        max_price: undefined as number | undefined,
         stock: 0,
         attributes: {},
         dietary_tags: [] as string[],
@@ -61,7 +58,7 @@ const CreateProduct: React.FC = () => {
       }
     ] as ProductVariant[]
   });
-
+  
   const [currentImageUrl, setCurrentImageUrl] = useState<string[]>(['']);
 
   useEffect(() => {
@@ -79,30 +76,45 @@ const CreateProduct: React.FC = () => {
   };
 
   const updateField = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (field === 'name' && !formData.slug) {
+    if (field === 'name') {
       const slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      setFormData(prev => ({ ...prev, slug }));
+      setFormData(prev => ({ ...prev, name: value, slug }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
     }
   };
 
   const updateVariant = (index: number, field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
-      variants: prev.variants.map((v, i) => i === index ? { ...v, [field]: value } : v)
+      variants: prev.variants.map((v, i) => {
+        if (i === index) {
+          const updated = { ...v, [field]: value };
+          // Auto-generate SKU when name changes
+          if (field === 'name') {
+            const skuBase = value.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            updated.sku = `${skuBase}-${Date.now().toString(36).substr(-4)}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+          }
+          return updated;
+        }
+        return v;
+      })
     }));
   };
 
   const addVariant = () => {
+    const variantNum = formData.variants.length + 1;
+    const variantName = `Variant ${variantNum}`;
+    const skuBase = variantName.toUpperCase().replace(/[^A-Z0-9]+/g, '-');
+    const generatedSku = `${skuBase}-${Date.now().toString(36).substr(-4)}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+    
     setFormData(prev => ({
       ...prev,
       variants: [...prev.variants, {
-        name: `Variant ${prev.variants.length + 1}`,
-        sku: '',
+        name: variantName,
+        sku: generatedSku,
         base_price: 0,
         sale_price: undefined,
-        min_price: undefined,
-        max_price: undefined,
         stock: 0,
         attributes: {},
         dietary_tags: [],
@@ -177,8 +189,6 @@ const CreateProduct: React.FC = () => {
           sku: v.sku || `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           base_price: parseFloat(String(v.base_price)),
           sale_price: v.sale_price ? parseFloat(String(v.sale_price)) : undefined,
-          min_price: v.min_price ? parseFloat(String(v.min_price)) : undefined,
-          max_price: v.max_price ? parseFloat(String(v.max_price)) : undefined,
           stock: parseInt(String(v.stock)) || 0,
           attributes: v.attributes,
           dietary_tags: v.dietary_tags,
@@ -191,6 +201,8 @@ const CreateProduct: React.FC = () => {
 
       await AdminAPI.createProduct(payload);
       toast.success('Product created successfully');
+      // Dispatch custom event to notify products list
+      window.dispatchEvent(new CustomEvent('product:created', { detail: { payload } }));
       navigate('/admin/products');
     } catch (error: any) {
       console.error('Failed to create product:', error);
@@ -248,18 +260,18 @@ const CreateProduct: React.FC = () => {
 
               <div>
                 <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Slug
+                  Slug <span className="text-xs text-gray-500">(auto-generated)</span>
                 </label>
                 <input
                   type="text"
                   value={formData.slug}
-                  onChange={(e) => updateField('slug', e.target.value)}
-                  className={`w-full px-2 py-1 rounded-lg border ${
+                  readOnly
+                  className={`w-full px-2 py-1 rounded-lg border bg-opacity-50 cursor-not-allowed ${
                     currentTheme === 'dark'
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } focus:ring-2 focus:ring-primary focus:border-transparent`}
-                  placeholder="auto-generated-slug"
+                      ? 'bg-gray-800 border-gray-600 text-gray-400'
+                      : 'bg-gray-100 border-gray-300 text-gray-600'
+                  }`}
+                  placeholder="auto-generated-from-name"
                 />
               </div>
 
@@ -281,16 +293,14 @@ const CreateProduct: React.FC = () => {
                 <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Origin
                 </label>
-                <input
-                  type="text"
+                <Dropdown
+                  options={getCountryOptions()}
                   value={formData.origin}
-                  onChange={(e) => updateField('origin', e.target.value)}
-                  className={`w-full px-2 py-1 rounded-lg border ${
-                    currentTheme === 'dark'
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } focus:ring-2 focus:ring-primary focus:border-transparent`}
-                  placeholder="e.g., USA, Local"
+                  onChange={(value) => updateField('origin', value)}
+                  placeholder="Select country of origin"
+                  searchable
+                  searchPlaceholder="Search countries..."
+                  className="w-full"
                 />
               </div>
 
@@ -438,18 +448,18 @@ const CreateProduct: React.FC = () => {
 
                     <div>
                       <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        SKU
+                        SKU <span className="text-xs text-gray-500">(auto-generated)</span>
                       </label>
                       <input
                         type="text"
                         value={variant.sku}
-                        onChange={(e) => updateVariant(index, 'sku', e.target.value)}
-                        className={`w-full px-2 py-1 rounded-lg border ${
+                        readOnly
+                        className={`w-full px-2 py-1 rounded-lg border bg-opacity-50 cursor-not-allowed ${
                           currentTheme === 'dark'
-                            ? 'bg-gray-700 border-gray-600 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
-                        } focus:ring-2 focus:ring-primary`}
-                        placeholder="Auto-generated"
+                            ? 'bg-gray-800 border-gray-600 text-gray-400'
+                            : 'bg-gray-100 border-gray-300 text-gray-600'
+                        }`}
+                        placeholder="Auto-generated from variant name"
                       />
                     </div>
 
@@ -500,44 +510,6 @@ const CreateProduct: React.FC = () => {
                         step="0.01"
                         value={variant.sale_price || ''}
                         onChange={(e) => updateVariant(index, 'sale_price', e.target.value ? parseFloat(e.target.value) : undefined)}
-                        className={`w-full px-2 py-1 rounded-lg border ${
-                          currentTheme === 'dark'
-                            ? 'bg-gray-700 border-gray-600 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
-                        } focus:ring-2 focus:ring-primary`}
-                        placeholder="Optional"
-                        min="0"
-                      />
-                    </div>
-
-                    <div>
-                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Min Price ($)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={variant.min_price || ''}
-                        onChange={(e) => updateVariant(index, 'min_price', e.target.value ? parseFloat(e.target.value) : undefined)}
-                        className={`w-full px-2 py-1 rounded-lg border ${
-                          currentTheme === 'dark'
-                            ? 'bg-gray-700 border-gray-600 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
-                        } focus:ring-2 focus:ring-primary`}
-                        placeholder="Optional"
-                        min="0"
-                      />
-                    </div>
-
-                    <div>
-                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Max Price ($)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={variant.max_price || ''}
-                        onChange={(e) => updateVariant(index, 'max_price', e.target.value ? parseFloat(e.target.value) : undefined)}
                         className={`w-full px-2 py-1 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'

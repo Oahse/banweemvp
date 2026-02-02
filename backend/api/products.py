@@ -133,6 +133,19 @@ async def get_home_data(
             sort_by="created_at",
             sort_order="desc"
         )
+
+        # Fallbacks if featured/deals are empty
+        if not featured:
+            featured = (popular_result.get("data") or [])[:4]
+
+        if not deals_result.get("data"):
+            deals_result = await product_service.get_products(
+                page=1,
+                limit=10,
+                filters={},
+                sort_by="created_at",
+                sort_order="desc"
+            )
         
         return Response.success(
             data={

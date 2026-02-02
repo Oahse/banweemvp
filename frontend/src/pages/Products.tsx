@@ -176,19 +176,19 @@ const Products = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="mb-6 space-y-4">
+      <div className="mb-4 space-y-3">
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="flex gap-3">
+        <form onSubmit={handleSearch} className="flex gap-2">
           <div className="flex-1 relative">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
+            <SearchIcon className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={16} />
             <input
               type="text"
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={cn(
-                'w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600',
-                'bg-white dark:bg-gray-800 text-gray-900 dark:text-white',
+                'w-full pl-8 pr-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600',
+                'bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm',
                 'placeholder-gray-500 dark:placeholder-gray-400',
                 'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary',
                 'transition-colors'
@@ -197,24 +197,24 @@ const Products = () => {
           </div>
           <button
             type="submit"
-            className="px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition-colors"
+            className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded text-sm font-medium transition-colors"
           >
             Search
           </button>
         </form>
 
         {/* Filter Toggle and Sort */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600',
+              'flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600',
               'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300',
               'hover:border-primary hover:bg-gray-50 dark:hover:bg-gray-700',
-              'transition-colors font-medium'
+              'transition-colors text-sm'
             )}
           >
-            <FilterIcon size={16} />
+            <FilterIcon size={14} />
             <span>Filters</span>
             {(selectedCategories.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000) && (
               <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full">
@@ -224,7 +224,7 @@ const Products = () => {
           </button>
 
           {/* Custom Sort Dropdown */}
-          <div className="w-full sm:w-auto sm:min-w-[180px]">
+          <div className="w-full sm:w-auto sm:min-w-[160px]">
             <Dropdown
               options={sortOptions}
               value={sortOption}
@@ -237,14 +237,14 @@ const Products = () => {
 
         {/* Filters Panel */}
         {showFilters && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 space-y-4">
             {/* Categories */}
             {categories && categories.length > 0 && (
               <div>
-                <h3 className="text-base font-medium text-main dark:text-white mb-3">
+                <h3 className="text-sm font-medium text-main dark:text-white mb-2">
                   Categories
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1">
                   {categories.map((category) => (
                     <button
                       key={category.id}
@@ -265,10 +265,10 @@ const Products = () => {
 
             {/* Price Range */}
             <div>
-              <h3 className="text-base font-medium text-main dark:text-white mb-3">
+              <h3 className="text-sm font-medium text-main dark:text-white mb-2">
                 Price Range
               </h3>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <div className="flex-1">
                   <label className="block text-xs text-copy-light dark:text-gray-400 mb-1">
                     Min Price
@@ -279,13 +279,13 @@ const Products = () => {
                     value={priceRange[0]}
                     onChange={(e) => handlePriceRangeChange([parseInt(e.target.value) || 0, priceRange[1]])}
                     className={cn(
-                      'w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600',
+                      'w-full px-2 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600',
                       'bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm',
                       'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
                     )}
                   />
                 </div>
-                <span className="text-copy-light dark:text-gray-400 mt-5">—</span>
+                <span className="text-copy-light dark:text-gray-400 mt-3">—</span>
                 <div className="flex-1">
                   <label className="block text-xs text-copy-light dark:text-gray-400 mb-1">
                     Max Price
@@ -296,7 +296,7 @@ const Products = () => {
                     value={priceRange[1]}
                     onChange={(e) => handlePriceRangeChange([priceRange[0], parseInt(e.target.value) || 1000])}
                     className={cn(
-                      'w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600',
+                      'w-full px-2 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600',
                       'bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm',
                       'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
                     )}
@@ -306,18 +306,26 @@ const Products = () => {
             </div>
 
             {/* Clear Filters */}
-            <button
-              onClick={clearFilters}
-              className={cn(
-                'flex items-center gap-2 px-4 py-2 text-sm rounded-lg',
-                'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
-                'hover:bg-gray-200 dark:hover:bg-gray-600',
-                'transition-colors font-medium'
-              )}
-            >
-              <XIcon size={16} />
-              Clear all filters
-            </button>
+            <div className="flex items-center justify-between">
+              <button
+                onClick={clearFilters}
+                className={cn(
+                  'flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg',
+                  'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
+                  'hover:bg-gray-200 dark:hover:bg-gray-600',
+                  'transition-colors'
+                )}
+              >
+                <XIcon size={14} />
+                Clear
+              </button>
+              <button
+                onClick={() => setShowFilters(false)}
+                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Done
+              </button>
+            </div>
           </div>
         )}
       </div>

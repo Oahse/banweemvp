@@ -130,7 +130,8 @@ export const AdminInventory = () => {
   }, [page, debouncedSearchQuery, statusFilter]);
 
   const getItemDisplay = (item: any) => ({
-    productName: item.variant?.product?.name ?? item.product_name ?? 'N/A',
+    productName: item.variant?.name ?? item.variant_name ?? 'N/A',
+    variantSku: item.variant?.sku ?? item.sku ?? 'N/A',
     locationName: item.location?.name ?? item.location_name ?? 'N/A',
     stockLevel: item.stock ?? item.quantity_available ?? item.quantity ?? item.stock_level ?? 0,
   });
@@ -485,7 +486,8 @@ export const AdminInventory = () => {
               <table className="w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Product</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Variant</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">SKU</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Location</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Stock Level</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
@@ -499,6 +501,7 @@ export const AdminInventory = () => {
                     return (
                       <tr key={item.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
                         <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{d.productName}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{d.variantSku}</td>
                         <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{d.locationName}</td>
                         <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">{d.stockLevel}</td>
                         <td className="px-6 py-4 text-sm">
@@ -533,7 +536,10 @@ export const AdminInventory = () => {
                     className={`p-4 flex flex-col gap-2 bg-white dark:bg-gray-800 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-900 dark:text-white">{d.productName}</span>
+                      <div>
+                        <span className="font-medium text-gray-900 dark:text-white block">{d.productName}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">SKU: {d.variantSku}</span>
+                      </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.cls}`}>
                         {status.label}
                       </span>

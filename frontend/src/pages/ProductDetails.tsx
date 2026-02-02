@@ -50,6 +50,12 @@ interface SelectedVariant {
   attributes: Record<string, any>;
   barcode: string;
   qr_code: string;
+  tags?: string[];
+  dietary_tags?: string[];
+  specifications?: Record<string, any>;
+  availability_status?: string;
+  is_active?: boolean;
+  images?: any[]; // Add images property
   inventory?: {
     id: string;
     quantity_available: number;
@@ -109,14 +115,15 @@ export const ProductDetails = () => {
   useEffect(() => {
     if (id && id !== 'search') {
       fetchProduct(() => ProductsAPI.getProduct(id));
+      // Fetch related products based on current product
       fetchRelatedProducts(() => ProductsAPI.getRecommendedProducts(id, 4));
     }
   }, [id, fetchProduct, fetchRelatedProducts]);
 
-  // Extract actual data from API response
-  const actualProductData = productData?.data || productData;
-  const actualRelatedData = relatedProductsData?.data || relatedProductsData;
-  const actualReviewsData = reviewsData?.data ? {
+  // Extract actual data from API response with proper type guards
+  const actualProductData: any = productData?.data || productData;
+  const actualRelatedData: any = relatedProductsData?.data || relatedProductsData;
+  const actualReviewsData: any = reviewsData?.data ? {
     data: reviewsData.data.data || reviewsData.data,
     total: reviewsData.data.total || reviewsData.total || 0,
     limit: reviewsData.data.limit || reviewsData.limit || 10
@@ -152,6 +159,12 @@ export const ProductDetails = () => {
         attributes: variant.attributes,
         barcode: variant.barcode,
         qr_code: variant.qr_code,
+        tags: variant.tags,
+        dietary_tags: variant.dietary_tags,
+        specifications: variant.specifications,
+        availability_status: variant.availability_status,
+        is_active: variant.is_active,
+        images: variant.images, // Add images
         inventory: variant.inventory,
       });
       // Reset image selection when product changes
@@ -167,7 +180,7 @@ export const ProductDetails = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedVariant?.id]);
 
-  const handleQuantityChange = (newQuantity) => {
+  const handleQuantityChange = (newQuantity: number) => {
     setQuantity(Math.max(1, newQuantity));
   };
 
@@ -197,7 +210,7 @@ export const ProductDetails = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <ErrorMessage
-          error={productError || { error: true, message: 'Product not found' }}
+          message={productError?.message || 'Product not found'}
           onRetry={() => fetchProduct(() => ProductsAPI.getProduct(id))}
         />
       </div>
@@ -219,7 +232,7 @@ export const ProductDetails = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <ErrorMessage
-          error={{ error: true, message: 'Failed to load product data' }}
+          message={'Failed to load product data'}
           onRetry={() => fetchProduct(() => ProductsAPI.getProduct(id))}
         />
       </div>
@@ -350,7 +363,7 @@ export const ProductDetails = () => {
           {/* Product Images */}
           <div className="space-y-4">
             <ProductImageGallery
-              images={actualProductData.variants?.flatMap((variant: ProductVariant) => variant.images || []) || []}
+              images={selectedVariant?.images || []}
               selectedImageIndex={selectedImage}
               onImageSelect={setSelectedImage}
               showThumbnails={true}
@@ -363,7 +376,7 @@ export const ProductDetails = () => {
               <div className="text-xs text-gray-500 mt-2">
                 Total Images: {actualProductData.variants?.flatMap((variant: ProductVariant) => variant.images || [])?.length || 0} | 
                 Selected Variant: {selectedVariant?.name || 'None'} | 
-                Selected Variant Images: {actualProductData.variants?.find((v: ProductVariant) => v.id === selectedVariant?.id)?.images?.length || 0}
+                Selected Variant Images: {selectedVariant?.images?.length || 0}
               </div>
             )}
             
@@ -458,7 +471,7 @@ export const ProductDetails = () => {
                     ({product.review_count || product.reviewCount || totalReviews} reviews)
                   </span>
                 </div>
-                <span className="text-xs text-copy-light">SKU: {product.sku}</span>
+                <span className="text-xs text-copy-light">SKU: {selectedVariant?.sku || 'N/A'}</span>
               </div>
 
               <div className="flex items-center space-x-4 mb-4">
@@ -476,7 +489,14 @@ export const ProductDetails = () => {
                   </>
                 ) : (
                   <span className="text-xl font-bold text-primary">
-                    {formatCurrency(selectedVariant?.sale_price || selectedVariant?.base_price || product.price)}
+                    {formatCurrency(
+                      selectedVariant?.sale_price ||
+                      selectedVariant?.base_price ||
+                      product.price_range?.min ||
+                      product.min_price ||
+                      product.price ||
+                      0
+                    )}
                   </span>
                 )}
               </div>
@@ -484,68 +504,103 @@ export const ProductDetails = () => {
               <p className="text-sm text-copy-light mb-6">{product.description}</p>
               
               {/* Variant Selection - Moved under description */}
-              {actualProductData?.variants && product.variants && product.variants.length > 1 && selectedVariant && (
+              {actualProductData?.variants && actualProductData.variants.length > 0 && (
                 <div className="mb-6">
-                  <VariantSelector
-                    variants={actualProductData.variants.map(variant => ({
-                      id: variant.id,
-                      product_id: variant.product_id || actualProductData.id,
-                      sku: variant.sku || '',
-                      name: variant.name || '',
-                      base_price: variant.base_price || 0,
-                      sale_price: variant.sale_price || null,
-                      stock: variant.stock || 0,
-                      barcode: variant.barcode || '',
-                      qr_code: variant.qr_code || '',
-                      attributes: variant.attributes ? Object.entries(variant.attributes).map(([name, value]) => ({
-                        id: `${variant.id}-${name}`,
-                        name,
-                        value: String(value)
-                      })) : [],
-                      images: variant.images || []
-                    }))}
-                    selectedVariant={{
-                      id: selectedVariant.id,
-                      product_id: actualProductData.id,
-                      sku: selectedVariant.sku || '',
-                      name: selectedVariant.name || '',
-                      base_price: selectedVariant.base_price || 0,
-                      sale_price: selectedVariant.sale_price || null,
-                      stock: selectedVariant.stock || 0,
-                      barcode: selectedVariant.barcode || '',
-                      qr_code: selectedVariant.qr_code || '',
-                      attributes: selectedVariant.attributes ? Object.entries(selectedVariant.attributes).map(([name, value]) => ({
-                        id: `${selectedVariant.id}-${name}`,
-                        name,
-                        value: String(value)
-                      })) : [],
-                      images: actualProductData.variants?.find(v => v.id === selectedVariant.id)?.images || []
-                    }}
-                    onVariantChange={(variant) => {
-                      const originalVariant = actualProductData.variants?.find(v => v.id === variant.id);
-                      if (originalVariant) {
-                        setSelectedVariant({
-                          id: originalVariant.id,
-                          name: originalVariant.name,
-                          base_price: originalVariant.base_price,
-                          sale_price: originalVariant.sale_price,
-                          current_price: originalVariant.current_price,
-                          discount_percentage: originalVariant.discount_percentage,
-                          stock: originalVariant.stock,
-                          sku: originalVariant.sku,
-                          attributes: originalVariant.attributes,
-                          barcode: originalVariant.barcode,
-                          qr_code: originalVariant.qr_code,
-                          inventory: originalVariant.inventory,
-                        });
-                      }
-                    }}
-                    showImages={false}
-                    showPrice={true}
-                    showStock={true}
-                    layout="grid"
-                    className=""
-                  />
+                  <h3 className="text-sm font-medium text-main mb-2">Available Variants</h3>
+                  <div className="space-y-1">
+                    {actualProductData.variants.map((variant: any, index: number) => {
+                      const isSelected = selectedVariant?.id === variant.id;
+                      const isAvailable = variant.stock > 0;
+                      const currentPrice = variant.sale_price || variant.base_price;
+                      
+                      return (
+                        <button
+                          key={variant.id}
+                          onClick={() => {
+                            if (isAvailable) {
+                              setSelectedVariant({
+                                id: variant.id,
+                                name: variant.name,
+                                base_price: variant.base_price,
+                                sale_price: variant.sale_price,
+                                current_price: variant.current_price,
+                                discount_percentage: variant.discount_percentage,
+                                stock: variant.stock,
+                                sku: variant.sku,
+                                attributes: variant.attributes,
+                                barcode: variant.barcode,
+                                qr_code: variant.qr_code,
+                                tags: variant.tags,
+                                dietary_tags: variant.dietary_tags,
+                                specifications: variant.specifications,
+                                availability_status: variant.availability_status,
+                                is_active: variant.is_active,
+                                images: variant.images,
+                                inventory: variant.inventory,
+                              });
+                              setSelectedImage(0);
+                            }
+                          }}
+                          disabled={!isAvailable}
+                          className={`w-full p-2 border rounded text-left transition-all text-sm ${
+                            isSelected
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:border-border-strong'
+                          } ${
+                            !isAvailable ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2 flex-1 min-w-0">
+                              <div className={`w-3 h-3 rounded-full border flex-shrink-0 ${
+                                isSelected ? 'border-primary bg-primary' : 'border-gray-300'
+                              }`}>
+                                {isSelected && (
+                                  <div className="w-1.5 h-1.5 rounded-full bg-white mx-auto mt-0.75"></div>
+                                )}
+                              </div>
+                              <span className="font-medium text-main truncate">
+                                {variant.name || `Variant ${index + 1}`}
+                              </span>
+                              {variant.sku && (
+                                <span className="text-xs text-copy-light flex-shrink-0">SKU: {variant.sku}</span>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center space-x-2 flex-shrink-0">
+                              <div className="text-right">
+                                <div className="text-sm font-bold text-primary">
+                                  ${currentPrice.toFixed(2)}
+                                </div>
+                                {variant.sale_price && variant.sale_price < variant.base_price && (
+                                  <div className="text-xs text-copy-light line-through">
+                                    ${variant.base_price.toFixed(2)}
+                                  </div>
+                                )}
+                              </div>
+                              <div className={`text-xs px-1.5 py-0.5 rounded-full ${
+                                isAvailable
+                                  ? 'bg-success-100 text-success-800'
+                                  : 'bg-error-100 text-error-800'
+                              }`}>
+                                {isAvailable ? `${variant.stock}` : 'Out'}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {variant.attributes && Object.keys(variant.attributes).length > 0 && (
+                            <div className="mt-1 text-xs text-copy-light truncate">
+                              {Object.entries(variant.attributes).map(([key, value], idx) => (
+                                <span key={key} className={idx > 0 ? 'ml-2' : ''}>
+                                  <span className="capitalize">{key.replace('_', ' ')}:</span> {String(value)}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
@@ -797,25 +852,240 @@ export const ProductDetails = () => {
           <div className="prose max-w-none">
             {activeTab === 'description' && (
               <div>
-                <p className="text-sm text-copy-light mb-4">{product.longDescription}</p>
-                <h4 className="text-sm font-medium text-main mb-2">Features:</h4>
-                <ul className="list-disc list-inside space-y-1">
-                  {product.features?.map((feature: string, index: number) => (
-                    <li key={index} className="text-sm text-copy-light">{feature}</li>
-                  ))}
-                </ul>
+                <p className="text-sm text-copy-light mb-4">{product.description || 'No description available.'}</p>
+                
+                {/* Product Tags */}
+                {(Array.isArray(selectedVariant?.tags) && selectedVariant?.tags.length > 0) || (Array.isArray(product.tags) && product.tags.length > 0) ? (
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-main mb-2">Tags:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {(Array.isArray(selectedVariant?.tags) && selectedVariant?.tags.length > 0 ? selectedVariant?.tags : product.tags).map((tag: any, index: number) => (
+                        <span
+                          key={`${typeof tag === 'string' ? tag : tag?.name || 'tag'}-${index}`}
+                          className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                          style={{ backgroundColor: typeof tag === 'object' && tag?.color ? `${tag.color}20` : undefined }}
+                        >
+                          {typeof tag === 'string' ? tag : tag?.name || 'Tag'}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+                
+                {/* Product Features */}
+                {product.features && product.features.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-main mb-2">Features:</h4>
+                    <ul className="list-disc list-inside space-y-1">
+                      {product.features.map((feature: string, index: number) => (
+                        <li key={index} className="text-sm text-copy-light">{feature}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Variant Attributes */}
+                {selectedVariant?.attributes && Object.keys(selectedVariant.attributes).length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-main mb-2">Variant Attributes:</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {Object.entries(selectedVariant.attributes).map(([key, value]) => (
+                        <div key={key} className="flex justify-between py-1">
+                          <span className="text-sm font-medium text-main capitalize">{key.replace('_', ' ')}:</span>
+                          <span className="text-sm text-copy-light">{String(value)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Supplier Information - Simplified */}
+                {product.supplier && (
+                  <div className="mt-4 p-3 bg-surface rounded-lg border border-border">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        {/* Supplier Logo or Fallback Icon */}
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3 overflow-hidden">
+                          {product.supplier.logo ? (
+                            <img 
+                              src={product.supplier.logo} 
+                              alt={`${product.supplier.company || 'Supplier'} logo`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-main">
+                            {product.supplier.company || `${product.supplier.firstname} ${product.supplier.lastname}`}
+                          </h4>
+                        </div>
+                      </div>
+                      
+                      {/* Blue Verification Icon */}
+                      <div className="flex items-center">
+                        <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 00-2.812 2.812 3.066 3.066 0 00-1.254.723 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 00-3.976 0 3.066 3.066 0 00-1.745.723 3.066 3.066 0 00-2.812-2.812 3.066 3.066 0 00-.723-1.254 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 002.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
             {activeTab === 'specifications' && (
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(product.specifications || {}).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-2 border-b border-gray-100">
-                      <span className="text-sm font-medium text-main">{key}:</span>
-                      <span className="text-sm text-copy-light">{value}</span>
+                  {/* Basic Product Info */}
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-sm font-medium text-main">Product ID:</span>
+                    <span className="text-sm text-copy-light">{product.id}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-sm font-medium text-main">SKU:</span>
+                    <span className="text-sm text-copy-light">{selectedVariant?.sku || product.sku || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-sm font-medium text-main">Category:</span>
+                    <span className="text-sm text-copy-light">
+                      {typeof product.category === 'object' && product.category.name 
+                        ? product.category.name 
+                        : (typeof product.category === 'string' 
+                          ? product.category 
+                          : 'Uncategorized')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-sm font-medium text-main">Stock:</span>
+                    <span className="text-sm text-copy-light">{selectedVariant?.inventory?.quantity_available ?? selectedVariant?.stock ?? 0} units</span>
+                  </div>
+                  
+                  {/* Product Status */}
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-sm font-medium text-main">Status:</span>
+                    <span className="text-sm text-copy-light">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        product.is_active ? 'bg-success-100 text-success-800' : 'bg-error-100 text-error-800'
+                      }`}>
+                        {product.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-sm font-medium text-main">Featured:</span>
+                    <span className="text-sm text-copy-light">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        (product.is_featured || product.featured) ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {(product.is_featured || product.featured) ? 'Featured' : 'Regular'}
+                      </span>
+                    </span>
+                  </div>
+                  
+                  {/* Dietary Information */}
+                  <div className="md:col-span-2 py-2 border-b border-gray-100">
+                    <span className="text-sm font-medium text-main block mb-2">Dietary Information:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {Array.isArray(selectedVariant?.dietary_tags) && selectedVariant.dietary_tags.length > 0 &&
+                        selectedVariant.dietary_tags.map((tag: string, index: number) => (
+                          <span key={`${tag}-${index}`} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                            {tag}
+                          </span>
+                        ))}
+                      {/* Common dietary tags based on product category */}
+                      {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('organic') || 
+                        typeof product.category === 'string' && product.category.toLowerCase().includes('organic')) && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Organic</span>
+                      )}
+                      
+                      {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('gluten') || 
+                        typeof product.category === 'string' && product.category.toLowerCase().includes('gluten')) && (
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Gluten-Free</span>
+                      )}
+                      
+                      {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('vegan') || 
+                        typeof product.category === 'string' && product.category.toLowerCase().includes('vegan')) && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Vegan</span>
+                      )}
+                      
+                      {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('vegetarian') || 
+                        typeof product.category === 'string' && product.category.toLowerCase().includes('vegetarian')) && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Vegetarian</span>
+                      )}
+                      
+                      {/* Default dietary tags for agricultural products */}
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Natural</span>
+                      <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">Non-GMO</span>
+                      <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">Sustainably Sourced</span>
+                      
+                      {/* Variant-specific dietary info */}
+                      {selectedVariant?.attributes?.dietary && (
+                        <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+                          {selectedVariant.attributes.dietary}
+                        </span>
+                      )}
+                      
+                      {selectedVariant?.attributes?.allergens && (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                          Contains: {selectedVariant.attributes.allergens}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Allergy Information */}
+                  <div className="md:col-span-2 py-2 border-b border-gray-100">
+                    <span className="text-sm font-medium text-main block mb-2">Allergy Information:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {/* Common allergens - show as safe unless specified */}
+                      <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Dairy-Free</span>
+                      <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Nut-Free</span>
+                      <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Soy-Free</span>
+                      
+                      {/* If product contains allergens, show them prominently */}
+                      {selectedVariant?.attributes?.contains_nuts && (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Nuts</span>
+                      )}
+                      
+                      {selectedVariant?.attributes?.contains_dairy && (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Dairy</span>
+                      )}
+                      
+                      {selectedVariant?.attributes?.contains_soy && (
+                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Soy</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Variant Attributes */}
+                  {selectedVariant?.attributes && Object.entries(selectedVariant.attributes)
+                    .filter(([key]) => !['dietary', 'allergens', 'contains_nuts', 'contains_dairy', 'contains_soy', 'weight', 'dimensions'].includes(key))
+                    .map(([key, value]) => (
+                      <div key={key} className="flex justify-between py-2 border-b border-gray-100">
+                        <span className="text-sm font-medium text-main capitalize">{key.replace('_', ' ')}:</span>
+                        <span className="text-sm text-copy-light">{String(value)}</span>
+                      </div>
+                  ))}
+
+                  {/* Variant Specifications */}
+                  {selectedVariant?.specifications && Object.entries(selectedVariant.specifications).map(([key, value]) => (
+                    <div key={`spec-${key}`} className="flex justify-between py-2 border-b border-gray-100">
+                      <span className="text-sm font-medium text-main capitalize">{key.replace('_', ' ')}:</span>
+                      <span className="text-sm text-copy-light">{String(value)}</span>
                     </div>
                   ))}
+                  
+                  {/* Additional Info */}
+                  {product.tags && product.tags.length > 0 && (
+                    <div className="flex justify-between py-2 border-b border-gray-100">
+                      <span className="text-sm font-medium text-main">Tags:</span>
+                      <span className="text-sm text-copy-light">{product.tags.map((tag: any) => tag.name).join(', ')}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -900,12 +1170,12 @@ export const ProductDetails = () => {
                   </div>
                 ) : reviewsError ? (
                   <ErrorMessage
-                    error={reviewsError}
+                    message={reviewsError?.message || 'Failed to load reviews'}
                     onRetry={() => fetchReviews(() => ReviewsAPI.getProductReviews(id, reviewsPage, 10, minRating, maxRating, sortBy))}
                   />
                 ) : reviewsList.length > 0 ? (
                   <div className="space-y-6">
-                    {reviewsList.map((review) => (
+                    {reviewsList.map((review: any) => (
                       <div key={review.id} className="border-b border-gray-100 pb-6">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
@@ -995,9 +1265,8 @@ export const ProductDetails = () => {
 
             {relatedError && (
               <ErrorMessage
-                error={relatedError}
+                message={relatedError?.message || 'Failed to load related products'}
                 onRetry={() => fetchRelatedProducts(() => ProductsAPI.getRecommendedProducts(id && id !== 'search' ? id : '', 4))}
-                className="mb-6"
               />
             )}
 
@@ -1013,12 +1282,22 @@ export const ProductDetails = () => {
               ) : actualRelatedData && Array.isArray(actualRelatedData) && actualRelatedData.length > 0 ? (
                 actualRelatedData.slice(0, 4).map((relatedProduct) => {
                   if (!relatedProduct) return null;
+                  
+                  // Get the first variant for display
+                  const displayVariant = relatedProduct.variants?.[0] || null;
 
                   return (
                     <ProductCard
                       key={relatedProduct.id}
-                      product={relatedProduct}
-                      selectedVariant={relatedProduct.variants?.[0]}
+                      product={{
+                        ...relatedProduct,
+                        // Ensure backward compatibility with expected structure
+                        price: displayVariant?.base_price || relatedProduct.price || 0,
+                        discountPrice: displayVariant?.sale_price || relatedProduct.discountPrice || null,
+                        image: displayVariant?.images?.[0]?.url || relatedProduct.image || '',
+                        variants: relatedProduct.variants || []
+                      }}
+                      selectedVariant={displayVariant}
                       className=""
                     />
                   );

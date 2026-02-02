@@ -14,6 +14,7 @@ from services.admin import AdminService
 from services.orders import OrderService
 from services.shipping import ShippingService
 from services.products import ProductService
+from services.review import ReviewService
 from models.user import User
 from models.subscriptions import Subscription
 from models.product import ProductVariant
@@ -23,6 +24,7 @@ from models.payments import PaymentIntent, Transaction
 from services.auth import AuthService
 from schemas.auth import UserCreate
 from schemas.user import UserUpdate
+from schemas.product import ProductCreate
 from schemas.shipping import ShippingMethodCreate, ShippingMethodUpdate
 from core.dependencies import get_current_auth_user
 
@@ -899,6 +901,27 @@ async def get_all_products_admin(
             message="Failed to fetch products"
         )
 
+@router.post("/products")
+async def create_product_admin(
+    product_data: ProductCreate,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create a new product (admin only)."""
+    try:
+        product_service = ProductService(db)
+        product = await product_service.create_product(product_data, current_user.id)
+        logger.info(f"Admin {current_user.id} created product {product.id}")
+        return Response.success(data=product, message="Product created successfully")
+    except APIException:
+        raise
+    except Exception as e:
+        logger.exception("Failed to create product in admin route")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message="Failed to create product"
+        )
+
 @router.get("/products/{product_id}")
 async def get_product_by_id_admin(
     product_id: UUID,
@@ -908,13 +931,14 @@ async def get_product_by_id_admin(
     """Get a single product by ID with all related data (admin only)."""
     try:
         from models.product import Product, ProductVariant, ProductImage, Category
+        from models.inventories import Inventory
         from sqlalchemy import select
         from sqlalchemy.orm import selectinload
         
         # Query product with all related data
         query = select(Product).options(
             selectinload(Product.variants).selectinload(ProductVariant.images),
-            selectinload(Product.variants).selectinload(ProductVariant.inventory),
+            selectinload(Product.variants).selectinload(ProductVariant.inventory).selectinload(Inventory.location),
             selectinload(Product.category),
             selectinload(Product.supplier)
         ).where(Product.id == product_id)
@@ -939,12 +963,17 @@ async def get_product_by_id_admin(
             # Add inventory details with error handling
             if variant.inventory:
                 try:
+                    # Get warehouse location name if available
+                    warehouse_location_name = None
+                    if variant.inventory.location_id:
+                        warehouse_location_name = getattr(variant.inventory.location, 'name', None)
+                    
                     variant_data["inventory"] = {
                         "quantity_available": getattr(variant.inventory, 'quantity_available', 0),
                         "quantity": getattr(variant.inventory, 'quantity', 0),
                         "reorder_level": getattr(variant.inventory, 'reorder_level', None),
                         "reorder_quantity": getattr(variant.inventory, 'reorder_quantity', None),
-                        "warehouse_location": getattr(variant.inventory, 'warehouse_location', None),
+                        "warehouse_location": warehouse_location_name,
                         "updated_at": variant.inventory.updated_at.isoformat() if variant.inventory.updated_at else None
                     }
                 except Exception as inv_error:
@@ -2200,4 +2229,25 @@ async def delete_category(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to delete category: {str(e)}"
+        )
+
+@router.post("/recalculate-ratings")
+async def recalculate_all_product_ratings(
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Recalculate ratings for all products that have reviews"""
+    try:
+        review_service = ReviewService(db)
+        updated_count = await review_service.recalculate_all_product_ratings()
+        
+        return Response.success(
+            data={"updated_count": updated_count},
+            message=f"Successfully recalculated ratings for {updated_count} products"
+        )
+    except Exception as e:
+        logger.error(f"Error recalculating product ratings: {str(e)}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to recalculate product ratings: {str(e)}"
         )

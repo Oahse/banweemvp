@@ -817,14 +817,14 @@ class AdminService:
                 else:
                     stock_status = "in_stock"
                 
-                # Derive min/max price from variants when product.min_price/max_price are null
+                # Derive min/max price from variants
                 variant_prices = [
                     (v.sale_price if v.sale_price is not None else v.base_price)
                     for v in product.variants
                     if v.is_active
                 ] if product.variants else []
-                min_price_val = product.min_price if product.min_price is not None else (min(variant_prices) if variant_prices else 0)
-                max_price_val = product.max_price if product.max_price is not None else (max(variant_prices) if variant_prices else 0)
+                min_price_val = min(variant_prices) if variant_prices else 0
+                max_price_val = max(variant_prices) if variant_prices else 0
                 
                 # Format variants data
                 variants_data = []
@@ -860,6 +860,10 @@ class AdminService:
                     }
                     variants_data.append(variant_data)
                 
+                # Calculate total views and purchases across all variants
+                total_views = sum(variant.view_count for variant in product.variants) if product.variants else 0
+                total_purchases = sum(variant.purchase_count for variant in product.variants) if product.variants else 0
+                
                 product_data = {
                     "id": str(product.id),
                     "name": product.name,
@@ -877,8 +881,8 @@ class AdminService:
                     "min_price": float(min_price_val) if min_price_val is not None else 0,
                     "max_price": float(max_price_val) if max_price_val is not None else 0,
                     "price": float(min_price_val) if min_price_val is not None else 0,
-                    "view_count": product.view_count,
-                    "purchase_count": product.purchase_count,
+                    "view_count": total_views,
+                    "purchase_count": total_purchases,
                     "total_stock": total_stock,
                     "stock_status": stock_status,
                     "category": product.category.name if product.category else None,

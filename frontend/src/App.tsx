@@ -74,6 +74,8 @@ const AdminShipping = lazy(() => import('./pages/admin/Shipping'));
 const SupplierDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminPayments = lazy(() => import('./pages/admin/Payments'));
 const AdminRefunds = lazy(() => import('./pages/admin/Refunds'));
+const Suppliers = lazy(() => import('./pages/Suppliers'));
+const SupplierDetail = lazy(() => import('./pages/SupplierDetail'));
 
 // Loading component
 const PageLoading: React.FC = () => (
@@ -165,7 +167,9 @@ export const App: React.FC = () => {
                         <Route path="/account/*" element={<ProtectedRoute><Layout><Suspense fallback={<AccountSkeleton />}><Account /></Suspense></Layout></ProtectedRoute>} />
                         <Route path="/login" element={<Layout><Login /></Layout>} />
                         <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
-                        <Route path="/register" element={<Layout><Register /></Layout>} />
+                        <Route path="/track-order" element={<Layout><TrackOrder /></Layout>} />
+                        <Route path="/suppliers" element={<Layout><Suspense fallback={<ProductListSkeleton />}><Suppliers /></Suspense></Layout>} />
+                        <Route path="/suppliers/:id" element={<Layout><Suspense fallback={<PageSkeleton />}><SupplierDetail /></Suspense></Layout>} />
                         <Route path="/about" element={<Layout><About /></Layout>} />
                         <Route path="/contact" element={<Layout><Contact /></Layout>} />
                         <Route path="/support" element={<Layout><Support /></Layout>} />

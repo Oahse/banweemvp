@@ -24,6 +24,7 @@ export { default as ShippingAPI } from './shipping';
 export { default as WishlistAPI } from './wishlists';
 export { default as TaxAPI } from './tax';
 export { default as RefundsAPI } from './refunds';
+export { default as SuppliersAPI } from './suppliers';
 
 // Create a centralized API object for easy access
 import AuthAPI from './auth';
@@ -43,6 +44,7 @@ import ShippingAPI from './shipping';
 import WishlistAPI from './wishlists';
 import TaxAPI from './tax';
 import RefundsAPI from './refunds';
+import SuppliersAPI from './suppliers';
 import { apiClient } from './client';
 
 // Main API object - use apiClient directly for new code

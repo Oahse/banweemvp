@@ -124,8 +124,9 @@ export const Home = () => {
   }, [execute]);
 
   useEffect(() => {
-    if (homeData && homeData.data) {
-      const { categories: categoriesData, featured, popular, deals: dealsData } = homeData.data;
+    if (homeData && typeof homeData === 'object' && 'data' in homeData && homeData.data) {
+      const payload = homeData?.data?.data ?? homeData?.data ?? {};
+      const { categories: categoriesData, featured, popular, deals: dealsData } = payload as any;
 
       // Helper function to convert API categories to demo format
       const convertCategory = (category: any) => ({
@@ -409,14 +410,30 @@ export const Home = () => {
                 <ProductCard key={index} isLoading={true} product={{} as any} selectedVariant={null} className="" />
               ))
             ) : featuredProducts.length > 0 ? (
-              featuredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  selectedVariant={product.variants?.[0] || null}
-                  className=""
-                />
-              ))
+              featuredProducts.map((product) => {
+                // Get the first variant for display
+                const displayVariant = product.variants?.[0] || null;
+                const minPrice = product.price_range?.min ?? product.min_price ?? product.price ?? 0;
+                const maxPrice = product.price_range?.max ?? product.max_price ?? minPrice;
+                const productImage = displayVariant?.primary_image?.url || displayVariant?.images?.[0]?.url || product.image || '';
+                return (
+                  <ProductCard
+                    key={product.id}
+                    product={{
+                      ...product,
+                      // Ensure backward compatibility with expected structure
+                      price: displayVariant?.base_price ?? minPrice,
+                      discountPrice: displayVariant?.sale_price ?? null,
+                      min_price: minPrice,
+                      max_price: maxPrice,
+                      image: productImage,
+                      variants: product.variants || []
+                    }}
+                    selectedVariant={displayVariant}
+                    className=""
+                  />
+                );
+              })
             ) : (
               <div className="col-span-full text-center py-8 text-copy-light">
                 No featured products available
@@ -500,24 +517,35 @@ export const Home = () => {
               </div>
             ) : filteredPopularProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
-                {filteredPopularProducts.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                      duration: 0.2,
-                      delay: index * 0.05,
-                      ease: "easeOut"
-                    }}
-                  >
-                    <ProductCard
-                      product={product}
-                      selectedVariant={product.variants?.[0] || null}
-                      className=""
-                    />
-                  </motion.div>
-                ))}
+                {filteredPopularProducts.map((product, index) => {
+                  // Get the first variant for display
+                  const displayVariant = product.variants?.[0] || null;
+                  return (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{
+                        duration: 0.2,
+                        delay: index * 0.05,
+                        ease: "easeOut"
+                      }}
+                    >
+                      <ProductCard
+                        product={{
+                          ...product,
+                          // Ensure backward compatibility with expected structure
+                          price: displayVariant?.base_price || product.price || 0,
+                          discountPrice: displayVariant?.sale_price || product.discountPrice || null,
+                          image: displayVariant?.images?.[0]?.url || product.image || '',
+                          variants: product.variants || []
+                        }}
+                        selectedVariant={displayVariant}
+                        className=""
+                      />
+                    </motion.div>
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-8 text-copy-light">
@@ -557,60 +585,80 @@ export const Home = () => {
                 </div>
               ))
             ) : (
-              deals.map((product) => (
-                <div key={product.id} className="flex flex-col md:flex-row bg-background rounded-lg overflow-hidden shadow-sm">
-                  <div className="md:w-1/3">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-60 md:h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 p-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
-                        -{product.discountPercent || Math.round(((product.price - (product.discountPrice || 0)) / product.price) * 100)}%
-                      </span>
-                      <span className="text-red-500 text-sm font-medium">
-                        Ends in {product.endsIn || '2d 15h 22m'}
-                      </span>
+              deals.map((product) => {
+                // Get the first variant for display
+                const displayVariant = product.variants?.[0] || null;
+                const productImage = displayVariant?.primary_image?.url || displayVariant?.images?.[0]?.url || product.image || 'https://source.unsplash.com/400x400/?product';
+                const basePrice = displayVariant?.base_price ?? product.price_range?.max ?? product.max_price ?? product.price ?? 0;
+                const salePrice = displayVariant?.sale_price ?? null;
+                const discountPercent = salePrice && basePrice > salePrice
+                  ? Math.round(((basePrice - salePrice) / basePrice) * 100)
+                  : (product.discountPercent ?? 0);
+                
+                return (
+                  <div key={product.id} className="flex flex-col md:flex-row bg-background rounded-lg overflow-hidden shadow-sm">
+                    <div className="md:w-1/3">
+                      <img
+                        src={productImage}
+                        alt={product.name}
+                        className="w-full h-60 md:h-full object-cover"
+                      />
                     </div>
-                    <h3 className="text-lg font-semibold text-main mb-2">{product.name}</h3>
-                    <p className="text-sm text-copy-light mb-4">
-                      {typeof product.category === 'object' && product.category.name 
-                        ? product.category.name 
-                        : (typeof product.category === 'string' 
-                          ? product.category 
-                          : 'Uncategorized')}
-                    </p>
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="flex items-center">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <span
-                            key={i}
-                            className={`text-sm ${i < Math.floor(product.rating_average || product.rating || 0) ? 'text-yellow-400' : 'text-gray-300'
-                              }`}>
-                            ★
-                          </span>
-                        ))}
+                    <div className="flex-1 p-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
+                          -{discountPercent}%
+                        </span>
+                        <span className="text-red-500 text-sm font-medium">
+                          Ends in {product.endsIn || '2d 15h 22m'}
+                        </span>
                       </div>
-                      <span className="text-sm text-copy-light">({product.review_count || product.reviewCount || 0})</span>
+                      <h3 className="text-lg font-semibold text-main mb-2">{product.name}</h3>
+                      <p className="text-sm text-copy-light mb-4">
+                        {typeof product.category === 'object' && product.category.name 
+                          ? product.category.name 
+                          : (typeof product.category === 'string' 
+                            ? product.category 
+                            : 'Uncategorized')}
+                      </p>
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="flex items-center">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span
+                              key={i}
+                              className={`text-sm ${i < Math.floor(product.rating_average || product.rating || 0) ? 'text-yellow-400' : 'text-gray-300'
+                                }`}>
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                        <span className="text-sm text-copy-light">({product.review_count || product.reviewCount || 0})</span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="text-xl font-bold text-primary">
+                          {formatCurrency(
+                            displayVariant?.sale_price || 
+                            displayVariant?.base_price || 
+                            product.min_price || 
+                            0
+                          )}
+                        </span>
+                        {displayVariant?.sale_price && displayVariant.sale_price < displayVariant.base_price && (
+                          <span className="text-sm text-copy-light line-through">
+                            {formatCurrency(displayVariant.base_price)}
+                          </span>
+                        )}
+                      </div>
+                      <Link
+                        to={`/products/${product.id}`}
+                        className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
+                        View Deal
+                        <ArrowRightIcon size={14} className="ml-2" />
+                      </Link>
                     </div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="text-xl font-bold text-primary">{formatCurrency(product.variants?.[0]?.sale_price || product.variants?.[0]?.base_price || product.min_price || 0)}</span>
-                      {product.variants?.[0]?.sale_price && (
-                        <span className="text-sm text-copy-light line-through">{formatCurrency(product.variants?.[0]?.base_price || product.min_price || 0)}</span>
-                      )}
-                    </div>
-                    <Link
-                      to={`/products/${product.id}`}
-                      className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
-                      View Deal
-                      <ArrowRightIcon size={14} className="ml-2" />
-                    </Link>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

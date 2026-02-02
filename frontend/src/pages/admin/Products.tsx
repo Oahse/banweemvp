@@ -86,8 +86,18 @@ export const Products = () => {
       setRefreshKey(prev => prev + 1);
     };
 
+    const handleProductCreated = (event: Event) => {
+      // Refetch products list when a new product is created
+      setPage(1);
+      setRefreshKey(prev => prev + 1);
+    };
+
     window.addEventListener('inventory:updated', handleInventoryUpdated);
-    return () => window.removeEventListener('inventory:updated', handleInventoryUpdated);
+    window.addEventListener('product:created', handleProductCreated);
+    return () => {
+      window.removeEventListener('inventory:updated', handleInventoryUpdated);
+      window.removeEventListener('product:created', handleProductCreated);
+    };
   }, []);
 
   useEffect(() => {
@@ -121,8 +131,13 @@ export const Products = () => {
         });
         
         // Handle response format
-        const data = response?.data?.data || response?.data;
-        const allProducts = Array.isArray(data) ? data : data?.items || [];
+        console.log('API Response:', response);
+        const responseData = response?.data || {};
+        const data = responseData?.data || [];  // The products array
+        const paginationData = responseData?.pagination || { page, limit: LIMIT, total: 0, pages: 0 };
+        const allProducts = Array.isArray(data) ? data : [];
+        console.log('Parsed products:', allProducts, 'Pagination:', paginationData);
+        
         const normalizedProducts = allProducts.map((product: any) => ({
           ...product,
           stock: product.stock ?? product.total_stock ?? product.primary_variant?.stock ?? 0
@@ -182,18 +197,12 @@ export const Products = () => {
           });
         }
         
-        const total = filteredProducts.length;
-        const pages = Math.max(1, Math.ceil(total / LIMIT));
-        const startIndex = (page - 1) * LIMIT;
-        const endIndex = startIndex + LIMIT;
-        const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
-        
-        setProducts(paginatedProducts);
+        setProducts(normalizedProducts);
         setPagination({
-          page: page,
-          limit: LIMIT,
-          total: total,
-          pages: pages
+          page: paginationData.page || page,
+          limit: paginationData.limit || LIMIT,
+          total: paginationData.total || 0,
+          pages: paginationData.pages || 0
         });
         
       } catch (err: any) {

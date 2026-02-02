@@ -196,8 +196,6 @@ class ProductVariant(BaseModel):
     # Pricing as columns
     base_price = Column(Float, nullable=False)
     sale_price = Column(Float, nullable=True)
-    min_price = Column(Float, nullable=True)
-    max_price = Column(Float, nullable=True)
 
     # Barcodes as text (simple storage)
     barcode = Column(Text, nullable=True)
@@ -263,8 +261,6 @@ class ProductVariant(BaseModel):
             "name": self.name,
             "base_price": self.base_price,
             "sale_price": self.sale_price,
-            "min_price": self.min_price,
-            "max_price": self.max_price,
             "current_price": self.current_price,
             "discount_percentage": self.discount_percentage,
             "stock": self.inventory.quantity_available if self.inventory else 0,

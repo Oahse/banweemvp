@@ -211,6 +211,9 @@ class ProductService:
             
             if filters.get("max_rating") is not None:
                 base_conditions.append(Product.rating <= filters["max_rating"])
+
+            if filters.get("featured"):
+                base_conditions.append(or_(Product.is_featured.is_(True), Product.featured.is_(True)))
         
         # Build subquery for filtering by category
         if filters and filters.get("category"):
@@ -250,7 +253,12 @@ class ProductService:
                     )
             
             if filters.get("sale"):
-                price_filters.append(ProductVariant.sale_price.isnot(None))
+                price_filters.append(
+                    and_(
+                        ProductVariant.sale_price.isnot(None),
+                        ProductVariant.sale_price < ProductVariant.base_price
+                    )
+                )
             
             if price_filters:
                 # Use EXISTS with correlated subquery for better performance
@@ -336,7 +344,7 @@ class ProductService:
                     ProductVariant.images),
                 selectinload(Product.variants).selectinload(ProductVariant.inventory)
             )
-            .where(Product.featured.is_(True))  # safer than == True
+            .where(or_(Product.is_featured.is_(True), Product.featured.is_(True)))  # support new and legacy flags
             .order_by(Product.created_at.desc())
             .limit(limit)
         )
@@ -347,7 +355,7 @@ class ProductService:
         print(f"Found {len(products)} featured products in DB.")
         for p in products:
             print(
-                f"  - {p.name} (Featured: {p.featured}, Variants: {len(p.variants)})")
+                f"  - {p.name} (Featured: {p.is_featured or p.featured}, Variants: {len(p.variants)})")
 
         if not products:
             print(
@@ -758,10 +766,14 @@ class ProductService:
         db_product = Product(
             id=uuid7(),
             name=product_data.name,
+            slug=product_data.slug,
             description=product_data.description,
+            short_description=product_data.short_description,
             category_id=product_data.category_id,
             supplier_id=supplier_id,
-            origin=product_data.origin
+            origin=product_data.origin,
+            is_featured=product_data.is_featured,
+            is_bestseller=product_data.is_bestseller
         )
 
         self.db.add(db_product)
@@ -785,8 +797,6 @@ class ProductService:
                 qr_code=None,  # Will be set after generation
                 base_price=variant_data.base_price,
                 sale_price=variant_data.sale_price,
-                min_price=variant_data.min_price,
-                max_price=variant_data.max_price,
                 attributes=variant_data.attributes or {},
                 specifications=variant_data.specifications,
                 dietary_tags=variant_data.dietary_tags or [],
@@ -820,29 +830,27 @@ class ProductService:
             # ALWAYS create inventory record for the variant (even if stock is 0)
             from models.inventories import Inventory, WarehouseLocation
             
-            # Get or create default warehouse location
-            default_location_result = await self.db.execute(
-                select(WarehouseLocation).where(WarehouseLocation.name == "Main Warehouse")
-            )
-            default_location = default_location_result.scalar_one_or_none()
-            
-            if not default_location:
-                # Try "Default" as fallback
+            # Get warehouse location from variant data if provided, otherwise use default
+            warehouse_location_id = None
+            if hasattr(variant_data, 'warehouse_location_id') and variant_data.warehouse_location_id:
+                # Use the warehouse location provided in variant data
+                warehouse_location_id = variant_data.warehouse_location_id
+            else:
+                # Try to find an existing warehouse location
                 default_location_result = await self.db.execute(
-                    select(WarehouseLocation).where(WarehouseLocation.name == "Default")
+                    select(WarehouseLocation).where(WarehouseLocation.name == "Main Warehouse")
                 )
                 default_location = default_location_result.scalar_one_or_none()
-            
-            if not default_location:
-                # Create default warehouse if it doesn't exist
-                default_location = WarehouseLocation(
-                    id=uuid7(),
-                    name="Default",
-                    address="Default Location",
-                    description="Default warehouse location for inventory"
-                )
-                self.db.add(default_location)
-                await self.db.flush()
+                
+                if not default_location:
+                    # Try "Default" as fallback
+                    default_location_result = await self.db.execute(
+                        select(WarehouseLocation).where(WarehouseLocation.name == "Default")
+                    )
+                    default_location = default_location_result.scalar_one_or_none()
+                
+                if default_location:
+                    warehouse_location_id = default_location.id
             
             # Get stock quantity from variant_data, default to 0 if not provided
             stock_quantity = getattr(variant_data, 'stock', 0) if hasattr(variant_data, 'stock') else 0
@@ -851,9 +859,9 @@ class ProductService:
             inventory = Inventory(
                 id=uuid7(),
                 variant_id=db_variant.id,
-                location_id=default_location.id,
+                location_id=warehouse_location_id,
                 quantity_available=stock_quantity,
-                quantity=stock_quantity,  # Legacy field for backward compatibility
+                quantity=stock_quantity, # Legacy field for backward compatibility
                 low_stock_threshold=10,
                 reorder_point=5,
                 inventory_status="active"

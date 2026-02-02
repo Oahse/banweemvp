@@ -24,8 +24,6 @@ class ProductVariantCreate(BaseModel):
     name: str
     base_price: float
     sale_price: Optional[float] = None
-    min_price: Optional[float] = None
-    max_price: Optional[float] = None
     stock: int = 0
     attributes: Optional[Dict[str, Any]] = {}
     specifications: Optional[Dict[str, Any]] = None
@@ -37,10 +35,14 @@ class ProductVariantCreate(BaseModel):
 
 class ProductCreate(BaseModel):
     name: str
+    slug: str
     description: Optional[str] = None
+    short_description: Optional[str] = None
     category_id: UUID
     variants: List[ProductVariantCreate]
     origin: Optional[str] = None
+    is_featured: bool = False
+    is_bestseller: bool = False
 
 
 class ProductUpdate(BaseModel):
@@ -90,8 +92,6 @@ class ProductVariantResponse(BaseModel):
     name: str
     base_price: float
     sale_price: Optional[float]
-    min_price: Optional[float] = None
-    max_price: Optional[float] = None
     current_price: float
     discount_percentage: float
     stock: int
