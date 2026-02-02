@@ -65,12 +65,27 @@ async def create_review(
 ):
     """Create a new review for a product."""
     try:
+        print(f"\n=== CREATE REVIEW START ===")
+        print(f"User ID: {current_user.id}")
+        print(f"Product ID: {review_data.product_id}")
+        print(f"Rating: {review_data.rating}")
+        
         review_service = ReviewService(db)
         review = await review_service.create_review(review_data, current_user.id)
+        
+        print(f"Review created: {review}")
+        print(f"=== CREATE REVIEW SUCCESS ===\n")
         return Response.success(data=review, message="Review created successfully")
-    except APIException:
+    except APIException as e:
+        print(f"APIException in create_review: {e.message}")
         raise
     except Exception as e:
+        print(f"\n=== CREATE REVIEW ERROR ===")
+        print(f"Exception type: {type(e).__name__}")
+        print(f"Exception message: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        print(f"=== END ERROR ===\n")
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to create review: {str(e)}"

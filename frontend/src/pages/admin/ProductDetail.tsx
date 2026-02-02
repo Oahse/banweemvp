@@ -307,14 +307,6 @@ export const AdminProductDetail = () => {
             
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-copy-light text-xs">Min Price:</span>
-                <span className="font-medium text-xs">${product.min_price?.toFixed(2) || '0.00'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-copy-light text-xs">Max Price:</span>
-                <span className="font-medium text-xs">${product.max_price?.toFixed(2) || '0.00'}</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-copy-light text-xs">Price Range:</span>
                 <span className="font-medium text-xs">
                   ${product.price_range?.min?.toFixed(2) || '0.00'} - 

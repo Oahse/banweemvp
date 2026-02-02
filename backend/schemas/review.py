@@ -6,8 +6,8 @@ from uuid import UUID
 
 class ReviewUser(BaseModel):
     id: UUID
-    firstname: str
-    lastname: str
+    firstname: Optional[str] = None
+    lastname: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -17,14 +17,14 @@ class ReviewResponse(BaseModel):
     rating: int
     comment: Optional[str]
     created_at: datetime
-    user: ReviewUser
+    user: Optional[ReviewUser] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class ReviewBase(BaseModel):
-    product_id: str
-    user_id: Optional[str] = None  # Will be set by the backend
+    product_id: UUID
+    user_id: Optional[UUID] = None  # Will be set by the backend
     # based on current user
     rating: int = Field(..., ge=1, le=5)
     comment: Optional[str] = Field(None, max_length=1000)
