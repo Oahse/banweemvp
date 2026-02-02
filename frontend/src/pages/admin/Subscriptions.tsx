@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Loader, AlertCircle, Eye, ChevronLeft, ChevronRight, Calendar, DollarSign, User, Package, SearchIcon, DownloadIcon } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, ChevronLeft, ChevronRight, Calendar, DollarSign, User, Package, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon } from 'lucide-react';
 import { Dropdown } from '../../components/ui/Dropdown';
 import AdminAPI from '../../api/admin';
 import toast from 'react-hot-toast';
@@ -54,8 +54,10 @@ interface Subscription {
 }
 
 export const AdminSubscriptions = () => {
+  const { currentTheme } = useTheme();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationInfo>({ 
@@ -64,25 +66,55 @@ export const AdminSubscriptions = () => {
     total: 0, 
     pages: 0 
   });
-  const [filters, setFilters] = useState({
-    status: '',
-    search: '',
-    date_from: '',
-    date_to: ''
-  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset to page 1 when filters change
+  const resetPage = useCallback(() => {
+    setPage(1);
+  }, []);
+
+  useEffect(() => {
+    resetPage();
+  }, [debouncedSearchQuery, statusFilter, sortBy, sortOrder, resetPage]);
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
-        setLoading(true);
+        if (page === 1 && !searchQuery && !statusFilter) {
+          setInitialLoading(true);
+        } else {
+          setLoading(true);
+        }
         setError(null);
+        console.log('Fetching subscriptions with params:', {
+          page,
+          limit: LIMIT,
+          search: debouncedSearchQuery || undefined,
+          status: statusFilter || undefined,
+          sort_by: sortBy,
+          sort_order: sortOrder
+        });
+        
         const response = await AdminAPI.getSubscriptions({
           page,
           limit: LIMIT,
-          status: filters.status || undefined,
-          search: filters.search || undefined,
-          date_from: filters.date_from || undefined,
-          date_to: filters.date_to || undefined
+          status: statusFilter || undefined,
+          search: debouncedSearchQuery || undefined,
+          sort_by: sortBy,
+          sort_order: sortOrder
         });
         
         if (response?.success && response?.data) {
@@ -105,16 +137,12 @@ export const AdminSubscriptions = () => {
         toast.error(message);
       } finally {
         setLoading(false);
+        setInitialLoading(false);
       }
     };
 
     fetchSubscriptions();
-  }, [page, filters]);
-
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPage(1); // Reset to first page when filters change
-  };
+  }, [page, debouncedSearchQuery, statusFilter, sortBy, sortOrder]);
 
   const formatCurrency = (amount: number, currency: string = 'USD') => {
     return new Intl.NumberFormat('en-US', {

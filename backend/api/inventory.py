@@ -224,18 +224,23 @@ async def get_all_inventory_items(
     location_id: Optional[UUID] = Query(None),
     low_stock: Optional[bool] = Query(None),
     search: Optional[str] = Query(None),
+    sort_by: Optional[str] = Query(None, regex="^(updated_at|created_at|product_name|quantity|location_name)$"),
+    sort_order: Optional[str] = Query(None, regex="^(asc|desc)$"),
     current_user: User = Depends(require_admin_or_supplier),
     inventory_service: InventoryService = Depends(get_inventory_service)
 ):
     """Get all inventory items with filters (Admin/Supplier access)."""
     try:
+        logger.info(f"API endpoint received params: page={page}, limit={limit}, sort_by={sort_by}, sort_order={sort_order}, low_stock={low_stock}, search={search}")
         items = await inventory_service.get_all_inventory_items(
             page=page,
             limit=limit,
             product_id=product_id,
             location_id=location_id,
             low_stock=low_stock,
-            search=search
+            search=search,
+            sort_by=sort_by,
+            sort_order=sort_order
         )
         return Response.success(data=items)
     except APIException:

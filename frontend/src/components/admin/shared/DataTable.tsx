@@ -209,7 +209,18 @@ export const AdminDataTable = <T extends Record<string, any>>({
   const renderCell = (column: Column<T>, row: T) => {
     const value = row[column.key];
     if (column.render) {
-      return column.render(value, row);
+      try {
+        const result = column.render(value, row);
+        // Additional safety check for custom render functions
+        if (typeof result === 'object' && result !== null && !React.isValidElement(result)) {
+          console.warn(`Column "${column.key}" render function returned an object:`, result);
+          return '[Invalid Render]';
+        }
+        return result;
+      } catch (error) {
+        console.error(`Error rendering column "${column.key}":`, error);
+        return '[Render Error]';
+      }
     }
     // Prevent rendering objects directly - React doesn't allow this
     if (value === null || value === undefined) {
@@ -220,20 +231,38 @@ export const AdminDataTable = <T extends Record<string, any>>({
       if (Array.isArray(value)) {
         return value.length > 0 ? value.join(', ') : '-';
       }
-      // If it's an object with full_name or name, show that
-      if ('full_name' in value) {
-        return (value as any).full_name;
+      // If it's an object with full_name, show that
+      if ('full_name' in value && value.full_name) {
+        return String(value.full_name);
       }
-      if ('name' in value) {
-        return (value as any).name;
+      // If it's an object with name, show that
+      if ('name' in value && value.name) {
+        return String(value.name);
       }
-      if ('email' in value) {
-        return (value as any).email;
+      // If it's an object with email, show that
+      if ('email' in value && value.email) {
+        return String(value.email);
       }
-      // Otherwise show [Object]
-      return '[Object]';
+      // If it's an object with description, show that
+      if ('description' in value && value.description) {
+        return String(value.description);
+      }
+      // If it's an object with id, show that as fallback
+      if ('id' in value && value.id) {
+        return String(value.id);
+      }
+      // Log the problematic object for debugging
+      console.warn(`Object value found in column "${column.key}":`, value);
+      // Otherwise convert to string safely or show placeholder
+      try {
+        const str = String(value);
+        return str === '[object Object]' ? '[Object]' : str;
+      } catch {
+        return '[Object]';
+      }
     }
-    return value;
+    // Ensure we always return a string or number
+    return typeof value === 'string' || typeof value === 'number' ? value : String(value);
   };
 
   // Get row class name
@@ -248,58 +277,67 @@ export const AdminDataTable = <T extends Record<string, any>>({
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
       {/* Header with search and filters */}
       {(searchable || filterable || actions || exportable) && (
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            {/* Search and Filters */}
-            <div className="flex-1 flex flex-col sm:flex-row gap-3">
+        <div className="p-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="flex flex-col gap-3">
+            {/* Search and Filters Row */}
+            <div className="flex flex-col lg:flex-row gap-3">
+              {/* Search */}
               {searchable && (
-                <div className="relative flex-1 max-w-md">
-                  <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                <div className="relative flex-1 lg:max-w-md">
+                  <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                   <input
                     type="text"
                     placeholder={searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 font-medium"
                   />
                 </div>
               )}
               
-              {filterable && filters.map((filter) => (
-                <div key={filter.key} className="min-w-[150px]">
-                  {filter.type === 'select' ? (
-                    <Dropdown
-                      options={filter.options || []}
-                      value={activeFilters[filter.key] || ''}
-                      onChange={(value) => handleFilterChange(filter.key, value)}
-                      placeholder={filter.placeholder || 'Select...'}
-                      className="w-full"
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      placeholder={filter.placeholder || `Filter by ${filter.label}`}
-                      value={activeFilters[filter.key] || ''}
-                      onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                    />
-                  )}
+              {/* Filters */}
+              {filterable && (
+                <div className="flex flex-wrap gap-2">
+                  {filters.map((filter) => (
+                    <div key={filter.key} className="min-w-[140px]">
+                      {filter.type === 'select' ? (
+                        <Dropdown
+                          options={filter.options || []}
+                          value={activeFilters[filter.key] || ''}
+                          onChange={(value) => handleFilterChange(filter.key, value)}
+                          placeholder={filter.placeholder || 'Select...'}
+                          className="w-full"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          placeholder={filter.placeholder || `Filter by ${filter.label}`}
+                          value={activeFilters[filter.key] || ''}
+                          onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+                          className="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 font-medium"
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
             
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              {actions}
-              {exportable && (
-                <button
-                  onClick={handleExport}
-                  className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-md transition-colors"
-                >
-                  <DownloadIcon className="h-4 w-4" />
-                  <span className="hidden sm:inline">Export</span>
-                </button>
-              )}
+            {/* Actions Row */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex-1"></div>
+              <div className="flex items-center gap-2">
+                {actions}
+                {exportable && (
+                  <button
+                    onClick={handleExport}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
+                  >
+                    <DownloadIcon className="h-4 w-4" />
+                    <span className="hidden sm:inline">Export</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -307,17 +345,17 @@ export const AdminDataTable = <T extends Record<string, any>>({
 
       {/* Loading State */}
       {loading && (
-        <div className="flex items-center justify-center py-12">
-          <Loader className="h-6 w-6 animate-spin text-green-600 dark:text-green-400 mr-2" />
-          <span className="text-gray-600 dark:text-gray-400">Loading...</span>
+        <div className="flex items-center justify-center py-6">
+          <Loader className="h-5 w-5 animate-spin text-green-600 dark:text-green-400 mr-2" />
+          <span className="text-xs text-gray-600 dark:text-gray-400">Loading...</span>
         </div>
       )}
 
       {/* Error State */}
       {error && (
-        <div className="flex items-center justify-center py-12">
-          <AlertCircle className="h-6 w-6 text-red-500 dark:text-red-400 mr-2" />
-          <span className="text-red-600 dark:text-red-400">{error}</span>
+        <div className="flex items-center justify-center py-6">
+          <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 mr-2" />
+          <span className="text-xs text-red-600 dark:text-red-400">{error}</span>
         </div>
       )}
 
@@ -325,51 +363,45 @@ export const AdminDataTable = <T extends Record<string, any>>({
       {!loading && !error && (
         <>
           {data.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-gray-400 dark:text-gray-500 mb-2">
-                <FilterIcon className="h-12 w-12 mx-auto" />
+            <div className="text-center py-6">
+              <div className="text-gray-400 dark:text-gray-500 mb-1">
+                <FilterIcon className="h-8 w-8 mx-auto" />
               </div>
-              <p className="text-gray-500 dark:text-gray-400">{emptyMessage}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{emptyMessage}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className={`w-full ${tableClassName}`}>
                 {/* Table Header */}
-                <thead className={`bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 ${headerClassName}`}>
+                <thead className={`bg-gray-100 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-600 ${headerClassName}`}>
                   <tr>
                     {selectable && (
-                      <th className="px-4 py-3 text-left">
+                      <th className="px-3 py-3 text-left">
                         <input
                           type="checkbox"
                           checked={selectedRows.size === data.length}
                           onChange={handleSelectAll}
-                          className="rounded border-gray-300 dark:border-gray-600 text-green-600 dark:text-green-400 focus:ring-green-500 focus:ring-green-400"
+                          className="rounded border-gray-300 dark:border-gray-600 text-green-600 dark:text-green-400 focus:ring-green-500 focus:ring-green-400 text-sm"
                         />
                       </th>
                     )}
                     {columns.map((column) => (
                       <th
                         key={String(column.key)}
-                        className={`px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${
+                        className={`px-3 py-3 text-left text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider ${
                           column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : ''
-                        } ${column.sortable && sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800' : ''}`}
+                        } ${column.sortable && sortable ? 'cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800' : ''}`}
                         style={{ width: column.width }}
                         onClick={() => column.sortable && sortable && handleSort(String(column.key))}
                       >
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-2">
                           {column.label}
                           {column.sortable && sortable && (
-                            <ArrowUpDownIcon className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+                            <ArrowUpDownIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                           )}
                         </div>
                       </th>
                     ))}
-                    {(onView || onEdit || onDelete) && (
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        <span className="hidden sm:inline">Actions</span>
-                        <span className="sm:hidden">•••</span>
-                      </th>
-                    )}
                   </tr>
                 </thead>
 
@@ -382,7 +414,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                       onClick={() => onRowClick && onRowClick(row)}
                     >
                       {selectable && (
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-2">
                           <input
                             type="checkbox"
                             checked={selectedRows.has(row.id)}
@@ -394,7 +426,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                       {columns.map((column) => (
                         <td
                           key={String(column.key)}
-                          className={`px-4 py-3 text-sm text-gray-900 dark:text-gray-100 ${
+                          className={`px-3 py-2 text-xs text-gray-900 dark:text-gray-100 ${
                             column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : ''
                           }`}
                         >
@@ -402,7 +434,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                         </td>
                       ))}
                       {(onView || onEdit || onDelete) && (
-                        <td className="px-4 py-3 text-right text-sm font-medium">
+                        <td className="px-3 py-2 text-right text-xs font-medium">
                           <div className="flex items-center justify-end gap-2">
                             {onView && (
                               <button
@@ -452,9 +484,9 @@ export const AdminDataTable = <T extends Record<string, any>>({
 
           {/* Pagination - Always show if paginated is true */}
           {paginated && (
-            <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="text-xs text-gray-700 dark:text-gray-300">
                   <span className="block sm:hidden">
                     Page {pagination.page} of {pagination.pages || 1}
                   </span>
@@ -464,25 +496,25 @@ export const AdminDataTable = <T extends Record<string, any>>({
                     {pagination.total} results
                   </span>
                 </div>
-                <div className="flex items-center justify-center sm:justify-end gap-2">
+                <div className="flex items-center justify-center sm:justify-end gap-1">
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page <= 1}
-                    className="p-2 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
+                    className="p-1.5 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
                   >
-                    <ChevronLeft className="h-4 w-4" />
+                    <ChevronLeft className="h-3 w-3" />
                   </button>
                   
-                  <span className="text-sm text-gray-700 dark:text-gray-300 hidden sm:block min-w-[100px] text-center">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 hidden sm:block min-w-[80px] text-center">
                     Page {pagination.page} of {pagination.pages || 1}
                   </span>
                   
                   <button
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page >= (pagination.pages || 1)}
-                    className="p-2 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
+                    className="p-1.5 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
                   >
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronRight className="h-3 w-3" />
                   </button>
                 </div>
               </div>

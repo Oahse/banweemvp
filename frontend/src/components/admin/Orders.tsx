@@ -188,28 +188,7 @@ export const Orders = () => {
   };
 
   return (
-    <PageLayout
-      title="Orders"
-      subtitle="Manage customer orders"
-      description="View, process, and manage all customer orders"
-      icon={ShoppingCartIcon}
-      actions={
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => navigate('/admin/analytics')}
-            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-          >
-            <TrendingUpIcon className="h-4 w-4" />
-            Analytics
-          </button>
-        </div>
-      }
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Admin' },
-        { label: 'Orders' }
-      ]}
-    >
+    <PageLayout>
       <div className="space-y-6">
         {/* Filters */}
         <FilterBar

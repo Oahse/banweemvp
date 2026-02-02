@@ -194,8 +194,9 @@ class InventoryService:
         ))
         return result.scalars().unique().first()
 
-    async def get_all_inventory_items(self, page: int = 1, limit: int = 10, product_id: Optional[UUID] = None, location_id: Optional[UUID] = None, low_stock: Optional[bool] = None, search: Optional[str] = None) -> dict:
+    async def get_all_inventory_items(self, page: int = 1, limit: int = 10, product_id: Optional[UUID] = None, location_id: Optional[UUID] = None, low_stock: Optional[bool] = None, search: Optional[str] = None, sort_by: Optional[str] = None, sort_order: Optional[str] = None) -> dict:
         try:
+            logger.info(f"get_all_inventory_items called with params: page={page}, limit={limit}, sort_by={sort_by}, sort_order={sort_order}, low_stock={low_stock}, search={search}")
             offset = (page - 1) * limit
             
             # Build query with proper eager loading
@@ -231,7 +232,47 @@ class InventoryService:
                 query = query.filter(and_(*conditions))
                 count_query = count_query.filter(and_(*conditions))
 
-            query = query.order_by(Inventory.updated_at.desc()).offset(offset).limit(limit)
+            # Build dynamic sorting - simplified approach with defaults
+            sort_field = sort_by or "updated_at"
+            sort_dir = sort_order or "desc"
+            
+            logger.info(f"Applying sorting: sort_field={sort_field}, sort_dir={sort_dir}")
+            
+            if sort_field == "created_at":
+                if sort_dir == "asc":
+                    query = query.order_by(Inventory.created_at.asc())
+                else:
+                    query = query.order_by(Inventory.created_at.desc())
+            elif sort_field == "product_name":
+                # Add explicit join for product name sorting
+                query = query.join(ProductVariant, Inventory.variant_id == ProductVariant.id)
+                query = query.join(Product, ProductVariant.product_id == Product.id)
+                if sort_dir == "asc":
+                    query = query.order_by(Product.name.asc())
+                else:
+                    query = query.order_by(Product.name.desc())
+            elif sort_field == "quantity":
+                if sort_dir == "asc":
+                    query = query.order_by(Inventory.quantity_available.asc())
+                else:
+                    query = query.order_by(Inventory.quantity_available.desc())
+            elif sort_field == "location_name":
+                # Add explicit join for location name sorting
+                query = query.join(WarehouseLocation, Inventory.location_id == WarehouseLocation.id)
+                if sort_dir == "asc":
+                    query = query.order_by(WarehouseLocation.name.asc())
+                else:
+                    query = query.order_by(WarehouseLocation.name.desc())
+            else:  # default to updated_at
+                if sort_dir == "asc":
+                    query = query.order_by(Inventory.updated_at.asc())
+                else:
+                    query = query.order_by(Inventory.updated_at.desc())
+
+            query = query.offset(offset).limit(limit)
+
+            # Log the final query for debugging
+            logger.info(f"Final SQL query: {str(query)}")
 
             # Execute queries
             total = await self.db.scalar(count_query) or 0

@@ -99,18 +99,30 @@ export const Products = () => {
     {
       key: 'category',
       label: 'Category',
-      render: (value: string) => (
-        <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-          {value}
-        </span>
-      )
+      render: (value: any) => {
+        // Handle both string and object values
+        const displayValue = typeof value === 'object' && value !== null ? 
+          (value.name || value.id || 'Unknown') : 
+          value;
+        return (
+          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+            {displayValue}
+          </span>
+        );
+      }
     },
     {
       key: 'supplier',
       label: 'Supplier',
-      render: (value: string) => (
-        <span className="text-sm text-gray-900">{value}</span>
-      )
+      render: (value: any) => {
+        // Handle both string and object values
+        const displayValue = typeof value === 'object' && value !== null ? 
+          (value.full_name || value.name || value.email || value.id || 'Unknown') : 
+          value;
+        return (
+          <span className="text-sm text-gray-900">{displayValue}</span>
+        );
+      }
     },
     {
       key: 'price',
@@ -247,26 +259,7 @@ export const Products = () => {
   };
 
   return (
-    <PageLayout
-      title="Products"
-      subtitle="Manage your product inventory"
-      description="View, edit, and manage all products in your store"
-      icon={PackageIcon}
-      actions={
-        <button
-          onClick={handleAddProduct}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          <PlusIcon className="h-4 w-4" />
-          Add Product
-        </button>
-      }
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Admin' },
-        { label: 'Products' }
-      ]}
-    >
+    <PageLayout>
       <div className="space-y-6">
         {/* Filters */}
         <FilterBar

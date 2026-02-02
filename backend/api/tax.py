@@ -89,12 +89,14 @@ async def calculate_tax(
 # ============================================================================
 
 
-@router.get("/admin/tax-rates", response_model=List[TaxRateResponse])
+@router.get("/admin/tax-rates")
 async def list_tax_rates(
     country_code: Optional[str] = Query(None, description="Filter by country code"),
     province_code: Optional[str] = Query(None, description="Filter by province code"),
     is_active: Optional[bool] = Query(None, description="Filter by active status"),
     search: Optional[str] = Query(None, description="Search in country/province names"),
+    sort_by: Optional[str] = Query(None, regex="^(created_at|country_name|tax_rate|tax_name)$"),
+    sort_order: Optional[str] = Query(None, regex="^(asc|desc)$"),
     page: int = Query(1, ge=1),
     per_page: int = Query(50, ge=1, le=100),
     db: AsyncSession = Depends(get_db)
@@ -103,6 +105,7 @@ async def list_tax_rates(
     try:
         # Build query
         query = select(TaxRate)
+        count_query = select(func.count(TaxRate.id))
         
         # Apply filters
         conditions = []
@@ -124,17 +127,46 @@ async def list_tax_rates(
         
         if conditions:
             query = query.where(and_(*conditions))
+            count_query = count_query.where(and_(*conditions))
         
-        # Add ordering
-        query = query.order_by(TaxRate.country_name, TaxRate.province_name)
+        # Add dynamic sorting
+        sort_field = sort_by or "created_at"
+        sort_dir = sort_order or "desc"
+        
+        if sort_field == "created_at":
+            if sort_dir == "asc":
+                query = query.order_by(TaxRate.created_at.asc())
+            else:
+                query = query.order_by(TaxRate.created_at.desc())
+        elif sort_field == "country_name":
+            if sort_dir == "asc":
+                query = query.order_by(TaxRate.country_name.asc())
+            else:
+                query = query.order_by(TaxRate.country_name.desc())
+        elif sort_field == "tax_rate":
+            if sort_dir == "asc":
+                query = query.order_by(TaxRate.tax_rate.asc())
+            else:
+                query = query.order_by(TaxRate.tax_rate.desc())
+        elif sort_field == "tax_name":
+            if sort_dir == "asc":
+                query = query.order_by(TaxRate.tax_name.asc().nulls_last())
+            else:
+                query = query.order_by(TaxRate.tax_name.desc().nulls_last())
+        else:
+            # Default sorting
+            query = query.order_by(TaxRate.country_name, TaxRate.province_name)
         
         # Apply pagination
         offset = (page - 1) * per_page
         query = query.offset(offset).limit(per_page)
         
-        # Execute query
+        # Execute queries
         result = await db.execute(query)
         tax_rates = result.scalars().all()
+        
+        total = await db.scalar(count_query) or 0
+        pages = (total + per_page - 1) // per_page
         
         # Convert to response format
         response_data = []
@@ -153,7 +185,15 @@ async def list_tax_rates(
                 updated_at=rate.updated_at.isoformat() if rate.updated_at else None
             ))
         
-        return response_data
+        return Response.success(data={
+            "data": response_data,
+            "pagination": {
+                "page": page,
+                "limit": per_page,
+                "total": total,
+                "pages": pages
+            }
+        })
         
     except Exception as e:
         raise HTTPException(

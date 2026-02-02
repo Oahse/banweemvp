@@ -217,26 +217,7 @@ export const Users = () => {
   };
 
   return (
-    <PageLayout
-      title="Users"
-      subtitle="Manage user accounts"
-      description="View, edit, and manage all user accounts in the system"
-      icon={UsersIcon}
-      actions={
-        <button
-          onClick={handleAddUser}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          <PlusIcon className="h-4 w-4" />
-          Add User
-        </button>
-      }
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Admin' },
-        { label: 'Users' }
-      ]}
-    >
+    <PageLayout>
       <div className="space-y-6">
         {/* Filters */}
         <FilterBar
