@@ -236,7 +236,7 @@ const CreateProduct: React.FC = () => {
                   type="text"
                   value={formData.name}
                   onChange={(e) => updateField('name', e.target.value)}
-                  className={`w-full px-2 py-1.5 rounded-lg border ${
+                  className={`w-full px-2 py-1 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -254,7 +254,7 @@ const CreateProduct: React.FC = () => {
                   type="text"
                   value={formData.slug}
                   onChange={(e) => updateField('slug', e.target.value)}
-                  className={`w-full px-2 py-1.5 rounded-lg border ${
+                  className={`w-full px-2 py-1 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -285,7 +285,7 @@ const CreateProduct: React.FC = () => {
                   type="text"
                   value={formData.origin}
                   onChange={(e) => updateField('origin', e.target.value)}
-                  className={`w-full px-2 py-1.5 rounded-lg border ${
+                  className={`w-full px-2 py-1 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -302,7 +302,7 @@ const CreateProduct: React.FC = () => {
                   type="text"
                   value={formData.short_description}
                   onChange={(e) => updateField('short_description', e.target.value)}
-                  className={`w-full px-2 py-1.5 rounded-lg border ${
+                  className={`w-full px-2 py-1 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -319,7 +319,7 @@ const CreateProduct: React.FC = () => {
                   value={formData.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
-                  className={`w-full px-2 py-1.5 rounded-lg border ${
+                  className={`w-full px-2 py-1 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -384,7 +384,7 @@ const CreateProduct: React.FC = () => {
               <button
                 type="button"
                 onClick={addVariant}
-                className="flex items-center gap-2 px-2 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+                className="flex items-center gap-2 px-2 py-1 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
               >
                 <Plus className="w-4 h-4" />
                 Add Variant
@@ -426,7 +426,7 @@ const CreateProduct: React.FC = () => {
                         type="text"
                         value={variant.name}
                         onChange={(e) => updateVariant(index, 'name', e.target.value)}
-                        className={`w-full px-2 py-1.5 rounded-lg border ${
+                        className={`w-full px-2 py-1 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -444,7 +444,7 @@ const CreateProduct: React.FC = () => {
                         type="text"
                         value={variant.sku}
                         onChange={(e) => updateVariant(index, 'sku', e.target.value)}
-                        className={`w-full px-2 py-1.5 rounded-lg border ${
+                        className={`w-full px-2 py-1 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -461,7 +461,7 @@ const CreateProduct: React.FC = () => {
                         type="number"
                         value={variant.stock}
                         onChange={(e) => updateVariant(index, 'stock', parseInt(e.target.value) || 0)}
-                        className={`w-full px-2 py-1.5 rounded-lg border ${
+                        className={`w-full px-2 py-1 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -480,7 +480,7 @@ const CreateProduct: React.FC = () => {
                         step="0.01"
                         value={variant.base_price}
                         onChange={(e) => updateVariant(index, 'base_price', parseFloat(e.target.value) || 0)}
-                        className={`w-full px-2 py-1.5 rounded-lg border ${
+                        className={`w-full px-2 py-1 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -500,7 +500,7 @@ const CreateProduct: React.FC = () => {
                         step="0.01"
                         value={variant.sale_price || ''}
                         onChange={(e) => updateVariant(index, 'sale_price', e.target.value ? parseFloat(e.target.value) : undefined)}
-                        className={`w-full px-2 py-1.5 rounded-lg border ${
+                        className={`w-full px-2 py-1 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -519,7 +519,7 @@ const CreateProduct: React.FC = () => {
                         step="0.01"
                         value={variant.min_price || ''}
                         onChange={(e) => updateVariant(index, 'min_price', e.target.value ? parseFloat(e.target.value) : undefined)}
-                        className={`w-full px-2 py-1.5 rounded-lg border ${
+                        className={`w-full px-2 py-1 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -538,7 +538,7 @@ const CreateProduct: React.FC = () => {
                         step="0.01"
                         value={variant.max_price || ''}
                         onChange={(e) => updateVariant(index, 'max_price', e.target.value ? parseFloat(e.target.value) : undefined)}
-                        className={`w-full px-2 py-1.5 rounded-lg border ${
+                        className={`w-full px-2 py-1 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -580,7 +580,7 @@ const CreateProduct: React.FC = () => {
                         const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
                         updateVariant(index, 'dietary_tags', selectedOptions);
                       }}
-                      className={`w-full px-2 py-1.5 rounded-lg border min-h-[120px] ${
+                      className={`w-full px-2 py-1 rounded-lg border min-h-[120px] ${
                         currentTheme === 'dark'
                           ? 'bg-gray-700 border-gray-600 text-white'
                           : 'bg-white border-gray-300 text-gray-900'
@@ -625,7 +625,7 @@ const CreateProduct: React.FC = () => {
                       type="text"
                       value={variant.tags || ''}
                       onChange={(e) => updateVariant(index, 'tags', e.target.value)}
-                      className={`w-full px-2 py-1.5 rounded-lg border ${
+                      className={`w-full px-2 py-1 rounded-lg border ${
                         currentTheme === 'dark'
                           ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -648,7 +648,7 @@ const CreateProduct: React.FC = () => {
                           newUrls[index] = e.target.value;
                           setCurrentImageUrl(newUrls);
                         }}
-                        className={`flex-1 px-2 py-1.5 rounded-lg border ${
+                        className={`flex-1 px-2 py-1 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
