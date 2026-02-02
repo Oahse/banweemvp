@@ -251,21 +251,6 @@ export const Payments = () => {
           <h1 className="text-xl lg:text-2xl font-semibold">Payments Management</h1>
           <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage payment transactions and processing</p>
         </div>
-        <div className="flex gap-2 w-full lg:w-auto">
-          <button
-            onClick={handleDownloadCSV}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-          >
-            <DownloadIcon size={18} />
-            <span className="hidden sm:inline">Download CSV</span>
-            <span className="sm:hidden">CSV</span>
-          </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium">
-            <PlusIcon size={18} />
-            <span className="hidden sm:inline">Process Payment</span>
-            <span className="sm:hidden">Process</span>
-          </button>
-        </div>
       </div>
 
       {/* Search and Filters */}
@@ -323,7 +308,7 @@ export const Payments = () => {
             
             <button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className={`inline-flex items-center gap-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
+              className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
                 currentTheme === 'dark' 
                   ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
                   : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
@@ -545,7 +530,50 @@ export const Payments = () => {
             </div>
           </>
         ) : (
-          <div className={`p-6 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No payments found</div>
+          <>
+            <div className={`p-6 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No payments found</div>
+            
+            {/* Pagination even with no data */}
+            <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+              <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                Total: 0 items
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  disabled
+                  className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors opacity-50 cursor-not-allowed ${
+                    currentTheme === 'dark' 
+                      ? 'border-gray-600 bg-gray-800 text-white' 
+                      : 'border-gray-300 bg-white text-gray-900'
+                  }`}
+                >
+                  <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
+                  <span className="hidden sm:inline">Previous</span>
+                </button>
+                
+                <div className="flex items-center gap-1 mx-1 lg:mx-2">
+                  <button
+                    disabled
+                    className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium bg-primary text-white`}
+                  >
+                    1
+                  </button>
+                </div>
+                
+                <button
+                  disabled
+                  className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors opacity-50 cursor-not-allowed ${
+                    currentTheme === 'dark' 
+                      ? 'border-gray-600 bg-gray-800 text-white' 
+                      : 'border-gray-300 bg-white text-gray-900'
+                  }`}
+                >
+                  <span className="hidden sm:inline">Next</span>
+                  <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>

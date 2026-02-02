@@ -298,16 +298,6 @@ export const Orders = () => {
           <h1 className="text-xl lg:text-2xl font-semibold">Orders Management</h1>
           <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage customer orders and fulfillment</p>
         </div>
-        <div className="flex gap-2 w-full lg:w-auto">
-          <button
-            onClick={handleDownloadCSV}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-          >
-            <DownloadIcon size={18} />
-            <span className="hidden sm:inline">Download CSV</span>
-            <span className="sm:hidden">CSV</span>
-          </button>
-        </div>
       </div>
 
       {/* Search and Filters */}
@@ -382,7 +372,7 @@ export const Orders = () => {
             
             <button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className={`inline-flex items-center gap-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
+              className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
                 currentTheme === 'dark' 
                   ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
                   : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'

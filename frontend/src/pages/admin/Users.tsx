@@ -346,7 +346,7 @@ export const Users = () => {
             
             <button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className={`inline-flex items-center gap-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
+              className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
                 currentTheme === 'dark' 
                   ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
                   : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
