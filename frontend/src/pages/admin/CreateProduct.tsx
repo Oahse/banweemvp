@@ -5,6 +5,8 @@ import { useTheme } from '../../store/ThemeContext';
 import AdminAPI from '../../api/admin';
 import { CategoriesAPI } from '../../api';
 import toast from 'react-hot-toast';
+import { DIETARY_TAGS } from '../../config/product';
+import Dropdown from '../../components/ui/Dropdown';
 
 interface Category {
   id: string;
@@ -16,8 +18,14 @@ interface ProductVariant {
   sku: string;
   base_price: number;
   sale_price?: number;
+  min_price?: number;
+  max_price?: number;
   stock: number;
   attributes: Record<string, any>;
+  dietary_tags: string[];
+  tags?: string;
+  specifications?: Record<string, any>;
+  is_active: boolean;
   image_urls: string[];
 }
 
@@ -33,24 +41,28 @@ const CreateProduct: React.FC = () => {
     short_description: '',
     category_id: '',
     origin: '',
-    dietary_tags: [] as string[],
+    is_featured: false,
+    is_bestseller: false,
     variants: [
       {
         name: 'Default',
         sku: '',
         base_price: 0,
         sale_price: undefined as number | undefined,
+        min_price: undefined as number | undefined,
+        max_price: undefined as number | undefined,
         stock: 0,
         attributes: {},
+        dietary_tags: [] as string[],
+        tags: '',
+        specifications: {},
+        is_active: true,
         image_urls: [] as string[]
       }
     ] as ProductVariant[]
   });
 
   const [currentImageUrl, setCurrentImageUrl] = useState<string[]>(['']);
-  const [selectedDietaryTags, setSelectedDietaryTags] = useState<string[]>([]);
-
-  const dietaryOptions = ['Vegan', 'Vegetarian', 'Gluten-Free', 'Dairy-Free', 'Organic', 'Non-GMO', 'Kosher', 'Halal'];
 
   useEffect(() => {
     fetchCategories();
@@ -89,8 +101,14 @@ const CreateProduct: React.FC = () => {
         sku: '',
         base_price: 0,
         sale_price: undefined,
+        min_price: undefined,
+        max_price: undefined,
         stock: 0,
         attributes: {},
+        dietary_tags: [],
+        tags: '',
+        specifications: {},
+        is_active: true,
         image_urls: []
       }]
     }));
@@ -125,11 +143,6 @@ const CreateProduct: React.FC = () => {
     );
   };
 
-  const toggleDietaryTag = (tag: string) => {
-    setSelectedDietaryTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-    );
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,26 +163,28 @@ const CreateProduct: React.FC = () => {
     try {
       setLoading(true);
 
-      const dietaryTagsObject = selectedDietaryTags.reduce((acc, tag) => {
-        acc[tag.toLowerCase().replace(/[^a-z0-9]/g, '_')] = true;
-        return acc;
-      }, {} as Record<string, boolean>);
-
       const payload = {
         name: formData.name,
         slug: formData.slug,
         description: formData.description || undefined,
         short_description: formData.short_description || undefined,
         category_id: formData.category_id,
-        dietary_tags: dietaryTagsObject,
         origin: formData.origin || undefined,
+        is_featured: formData.is_featured,
+        is_bestseller: formData.is_bestseller,
         variants: formData.variants.map(v => ({
           name: v.name,
           sku: v.sku || `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           base_price: parseFloat(String(v.base_price)),
           sale_price: v.sale_price ? parseFloat(String(v.sale_price)) : undefined,
+          min_price: v.min_price ? parseFloat(String(v.min_price)) : undefined,
+          max_price: v.max_price ? parseFloat(String(v.max_price)) : undefined,
           stock: parseInt(String(v.stock)) || 0,
           attributes: v.attributes,
+          dietary_tags: v.dietary_tags,
+          tags: v.tags || undefined,
+          specifications: v.specifications || undefined,
+          is_active: v.is_active,
           image_urls: v.image_urls
         }))
       };
@@ -221,7 +236,7 @@ const CreateProduct: React.FC = () => {
                   type="text"
                   value={formData.name}
                   onChange={(e) => updateField('name', e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border ${
+                  className={`w-full px-2 py-1.5 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -239,7 +254,7 @@ const CreateProduct: React.FC = () => {
                   type="text"
                   value={formData.slug}
                   onChange={(e) => updateField('slug', e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border ${
+                  className={`w-full px-2 py-1.5 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -252,21 +267,14 @@ const CreateProduct: React.FC = () => {
                 <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Category *
                 </label>
-                <select
+                <Dropdown
+                  options={categories.map(cat => ({ value: cat.id, label: cat.name }))}
                   value={formData.category_id}
-                  onChange={(e) => updateField('category_id', e.target.value)}
-                  className={`px-3 py-2 rounded-lg border ${
-                    currentTheme === 'dark'
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } focus:ring-2 focus:ring-primary focus:border-transparent`}
-                  required
-                >
-                  <option value="">Select a category</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
+                  onChange={(value) => updateField('category_id', value)}
+                  placeholder="Select a category"
+                  searchable
+                  className="w-full"
+                />
               </div>
 
               <div>
@@ -277,7 +285,7 @@ const CreateProduct: React.FC = () => {
                   type="text"
                   value={formData.origin}
                   onChange={(e) => updateField('origin', e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border ${
+                  className={`w-full px-2 py-1.5 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -294,7 +302,7 @@ const CreateProduct: React.FC = () => {
                   type="text"
                   value={formData.short_description}
                   onChange={(e) => updateField('short_description', e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border ${
+                  className={`w-full px-2 py-1.5 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -311,7 +319,7 @@ const CreateProduct: React.FC = () => {
                   value={formData.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
-                  className={`w-full px-3 py-2 rounded-lg border ${
+                  className={`w-full px-2 py-1.5 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -319,30 +327,50 @@ const CreateProduct: React.FC = () => {
                   placeholder="Full product description"
                 />
               </div>
-            </div>
 
-            {/* Dietary Tags */}
-            <div className="mt-4">
-              <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                Dietary Tags
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {dietaryOptions.map(tag => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => toggleDietaryTag(tag)}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                      selectedDietaryTags.includes(tag)
-                        ? 'bg-primary text-white'
-                        : currentTheme === 'dark'
-                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
+              {/* Marketing Flags */}
+              <div className="md:col-span-2">
+                <label className={`block text-sm font-medium mb-3 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Marketing Options
+                </label>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Featured Product
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => updateField('is_featured', !formData.is_featured)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                        formData.is_featured ? 'bg-primary' : 'bg-gray-200'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          formData.is_featured ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Bestseller
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => updateField('is_bestseller', !formData.is_bestseller)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                        formData.is_bestseller ? 'bg-primary' : 'bg-gray-200'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          formData.is_bestseller ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -356,7 +384,7 @@ const CreateProduct: React.FC = () => {
               <button
                 type="button"
                 onClick={addVariant}
-                className="flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+                className="flex items-center gap-2 px-2 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
               >
                 <Plus className="w-4 h-4" />
                 Add Variant
@@ -398,7 +426,7 @@ const CreateProduct: React.FC = () => {
                         type="text"
                         value={variant.name}
                         onChange={(e) => updateVariant(index, 'name', e.target.value)}
-                        className={`w-full px-3 py-2 rounded-lg border ${
+                        className={`w-full px-2 py-1.5 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -416,7 +444,7 @@ const CreateProduct: React.FC = () => {
                         type="text"
                         value={variant.sku}
                         onChange={(e) => updateVariant(index, 'sku', e.target.value)}
-                        className={`w-full px-3 py-2 rounded-lg border ${
+                        className={`w-full px-2 py-1.5 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -433,7 +461,7 @@ const CreateProduct: React.FC = () => {
                         type="number"
                         value={variant.stock}
                         onChange={(e) => updateVariant(index, 'stock', parseInt(e.target.value) || 0)}
-                        className={`w-full px-3 py-2 rounded-lg border ${
+                        className={`w-full px-2 py-1.5 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -452,7 +480,7 @@ const CreateProduct: React.FC = () => {
                         step="0.01"
                         value={variant.base_price}
                         onChange={(e) => updateVariant(index, 'base_price', parseFloat(e.target.value) || 0)}
-                        className={`w-full px-3 py-2 rounded-lg border ${
+                        className={`w-full px-2 py-1.5 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -472,7 +500,7 @@ const CreateProduct: React.FC = () => {
                         step="0.01"
                         value={variant.sale_price || ''}
                         onChange={(e) => updateVariant(index, 'sale_price', e.target.value ? parseFloat(e.target.value) : undefined)}
-                        className={`w-full px-3 py-2 rounded-lg border ${
+                        className={`w-full px-2 py-1.5 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
@@ -481,6 +509,129 @@ const CreateProduct: React.FC = () => {
                         min="0"
                       />
                     </div>
+
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Min Price ($)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={variant.min_price || ''}
+                        onChange={(e) => updateVariant(index, 'min_price', e.target.value ? parseFloat(e.target.value) : undefined)}
+                        className={`w-full px-2 py-1.5 rounded-lg border ${
+                          currentTheme === 'dark'
+                            ? 'bg-gray-700 border-gray-600 text-white'
+                            : 'bg-white border-gray-300 text-gray-900'
+                        } focus:ring-2 focus:ring-primary`}
+                        placeholder="Optional"
+                        min="0"
+                      />
+                    </div>
+
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Max Price ($)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={variant.max_price || ''}
+                        onChange={(e) => updateVariant(index, 'max_price', e.target.value ? parseFloat(e.target.value) : undefined)}
+                        className={`w-full px-2 py-1.5 rounded-lg border ${
+                          currentTheme === 'dark'
+                            ? 'bg-gray-700 border-gray-600 text-white'
+                            : 'bg-white border-gray-300 text-gray-900'
+                        } focus:ring-2 focus:ring-primary`}
+                        placeholder="Optional"
+                        min="0"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Active
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => updateVariant(index, 'is_active', !variant.is_active)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                          variant.is_active ? 'bg-primary' : 'bg-gray-200'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            variant.is_active ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Dietary Tags for this variant */}
+                  <div className="mt-4">
+                    <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Dietary Tags (select multiple)
+                    </label>
+                    <select
+                      multiple
+                      value={variant.dietary_tags}
+                      onChange={(e) => {
+                        const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+                        updateVariant(index, 'dietary_tags', selectedOptions);
+                      }}
+                      className={`w-full px-2 py-1.5 rounded-lg border min-h-[120px] ${
+                        currentTheme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:ring-2 focus:ring-primary focus:border-transparent`}
+                    >
+                      {DIETARY_TAGS.map(tag => (
+                        <option key={tag} value={tag}>
+                          {tag}
+                        </option>
+                      ))}
+                    </select>
+                    <p className={`mt-1 text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Hold Ctrl/Cmd to select multiple tags. Selected: {variant.dietary_tags.length}
+                    </p>
+                    {variant.dietary_tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {variant.dietary_tags.map(tag => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white text-xs rounded-full"
+                          >
+                            {tag}
+                            <button
+                              type="button"
+                              onClick={() => updateVariant(index, 'dietary_tags', variant.dietary_tags.filter(t => t !== tag))}
+                              className="hover:bg-white hover:bg-opacity-20 rounded-full p-0.5"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Tags field */}
+                  <div className="mt-3">
+                    <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Tags (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={variant.tags || ''}
+                      onChange={(e) => updateVariant(index, 'tags', e.target.value)}
+                      className={`w-full px-2 py-1.5 rounded-lg border ${
+                        currentTheme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                      } focus:ring-2 focus:ring-primary focus:border-transparent`}
+                      placeholder="e.g., organic,local,fresh"
+                    />
                   </div>
 
                   {/* Images */}
@@ -497,7 +648,7 @@ const CreateProduct: React.FC = () => {
                           newUrls[index] = e.target.value;
                           setCurrentImageUrl(newUrls);
                         }}
-                        className={`flex-1 px-3 py-2 rounded-lg border ${
+                        className={`flex-1 px-2 py-1.5 rounded-lg border ${
                           currentTheme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white'
                             : 'bg-white border-gray-300 text-gray-900'

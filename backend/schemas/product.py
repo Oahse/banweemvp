@@ -24,8 +24,14 @@ class ProductVariantCreate(BaseModel):
     name: str
     base_price: float
     sale_price: Optional[float] = None
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
     stock: int = 0
     attributes: Optional[Dict[str, Any]] = {}
+    specifications: Optional[Dict[str, Any]] = None
+    dietary_tags: Optional[List[str]] = []
+    tags: Optional[str] = None
+    availability_status: str = "available"
     image_urls: Optional[List[str]] = []  # jsDelivr CDN URLs
 
 
@@ -35,7 +41,6 @@ class ProductCreate(BaseModel):
     category_id: UUID
     variants: List[ProductVariantCreate]
     origin: Optional[str] = None
-    dietary_tags: Optional[List[str]] = []
 
 
 class ProductUpdate(BaseModel):
@@ -43,7 +48,6 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     category_id: Optional[UUID] = None
     origin: Optional[str] = None
-    dietary_tags: Optional[List[str]] = None
 
 
 class CategoryResponse(BaseModel):
@@ -86,10 +90,18 @@ class ProductVariantResponse(BaseModel):
     name: str
     base_price: float
     sale_price: Optional[float]
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
     current_price: float
     discount_percentage: float
     stock: int
     attributes: Optional[Dict[str, Any]]
+    specifications: Optional[Dict[str, Any]] = None
+    dietary_tags: Optional[List[str]] = []
+    tags: List[str] = []
+    availability_status: str = "available"
+    view_count: int = 0
+    purchase_count: int = 0
     is_active: bool
     barcode: Optional[str] = None  # Base64 encoded barcode image
     qr_code: Optional[str] = None  # Base64 encoded QR code image
@@ -121,10 +133,10 @@ class ProductResponse(BaseModel):
     rating: float
     review_count: int
     origin: Optional[str]
-    dietary_tags: Optional[List[str]]
     is_active: bool
     price_range: PriceRange
     in_stock: bool
+    availability_status: str = "available"
     created_at: str
     updated_at: Optional[str]
     # Relationships

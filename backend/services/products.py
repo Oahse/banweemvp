@@ -143,11 +143,11 @@ class ProductService:
                 rating=product.rating,
                 review_count=product.review_count,
                 origin=product.origin,
-                dietary_tags=product.dietary_tags,
                 is_active=product.is_active,
                 price_range=PriceRange(
                     min=product.price_range["min"], max=product.price_range["max"]),
                 in_stock=product.in_stock,
+                availability_status=product.availability_status,
                 created_at=product.created_at.isoformat() if product.created_at else "",
                 updated_at=product.updated_at.isoformat() if product.updated_at else None,
                 category=category,
@@ -168,8 +168,8 @@ class ProductService:
                 rating=getattr(product, 'rating', 0.0),
                 review_count=getattr(product, 'review_count', 0),
                 origin=getattr(product, 'origin', ''),
-                dietary_tags=getattr(product, 'dietary_tags', []),
                 is_active=getattr(product, 'is_active', True),
+                availability_status="out_of_stock",
                 price_range=PriceRange(min=0, max=0),
                 in_stock=False,
                 created_at=product.created_at.isoformat() if product.created_at else "",
@@ -761,8 +761,7 @@ class ProductService:
             description=product_data.description,
             category_id=product_data.category_id,
             supplier_id=supplier_id,
-            origin=product_data.origin,
-            dietary_tags=product_data.dietary_tags or []
+            origin=product_data.origin
         )
 
         self.db.add(db_product)
@@ -786,7 +785,15 @@ class ProductService:
                 qr_code=None,  # Will be set after generation
                 base_price=variant_data.base_price,
                 sale_price=variant_data.sale_price,
-                attributes=variant_data.attributes or {}
+                min_price=variant_data.min_price,
+                max_price=variant_data.max_price,
+                attributes=variant_data.attributes or {},
+                specifications=variant_data.specifications,
+                dietary_tags=variant_data.dietary_tags or [],
+                tags=variant_data.tags,
+                availability_status=variant_data.availability_status or "available",
+                view_count=0,
+                purchase_count=0
             )
             self.db.add(db_variant)
             await self.db.flush()  # Get variant ID

@@ -40,6 +40,9 @@ interface ProductVariant {
   sale_price?: number;
   stock: number;
   attributes: Record<string, any>;
+  dietary_tags: string[];
+  tags?: string;
+  specifications?: Record<string, any>;
   image_urls: string[];
 }
 
@@ -49,9 +52,6 @@ interface ProductFormData {
   description: string;
   short_description: string;
   category_id: string;
-  tags: string[];
-  specifications: Record<string, any>;
-  dietary_tags: string[];
   origin: string;
   variants: ProductVariant[];
 }
@@ -67,9 +67,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => {
     description: '',
     short_description: '',
     category_id: '',
-    tags: [],
-    specifications: {},
-    dietary_tags: [],
     origin: '',
     variants: [
       {
@@ -79,16 +76,15 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => {
         sale_price: undefined,
         stock: 0,
         attributes: {},
+        dietary_tags: [],
+        tags: '',
+        specifications: {},
         image_urls: []
       }
     ]
   });
 
-  // Tag and specification inputs
-  const [newTag, setNewTag] = useState('');
-  const [newDietaryTag, setNewDietaryTag] = useState('');
-  const [newSpecKey, setNewSpecKey] = useState('');
-  const [newSpecValue, setNewSpecValue] = useState('');
+  // Attribute inputs for variants
   const [newAttributeKey, setNewAttributeKey] = useState<string[]>([]);
   const [newAttributeValue, setNewAttributeValue] = useState<string[]>([]);
 
@@ -122,11 +118,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => {
           description: product.description || '',
           short_description: product.short_description || '',
           category_id: product.category_id || '',
-          tags: product.tags || [],
-          specifications: product.specifications || {},
-          dietary_tags: typeof product.dietary_tags === 'object' 
-            ? Object.keys(product.dietary_tags).filter(key => product.dietary_tags[key])
-            : product.dietary_tags || [],
           origin: product.origin || '',
           variants: product.variants?.map((v: any) => ({
             id: v.id,
@@ -136,6 +127,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => {
             sale_price: v.sale_price,
             stock: v.stock || v.inventory?.quantity_available || 0,
             attributes: v.attributes || {},
+            dietary_tags: v.dietary_tags || [],
+            tags: Array.isArray(v.tags) ? v.tags.join(',') : (v.tags || ''),
+            specifications: v.specifications || {},
             image_urls: v.images?.map((img: any) => img.url) || []
           })) || []
         });
@@ -163,58 +157,17 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => {
     }));
   };
 
-  const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, newTag.trim()]
-      }));
-      setNewTag('');
-    }
-  };
-
-  const removeTag = (tag: string) => {
+  const toggleVariantDietaryTag = (variantIndex: number, tag: string) => {
     setFormData(prev => ({
       ...prev,
-      tags: prev.tags.filter(t => t !== tag)
+      variants: prev.variants.map((v, i) => 
+        i === variantIndex
+          ? { ...v, dietary_tags: v.dietary_tags.includes(tag) 
+              ? v.dietary_tags.filter(t => t !== tag) 
+              : [...v.dietary_tags, tag] }
+          : v
+      )
     }));
-  };
-
-  const addDietaryTag = (tag: string) => {
-    if (!formData.dietary_tags.includes(tag)) {
-      setFormData(prev => ({
-        ...prev,
-        dietary_tags: [...prev.dietary_tags, tag]
-      }));
-    }
-  };
-
-  const removeDietaryTag = (tag: string) => {
-    setFormData(prev => ({
-      ...prev,
-      dietary_tags: prev.dietary_tags.filter(t => t !== tag)
-    }));
-  };
-
-  const addSpecification = () => {
-    if (newSpecKey.trim() && newSpecValue.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        specifications: {
-          ...prev.specifications,
-          [newSpecKey.trim()]: newSpecValue.trim()
-        }
-      }));
-      setNewSpecKey('');
-      setNewSpecValue('');
-    }
-  };
-
-  const removeSpecification = (key: string) => {
-    setFormData(prev => {
-      const { [key]: removed, ...rest } = prev.specifications;
-      return { ...prev, specifications: rest };
-    });
   };
 
   const addVariant = () => {
@@ -229,6 +182,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => {
           sale_price: undefined,
           stock: 0,
           attributes: {},
+          dietary_tags: [],
+          tags: '',
+          specifications: {},
           image_urls: []
         }
       ]
