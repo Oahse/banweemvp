@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, ShoppingCartIcon, TrendingUpIcon, PackageIcon, CalendarIcon, UserIcon, CreditCardIcon } from 'lucide-react';
 import AdminAPI from '../../api/admin';
 import toast from 'react-hot-toast';
@@ -37,6 +38,7 @@ interface Order {
 }
 
 export const Orders = () => {
+  const navigate = useNavigate();
   const { currentTheme } = useTheme();
   const { formatCurrency } = useLocale();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -275,7 +277,7 @@ export const Orders = () => {
   };
 
   const handleView = (order: Order) => {
-    toast.success(`Viewing order ${order.order_number}`);
+    navigate(`/admin/orders/${order.id}`);
   };
 
   if (initialLoading) {
