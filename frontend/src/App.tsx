@@ -62,6 +62,7 @@ const AdminProducts = lazy(() => import('./pages/admin/Products'));
 const AdminProductDetail = lazy(() => import('./pages/admin/ProductDetail'));
 const CreateProduct = lazy(() => import('./pages/admin/CreateProduct'));
 const EditProduct = lazy(() => import('./pages/admin/EditProduct'));
+const AdminCategories = lazy(() => import('./pages/admin/Categories'));
 const AdminUsers = lazy(() => import('./pages/admin/Users'));
 const AdminUserDetail = lazy(() => import('./pages/admin/UserDetail'));
 const AdminTaxRates = lazy(() => import('./pages/admin/TaxRates'));
@@ -78,6 +79,27 @@ const AdminRefunds = lazy(() => import('./pages/admin/Refunds'));
 const PageLoading: React.FC = () => (
   <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
     <div className="w-16 h-16 border-4 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
+
+// Error boundary for lazy loading
+const LazyLoadError: React.FC<{ error: Error; retry: () => void }> = ({ error, retry }) => (
+  <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="text-center p-8">
+      <div className="text-red-500 mb-4">
+        <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+      </div>
+      <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Failed to load page</h2>
+      <p className="text-gray-600 dark:text-gray-400 mb-4">{error.message}</p>
+      <button 
+        onClick={retry}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Try Again
+      </button>
+    </div>
   </div>
 );
 
@@ -160,6 +182,13 @@ export const App: React.FC = () => {
                           <Route path="products/new" element={<Suspense fallback={<PageSkeleton />}><CreateProduct /></Suspense>} />
                           <Route path="products/:productId" element={<Suspense fallback={<ProductDetailSkeleton />}><AdminProductDetail /></Suspense>} />
                           <Route path="products/:productId/edit" element={<Suspense fallback={<PageSkeleton />}><EditProduct /></Suspense>} />
+                          <Route path="categories" element={
+                            <Suspense fallback={<AdminTableSkeleton />}>
+                              <ErrorBoundary>
+                                <AdminCategories />
+                              </ErrorBoundary>
+                            </Suspense>
+                          } />
                           <Route path="users" element={<Suspense fallback={<AdminTableSkeleton />}><AdminUsers /></Suspense>} />
                           <Route path="users/:userId" element={<Suspense fallback={<PageSkeleton />}><AdminUserDetail /></Suspense>} />
                           <Route path="tax-rates" element={<Suspense fallback={<AdminTableSkeleton />}><AdminTaxRates /></Suspense>} />

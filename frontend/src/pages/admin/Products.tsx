@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, ArrowUpDownIcon, EyeIcon, PackageIcon } from 'lucide-react';
+import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, ArrowUpDownIcon, EyeIcon, PackageIcon, Trash2, AlertTriangle, X } from 'lucide-react';
 import AdminAPI from '../../api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '../../store/ThemeContext';
@@ -53,6 +53,9 @@ export const Products = () => {
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Debounce search query
   useEffect(() => {
@@ -236,6 +239,39 @@ export const Products = () => {
 
   const handleView = (product: Product) => {
     navigate(`/admin/products/${product.id}`);
+  };
+
+  const handleDelete = (product: Product) => {
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      // Optimistically remove from UI immediately
+      setProducts(prev => prev.filter(p => p.id !== productToDelete.id));
+      setPagination(prev => ({ ...prev, total: prev.total - 1 }));
+      
+      await AdminAPI.deleteProduct(productToDelete.id);
+      toast.success('Product deleted successfully');
+      setShowDeleteModal(false);
+      setProductToDelete(null);
+    } catch (error: any) {
+      console.error('Failed to delete product:', error);
+      toast.error(error?.response?.data?.message || 'Failed to delete product');
+      // Revert the optimistic update on error
+      setRefreshKey(prev => prev + 1);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setProductToDelete(null);
   };
 
   if (initialLoading) {
@@ -456,13 +492,22 @@ export const Products = () => {
                       <td className="px-6 py-4 text-sm">{stockBadge(product.stock)}</td>
                       <td className="px-6 py-4 text-sm">{statusBadge(product.status)}</td>
                       <td className="px-6 py-4 text-sm">
-                        <button 
-                          onClick={() => handleView(product)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
-                        >
-                          <EyeIcon size={14} />
-                          View
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => handleView(product)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                          >
+                            <EyeIcon size={14} />
+                            View
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(product)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors"
+                          >
+                            <Trash2 size={14} />
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -486,85 +531,27 @@ export const Products = () => {
                     <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(product.price)}</span>
                     {stockBadge(product.stock)}
                   </div>
-                  <button 
-                    onClick={() => handleView(product)}
-                    className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm w-fit"
-                  >
-                    <EyeIcon size={14} />
-                    View Details
-                  </button>
+                  <div className="flex items-center gap-2 mt-2">
+                    <button 
+                      onClick={() => handleView(product)}
+                      className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
+                    >
+                      <EyeIcon size={14} />
+                      View
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(product)}
+                      className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors text-sm"
+                    >
+                      <Trash2 size={14} />
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
 
-            <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-              <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                {pagination.total > 0
-                  ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
-                  : `Total: ${pagination.total} items`
-                }
-                {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
-              </p>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1}
-                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                    currentTheme === 'dark' 
-                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                  }`}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
-                
-                {/* Page numbers */}
-                <div className="flex items-center gap-1 mx-2">
-                  {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
-                    let pageNum;
-                    if (pagination.pages <= 5) {
-                      pageNum = i + 1;
-                    } else if (page <= 3) {
-                      pageNum = i + 1;
-                    } else if (page >= pagination.pages - 2) {
-                      pageNum = pagination.pages - 4 + i;
-                    } else {
-                      pageNum = page - 2 + i;
-                    }
-                    
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setPage(pageNum)}
-                        className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
-                          pageNum === page
-                            ? 'bg-primary text-white'
-                            : currentTheme === 'dark'
-                              ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                              : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
-                
-                <button
-                  onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
-                  disabled={page >= (pagination.pages || 1)}
-                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                    currentTheme === 'dark' 
-                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                  }`}
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+
           </>
         ) : (
           <div className="p-8 text-center">
@@ -572,7 +559,160 @@ export const Products = () => {
             <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No products found</p>
           </div>
         )}
+        
+        {/* Always show pagination */}
+        <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            {pagination.total > 0
+              ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
+              : `Total: ${pagination.total} items`
+            }
+            {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                currentTheme === 'dark' 
+                  ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                  : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous
+            </button>
+            
+            {/* Page numbers */}
+            <div className="flex items-center gap-1 mx-2">
+              {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
+                let pageNum;
+                if (pagination.pages <= 5) {
+                  pageNum = i + 1;
+                } else if (page <= 3) {
+                  pageNum = i + 1;
+                } else if (page >= pagination.pages - 2) {
+                  pageNum = pagination.pages - 4 + i;
+                } else {
+                  pageNum = page - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
+                      pageNum === page
+                        ? 'bg-primary text-white'
+                        : currentTheme === 'dark'
+                          ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
+                          : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
+              disabled={page >= (pagination.pages || 1)}
+              className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                currentTheme === 'dark' 
+                  ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                  : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              }`}
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && productToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div 
+            className={`relative w-full max-w-sm rounded-xl shadow-2xl ${
+              currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={cancelDelete}
+              disabled={isDeleting}
+              className={`absolute top-3 right-3 p-0.5 rounded-md transition-colors ${
+                currentTheme === 'dark' 
+                  ? 'hover:bg-gray-700 text-gray-400 hover:text-gray-300' 
+                  : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
+              } disabled:opacity-50`}
+            >
+              <X size={16} />
+            </button>
+
+            <div className="p-5">
+              {/* Icon */}
+              <div className="flex items-center justify-center w-11 h-11 mx-auto mb-3 rounded-full bg-red-500/10">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+
+              {/* Title */}
+              <h3 className={`text-lg font-semibold text-center mb-1.5 ${
+                currentTheme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>
+                Delete Product
+              </h3>
+
+              {/* Message */}
+              <p className={`text-sm text-center mb-4 ${
+                currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+              }`}>
+                Are you sure you want to delete{' '}
+                <span className="font-semibold">"{productToDelete.name}"</span>?
+                <br />
+                <span className="text-xs text-red-500">
+                  This will permanently delete all variants, inventory, reviews, and cart items.
+                </span>
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <button
+                  onClick={cancelDelete}
+                  disabled={isDeleting}
+                  className={`flex-1 px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
+                    currentTheme === 'dark'
+                      ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={isDeleting}
+                  className="flex-1 px-3 py-2 text-sm bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader className="w-3.5 h-3.5 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={14} />
+                      Delete
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

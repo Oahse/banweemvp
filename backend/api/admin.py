@@ -1,6 +1,6 @@
 from uuid import UUID
 from datetime import datetime, timezone, timedelta
-from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
+from fastapi import APIRouter, Depends, Query, status, BackgroundTasks, HTTPException
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_
@@ -13,6 +13,7 @@ from core.logging import get_logger
 from services.admin import AdminService
 from services.orders import OrderService
 from services.shipping import ShippingService
+from services.products import ProductService
 from models.user import User
 from models.subscriptions import Subscription
 from models.product import ProductVariant
@@ -994,6 +995,26 @@ async def get_product_by_id_admin(
             message=f"Failed to fetch product: {str(e)}"
         )
 
+@router.delete("/products/{product_id}")
+async def delete_product_admin(
+    product_id: UUID,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete a product and all its associated data (admin only)."""
+    try:
+        product_service = ProductService(db)
+        await product_service.delete_product(product_id, current_user.id, is_admin=True)
+        return Response.success(message="Product deleted successfully")
+    except HTTPException as e:
+        raise APIException(status_code=e.status_code, message=e.detail)
+    except Exception as e:
+        logger.exception(f"Failed to delete product {product_id}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to delete product: {str(e)}"
+        )
+
 @router.get("/variants")
 async def get_all_variants_admin(
     page: int = Query(1, ge=1),
@@ -1916,4 +1937,267 @@ async def get_admin_payments(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch payments: {str(e)}"
+        )
+
+
+# Category Management Endpoints
+@router.get("/categories")
+async def get_admin_categories(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    search: Optional[str] = Query(None),
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all categories for admin management."""
+    try:
+        from models.product import Category
+        
+        query = select(Category)
+        count_query = select(func.count()).select_from(Category)
+        
+        if search:
+            search_term = f"%{search}%"
+            query = query.where(
+                or_(
+                    Category.name.ilike(search_term),
+                    Category.description.ilike(search_term)
+                )
+            )
+            count_query = count_query.where(
+                or_(
+                    Category.name.ilike(search_term),
+                    Category.description.ilike(search_term)
+                )
+            )
+        
+        query = query.order_by(Category.name.asc())
+        
+        total = await db.scalar(count_query)
+        offset = (page - 1) * limit
+        categories = (await db.execute(query.offset(offset).limit(limit))).scalars().all()
+        
+        categories_data = [
+            {
+                "id": str(category.id),
+                "name": category.name,
+                "description": category.description,
+                "image_url": category.image_url,
+                "is_active": category.is_active,
+                "created_at": category.created_at.isoformat() if category.created_at else None,
+                "updated_at": category.updated_at.isoformat() if category.updated_at else None
+            }
+            for category in categories
+        ]
+        
+        pages = (total + limit - 1) // limit
+        
+        return Response.success(
+            data={
+                "data": categories_data,
+                "page": page,
+                "limit": limit,
+                "total": total,
+                "pages": pages
+            },
+            message="Categories retrieved successfully"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error fetching admin categories: {str(e)}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to fetch categories: {str(e)}"
+        )
+
+
+class CategoryCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    image_url: Optional[str] = None
+    is_active: bool = True
+
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    image_url: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+@router.post("/categories")
+async def create_category(
+    category_data: CategoryCreate,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create a new category (admin only)."""
+    try:
+        from models.product import Category
+        from core.utils.uuid_utils import uuid7
+        from slugify import slugify
+        
+        # Check if category with same name exists
+        existing = await db.scalar(
+            select(Category).where(Category.name == category_data.name)
+        )
+        if existing:
+            raise APIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                message="Category with this name already exists"
+            )
+        
+        category = Category(
+            id=uuid7(),
+            name=category_data.name,
+            description=category_data.description,
+            image_url=category_data.image_url,
+            is_active=category_data.is_active
+        )
+        
+        db.add(category)
+        await db.commit()
+        await db.refresh(category)
+        
+        return Response.success(
+            data={
+                "id": str(category.id),
+                "name": category.name,
+                "description": category.description,
+                "image_url": category.image_url,
+                "is_active": category.is_active,
+                "created_at": category.created_at.isoformat() if category.created_at else None,
+                "updated_at": category.updated_at.isoformat() if category.updated_at else None
+            },
+            message="Category created successfully"
+        )
+        
+    except APIException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating category: {str(e)}")
+        await db.rollback()
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to create category: {str(e)}"
+        )
+
+
+@router.put("/categories/{category_id}")
+async def update_category(
+    category_id: UUID,
+    category_data: CategoryUpdate,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update a category (admin only)."""
+    try:
+        from models.product import Category
+        from slugify import slugify
+        
+        category = await db.get(Category, category_id)
+        if not category:
+            raise APIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                message="Category not found"
+            )
+        
+        # Check for name conflict if name is being updated
+        if category_data.name and category_data.name != category.name:
+            existing = await db.scalar(
+                select(Category).where(
+                    Category.name == category_data.name,
+                    Category.id != category_id
+                )
+            )
+            if existing:
+                raise APIException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    message="Category with this name already exists"
+                )
+            
+            category.name = category_data.name
+        
+        if category_data.description is not None:
+            category.description = category_data.description
+        
+        if category_data.image_url is not None:
+            category.image_url = category_data.image_url
+        
+        if category_data.is_active is not None:
+            category.is_active = category_data.is_active
+        
+        category.updated_at = datetime.now(timezone.utc)
+        
+        await db.commit()
+        await db.refresh(category)
+        
+        return Response.success(
+            data={
+                "id": str(category.id),
+                "name": category.name,
+                "description": category.description,
+                "image_url": category.image_url,
+                "is_active": category.is_active,
+                "created_at": category.created_at.isoformat() if category.created_at else None,
+                "updated_at": category.updated_at.isoformat() if category.updated_at else None
+            },
+            message="Category updated successfully"
+        )
+        
+    except APIException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating category: {str(e)}")
+        await db.rollback()
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to update category: {str(e)}"
+        )
+
+
+@router.delete("/categories/{category_id}")
+async def delete_category(
+    category_id: UUID,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete a category (admin only)."""
+    try:
+        from models.product import Category, Product
+        
+        category = await db.get(Category, category_id)
+        if not category:
+            raise APIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                message="Category not found"
+            )
+        
+        # Check if any products are using this category
+        products_count = await db.scalar(
+            select(func.count()).select_from(Product).where(Product.category_id == category_id)
+        )
+        
+        if products_count > 0:
+            raise APIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                message=f"Cannot delete category. {products_count} product(s) are using this category."
+            )
+        
+        await db.delete(category)
+        await db.commit()
+        
+        return Response.success(
+            data=None,
+            message="Category deleted successfully"
+        )
+        
+    except APIException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting category: {str(e)}")
+        await db.rollback()
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to delete category: {str(e)}"
         )

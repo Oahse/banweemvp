@@ -4,17 +4,121 @@
  */
 
 export const DIETARY_TAGS = [
+  // Dietary Lifestyles
   'Vegetarian',
   'Vegan',
-  'Gluten-Free',
-  'Organic',
-  'Non-GMO',
-  'Dairy-Free',
-  'Sugar-Free',
-  'Keto-Friendly',
+  'Pescatarian',
+  'Flexitarian',
+  'Omnivore',
+  'Raw Vegan',
+  'Fruitarian',
+  'Whole-Food Plant-Based',
+  'Plant-Based',
+  
+  // Low-Carb & Metabolic Diets
+  'Keto',
   'Paleo',
+  'Carnivore',
+  'Low-Carb',
+  'FODMAP-Friendly',
+  'Grain-Free',
+  'Atkins',
+  'Zone Diet',
+  
+  // Regional & Traditional Diets
+  'Mediterranean',
+  'DASH',
+  'Nordic',
+  'Ayurvedic',
+  'Macrobiotic',
+  'Japanese',
+  'Thai',
+  
+  // Allergy & Intolerance (Codex/FDA/EU standards)
+  'Gluten-Free',
+  'Dairy-Free',
+  'Lactose-Free',
+  'Egg-Free',
+  'Nut-Free',
+  'Peanut-Free',
+  'Tree-Nut-Free',
+  'Soy-Free',
+  'Sesame-Free',
+  'Shellfish-Free',
+  'Fish-Free',
+  'Wheat-Free',
+  'Sulfite-Free',
+  'Corn-Free',
+  'Mollusc-Free',
+  'Histamine-Free',
+  'Lectin-Free',
+  
+  // Health & Nutrition
+  'Low-Sodium',
+  'Low-Fat',
+  'Low-Sugar',
+  'Sugar-Free',
+  'No-Refined-Sugars',
+  'High-Protein',
+  'High-Fiber',
+  'High-Calcium',
+  'High-Iron',
+  'Heart-Healthy',
+  'Diabetic-Friendly',
+  'Cholesterol-Free',
+  'Trans-Fat-Free',
+  'Omega-3-Rich',
+  'Probiotic',
+  'Prebiotic',
+  'B12-Fortified',
+  'Vitamin-D-Fortified',
+  
+  // Production Methods & Quality
+  'Organic',
+  'Certified-Organic',
+  'Non-GMO',
+  'Grass-Fed',
+  'Wild-Caught',
+  'Antibiotic-Free',
+  'Hormone-Free',
+  'Cage-Free',
+  'Free-Range',
+  'Regenerative',
+  'Locally-Sourced',
+  'Fair-Trade',
+  'Sustainable',
+  'Lab-Grown',
+  
+  // Processing & Additives
+  'Natural',
+  'Raw',
+  'Whole-Grain',
+  'Cold-Pressed',
+  'Sprouted',
+  'Fermented',
+  'No-Artificial-Sweeteners',
+  'No-Artificial-Flavors',
+  'No-Artificial-Colors',
+  'Preservative-Free',
+  'Pesticide-Free',
+  'Additive-Free',
+  'Alcohol-Free',
+  'BPA-Free',
+  'Mercury-Free',
+  
+  // Religious & Cultural
   'Halal',
-  'Kosher'
+  'Kosher',
+  'Halal-Certified',
+  'Kosher-Certified',
+  
+  // Ethical & Environmental
+  'Cruelty-Free',
+  'Eco-Friendly',
+  'Carbon-Neutral',
+  'Traceable',
+  'Plastic-Free',
+  'Recyclable-Packaging'
 ];
 
 export const PRODUCT_STATUSES = [

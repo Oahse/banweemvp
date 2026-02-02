@@ -60,6 +60,16 @@ export default defineConfig({
   server: {
     hmr: {
       overlay: false
+    },
+    fs: {
+      strict: false
+    },
+    watch: {
+      usePolling: false,
+      interval: 100
     }
+  },
+  preview: {
+    port: 4173
   }
 })

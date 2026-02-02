@@ -52,6 +52,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { title: 'Dashboard', path: '/admin', icon: <LayoutDashboardIcon size={18} /> },
     { title: 'Orders', path: '/admin/orders', icon: <ShoppingCartIcon size={18} /> },
     { title: 'Products', path: '/admin/products', icon: <PackageIcon size={18} /> },
+    { title: 'Categories', path: '/admin/categories', icon: <FileTextIcon size={18} /> },
     { title: 'Users', path: '/admin/users', icon: <UsersIcon size={18} /> },
     { title: 'Subscriptions', path: '/admin/subscriptions', icon: <FileTextIcon size={18} /> },
     { title: 'Payments', path: '/admin/payments', icon: <CreditCardIcon size={18} /> },
@@ -155,15 +156,15 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
               <div className="relative">
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="flex items-center space-x-1.5 px-2 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+                  <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                     {(user as any)?.full_name?.charAt(0) || (user as any)?.firstname?.charAt(0) || 'A'}
                   </div>
                   <span className="text-xs font-medium hidden md:block">
                     {(user as any)?.full_name || `${(user as any)?.firstname} ${(user as any)?.lastname}` || 'Admin'}
                   </span>
-                  <ChevronDownIcon size={16} />
+                  <ChevronDownIcon size={14} />
                 </button>
                 
                 {profileDropdownOpen && (

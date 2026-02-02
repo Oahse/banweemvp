@@ -9,6 +9,8 @@ from models.product import Product, ProductVariant, Category, ProductImage
 from models.inventories import Inventory
 from models.cart import CartItem
 from models.user import User
+from models.review import Review
+from models.wishlist import WishlistItem
 from schemas.product import (
     ProductCreate, ProductUpdate, ProductResponse, ProductListResponse,
     ProductVariantResponse, CategoryResponse, SupplierResponse,
@@ -892,8 +894,10 @@ class ProductService:
         # Return the updated product
         return await self.get_product_by_id(product_id)
 
-    async def delete_product(self, product_id: UUID, user_id: UUID):
-        """Delete a product."""
+    async def delete_product(self, product_id: UUID, user_id: UUID, is_admin: bool = False):
+        """Delete a product and all its associated data (variants, inventory, reviews, cart items, wishlist items)."""
+        from models.orders import OrderItem
+        
         query = select(Product).where(Product.id == product_id)
         result = await self.db.execute(query)
         product = result.scalar_one_or_none()
@@ -902,9 +906,44 @@ class ProductService:
             raise HTTPException(status_code=404, detail="Product not found")
 
         # Check if user owns the product (for suppliers) or is admin
-        if product.supplier_id != user_id:
+        if not is_admin and product.supplier_id != user_id:
             raise HTTPException(
                 status_code=403, detail="Not authorized to delete this product")
+        
+        # Check if product has any order items (prevent deletion of ordered products)
+        variant_ids = [variant.id for variant in product.variants]
+        if variant_ids:
+            order_items = (await self.db.execute(
+                select(OrderItem).where(OrderItem.variant_id.in_(variant_ids))
+            )).scalars().first()
+            
+            if order_items:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Cannot delete product that has been ordered. Product has order history."
+                )
 
+        # Delete all reviews for this product
+        reviews = (await self.db.execute(
+            select(Review).where(Review.product_id == product_id)
+        )).scalars().all()
+        for review in reviews:
+            await self.db.delete(review)
+
+        # Delete all cart items for this product
+        cart_items = (await self.db.execute(
+            select(CartItem).where(CartItem.product_id == product_id)
+        )).scalars().all()
+        for cart_item in cart_items:
+            await self.db.delete(cart_item)
+
+        # Delete all wishlist items for this product
+        wishlist_items = (await self.db.execute(
+            select(WishlistItem).where(WishlistItem.product_id == product_id)
+        )).scalars().all()
+        for wishlist_item in wishlist_items:
+            await self.db.delete(wishlist_item)
+
+        # Delete the product (this will cascade delete variants and inventory due to cascade="all, delete-orphan")
         await self.db.delete(product)
         await self.db.commit()

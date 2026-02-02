@@ -255,7 +255,7 @@ const CreateProduct: React.FC = () => {
                 <select
                   value={formData.category_id}
                   onChange={(e) => updateField('category_id', e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border ${
+                  className={`px-3 py-2 rounded-lg border ${
                     currentTheme === 'dark'
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'

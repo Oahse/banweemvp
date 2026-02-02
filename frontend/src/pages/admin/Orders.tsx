@@ -474,29 +474,26 @@ export const Orders = () => {
               <table className="w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Order Number</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Customer</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Total Amount</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Order #</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Customer</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-900 dark:text-white">Total</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Status</th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-900 dark:text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {orders.map((order: any) => (
                     <tr key={order.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
-                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{order.order_number || 'N/A'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{order.user_name || order.user_email || 'N/A'}</td>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(order.total_amount)}</td>
-                      <td className="px-6 py-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          {statusBadge(order.status)}
-                          {paymentStatusBadge(order.payment_status)}
-                        </div>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{order.order_number || order.id?.substring(0, 8)}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{order.user_name || order.user_email || 'N/A'}</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-right text-gray-900 dark:text-white">{formatCurrency(order.total_amount)}</td>
+                      <td className="px-4 py-3 text-sm">
+                        {statusBadge(order.status)}
                       </td>
-                      <td className="px-6 py-4 text-sm">
+                      <td className="px-4 py-3 text-sm text-center">
                         <button 
                           onClick={() => handleView(order)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                         >
                           <EyeIcon size={14} />
                           View
@@ -516,7 +513,7 @@ export const Orders = () => {
                   className={`p-4 flex flex-col gap-2 bg-white dark:bg-gray-800 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900 dark:text-white">{order.order_number || 'N/A'}</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{order.order_number || order.id?.substring(0, 8)}</span>
                     {statusBadge(order.status)}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-300">{order.user_name || order.user_email || 'N/A'}</div>
@@ -535,74 +532,7 @@ export const Orders = () => {
               ))}
             </div>
 
-            <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-              <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                {pagination.total > 0
-                  ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
-                  : `Total: ${pagination.total} items`
-                }
-                {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
-              </p>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1}
-                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                    currentTheme === 'dark' 
-                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                  }`}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
-                
-                {/* Page numbers */}
-                <div className="flex items-center gap-1 mx-2">
-                  {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
-                    let pageNum;
-                    if (pagination.pages <= 5) {
-                      pageNum = i + 1;
-                    } else if (page <= 3) {
-                      pageNum = i + 1;
-                    } else if (page >= pagination.pages - 2) {
-                      pageNum = pagination.pages - 4 + i;
-                    } else {
-                      pageNum = page - 2 + i;
-                    }
-                    
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setPage(pageNum)}
-                        className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
-                          pageNum === page
-                            ? 'bg-primary text-white'
-                            : currentTheme === 'dark'
-                              ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                              : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
-                
-                <button
-                  onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
-                  disabled={page >= (pagination.pages || 1)}
-                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                    currentTheme === 'dark' 
-                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                  }`}
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+
           </>
         ) : (
           <div className="p-8 text-center">
@@ -610,6 +540,76 @@ export const Orders = () => {
             <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No orders found</p>
           </div>
         )}
+        
+        {/* Always show pagination */}
+        <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            {pagination.total > 0
+              ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
+              : `Total: ${pagination.total} items`
+            }
+            {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                currentTheme === 'dark' 
+                  ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                  : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous
+            </button>
+            
+            {/* Page numbers */}
+            <div className="flex items-center gap-1 mx-2">
+              {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
+                let pageNum;
+                if (pagination.pages <= 5) {
+                  pageNum = i + 1;
+                } else if (page <= 3) {
+                  pageNum = i + 1;
+                } else if (page >= pagination.pages - 2) {
+                  pageNum = pagination.pages - 4 + i;
+                } else {
+                  pageNum = page - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
+                      pageNum === page
+                        ? 'bg-primary text-white'
+                        : currentTheme === 'dark'
+                          ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
+                          : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
+              disabled={page >= (pagination.pages || 1)}
+              className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                currentTheme === 'dark' 
+                  ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                  : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              }`}
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

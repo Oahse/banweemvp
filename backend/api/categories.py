@@ -25,7 +25,6 @@ router = APIRouter(prefix="/categories", tags=["categories"])
 async def list_categories(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=100),
-    parent_id: Optional[UUID] = Query(None),
     active_only: bool = Query(True),
     db: AsyncSession = Depends(get_db)
 ):
@@ -38,15 +37,10 @@ async def list_categories(
         if active_only:
             query = query.where(Category.is_active == True)
         
-        if parent_id:
-            query = query.where(Category.parent_id == parent_id)
-        
         # Pagination
         total_query = select(Category)
         if active_only:
             total_query = total_query.where(Category.is_active == True)
-        if parent_id:
-            total_query = total_query.where(Category.parent_id == parent_id)
         
         total_result = await db.execute(select(func.count()).select_from(total_query.subquery()))
         total = total_result.scalar() or 0
@@ -63,7 +57,6 @@ async def list_categories(
                         "id": str(c.id),
                         "name": c.name,
                         "description": c.description,
-                        "parent_id": str(c.parent_id) if c.parent_id else None,
                         "image_url": c.image_url,
                         "is_active": c.is_active,
                         "created_at": c.created_at.isoformat() if hasattr(c.created_at, 'isoformat') else str(c.created_at)
@@ -109,7 +102,6 @@ async def get_category(
                 "id": str(category.id),
                 "name": category.name,
                 "description": category.description,
-                "parent_id": str(category.parent_id) if category.parent_id else None,
                 "image_url": category.image_url,
                 "is_active": category.is_active,
                 "created_at": category.created_at.isoformat() if hasattr(category.created_at, 'isoformat') else str(category.created_at)
@@ -136,7 +128,6 @@ async def create_category(
         new_category = Category(
             name=category_data.get("name"),
             description=category_data.get("description"),
-            parent_id=category_data.get("parent_id"),
             image_url=category_data.get("image_url"),
             is_active=category_data.get("is_active", True)
         )
@@ -150,7 +141,6 @@ async def create_category(
                 "id": str(new_category.id),
                 "name": new_category.name,
                 "description": new_category.description,
-                "parent_id": str(new_category.parent_id) if new_category.parent_id else None,
                 "image_url": new_category.image_url,
                 "is_active": new_category.is_active,
                 "created_at": new_category.created_at.isoformat() if hasattr(new_category.created_at, 'isoformat') else str(new_category.created_at)
@@ -199,7 +189,6 @@ async def update_category(
                 "id": str(category.id),
                 "name": category.name,
                 "description": category.description,
-                "parent_id": str(category.parent_id) if category.parent_id else None,
                 "image_url": category.image_url,
                 "is_active": category.is_active,
                 "created_at": category.created_at.isoformat() if hasattr(category.created_at, 'isoformat') else str(category.created_at)

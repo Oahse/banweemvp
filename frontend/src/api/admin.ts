@@ -808,6 +808,53 @@ export class AdminAPI {
   }
 
   /**
+   * Get all categories for admin management
+   */
+  static async getCategories(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.search) queryParams.append('search', params.search);
+
+    const url = `/admin/categories${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url, {});
+  }
+
+  /**
+   * Create a new category
+   */
+  static async createCategory(data: {
+    name: string;
+    description?: string;
+    is_active?: boolean;
+  }) {
+    return await apiClient.post('/admin/categories', data, {});
+  }
+
+  /**
+   * Update a category
+   */
+  static async updateCategory(categoryId: string, data: {
+    name?: string;
+    description?: string;
+    is_active?: boolean;
+  }) {
+    return await apiClient.put(`/admin/categories/${categoryId}`, data, {});
+  }
+
+  /**
+   * Delete a category
+   */
+  static async deleteCategory(categoryId: string) {
+    return await apiClient.delete(`/admin/categories/${categoryId}`, {});
+  }
+
+  /**
    * Get all payments for admin management
    */
   static async getPayments(params: {

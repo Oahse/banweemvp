@@ -45,12 +45,8 @@ class Product(BaseModel):
         Index('idx_products_category_status', 'category_id', 'product_status'),
         Index('idx_products_supplier_status', 'supplier_id', 'product_status'),
         Index('idx_products_featured_rating', 'is_featured', 'rating_average'),
-        Index('idx_products_price_range', 'min_price', 'max_price'),
-        Index('idx_products_availability', 'availability_status'),
         Index('idx_products_published', 'published_at', 'product_status'),
         Index('idx_products_slug', 'slug'),
-        # GIN index for JSONB specifications
-        Index('idx_products_specifications', 'specifications', postgresql_using='gin'),
         {'extend_existing': True}
     )
 
@@ -66,13 +62,8 @@ class Product(BaseModel):
 
     # Status fields as columns for indexing and fast filtering
     product_status = Column(String(50), default="active", nullable=False)  # active, inactive, draft, discontinued
-    availability_status = Column(String(50), default="available", nullable=False)  # available, out_of_stock, pre_order
 
-    # Pricing summary (calculated from variants)
-    min_price = Column(Float, nullable=True)
-    max_price = Column(Float, nullable=True)
-
-    # Quality metrics as columns for sorting/filtering
+    # Quality metrics as columns for sorting/filtering (aggregated from variants)
     rating_average = Column(Float, default=0.0)
     rating_count = Column(Integer, default=0)
     review_count = Column(Integer, default=0)
@@ -84,19 +75,8 @@ class Product(BaseModel):
     rating = Column(Float, default=0.0)  # Legacy field
     is_active = Column(Boolean, default=True)  # Legacy field
 
-    # Use JSONB only for complex, queryable data
-    specifications = Column(JSONB, nullable=True)  # Technical specs that need filtering
-    dietary_tags = Column(JSONB, nullable=False)  # Dietary information for filtering
-
-    # Simple tags as text for better performance (comma-separated)
-    tags = Column(Text, nullable=True)  # "organic,gluten-free,vegan"
-
     # Dates for lifecycle management
     published_at = Column(DateTime(timezone=True), nullable=True)
-
-    # Analytics as columns
-    view_count = Column(Integer, default=0)
-    purchase_count = Column(Integer, default=0)
 
     # Legacy fields for backward compatibility
     origin = Column(String(100), nullable=True)
@@ -133,6 +113,25 @@ class Product(BaseModel):
         """Check if any variant is in stock"""
         return any(v.inventory and v.inventory.quantity_available > 0 for v in self.variants if v.is_active)
 
+    @property
+    def availability_status(self) -> str:
+        """Get overall availability status from variants"""
+        if not self.variants:
+            return "out_of_stock"
+        
+        # Check if any variant is available
+        available_variants = [v for v in self.variants if v.is_active]
+        if not available_variants:
+            return "out_of_stock"
+        
+        # Check stock levels
+        in_stock = [v for v in available_variants if v.inventory and v.inventory.quantity_available > 0]
+        low_stock = [v for v in available_variants if v.inventory and v.inventory.quantity_available > 0 and v.inventory.quantity_available <= v.inventory.low_stock_threshold]
+        
+        if in_stock:
+            return "limited" if low_stock else "available"
+        return "out_of_stock"
+
     def to_dict(self, include_variants=False, include_seo=False) -> dict:
         """Convert product to dictionary for API responses"""
         data = {
@@ -144,23 +143,15 @@ class Product(BaseModel):
             "category_id": str(self.category_id),
             "supplier_id": str(self.supplier_id),
             "product_status": self.product_status,
-            "availability_status": self.availability_status,
-            "min_price": self.min_price,
-            "max_price": self.max_price,
             "rating_average": self.rating_average,
             "rating_count": self.rating_count,
             "review_count": self.review_count,
             "is_featured": self.is_featured,
             "is_bestseller": self.is_bestseller,
-            "specifications": self.specifications,
-            "dietary_tags": self.dietary_tags,
-            "tags": self.tags.split(",") if self.tags else [],
-            "published_at": self.published_at.isoformat() if self.published_at else None,
-            "view_count": self.view_count,
-            "purchase_count": self.purchase_count,
-            "origin": self.origin,
             "price_range": self.price_range,
+            "availability_status": self.availability_status,
             "in_stock": self.in_stock,
+            "origin": self.origin,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             # Legacy fields
@@ -191,6 +182,10 @@ class ProductVariant(BaseModel):
         Index('idx_variants_sku', 'sku'),
         Index('idx_variants_active', 'is_active'),
         Index('idx_variants_price', 'base_price', 'sale_price'),
+        Index('idx_variants_availability', 'availability_status'),
+        # GIN indexes for JSONB fields only
+        Index('idx_variants_specifications', 'specifications', postgresql_using='gin'),
+        Index('idx_variants_dietary_tags', 'dietary_tags', postgresql_using='gin'),
         {'extend_existing': True}
     )
 
@@ -201,6 +196,8 @@ class ProductVariant(BaseModel):
     # Pricing as columns
     base_price = Column(Float, nullable=False)
     sale_price = Column(Float, nullable=True)
+    min_price = Column(Float, nullable=True)
+    max_price = Column(Float, nullable=True)
 
     # Barcodes as text (simple storage)
     barcode = Column(Text, nullable=True)
@@ -208,9 +205,19 @@ class ProductVariant(BaseModel):
 
     # Use JSONB only for complex attributes that need querying
     attributes = Column(JSONB, nullable=True)  # {"size": "1kg", "color": "red"}
+    specifications = Column(JSONB, nullable=True)  # Technical specs that need filtering
+    dietary_tags = Column(JSONB, nullable=False)  # Dietary information for filtering
+    
+    # Simple tags as text for better performance
+    tags = Column(Text, nullable=True)  # "organic,gluten-free,vegan"
     
     # Status as column
     is_active = Column(Boolean, default=True)
+    availability_status = Column(String(50), default="available", nullable=False)  # available, limited, out_of_stock
+
+    # Analytics as columns
+    view_count = Column(Integer, default=0)
+    purchase_count = Column(Integer, default=0)
 
     # Relationships
     product = relationship("Product", back_populates="variants")
@@ -256,11 +263,19 @@ class ProductVariant(BaseModel):
             "name": self.name,
             "base_price": self.base_price,
             "sale_price": self.sale_price,
+            "min_price": self.min_price,
+            "max_price": self.max_price,
             "current_price": self.current_price,
             "discount_percentage": self.discount_percentage,
             "stock": self.inventory.quantity_available if self.inventory else 0,
             "attributes": self.attributes,
+            "specifications": self.specifications,
+            "dietary_tags": self.dietary_tags,
+            "tags": self.tags.split(",") if self.tags else [],
             "is_active": self.is_active,
+            "availability_status": self.availability_status,
+            "view_count": self.view_count,
+            "purchase_count": self.purchase_count,
             "barcode": self.barcode,
             "qr_code": self.qr_code,
             "created_at": self.created_at.isoformat() if self.created_at else None,
