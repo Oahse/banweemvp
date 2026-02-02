@@ -69,7 +69,6 @@ const AdminInventoryAdjustments = lazy(() => import('./pages/admin/InventoryAdju
 const AdminSubscriptions = lazy(() => import('./pages/admin/Subscriptions'));
 const AdminInventory = lazy(() => import('./pages/admin/Inventory'));
 const AdminShipping = lazy(() => import('./pages/admin/Shipping'));
-const AdminShippingMethods = lazy(() => import('./pages/admin/ShippingMethods'));
 const SupplierDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminPayments = lazy(() => import('./pages/admin/Payments'));
 const AdminRefunds = lazy(() => import('./pages/admin/Refunds'));
@@ -167,7 +166,6 @@ export const App: React.FC = () => {
                           <Route path="subscriptions" element={<Suspense fallback={<AdminTableSkeleton />}><AdminSubscriptions /></Suspense>} />
                           <Route path="inventory" element={<Suspense fallback={<AdminTableSkeleton />}><AdminInventory /></Suspense>} />
                           <Route path="shipping" element={<Suspense fallback={<AdminTableSkeleton />}><AdminShipping /></Suspense>} />
-                          <Route path="shipping-methods" element={<Suspense fallback={<AdminTableSkeleton />}><AdminShippingMethods /></Suspense>} />
                           <Route path="payments" element={<Suspense fallback={<AdminTableSkeleton />}><AdminPayments /></Suspense>} />
                           <Route path="refunds" element={<Suspense fallback={<AdminTableSkeleton />}><AdminRefunds /></Suspense>} />
                         </Route>

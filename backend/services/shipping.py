@@ -29,6 +29,10 @@ class ShippingService:
         result = await self.db.execute(select(ShippingMethod).where(ShippingMethod.id == shipping_method_id))
         return result.scalars().first()
 
+    async def get_all_shipping_methods(self) -> List[ShippingMethod]:
+        result = await self.db.execute(select(ShippingMethod))
+        return result.scalars().all()
+
     async def get_all_active_shipping_methods(self) -> List[ShippingMethod]:
         result = await self.db.execute(select(ShippingMethod).where(ShippingMethod.is_active == True))
         return result.scalars().all()

@@ -731,7 +731,7 @@ async def get_all_shipping_methods(
     """Get all shipping methods (admin only)."""
     try:
         shipping_service = ShippingService(db)
-        methods = await shipping_service.get_all_active_shipping_methods()
+        methods = await shipping_service.get_all_shipping_methods()
         
         # Convert to dict format for API response
         methods_data = []
@@ -743,6 +743,8 @@ async def get_all_shipping_methods(
                 "price": float(method.price),
                 "estimated_days": method.estimated_days,
                 "is_active": method.is_active,
+                "carrier": method.carrier,
+                "tracking_url_template": method.tracking_url_template,
                 "created_at": method.created_at.isoformat() if method.created_at else None,
                 "updated_at": method.updated_at.isoformat() if method.updated_at else None
             })
@@ -778,6 +780,8 @@ async def get_shipping_method(
             "price": float(method.price),
             "estimated_days": method.estimated_days,
             "is_active": method.is_active,
+            "carrier": method.carrier,
+            "tracking_url_template": method.tracking_url_template,
             "created_at": method.created_at.isoformat() if method.created_at else None,
             "updated_at": method.updated_at.isoformat() if method.updated_at else None
         }
@@ -809,6 +813,8 @@ async def create_shipping_method(
             "price": float(method.price),
             "estimated_days": method.estimated_days,
             "is_active": method.is_active,
+            "carrier": method.carrier,
+            "tracking_url_template": method.tracking_url_template,
             "created_at": method.created_at.isoformat() if method.created_at else None,
             "updated_at": method.updated_at.isoformat() if method.updated_at else None
         }
@@ -847,6 +853,8 @@ async def update_shipping_method(
             "price": float(method.price),
             "estimated_days": method.estimated_days,
             "is_active": method.is_active,
+            "carrier": method.carrier,
+            "tracking_url_template": method.tracking_url_template,
             "created_at": method.created_at.isoformat() if method.created_at else None,
             "updated_at": method.updated_at.isoformat() if method.updated_at else None
         }

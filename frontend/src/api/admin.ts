@@ -49,6 +49,8 @@ export class AdminAPI {
     search?: string;
     status?: string;
     verified?: boolean;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
   }) {
     const queryParams = new URLSearchParams();
     
@@ -58,6 +60,8 @@ export class AdminAPI {
     if (params?.search) queryParams.append('search', params.search);
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
 
     const url = `/admin/users${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url, {});
@@ -179,7 +183,7 @@ export class AdminAPI {
     page?: number; 
     limit?: number; 
     search?: string;
-    status?: string;
+    low_stock?: boolean;
     sort_by?: string;
     sort_order?: 'asc' | 'desc';
   }) {
@@ -188,7 +192,7 @@ export class AdminAPI {
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.search) queryParams.append('search', params.search);
-    if (params?.status) queryParams.append('status', params.status);
+    if (params?.low_stock !== undefined) queryParams.append('low_stock', params.low_stock.toString());
     if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
     if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
 
@@ -705,6 +709,8 @@ export class AdminAPI {
     province_code?: string;
     is_active?: boolean;
     search?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
   }) {
     const queryParams = new URLSearchParams();
     
@@ -714,8 +720,10 @@ export class AdminAPI {
     if (params?.province_code) queryParams.append('province_code', params.province_code);
     if (params?.is_active !== undefined) queryParams.append('is_active', params.is_active.toString());
     if (params?.search) queryParams.append('search', params.search);
+    if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
 
-    const url = `/admin/tax-rates/${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/tax/admin/tax-rates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url, {});
   }
 
@@ -723,28 +731,128 @@ export class AdminAPI {
    * Get tax rate by ID
    */
   static async getTaxRate(taxRateId: string) {
-    return await apiClient.get(`/admin/tax-rates/${taxRateId}`, {});
+    return await apiClient.get(`/tax/admin/tax-rates/${taxRateId}`, {});
   }
 
   /**
    * Create tax rate
    */
   static async createTaxRate(taxRateData: any) {
-    return await apiClient.post('/admin/tax-rates/', taxRateData, {});
+    return await apiClient.post('/tax/admin/tax-rates/', taxRateData, {});
   }
 
   /**
    * Update tax rate
    */
   static async updateTaxRate(taxRateId: string, taxRateData: any) {
-    return await apiClient.put(`/admin/tax-rates/${taxRateId}`, taxRateData, {});
+    return await apiClient.put(`/tax/admin/tax-rates/${taxRateId}`, taxRateData, {});
   }
 
   /**
    * Delete tax rate
    */
   static async deleteTaxRate(taxRateId: string) {
-    return await apiClient.delete(`/admin/tax-rates/${taxRateId}`, {});
+    return await apiClient.delete(`/tax/admin/tax-rates/${taxRateId}`, {});
+  }
+
+  /**
+   * Get all orders for admin management
+   */
+  static async getOrders(params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    payment_status?: string;
+    search?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.payment_status) queryParams.append('payment_status', params.payment_status);
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
+
+    const url = `/v1/admin/orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url, {});
+  }
+
+  /**
+   * Get all products for admin management
+   */
+  static async getProducts(params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    category?: string;
+    search?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
+
+    const url = `/v1/admin/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url, {});
+  }
+
+  /**
+   * Get all payments for admin management
+   */
+  static async getPayments(params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
+
+    const url = `/admin/payments${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url, {});
+  }
+
+  /**
+   * Get all refunds for admin management
+   */
+  static async getRefunds(params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
+
+    const url = `/admin/refunds${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url, {});
   }
 
   /**
@@ -757,6 +865,8 @@ export class AdminAPI {
     search?: string;
     date_from?: string;
     date_to?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
   }) {
     const queryParams = new URLSearchParams();
     
@@ -766,6 +876,8 @@ export class AdminAPI {
     if (params?.search) queryParams.append('search', params.search);
     if (params?.date_from) queryParams.append('date_from', params.date_from);
     if (params?.date_to) queryParams.append('date_to', params.date_to);
+    if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
 
     const url = `/subscriptions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url, {});

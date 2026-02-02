@@ -56,7 +56,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { title: 'Subscriptions', path: '/admin/subscriptions', icon: <FileTextIcon size={18} /> },
     { title: 'Payments', path: '/admin/payments', icon: <CreditCardIcon size={18} /> },
     { title: 'Refunds', path: '/admin/refunds', icon: <RefreshCwIcon size={18} /> },
-    { title: 'Shipping', path: '/admin/shipping-methods', icon: <TruckIcon size={18} /> },
+    { title: 'Shipping', path: '/admin/shipping', icon: <TruckIcon size={18} /> },
     { title: 'Tax Rates', path: '/admin/tax-rates', icon: <Percent size={18} /> },
     { title: 'Inventory', path: '/admin/inventory', icon: <BoxesIcon size={18} /> },
     { title: 'Website', path: '/', icon: <GlobeIcon size={18} /> },
@@ -117,9 +117,9 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 <li key={item.path}>
                   <Link
                     to={item.path}
-                    className={`flex items-center px-3 py-2 text-sm ${isActive(item.path)
+                    className={`flex items-center px-3 py-2 text-xs ${isActive(item.path)
                         ? 'bg-primary text-white font-medium'
-                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                       }`}
                     onClick={() => setSidebarOpen(false)}>
                     <span className="mr-2">{item.icon}</span>
@@ -133,7 +133,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
         <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md">
+            className="flex items-center w-full px-3 py-2 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md">
             <LogOutIcon size={14} className="mr-2" />
             <span>Logout</span>
           </button>
@@ -160,7 +160,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
                     {(user as any)?.full_name?.charAt(0) || (user as any)?.firstname?.charAt(0) || 'A'}
                   </div>
-                  <span className="text-sm font-medium hidden md:block">
+                  <span className="text-xs font-medium hidden md:block">
                     {(user as any)?.full_name || `${(user as any)?.firstname} ${(user as any)?.lastname}` || 'Admin'}
                   </span>
                   <ChevronDownIcon size={16} />
@@ -170,7 +170,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                   <div className="absolute right-0 mt-2 w-48 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg z-50 bg-white dark:bg-gray-800">
                     <Link
                       to="/account/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="block px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <div className="flex items-center space-x-2">
@@ -180,7 +180,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                     </Link>
                     <Link
                       to="/account"
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="block px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <div className="flex items-center space-x-2">
@@ -194,7 +194,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                         handleLogout();
                         setProfileDropdownOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className="block w-full text-left px-4 py-2 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
                       <div className="flex items-center space-x-2">
                         <LogOutIcon size={16} />
