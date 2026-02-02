@@ -98,29 +98,13 @@ export const AdminProductDetail = () => {
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate(`/admin/products/${productId}/edit`)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary text-white rounded text-xs hover:bg-primary/90 transition-colors"
-          >
-            <Edit className="w-3 h-3" />
-            Edit
-          </button>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-            product.product_status === 'active' ? 'bg-success/20 text-success' : 
-            product.product_status === 'inactive' ? 'bg-warning/20 text-warning' :
-            'bg-gray/20 text-gray'
-          }`}>
-            {product.product_status?.charAt(0).toUpperCase() + product.product_status?.slice(1) || 'Unknown'}
-          </span>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-            product.availability_status === 'available' ? 'bg-success/20 text-success' : 
-            product.availability_status === 'out_of_stock' ? 'bg-destructive/20 text-destructive' :
-            'bg-warning/20 text-warning'
-          }`}>
-            {product.availability_status?.replace('_', ' ').charAt(0).toUpperCase() + product.availability_status?.replace('_', ' ').slice(1) || 'Unknown'}
-          </span>
-        </div>
+        <button
+          onClick={() => navigate(`/admin/products/${productId}/edit`)}
+          className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary text-white rounded text-xs hover:bg-primary/90 transition-colors"
+        >
+          <Edit className="w-3 h-3" />
+          Edit
+        </button>
       </div>
 
       {/* Product Information */}
