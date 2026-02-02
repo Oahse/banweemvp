@@ -4,6 +4,7 @@ from sqlalchemy.orm import selectinload
 from typing import Optional, List, Dict, Any
 from fastapi import HTTPException
 from uuid import UUID
+from core.utils.uuid_utils import uuid7
 from models.product import Product, ProductVariant, Category, ProductImage
 from models.inventories import Inventory
 from models.cart import CartItem
@@ -270,7 +271,8 @@ class ProductService:
             .options(
                 selectinload(Product.category),
                 selectinload(Product.supplier),
-                selectinload(Product.variants).selectinload(ProductVariant.images)
+                selectinload(Product.variants).selectinload(ProductVariant.images),
+                selectinload(Product.variants).selectinload(ProductVariant.inventory)
             )
         )
 
@@ -330,6 +332,7 @@ class ProductService:
                 selectinload(Product.supplier),
                 selectinload(Product.variants).selectinload(
                     ProductVariant.images),
+                selectinload(Product.variants).selectinload(ProductVariant.inventory)
             )
             .where(Product.featured.is_(True))  # safer than == True
             .order_by(Product.created_at.desc())
@@ -364,7 +367,8 @@ class ProductService:
                 selectinload(Product.category),
                 selectinload(Product.supplier),
                 selectinload(Product.variants).selectinload(
-                    ProductVariant.images)
+                    ProductVariant.images),
+                selectinload(Product.variants).selectinload(ProductVariant.inventory)
             )
         )
 
@@ -377,7 +381,8 @@ class ProductService:
                 selectinload(Product.category),
                 selectinload(Product.supplier),
                 selectinload(Product.variants).selectinload(
-                    ProductVariant.images)
+                    ProductVariant.images),
+                selectinload(Product.variants).selectinload(ProductVariant.inventory)
             ).order_by(Product.rating.desc(), Product.review_count.desc()).limit(limit)
 
             fallback_result = await self.db.execute(fallback_query)
@@ -403,7 +408,8 @@ class ProductService:
         query = select(Product).options(
             selectinload(Product.category),
             selectinload(Product.supplier),
-            selectinload(Product.variants).selectinload(ProductVariant.images)
+            selectinload(Product.variants).selectinload(ProductVariant.images),
+            selectinload(Product.variants).selectinload(ProductVariant.inventory)
         ).where(
             and_(Product.category_id == product.category_id,
                  Product.id != product_id)
@@ -475,7 +481,8 @@ class ProductService:
         query = select(Product).options(
             selectinload(Product.category),
             selectinload(Product.supplier),
-            selectinload(Product.variants).selectinload(ProductVariant.images)
+            selectinload(Product.variants).selectinload(ProductVariant.images),
+            selectinload(Product.variants).selectinload(ProductVariant.inventory)
         ).where(Product.id == product_id)
 
         result = await self.db.execute(query)
@@ -488,7 +495,8 @@ class ProductService:
     async def get_variant_by_id(self, variant_id: UUID) -> Optional[ProductVariantResponse]:
         """Get product variant by ID."""
         query = select(ProductVariant).options(
-            selectinload(ProductVariant.images)
+            selectinload(ProductVariant.images),
+            selectinload(ProductVariant.inventory)
         ).where(ProductVariant.id == variant_id)
 
         result = await self.db.execute(query)
@@ -501,7 +509,8 @@ class ProductService:
     async def get_product_variants(self, product_id: UUID) -> List[ProductVariantResponse]:
         """Get all variants for a product."""
         query = select(ProductVariant).options(
-            selectinload(ProductVariant.images)
+            selectinload(ProductVariant.images),
+            selectinload(ProductVariant.inventory)
         ).where(ProductVariant.product_id == product_id)
 
         result = await self.db.execute(query)

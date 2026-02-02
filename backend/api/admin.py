@@ -1,9 +1,10 @@
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func, or_
+from sqlalchemy.orm import selectinload
 from typing import Optional, Dict, Any, List
 from core.db import get_db
 from core.utils.response import Response
@@ -13,9 +14,14 @@ from services.admin import AdminService
 from services.orders import OrderService
 from services.shipping import ShippingService
 from models.user import User
+from models.subscriptions import Subscription
+from models.product import ProductVariant
+from models.refunds import Refund, RefundStatus, RefundItem
 from models.orders import Order
+from models.payments import PaymentIntent, Transaction
 from services.auth import AuthService
 from schemas.auth import UserCreate
+from schemas.user import UserUpdate
 from schemas.shipping import ShippingMethodCreate, ShippingMethodUpdate
 from core.dependencies import get_current_auth_user
 
@@ -34,6 +40,18 @@ class UpdateOrderStatusRequest(BaseModel):
     location: Optional[str] = None
     description: Optional[str] = None
 
+class UpdateRefundStatusRequest(BaseModel):
+    status: str
+    admin_notes: Optional[str] = None
+
+class AdminUserUpdate(BaseModel):
+    firstname: Optional[str] = None
+    lastname: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role: Optional[str] = None
+    is_active: Optional[bool] = None
+    password: Optional[str] = None
+
 def require_admin(current_user: User = Depends(get_current_auth_user)):
     """Require admin role."""
     if current_user.role not in ["admin", "manager", "Admin", "SuperAdmin"]:
@@ -42,6 +60,181 @@ def require_admin(current_user: User = Depends(get_current_auth_user)):
             message="Admin access required"
         )
     return current_user
+
+
+def _parse_date_filter(value: Optional[str]) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed
+    except ValueError:
+        raise APIException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message="Invalid date format. Use ISO format (YYYY-MM-DD)."
+        )
+
+
+@router.get("/subscriptions")
+async def get_all_subscriptions(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    status_filter: Optional[str] = Query(None, alias="status"),
+    search: Optional[str] = Query(None),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    sort_by: str = Query("created_at"),
+    sort_order: str = Query("desc"),
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all subscriptions (admin only)."""
+    try:
+        base_query = select(Subscription).join(User).options(
+            selectinload(Subscription.user),
+            selectinload(Subscription.products)
+        )
+
+        if status_filter:
+            base_query = base_query.where(Subscription.status == status_filter)
+
+        if search:
+            search_term = f"%{search}%"
+            base_query = base_query.where(
+                or_(
+                    User.email.ilike(search_term),
+                    User.firstname.ilike(search_term),
+                    User.lastname.ilike(search_term)
+                )
+            )
+
+        parsed_from = _parse_date_filter(date_from)
+        parsed_to = _parse_date_filter(date_to)
+
+        if parsed_from:
+            base_query = base_query.where(Subscription.created_at >= parsed_from)
+
+        if parsed_to:
+            if date_to and "T" not in date_to:
+                parsed_to = parsed_to + timedelta(days=1)
+                base_query = base_query.where(Subscription.created_at < parsed_to)
+            else:
+                base_query = base_query.where(Subscription.created_at <= parsed_to)
+
+        sort_columns = {
+            "created_at": Subscription.created_at,
+            "status": Subscription.status,
+            "next_billing_date": Subscription.next_billing_date,
+            "total": Subscription.total,
+            "price": Subscription.price
+        }
+        sort_column = sort_columns.get(sort_by, Subscription.created_at)
+        base_query = base_query.order_by(sort_column.asc() if sort_order == "asc" else sort_column.desc())
+
+        count_query = select(func.count()).select_from(Subscription).join(User)
+        if status_filter:
+            count_query = count_query.where(Subscription.status == status_filter)
+        if search:
+            search_term = f"%{search}%"
+            count_query = count_query.where(
+                or_(
+                    User.email.ilike(search_term),
+                    User.firstname.ilike(search_term),
+                    User.lastname.ilike(search_term)
+                )
+            )
+        if parsed_from:
+            count_query = count_query.where(Subscription.created_at >= parsed_from)
+        if parsed_to:
+            if date_to and "T" not in date_to:
+                count_query = count_query.where(Subscription.created_at < parsed_to)
+            else:
+                count_query = count_query.where(Subscription.created_at <= parsed_to)
+
+        total_result = await db.execute(count_query)
+        total = total_result.scalar() or 0
+
+        result = await db.execute(
+            base_query.offset((page - 1) * limit).limit(limit)
+        )
+        subscriptions = result.scalars().all()
+
+        subscriptions_data = []
+        for subscription in subscriptions:
+            payload = subscription.to_dict(include_products=True)
+            variant_quantities = payload.get("variant_quantities") or {}
+            variants_payload = []
+
+            try:
+                for variant in subscription.products or []:
+                    variant_id = str(variant.id)
+                    variants_payload.append({
+                        "id": variant_id,
+                        "name": variant.name,
+                        "sku": variant.sku,
+                        "base_price": float(variant.base_price),
+                        "current_price": float(getattr(variant, "current_price", variant.base_price)),
+                        "qty": int(variant_quantities.get(variant_id, 1))
+                    })
+
+                if not variants_payload:
+                    variant_ids = payload.get("variant_ids") or []
+                    resolved_ids = []
+                    for variant_id in variant_ids:
+                        try:
+                            resolved_ids.append(UUID(str(variant_id)))
+                        except Exception:
+                            continue
+
+                    if resolved_ids:
+                        variant_result = await db.execute(
+                            select(ProductVariant).where(ProductVariant.id.in_(resolved_ids))
+                        )
+                        variants = variant_result.scalars().all()
+                        for variant in variants:
+                            variant_id = str(variant.id)
+                            variants_payload.append({
+                                "id": variant_id,
+                                "name": variant.name,
+                                "sku": variant.sku,
+                                "base_price": float(variant.base_price),
+                                "current_price": float(getattr(variant, "current_price", variant.base_price)),
+                                "qty": int(variant_quantities.get(variant_id, 1))
+                            })
+            except Exception:
+                variants_payload = []
+            payload["user"] = {
+                "id": str(subscription.user.id) if subscription.user else None,
+                "name": subscription.user.full_name if subscription.user else "",
+                "email": subscription.user.email if subscription.user else ""
+            }
+            payload["base_cost"] = payload.get("subtotal", 0)
+            payload["delivery_cost"] = payload.get("shipping_cost", 0)
+            payload["total_cost"] = payload.get("total", 0)
+            payload["subscription_plan"] = None
+            payload["variants"] = variants_payload
+            subscriptions_data.append(payload)
+
+        pages = max(1, (total + limit - 1) // limit) if limit else 1
+
+        return Response.success(data={
+            "data": subscriptions_data,
+            "pagination": {
+                "page": page,
+                "limit": limit,
+                "total": total,
+                "pages": pages
+            }
+        })
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to fetch subscriptions: {str(e)}"
+        )
 
 # Basic Admin Routes
 @router.get("/stats")
@@ -130,6 +323,193 @@ async def get_order_by_id(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch order: {str(e)}"
+        )
+
+# Refunds Management Routes
+@router.get("/refunds")
+async def get_all_refunds(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    refund_status: Optional[RefundStatus] = Query(None, alias="status"),
+    sort_by: str = Query("created_at"),
+    sort_order: str = Query("desc"),
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all refunds (admin only)."""
+    try:
+        base_query = select(Refund).options(
+            selectinload(Refund.user),
+            selectinload(Refund.order)
+        )
+
+        if refund_status:
+            base_query = base_query.where(Refund.status == refund_status)
+
+        sort_column = Refund.created_at
+        if sort_by == "amount":
+            sort_column = Refund.requested_amount
+
+        if sort_order == "asc":
+            base_query = base_query.order_by(sort_column.asc())
+        else:
+            base_query = base_query.order_by(sort_column.desc())
+
+        count_query = select(func.count()).select_from(Refund)
+        if refund_status:
+            count_query = count_query.where(Refund.status == refund_status)
+
+        total_result = await db.execute(count_query)
+        total = total_result.scalar() or 0
+
+        result = await db.execute(
+            base_query.offset((page - 1) * limit).limit(limit)
+        )
+        refunds = result.scalars().all()
+
+        refunds_data = []
+        for refund in refunds:
+            customer_name = refund.user.full_name if refund.user else ""
+            refunds_data.append({
+                "id": str(refund.id),
+                "payment_id": None,
+                "order_id": str(refund.order_id),
+                "amount": float(refund.requested_amount),
+                "currency": refund.currency,
+                "status": refund.status.value if refund.status else None,
+                "reason": refund.reason.value if refund.reason else None,
+                "created_at": refund.created_at.isoformat() if refund.created_at else None,
+                "customer_name": customer_name
+            })
+
+        # Calculate pages - ensure at least 1 page even if total is 0
+        pages = max(1, (total + limit - 1) // limit) if limit else 1
+
+        return Response.success(
+            data={
+                "data": refunds_data,
+                "pagination": {
+                    "page": page,
+                    "limit": limit,
+                    "total": total,
+                    "pages": pages
+                }
+            }
+        )
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to fetch refunds {str(e)}"
+        )
+
+@router.get("/refunds/{refund_id}")
+async def get_refund_details(
+    refund_id: UUID,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get refund details (admin only)."""
+    try:
+        result = await db.execute(
+            select(Refund)
+            .where(Refund.id == refund_id)
+            .options(
+                selectinload(Refund.user),
+                selectinload(Refund.order),
+                selectinload(Refund.refund_items).selectinload(RefundItem.order_item)
+            )
+        )
+        refund = result.scalars().first()
+
+        if not refund:
+            raise APIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                message="Refund not found"
+            )
+
+        refund_data = refund.to_dict()
+        refund_data["customer_name"] = refund.user.full_name if refund.user else ""
+        refund_data["refund_items"] = [
+            {
+                "id": str(item.id),
+                "order_item_id": str(item.order_item_id),
+                "quantity_to_refund": item.quantity_to_refund,
+                "unit_price": item.unit_price,
+                "total_refund_amount": item.total_refund_amount,
+                "condition_notes": item.condition_notes,
+            }
+            for item in refund.refund_items
+        ]
+
+        return Response.success(data=refund_data)
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to fetch refund details {str(e)}"
+        )
+
+@router.put("/refunds/{refund_id}/status")
+async def update_refund_status(
+    refund_id: UUID,
+    payload: UpdateRefundStatusRequest,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update refund status (admin only)."""
+    try:
+        result = await db.execute(select(Refund).where(Refund.id == refund_id))
+        refund = result.scalars().first()
+
+        if not refund:
+            raise APIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                message="Refund not found"
+            )
+
+        try:
+            new_status = RefundStatus(payload.status)
+        except Exception:
+            raise APIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                message="Invalid refund status"
+            )
+
+        refund.status = new_status
+        if payload.admin_notes is not None:
+            refund.admin_notes = payload.admin_notes
+
+        now = datetime.now(timezone.utc)
+        if new_status == RefundStatus.APPROVED:
+            refund.approved_at = now
+            refund.reviewed_at = now
+            refund.reviewed_by = current_user.id
+            if refund.approved_amount is None:
+                refund.approved_amount = refund.requested_amount
+        elif new_status == RefundStatus.REJECTED:
+            refund.reviewed_at = now
+            refund.reviewed_by = current_user.id
+        elif new_status == RefundStatus.PROCESSING:
+            refund.processed_at = now
+            refund.processed_by = current_user.id
+            if refund.processed_amount is None:
+                refund.processed_amount = refund.approved_amount or refund.requested_amount
+        elif new_status == RefundStatus.COMPLETED:
+            refund.completed_at = now
+
+        await db.commit()
+        await db.refresh(refund)
+
+        refund_data = refund.to_dict()
+        refund_data["customer_name"] = refund.user.full_name if refund.user else ""
+        return Response.success(data=refund_data, message="Refund status updated")
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to update refund status {str(e)}"
         )
 
 @router.put("/orders/{order_id}/ship")
@@ -340,6 +720,64 @@ async def get_user_by_id(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch user: {str(e)}"
+        )
+
+@router.put("/users/{user_id}")
+async def update_user_admin(
+    user_id: str,
+    payload: AdminUserUpdate,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update user details (admin only)."""
+    try:
+        from services.user import UserService
+        from services.auth import AuthService
+
+        user_uuid = UUID(user_id)
+        user_service = UserService(db)
+        auth_service = AuthService(db)
+
+        user_data = UserUpdate(
+            firstname=payload.firstname,
+            lastname=payload.lastname,
+            email=payload.email,
+            is_active=payload.is_active
+        )
+
+        user = await user_service.update_user(user_uuid, user_data)
+        if not user:
+            raise APIException(status_code=status.HTTP_404_NOT_FOUND, message="User not found")
+
+        if payload.role:
+            user.role = payload.role
+
+        if payload.password:
+            user.hashed_password = auth_service.get_password_hash(payload.password)
+
+        await db.commit()
+        await db.refresh(user)
+
+        return Response.success(
+            data={
+                "id": str(user.id),
+                "email": user.email,
+                "firstname": user.firstname,
+                "lastname": user.lastname,
+                "role": user.role,
+                "is_active": user.is_active,
+                "verified": user.verified,
+                "created_at": user.created_at.isoformat() if user.created_at else None,
+                "last_login": user.last_login.isoformat() if user.last_login else None
+            },
+            message="User updated successfully"
+        )
+    except APIException:
+        raise
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to update user: {str(e)}"
         )
 
 @router.put("/users/{user_id}/status")
@@ -1312,4 +1750,170 @@ async def bulk_update_tax_rates(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to bulk update tax rates: {str(e)}"
+        )
+
+# --- Inventory Sync Endpoints ---
+@router.post("/sync-inventory")
+async def sync_all_inventory(
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Sync all product availability statuses based on current inventory levels.
+    This ensures products showing as out of stock actually have no inventory.
+    Admin only - for data consistency maintenance.
+    """
+    try:
+        from services.inventory import InventoryService
+        inventory_service = InventoryService(db)
+        result = await inventory_service.sync_all_products_availability()
+        
+        return Response.success(
+            data=result,
+            message=result.get("message", "Inventory sync completed")
+        )
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to sync inventory: {str(e)}"
+        )
+
+
+@router.post("/sync-inventory/product/{product_id}")
+async def sync_product_inventory(
+    product_id: str,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Sync a single product's availability status based on its variant inventory levels.
+    Admin only - for data consistency maintenance.
+    """
+    try:
+        from uuid import UUID as UUIDType
+        from services.inventory import InventoryService
+        
+        product_id_uuid = UUIDType(product_id)
+        inventory_service = InventoryService(db)
+        result = await inventory_service.sync_product_availability_status(product_id_uuid)
+        
+        return Response.success(
+            data=result,
+            message="Product inventory synced successfully"
+        )
+    except ValueError:
+        raise APIException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message="Invalid product ID format"
+        )
+    except Exception as e:
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to sync product inventory: {str(e)}"
+        )
+
+
+@router.get("/payments")
+async def get_admin_payments(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    status: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+    sort_by: str = Query("created_at"),
+    sort_order: str = Query("desc", regex="^(asc|desc)$"),
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get all payments for admin management
+    """
+    try:
+        # Build base query for PaymentIntents
+        query = select(PaymentIntent).options(selectinload(PaymentIntent.user))
+        
+        # Apply filters
+        if status:
+            query = query.where(PaymentIntent.status == status)
+        
+        if search:
+            search_term = f"%{search}%"
+            query = query.where(
+                or_(
+                    PaymentIntent.stripe_payment_intent_id.ilike(search_term),
+                    PaymentIntent.payment_method_type.ilike(search_term)
+                )
+            )
+        
+        # Apply sorting
+        if sort_by == "created_at":
+            sort_column = PaymentIntent.created_at
+        elif sort_by == "amount":
+            # Extract amount from amount_breakdown JSON
+            sort_column = PaymentIntent.amount_breakdown
+        elif sort_by == "status":
+            sort_column = PaymentIntent.status
+        else:
+            sort_column = PaymentIntent.created_at
+        
+        if sort_order == "desc":
+            query = query.order_by(sort_column.desc())
+        else:
+            query = query.order_by(sort_column.asc())
+        
+        # Get total count
+        count_query = select(func.count()).select_from(query.subquery())
+        total_result = await db.execute(count_query)
+        total = total_result.scalar()
+        
+        # Apply pagination
+        offset = (page - 1) * limit
+        query = query.offset(offset).limit(limit)
+        
+        # Execute query
+        result = await db.execute(query)
+        payment_intents = result.scalars().all()
+        
+        # Format response data
+        payments_data = []
+        for payment in payment_intents:
+            # Extract amount from amount_breakdown
+            amount = 0
+            if payment.amount_breakdown:
+                if isinstance(payment.amount_breakdown, dict):
+                    amount = float(payment.amount_breakdown.get("total", 0))
+                else:
+                    amount = float(payment.amount_breakdown)
+            
+            payments_data.append({
+                "id": str(payment.id),
+                "order_id": str(payment.order_id) if payment.order_id else None,
+                "amount": amount,
+                "currency": payment.currency,
+                "status": payment.status,
+                "payment_method": payment.payment_method_type or "Unknown",
+                "created_at": payment.created_at.isoformat() if payment.created_at else None,
+                "customer_name": payment.user.full_name if payment.user else "Unknown User"
+            })
+        
+        # Calculate pagination info
+        pages = (total + limit - 1) // limit
+        
+        return Response.success(
+            data={
+                "data": payments_data,
+                "pagination": {
+                    "page": page,
+                    "limit": limit,
+                    "total": total,
+                    "pages": pages
+                }
+            },
+            message="Payments retrieved successfully"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error fetching admin payments: {str(e)}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to fetch payments: {str(e)}"
         )

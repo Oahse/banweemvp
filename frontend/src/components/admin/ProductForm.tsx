@@ -56,7 +56,7 @@ interface ProductFormData {
   variants: ProductVariant[];
 }
 
-export const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => {
+const ProductForm: React.FC<ProductFormProps> = ({ productId, mode }) => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const [loading, setLoading] = useState(false);

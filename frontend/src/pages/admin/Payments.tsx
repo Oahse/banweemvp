@@ -248,8 +248,8 @@ export const Payments = () => {
     <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Payments Management</h1>
-          <p className={`mt-1 text-sm lg:text-base ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage payment transactions and processing</p>
+          <h1 className="text-xl lg:text-2xl font-semibold">Payments Management</h1>
+          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage payment transactions and processing</p>
         </div>
         <div className="flex gap-2 w-full lg:w-auto">
           <button
@@ -391,7 +391,7 @@ export const Payments = () => {
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className="text-lg lg:text-xl font-bold">All Payments</h2>
+          <h2 className="text-base lg:text-lg font-semibold">All Payments</h2>
         </div>
 
         {payments.length > 0 ? (
@@ -475,13 +475,15 @@ export const Payments = () => {
               ))}
             </div>
 
-            {pagination.total > 0 && (
-              <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-                <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} items
-                  {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
-                </p>
-                <div className="flex items-center gap-1">
+            <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+              <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {pagination.total > 0
+                  ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
+                  : `Total: ${pagination.total} items`
+                }
+                {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
+              </p>
+              <div className="flex items-center gap-1">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page <= 1}
@@ -497,7 +499,7 @@ export const Payments = () => {
                   
                   {/* Page numbers */}
                   <div className="flex items-center gap-1 mx-1 lg:mx-2">
-                    {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
+                    {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
                       let pageNum;
                       if (pagination.pages <= 5) {
                         pageNum = i + 1;
@@ -528,8 +530,8 @@ export const Payments = () => {
                   </div>
                   
                   <button
-                    onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
-                    disabled={page >= pagination.pages || pagination.pages <= 1}
+                    onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
+                    disabled={page >= (pagination.pages || 1)}
                     className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
                       currentTheme === 'dark' 
                         ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
@@ -539,9 +541,8 @@ export const Payments = () => {
                     <span className="hidden sm:inline">Next</span>
                     <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
                   </button>
-                </div>
               </div>
-            )}
+            </div>
           </>
         ) : (
           <div className={`p-6 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No payments found</div>

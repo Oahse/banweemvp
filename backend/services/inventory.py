@@ -424,10 +424,33 @@ class InventoryService:
         inventory_item = await self.get_inventory_item_by_id(inventory_id)
         if not inventory_item:
             raise APIException(status_code=404, message="Inventory item not found")
-        
-        for field, value in inventory_data.model_dump(exclude_unset=True).items():
+
+        update_data = inventory_data.model_dump(exclude_unset=True)
+        location_name = update_data.pop("location_name", None)
+
+        if "quantity" in update_data:
+            quantity_value = update_data.pop("quantity")
+            inventory_item.quantity_available = quantity_value
+            inventory_item.quantity = quantity_value
+            inventory_item.last_restocked_at = datetime.utcnow()
+
+        if location_name:
+            normalized_name = location_name.strip()
+            if normalized_name:
+                existing_location = await self.db.scalar(
+                    select(WarehouseLocation).where(func.lower(WarehouseLocation.name) == normalized_name.lower())
+                )
+                if existing_location:
+                    inventory_item.location_id = existing_location.id
+                else:
+                    new_location = WarehouseLocation(id=uuid7(), name=normalized_name)
+                    self.db.add(new_location)
+                    await self.db.flush()
+                    inventory_item.location_id = new_location.id
+
+        for field, value in update_data.items():
             setattr(inventory_item, field, value)
-        
+
         inventory_item.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(inventory_item)
@@ -772,6 +795,24 @@ class InventoryService:
             
             logger.info(f"Atomically decremented stock for variant {variant_id}: -{quantity}")
             
+            # Queue product availability sync as background task (don't wait for it)
+            try:
+                from core.arq_worker import enqueue_sync_product_availability
+                
+                # Get the variant to find its product
+                variant_result = await self.db.execute(
+                    select(ProductVariant).where(ProductVariant.id == variant_id)
+                )
+                variant = variant_result.scalar_one_or_none()
+                
+                if variant:
+                    # Queue sync as background task - don't block the order response
+                    await enqueue_sync_product_availability(str(variant.product_id))
+                    logger.info(f"Queued inventory sync for product {variant.product_id}")
+            except Exception as sync_error:
+                logger.warning(f"Failed to queue product availability sync: {sync_error}")
+                # Don't fail the entire operation if queueing fails
+            
             return {
                 "success": True,
                 "old_quantity": inventory.quantity_available + quantity,
@@ -829,6 +870,24 @@ class InventoryService:
             await self.db.commit()
             
             logger.info(f"Atomically incremented stock for variant {variant_id}: +{quantity}")
+            
+            # Queue product availability sync as background task (don't wait for it)
+            try:
+                from core.arq_worker import enqueue_sync_product_availability
+                
+                # Get the variant to find its product
+                variant_result = await self.db.execute(
+                    select(ProductVariant).where(ProductVariant.id == variant_id)
+                )
+                variant = variant_result.scalar_one_or_none()
+                
+                if variant:
+                    # Queue sync as background task - don't block the cancellation response
+                    await enqueue_sync_product_availability(str(variant.product_id))
+                    logger.info(f"Queued inventory sync for product {variant.product_id}")
+            except Exception as sync_error:
+                logger.warning(f"Failed to queue product availability sync: {sync_error}")
+                # Don't fail the entire operation if queueing fails
             
             return {
                 "success": True,
@@ -909,3 +968,118 @@ class InventoryService:
         except Exception as e:
             logger.error(f"Failed to log inventory change: {e}")
             # Don't raise exception as logging failures shouldn't break inventory operations
+
+    async def sync_product_availability_status(self, product_id: UUID) -> Dict[str, Any]:
+        """
+        Sync product availability_status based on its variants' inventory levels
+        
+        Checks all variants of a product and updates the product's availability_status:
+        - "available" if at least one variant has stock > 0
+        - "out_of_stock" if all variants have stock <= 0
+        - "pre_order" if product has pre_order flag set
+        """
+        try:
+            # Get product with variants and inventory
+            product_result = await self.db.execute(
+                select(Product)
+                .where(Product.id == product_id)
+                .options(selectinload(Product.variants).selectinload(ProductVariant.inventory))
+            )
+            product = product_result.scalar_one_or_none()
+            
+            if not product:
+                return {
+                    "success": False,
+                    "message": f"Product {product_id} not found"
+                }
+            
+            # Check if any variant has stock
+            has_stock = False
+            total_stock = 0
+            
+            for variant in product.variants or []:
+                if variant.inventory and variant.inventory.quantity_available > 0:
+                    has_stock = True
+                    total_stock += variant.inventory.quantity_available
+            
+            # Update product availability status
+            old_status = product.availability_status
+            if has_stock:
+                product.availability_status = "available"
+            else:
+                product.availability_status = "out_of_stock"
+            
+            await self.db.commit()
+            
+            logger.info(f"Synced product {product_id} availability: {old_status} → {product.availability_status} (total stock: {total_stock})")
+            
+            return {
+                "success": True,
+                "product_id": str(product_id),
+                "old_status": old_status,
+                "new_status": product.availability_status,
+                "total_stock": total_stock,
+                "variant_count": len(product.variants or [])
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to sync product availability status: {e}")
+            return {
+                "success": False,
+                "message": f"Failed to sync availability status: {str(e)}"
+            }
+
+    async def sync_all_products_availability(self) -> Dict[str, Any]:
+        """
+        Sync availability_status for all products based on their inventory
+        Returns summary of changes made
+        """
+        try:
+            # Get all products with variants and inventory
+            products_result = await self.db.execute(
+                select(Product)
+                .options(selectinload(Product.variants).selectinload(ProductVariant.inventory))
+            )
+            products = products_result.scalars().all()
+            
+            updated_count = 0
+            still_in_stock = 0
+            went_out_of_stock = 0
+            
+            for product in products:
+                total_stock = 0
+                for variant in product.variants or []:
+                    if variant.inventory:
+                        total_stock += variant.inventory.quantity_available
+                
+                old_status = product.availability_status
+                new_status = "available" if total_stock > 0 else "out_of_stock"
+                
+                if old_status != new_status:
+                    product.availability_status = new_status
+                    updated_count += 1
+                    
+                    if new_status == "out_of_stock":
+                        went_out_of_stock += 1
+                    else:
+                        still_in_stock += 1
+                    
+                    logger.info(f"Updated product {product.id} availability: {old_status} → {new_status}")
+            
+            await self.db.commit()
+            
+            return {
+                "success": True,
+                "total_products": len(products),
+                "updated_count": updated_count,
+                "went_out_of_stock": went_out_of_stock,
+                "back_in_stock": still_in_stock,
+                "message": f"Synced {updated_count} products ({went_out_of_stock} went out of stock, {still_in_stock} back in stock)"
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to sync all products availability: {e}")
+            return {
+                "success": False,
+                "message": f"Failed to sync all products: {str(e)}"
+            }

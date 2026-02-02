@@ -360,8 +360,8 @@ export const AdminTaxRates = () => {
     <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Tax Rates Management</h1>
-          <p className={`mt-1 text-sm lg:text-base ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</p>
+          <h1 className="text-xl lg:text-2xl font-semibold">Tax Rates Management</h1>
+          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</p>
         </div>
         <div className="flex gap-2 w-full lg:w-auto">
           <button 
@@ -496,7 +496,7 @@ export const AdminTaxRates = () => {
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className="text-lg lg:text-xl font-bold">All Tax Rates</h2>
+          <h2 className="text-base lg:text-lg font-semibold">All Tax Rates</h2>
         </div>
 
         {taxRates.length > 0 ? (
@@ -668,10 +668,10 @@ export const AdminTaxRates = () => {
 
       {/* Add/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={() => setShowModal(false)}>
           <div className={`rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto ${
             currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'
-          }`}>
+          }`} onClick={(e) => e.stopPropagation()}>
             <div className="p-4 lg:p-6">
               <div className="flex justify-between items-center mb-4 lg:mb-6">
                 <h2 className={`text-base lg:text-xl font-semibold ${

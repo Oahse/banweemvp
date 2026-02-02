@@ -777,7 +777,7 @@ export class AdminAPI {
     if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
     if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
 
-    const url = `/v1/admin/orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/admin/orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url, {});
   }
 
@@ -803,7 +803,7 @@ export class AdminAPI {
     if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
     if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
 
-    const url = `/v1/admin/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/admin/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url, {});
   }
 
@@ -856,6 +856,20 @@ export class AdminAPI {
   }
 
   /**
+   * Get refund details by ID (admin)
+   */
+  static async getRefundDetails(refundId: string) {
+    return await apiClient.get(`/admin/refunds/${refundId}`, {});
+  }
+
+  /**
+   * Update refund status (admin)
+   */
+  static async updateRefundStatus(refundId: string, status: string, admin_notes?: string) {
+    return await apiClient.put(`/admin/refunds/${refundId}/status`, { status, admin_notes }, {});
+  }
+
+  /**
    * Get all subscriptions for admin management
    */
   static async getSubscriptions(params: {
@@ -879,7 +893,7 @@ export class AdminAPI {
     if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
     if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
 
-    const url = `/subscriptions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/admin/subscriptions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url, {});
   }
 

@@ -70,6 +70,15 @@ class SupplierResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class InventoryResponse(BaseModel):
+    id: Optional[UUID] = None
+    quantity_available: int = 0
+    low_stock_threshold: int = 10
+    inventory_status: str = "active"
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ProductVariantResponse(BaseModel):
     id: UUID
     product_id: UUID
@@ -86,6 +95,7 @@ class ProductVariantResponse(BaseModel):
     qr_code: Optional[str] = None  # Base64 encoded QR code image
     images: List[ProductImageResponse] = []
     primary_image: Optional[ProductImageResponse] = None
+    inventory: Optional[InventoryResponse] = None
     created_at: str
     updated_at: Optional[str]
     product_name: Optional[str] = None

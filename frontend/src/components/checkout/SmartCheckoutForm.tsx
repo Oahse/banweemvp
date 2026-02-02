@@ -617,8 +617,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
       {/* Add Address Modal */}
       {showAddAddressForm && (
-        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-surface dark:bg-surface-dark rounded-lg p-6 max-w-md w-full mx-4 border border-border-light dark:border-border-dark">
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50" onClick={() => setShowAddAddressForm(false)}>
+          <div className="bg-surface dark:bg-surface-dark rounded-lg p-6 max-w-md w-full mx-4 border border-border-light dark:border-border-dark" onClick={(e) => e.stopPropagation()}>
             <AddAddressForm
               onSuccess={() => {
                 setShowAddAddressForm(false);

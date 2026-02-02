@@ -265,6 +265,12 @@ class ProductVariant(BaseModel):
             "qr_code": self.qr_code,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "inventory": {
+                "id": str(self.inventory.id) if self.inventory else None,
+                "quantity_available": self.inventory.quantity_available if self.inventory else 0,
+                "low_stock_threshold": self.inventory.low_stock_threshold if self.inventory else 10,
+                "inventory_status": self.inventory.inventory_status if self.inventory else "active"
+            } if self.inventory else None
         }
 
         if include_images:

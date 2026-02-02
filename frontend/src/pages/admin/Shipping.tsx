@@ -377,7 +377,9 @@ export const AdminShipping = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
+        <Loader className={`w-12 h-12 animate-spin ${
+          currentTheme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`} />
       </div>
     );
   }
@@ -386,8 +388,8 @@ export const AdminShipping = () => {
     <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Shipping Management</h1>
-          <p className={`mt-1 text-sm lg:text-base ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage shipping methods and rates</p>
+          <h1 className="text-xl lg:text-2xl font-semibold">Shipping Management</h1>
+          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage shipping methods and rates</p>
         </div>
         <div className="flex gap-2 w-full lg:w-auto">
           <button
@@ -420,7 +422,11 @@ export const AdminShipping = () => {
               />
               {searchQuery !== debouncedSearchQuery && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <div className={`w-4 h-4 border-2 rounded-full animate-spin ${
+                    currentTheme === 'dark' 
+                      ? 'border-white border-t-transparent' 
+                      : 'border-gray-900 border-t-transparent'
+                  }`}></div>
                 </div>
               )}
             </div>
@@ -522,7 +528,7 @@ export const AdminShipping = () => {
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className="text-lg lg:text-xl font-bold">All Shipping Methods</h2>
+            <h2 className="text-base lg:text-lg font-semibold">All Shipping Methods</h2>
         </div>
 
         {methods.length > 0 ? (
@@ -700,8 +706,8 @@ export const AdminShipping = () => {
       </div>
 
       {showDetailsModal && viewingMethod && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowDetailsModal(false)}>
+          <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="text-lg font-semibold">{viewingMethod.name}</h3>
@@ -765,8 +771,8 @@ export const AdminShipping = () => {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowModal(false)}>
+          <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="text-lg font-semibold">{editingMethod ? 'Edit Shipping Method' : 'Add Shipping Method'}</h3>

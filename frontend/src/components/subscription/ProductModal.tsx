@@ -127,10 +127,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   return (
     <>
       {/* Modal Backdrop */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
         <div className={combineThemeClasses(
           themeClasses.card.base,
           'w-full max-w-4xl max-h-[90vh] flex flex-col'
+        )} onClick={(e) => e.stopPropagation()}>
         )}>
           {/* Header */}
           <div className="p-6 border-b border-border flex-shrink-0">

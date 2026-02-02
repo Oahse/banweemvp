@@ -56,13 +56,14 @@ const Support = lazy(() => import('./pages/Support'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
 const AdminDashboardPage = lazy(() => import('./components/admin/Dashboard'));
-const AdminOrders = lazy(() => import('./components/admin/Orders'));
+const AdminOrders = lazy(() => import('./pages/admin/Orders'));
 const AdminOrderDetail = lazy(() => import('./pages/admin/OrderDetail'));
 const AdminProducts = lazy(() => import('./pages/admin/Products'));
 const AdminProductDetail = lazy(() => import('./pages/admin/ProductDetail'));
 const CreateProduct = lazy(() => import('./pages/admin/CreateProduct'));
 const EditProduct = lazy(() => import('./pages/admin/EditProduct'));
-const AdminUsers = lazy(() => import('./components/admin/Users'));
+const AdminUsers = lazy(() => import('./pages/admin/Users'));
+const AdminUserDetail = lazy(() => import('./pages/admin/UserDetail'));
 const AdminTaxRates = lazy(() => import('./pages/admin/TaxRates'));
 const AdminInventoryLocations = lazy(() => import('./pages/admin/InventoryLocations'));
 const AdminInventoryAdjustments = lazy(() => import('./pages/admin/InventoryAdjustments'));
@@ -160,6 +161,7 @@ export const App: React.FC = () => {
                           <Route path="products/:productId" element={<Suspense fallback={<ProductDetailSkeleton />}><AdminProductDetail /></Suspense>} />
                           <Route path="products/:productId/edit" element={<Suspense fallback={<PageSkeleton />}><EditProduct /></Suspense>} />
                           <Route path="users" element={<Suspense fallback={<AdminTableSkeleton />}><AdminUsers /></Suspense>} />
+                          <Route path="users/:userId" element={<Suspense fallback={<PageSkeleton />}><AdminUserDetail /></Suspense>} />
                           <Route path="tax-rates" element={<Suspense fallback={<AdminTableSkeleton />}><AdminTaxRates /></Suspense>} />
                           <Route path="inventory/locations" element={<Suspense fallback={<AdminTableSkeleton />}><AdminInventoryLocations /></Suspense>} />
                           <Route path="inventory/adjustments" element={<Suspense fallback={<AdminTableSkeleton />}><AdminInventoryAdjustments /></Suspense>} />

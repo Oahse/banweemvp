@@ -285,6 +285,38 @@ async def process_subscription_orders_task(ctx: Dict[str, Any]) -> str:
         logger.error(f"Error processing subscription orders: {e}")
         raise
 
+async def sync_product_availability_task(ctx: Dict[str, Any], product_id: str = None) -> str:
+    """Sync product availability status based on inventory levels (background task)"""
+    try:
+        from services.inventory import InventoryService
+        from uuid import UUID
+        
+        async with ctx['db_session']() as db:
+            inventory_service = InventoryService(db)
+            
+            if product_id:
+                # Sync single product
+                result = await inventory_service.sync_product_availability_status(UUID(product_id))
+                if result["success"]:
+                    logger.info(f"✅ Synced product {product_id}: {result['old_status']} → {result['new_status']} (stock: {result['total_stock']})")
+                    return f"Product {product_id} synced: {result['old_status']} → {result['new_status']}"
+                else:
+                    logger.warning(f"Failed to sync product {product_id}: {result['message']}")
+                    return f"Failed to sync product {product_id}"
+            else:
+                # Sync all products
+                result = await inventory_service.sync_all_products_availability()
+                if result["success"]:
+                    logger.info(f"✅ {result['message']}")
+                    return result['message']
+                else:
+                    logger.warning(f"Failed to sync all products: {result['message']}")
+                    return f"Failed to sync all products"
+                
+    except Exception as e:
+        logger.error(f"Error syncing product availability: {e}")
+        raise
+
 async def cleanup_old_data_task(ctx: Dict[str, Any], data_type: str, days_old: int = 30) -> str:
     """Cleanup old data background task"""
     try:
@@ -314,6 +346,7 @@ class WorkerSettings:
         process_subscription_renewal_task,
         retry_failed_payment_task,
         process_subscription_orders_task,
+        sync_product_availability_task,
         cleanup_old_data_task,
     ]
     on_startup = startup
@@ -388,3 +421,11 @@ async def enqueue_cart_cleanup():
     """Enqueue cart cleanup task"""
     pool = await get_arq_pool()
     await pool.enqueue_job('cleanup_old_data_task', 'expired_carts')
+
+async def enqueue_sync_product_availability(product_id: str = None):
+    """Enqueue product availability sync task"""
+    pool = await get_arq_pool()
+    if product_id:
+        await pool.enqueue_job('sync_product_availability_task', product_id)
+    else:
+        await pool.enqueue_job('sync_product_availability_task')

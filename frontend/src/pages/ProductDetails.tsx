@@ -50,6 +50,12 @@ interface SelectedVariant {
   attributes: Record<string, any>;
   barcode: string;
   qr_code: string;
+  inventory?: {
+    id: string;
+    quantity_available: number;
+    low_stock_threshold: number;
+    inventory_status: string;
+  };
 }
 
 // Product Details Component - using backend data directly
@@ -146,6 +152,7 @@ export const ProductDetails = () => {
         attributes: variant.attributes,
         barcode: variant.barcode,
         qr_code: variant.qr_code,
+        inventory: variant.inventory,
       });
       // Reset image selection when product changes
       setSelectedImage(0);
@@ -270,7 +277,8 @@ export const ProductDetails = () => {
         }
       } else {
         // Check stock availability
-        if (cartQuantity >= selectedVariant.stock) {
+        const availableStock = selectedVariant.inventory?.quantity_available ?? selectedVariant.stock;
+        if (cartQuantity >= availableStock) {
           toast.error('Cannot add more items than available in stock');
           return;
         }
@@ -528,6 +536,7 @@ export const ProductDetails = () => {
                           attributes: originalVariant.attributes,
                           barcode: originalVariant.barcode,
                           qr_code: originalVariant.qr_code,
+                          inventory: originalVariant.inventory,
                         });
                       }
                     }}
@@ -544,9 +553,9 @@ export const ProductDetails = () => {
             {/* Stock Status */}
             {selectedVariant && (
               <div className="mb-4">
-                {selectedVariant.stock > 0 ? (
+                {(selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 ? (
                   <span className="text-xs text-success-600 font-medium">
-                    ✓ In Stock ({selectedVariant.stock} available)
+                    ✓ In Stock ({selectedVariant.inventory?.quantity_available ?? selectedVariant.stock} available)
                   </span>
                 ) : (
                   <span className="text-xs text-error-600 font-medium">
@@ -557,7 +566,7 @@ export const ProductDetails = () => {
             )}
 
             {/* Quantity Selection */}
-            {selectedVariant && selectedVariant.stock > 0 && (
+            {selectedVariant && (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 && (
               <div>
                 <h3 className="text-xs font-medium text-main mb-3">Quantity:</h3>
                 <div className="flex items-center space-x-2">
@@ -571,7 +580,7 @@ export const ProductDetails = () => {
                   <span className="w-12 text-center font-medium text-sm">{quantity}</span>
                   <button
                     onClick={() => handleQuantityChange(quantity + 1)}
-                    disabled={selectedVariant && quantity >= selectedVariant.stock}
+                    disabled={selectedVariant && quantity >= (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock)}
                     className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                   >
                     <PlusIcon size={12} />
@@ -603,7 +612,7 @@ export const ProductDetails = () => {
                       </span>
                       <button
                         onClick={() => handleCartOperation('increment')}
-                        disabled={isCartUpdating || (selectedVariant ? cartQuantity >= selectedVariant.stock : true)}
+                        disabled={isCartUpdating || (selectedVariant ? cartQuantity >= (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) : true)}
                         className="bg-primary hover:bg-primary-dark text-white p-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                       >
                         {isCartUpdating ? (
@@ -634,7 +643,7 @@ export const ProductDetails = () => {
                         }, 'cart');
                         setIsCartUpdating(false);
                       }}
-                      disabled={!selectedVariant || selectedVariant.stock <= 0 || isCartUpdating}
+                      disabled={!selectedVariant || (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) <= 0 || isCartUpdating}
                       className="w-full bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-xs"
                     >
                       {isCartUpdating ? (
@@ -645,7 +654,7 @@ export const ProductDetails = () => {
                       ) : (
                         <>
                           <ShoppingCartIcon size={16} className="mr-2" />
-                          {selectedVariant && selectedVariant.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                          {selectedVariant && (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) <= 0 ? 'Out of Stock' : 'Add to Cart'}
                         </>
                       )}
                     </button>
@@ -707,14 +716,15 @@ export const ProductDetails = () => {
               </div>
 
               {/* Subscription Button */}
-              {isAuthenticated && hasActiveSubscriptions && selectedVariant && selectedVariant.stock > 0 && (
+              {isAuthenticated && hasActiveSubscriptions && selectedVariant && (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 && (
                 <button
                   onClick={() => {
                     if (!selectedVariant) {
                       toast.error('Please select a variant first');
                       return;
                     }
-                    if (selectedVariant.stock <= 0) {
+                    const availableInventory = selectedVariant.inventory?.quantity_available ?? selectedVariant.stock;
+                    if (availableInventory <= 0) {
                       toast.error('This variant is out of stock');
                       return;
                     }

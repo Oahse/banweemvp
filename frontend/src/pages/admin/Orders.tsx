@@ -278,20 +278,23 @@ export const Orders = () => {
     toast.success(`Viewing order ${order.order_number}`);
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
+        <div className="text-center">
+          <Loader className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading orders...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Orders Management</h1>
-          <p className={`mt-1 text-sm lg:text-base ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage customer orders and fulfillment</p>
+          <h1 className="text-xl lg:text-2xl font-semibold">Orders Management</h1>
+          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage customer orders and fulfillment</p>
         </div>
         <div className="flex gap-2 w-full lg:w-auto">
           <button
@@ -301,11 +304,6 @@ export const Orders = () => {
             <DownloadIcon size={18} />
             <span className="hidden sm:inline">Download CSV</span>
             <span className="sm:hidden">CSV</span>
-          </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium">
-            <PlusIcon size={18} />
-            <span className="hidden sm:inline">Create Order</span>
-            <span className="sm:hidden">Create</span>
           </button>
         </div>
       </div>
@@ -449,68 +447,68 @@ export const Orders = () => {
       {error && (
         <div className={`p-4 rounded-lg border flex items-start gap-3 ${
           currentTheme === 'dark' 
-            ? 'bg-red-900/20 border-red-800 text-red-200' 
-            : 'bg-red-50 border-red-200 text-red-800'
+            ? 'bg-error/10 border-error/30 text-error' 
+            : 'bg-error/10 border-error/30 text-error'
         }`}>
           <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold">Error</p>
-            <p className="text-sm">{error}</p>
+          <div className="flex-1">
+            <p className="font-semibold">Error Loading Orders</p>
+            <p className="text-sm mt-1">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className={`mt-2 text-sm underline hover:no-underline ${
+                currentTheme === 'dark' ? 'text-error hover:text-error-light' : 'text-error hover:text-error-dark'
+              }`}
+            >
+              Try again
+            </button>
           </div>
         </div>
       )}
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className="text-lg lg:text-xl font-bold">All Orders</h2>
-        </div>
-
-        {orders.length > 0 ? (
+        
+        {loading && !initialLoading ? (
+          <div className="p-8">
+            <div className="flex items-center justify-center">
+              <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
+              <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating orders...</span>
+            </div>
+          </div>
+        ) : orders.length > 0 ? (
           <>
             {/* Desktop table */}
             <div className="overflow-x-auto hidden md:block">
               <table className="w-full">
-                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
+                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
                   <tr>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Order Number</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Customer</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Items</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Total Amount</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Status</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Payment</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Created</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Actions</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Order Number</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Customer</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Total Amount</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {orders.map((order: any) => (
-                    <tr key={order.id} className={`border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono text-primary`}>{order.order_number || 'N/A'}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        <div>
-                          <div className="font-medium">{order.user_name || 'N/A'}</div>
-                          <div className="text-xs">{order.user_email || 'N/A'}</div>
+                    <tr key={order.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{order.order_number || 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{order.user_name || order.user_email || 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(order.total_amount)}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          {statusBadge(order.status)}
+                          {paymentStatusBadge(order.payment_status)}
                         </div>
                       </td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{order.items_count || 0} items</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(order.total_amount)}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">{statusBadge(order.status)}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">{paymentStatusBadge(order.payment_status)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(order.created_at || '').toLocaleDateString()}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">
-                        <div className="flex gap-1 lg:gap-2">
-                          <button 
-                            onClick={() => handleView(order)}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                          >
-                            <EyeIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">View</span>
-                          </button>
-                          <button className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
-                            <EditIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">Edit</span>
-                          </button>
-                        </div>
+                      <td className="px-6 py-4 text-sm">
+                        <button 
+                          onClick={() => handleView(order)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                        >
+                          <EyeIcon size={14} />
+                          View
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -519,113 +517,106 @@ export const Orders = () => {
             </div>
 
             {/* Mobile cards */}
-            <div className={`md:hidden divide-y ${currentTheme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+            <div className="md:hidden divide-y divide-gray-200">
               {orders.map((order: any) => (
                 <div
                   key={order.id}
-                  className={`p-3 lg:p-4 flex flex-col gap-2 ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
+                  className={`p-4 flex flex-col gap-2 bg-white dark:bg-gray-800 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs lg:text-sm font-mono text-primary">{order.order_number || 'N/A'}</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{order.order_number || 'N/A'}</span>
                     {statusBadge(order.status)}
                   </div>
-                  <div className={`text-sm lg:text-base font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{order.user_name || 'N/A'}</div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{order.user_email || 'N/A'}</div>
-                  <div className="flex gap-1 lg:gap-2">
-                    <span className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{order.items_count || 0} items</span>
-                    <span className={`text-xs lg:text-sm font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(order.total_amount)}</span>
-                  </div>
-                  <div className="flex gap-1 lg:gap-2">
+                  <div className="text-sm text-gray-600 dark:text-gray-300">{order.user_name || order.user_email || 'N/A'}</div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(order.total_amount)}</span>
                     {paymentStatusBadge(order.payment_status)}
-                    <span className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Created: {new Date(order.created_at || '').toLocaleDateString()}</span>
                   </div>
-                  <div className="flex gap-1 lg:gap-2 mt-2">
-                    <button 
-                      onClick={() => handleView(order)}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs"
-                    >
-                      <EyeIcon size={14} />
-                      View
-                    </button>
-                    <button className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-xs">
-                      <EditIcon size={14} />
-                      Edit
-                    </button>
-                  </div>
+                  <button 
+                    onClick={() => handleView(order)}
+                    className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm w-fit"
+                  >
+                    <EyeIcon size={14} />
+                    View Details
+                  </button>
                 </div>
               ))}
             </div>
 
-            {pagination.total > 0 && (
-              <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-                <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} items
-                  {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
-                </p>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
-                    <span className="hidden sm:inline">Previous</span>
-                  </button>
-                  
-                  {/* Page numbers */}
-                  <div className="flex items-center gap-1 mx-1 lg:mx-2">
-                    {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
-                      let pageNum;
-                      if (pagination.pages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (page >= pagination.pages - 2) {
-                        pageNum = pagination.pages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-                      
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium transition-colors ${
-                            pageNum === page
-                              ? 'bg-primary text-white'
-                              : currentTheme === 'dark'
-                                ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                                : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  
-                  <button
-                    onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
-                    disabled={page >= pagination.pages || pagination.pages <= 1}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <span className="hidden sm:inline">Next</span>
-                    <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
-                  </button>
+            <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+              <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {pagination.total > 0
+                  ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
+                  : `Total: ${pagination.total} items`
+                }
+                {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    currentTheme === 'dark' 
+                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </button>
+                
+                {/* Page numbers */}
+                <div className="flex items-center gap-1 mx-2">
+                  {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
+                    let pageNum;
+                    if (pagination.pages <= 5) {
+                      pageNum = i + 1;
+                    } else if (page <= 3) {
+                      pageNum = i + 1;
+                    } else if (page >= pagination.pages - 2) {
+                      pageNum = pagination.pages - 4 + i;
+                    } else {
+                      pageNum = page - 2 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
+                          pageNum === page
+                            ? 'bg-primary text-white'
+                            : currentTheme === 'dark'
+                              ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
+                              : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
                 </div>
+                
+                <button
+                  onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
+                  disabled={page >= (pagination.pages || 1)}
+                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    currentTheme === 'dark' 
+                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
-            )}
+            </div>
           </>
         ) : (
-          <div className={`p-6 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No orders found</div>
+          <div className="p-8 text-center">
+            <PackageIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No orders found</p>
+          </div>
         )}
       </div>
     </div>

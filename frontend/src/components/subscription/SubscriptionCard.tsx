@@ -387,8 +387,8 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
 
       {/* Delete Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowDeleteModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold mb-2">Delete Subscription</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               Are you sure you want to delete this subscription? This action cannot be undone.

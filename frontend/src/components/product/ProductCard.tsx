@@ -367,10 +367,14 @@ export const ProductCard = ({
           <div className="flex space-x-2">
             <button
               onClick={handleAddToCart}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${isInCart
-                ? 'bg-primary text-white'
-                : 'bg-surface text-copy hover:bg-primary hover:text-white'
-                }`}
+              disabled={displayVariant && (!displayVariant.inventory || displayVariant.inventory.quantity_available === 0)}
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+                displayVariant && (!displayVariant.inventory || displayVariant.inventory.quantity_available === 0)
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : isInCart
+                    ? 'bg-primary text-white'
+                    : 'bg-surface text-copy hover:bg-primary hover:text-white'
+              }`}
               aria-label={isInCart ? "Remove from cart" : "Add to cart"}>
               {isInCart ? <ShoppingCartIcon size={16} /> : <ShoppingCartIcon size={16} />}
             </button>

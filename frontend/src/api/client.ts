@@ -473,21 +473,25 @@ class APIClient {
 
   async post(url: string, data?: any, config?: any) {
     const response = await this.client.post(url, data, config);
+    requestCache.clear();
     return response.data;
   }
 
   async put(url: string, data?: any, config?: any) {
     const response = await this.client.put(url, data, config);
+    requestCache.clear();
     return response.data;
   }
 
   async patch(url: string, data?: any, config?: any) {
     const response = await this.client.patch(url, data, config);
+    requestCache.clear();
     return response.data;
   }
 
   async delete(url: string, config?: any) {
     const response = await this.client.delete(url, config);
+    requestCache.clear();
     return response.data;
   }
 

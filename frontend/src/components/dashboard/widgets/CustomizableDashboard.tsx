@@ -243,8 +243,8 @@ export const CustomizableDashboard = ({
     const categories = Array.from(new Set(widgetTemplates.map(t => t.category)));
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowAddWidget(false)}>
+        <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Add Widget</h2>
             <button
@@ -293,8 +293,8 @@ export const CustomizableDashboard = ({
     if (!widget) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setEditingWidget(null)}>
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Edit Widget</h2>
             <button

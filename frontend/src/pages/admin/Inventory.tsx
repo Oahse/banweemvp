@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, EditIcon, ArrowUpDownIcon, PackageIcon } from 'lucide-react';
+import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, EditIcon, ArrowUpDownIcon, PackageIcon, PlusIcon, X } from 'lucide-react';
 import AdminAPI from '../../api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '../../store/ThemeContext';
@@ -14,19 +14,46 @@ interface PaginationInfo {
   pages: number;
 }
 
+interface InventoryItem {
+  id: string;
+  product_id: string;
+  product_name: string;
+  sku: string;
+  quantity: number;
+  location_name: string;
+  low_stock_threshold: number;
+  created_at: string;
+  updated_at?: string;
+}
+
 export const AdminInventory = () => {
   const { currentTheme } = useTheme();
   const [inventory, setInventory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: LIMIT, total: 0, pages: 0 });
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: LIMIT,
+    total: 0,
+    pages: 1
+  });
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [showModal, setShowModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    product_id: '',
+    product_name: '',
+    sku: '',
+    quantity: '',
+    location_name: '',
+    low_stock_threshold: ''
+  });
 
   // Debounce search query
   useEffect(() => {
@@ -105,14 +132,144 @@ export const AdminInventory = () => {
   const getItemDisplay = (item: any) => ({
     productName: item.variant?.product?.name ?? item.product_name ?? 'N/A',
     locationName: item.location?.name ?? item.location_name ?? 'N/A',
-    stockLevel: item.quantity_available ?? item.quantity ?? item.stock_level ?? 0,
+    stockLevel: item.stock ?? item.quantity_available ?? item.quantity ?? item.stock_level ?? 0,
   });
 
   const stockStatus = (item: any) => {
     const level = getItemDisplay(item).stockLevel;
+    // Debug logging to help identify the issue
+    console.log('Stock check for item:', {
+      id: item.id,
+      productName: getItemDisplay(item).productName,
+      stock: item.stock,
+      quantity_available: item.quantity_available,
+      quantity: item.quantity,
+      stock_level: item.stock_level,
+      calculatedLevel: level
+    });
+    
     if (level > 10) return { label: 'In Stock', cls: 'bg-success/20 text-success' };
     if (level > 0) return { label: 'Low Stock', cls: 'bg-warning/20 text-warning' };
     return { label: 'Out of Stock', cls: 'bg-error/20 text-error' };
+  };
+
+  const openEditModal = (item: any) => {
+    const d = getItemDisplay(item);
+    setEditingItem(item);
+    setFormData({
+      product_id: item.product_id || item.variant?.product_id || '',
+      product_name: d.productName,
+      sku: item.variant?.sku || item.sku || '',
+      quantity: String(d.stockLevel),
+      location_name: d.locationName,
+      low_stock_threshold: String(item.low_stock_threshold || item.variant?.low_stock_threshold || 10)
+    });
+    setShowModal(true);
+  };
+
+  const openAddModal = () => {
+    setFormData({
+      product_id: '',
+      product_name: '',
+      sku: '',
+      quantity: '',
+      location_name: '',
+      low_stock_threshold: ''
+    });
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const quantity = parseInt(formData.quantity);
+    if (isNaN(quantity) || quantity < 0) {
+      toast.error('Quantity must be 0 or greater');
+      return;
+    }
+    
+    const lowStockThreshold = parseInt(formData.low_stock_threshold);
+    if (isNaN(lowStockThreshold) || lowStockThreshold < 0) {
+      toast.error('Low stock threshold must be 0 or greater');
+      return;
+    }
+    
+    try {
+      if (editingItem) {
+        // Update existing inventory item
+        const response = await AdminAPI.updateInventoryItem(editingItem.id, {
+          quantity: quantity,
+          low_stock_threshold: lowStockThreshold,
+          location_name: formData.location_name.trim() || 'Main Warehouse'
+        });
+
+        if (response?.success === false) {
+          throw new Error(response?.message || 'Failed to update inventory');
+        }
+
+        const refreshed = await AdminAPI.getInventoryItem(editingItem.id);
+        const updatedItem = refreshed?.data || refreshed?.data?.data || refreshed;
+
+        if (updatedItem) {
+          setInventory(prev => prev.map(item =>
+            item.id === editingItem.id ? { ...item, ...updatedItem } : item
+          ));
+        }
+
+        const updatedProductId = formData.product_id?.trim()
+          || editingItem?.product_id
+          || editingItem?.variant?.product_id
+          || '';
+        if (updatedProductId) {
+          window.dispatchEvent(new CustomEvent('inventory:updated', {
+            detail: {
+              productId: updatedProductId,
+              stock: quantity
+            }
+          }));
+        }
+
+        toast.success('Inventory updated successfully');
+      } else {
+        // Add new inventory item (this shouldn't happen now, but keeping for backwards compatibility)
+        if (!formData.product_id.trim()) {
+          toast.error('Product ID is required');
+          return;
+        }
+        
+        if (!formData.product_name.trim()) {
+          toast.error('Product name is required');
+          return;
+        }
+        
+        const payload = {
+          product_id: formData.product_id.trim(),
+          product_name: formData.product_name.trim(),
+          sku: formData.sku.trim() || null,
+          quantity: quantity,
+          location_name: formData.location_name.trim() || 'Main Warehouse',
+          low_stock_threshold: lowStockThreshold
+        };
+        
+        const response = await AdminAPI.createInventoryItem(payload);
+        const newItem = response?.data?.data || response?.data;
+        
+        if (newItem) {
+          setInventory(prev => [newItem, ...prev]);
+          setPagination(prev => ({
+            ...prev,
+            total: prev.total + 1
+          }));
+        }
+        
+        toast.success('Inventory item added successfully');
+      }
+      
+      setShowModal(false);
+      setEditingItem(null);
+    } catch (error: any) {
+      toast.error(editingItem ? 'Failed to update inventory' : 'Failed to add inventory item');
+    }
   };
 
   const handleDownloadCSV = async () => {
@@ -181,18 +338,8 @@ export const AdminInventory = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Inventory Management</h1>
-          <p className={`mt-1 text-sm lg:text-base ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage stock levels and locations</p>
-        </div>
-        <div className="flex gap-2 w-full lg:w-auto">
-          <button
-            onClick={handleDownloadCSV}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-          >
-            <DownloadIcon size={18} />
-            <span className="hidden sm:inline">Download CSV</span>
-            <span className="sm:hidden">CSV</span>
-          </button>
+          <h1 className="text-xl lg:text-2xl font-semibold">Inventory Management</h1>
+          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage stock levels and locations</p>
         </div>
       </div>
 
@@ -342,6 +489,7 @@ export const AdminInventory = () => {
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Location</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Stock Level</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -357,6 +505,15 @@ export const AdminInventory = () => {
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.cls}`}>
                             {status.label}
                           </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <button 
+                            onClick={() => openEditModal(item)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                          >
+                            <EditIcon size={14} />
+                            Edit
+                          </button>
                         </td>
                       </tr>
                     );
@@ -383,6 +540,13 @@ export const AdminInventory = () => {
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-300">{d.locationName}</div>
                     <div className="text-sm font-semibold text-gray-900 dark:text-white">Stock: {d.stockLevel}</div>
+                    <button 
+                      onClick={() => openEditModal(item)}
+                      className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm w-fit"
+                    >
+                      <EditIcon size={14} />
+                      Edit Stock
+                    </button>
                   </div>
                 );
               })}
@@ -482,6 +646,173 @@ export const AdminInventory = () => {
           </div>
         )}
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowModal(false)}>
+          <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold">{editingItem ? 'Edit Inventory' : 'Add Inventory Item'}</h3>
+                <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{editingItem ? 'Update stock levels and location' : 'Fill in the details below'}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingItem(null);
+                }}
+                className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {editingItem && (
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Product
+                  </label>
+                  <div className={`w-full px-3 py-2 text-sm border rounded-lg ${currentTheme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-400' : 'bg-gray-100 border-gray-300 text-gray-600'}`}>
+                    {formData.product_name}
+                  </div>
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {!editingItem && (
+                  <>
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Product ID *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.product_id}
+                        onChange={(e) => setFormData(prev => ({ ...prev, product_id: e.target.value }))}
+                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors ${
+                          currentTheme === 'dark'
+                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                        }`}
+                        placeholder="e.g., prod_123456"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Product Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.product_name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, product_name: e.target.value }))}
+                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors ${
+                          currentTheme === 'dark'
+                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                        }`}
+                        placeholder="e.g., Premium T-Shirt"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        SKU
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.sku}
+                        onChange={(e) => setFormData(prev => ({ ...prev, sku: e.target.value }))}
+                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors ${
+                          currentTheme === 'dark'
+                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                        }`}
+                        placeholder="e.g., TSHIRT-RED-L"
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Quantity *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.quantity}
+                    onChange={(e) => setFormData(prev => ({ ...prev, quantity: e.target.value }))}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors ${
+                      currentTheme === 'dark'
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder="e.g., 100"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.location_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, location_name: e.target.value }))}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors ${
+                      currentTheme === 'dark'
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder="e.g., Main Warehouse"
+                  />
+                </div>
+
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Low Stock Threshold *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.low_stock_threshold}
+                    onChange={(e) => setFormData(prev => ({ ...prev, low_stock_threshold: e.target.value }))}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors ${
+                      currentTheme === 'dark'
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder="e.g., 10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-600">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingItem(null);
+                  }}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+                >
+                  {editingItem ? 'Update Stock' : 'Add Item'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

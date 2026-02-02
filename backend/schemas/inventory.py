@@ -43,6 +43,7 @@ class InventoryCreate(InventoryBase):
 
 class InventoryUpdate(BaseModel):
     location_id: Optional[UUID] = None
+    location_name: Optional[str] = None
     quantity: Optional[int] = Field(default=None, ge=0)
     low_stock_threshold: Optional[int] = Field(default=None, ge=0)
 

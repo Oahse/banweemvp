@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon, UserIcon } from 'lucide-react';
+import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon } from 'lucide-react';
 import AdminAPI from '../../api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '../../store/ThemeContext';
@@ -20,10 +20,33 @@ interface Refund {
   order_id: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'approved' | 'rejected' | 'processed';
+  status: string;
   reason: string;
   created_at: string;
   customer_name: string;
+  refund_number?: string;
+  refund_type?: string;
+  requested_amount?: number;
+  approved_amount?: number;
+  processed_amount?: number;
+  customer_reason?: string;
+  customer_notes?: string;
+  admin_notes?: string;
+  reviewed_at?: string;
+  approved_at?: string;
+  processed_at?: string;
+  completed_at?: string;
+  refund_metadata?: Record<string, any>;
+  refund_items?: RefundItem[];
+}
+
+interface RefundItem {
+  id: string;
+  order_item_id: string;
+  quantity_to_refund: number;
+  unit_price: number;
+  total_refund_amount: number;
+  condition_notes?: string;
 }
 
 export const Refunds = () => {
@@ -44,6 +67,10 @@ export const Refunds = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [viewingRefund, setViewingRefund] = useState<Refund | null>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [adminNotes, setAdminNotes] = useState('');
 
   // Debounce search query
   useEffect(() => {
@@ -136,6 +163,14 @@ export const Refunds = () => {
               ? aName.localeCompare(bName)
               : bName.localeCompare(aName);
           });
+        } else if (sortBy === 'status') {
+          filteredRefunds.sort((a: any, b: any) => {
+            const aStatus = (a.status || '').toLowerCase();
+            const bStatus = (b.status || '').toLowerCase();
+            return sortOrder === 'asc'
+              ? aStatus.localeCompare(bStatus)
+              : bStatus.localeCompare(aStatus);
+          });
         }
         
         const total = filteredRefunds.length;
@@ -174,13 +209,17 @@ export const Refunds = () => {
 
   const statusBadge = (status: string) => {
     const statusConfig = {
-      processed: { bg: 'bg-success/20', text: 'text-success', label: 'Processed' },
+      requested: { bg: 'bg-warning/20', text: 'text-warning', label: 'Requested' },
+      pending_review: { bg: 'bg-warning/20', text: 'text-warning', label: 'Pending Review' },
       approved: { bg: 'bg-primary/20', text: 'text-primary', label: 'Approved' },
-      pending: { bg: 'bg-warning/20', text: 'text-warning', label: 'Pending' },
-      rejected: { bg: 'bg-error/20', text: 'text-error', label: 'Rejected' }
+      rejected: { bg: 'bg-error/20', text: 'text-error', label: 'Rejected' },
+      processing: { bg: 'bg-blue-500/20', text: 'text-blue-500', label: 'Processing' },
+      completed: { bg: 'bg-success/20', text: 'text-success', label: 'Completed' },
+      failed: { bg: 'bg-error/20', text: 'text-error', label: 'Failed' },
+      cancelled: { bg: 'bg-gray-500/20', text: 'text-gray-500', label: 'Cancelled' }
     };
     
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.requested;
     
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
@@ -233,8 +272,46 @@ export const Refunds = () => {
     }
   };
 
-  const handleView = (refund: Refund) => {
-    toast.success(`Viewing refund ${refund.id}`);
+  const handleView = async (refund: Refund) => {
+    setViewingRefund(refund);
+    setAdminNotes(refund.admin_notes || '');
+    setShowDetailsModal(true);
+    setDetailsLoading(true);
+    try {
+      const response = await AdminAPI.getRefundDetails(refund.id);
+      const data = response?.data?.data || response?.data;
+      if (data) {
+        setViewingRefund(data);
+        setAdminNotes(data.admin_notes || '');
+      }
+    } catch (error: any) {
+      toast.error('Failed to load refund details');
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (refundId: string, status: string) => {
+    const previous = refunds;
+    setRefunds(prev => prev.map(refund =>
+      refund.id === refundId ? { ...refund, status } : refund
+    ));
+    setViewingRefund(prev => (prev && prev.id === refundId ? { ...prev, status, admin_notes: adminNotes } : prev));
+
+    try {
+      const response = await AdminAPI.updateRefundStatus(refundId, status, adminNotes || undefined);
+      const updated = response?.data?.data || response?.data;
+      if (updated) {
+        setRefunds(prev => prev.map(refund =>
+          refund.id === refundId ? { ...refund, ...updated } : refund
+        ));
+        setViewingRefund(prev => (prev && prev.id === refundId ? { ...prev, ...updated } : prev));
+      }
+      toast.success('Refund status updated');
+    } catch (error: any) {
+      setRefunds(previous);
+      toast.error('Failed to update refund status');
+    }
   };
 
   if (loading) {
@@ -249,23 +326,8 @@ export const Refunds = () => {
     <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Refunds Management</h1>
-          <p className={`mt-1 text-sm lg:text-base ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage refund requests and processing</p>
-        </div>
-        <div className="flex gap-2 w-full lg:w-auto">
-          <button
-            onClick={handleDownloadCSV}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-          >
-            <DownloadIcon size={18} />
-            <span className="hidden sm:inline">Download CSV</span>
-            <span className="sm:hidden">CSV</span>
-          </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium">
-            <PlusIcon size={18} />
-            <span className="hidden sm:inline">Process Refund</span>
-            <span className="sm:hidden">Process</span>
-          </button>
+          <h1 className="text-xl lg:text-2xl font-semibold">Refunds Management</h1>
+          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage refund requests and processing</p>
         </div>
       </div>
 
@@ -298,10 +360,14 @@ export const Refunds = () => {
             <Dropdown
               options={[
                 { value: '', label: 'All Status' },
-                { value: 'pending', label: 'Pending' },
+                { value: 'requested', label: 'Requested' },
+                { value: 'pending_review', label: 'Pending Review' },
                 { value: 'approved', label: 'Approved' },
                 { value: 'rejected', label: 'Rejected' },
-                { value: 'processed', label: 'Processed' }
+                { value: 'processing', label: 'Processing' },
+                { value: 'completed', label: 'Completed' },
+                { value: 'failed', label: 'Failed' },
+                { value: 'cancelled', label: 'Cancelled' }
               ]}
               value={statusFilter}
               onChange={setStatusFilter}
@@ -392,7 +458,7 @@ export const Refunds = () => {
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className="text-lg lg:text-xl font-bold">All Refunds</h2>
+          <h2 className="text-base lg:text-lg font-semibold">All Refunds</h2>
         </div>
 
         {refunds.length > 0 ? (
@@ -414,7 +480,11 @@ export const Refunds = () => {
                 </thead>
                 <tbody>
                   {refunds.map((refund: any) => (
-                    <tr key={refund.id} className={`border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <tr
+                      key={refund.id}
+                      onClick={() => handleView(refund)}
+                      className={`border-b cursor-pointer ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}
+                    >
                       <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono text-primary`}>{String(refund.id).slice(0, 8)}</td>
                       <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{String(refund.order_id).slice(0, 8)}</td>
                       <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{refund.customer_name || 'N/A'}</td>
@@ -425,15 +495,24 @@ export const Refunds = () => {
                       <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">
                         <div className="flex gap-1 lg:gap-2">
                           <button 
-                            onClick={() => handleView(refund)}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleView(refund);
+                            }}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
                           >
                             <EyeIcon size={14} className="hidden sm:block" />
                             <span className="sm:hidden">View</span>
                           </button>
-                          <button className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
-                            <EditIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">Edit</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleView(refund);
+                            }}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-success text-white rounded hover:bg-success/90 transition-colors"
+                          >
+                            <CreditCardIcon size={14} className="hidden sm:block" />
+                            <span className="sm:hidden">Process</span>
                           </button>
                         </div>
                       </td>
@@ -448,7 +527,8 @@ export const Refunds = () => {
               {refunds.map((refund: any) => (
                 <div
                   key={refund.id}
-                  className={`p-3 lg:p-4 flex flex-col gap-2 ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
+                  onClick={() => handleView(refund)}
+                  className={`p-3 lg:p-4 flex flex-col gap-2 cursor-pointer ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs lg:text-sm font-mono text-primary">{String(refund.id).slice(0, 8)}</span>
@@ -461,93 +541,260 @@ export const Refunds = () => {
                   <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(refund.created_at || '').toLocaleDateString()}</div>
                   <div className="flex gap-1 lg:gap-2 mt-2">
                     <button 
-                      onClick={() => handleView(refund)}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleView(refund);
+                      }}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-xs"
                     >
                       <EyeIcon size={14} />
                       View
                     </button>
-                    <button className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-xs">
-                      <EditIcon size={14} />
-                      Edit
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleView(refund);
+                      }}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-success text-white rounded hover:bg-success/90 transition-colors text-xs"
+                    >
+                      <CreditCardIcon size={14} />
+                      Process
                     </button>
                   </div>
                 </div>
               ))}
             </div>
-
-            {pagination.total > 0 && (
-              <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-                <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} items
-                  {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
-                </p>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
-                    <span className="hidden sm:inline">Previous</span>
-                  </button>
-                  
-                  {/* Page numbers */}
-                  <div className="flex items-center gap-1 mx-1 lg:mx-2">
-                    {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
-                      let pageNum;
-                      if (pagination.pages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (page >= pagination.pages - 2) {
-                        pageNum = pagination.pages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-                      
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium transition-colors ${
-                            pageNum === page
-                              ? 'bg-primary text-white'
-                              : currentTheme === 'dark'
-                                ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                                : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  
-                  <button
-                    onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
-                    disabled={page >= pagination.pages || pagination.pages <= 1}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <span className="hidden sm:inline">Next</span>
-                    <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
           </>
         ) : (
           <div className={`p-6 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No refunds found</div>
         )}
+
+        {/* Pagination - Always visible */}
+        <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+          <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            {pagination.total > 0
+              ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
+              : `Total: ${pagination.total} items`
+            }
+            {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
+          </p>
+          <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
+                  currentTheme === 'dark' 
+                    ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                    : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
+                <span className="hidden sm:inline">Previous</span>
+              </button>
+              
+              {/* Page numbers */}
+              <div className="flex items-center gap-1 mx-1 lg:mx-2">
+                {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
+                  let pageNum;
+                  if (pagination.pages <= 5) {
+                    pageNum = i + 1;
+                  } else if (page <= 3) {
+                    pageNum = i + 1;
+                  } else if (page >= pagination.pages - 2) {
+                    pageNum = pagination.pages - 4 + i;
+                  } else {
+                    pageNum = page - 2 + i;
+                  }
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPage(pageNum)}
+                      className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium transition-colors ${
+                        pageNum === page
+                          ? 'bg-primary text-white'
+                          : currentTheme === 'dark'
+                            ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
+                            : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+              
+              <button
+                onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
+                disabled={page >= (pagination.pages || 1)}
+                className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
+                  currentTheme === 'dark' 
+                    ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                    : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
+              </button>
+          </div>
+        </div>
       </div>
+
+      {showDetailsModal && viewingRefund && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowDetailsModal(false)}>
+          <div className={`w-full max-w-4xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold">Refund Details</h3>
+                <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {viewingRefund.refund_number || viewingRefund.id}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+              >
+                <span className="text-xl">×</span>
+              </button>
+            </div>
+
+            {detailsLoading ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader className="w-8 h-8 text-primary animate-spin" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer</p>
+                    <p>{viewingRefund.customer_name || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</p>
+                    {statusBadge(viewingRefund.status)}
+                  </div>
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Order ID</p>
+                    <p className="font-mono break-all">{viewingRefund.order_id}</p>
+                  </div>
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Reason</p>
+                    <p>{viewingRefund.reason || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Refund Type</p>
+                    <p>{viewingRefund.refund_type || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Requested Amount</p>
+                    <p className="font-mono">
+                      {formatCurrency(viewingRefund.requested_amount ?? viewingRefund.amount, viewingRefund.currency)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Approved Amount</p>
+                    <p className="font-mono">
+                      {viewingRefund.approved_amount != null
+                        ? formatCurrency(viewingRefund.approved_amount, viewingRefund.currency)
+                        : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Processed Amount</p>
+                    <p className="font-mono">
+                      {viewingRefund.processed_amount != null
+                        ? formatCurrency(viewingRefund.processed_amount, viewingRefund.currency)
+                        : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Reason</p>
+                    <p>{viewingRefund.customer_reason || '—'}</p>
+                  </div>
+                  <div>
+                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Notes</p>
+                    <p>{viewingRefund.customer_notes || '—'}</p>
+                  </div>
+                </div>
+
+                {viewingRefund.refund_items && viewingRefund.refund_items.length > 0 && (
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className={`px-4 py-2 text-sm font-semibold ${currentTheme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
+                      Refunded Items
+                    </div>
+                    <div className="divide-y">
+                      {viewingRefund.refund_items.map((item) => (
+                        <div key={item.id} className={`px-4 py-2 text-sm ${currentTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                            <span className="font-mono">{item.order_item_id}</span>
+                            <span>Qty: {item.quantity_to_refund}</span>
+                            <span className="font-mono">${item.total_refund_amount.toFixed(2)}</span>
+                          </div>
+                          {item.condition_notes && (
+                            <p className={`mt-1 text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                              Notes: {item.condition_notes}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Admin Notes
+                  </label>
+                  <textarea
+                    value={adminNotes}
+                    onChange={(e) => setAdminNotes(e.target.value)}
+                    rows={3}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors ${
+                      currentTheme === 'dark'
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder="Add internal notes..."
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6 flex flex-wrap justify-end gap-2">
+              <button
+                onClick={() => handleStatusUpdate(viewingRefund.id, 'approved')}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+              >
+                Approve
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(viewingRefund.id, 'processing')}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                Mark Processing
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(viewingRefund.id, 'completed')}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-success text-white rounded-lg hover:bg-success/90 transition-colors text-sm font-medium"
+              >
+                Mark Completed
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(viewingRefund.id, 'rejected')}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-error text-white rounded-lg hover:bg-error/90 transition-colors text-sm font-medium"
+              >
+                Reject
+              </button>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

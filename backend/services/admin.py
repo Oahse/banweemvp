@@ -61,6 +61,9 @@ class AdminService:
         if verified is not None:
             conditions.append(User.verified == verified)
         
+        # Exclude soft-deleted users by default
+        conditions.append(User.account_status != "deleted")
+
         if conditions:
             query = query.where(and_(*conditions))
             count_query = count_query.where(and_(*conditions))
@@ -1072,15 +1075,20 @@ class AdminService:
         try:
             result = await self.db.execute(select(User).where(User.id == UUID(user_id)))
             user = result.scalar_one_or_none()
-            
+
             if not user:
                 raise HTTPException(status_code=404, detail="User not found")
-            
-            await self.db.delete(user)
+
+            # Soft delete only
+            user.is_active = False
+            user.account_status = "deleted"
+            user.verification_status = "deleted"
+            user.verified = False
+
             await self.db.commit()
-            
+            await self.db.refresh(user)
             return True
-            
+
         except Exception as e:
             raise HTTPException(
                 status_code=400,

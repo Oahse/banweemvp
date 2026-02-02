@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, PackageIcon, DollarSignIcon, TagIcon } from 'lucide-react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, ArrowUpDownIcon, EyeIcon, PackageIcon } from 'lucide-react';
 import AdminAPI from '../../api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '../../store/ThemeContext';
@@ -32,6 +33,8 @@ interface Product {
 export const Products = () => {
   const { currentTheme } = useTheme();
   const { formatCurrency } = useLocale();
+  const navigate = useNavigate();
+  const hasLoadedRef = useRef(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -49,6 +52,7 @@ export const Products = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Debounce search query
   useEffect(() => {
@@ -65,9 +69,28 @@ export const Products = () => {
   }, []);
 
   useEffect(() => {
+    const handleInventoryUpdated = (event: Event) => {
+      const detail = (event as CustomEvent).detail as { productId: string; stock: number } | undefined;
+      if (!detail?.productId) {
+        return;
+      }
+
+      setProducts(prev => prev.map(product => (
+        product.id === detail.productId
+          ? { ...product, stock: detail.stock, total_stock: detail.stock, updated_at: new Date().toISOString() }
+          : product
+      )));
+      setRefreshKey(prev => prev + 1);
+    };
+
+    window.addEventListener('inventory:updated', handleInventoryUpdated);
+    return () => window.removeEventListener('inventory:updated', handleInventoryUpdated);
+  }, []);
+
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
-        if (page === 1 && !searchQuery && !statusFilter && !categoryFilter) {
+        if (!hasLoadedRef.current) {
           setInitialLoading(true);
         } else {
           setLoading(true);
@@ -97,9 +120,13 @@ export const Products = () => {
         // Handle response format
         const data = response?.data?.data || response?.data;
         const allProducts = Array.isArray(data) ? data : data?.items || [];
+        const normalizedProducts = allProducts.map((product: any) => ({
+          ...product,
+          stock: product.stock ?? product.total_stock ?? product.primary_variant?.stock ?? 0
+        }));
         
         // Apply client-side filtering and sorting if needed
-        let filteredProducts = allProducts;
+        let filteredProducts = normalizedProducts;
         
         // Apply search filter
         if (debouncedSearchQuery) {
@@ -173,11 +200,12 @@ export const Products = () => {
       } finally {
         setLoading(false);
         setInitialLoading(false);
+        hasLoadedRef.current = true;
       }
     };
 
     fetchProducts();
-  }, [page, debouncedSearchQuery, statusFilter, categoryFilter, sortBy, sortOrder]);
+  }, [page, debouncedSearchQuery, statusFilter, categoryFilter, sortBy, sortOrder, refreshKey]);
 
   const statusBadge = (status: string) => {
     const statusConfig = {
@@ -206,84 +234,34 @@ export const Products = () => {
     }
   };
 
-  const handleDownloadCSV = () => {
-    try {
-      // Get all products without pagination for CSV
-      const allProducts = products.map((product: any) => ({
-        'Product ID': product.id || 'N/A',
-        'Name': product.name || 'N/A',
-        'SKU': product.slug || 'N/A',
-        'Category': product.category || 'N/A',
-        'Supplier': product.supplier || 'N/A',
-        'Price': formatCurrency(product.price),
-        'Stock': product.stock || 0,
-        'Status': product.status || 'N/A',
-        'Created At': new Date(product.created_at || '').toLocaleDateString()
-      }));
-
-      // Create CSV content
-      const headers = Object.keys(allProducts[0] || {});
-      const csvContent = [
-        headers.join(','),
-        ...allProducts.map((item: any) => {
-          return headers.map(header => {
-            const value = item[header];
-            return typeof value === 'string' && value.includes(',') 
-              ? `"${value}"` 
-              : value;
-          }).join(',');
-        })
-      ].join('\n');
-
-      // Create and download CSV file
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `products-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      toast.success('Products downloaded successfully');
-    } catch (error: any) {
-      toast.error('Failed to download products');
-    }
-  };
-
   const handleView = (product: Product) => {
-    toast.success(`Viewing product ${product.name}`);
+    navigate(`/admin/products/${product.id}`);
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
+        <div className="text-center">
+          <Loader className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading products...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Products Management</h1>
-          <p className={`mt-1 text-sm lg:text-base ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product catalog and inventory</p>
+          <h1 className="text-xl lg:text-2xl font-semibold">Products Management</h1>
+          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product catalog and inventory</p>
         </div>
         <div className="flex gap-2 w-full lg:w-auto">
           <button
-            onClick={handleDownloadCSV}
+            onClick={() => navigate('/admin/products/new')}
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
           >
-            <DownloadIcon size={18} />
-            <span className="hidden sm:inline">Download CSV</span>
-            <span className="sm:hidden">CSV</span>
-          </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium">
-            <PlusIcon size={18} />
-            <span className="hidden sm:inline">Add Product</span>
-            <span className="sm:hidden">Add</span>
+            Add Product
           </button>
         </div>
       </div>
@@ -426,63 +404,65 @@ export const Products = () => {
       {error && (
         <div className={`p-4 rounded-lg border flex items-start gap-3 ${
           currentTheme === 'dark' 
-            ? 'bg-red-900/20 border-red-800 text-red-200' 
-            : 'bg-red-50 border-red-200 text-red-800'
+            ? 'bg-error/10 border-error/30 text-error' 
+            : 'bg-error/10 border-error/30 text-error'
         }`}>
           <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold">Error</p>
-            <p className="text-sm">{error}</p>
+          <div className="flex-1">
+            <p className="font-semibold">Error Loading Products</p>
+            <p className="text-sm mt-1">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className={`mt-2 text-sm underline hover:no-underline ${
+                currentTheme === 'dark' ? 'text-error hover:text-error-light' : 'text-error hover:text-error-dark'
+              }`}
+            >
+              Try again
+            </button>
           </div>
         </div>
       )}
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className="text-lg lg:text-xl font-bold">All Products</h2>
-        </div>
-
-        {products.length > 0 ? (
+        
+        {loading && !initialLoading ? (
+          <div className="p-8">
+            <div className="flex items-center justify-center">
+              <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
+              <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating products...</span>
+            </div>
+          </div>
+        ) : products.length > 0 ? (
           <>
             {/* Desktop table */}
             <div className="overflow-x-auto hidden md:block">
               <table className="w-full">
-                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
+                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
                   <tr>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Product ID</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Name</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">SKU</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Category</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Price</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Stock</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Status</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Actions</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Name</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Category</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Price</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Stock</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {products.map((product: any) => (
-                    <tr key={product.id} className={`border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono text-primary`}>{String(product.id).slice(0, 8)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name || 'N/A'}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{product.slug || 'N/A'}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{product.category || 'N/A'}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(product.price)}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">{stockBadge(product.stock)}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">{statusBadge(product.status)}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">
-                        <div className="flex gap-1 lg:gap-2">
-                          <button 
-                            onClick={() => handleView(product)}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                          >
-                            <EyeIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">View</span>
-                          </button>
-                          <button className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
-                            <EditIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">Edit</span>
-                          </button>
-                        </div>
+                    <tr key={product.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{product.name || 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{product.category || 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(product.price)}</td>
+                      <td className="px-6 py-4 text-sm">{stockBadge(product.stock)}</td>
+                      <td className="px-6 py-4 text-sm">{statusBadge(product.status)}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <button 
+                          onClick={() => handleView(product)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                        >
+                          <EyeIcon size={14} />
+                          View
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -491,110 +471,106 @@ export const Products = () => {
             </div>
 
             {/* Mobile cards */}
-            <div className={`md:hidden divide-y ${currentTheme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+            <div className="md:hidden divide-y divide-gray-200">
               {products.map((product: any) => (
                 <div
                   key={product.id}
-                  className={`p-3 lg:p-4 flex flex-col gap-2 ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
+                  className={`p-4 flex flex-col gap-2 bg-white dark:bg-gray-800 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs lg:text-sm font-mono text-primary">{String(product.id).slice(0, 8)}</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{product.name || 'N/A'}</span>
                     {statusBadge(product.status)}
                   </div>
-                  <div className={`text-sm lg:text-base font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name || 'N/A'}</div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>SKU: {product.slug || 'N/A'}</div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Category: {product.category || 'N/A'}</div>
-                  <div className="flex gap-1 lg:gap-2">
-                    <span className={`text-xs lg:text-sm font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(product.price)}</span>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Category: {product.category || 'N/A'}</div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(product.price)}</span>
                     {stockBadge(product.stock)}
                   </div>
-                  <div className="flex gap-1 lg:gap-2 mt-2">
-                    <button 
-                      onClick={() => handleView(product)}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs"
-                    >
-                      <EyeIcon size={14} />
-                      View
-                    </button>
-                    <button className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-xs">
-                      <EditIcon size={14} />
-                      Edit
-                    </button>
-                  </div>
+                  <button 
+                    onClick={() => handleView(product)}
+                    className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm w-fit"
+                  >
+                    <EyeIcon size={14} />
+                    View Details
+                  </button>
                 </div>
               ))}
             </div>
 
-            {pagination.total > 0 && (
-              <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-                <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} items
-                  {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
-                </p>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
-                    <span className="hidden sm:inline">Previous</span>
-                  </button>
-                  
-                  {/* Page numbers */}
-                  <div className="flex items-center gap-1 mx-1 lg:mx-2">
-                    {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
-                      let pageNum;
-                      if (pagination.pages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (page >= pagination.pages - 2) {
-                        pageNum = pagination.pages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-                      
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium transition-colors ${
-                            pageNum === page
-                              ? 'bg-primary text-white'
-                              : currentTheme === 'dark'
-                                ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                                : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  
-                  <button
-                    onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
-                    disabled={page >= pagination.pages || pagination.pages <= 1}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <span className="hidden sm:inline">Next</span>
-                    <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
-                  </button>
+            <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+              <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {pagination.total > 0
+                  ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
+                  : `Total: ${pagination.total} items`
+                }
+                {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    currentTheme === 'dark' 
+                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </button>
+                
+                {/* Page numbers */}
+                <div className="flex items-center gap-1 mx-2">
+                  {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
+                    let pageNum;
+                    if (pagination.pages <= 5) {
+                      pageNum = i + 1;
+                    } else if (page <= 3) {
+                      pageNum = i + 1;
+                    } else if (page >= pagination.pages - 2) {
+                      pageNum = pagination.pages - 4 + i;
+                    } else {
+                      pageNum = page - 2 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
+                          pageNum === page
+                            ? 'bg-primary text-white'
+                            : currentTheme === 'dark'
+                              ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
+                              : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
                 </div>
+                
+                <button
+                  onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
+                  disabled={page >= (pagination.pages || 1)}
+                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    currentTheme === 'dark' 
+                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
-            )}
+            </div>
           </>
         ) : (
-          <div className={`p-6 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No products found</div>
+          <div className="p-8 text-center">
+            <PackageIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No products found</p>
+          </div>
         )}
       </div>
     </div>
