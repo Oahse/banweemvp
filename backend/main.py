@@ -46,7 +46,7 @@ from api import (
 
 from contextlib import asynccontextmanager
 from arq import Worker
-import logging
+
 
 # Global variable to store the ARQ worker
 arq_worker = None

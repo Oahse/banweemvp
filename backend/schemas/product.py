@@ -45,11 +45,35 @@ class ProductCreate(BaseModel):
     is_bestseller: bool = False
 
 
+class ProductVariantUpdate(BaseModel):
+    id: Optional[UUID] = None  # Include ID for existing variants
+    sku: Optional[str] = None
+    name: Optional[str] = None
+    base_price: Optional[float] = None
+    sale_price: Optional[float] = None
+    stock: Optional[int] = None
+    attributes: Optional[Dict[str, Any]] = None
+    specifications: Optional[Dict[str, Any]] = None
+    dietary_tags: Optional[List[str]] = None
+    tags: Optional[str] = None
+    is_active: Optional[bool] = None
+    availability_status: Optional[str] = None
+    barcode: Optional[str] = None
+    qr_code: Optional[str] = None
+    images: Optional[List[Dict[str, Any]]] = None  # List of image objects with id, url, alt_text, is_primary, sort_order
+
+
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
+    slug: Optional[str] = None
     description: Optional[str] = None
+    short_description: Optional[str] = None
     category_id: Optional[UUID] = None
     origin: Optional[str] = None
+    product_status: Optional[str] = None
+    is_featured: Optional[bool] = None
+    is_bestseller: Optional[bool] = None
+    variants: Optional[List[ProductVariantUpdate]] = None
 
 
 class CategoryResponse(BaseModel):

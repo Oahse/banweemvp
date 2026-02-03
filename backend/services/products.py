@@ -3,6 +3,7 @@ from sqlalchemy import select, and_, or_, func, text
 from sqlalchemy.orm import selectinload
 from typing import Optional, List, Dict, Any
 from fastapi import HTTPException
+import uuid
 from uuid import UUID
 from core.utils.uuid_utils import uuid7
 from models.product import Product, ProductVariant, Category, ProductImage
@@ -17,6 +18,9 @@ from schemas.product import (
     ProductImageResponse, PriceRange
 )
 from core.errors import APIException
+from core.logging import get_structured_logger
+
+logger = get_structured_logger(__name__)
 
 
 class ProductService:
@@ -886,9 +890,22 @@ class ProductService:
         # Return the created product
         return await self.get_product_by_id(db_product.id)
 
-    async def update_product(self, product_id: UUID, product_data: ProductUpdate, user_id: UUID) -> ProductResponse:
-        """Update a product."""
-        query = select(Product).where(Product.id == product_id)
+    async def update_product(
+        self,
+        product_id: UUID,
+        product_data: ProductUpdate,
+        user_id: UUID,
+        is_admin: bool = False
+    ) -> ProductResponse:
+        """Update a product and its variants."""
+        from models.inventories import Inventory
+        
+        logger.info(f"Updating product {product_id} with data: {product_data.dict(exclude_unset=True)}")
+        
+        query = select(Product).options(
+            selectinload(Product.variants).selectinload(ProductVariant.images),
+            selectinload(Product.variants).selectinload(ProductVariant.inventory)
+        ).where(Product.id == product_id)
         result = await self.db.execute(query)
         product = result.scalar_one_or_none()
 
@@ -896,15 +913,205 @@ class ProductService:
             raise HTTPException(status_code=404, detail="Product not found")
 
         # Check if user owns the product (for suppliers) or is admin
-        if product.supplier_id != user_id:
+        if not is_admin and product.supplier_id != user_id:
             raise HTTPException(
                 status_code=403, detail="Not authorized to update this product")
 
-        # Update fields
-        for field, value in product_data.dict(exclude_unset=True).items():
+        # Update product fields
+        update_dict = product_data.dict(exclude_unset=True, exclude={'variants'})
+        for field, value in update_dict.items():
             setattr(product, field, value)
+        
+        logger.info(f"Updated product fields: {update_dict}")
+
+        # Handle variant updates if provided
+        if product_data.variants is not None:
+            logger.info(f"Processing {len(product_data.variants)} variants")
+            logger.info(f"Variant data: {[v.dict(exclude_unset=True) for v in product_data.variants]}")
+            existing_variant_ids = {str(v.id) for v in product.variants}
+            updated_variant_ids = set()
+            
+            for idx, variant_data in enumerate(product_data.variants):
+                logger.info(f"Processing variant {idx}: id={variant_data.id}, data={variant_data.dict(exclude_unset=True)}")
+                
+                if variant_data.id:
+                    # Update existing variant
+                    variant_id = variant_data.id
+                    updated_variant_ids.add(str(variant_id))
+                    
+                    variant = next((v for v in product.variants if v.id == variant_id), None)
+                    if variant:
+                        logger.info(f"Updating existing variant {variant_id}")
+                        # Update variant fields - only update fields that were explicitly provided
+                        variant_dict = variant_data.dict(exclude_unset=True, exclude={'id', 'images', 'stock'})
+                        logger.info(f"Fields to update: {list(variant_dict.keys())}")
+                        
+                        # Flag to track if we made any changes
+                        made_changes = False
+                        
+                        for field, value in variant_dict.items():
+                            if value is not None:  # Only update if value is provided
+                                old_value = getattr(variant, field, None)
+                                if old_value != value:  # Only if value actually changed
+                                    setattr(variant, field, value)
+                                    made_changes = True
+                                    logger.info(f"Updated variant.{field}: {old_value} -> {value}")
+                        
+                        # Handle stock update via inventory
+                        if variant_data.stock is not None:
+                            if not variant.inventory:
+                                # Create inventory if it doesn't exist
+                                logger.info(f"Creating new inventory for variant {variant_id} with stock {variant_data.stock}")
+                                inventory = Inventory(
+                                    id=uuid7(),
+                                    variant_id=variant.id,
+                                    quantity=variant_data.stock,
+                                    quantity_available=variant_data.stock,
+                                    low_stock_threshold=10
+                                )
+                                self.db.add(inventory)
+                            else:
+                                # Update existing inventory
+                                logger.info(f"Updating inventory for variant {variant_id}: {variant.inventory.quantity} -> {variant_data.stock}")
+                                variant.inventory.quantity = variant_data.stock
+                                variant.inventory.quantity_available = variant_data.stock
+                        
+                        # Handle images if provided (only if explicitly set in the request)
+                        # ID-based image management: update existing, create new, delete removed
+                        logger.info(f"🔍 Checking images for variant {variant_id}")
+                        logger.info(f"🔍 hasattr fields_set: {hasattr(variant_data, 'fields_set')}")
+                        if hasattr(variant_data, 'fields_set'):
+                            logger.info(f"🔍 fields_set: {variant_data.fields_set}")
+                            logger.info(f"🔍 'images' in fields_set: {'images' in variant_data.fields_set}")
+                        logger.info(f"🔍 variant_data.images: {variant_data.images}")
+                        
+                        # Process images if they're provided (not None)
+                        if variant_data.images is not None:
+                            logger.info(f"Updating images for variant {variant_id}: {len(variant_data.images) if variant_data.images else 0} images")
+                            
+                            if variant_data.images:
+                                # Collect incoming image IDs (both UUID objects and strings)
+                                incoming_image_ids = set()
+                                for img_data in variant_data.images:
+                                    if isinstance(img_data, dict) and img_data.get('id'):
+                                        img_id = img_data.get('id')
+                                        # Convert to UUID if it's a string
+                                        if isinstance(img_id, str):
+                                            try:
+                                                img_id = uuid.UUID(img_id)
+                                            except ValueError:
+                                                continue
+                                        incoming_image_ids.add(img_id)
+                                
+                                # Delete images that are no longer in the list
+                                for img in variant.images[:]:
+                                    if img.id not in incoming_image_ids:
+                                        logger.info(f"Deleting removed image {img.id}")
+                                        self.db.delete(img)
+                                
+                                # Update existing images or create new ones
+                                for img_idx, img_data in enumerate(variant_data.images):
+                                    if isinstance(img_data, dict):
+                                        img_id = img_data.get('id')
+                                        
+                                        if img_id:
+                                            # Convert string ID to UUID if needed
+                                            if isinstance(img_id, str):
+                                                try:
+                                                    img_id = uuid.UUID(img_id)
+                                                except ValueError:
+                                                    logger.warning(f"Invalid image ID format: {img_id}")
+                                                    continue
+                                            
+                                            # Update existing image
+                                            existing_img = next((img for img in variant.images if img.id == img_id), None)
+                                            if existing_img:
+                                                logger.info(f"Updating existing image {img_id}")
+                                                existing_img.url = img_data.get('url', existing_img.url)
+                                                existing_img.alt_text = img_data.get('alt_text', existing_img.alt_text)
+                                                existing_img.is_primary = img_data.get('is_primary', existing_img.is_primary)
+                                                existing_img.sort_order = img_data.get('sort_order', existing_img.sort_order)
+                                            else:
+                                                logger.warning(f"Image ID {img_id} not found in variant images, skipping")
+                                        else:
+                                            # Create new image (no ID provided)
+                                            logger.info(f"Creating new image at index {img_idx}")
+                                            image = ProductImage(
+                                                id=uuid7(),
+                                                variant_id=variant.id,
+                                                url=img_data.get('url', ''),
+                                                alt_text=img_data.get('alt_text', ''),
+                                                is_primary=img_data.get('is_primary', False),
+                                                sort_order=img_data.get('sort_order', img_idx)
+                                            )
+                                            self.db.add(image)
+                            else:
+                                # Empty images array means delete all images
+                                logger.info(f"Deleting all images for variant {variant_id}")
+                                for img in variant.images[:]:
+                                    self.db.delete(img)
+                    else:
+                        logger.warning(f"Variant {variant_id} not found in product variants")
+                else:
+                    # Create new variant
+                    logger.info(f"Creating new variant")
+                    new_variant_dict = variant_data.dict(exclude_unset=True, exclude={'id', 'images', 'stock'})
+                    new_variant = ProductVariant(
+                        product_id=product_id,
+                        **new_variant_dict
+                    )
+                    
+                    # Generate SKU if not provided
+                    if not new_variant.sku:
+                        new_variant.sku = await self._generate_sku(product)
+                    
+                    self.db.add(new_variant)
+                    await self.db.flush()  # Get the new variant ID
+                    updated_variant_ids.add(str(new_variant.id))
+                    
+                    logger.info(f"Created new variant with ID {new_variant.id}")
+                    
+                    # Create inventory for new variant
+                    if variant_data.stock is not None:
+                        inventory = Inventory(
+                            id=uuid7(),
+                            variant_id=new_variant.id,
+                            quantity=variant_data.stock,
+                            quantity_available=variant_data.stock,
+                            low_stock_threshold=10
+                        )
+                        self.db.add(inventory)
+                    
+                    # Add images for new variant
+                    if variant_data.images:
+                        for img_data in variant_data.images:
+                            if isinstance(img_data, dict):
+                                image = ProductImage(
+                                    id=uuid7(),
+                                    variant_id=new_variant.id,
+                                    url=img_data.get('url', ''),
+                                    alt_text=img_data.get('alt_text', ''),
+                                    is_primary=img_data.get('is_primary', False),
+                                    sort_order=img_data.get('sort_order', 0)
+                                )
+                                self.db.add(image)
+            
+            # Delete variants that were removed (keep at least one variant)
+            variants_to_delete = existing_variant_ids - updated_variant_ids
+            if variants_to_delete and len(updated_variant_ids) > 0:
+                logger.info(f"Deleting {len(variants_to_delete)} variants: {variants_to_delete}")
+                for variant in product.variants[:]:
+                    if str(variant.id) in variants_to_delete:
+                        # Delete associated inventory
+                        if variant.inventory:
+                            self.db.delete(variant.inventory)
+                        # Delete associated images
+                        for img in variant.images:
+                            self.db.delete(img)
+                        self.db.delete(variant)
 
         await self.db.commit()
+        logger.info(f"Product {product_id} updated successfully")
 
         # Return the updated product
         return await self.get_product_by_id(product_id)

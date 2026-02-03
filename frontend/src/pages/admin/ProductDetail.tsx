@@ -100,9 +100,9 @@ export const AdminProductDetail = () => {
         
         <button
           onClick={() => navigate(`/admin/products/${productId}/edit`)}
-          className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary text-white rounded text-xs hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors font-medium"
         >
-          <Edit className="w-3 h-3" />
+          <Edit className="w-4 h-4" />
           Edit
         </button>
       </div>

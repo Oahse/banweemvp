@@ -410,7 +410,8 @@ export const Dashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="space-y-4">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
               <div className="space-y-3">
@@ -443,17 +444,6 @@ export const Dashboard = () => {
                   <div className="flex items-center space-x-3">
                     <UsersIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                     <span className="text-sm font-medium text-gray-900 dark:text-white">Manage Users</span>
-                  </div>
-                  <ArrowRightIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                </button>
-                
-                <button
-                  onClick={() => navigate('/admin/analytics')}
-                  className="w-full flex items-center justify-between p-3 text-left border border-gray-200 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <TrendingUpIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">View Analytics</span>
                   </div>
                   <ArrowRightIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                 </button>

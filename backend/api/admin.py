@@ -24,7 +24,7 @@ from models.payments import PaymentIntent, Transaction
 from services.auth import AuthService
 from schemas.auth import UserCreate
 from schemas.user import UserUpdate
-from schemas.product import ProductCreate
+from schemas.product import ProductCreate, ProductUpdate
 from schemas.shipping import ShippingMethodCreate, ShippingMethodUpdate
 from core.dependencies import get_current_auth_user
 
@@ -1022,6 +1022,27 @@ async def get_product_by_id_admin(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch product: {str(e)}"
+        )
+
+@router.put("/products/{product_id}")
+async def update_product_admin(
+    product_id: UUID,
+    product_data: ProductUpdate,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update a product (admin only)."""
+    try:
+        product_service = ProductService(db)
+        product = await product_service.update_product(product_id, product_data, current_user.id, is_admin=True)
+        return Response.success(data=product, message="Product updated successfully")
+    except APIException:
+        raise
+    except Exception as e:
+        logger.exception(f"Failed to update product {product_id}")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to update product: {str(e)}"
         )
 
 @router.delete("/products/{product_id}")

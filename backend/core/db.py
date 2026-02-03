@@ -140,7 +140,7 @@ class DatabaseOptimizer:
             pool_recycle=pool_recycle,  # Recycle connections every hour
             pool_timeout=pool_timeout,  # Timeout for getting connection from pool
             # Async settings
-            echo=env_is_local,  # Log SQL in development
+            echo=False,  # Disable SQL logging to reduce noise
             future=True,
             # Performance settings
             connect_args={
@@ -399,7 +399,7 @@ class DatabaseManager:
         else:
             engine_db = create_async_engine(
                 database_uri,
-                echo=env_is_local,
+                echo=False,
                 pool_pre_ping=True,
                 pool_recycle=3600,
                 pool_size=10,

@@ -168,11 +168,12 @@ const EditProduct: React.FC = () => {
         is_featured: formData.is_featured,
         is_bestseller: formData.is_bestseller,
         variants: formData.variants.map(v => ({
-          ...(v.id && { id: v.id }),
+          ...(v.id ? { id: v.id } : {}),
           name: v.name,
           sku: v.sku,
           base_price: v.base_price,
-          sale_price: v.sale_price || undefined,
+          sale_price: v.sale_price !== undefined && v.sale_price !== null ? v.sale_price : undefined,
+          stock: v.stock,
           attributes: v.attributes,
           specifications: v.specifications,
           dietary_tags: v.dietary_tags,
@@ -182,7 +183,7 @@ const EditProduct: React.FC = () => {
           barcode: v.barcode,
           qr_code: v.qr_code,
           images: (v.images || []).filter(img => img.url).map(img => ({
-            ...(img.id && { id: img.id }),
+            ...(img.id ? { id: img.id } : {}),
             url: img.url,
             alt_text: img.alt_text || '',
             is_primary: img.is_primary || false,
@@ -191,12 +192,25 @@ const EditProduct: React.FC = () => {
         }))
       };
       
-      await AdminAPI.updateProduct(productId, updateData);
+      console.log('📤 Sending update data to API:', JSON.stringify(updateData, null, 2));
+      console.log('🖼️ Variant 0 images being sent:', updateData.variants[0]?.images);
+      console.log('🖼️ Variant 1 images being sent:', updateData.variants[1]?.images);
+      
+      const response = await AdminAPI.updateProduct(productId, updateData);
+      
+      console.log('✅ API Response:', response);
+      console.log('📊 Response Data:', response?.data);
+      console.log('✅ Product updated successfully');
+      
       toast.success('Product updated successfully');
-      navigate(`/admin/products/${productId}`);
+      
+      // Reload the product data to show updated images
+      await fetchData();
       
     } catch (err: any) {
-      console.error('Error updating product:', err);
+      console.error('❌ Error updating product:', err);
+      console.error('🔍 Error response:', err?.response?.data);
+      console.error('🔍 Error message:', err?.message);
       const message = err?.response?.data?.message || err?.message || 'Failed to update product';
       toast.error(message);
     } finally {
@@ -520,7 +534,7 @@ const EditProduct: React.FC = () => {
 
           <div className="space-y-6">
             {formData.variants.map((variant, index) => (
-              <div key={index} className="border border-border rounded-lg p-4 space-y-4">
+              <div key={variant.id || index} className="border border-border rounded-lg p-4 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-semibold text-copy">Variant {index + 1}</h3>
                   {formData.variants.length > 1 && (
@@ -713,7 +727,7 @@ const EditProduct: React.FC = () => {
                   
                   <div className="space-y-2">
                     {(variant.images || []).map((img, imgIndex) => (
-                      <div key={imgIndex} className="space-y-2 p-3 border border-border rounded-lg">
+                      <div key={img.id || imgIndex} className="space-y-2 p-3 border border-border rounded-lg">`
                         <div className="flex gap-2">
                           <input
                             type="url"
