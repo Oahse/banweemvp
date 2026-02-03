@@ -167,7 +167,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       // Unwrap response data if it comes wrapped in { success, data }
       const newCart = response?.data || response;
       setCart(newCart ? { ...newCart } : cart);
-      toast.success(`Added ${item.quantity || 1} item${(item.quantity || 1) > 1 ? 's' : ''} to cart`);
       return true;
     } catch (error: any) {
       handleAuthError(error);
@@ -216,7 +215,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       // Unwrap response data if it comes wrapped
       const newCart = response?.data || response;
       setCart(newCart ? { ...newCart } : null);
-      toast.success(`${itemName} removed from cart`);
     } catch (error: any) {
       // Revert optimistic update on error
       setCart(previousCart);
@@ -267,7 +265,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       // Unwrap response data if it comes wrapped
       const newCart = response?.data || response;
       setCart(newCart ? { ...newCart } : cart);
-      toast.success('Cart updated');
     } catch (error: any) {
       handleCartSyncError(error, fetchCart);
       throw error;

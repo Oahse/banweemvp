@@ -340,12 +340,14 @@ class OrderService:
             return validation_result
             
         except Exception as e:
+            import traceback
             logger.error(f"Checkout validation failed for user {user_id}: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
             validation_result['valid'] = False
             validation_result['can_proceed'] = False
             validation_result['errors'].append({
                 'type': 'system_error',
-                'message': 'Checkout validation failed due to system error'
+                'message': f'Checkout validation failed: {str(e)}'
             })
             return validation_result
 

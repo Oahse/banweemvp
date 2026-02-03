@@ -113,7 +113,11 @@ export const App: React.FC = () => {
           <FontLoader />
           <Toaster
             position="top-right"
+            gutter={12}
+            containerStyle={{}}
             toastOptions={{
+              className: '',
+              style: {},
               success: {
                 duration: 3000,
                 style: {

@@ -196,7 +196,6 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (response.success) {
-        toast.success('Item added to wishlist!');
         // Don't fetch immediately - let optimistic update handle UI
         // Background refresh will happen naturally on next page load or user action
         return true;
@@ -233,7 +232,6 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
         ...prev,
         items: prev.items.filter(item => item.id !== itemId),
       } : undefined);
-      toast.success('Item removed from wishlist!');
       return true;
     }
 
@@ -249,7 +247,6 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await WishlistAPI.removeItemFromWishlist(userId, wishlistId, itemId);
       if (response.success) {
-        toast.success('Item removed from wishlist!');
         // Don't fetch immediately - let optimistic update handle UI
         // Background refresh will happen naturally on next page load or user action
         return true;

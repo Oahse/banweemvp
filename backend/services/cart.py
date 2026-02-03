@@ -242,6 +242,7 @@ class CartService:
             .options(
                 selectinload(Cart.items).selectinload(CartItem.variant).selectinload(ProductVariant.images),
                 selectinload(Cart.items).selectinload(CartItem.variant).selectinload(ProductVariant.product),
+                selectinload(Cart.items).selectinload(CartItem.variant).selectinload(ProductVariant.inventory),
                 selectinload(Cart.items).selectinload(CartItem.product)
             )
             .where(Cart.user_id == user_id)
@@ -323,56 +324,67 @@ class CartService:
         """Validate individual cart item"""
         issues = []
         
-        # Check if variant is active
-        if not item.variant.is_active:
-            issues.append({
-                'type': 'inactive_variant',
-                'severity': 'error',
-                'message': f'Product variant "{item.variant.name}" is no longer available',
-                'variant_id': str(item.variant_id)
-            })
-        
-        # Check if product is active
-        if item.product and item.product.product_status != 'active':
-            issues.append({
-                'type': 'inactive_product',
-                'severity': 'error',
-                'message': f'Product "{item.product.name}" is no longer available',
-                'product_id': str(item.product_id)
-            })
-        
-        # Check stock availability
         try:
-            from services.inventory import InventoryService
-            inventory_service = InventoryService(self.db)
-            stock_info = await inventory_service.get_variant_stock_info(item.variant_id)
-            
-            if stock_info['quantity_available'] < item.quantity:
-                severity = 'error' if stock_info['quantity_available'] == 0 else 'warning'
+            # Check if variant is active
+            if not item.variant or not item.variant.is_active:
                 issues.append({
-                    'type': 'insufficient_stock',
-                    'severity': severity,
-                    'message': f'Only {stock_info["quantity_available"]} units available for "{item.variant.name}"',
-                    'variant_id': str(item.variant_id),
-                    'requested_quantity': item.quantity,
-                    'available_quantity': stock_info['quantity_available']
+                    'type': 'inactive_variant',
+                    'severity': 'error',
+                    'message': f'Product variant "{item.variant.name if item.variant else "Unknown"}" is no longer available',
+                    'variant_id': str(item.variant_id)
+                })
+                return issues
+            
+            # Check if product is active
+            if item.product and item.product.product_status != 'active':
+                issues.append({
+                    'type': 'inactive_product',
+                    'severity': 'error',
+                    'message': f'Product "{item.product.name}" is no longer available',
+                    'product_id': str(item.product_id)
+                })
+            
+            # Check stock availability
+            try:
+                from services.inventory import InventoryService
+                inventory_service = InventoryService(self.db)
+                stock_check = await inventory_service.check_stock_availability(item.variant_id, item.quantity)
+                
+                if not stock_check.get('available', False):
+                    severity = 'error' if stock_check.get('current_stock', 0) == 0 else 'warning'
+                    issues.append({
+                        'type': 'insufficient_stock',
+                        'severity': severity,
+                        'message': stock_check.get('message', f'Insufficient stock for "{item.variant.name}"'),
+                        'variant_id': str(item.variant_id),
+                        'requested_quantity': item.quantity,
+                        'available_quantity': stock_check.get('current_stock', 0)
+                    })
+            except Exception as e:
+                logger.warning(f"Could not check stock for variant {item.variant_id}: {e}")
+                # Don't fail validation if stock check fails, just skip it
+            
+            # Check quantity limits
+            if item.quantity <= 0:
+                issues.append({
+                    'type': 'invalid_quantity',
+                    'severity': 'error',
+                    'message': 'Quantity must be greater than 0',
+                    'variant_id': str(item.variant_id)
+                })
+            elif item.quantity > 100:  # Business rule: max 100 per item
+                issues.append({
+                    'type': 'quantity_limit_exceeded',
+                    'severity': 'warning',
+                    'message': 'Quantity exceeds recommended limit of 100',
+                    'variant_id': str(item.variant_id)
                 })
         except Exception as e:
-            logger.warning(f"Could not check stock for variant {item.variant_id}: {e}")
-        
-        # Check quantity limits
-        if item.quantity <= 0:
+            logger.error(f"Error validating cart item {item.id}: {e}")
             issues.append({
-                'type': 'invalid_quantity',
+                'type': 'validation_error',
                 'severity': 'error',
-                'message': 'Quantity must be greater than 0',
-                'variant_id': str(item.variant_id)
-            })
-        elif item.quantity > 100:  # Business rule: max 100 per item
-            issues.append({
-                'type': 'quantity_limit_exceeded',
-                'severity': 'warning',
-                'message': 'Quantity exceeds recommended limit of 100',
+                'message': 'Failed to validate cart item',
                 'variant_id': str(item.variant_id)
             })
         
@@ -838,19 +850,23 @@ class CartService:
                 continue
                 
             # Check stock
-            if variant["stock"] < item["quantity"]:
+            available_stock = variant.get("quantity_available") or variant.get("stock") or 0
+            if available_stock < item["quantity"]:
                 issues.append({
                     "item_id": item["id"],
                     "severity": "warning",
-                    "message": f"Only {variant['stock']} items available, but {item['quantity']} requested"
+                    "message": f"Only {available_stock} items available, but {item['quantity']} requested"
                 })
             
             # Check if price changed
-            if abs(float(item["price_per_unit"]) - float(variant["current_price"])) > 0.01:
+            item_price = float(item.get("price_per_unit") or item.get("price") or 0)
+            variant_price = float(variant.get("current_price") or variant.get("sale_price") or variant.get("base_price") or 0)
+            
+            if item_price > 0 and variant_price > 0 and abs(item_price - variant_price) > 0.01:
                 issues.append({
                     "item_id": item["id"],
                     "severity": "info",
-                    "message": f"Price changed from ${item['price_per_unit']:.2f} to ${variant['current_price']:.2f}"
+                    "message": f"Price changed from ${item_price:.2f} to ${variant_price:.2f}"
                 })
 
         return {
