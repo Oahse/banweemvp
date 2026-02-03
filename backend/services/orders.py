@@ -4,7 +4,7 @@ Handles complete order lifecycle with backend-only price calculations
 """
 import hashlib
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, desc
+from sqlalchemy import select, and_, desc, delete
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException, BackgroundTasks
 from models.orders import Order, OrderItem, TrackingEvent
@@ -247,14 +247,18 @@ class OrderService:
             'can_proceed': True,
             'errors': [],
             'warnings': [],
-            'pricing': None,
-            'cart': None
+            'pricing': None
         }
         
         try:
             # Step 1: Validate cart exists and has items
             cart_service = CartService(self.db)
             cart_validation = await cart_service.validate_cart(user_id)
+            
+            logger.info(f"Cart validation result: valid={cart_validation.get('valid')}, can_checkout={cart_validation.get('can_checkout')}")
+            if cart_validation.get('issues'):
+                for issue in cart_validation.get('issues'):
+                    logger.info(f"Cart issue: {issue}")
             
             if not cart_validation.get('valid', False):
                 validation_result['valid'] = False
@@ -263,7 +267,17 @@ class OrderService:
                 return validation_result
             
             cart = cart_validation['cart']
-            validation_result['cart'] = cart
+            
+            # Verify cart has items before proceeding
+            if not cart or not hasattr(cart, 'items') or not cart.items:
+                validation_result['valid'] = False
+                validation_result['can_proceed'] = False
+                validation_result['errors'].append({
+                    'type': 'cart_validation',
+                    'severity': 'error', 
+                    'message': 'Cart has no valid items for checkout'
+                })
+                return validation_result
             
             # Step 2: Validate shipping address
             shipping_address_result = await self.db.execute(
@@ -377,7 +391,28 @@ class OrderService:
                 }
             )
         
-        cart = validation_result['cart']
+        # Step 2: Get cart from database to access items for order creation
+        # We need to fetch the cart fresh from the database in case items were updated
+        cart_result = await self.db.execute(
+            select(Cart).where(Cart.user_id == user_id).options(
+                selectinload(Cart.items).selectinload(CartItem.variant)
+            )
+        )
+        cart = cart_result.scalar_one_or_none()
+        
+        # Validate cart still has items (defensive check)
+        if not cart:
+            raise HTTPException(
+                status_code=400,
+                detail="Cart not found"
+            )
+        
+        if not cart.items:
+            raise HTTPException(
+                status_code=400,
+                detail="Cart is empty - no items to checkout"
+            )
+        
         pricing = validation_result['pricing']
         
         # Step 2: Get addresses and shipping method
@@ -392,111 +427,113 @@ class OrderService:
         shipping_method = shipping_method_result.scalar_one()
         
         try:
-            # Step 3: Create order with atomic transaction
-            async with self.db.begin():
-                # Generate order number
-                order_number = f"ORD-{datetime.utcnow().strftime('%Y%m%d')}-{uuid7().hex[:8].upper()}"
+            # Step 3: Create order
+            # Generate order number
+            order_number = f"ORD-{datetime.utcnow().strftime('%Y%m%d')}-{uuid7().hex[:8].upper()}"
+            
+            # Create order
+            order = Order(
+                id=uuid7(),
+                order_number=order_number,
+                user_id=user_id,
+                order_status="pending",
+                payment_status="pending",
+                fulfillment_status="unfulfilled",
+                subtotal=pricing['subtotal'],
+                shipping_cost=pricing['shipping']['cost'],
+                tax_amount=pricing['tax']['amount'],
+                tax_rate=pricing['tax']['rate'],
+                total_amount=pricing['total'],
+                currency=pricing['currency'],
+                shipping_method=shipping_method.name,
+                billing_address={
+                    'street': shipping_address.street,
+                    'city': shipping_address.city,
+                    'state': shipping_address.state,
+                    'country': shipping_address.country,
+                    'post_code': shipping_address.post_code
+                },
+                shipping_address={
+                    'street': shipping_address.street,
+                    'city': shipping_address.city,
+                    'state': shipping_address.state,
+                    'country': shipping_address.country,
+                    'post_code': shipping_address.post_code
+                },
+                notes=request.notes
+            )
+            self.db.add(order)
+            await self.db.flush()
+            
+            # Create order items and update inventory
+            order_items_list = []
+            for cart_item in cart.items:
+                variant_price = cart_item.variant.sale_price or cart_item.variant.base_price
                 
-                # Create order
-                order = Order(
+                order_item = OrderItem(
                     id=uuid7(),
-                    order_number=order_number,
-                    user_id=user_id,
-                    order_status="pending",
-                    payment_status="pending",
-                    fulfillment_status="unfulfilled",
-                    subtotal=pricing['subtotal'],
-                    shipping_cost=pricing['shipping']['cost'],
-                    tax_amount=pricing['tax']['amount'],
-                    tax_rate=pricing['tax']['rate'],
-                    total_amount=pricing['total'],
-                    currency=pricing['currency'],
-                    shipping_method=shipping_method.name,
-                    billing_address={
-                        'street': shipping_address.street,
-                        'city': shipping_address.city,
-                        'state': shipping_address.state,
-                        'country': shipping_address.country,
-                        'post_code': shipping_address.post_code
-                    },
-                    shipping_address={
-                        'street': shipping_address.street,
-                        'city': shipping_address.city,
-                        'state': shipping_address.state,
-                        'country': shipping_address.country,
-                        'post_code': shipping_address.post_code
-                    },
-                    notes=request.notes
+                    order_id=order.id,
+                    variant_id=cart_item.variant_id,
+                    quantity=cart_item.quantity,
+                    price_per_unit=variant_price,
+                    total_price=variant_price * cart_item.quantity
                 )
-                self.db.add(order)
-                await self.db.flush()
+                self.db.add(order_item)
+                order_items_list.append(order_item)
                 
-                # Create order items and update inventory
-                for cart_item in cart.items:
-                    variant_price = cart_item.variant.sale_price or cart_item.variant.base_price
-                    
-                    order_item = OrderItem(
-                        id=uuid7(),
-                        order_id=order.id,
-                        variant_id=cart_item.variant_id,
-                        quantity=cart_item.quantity,
-                        price_per_unit=variant_price,
-                        total_price=variant_price * cart_item.quantity
-                    )
-                    self.db.add(order_item)
-                    
-                    # Update inventory
-                    await self.inventory_service.adjust_stock(
-                        cart_item.variant_id,
-                        -cart_item.quantity,
-                        reason="order_placed",
-                        reference_id=str(order.id)
-                    )
-                
-                # Clear cart
-                await self.db.execute(delete(CartItem).where(CartItem.cart_id == cart.id))
-                
-                await self.db.commit()
-                
-                logger.info(f"Order {order_number} created successfully for user {user_id}")
-                
-                # Return order response
-                return OrderResponse(
-                    id=order.id,
-                    order_number=order_number,
-                    user_id=user_id,
-                    status=order.order_status,
-                    total_amount=order.total_amount,
-                    currency=order.currency,
-                    created_at=order.created_at,
-                    items=[
-                        OrderItemResponse(
-                            id=item.id,
-                            variant_id=item.variant_id,
-                            quantity=item.quantity,
-                            price_per_unit=item.price_per_unit,
-                            total_price=item.total_price
-                        ) for item in order.items
-                    ]
+                # Update inventory
+                adjustment = StockAdjustmentCreate(
+                    variant_id=cart_item.variant_id,
+                    quantity_change=-cart_item.quantity,
+                    reason=f"Order placed: {order_number}",
+                    notes=f"Auto-adjusted inventory for order {order_number}"
                 )
-                
+                await self.inventory_service.adjust_stock(
+                    adjustment,
+                    adjusted_by_user_id=user_id,
+                    commit=False
+                )
+            
+            # Clear cart
+            await self.db.execute(delete(CartItem).where(CartItem.cart_id == cart.id))
+            
+            # Explicitly commit the transaction to persist all changes
+            await self.db.commit()
+            
+            logger.info(f"Order {order_number} created successfully for user {user_id}")
+            
+            # Return order response using the items we collected
+            return OrderResponse(
+                id=order.id,
+                user_id=user_id,
+                status=order.order_status,
+                total_amount=order.total_amount,
+                subtotal=order.subtotal,
+                tax_amount=order.tax_amount,
+                shipping_amount=order.shipping_cost,
+                discount_amount=Decimal('0.00'),  # Can be updated if discount is used
+                currency=order.currency,
+                created_at=order.created_at.isoformat() if order.created_at else datetime.utcnow().isoformat(),
+                tracking_number=None,
+                estimated_delivery=None,
+                items=[
+                    OrderItemResponse(
+                        id=item.id,
+                        variant_id=item.variant_id,
+                        quantity=item.quantity,
+                        price_per_unit=item.price_per_unit,
+                        total_price=item.total_price
+                    ) for item in order_items_list
+                ]
+            )
+            
         except Exception as e:
             logger.error(f"Order creation failed for user {user_id}: {e}")
-            await self.db.rollback()
+            # Session will auto-rollback on exception due to the context manager
             raise HTTPException(
                 status_code=500,
                 detail="Order creation failed due to system error"
             )
-            # Check for price tampering
-            tampering_result = await security_service.detect_price_tampering(
-                client_id, request.submitted_prices, actual_prices
-            )
-            
-            if tampering_result.get("blocked"):
-                if tampering_result["reason"] == "account_suspended":
-                    raise HTTPException(status_code=403, detail=tampering_result["message"])
-                else:
-                    raise HTTPException(status_code=400, detail=tampering_result["message"])
         
         # STEP 3: Proceed with regular order placement
         return await self.place_order_with_idempotency(user_id, request, background_tasks, idempotency_key)

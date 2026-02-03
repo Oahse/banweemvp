@@ -267,8 +267,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       });
 
       if (orderResponse.success) {
-        // Clear cart and form data
-        await clearCart();
+        // Clear cart silently (no toast) since we're showing order success message
+        await clearCart(false);
         localStorage.removeItem('checkout_form_data');
         
         toast.success('Order placed successfully!');

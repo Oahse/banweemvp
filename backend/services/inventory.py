@@ -468,22 +468,33 @@ class InventoryService:
         """Adjust stock levels atomically with SELECT ... FOR UPDATE"""
         try:
             # Use atomic stock operation from the model
-            from models.inventories import atomic_stock_operation
+            from models.inventories import Inventory
             
-            result = await atomic_stock_operation(
+            # Get inventory with lock
+            inventory = await Inventory.get_with_lock(self.db, adjustment_data.variant_id)
+            
+            if not inventory:
+                raise APIException(
+                    status_code=404,
+                    message=f"Inventory not found for variant {adjustment_data.variant_id}"
+                )
+            
+            # Perform atomic update
+            adjustment = await inventory.atomic_update_stock(
                 db=self.db,
-                variant_id=adjustment_data.variant_id,
-                operation="update",
                 quantity_change=adjustment_data.quantity_change,
                 reason=adjustment_data.reason,
                 user_id=adjusted_by_user_id,
                 notes=adjustment_data.notes
             )
             
-            return result["inventory"]
+            if commit:
+                await self.db.commit()
+            
+            return inventory
             
         except Exception as e:
-            logger.error(f"Error in atomic stock adjustment: {e}")
+            logger.error(f"Error in stock adjustment: {e}")
             raise APIException(
                 status_code=500,
                 message=f"Failed to adjust stock: {str(e)}"

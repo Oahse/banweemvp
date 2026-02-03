@@ -13,7 +13,7 @@ interface CartContextType {
   addItem: (item: AddToCartRequest) => Promise<boolean>;
   removeItem: (itemId: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
-  clearCart: () => Promise<void>;
+  clearCart: (showToast?: boolean) => Promise<void>;
   refreshCart: () => Promise<void>;
   totalItems: number;
   items: Cart['items'];
@@ -272,7 +272,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   // ✅ Optimistic clear cart with useState first
-  const clearCart = async () => {
+  const clearCart = async (showToast: boolean = true) => {
     const token = TokenManager.getToken();
     if (!token) {
       const error = new Error('User must be authenticated');
@@ -303,7 +303,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       // Unwrap response data if it comes wrapped
       const newCart = response?.data || optimisticCart;
       setCart(newCart ? { ...newCart } : null);
-      toast.success('Cart cleared');
+      if (showToast) {
+        toast.success('Cart cleared');
+      }
     } catch (error: any) {
       handleAuthError(error);
       throw error;

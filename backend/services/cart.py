@@ -822,66 +822,6 @@ class CartService:
         
         return checkout_summary
 
-    async def validate_cart(
-        self,
-        user_id: Optional[UUID] = None,
-        session_id: Optional[str] = None,
-        country_code: str = 'US',
-        province_code: Optional[str] = None
-    ) -> Dict[str, Any]:
-        """Validate cart items for stock and pricing"""
-        
-        cart_data = await self.get_cart(
-            user_id=user_id, 
-            session_id=session_id,
-            country_code=country_code,
-            province_code=province_code
-        )
-        issues = []
-        
-        for item in cart_data["items"]:
-            variant = item.get("variant")
-            if not variant:
-                issues.append({
-                    "item_id": item["id"],
-                    "severity": "error",
-                    "message": "Product variant not found"
-                })
-                continue
-                
-            # Check stock
-            available_stock = variant.get("quantity_available") or variant.get("stock") or 0
-            if available_stock < item["quantity"]:
-                issues.append({
-                    "item_id": item["id"],
-                    "severity": "warning",
-                    "message": f"Only {available_stock} items available, but {item['quantity']} requested"
-                })
-            
-            # Check if price changed
-            item_price = float(item.get("price_per_unit") or item.get("price") or 0)
-            variant_price = float(variant.get("current_price") or variant.get("sale_price") or variant.get("base_price") or 0)
-            
-            if item_price > 0 and variant_price > 0 and abs(item_price - variant_price) > 0.01:
-                issues.append({
-                    "item_id": item["id"],
-                    "severity": "info",
-                    "message": f"Price changed from ${item_price:.2f} to ${variant_price:.2f}"
-                })
-
-        return {
-            "valid": len([i for i in issues if i["severity"] == "error"]) == 0,
-            "can_checkout": len([i for i in issues if i["severity"] in ["error", "warning"]]) == 0,
-            "issues": issues,
-            "cart": cart_data,
-            "summary": {
-                "total_items": len(cart_data["items"]),
-                "total_amount": cart_data["total_amount"],
-                "issues_count": len(issues)
-            },
-            "validation_timestamp": datetime.utcnow().isoformat()
-        }
-
     async def apply_promocode(
         self,
         user_id: Optional[UUID] = None,
