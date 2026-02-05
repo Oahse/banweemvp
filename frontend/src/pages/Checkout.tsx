@@ -34,7 +34,6 @@ export const Checkout = () => {
   // Redirect if cart is empty (only after auth is confirmed)
   useEffect(() => {
     if (!authLoading && isAuthenticated && !cartLoading && (!cart || !cart.items || cart.items.length === 0)) {
-      toast.error('Your cart is empty');
       navigate('/cart');
     }
   }, [cart, cartLoading, navigate, authLoading, isAuthenticated]);

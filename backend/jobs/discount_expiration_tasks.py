@@ -8,7 +8,7 @@ import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from core.db import get_db_session
+from core.db import AsyncSessionDB
 from services.discounts import DiscountEngine
 from core.utils.messages.email import send_email
 from core.utils.messages.sms import send_sms
@@ -56,7 +56,7 @@ class DiscountExpirationTaskManager:
         Returns:
             Summary of expiration handling results
         """
-        async with get_db_session() as db_session:
+        async with AsyncSessionDB() as db_session:
             try:
                 discount_engine = DiscountEngine(db_session)
                 
@@ -228,7 +228,7 @@ class DiscountExpirationTaskManager:
         Returns:
             Summary of soon-to-expire discount notifications
         """
-        async with get_db_session() as db_session:
+        async with AsyncSessionDB() as db_session:
             try:
                 from models.discounts import Discount, SubscriptionDiscount
                 

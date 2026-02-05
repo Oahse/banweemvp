@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon, UserIcon } from 'lucide-react';
+import { Loader, AlertCircle, PlusIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon, UserIcon } from 'lucide-react';
 import AdminAPI from '../../api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '../../store/ThemeContext';
@@ -28,6 +28,8 @@ interface PaginationInfo {
 export const Payments = () => {
   const { currentTheme } = useTheme();
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,8 +93,10 @@ export const Payments = () => {
         });
         
         // Handle response format
-        const data = response?.data?.data || response?.data;
-        const allPayments = Array.isArray(data) ? data : data?.items || [];
+        const payload = response?.data?.data || response?.data;
+        const allPayments = Array.isArray(payload)
+          ? payload
+          : payload?.data || payload?.items || [];
         
         // Apply client-side filtering and sorting if needed
         let filteredPayments = allPayments;
@@ -143,7 +147,22 @@ export const Payments = () => {
         const endIndex = startIndex + LIMIT;
         const paginatedPayments = filteredPayments.slice(startIndex, endIndex);
         
-        setPayments(paginatedPayments);
+        const normalizedPayments = paginatedPayments.map((payment: any) => {
+          const rawStatus = (payment.status || '').toLowerCase();
+          let normalizedStatus = rawStatus;
+
+          if (rawStatus === 'succeeded') normalizedStatus = 'completed';
+          if (rawStatus === 'requires_action' || rawStatus === 'requires_payment_method') {
+            normalizedStatus = 'pending';
+          }
+
+          return {
+            ...payment,
+            status: normalizedStatus
+          };
+        });
+
+        setPayments(normalizedPayments);
         setPagination({
           page: page,
           limit: LIMIT,
@@ -174,7 +193,10 @@ export const Payments = () => {
   const statusBadge = (status: string) => {
     const statusConfig = {
       completed: { bg: 'bg-success/20', text: 'text-success', label: 'Completed' },
+      succeeded: { bg: 'bg-success/20', text: 'text-success', label: 'Completed' },
       pending: { bg: 'bg-warning/20', text: 'text-warning', label: 'Pending' },
+      requires_action: { bg: 'bg-warning/20', text: 'text-warning', label: 'Pending' },
+      requires_payment_method: { bg: 'bg-warning/20', text: 'text-warning', label: 'Pending' },
       failed: { bg: 'bg-error/20', text: 'text-error', label: 'Failed' },
       refunded: { bg: 'bg-gray-500/20', text: 'text-gray-500', label: 'Refunded' }
     };
@@ -233,7 +255,8 @@ export const Payments = () => {
   };
 
   const handleView = (payment: Payment) => {
-    toast.success(`Viewing payment ${payment.id}`);
+    setSelectedPayment(payment);
+    setIsViewOpen(true);
   };
 
   if (loading) {
@@ -245,7 +268,7 @@ export const Payments = () => {
   }
 
   return (
-    <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-6 overflow-x-hidden ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl lg:text-2xl font-semibold">Payments Management</h1>
@@ -382,8 +405,8 @@ export const Payments = () => {
         {payments.length > 0 ? (
           <>
             {/* Desktop table */}
-            <div className="overflow-x-auto hidden md:block">
-              <table className="w-full">
+            <div className="overflow-x-auto hidden md:block max-w-full">
+              <table className="min-w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                   <tr>
                     <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Payment ID</th>
@@ -414,10 +437,6 @@ export const Payments = () => {
                           >
                             <EyeIcon size={14} className="hidden sm:block" />
                             <span className="sm:hidden">View</span>
-                          </button>
-                          <button className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
-                            <EditIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">Edit</span>
                           </button>
                         </div>
                       </td>
@@ -450,10 +469,6 @@ export const Payments = () => {
                     >
                       <EyeIcon size={14} />
                       View
-                    </button>
-                    <button className="inline-flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-xs">
-                      <EditIcon size={14} />
-                      Edit
                     </button>
                   </div>
                 </div>
@@ -576,6 +591,31 @@ export const Payments = () => {
           </>
         )}
       </div>
+
+      {isViewOpen && selectedPayment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className={`w-full max-w-lg rounded-lg p-6 ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Payment Details</h2>
+              <button
+                onClick={() => setIsViewOpen(false)}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                Close
+              </button>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div><strong>ID:</strong> {selectedPayment.id}</div>
+              <div><strong>Order ID:</strong> {selectedPayment.order_id || 'N/A'}</div>
+              <div><strong>Customer:</strong> {selectedPayment.customer_name || 'N/A'}</div>
+              <div><strong>Amount:</strong> {formatCurrency(selectedPayment.amount, selectedPayment.currency)}</div>
+              <div><strong>Method:</strong> {selectedPayment.payment_method || 'N/A'}</div>
+              <div><strong>Status:</strong> {selectedPayment.status}</div>
+              <div><strong>Date:</strong> {selectedPayment.created_at ? new Date(selectedPayment.created_at).toLocaleString() : 'N/A'}</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

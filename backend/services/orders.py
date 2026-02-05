@@ -7,7 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, desc, delete
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException, BackgroundTasks
-from models.orders import Order, OrderItem, TrackingEvent
+from models.orders import Order, OrderItem, TrackingEvent, PaymentStatus, OrderStatus
+from models.user import User
+from jobs.email_tasks import send_order_confirmation_email
 from models.cart import Cart, CartItem
 from models.user import User, Address
 from models.product import ProductVariant
@@ -493,6 +495,60 @@ class OrderService:
                     adjusted_by_user_id=user_id,
                     commit=False
                 )
+
+            # Process payment with Stripe using backend-calculated total
+            payment_service = PaymentService(self.db)
+            payment_idempotency_key = (
+                f"payment_{order.id}_{idempotency_key}" if idempotency_key else f"payment_{order.id}"
+            )
+
+            payment_result = await payment_service.process_payment_idempotent(
+                user_id=user_id,
+                order_id=order.id,
+                amount=order.total_amount,
+                payment_method_id=request.payment_method_id,
+                idempotency_key=payment_idempotency_key,
+                request_id=str(uuid7()),
+                frontend_calculated_amount=getattr(request, "frontend_calculated_total", None)
+            )
+
+            if payment_result.get("status") != "succeeded":
+                order.payment_status = PaymentStatus.FAILED
+                order.order_status = OrderStatus.PENDING
+                order.failure_reason = payment_result.get("error", "Payment processing failed")
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Payment failed: {order.failure_reason}"
+                )
+
+            order.payment_status = PaymentStatus.PAID
+            order.order_status = OrderStatus.CONFIRMED
+
+            # Send invoice/confirmation email in background
+            try:
+                user_result = await self.db.execute(select(User).where(User.id == user_id))
+                user = user_result.scalar_one_or_none()
+                if user and getattr(user, "email", None):
+                    email_items = [
+                        {
+                            "name": cart_item.variant.name if cart_item.variant else "Item",
+                            "quantity": cart_item.quantity,
+                            "price": float(cart_item.variant.sale_price or cart_item.variant.base_price or 0)
+                        }
+                        for cart_item in cart.items
+                    ]
+                    send_order_confirmation_email(
+                        background_tasks=background_tasks,
+                        to_email=user.email,
+                        customer_name=getattr(user, "full_name", "Customer"),
+                        order_number=order.order_number,
+                        order_date=order.created_at or datetime.utcnow(),
+                        total_amount=order.total_amount,
+                        items=email_items,
+                        shipping_address=order.shipping_address
+                    )
+            except Exception as email_error:
+                logger.error(f"Failed to schedule invoice email: {email_error}")
             
             # Clear cart
             await self.db.execute(delete(CartItem).where(CartItem.cart_id == cart.id))

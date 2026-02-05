@@ -6,7 +6,7 @@ Uses ARQ for scheduled retries and FastAPI BackgroundTasks for immediate process
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_
 from datetime import datetime, timedelta
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import asyncio
 import logging
 from fastapi import BackgroundTasks
@@ -17,7 +17,7 @@ from core.arq_worker import enqueue_payment_retry, enqueue_data_cleanup
 from models.payments import PaymentIntent, Transaction
 from models.subscriptions import Subscription
 from models.orders import Order
-from services.payment_failure_handler import PaymentFailureHandler, PaymentFailureReason
+from services.payments.payment_failure_handler import PaymentFailureHandler, PaymentFailureReason
 from services.payments import PaymentService
 
 logger = logging.getLogger(__name__)

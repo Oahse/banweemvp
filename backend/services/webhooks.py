@@ -195,7 +195,7 @@ class WebhookService:
             
             # Use comprehensive failure handler if payment intent exists
             try:
-                from services.payment_failure_handler import PaymentFailureHandler
+                from services.payments.payment_failure_handler import PaymentFailureHandler
                 
                 # Find the payment intent
                 payment_intent_result = await self.db.execute(

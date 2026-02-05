@@ -120,11 +120,8 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
 
   const refreshSubscriptions = async () => {
     if (!isAuthenticated || isRefreshing.current) {
-      console.log('RefreshSubscriptions: Skipping - not authenticated or already refreshing');
       return;
     }
-
-    console.log('RefreshSubscriptions: Starting refresh...');
     isRefreshing.current = true;
     setLoading(true);
     setError(null);
@@ -142,17 +139,12 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
     }, 10000); // 10 second timeout
 
     try {
-      console.log('RefreshSubscriptions: Calling API...');
       const response = await SubscriptionAPI.getUserSubscriptions();
-      console.log('RefreshSubscriptions: API response:', response?.data);
       
       // API returns SubscriptionListResponse with subscriptions property
       const subscriptionsData = response?.data?.subscriptions || [];
-      console.log('RefreshSubscriptions: Setting subscriptions:', subscriptionsData.length, 'items');
-      console.log('RefreshSubscriptions: Total available:', response?.data?.total, 'subscriptions');
       
       setSubscriptions(subscriptionsData);
-      console.log('RefreshSubscriptions: Successfully loaded', subscriptionsData.length, 'subscriptions');
     } catch (error: any) {
       console.error('RefreshSubscriptions: Error:', error);
       if (error.statusCode === 401) {
@@ -168,13 +160,11 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
       clearTimeout(timeoutId);
       setLoading(false);
       isRefreshing.current = false;
-      console.log('RefreshSubscriptions: Completed');
     }
   };
 
   // Manual refresh function for troubleshooting
   const manualRefresh = async () => {
-    console.log('ManualRefresh: Forcing refresh...');
     hasInitialized.current = false; // Reset flag to force refresh
     await refreshSubscriptions();
   };

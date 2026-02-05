@@ -43,7 +43,6 @@ export const Cart = () => {
   
   const validateForCheckout = () => {
     if (!cart?.items.length) {
-      toast.error('Your cart is empty');
       return false;
     }
     

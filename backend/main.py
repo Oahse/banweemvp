@@ -46,10 +46,16 @@ from api import (
 
 from contextlib import asynccontextmanager
 from arq import Worker
+from jobs.discount_expiration_tasks import DiscountExpirationTaskManager
+from jobs.payment_retry_tasks import PaymentRetryTaskManager
+from jobs.subscription_tasks import SubscriptionTaskManager
 
 
 # Global variable to store the ARQ worker
 arq_worker = None
+discount_task_manager = None
+payment_retry_task_manager = None
+subscription_task_manager = None
 
 async def run_database_migrations():
     """Run Alembic database migrations during startup"""
@@ -232,6 +238,16 @@ async def lifespan(app: FastAPI):
             if settings.ENVIRONMENT != "local":
                 raise RuntimeError("ARQ connection required for background tasks")
 
+    # Start background task managers
+    global discount_task_manager, payment_retry_task_manager, subscription_task_manager
+    discount_task_manager = DiscountExpirationTaskManager()
+    payment_retry_task_manager = PaymentRetryTaskManager()
+    subscription_task_manager = SubscriptionTaskManager()
+
+    asyncio.create_task(discount_task_manager.start_expiration_monitor())
+    asyncio.create_task(payment_retry_task_manager.start_retry_scheduler())
+    asyncio.create_task(subscription_task_manager.start_subscription_scheduler())
+
     # Run database maintenance and optimization
     try:
         async with AsyncSessionDB() as db:
@@ -246,6 +262,14 @@ async def lifespan(app: FastAPI):
     
     # Shutdown event
     logger.info("Application shutting down...")
+
+    # Stop background task managers
+    if discount_task_manager:
+        discount_task_manager.stop_expiration_monitor()
+    if payment_retry_task_manager:
+        payment_retry_task_manager.stop_retry_scheduler()
+    if subscription_task_manager:
+        subscription_task_manager.stop_subscription_scheduler()
     
     # Stop ARQ worker
     if settings.ENABLE_ARQ:

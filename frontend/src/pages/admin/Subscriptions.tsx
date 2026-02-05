@@ -136,16 +136,6 @@ export const AdminSubscriptions = () => {
           setLoading(true);
         }
         setError(null);
-        console.log('Fetching subscriptions with params:', {
-          page,
-          limit: LIMIT,
-          search: debouncedSearchQuery || undefined,
-          status: statusFilter || undefined,
-          date_from: dateFromFilter || undefined,
-          date_to: dateToFilter || undefined,
-          sort_by: sortBy,
-          sort_order: sortOrder
-        });
         
         const response = await AdminAPI.getSubscriptions({
           page,
