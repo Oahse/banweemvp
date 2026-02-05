@@ -3,9 +3,9 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { describe, it, expect, vitest, beforeEach, afterEach } from 'vitest';
 import { BrowserRouter, Link, useNavigate } from 'react-router-dom';
 import { Header } from './Header';
-import { useAuth } from '../../store/AuthContext';
-import { useCart } from '../../store/CartContext';
-import { useWishlist } from '../../store/WishlistContext';
+import { useAuth } from '../../../AuthContext';
+import { useCart } from '../../../CartContext';
+import { useWishlist } from '../../../WishlistContext';
 import { SkeletonHeader } from '../ui/SkeletonNavigation';
 import { getCountryByCode } from '../../utils/countries';
 import {

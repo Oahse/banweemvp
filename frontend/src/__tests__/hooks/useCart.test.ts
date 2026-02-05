@@ -3,8 +3,8 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useCart } from '../../hooks/useCart';
-import { CartContext } from '../../store/CartContext';
+import { useCart } from '../../../shared/hooks/useCart';
+import { CartContext } from '../../../CartContext';
 import React from 'react';
 
 describe('useCart', () => {

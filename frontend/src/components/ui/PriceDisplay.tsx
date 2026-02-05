@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocale } from '../../store/LocaleContext';
+import { useLocale } from '../../../LocaleContext';
 
 interface PriceDisplayProps {
   /** The price amount to display */

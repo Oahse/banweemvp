@@ -4,7 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { CheckoutFlow } from '../../../components/checkout/CheckoutFlow';
+import { CheckoutFlow } from ./components/CheckoutFlow';
 import { CartProvider } from '../../../store/CartContext';
 import { AuthProvider } from '../../../store/AuthContext';
 import { mockCart, mockUser, TestWrapper } from '../../setup';

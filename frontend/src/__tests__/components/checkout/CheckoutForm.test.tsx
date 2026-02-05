@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders, mockCart, mockUser } from '../../setup';
-import CheckoutForm from '../../../components/checkout/CheckoutForm';
+import CheckoutForm from ./components/CheckoutForm';
 import * as OrdersAPI from '../../../api/orders';
 import * as PaymentsAPI from '../../../api/payments';
 import * as CartAPI from '../../../api/cart';

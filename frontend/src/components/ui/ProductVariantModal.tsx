@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, SearchIcon, PackageIcon, PlusIcon, CheckIcon } from 'lucide-react';
-import { useLocale } from '../../store/LocaleContext';
+import { useLocale } from '../../../LocaleContext';
 import ProductsAPI from '../../api/products';
 import { toast } from 'react-hot-toast';
 import { Product } from '../../types';

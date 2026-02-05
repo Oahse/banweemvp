@@ -3,8 +3,8 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useAuth } from '../../hooks/useAuth';
-import { AuthContext } from '../../store/AuthContext';
+import { useAuth } from '../../shared/hooks/useAuth';
+import { AuthContext } from '../../../AuthContext';
 import { toast } from 'react-hot-toast';
 import React from 'react';
 

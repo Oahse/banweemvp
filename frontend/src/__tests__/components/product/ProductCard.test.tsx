@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import { ProductCard } from '../../../components/product/ProductCard';
+import { ProductCard } from ./components/ProductCard';
 import { mockProduct } from '../../setup';
 
 // Mock cart context
