@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { extractErrorMessage } from '../utils/api-response';
+import { extractErrorMessage } from '../../../../utils/api-response';
 
 export const EmailVerification = () => {
   const [searchParams] = useSearchParams();

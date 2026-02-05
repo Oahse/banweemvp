@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Input } from '../../../generic/Input';
+import { Input } from '../../../../components/generic/Input';
 import { toast } from 'react-hot-toast';
-import { validation } from '../utils/validation';
-import { AuthAPI } from '../api';
-import { extractErrorMessage } from '../utils/api-response';
+import { validation } from '../../../../utils/validation';
+import { AuthAPI } from '../../../../api';
+import { extractErrorMessage } from '../../../../utils/api-response';
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState('');

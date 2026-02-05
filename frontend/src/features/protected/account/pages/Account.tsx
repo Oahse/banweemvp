@@ -12,10 +12,10 @@ const AccountSkeleton = () => (
 );
 
 // Lazy load account pages (feature-based)
-const Dashboard = lazy(() => import('./Dashboard'));
-const Profile = lazy(() => import('./Profile'));
+const AccountDashboardPage = lazy(() => import('./AccountDashboardPage'));
+const AccountProfilePage = lazy(() => import('./AccountProfilePage'));
 const Orders = lazy(() => import('./Orders'));
-const OrderDetail = lazy(() => import('./OrderDetail'));
+const AccountOrderDetailPage = lazy(() => import('./AccountOrderDetailPage'));
 const TrackOrder = lazy(() => import('./TrackOrder'));
 const ShipmentTracking = lazy(() => import('../../shipping/pages/ShipmentTracking'));
 const Wishlist = lazy(() => import('./Wishlist'));
@@ -53,11 +53,11 @@ export const Account = () => {
   return (
     <AccountLayout>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/" element={<AccountDashboardPage />} />
+        <Route path="/dashboard" element={<AccountDashboardPage />} />
+        <Route path="/profile" element={<AccountProfilePage />} />
         <Route path="/orders" element={<Orders />} />
-        <Route path="/orders/:orderId" element={<OrderDetail />} />
+        <Route path="/orders/:orderId" element={<AccountOrderDetailPage />} />
         <Route path="/tracking" element={<TrackOrder />} />
         <Route path="/tracking/:shipmentId" element={<ShipmentTracking />} />
         <Route path="/wishlist" element={<Wishlist />} />
@@ -70,7 +70,7 @@ export const Account = () => {
         <Route path="/subscriptions/:subscriptionId/orders" element={<SubscriptionOrders />} />
         
         {/* Redirect root to dashboard */}
-        <Route path="*" element={<Dashboard />} />
+        <Route path="*" element={<AccountDashboardPage />} />
       </Routes>
     </AccountLayout>
   );
