@@ -3,7 +3,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../protected/cart/contexts/CartContext';
+import { useCart } from '../../cart/contexts/CartContext';
 import { useAuth } from '../../protected/auth/contexts/AuthContext';
 import { useTheme } from '../../ThemeContext';
 import { AuthAPI } from '../api/auth';

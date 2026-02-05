@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../AuthContext';
 import { toast } from 'react-hot-toast';
-import { Input } from '../../../generic/Input';
+import { Input } from '../../../../components/generic/Input';
 import { Checkbox } from '../../../generic/Checkbox';
 import SocialAuth from './SocialAuth';
 import { validation } from '../utils/validation';
