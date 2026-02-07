@@ -1,4 +1,4 @@
-import { useAuth } from '../../AuthContext';
+import { useAuth } from '../../auth/hooks/useAuth';
 import { useSubscription as useSubscriptionContext } from '../../SubscriptionContext';
 import { toast } from 'react-hot-toast';
 
