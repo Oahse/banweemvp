@@ -26,7 +26,7 @@ import ReviewForm from './components/ReviewForm';
 import { Dropdown } from '../../../components/ui/Dropdown';
 import { useCart } from '../../protected/cart/contexts/CartContext';
 import { useWishlist } from '../../protected/wishlist/contexts/WishlistContext';
-import { useLocale } from '../../components/shared/contexts/LocaleContext';
+import { useLocale } from '../../../components/shared/contexts/LocaleContext';
 import { useApi } from '../../../components/shared/hooks/useAsync';
 import { useSubscriptionAction } from '../../components/shared/hooks/useSubscription';
 import { ProductsAPI, ReviewsAPI } from '../api';
