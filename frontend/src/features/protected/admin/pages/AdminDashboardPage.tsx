@@ -3,181 +3,494 @@ import AdminLayout from '../components/AdminLayout';
 import DashboardFilterBar, { DashboardFilters } from '../components/DashboardFilterBar';
 import AdminStatsCard from '../components/shared/StatsCard';
 import AdminDataTable, { Column, PaginationInfo } from '../components/shared/DataTable';
-import { AdminAPI } from '../../../../api/admin';
-import ErrorBoundary from '@/components/shared/ErrorBoundary';
+import { AdminAPI } from '@/api/admin';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
+
+// Loading spinner for stats
+const StatsCardSkeleton: React.FC = () => (
+  <div className="flex items-center justify-center h-48">
+    <LoadingSpinner size="lg" text="Loading dashboard..." />
+  </div>
+);
+
+// Loading spinner for table
+const TableSkeleton: React.FC = () => (
+  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+    <div className="space-y-4">
+      {/* Table header skeleton */}
+      <div className="h-8 bg-gray-100 dark:bg-gray-700 rounded mb-4 animate-pulse"></div>
+      
+      {/* Table rows skeleton */}
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="flex items-center space-x-4 py-2">
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-12 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-16 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-20 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-16 animate-pulse"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const defaultFilters: DashboardFilters = {
   dateRange: 'month',
-  status: undefined,
-  category: undefined,
 };
 
 const AdminDashboard: React.FC = () => {
   const [filters, setFilters] = useState<DashboardFilters>(defaultFilters);
   const [stats, setStats] = useState<any>(null);
   const [loadingStats, setLoadingStats] = useState(false);
-  const [statsError, setStatsError] = useState<string|null>(null);
+  const [statsError, setStatsError] = useState<string | null>(null);
+  
   const [tableData, setTableData] = useState<any[]>([]);
   const [tableLoading, setTableLoading] = useState(false);
-  const [tableError, setTableError] = useState<string|null>(null);
-  const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, pages: 1 });
+  const [tableError, setTableError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: 5,
+    total: 0,
+    pages: 1
+  });
 
-  // Fetch dashboard stats
+  const columns: Column[] = [
+    { key: 'id', label: 'ID', sortable: true },
+    { key: 'email', label: 'Email', sortable: true },
+    { key: 'full_name', label: 'Name', sortable: true },
+    { key: 'is_active', label: 'Status', sortable: true },
+    { key: 'created_at', label: 'Created', sortable: true }
+  ];
+
+  // Fetch dashboard data
   useEffect(() => {
-    setLoadingStats(true);
-    AdminAPI.getAdminStats({
-      date_from: filters.startDate,
-      date_to: filters.endDate,
-      status: filters.status,
-      category: filters.category,
-    })
-      .then((res: any) => {
-        setStats(res.data || res);
-        setStatsError(null);
-      })
-      .catch((err: any) => {
-        setStatsError('Failed to load stats');
-      })
-      .finally(() => setLoadingStats(false));
+    const fetchDashboardData = async () => {
+      setLoadingStats(true);
+      setStatsError(null);
+      
+      let date_from: string | undefined;
+      let date_to: string | undefined;
+      
+      if (filters.dateRange === 'today') {
+        const today = new Date();
+        date_from = today.toISOString().split('T')[0];
+        date_to = today.toISOString().split('T')[0];
+      } else if (filters.dateRange === 'week') {
+        const today = new Date();
+        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        date_from = weekAgo.toISOString().split('T')[0];
+        date_to = today.toISOString().split('T')[0];
+      } else if (filters.dateRange === 'month') {
+        const today = new Date();
+        const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+        date_from = monthAgo.toISOString().split('T')[0];
+        date_to = today.toISOString().split('T')[0];
+      } else if (filters.dateRange === 'quarter') {
+        const today = new Date();
+        const quarterAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
+        date_from = quarterAgo.toISOString().split('T')[0];
+        date_to = today.toISOString().split('T')[0];
+      } else if (filters.dateRange === 'year') {
+        const today = new Date();
+        const yearAgo = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
+        date_from = yearAgo.toISOString().split('T')[0];
+        date_to = today.toISOString().split('T')[0];
+      } else {
+        // Use custom dates if provided
+        date_from = filters.startDate;
+        date_to = filters.endDate;
+      }
+      
+      try {
+        const res = await AdminAPI.getDashboardData({
+          date_from,
+          date_to,
+        });
+        
+        const data = res.data || res;
+        setStats(data);
+        
+        // Set table data if recent users exist
+        if (data.recent_users && Array.isArray(data.recent_users)) {
+          setTableData(data.recent_users);
+          setPagination({
+            page: 1,
+            limit: 5,
+            total: data.recent_users.length,
+            pages: 1
+          });
+        } else {
+          // Fallback to empty array if no recent users data
+          setTableData([]);
+          setPagination({
+            page: 1,
+            limit: 5,
+            total: 0,
+            pages: 1
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+        setStatsError('Failed to load dashboard data');
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    fetchDashboardData();
   }, [filters]);
 
-  // Fetch table data (example: users)
-  const fetchTableData = async (params: any) => {
+  const fetchTableData = async (params: { page: number; limit: number; search?: string; filters?: Record<string, string>; sort_by?: string; sort_order?: 'asc' | 'desc' }) => {
     setTableLoading(true);
+    setTableError(null);
+    
     try {
       const res = await AdminAPI.getUsers({
         page: params.page,
         limit: params.limit,
-        status: filters.status,
         role: undefined,
         search: params.search,
         sort_by: params.sort_by,
         sort_order: params.sort_order,
       });
-      setTableData(res.data?.users || []);
-      setPagination({
-        page: res.data?.page || 1,
-        limit: res.data?.limit || 10,
-        total: res.data?.total || 0,
-        pages: res.data?.pages || 1,
-      });
-      setTableError(null);
+      
+      const users = res.data?.users || [];
+      setTableData(users);
+      
+      if (res.data?.pagination) {
+        setPagination({
+          page: res.data.pagination.page,
+          limit: res.data.pagination.limit,
+          total: res.data.pagination.total,
+          pages: res.data.pagination.pages
+        });
+      }
     } catch (err) {
-      setTableError('Failed to load table data');
+      console.error('Failed to fetch table data:', err);
+      setTableError('Failed to load users data');
     } finally {
       setTableLoading(false);
     }
   };
 
-  // Table columns
-  const columns: Column[] = [
-    { key: 'id', label: 'ID', sortable: true },
-    { key: 'email', label: 'Email', sortable: true },
-    { key: 'full_name', label: 'Name', sortable: true },
-    { key: 'role', label: 'Role', sortable: true },
-    { key: 'status', label: 'Status', sortable: true },
-  ];
-
-  // Font style from account pages
-  const fontClass = 'font-sans';
-
   return (
     <AdminLayout>
-      <div className={fontClass + " py-4"}>
-        <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Admin Dashboard</h1>
+      <div className="space-y-6">
         <DashboardFilterBar
           filters={filters}
           onFiltersChange={setFilters}
-          onReset={() => setFilters(defaultFilters)}
         />
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
-          <AdminStatsCard
-            title="Total Users"
-            value={stats?.total_users ?? '-'}
-            loading={loadingStats}
-            error={statsError ?? undefined}
-            color="blue"
-          />
-          <AdminStatsCard
-            title="Total Orders"
-            value={stats?.total_orders ?? '-'}
-            loading={loadingStats}
-            error={statsError ?? undefined}
-            color="green"
-          />
-          {/* Revenue cards: handle object case */}
-          {typeof stats?.revenue === 'object' && stats?.revenue !== null ? (
-            <>
+        
+        {/* Overview Section */}
+        {loadingStats ? (
+          <StatsCardSkeleton />
+        ) : stats?.overview ? (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Platform Overview</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <AdminStatsCard
-                title="Total Revenue"
-                value={stats.revenue.total_revenue ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="purple"
-              />
-              <AdminStatsCard
-                title="Revenue Today"
-                value={stats.revenue.revenue_today ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="indigo"
-              />
-              <AdminStatsCard
-                title="Revenue This Month"
-                value={stats.revenue.revenue_this_month ?? '-'}
+                title="Total Users"
+                value={stats.overview.total_users ?? '-'}
                 loading={loadingStats}
                 error={statsError ?? undefined}
                 color="blue"
               />
               <AdminStatsCard
-                title="Currency"
-                value={stats.revenue.currency ?? '-'}
+                title="Active Users"
+                value={stats.overview.active_users ?? '-'}
                 loading={loadingStats}
                 error={statsError ?? undefined}
-                color="gray"
+                color="green"
               />
-            </>
-          ) : (
-            <AdminStatsCard
-              title="Revenue"
-              value={stats?.revenue ?? '-'}
-              loading={loadingStats}
-              error={statsError ?? undefined}
-              color="purple"
+              <AdminStatsCard
+                title="Total Products"
+                value={stats.overview.total_products ?? '-'}
+                loading={loadingStats}
+                error={statsError ?? undefined}
+                color="purple"
+              />
+              <AdminStatsCard
+                title="Active Products"
+                value={stats.overview.active_products ?? '-'}
+                loading={loadingStats}
+                error={statsError ?? undefined}
+                color="yellow"
+              />
+            </div>
+          </div>
+        ) : null}
+
+        {/* Revenue Section */}
+        {loadingStats ? (
+          <StatsCardSkeleton />
+        ) : stats?.revenue ? (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Revenue Overview</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Revenue Chart */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Revenue Trend</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={[
+                    { name: 'Total Revenue', data: [
+                      { name: 'This Month', value: stats.revenue.revenue_this_month || 0 },
+                      { name: 'Last Month', value: stats.revenue.revenue_last_month || 0 }
+                    ].filter(item => item.value > 0) },
+                    { name: 'Daily Revenue', data: [
+                      { name: 'Today', value: stats.revenue.revenue_today || 0 },
+                      { name: 'Yesterday', value: stats.revenue.revenue_yesterday || 0 },
+                      { name: '2 Days Ago', value: stats.revenue.revenue_2_days_ago || 0 },
+                      { name: '3 Days Ago', value: stats.revenue.revenue_3_days_ago || 0 },
+                      { name: '4 Days Ago', value: stats.revenue.revenue_4_days_ago || 0 },
+                      { name: '5 Days Ago', value: stats.revenue.revenue_5_days_ago || 0 },
+                      { name: '6 Days Ago', value: stats.revenue.revenue_6_days_ago || 0 }
+                    ].filter(item => item.value > 0) }
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="name" 
+                      stroke="#888888" 
+                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 10 }}
+                    />
+                    <YAxis 
+                      stroke="#888888" 
+                      tick={{ fontSize: 10 }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        padding: '8px'
+                      }}
+                      formatter={(value: any) => `$${value}`}
+                    />
+                    <Legend 
+                      wrapperStyle={{ paddingTop: '20px' }}
+                      iconType="line"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#8884d8" 
+                      strokeWidth={3}
+                      dot={{ fill: '#8884d8', strokeWidth: 2, r: 6 }}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              
+              {/* Revenue Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Revenue Metrics</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                      <div>
+                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">${stats.revenue.revenue_today || '0'}</div>
+                        <div className="text-sm text-green-600 dark:text-green-400">Revenue Today</div>
+                      </div>
+                      <div className="text-green-600 dark:text-green-400 text-3xl">↗</div>
+                    </div>
+                    <div className="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <div>
+                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">${stats.revenue.revenue_this_month || '0'}</div>
+                        <div className="text-sm text-blue-600 dark:text-blue-400">Revenue This Month</div>
+                      </div>
+                      <div className="text-blue-600 dark:text-blue-400 text-3xl">📈</div>
+                    </div>
+                    <div className="flex justify-between items-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                      <div>
+                        <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">${stats.revenue.total_revenue || '0'}</div>
+                        <div className="text-sm text-purple-600 dark:text-purple-400">Total Revenue</div>
+                      </div>
+                      <div className="text-purple-600 dark:text-purple-400 text-3xl">💰</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Orders Section */}
+        {loadingStats ? (
+          <StatsCardSkeleton />
+        ) : stats?.overview ? (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Orders Overview</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <AdminStatsCard
+                title="Total Orders"
+                value={stats.overview.total_orders ?? '-'}
+                loading={loadingStats}
+                error={statsError ?? undefined}
+                color="green"
+              />
+              <AdminStatsCard
+                title="Orders Today"
+                value={stats.overview.orders_today ?? '-'}
+                loading={loadingStats}
+                error={statsError ?? undefined}
+                color="blue"
+              />
+              <AdminStatsCard
+                title="Total Subscriptions"
+                value={stats.overview.total_subscriptions ?? '-'}
+                loading={loadingStats}
+                error={statsError ?? undefined}
+                color="yellow"
+              />
+              <AdminStatsCard
+                title="Active Subscriptions"
+                value={stats.overview.active_subscriptions ?? '-'}
+                loading={loadingStats}
+                error={statsError ?? undefined}
+                color="green"
+              />
+            </div>
+          </div>
+        ) : null}
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Total Orders Chart */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Total Orders Trend</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={[
+                { name: 'Total Orders', data: [
+                  { name: 'Today', value: stats?.overview?.orders_today || 0, fill: '#3b82f6' },
+                  { name: 'Yesterday', value: stats?.overview?.orders_yesterday || 0, fill: '#6366f1' },
+                  { name: 'This Week', value: stats?.overview?.orders_this_week || 0, fill: '#8b5cf6' },
+                  { name: 'Last Week', value: stats?.overview?.orders_last_week || 0, fill: '#10b981' },
+                  { name: 'This Month', value: stats?.overview?.orders_this_month || 0, fill: '#059669' }
+                ].filter(item => item.value > 0) }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis 
+                  tick={{ fontSize: 10 }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    padding: '8px'
+                  }}
+                  formatter={(value: any, name: any) => `${name}: ${value}`}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '20px' }}
+                  iconType="rect"
+                />
+                <Bar dataKey="value" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          
+          {/* Total Users Chart */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Total Users Trend</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={[
+                { name: 'Total Users', data: [
+                  { name: 'Today', value: stats?.overview?.users_today || 0 },
+                  { name: 'Yesterday', value: stats?.overview?.users_yesterday || 0 },
+                  { name: 'This Week', value: stats?.overview?.users_this_week || 0 },
+                  { name: 'Last Week', value: stats?.overview?.users_last_week || 0 },
+                  { name: 'This Month', value: stats?.overview?.users_this_month || 0 }
+                ].filter(item => item.value > 0) }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="name" 
+                  stroke="#888888" 
+                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis 
+                  stroke="#888888" 
+                  tick={{ fontSize: 10 }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    padding: '8px'
+                  }}
+                  formatter={(value: any) => `${value}`}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '20px' }}
+                  iconType="line"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#8884d8" 
+                  strokeWidth={3}
+                  dot={{ fill: '#8884d8', strokeWidth: 2, r: 6 }}
+                  activeDot={{ r: 8 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Recent Users Table */}
+        {tableLoading ? (
+          <TableSkeleton />
+        ) : tableData.length > 0 ? (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Recent Users</h2>
+            <AdminDataTable
+              columns={columns}
+              data={tableData}
+              loading={tableLoading}
+              error={tableError ?? null}
+              pagination={pagination}
+              onPageChange={(page: number) => setPagination(prev => ({ ...prev, page }))}
+              fetchData={fetchTableData}
             />
-          )}
-          <AdminStatsCard
-            title="Active Subscriptions"
-            value={stats?.active_subscriptions ?? '-'}
-            loading={loadingStats}
-            error={statsError ?? undefined}
-            color="indigo"
-          />
-        </div>
-        {/* Data Table */}
-        <div className="my-8">
-          <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">User Overview</h2>
-          <AdminDataTable
-            data={tableData}
-            loading={tableLoading}
-            error={tableError}
-            pagination={pagination}
-            columns={columns}
-            fetchData={fetchTableData}
-            emptyMessage="No users found"
-            className=""
-          />
-        </div>
+          </div>
+        ) : null}
+
+        {/* Recent Orders Table */}
+        {stats?.recent_orders && stats.recent_orders.length > 0 ? (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Recent Orders</h2>
+            <AdminDataTable
+              columns={[
+                { key: 'id', label: 'Order ID', sortable: true }, 
+                { key: 'user_email', label: 'User Email', sortable: true }, 
+                { key: 'status', label: 'Status', sortable: true }, 
+                { key: 'total_amount', label: 'Total', sortable: true }, 
+                { key: 'created_at', label: 'Created', sortable: true }
+              ]}
+              data={stats.recent_orders}
+              loading={tableLoading}
+              error={tableError ?? null}
+              pagination={{ page: 1, limit: 5, total: stats.recent_orders.length, pages: 1 }}
+              onPageChange={() => {}}
+              fetchData={() => Promise.resolve()}
+            />
+          </div>
+        ) : null}
       </div>
     </AdminLayout>
   );
 };
 
-export default function WrappedAdminDashboardPage(props) {
-  return (
-    <ErrorBoundary>
-      <AdminDashboardPage {...props} />
-    </ErrorBoundary>
-  );
-}
+export default AdminDashboard;
