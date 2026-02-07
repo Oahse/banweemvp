@@ -121,7 +121,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const transformedUser = transformUser(response.data.user);
       setUser(transformedUser);
       setIsAuthenticated(true);
-      toast.success('Login successful!');
       console.log('AuthContext: Login successful, isAuthenticated set to true.');
       
       // Return the user so the login component can handle navigation
