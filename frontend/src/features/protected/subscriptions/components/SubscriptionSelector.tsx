@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { XIcon, CalendarIcon, CreditCardIcon, PlusIcon } from 'lucide-react';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useSubscriptionAction } from '../hooks/useSubscription';
-import { formatCurrency } from '../../utils/locale-config';
+import { formatCurrency } from '../../../../utils/locale-config';
 import { themeClasses, getButtonClasses } from '../../utils/themeClasses';
-import { VariantSelector } from '../product/VariantSelector';
+import { VariantSelector } from '../components/VariantSelector';
 import { useNavigate } from 'react-router-dom';
 
 interface SubscriptionSelectorProps {
