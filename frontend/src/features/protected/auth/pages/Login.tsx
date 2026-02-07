@@ -3,10 +3,10 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { Input } from '../../../generic/Input';
-import { Checkbox } from '../../../generic/Checkbox';
+import { Input } from '../../../../components/generic/Input';
+import { Checkbox } from '../../../../components/generic/Checkbox';
 import { SkeletonLoginForm } from '../components/ui/SkeletonForm';
-import SocialAuth from './SocialAuth';
+import SocialAuth from '../components/SocialAuth';
 
 /**
  * Login component for user authentication.

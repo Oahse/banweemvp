@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, ShoppingCartIcon, TrendingUpIcon, PackageIcon, CalendarIcon, UserIcon, CreditCardIcon } from 'lucide-react';
-import AdminAPI from '../../api/admin';
+import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import { useTheme } from '../../../ThemeContext';
-import { useLocale } from '../../../LocaleContext';
-import Dropdown from '../../components/ui/Dropdown';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import { useLocale } from '@/components/shared/contexts/LocaleContext';
+import Dropdown from '@/components/ui/Dropdown';
 
 const LIMIT = 10;
 

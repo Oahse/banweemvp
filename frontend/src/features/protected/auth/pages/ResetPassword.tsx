@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { extractErrorMessage } from '../utils/api-response';
+import { extractErrorMessage } from '../../../../utils/api-response';
 
 export const ResetPassword = () => {
   const [searchParams] = useSearchParams();

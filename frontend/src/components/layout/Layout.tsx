@@ -4,7 +4,7 @@ import { Footer } from './Footer';
 import { MobileSearch } from './MobileSearch';
 import { MobileCategories } from './MobileCategories';
 import { useTheme } from '../shared/contexts/ThemeContext';
-
+import { Outlet } from 'react-router-dom';
 export const Layout = ({
   children,
   className = '',
@@ -109,7 +109,7 @@ export const Layout = ({
 };
 
 // Specialized layout variants
-import { Outlet } from 'react-router-dom';
+
 export const AdminLayout = (props) => (
   <Layout showHeader={false} showFooter={false} className="bg-surface-elevated" {...props}>
     <Outlet />

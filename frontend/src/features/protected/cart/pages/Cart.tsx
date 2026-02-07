@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback} from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon, AlertCircle, CheckCircle, Loader2} from 'lucide-react';
 import { useCart } from '../../CartContext';
-import { useAuth } from '../../shared/hooks/useAuth';
+import { useAuth } from '../../auth/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { useLocale } from '../../LocaleContext';
 import { motion, AnimatePresence } from 'framer-motion';

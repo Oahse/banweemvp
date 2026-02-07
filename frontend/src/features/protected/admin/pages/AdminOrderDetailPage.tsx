@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, ArrowLeft, DownloadIcon, MapPin, Truck, Package, DollarSign, Clock, CheckCircle } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import apiClient from '@/api/client';
-import { Dropdown } from '../../components/ui/Dropdown';
+import { Dropdown } from '@/components/ui/Dropdown';
 import toast from 'react-hot-toast';
 
 interface OrderDetail {
