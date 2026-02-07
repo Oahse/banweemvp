@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { AuthContext } from '../../AuthContext';
+import { AuthContext } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 
 export const useAuth = () => {
