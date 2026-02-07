@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CheckIcon, ImageIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses } from '../../../../utils/themeClasses';
-import { formatCurrency } from '../../utils/locale-config';
+import { formatCurrency } from '../../../../utils/locale-config';
 
 interface Variant {
   id: string;
