@@ -29,7 +29,7 @@ import { useWishlist } from '../../protected/wishlist/contexts/WishlistContext';
 import { useLocale } from '../../../components/shared/contexts/LocaleContext';
 import { useApi } from '../../../components/shared/hooks/useAsync';
 import { useSubscriptionAction } from '../../components/shared/hooks/useSubscription';
-import { ProductsAPI, ReviewsAPI } from '../api';
+import { ProductsAPI, ReviewsAPI } from '../../../../api';
 import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
 import { Product, ProductVariant, ProductImage } from '../types';
 
