@@ -109,9 +109,10 @@ export const Layout = ({
 };
 
 // Specialized layout variants
-export const AdminLayout = ({ children, ...props }) => (
+import { Outlet } from 'react-router-dom';
+export const AdminLayout = (props) => (
   <Layout showHeader={false} showFooter={false} className="bg-surface-elevated" {...props}>
-    {children}
+    <Outlet />
   </Layout>
 );
 
