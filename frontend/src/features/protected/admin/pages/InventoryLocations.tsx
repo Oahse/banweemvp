@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Loader, AlertCircle, Plus, Edit, Trash2, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
+import { AdminLayout } from '@/components/layout/Layout';
 
 const LIMIT = 20;
 
@@ -101,6 +102,7 @@ export const AdminInventoryLocations = () => {
   }
 
   return (
+    <AdminLayout>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -246,6 +248,7 @@ export const AdminInventoryLocations = () => {
         )}
       </div>
     </div>
+    </AdminLayout>
   );
 };
 

@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loader, ArrowLeft, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import AdminAPI from '../../api/admin';
-import { useTheme } from '../../../ThemeContext';
-import Dropdown from '../../components/ui/Dropdown';
+import AdminAPI from '@/api/admin';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import Dropdown from '@/components/ui/Dropdown';
+import { AdminLayout } from '@/components/layout/Layout';
 
 interface UserDetailData {
   id: string;
@@ -137,6 +138,7 @@ export const UserDetail = () => {
   }
 
   return (
+    <AdminLayout>
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex items-center justify-between">
         <div>
@@ -282,6 +284,7 @@ export const UserDetail = () => {
         </form>
       </div>
     </div>
+    </AdminLayout>
   );
 };
 

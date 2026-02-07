@@ -4,9 +4,10 @@ import { ArrowLeft, Save, Loader, AlertCircle, Package, DollarSign, Tag, FileTex
 import AdminAPI from '@/api/admin';
 import { CategoriesAPI } from '@/api';
 import toast from 'react-hot-toast';
-import Dropdown from '../../components/ui/Dropdown';
-import { getCountryOptions } from '../../data/countries';
-import { DIETARY_TAGS } from '../../config/product';
+import Dropdown from '@/components/ui/Dropdown';
+import { getCountryOptions } from '@/data/countries';
+import { DIETARY_TAGS } from '@/config/product';
+import { AdminLayout } from '@/components/layout/Layout';
 
 interface Category {
   id: string;
@@ -339,6 +340,7 @@ const EditProduct: React.FC = () => {
   }
 
   return (
+    <AdminLayout>
     <div className="p-6 space-y-6 max-w-7xl">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -817,6 +819,7 @@ const EditProduct: React.FC = () => {
         </div>
       </form>
     </div>
+    </AdminLayout>
   );
 };
 

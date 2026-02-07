@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Plus, Trash2, Package } from 'lucide-react';
-import { useTheme } from '../../../ThemeContext';
-import AdminAPI from '../../api/admin';
-import { CategoriesAPI } from '../../api';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import AdminAPI from '@/api/admin';
+import { CategoriesAPI } from '@/api';
 import toast from 'react-hot-toast';
-import { DIETARY_TAGS } from '../../config/product';
-import Dropdown from '../../components/ui/Dropdown';
-import { getCountryOptions } from '../../data/countries';
+import { DIETARY_TAGS } from '@/config/product';
+import Dropdown from '@/components/ui/Dropdown';
+import { getCountryOptions } from '@/data/countries';
+import { AdminLayout } from '@/components/layout/Layout';
 
 interface Category {
   id: string;
@@ -213,6 +214,7 @@ const CreateProduct: React.FC = () => {
   };
 
   return (
+    <AdminLayout>
     <div className={`min-h-screen ${currentTheme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
@@ -688,6 +690,7 @@ const CreateProduct: React.FC = () => {
         </form>
       </div>
     </div>
+    </AdminLayout>
   );
 };
 

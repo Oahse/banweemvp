@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, ArrowUpDownIcon, EyeIcon, PackageIcon } from 'lucide-react';
-import AdminAPI from '../../api/admin';
+import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import { useTheme } from '../../../ThemeContext';
-import Dropdown from '../../components/ui/Dropdown';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import Dropdown from '@/components/ui/Dropdown';
+import { AdminLayout } from '@/components/layout/Layout';
 
 const LIMIT = 10;
 const FETCH_LIMIT = 100;
@@ -269,6 +270,7 @@ export const Users = () => {
   }
 
   return (
+    <AdminLayout>
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
@@ -644,6 +646,7 @@ export const Users = () => {
         </div>
       )}
     </div>
+    </AdminLayout>
   );
 };
 

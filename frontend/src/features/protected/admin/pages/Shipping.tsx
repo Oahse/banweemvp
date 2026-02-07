@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, PackageIcon, TruckIcon } from 'lucide-react';
-import AdminAPI from '../../api/admin';
+import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import { useTheme } from '../../../ThemeContext';
-import Dropdown from '../../components/ui/Dropdown';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import Dropdown from '@/components/ui/Dropdown';
+import { AdminLayout } from '@/components/layout/Layout';
 
 const LIMIT = 10;
 
@@ -385,6 +386,7 @@ export const AdminShipping = () => {
   }
 
   return (
+    <AdminLayout>
     <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -941,6 +943,7 @@ export const AdminShipping = () => {
         </div>
       )}
     </div>
+    </AdminLayout>
   );
 };
 
