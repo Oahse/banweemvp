@@ -1,6 +1,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ChevronRightIcon, CheckIcon } from 'lucide-react';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 }
+  }
+};
 
 export const About = () => {
   // Team members data
@@ -42,18 +63,23 @@ export const About = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6 text-copy animate-fade-in">
+    <motion.div 
+      className="container mx-auto px-4 py-6 text-copy"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {/* Breadcrumb */}
-      <nav className="flex mb-4 text-xs animate-slide-in">
+      <motion.nav className="flex mb-4 text-xs" variants={itemVariants}>
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
         <ChevronRightIcon size={12} className="mx-1" />
         <span className="text-copy">About Us</span>
-      </nav>
+      </motion.nav>
 
       {/* Hero Section */}
-      <div className="relative mb-8 animate-scale-in" style={{ animationDelay: '0.1s' }}>
+      <motion.div className="relative mb-8" variants={itemVariants}>
         <div className="h-[200px] md:h-[250px] w-full">
           <div className="absolute inset-0 bg-black/40 z-10"></div>
           <img
@@ -70,10 +96,10 @@ export const About = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Mission & Vision */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <motion.div className="max-w-4xl mx-auto mb-8" variants={itemVariants}>
         <div className="text-center mb-6">
           <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Mission & Vision</h2>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
@@ -102,10 +128,10 @@ export const About = () => {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Our Story */}
-      <div className="max-w-4xl mx-auto mb-8 animate-slide-in" style={{ animationDelay: '0.2s' }}>
+      <motion.div className="max-w-4xl mx-auto mb-8" variants={itemVariants}>
         <div className="text-center mb-6">
           <h2 className="text-sm md:text-base font-semibold text-copy mb-2">The Banwee Journey</h2>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
@@ -148,10 +174,10 @@ export const About = () => {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Our Values */}
-      <div className="max-w-4xl mx-auto mb-8 animate-slide-in" style={{ animationDelay: '0.3s' }}>
+      <motion.div className="max-w-4xl mx-auto mb-8" variants={itemVariants}>
         <div className="text-center mb-6">
           <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Values</h2>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
@@ -171,10 +197,10 @@ export const About = () => {
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Our Team */}
-      <div className="max-w-4xl mx-auto mb-8 animate-slide-in" style={{ animationDelay: '0.4s' }}>
+      <motion.div className="max-w-4xl mx-auto mb-8" variants={itemVariants}>
         <div className="text-center mb-6">
           <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Meet Our Team</h2>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
@@ -199,10 +225,10 @@ export const About = () => {
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Impact Stats */}
-      <div className="bg-primary/10 py-6 mb-8 animate-slide-in" style={{ animationDelay: '0.5s' }}>
+      <motion.div className="bg-primary/10 py-6 mb-8" variants={itemVariants}>
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-6">
             <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Impact</h2>
@@ -223,10 +249,10 @@ export const About = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Join Us CTA */}
-      <div className="max-w-4xl mx-auto text-center">
+      <motion.div className="max-w-4xl mx-auto text-center" variants={itemVariants}>
         <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Join Our Journey</h2>
         <p className="text-xs text-copy-light mb-4 max-w-2xl mx-auto">
           Be part of our mission to support sustainable development in Africa while enjoying exceptional products with
@@ -244,8 +270,8 @@ export const About = () => {
             Manage Subscriptions
           </Link>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

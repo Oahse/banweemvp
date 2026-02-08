@@ -29,6 +29,31 @@ export const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Validation
+    if (!formData.name.trim()) {
+      toast.error('Please enter your name');
+      setIsSubmitting(false);
+      return;
+    }
+    
+    if (!formData.email.trim()) {
+      toast.error('Please enter your email');
+      setIsSubmitting(false);
+      return;
+    }
+    
+    if (!formData.subject.trim()) {
+      toast.error('Please select a subject');
+      setIsSubmitting(false);
+      return;
+    }
+    
+    if (!formData.message.trim() || formData.message.trim().length < 10) {
+      toast.error('Message must be at least 10 characters long');
+      setIsSubmitting(false);
+      return;
+    }
+    
     try {
       await ContactMessagesAPI.create(formData);
       
@@ -50,7 +75,7 @@ export const Contact = () => {
       }, 5000);
     } catch (error: any) {
       console.error('Error sending message:', error);
-      toast.error(error.response?.data?.detail || 'Failed to send message. Please try again.');
+      toast.error(error.response?.data?.message || 'Failed to send message. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -227,7 +252,11 @@ export const Contact = () => {
                       onChange={handleChange}
                       required
                       rows={6}
+                      placeholder="Please describe your inquiry in detail (minimum 10 characters)"
                     />
+                    <p className="text-xs text-copy-light mt-1">
+                      Minimum 10 characters required
+                    </p>
                   </div>
                   <button
                     type="submit"

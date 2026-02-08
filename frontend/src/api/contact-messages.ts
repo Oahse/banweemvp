@@ -47,7 +47,7 @@ export const ContactMessagesAPI = {
    */
   create: async (data: ContactMessageCreate): Promise<ContactMessage> => {
     const response = await apiClient.post('/contact-messages', data);
-    return response.data;
+    return response.data.data;
   },
 
   /**
@@ -61,7 +61,13 @@ export const ContactMessagesAPI = {
     search?: string;
   }): Promise<ContactMessageListResponse> => {
     const response = await apiClient.get('/contact-messages', { params });
-    return response.data;
+    return {
+      messages: response.data.data.messages,
+      total: response.data.pagination.total,
+      page: response.data.pagination.page,
+      page_size: response.data.pagination.page_size,
+      total_pages: response.data.pagination.total_pages
+    };
   },
 
   /**
@@ -82,7 +88,7 @@ export const ContactMessagesAPI = {
    */
   getById: async (id: string): Promise<ContactMessage> => {
     const response = await apiClient.get(`/contact-messages/${id}`);
-    return response.data;
+    return response.data.data;
   },
 
   /**
@@ -90,7 +96,7 @@ export const ContactMessagesAPI = {
    */
   update: async (id: string, data: ContactMessageUpdate): Promise<ContactMessage> => {
     const response = await apiClient.patch(`/contact-messages/${id}`, data);
-    return response.data;
+    return response.data.data;
   },
 
   /**
