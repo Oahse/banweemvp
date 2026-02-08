@@ -4,7 +4,7 @@ Endpoints for contact message management
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from uuid import UUID
 import math
@@ -29,15 +29,15 @@ router = APIRouter(prefix="/contact-messages", tags=["Contact Messages"])
 
 
 @router.post("")
-def create_contact_message(
+async def create_contact_message(
     message_data: ContactMessageCreate,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Create a new contact message (public endpoint)
     """
     try:
-        message = ContactMessageService.create_message(db, message_data)
+        message = await ContactMessageService.create_message(db, message_data)
         return Response.success(
             data={
                 "id": str(message.id),
@@ -65,20 +65,20 @@ def create_contact_message(
 
 
 @router.get("")
-def get_all_contact_messages(
+async def get_all_contact_messages(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     status_filter: Optional[MessageStatus] = Query(None, alias="status"),
     priority: Optional[MessagePriority] = None,
     search: Optional[str] = None,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user = Depends(require_admin)
 ):
     """
     Get all contact messages with pagination and filters (admin only)
     """
     try:
-        messages, total = ContactMessageService.get_all_messages(
+        messages, total = await ContactMessageService.get_all_messages(
             db=db,
             page=page,
             page_size=page_size,
@@ -126,15 +126,15 @@ def get_all_contact_messages(
 
 
 @router.get("/stats")
-def get_contact_message_stats(
-    db: Session = Depends(get_db),
+async def get_contact_message_stats(
+    db: AsyncSession = Depends(get_db),
     current_user = Depends(require_admin)
 ):
     """
     Get contact message statistics (admin only)
     """
     try:
-        stats = ContactMessageService.get_message_stats(db)
+        stats = await ContactMessageService.get_message_stats(db)
         return Response.success(
             data=stats,
             message="Contact message statistics retrieved successfully"
@@ -148,15 +148,15 @@ def get_contact_message_stats(
 
 
 @router.get("/{message_id}")
-def get_contact_message(
+async def get_contact_message(
     message_id: UUID,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user = Depends(require_admin)
 ):
     """
     Get a specific contact message by ID (admin only)
     """
-    message = ContactMessageService.get_message_by_id(db, message_id)
+    message = await ContactMessageService.get_message_by_id(db, message_id)
     
     if not message:
         raise APIException(
@@ -184,17 +184,17 @@ def get_contact_message(
 
 
 @router.patch("/{message_id}")
-def update_contact_message(
+async def update_contact_message(
     message_id: UUID,
     update_data: ContactMessageUpdate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user = Depends(require_admin)
 ):
     """
     Update a contact message (admin only)
     """
     try:
-        message = ContactMessageService.update_message(db, message_id, update_data)
+        message = await ContactMessageService.update_message(db, message_id, update_data)
         
         if not message:
             raise APIException(
@@ -230,16 +230,16 @@ def update_contact_message(
 
 
 @router.delete("/{message_id}")
-def delete_contact_message(
+async def delete_contact_message(
     message_id: UUID,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user = Depends(require_admin)
 ):
     """
     Delete a contact message (admin only)
     """
     try:
-        success = ContactMessageService.delete_message(db, message_id)
+        success = await ContactMessageService.delete_message(db, message_id)
         
         if not success:
             raise APIException(

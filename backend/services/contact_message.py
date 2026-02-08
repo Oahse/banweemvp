@@ -3,7 +3,7 @@ Contact Message Service
 Business logic for contact message operations
 """
 
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import desc, or_, func, select
 from typing import Optional, List
 from uuid import UUID
@@ -18,7 +18,7 @@ class ContactMessageService:
     """Service for managing contact messages"""
     
     @staticmethod
-    def create_message(db: Session, message_data: ContactMessageCreate) -> ContactMessage:
+    async def create_message(db: AsyncSession, message_data: ContactMessageCreate) -> ContactMessage:
         """Create a new contact message"""
         try:
             message = ContactMessage(
@@ -31,27 +31,27 @@ class ContactMessageService:
             )
             
             db.add(message)
-            db.commit()
-            db.refresh(message)
+            await db.commit()
+            await db.refresh(message)
             
             logger.info(f"Contact message created: {message.id} from {message.email}")
             return message
             
         except Exception as e:
-            db.rollback()
+            await db.rollback()
             logger.error(f"Error creating contact message: {str(e)}")
             raise
     
     @staticmethod
-    def get_message_by_id(db: Session, message_id: UUID) -> Optional[ContactMessage]:
+    async def get_message_by_id(db: AsyncSession, message_id: UUID) -> Optional[ContactMessage]:
         """Get a contact message by ID"""
         stmt = select(ContactMessage).where(ContactMessage.id == message_id)
-        result = db.execute(stmt)
+        result = await db.execute(stmt)
         return result.scalar_one_or_none()
     
     @staticmethod
-    def get_all_messages(
-        db: Session,
+    async def get_all_messages(
+        db: AsyncSession,
         page: int = 1,
         page_size: int = 20,
         status: Optional[MessageStatus] = None,
@@ -84,28 +84,29 @@ class ContactMessageService:
             count_stmt = count_stmt.where(search_filter)
         
         # Get total count
-        total = db.execute(count_stmt).scalar()
+        count_result = await db.execute(count_stmt)
+        total = count_result.scalar()
         
         # Apply pagination and ordering
         stmt = stmt.order_by(desc(ContactMessage.created_at)).offset(
             (page - 1) * page_size
         ).limit(page_size)
         
-        result = db.execute(stmt)
+        result = await db.execute(stmt)
         messages = result.scalars().all()
         
         return messages, total
     
     @staticmethod
-    def update_message(
-        db: Session,
+    async def update_message(
+        db: AsyncSession,
         message_id: UUID,
         update_data: ContactMessageUpdate
     ) -> Optional[ContactMessage]:
         """Update a contact message (admin only)"""
         try:
             stmt = select(ContactMessage).where(ContactMessage.id == message_id)
-            result = db.execute(stmt)
+            result = await db.execute(stmt)
             message = result.scalar_one_or_none()
             
             if not message:
@@ -128,59 +129,63 @@ class ContactMessageService:
             
             message.updated_at = datetime.utcnow()
             
-            db.commit()
-            db.refresh(message)
+            await db.commit()
+            await db.refresh(message)
             
             logger.info(f"Contact message updated: {message.id}")
             return message
             
         except Exception as e:
-            db.rollback()
+            await db.rollback()
             logger.error(f"Error updating contact message: {str(e)}")
             raise
     
     @staticmethod
-    def delete_message(db: Session, message_id: UUID) -> bool:
+    async def delete_message(db: AsyncSession, message_id: UUID) -> bool:
         """Delete a contact message"""
         try:
             stmt = select(ContactMessage).where(ContactMessage.id == message_id)
-            result = db.execute(stmt)
+            result = await db.execute(stmt)
             message = result.scalar_one_or_none()
             
             if not message:
                 return False
             
-            db.delete(message)
-            db.commit()
+            await db.delete(message)
+            await db.commit()
             
             logger.info(f"Contact message deleted: {message_id}")
             return True
             
         except Exception as e:
-            db.rollback()
+            await db.rollback()
             logger.error(f"Error deleting contact message: {str(e)}")
             raise
     
     @staticmethod
-    def get_message_stats(db: Session) -> dict:
+    async def get_message_stats(db: AsyncSession) -> dict:
         """Get statistics about contact messages"""
         total_stmt = select(func.count(ContactMessage.id))
-        total = db.execute(total_stmt).scalar()
+        total_result = await db.execute(total_stmt)
+        total = total_result.scalar()
         
         new_stmt = select(func.count(ContactMessage.id)).where(
             ContactMessage.status == MessageStatus.NEW
         )
-        new = db.execute(new_stmt).scalar()
+        new_result = await db.execute(new_stmt)
+        new = new_result.scalar()
         
         in_progress_stmt = select(func.count(ContactMessage.id)).where(
             ContactMessage.status == MessageStatus.IN_PROGRESS
         )
-        in_progress = db.execute(in_progress_stmt).scalar()
+        in_progress_result = await db.execute(in_progress_stmt)
+        in_progress = in_progress_result.scalar()
         
         resolved_stmt = select(func.count(ContactMessage.id)).where(
             ContactMessage.status == MessageStatus.RESOLVED
         )
-        resolved = db.execute(resolved_stmt).scalar()
+        resolved_result = await db.execute(resolved_stmt)
+        resolved = resolved_result.scalar()
         
         return {
             "total": total or 0,
