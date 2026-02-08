@@ -12,15 +12,15 @@ const AccountSkeleton = () => (
 );
 
 // Lazy load account pages (feature-based)
-const AccountDashboardPage = lazy(() => import('./AccountDashboardPage'));
-const AccountProfilePage = lazy(() => import('./AccountProfilePage'));
-const AccountOrdersPage = lazy(() => import('./AccountOrdersPage'));
-const AccountOrderDetailPage = lazy(() => import('./AccountOrderDetailPage'));
+const AccountDashboardPage = lazy(() => import('./AccountDashboardPage').then(module => ({ default: module.Dashboard })));
+const AccountProfilePage = lazy(() => import('./AccountProfilePage').then(module => ({ default: module.Profile })));
+const AccountOrdersPage = lazy(() => import('./AccountOrdersPage').then(module => ({ default: module.Orders })));
+const AccountOrderDetailPage = lazy(() => import('./AccountOrderDetailPage').then(module => ({ default: module.OrderDetail })));
 const AccountTrackOrderPage = lazy(() => import('./AccountTrackOrderPage'));
 const ShipmentTracking = lazy(() => import('@/features/shipping/pages/ShipmentTracking')); // TODO: Implement shipping module
-const AccountWishlistPage = lazy(() => import('./AccountWishlistPage'));
+const AccountWishlistPage = lazy(() => import('./AccountWishlistPage').then(module => ({ default: module.WishlistConsolidated })));
 const AccountWishlistEditPage = lazy(() => import('./AccountWishlistEditPage'));
-const AccountAddressesPage = lazy(() => import('./AccountAddressesPage'));
+const AccountAddressesPage = lazy(() => import('./AccountAddressesPage').then(module => ({ default: module.Addresses })));
 const AccountMySubscriptionsPage = lazy(() => import('./AccountMySubscriptionsPage').then(module => ({ default: module.MySubscriptions })));
 const AccountSubscriptionEditPage = lazy(() => import('./AccountSubscriptionEditPage'));
 const SubscriptionDetails = lazy(() => import('./SubscriptionDetails'));

@@ -202,7 +202,6 @@ const ContactMessages: React.FC = () => {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-main mb-2">Contact Messages</h1>
           <p className="text-sm text-copy-light">
             Manage customer inquiries and support requests
           </p>

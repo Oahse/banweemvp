@@ -72,10 +72,10 @@ export const Orders = (props: OrdersProps) => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await OrdersAPI.getOrders({
+        const response = await execute(() => OrdersAPI.getOrders({
           page: currentPage,
           limit: ordersPerPage
-        });
+        }));
         
         const orders = unwrapResponse(response);
         setTotalOrders(orders.total || 0);
@@ -86,7 +86,7 @@ export const Orders = (props: OrdersProps) => {
     };
 
     fetchOrders();
-  }, [currentPage]);
+  }, [currentPage, execute]);
 
   return (
     <div className="space-y-4">
