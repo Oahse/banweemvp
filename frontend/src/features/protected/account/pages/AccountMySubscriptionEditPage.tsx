@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../../SubscriptionContext';
+import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
 import { toast } from 'react-hot-toast';
 import { CalendarIcon, DollarSignIcon } from 'lucide-react';
 
-const AccountSubscriptionEditPage: React.FC = () => {
+const AccountMySubscriptionEditPage: React.FC = () => {
   const { subscriptionId } = useParams();
   const navigate = useNavigate();
-  const { getSubscription, updateSubscription } = useSubscription();
+  const { getSubscriptionDetails, updateSubscription } = useSubscription();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,12 +23,12 @@ const AccountSubscriptionEditPage: React.FC = () => {
       setLoading(true);
       setError('');
       try {
-        const sub = await getSubscription(subscriptionId);
+        const sub = await getSubscriptionDetails(subscriptionId);
         setSubscription(sub);
         setForm({
-          plan: sub?.subscription_plan?.name || '',
-          billing_interval: sub?.subscription_plan?.billing_interval || '',
-          auto_renew: !!sub?.auto_renew,
+          plan: sub?.subscription?.name || '',
+          billing_interval: sub?.subscription?.billing_cycle || '',
+          auto_renew: !!sub?.subscription?.auto_renew,
         });
       } catch (err) {
         setError('Failed to load subscription');
@@ -37,10 +37,11 @@ const AccountSubscriptionEditPage: React.FC = () => {
       }
     };
     fetchSub();
-  }, [subscriptionId, getSubscription]);
+  }, [subscriptionId, getSubscriptionDetails]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
     setForm(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -51,7 +52,7 @@ const AccountSubscriptionEditPage: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      await updateSubscription(subscriptionId, {
+      await updateSubscription(subscriptionId!, {
         plan: form.plan,
         billing_interval: form.billing_interval,
         auto_renew: form.auto_renew,
@@ -72,7 +73,7 @@ const AccountSubscriptionEditPage: React.FC = () => {
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <CalendarIcon size={20} /> Edit Subscription
+        <CalendarIcon size={20} /> Edit My Subscription
       </h2>
       <div className="mb-4">
         <label className="block text-xs font-medium mb-1">Plan Name</label>
@@ -116,4 +117,4 @@ const AccountSubscriptionEditPage: React.FC = () => {
   );
 };
 
-export default AccountSubscriptionEditPage;
+export default AccountMySubscriptionEditPage;

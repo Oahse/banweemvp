@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
-import { useAuth } from '../../../AuthContext';
+import apiClient from '@/api';
+import { useAuth } from '../../auth/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+interface StripePaymentFormProps {
+  orderId?: string | null;
+  amount?: number | null;
+  currency?: string | null;
+  onPaymentSuccess: (paymentMethodId: string) => void;
+  onPaymentError: (msg: string) => void;
+}
 
-
-const StripePaymentForm = ({
-  orderId,
-  amount,
-  currency,
+const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
+  orderId = null,
+  amount = null,
+  currency = null,
   onPaymentSuccess,
   onPaymentError,
 }) => {
@@ -20,115 +25,140 @@ const StripePaymentForm = ({
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  const [clientSecret, setClientSecret] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isSecure, setIsSecure] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) {
-      toast.error("Please log in to make a payment.");
-      navigate("/login");
-      return;
+      toast.error('Please log in to add a card.');
+      navigate('/login');
     }
+  }, [isAuthenticated, navigate]);
 
-    const createPaymentIntent = async () => {
-      setLoading(true);
+  useEffect(() => {
+    // Check for secure context: allow https or localhost
+    const protocol = window.location.protocol;
+    const host = window.location.hostname;
+    const secure = protocol === 'https:' || host === 'localhost' || host === '127.0.0.1';
+    setIsSecure(secure);
+  }, []);
+
+  useEffect(() => {
+    // Initialize payment intent / setup intent on mount if amount or orderId provided
+    const init = async () => {
+      if (!isAuthenticated) return;
+      if (!isSecure) {
+        toast.error('Payment requires a secure (HTTPS) connection.');
+        onPaymentError('Insecure connection');
+        setInitializing(false);
+        return;
+      }
+
       try {
-        const response = await axios.post(
-          "/v1/payments/create-payment-intent",
-          {
-            order_id: orderId,
-            amount: amount,
-            currency: currency,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-        setClientSecret(response.data.client_secret);
-      } catch (error) {
-        console.error("Error creating payment intent:", error);
-        toast.error("Failed to initialize payment. Please try again.");
-        onPaymentError("Failed to initialize payment.");
+        setInitializing(true);
+        const payload = { order_id: orderId || null, amount: amount || null, currency: currency || null };
+        // call backend to create a PaymentIntent (backend should set automatic_payment_methods if needed)
+        const resp: any = await apiClient.post('/orders/create-payment-intent', payload);
+        const cs = resp?.client_secret || resp?.data?.client_secret || null;
+        if (cs) {
+          setClientSecret(cs);
+        } else {
+          throw new Error('No client secret returned');
+        }
+      } catch (err) {
+        console.error('Failed to initialize payment', err);
+        toast.error('Failed to initialize payment. Please try again.');
+        onPaymentError('Failed to initialize payment.');
       } finally {
-        setLoading(false);
+        setInitializing(false);
       }
     };
 
-    createPaymentIntent();
-  }, [orderId, amount, currency, isAuthenticated, navigate, onPaymentError]);
+    init();
+  }, [isAuthenticated, orderId, amount, currency, isSecure, onPaymentError]);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!stripe || !elements) return;
+    if (!clientSecret) {
+      onPaymentError('Payment not initialized');
+      return;
+    }
 
-    if (!stripe || !elements || !clientSecret) {
-      // Stripe.js has not yet loaded.
-      // Make sure to disable form submission until Stripe.js has loaded.
+    const cardElement = elements.getElement(CardElement);
+    if (!cardElement) {
+      onPaymentError('Card element not found');
       return;
     }
 
     setLoading(true);
-
-    const result = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: elements.getElement(CardElement),
-        billing_details: {
-          name: user?.name || "", // Pre-fill with user's name if available
-          email: user?.email || "", // Pre-fill with user's email if available
+    try {
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: (user as any)?.name || (user as any)?.full_name || undefined,
+            email: (user as any)?.email || undefined,
+          },
         },
-      },
-    });
+      });
 
-    if (result.error) {
-      // Show error to your customer (e.g., insufficient funds, card declined)
-      console.error(result.error.message);
-      toast.error(result.error.message || "Payment failed.");
-      onPaymentError(result.error.message || "Payment failed.");
-    } else {
-      // The payment has been processed!
-      if (result.paymentIntent.status === 'succeeded') {
-        toast.success("Payment successful!");
+      if (result.error) {
+        console.error('Stripe confirmCardPayment error', result.error);
+        toast.error(result.error.message || 'Payment failed');
+        onPaymentError(result.error.message || 'Payment failed');
+        return;
+      }
+
+      if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+        toast.success('Payment successful!');
         onPaymentSuccess(result.paymentIntent.id);
       } else {
-        toast.error("Payment not successful. Status: " + result.paymentIntent.status);
-        onPaymentError("Payment not successful. Status: " + result.paymentIntent.status);
+        const status = result.paymentIntent?.status || 'unknown';
+        toast.error(`Payment not successful. Status: ${status}`);
+        onPaymentError(`Payment not successful. Status: ${status}`);
       }
+    } catch (err) {
+      console.error('Stripe confirmCardPayment exception', err);
+      toast.error('Payment failed');
+      onPaymentError('Payment failed');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  // Detect theme for styling
+  const prefersDark = typeof window !== 'undefined' && (document.documentElement.classList.contains('dark') || window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const cardStyle = {
+    base: {
+      fontSize: '14px',
+      color: prefersDark ? '#e5e7eb' : '#111827',
+      '::placeholder': { color: prefersDark ? '#9ca3af' : '#6b7280' },
+      fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial',
+    },
+    invalid: { color: '#ef4444' },
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {!clientSecret && loading && (
-        <div className="text-center text-primary">Loading payment options...</div>
-      )}
-      {clientSecret && (
-        <div className="border border-gray-300 p-4 rounded-md">
-          <CardElement
-            options={{
-              style: {
-                base: {
-                  fontSize: '16px',
-                  color: '#424770',
-                  '::placeholder': {
-                    color: '#aab7c4',
-                  },
-                },
-                invalid: {
-                  color: '#9e2146',
-                },
-              },
-            }}
-          />
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        {initializing ? (
+          <div className="text-sm text-gray-500">Loading payment options...</div>
+        ) : !isSecure ? (
+          <div className="text-sm text-red-600">Payment requires a secure (HTTPS) connection.</div>
+        ) : (
+          <CardElement options={{ style: cardStyle }} />
+        )}
+      </div>
       <button
         type="submit"
-        disabled={!stripe || !elements || !clientSecret || loading}
-        className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!stripe || !elements || loading || initializing || !isSecure || !clientSecret}
+        className="w-full bg-primary text-white px-3 py-2 rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
       >
-        {loading ? "Processing..." : "Pay Now"}
+        {loading ? 'Processing...' : (orderId || amount ? 'Pay Now' : 'Add Card')}
       </button>
     </form>
   );

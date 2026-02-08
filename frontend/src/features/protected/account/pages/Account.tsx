@@ -17,14 +17,13 @@ const AccountProfilePage = lazy(() => import('./AccountProfilePage').then(module
 const AccountOrdersPage = lazy(() => import('./AccountOrdersPage').then(module => ({ default: module.Orders })));
 const AccountOrderDetailPage = lazy(() => import('./AccountOrderDetailPage').then(module => ({ default: module.OrderDetail })));
 const AccountTrackOrderPage = lazy(() => import('./AccountTrackOrderPage'));
-const ShipmentTracking = lazy(() => import('@/features/shipping/pages/ShipmentTracking')); // TODO: Implement shipping module
-const AccountWishlistPage = lazy(() => import('./AccountWishlistPage').then(module => ({ default: module.WishlistConsolidated })));
+const AccountWishlistPage = lazy(() => import('./AccountWishlistPage').then(module => ({ default: module.Wishlist })));
 const AccountWishlistEditPage = lazy(() => import('./AccountWishlistEditPage'));
 const AccountAddressesPage = lazy(() => import('./AccountAddressesPage').then(module => ({ default: module.Addresses })));
 const AccountMySubscriptionsPage = lazy(() => import('./AccountMySubscriptionsPage').then(module => ({ default: module.MySubscriptions })));
 const AccountSubscriptionEditPage = lazy(() => import('./AccountSubscriptionEditPage'));
 const SubscriptionDetails = lazy(() => import('./SubscriptionDetails'));
-// const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage').then(module => ({ default: module.AccountPaymentMethodsPage }))); // TODO: Implement payment methods
+const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage').then(module => ({ default: module.AccountPaymentMethodsPage })));
 
 // Loading Spinner
 const LoadingSpinner = () => (
@@ -63,7 +62,7 @@ export const Account = () => {
           <Route path="/wishlist" element={<AccountWishlistPage />} />
           <Route path="/wishlist/:wishlistId/edit" element={<AccountWishlistEditPage />} />
           <Route path="/addresses" element={<AccountAddressesPage />} />
-          {/* <Route path="/payment-methods" element={<AccountPaymentMethodsPage />} /> */} // TODO: Implement payment methods
+          <Route path="/payment-methods" element={<AccountPaymentMethodsPage />} />
           <Route path="/subscriptions" element={<AccountMySubscriptionsPage /> } />
           <Route path="/subscriptions/:subscriptionId" element={<SubscriptionDetails />} />
           <Route path="/subscriptions/:subscriptionId/edit" element={<AccountSubscriptionEditPage />} />

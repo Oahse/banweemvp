@@ -88,10 +88,12 @@ export const Orders = (props: OrdersProps) => {
     fetchOrders();
   }, [currentPage, execute]);
 
+  // Defensive: ensure ordersArray is always an array
+  const ordersArray = Array.isArray(paginatedData?.data) ? paginatedData.data : [];
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Your Orders</h2>
         <p className="text-xs text-gray-600">
           {totalOrders} order{totalOrders !== 1 ? 's' : ''}
         </p>
@@ -103,7 +105,7 @@ export const Orders = (props: OrdersProps) => {
         <div className="text-center py-6">
           <p className="text-xs text-red-600">Error loading orders</p>
         </div>
-      ) : paginatedData?.data?.length === 0 ? (
+      ) : ordersArray.length === 0 ? (
         <div className="text-center py-6">
           <ShoppingBagIcon className="mx-auto h-10 w-10 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No orders</h3>
@@ -121,7 +123,7 @@ export const Orders = (props: OrdersProps) => {
         </div>
       ) : (
         <div className="space-y-3">
-          {paginatedData?.data?.map((order: Order) => (
+          {ordersArray.map((order: Order) => (
             <div key={order.id} className="bg-white shadow rounded-lg">
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">

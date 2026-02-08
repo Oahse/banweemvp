@@ -99,8 +99,7 @@ export const Profile = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-        <h2 className="text-base font-semibold mb-2 text-gray-900 dark:text-white">Profile Details</h2>
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> First Name</label>
@@ -110,7 +109,7 @@ export const Profile = () => {
               value={formData.firstname}
               disabled={!isEditing}
               onChange={handleChange}
-              className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
+              className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
             {errors.firstname && <span className="text-xs text-red-500">{errors.firstname}</span>}
           </div>
@@ -122,7 +121,7 @@ export const Profile = () => {
               value={formData.lastname}
               disabled={!isEditing}
               onChange={handleChange}
-              className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
+              className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
             {errors.lastname && <span className="text-xs text-red-500">{errors.lastname}</span>}
           </div>
@@ -133,7 +132,7 @@ export const Profile = () => {
               type="email"
               value={formData.email}
               disabled
-              className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
+              className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
           </div>
           <div>
@@ -144,7 +143,7 @@ export const Profile = () => {
               value={formData.phone}
               disabled={!isEditing}
               onChange={handleChange}
-              className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
+              className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
             {errors.phone && <span className="text-xs text-red-500">{errors.phone}</span>}
           </div>
@@ -234,12 +233,12 @@ export const Profile = () => {
         </div>
         <div className="mt-4 flex gap-2">
           <button
-            className="px-4 py-1.5 text-xs font-medium rounded bg-primary text-white disabled:opacity-50"
+            className="px-3 py-2 text-sm font-medium rounded bg-primary text-white disabled:opacity-50"
             disabled={!isEditing || loading}
             onClick={handleSave}
           >Save</button>
           <button
-            className="px-4 py-1.5 text-xs font-medium rounded bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+            className="px-3 py-2 text-sm font-medium rounded bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
             onClick={() => setIsEditing(!isEditing)}
             disabled={loading}
           >{isEditing ? 'Cancel' : 'Edit'}</button>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircleIcon, MapPinIcon, HomeIcon, BriefcaseIcon, TrashIcon, PencilIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useApi } from '../../../shared/hooks/useAsync';
-import { AuthAPI } from '../../api';
-import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
-import { SkeletonAddresses } from '../ui/SkeletonAddresses';
-import { Dropdown } from '../ui/Dropdown';
-import { countries, getCountryOptions, getProvinceOptions, getCountryByCode, getProvincesByCountry, getCityOptions, getCitiesByProvince } from '../../data/countries';
+import { useApi } from '../../../../components/shared/hooks/useAsync';
+import { AuthAPI } from '../../../../api';
+import { unwrapResponse, extractErrorMessage } from '../../../../utils/api-response';
+import { SkeletonAddresses } from '../../../../components/ui/SkeletonAddresses';
+import { Dropdown } from '../../../../components/ui/Dropdown';
+import { countries, getCountryOptions, getProvinceOptions, getCountryByCode, getProvincesByCountry, getCityOptions, getCitiesByProvince } from '../../../../data/countries';
 /**
  * Addresses component allows users to manage their saved addresses.
  * Users can view, add, edit, and delete addresses.
@@ -194,37 +194,37 @@ export const Addresses = () => {
         {/* Display existing addresses or a message if none are saved */}
         {localAddresses && localAddresses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {localAddresses.map((address: any) => (
-              <div key={address.id} className={`border rounded-lg p-3 border-gray-200 dark:border-gray-700'}`}>
+              {localAddresses.map((address: any) => (
+                <div key={address.id} className="border rounded-lg p-3 border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between mb-2">
                   <div className="flex items-center">
                     <span className="mr-1">
                       {getAddressTypeIcon(address.kind)}
                     </span>
-                    <span className="text-xs font-medium text-main dark:text-white capitalize">
+                      <span className="text-sm font-medium text-main dark:text-white capitalize">
                       {address.kind}
                     </span>
                   </div>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 text-xs">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                   {address.street}
                 </p>
-                <p className="text-gray-600 dark:text-gray-300 text-xs">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                   {address.city}, {address.state} {address.post_code}
                 </p>
-                <p className="text-gray-600 dark:text-gray-300 text-xs">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                   {getCountryByCode(address.country)?.name || address.country}
                 </p>
                 <div className="flex mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                   {/* Edit and Delete buttons for each address */}
-                  <button onClick={() => handleEditAddress(address)} className="flex items-center text-xs text-gray-600 hover:text-primary dark:text-gray-300 mr-3">
-                    <PencilIcon size={12} className="mr-1" />
-                    Edit
-                  </button>
-                  <button onClick={() => handleDeleteAddress(address.id)} className="flex items-center text-xs text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 mr-3">
-                    <TrashIcon size={12} className="mr-1" />
-                    Delete
-                  </button>
+                    <button onClick={() => handleEditAddress(address)} className="flex items-center text-sm text-gray-600 hover:text-primary dark:text-gray-300 mr-3">
+                      <PencilIcon size={14} className="mr-1" />
+                      Edit
+                    </button>
+                    <button onClick={() => handleDeleteAddress(address.id)} className="flex items-center text-sm text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 mr-3">
+                      <TrashIcon size={14} className="mr-1" />
+                      Delete
+                    </button>
                 </div>
               </div>
             ))}
