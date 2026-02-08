@@ -38,8 +38,8 @@ export const FAQ = () => {
       </nav>
 
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-lg md:text-xl font-semibold text-copy mb-3">Frequently Asked Questions</h1>
+        <div className="text-center mb-6">
+          <h1 className="text-base md:text-lg font-semibold text-copy mb-2">Frequently Asked Questions</h1>
           <p className="text-xs text-copy-light max-w-2xl mx-auto">
             Find answers to common questions about our products, shipping, returns, and more. Can't find what you're
             looking for? Contact our support team.
@@ -47,21 +47,21 @@ export const FAQ = () => {
         </div>
 
         {/* Search bar */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="relative">
             <input
               type="text"
               placeholder="Search for questions..."
-              className="w-full px-3 py-2 pl-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-transparent text-xs"
+              className="w-full px-3 py-2 pl-9 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-transparent text-xs"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <SearchIcon size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-copy-lighter" />
+            <SearchIcon size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-copy-lighter" />
           </div>
         </div>
 
         {/* Categories */}
-        <div className="mb-6 overflow-x-auto">
+        <div className="mb-4 overflow-x-auto">
           <div className="flex space-x-2 min-w-max">
             {categories.map((category) => (
               <button
@@ -79,36 +79,36 @@ export const FAQ = () => {
         </div>
 
         {/* FAQ items */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filteredQuestions.length > 0 ? (
             filteredQuestions.map((item) => (
               <div key={item.id} className="bg-surface rounded-lg shadow-sm border border-border-light overflow-hidden">
                 <button
-                  className="flex justify-between items-center w-full p-4 text-left"
+                  className="flex justify-between items-center w-full p-3 text-left"
                   onClick={() => toggleQuestion(item.id)}>
-                  <h3 className="font-medium text-copy text-sm">{item.question}</h3>
+                  <h3 className="text-sm font-medium text-copy">{item.question}</h3>
                   {openQuestions.includes(item.id) ? (
-                    <MinusIcon size={16} className="text-primary flex-shrink-0" />
+                    <MinusIcon size={14} className="text-primary flex-shrink-0" />
                   ) : (
-                    <PlusIcon size={16} className="text-primary flex-shrink-0" />
+                    <PlusIcon size={14} className="text-primary flex-shrink-0" />
                   )}
                 </button>
                 {openQuestions.includes(item.id) && (
-                  <div className="px-4 pb-4">
+                  <div className="px-3 pb-3">
                     <div className="pt-2 border-t border-border-light">
-                      <p className="text-xs text-copy-light mt-3">{item.answer}</p>
+                      <p className="text-xs text-copy-light mt-2">{item.answer}</p>
                     </div>
                   </div>
                 )}
               </div>
             ))
           ) : (
-            <div className="text-center py-12 bg-surface rounded-lg shadow-sm">
-              <div className="mx-auto w-16 h-16 bg-background rounded-full flex items-center justify-center mb-4">
-                <SearchIcon size={24} className="text-copy-lighter" />
+            <div className="text-center py-8 bg-surface rounded-lg shadow-sm">
+              <div className="mx-auto w-12 h-12 bg-background rounded-full flex items-center justify-center mb-3">
+                <SearchIcon size={16} className="text-copy-lighter" />
               </div>
-              <h3 className="text-lg font-medium text-copy mb-2">No results found</h3>
-              <p className="text-copy-light">
+              <h3 className="text-sm font-medium text-copy mb-1">No results found</h3>
+              <p className="text-xs text-copy-light">
                 Try adjusting your search or filter to find what you're looking for
               </p>
             </div>
@@ -116,14 +116,14 @@ export const FAQ = () => {
         </div>
 
         {/* Contact section */}
-        <div className="mt-16 bg-primary/10 rounded-lg p-6 md:p-8 text-center">
-          <h2 className="text-lg font-semibold text-copy mb-4">Still have questions?</h2>
-          <p className="text-copy-light mb-6 max-w-md mx-auto">
+        <div className="mt-8 bg-primary/10 rounded-lg p-4 text-center">
+          <h2 className="text-sm font-semibold text-copy mb-2">Still have questions?</h2>
+          <p className="text-xs text-copy-light mb-3 max-w-md mx-auto">
             If you couldn't find the answer you were looking for, our support team is here to help.
           </p>
           <Link
             to="/contact"
-            className="inline-block bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md transition-colors">
+            className="inline-block bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
             Contact Support
           </Link>
         </div>
