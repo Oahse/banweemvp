@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -7,6 +8,28 @@ import { Input } from '../../../../components/generic/Input';
 import { Checkbox } from '../../../../components/generic/Checkbox';
 import SocialAuth from '../components/SocialAuth';
 import { validation } from '../../../../utils/validation';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3 }
+  }
+};
 
 /**
  * Register component for user account creation.
@@ -159,10 +182,20 @@ export const Register = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 text-copy">
-      <div className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light">
-        <h1 className="text-xl font-bold text-main mb-4 text-center">Create an Account</h1>
-        <form className="space-y-3" onSubmit={handleSubmit}>
+    <motion.div 
+      className="container mx-auto px-4 py-8 text-copy"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <motion.div 
+        className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light"
+        variants={itemVariants}
+      >
+        <motion.h1 className="text-xl font-bold text-main mb-4 text-center" variants={itemVariants}>
+          Create an Account
+        </motion.h1>
+        <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
           {/* FIXED: First Name Input */}
           <Input
             label="First Name"
@@ -333,17 +366,19 @@ export const Register = () => {
               'Create Account'
             )}
           </button>
-        </form>
-        <div className="relative flex items-center justify-center my-4">
+        </motion.form>
+        <motion.div variants={itemVariants}>
+          <div className="relative flex items-center justify-center my-4">
           <div className="border-t border-border-light w-full"></div>
           <span className="bg-surface px-3 text-xs text-copy-light absolute">Or continue with</span>
         </div>
         <SocialAuth mode="register" />
-        <p className="text-center mt-4 text-xs text-copy-light">
+        <motion.p className="text-center mt-4 text-xs text-copy-light" variants={itemVariants}>
           Already have an account? <Link to="/login" className="text-primary hover:underline">Login</Link>
-        </p>
-      </div>
-    </div>
+        </motion.p>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 

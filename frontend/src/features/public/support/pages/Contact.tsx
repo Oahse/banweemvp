@@ -1,11 +1,32 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ChevronRightIcon, MapPinIcon, PhoneIcon, MailIcon, ClockIcon, CheckCircleIcon, MessageCircle } from 'lucide-react';
 import { Input } from '../../../../components/generic/Input';
 import { Textarea } from '../../../../components/generic/Textarea';
 import { Select } from '../../../../components/generic/Select';
 import { ContactMessagesAPI } from '../../../../api/contact-messages';
 import toast from 'react-hot-toast';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 }
+  }
+};
 
 export const Contact = () => {
   const [formData, setFormData] = useState({
@@ -93,17 +114,22 @@ export const Contact = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6 text-copy font-sans animate-fade-in">
+    <motion.div 
+      className="container mx-auto px-4 py-6 text-copy font-sans"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {/* Breadcrumb */}
-      <nav className="flex mb-4 text-xs animate-slide-in">
+      <motion.nav className="flex mb-4 text-xs" variants={itemVariants}>
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
         <ChevronRightIcon size={12} className="mx-1" />
         <span className="text-copy">Contact Us</span>
-      </nav>
+      </motion.nav>
 
-      <div className="max-w-5xl mx-auto">
+      <motion.div className="max-w-5xl mx-auto" variants={itemVariants}>
         <div className="text-center mb-6">
           <h1 className="text-base md:text-lg font-semibold text-copy mb-2">Get In Touch</h1>
           <p className="text-xs text-copy-light max-w-2xl mx-auto">
@@ -113,7 +139,7 @@ export const Contact = () => {
         </div>
 
         {/* Contact Methods */}
-        <div className="mb-6 animate-slide-in" style={{ animationDelay: '0.1s' }}>
+        <motion.div className="mb-6" variants={itemVariants}>
           <h2 className="text-sm font-semibold text-copy mb-3">Contact Methods</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* WhatsApp */}
@@ -196,9 +222,9 @@ export const Contact = () => {
               </div>
             </a>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col lg:flex-row gap-4 animate-slide-in" style={{ animationDelay: '0.2s' }}>
+        <motion.div className="flex flex-col lg:flex-row gap-4" variants={itemVariants}>
           {/* Contact Form */}
           <div className="lg:w-2/3">
             <div className="bg-surface rounded-lg shadow-sm p-3">
@@ -357,10 +383,10 @@ export const Contact = () => {
               </Link>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Map */}
-        <div className="mt-6 animate-slide-in" style={{ animationDelay: '0.3s' }}>
+        <motion.div className="mt-6" variants={itemVariants}>
           <div className="bg-surface rounded-lg shadow-sm p-3">
             <h2 className="text-sm font-semibold text-copy mb-3">Find Us</h2>
             <div className="h-64 bg-border rounded-lg overflow-hidden">
@@ -377,9 +403,9 @@ export const Contact = () => {
                 title="Banwee Store Location"></iframe>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 

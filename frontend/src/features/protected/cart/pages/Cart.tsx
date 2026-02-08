@@ -425,22 +425,43 @@ export const Cart = () => {
   });
   
   return (
-    <div className="container mx-auto px-4 py-6 text-copy" key={`cart-${cart?.id || 'empty'}-${cartItems.length}`}>
+    <motion.div 
+      className="container mx-auto px-4 py-6 text-copy" 
+      key={`cart-${cart?.id || 'empty'}-${cartItems.length}`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       {/* Breadcrumb */}
-      <nav className="flex mb-4 text-xs">
+      <motion.nav 
+        className="flex mb-4 text-xs"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
         <ChevronRightIcon size={14} className="mx-2" />
         <span className="text-copy">Shopping Cart</span>
-      </nav>
+      </motion.nav>
 
-      <h1 className="text-lg font-bold text-copy mb-4 flex items-center justify-between">
+      <motion.h1 
+        className="text-lg font-bold text-copy mb-4 flex items-center justify-between"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
         <span>Your Shopping Cart</span>
-      </h1>
+      </motion.h1>
 
       {cartItems.length === 0 ? (
-        <div className="text-center py-8">
+        <motion.div 
+          className="text-center py-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-background flex items-center justify-center">
             <ShoppingCartIcon size={24} className="text-copy-lighter" />
           </div>
@@ -451,9 +472,14 @@ export const Cart = () => {
             className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
             Continue Shopping
           </Link>
-        </div>
+        </motion.div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-4">
+        <motion.div 
+          className="flex flex-col lg:flex-row gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           {/* Cart Items */}
           <div className="lg:w-2/3">
             <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
@@ -535,7 +561,7 @@ export const Cart = () => {
               </motion.div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Remove Item Confirmation Modal */}
@@ -565,7 +591,7 @@ export const Cart = () => {
         variant="danger"
         loading={clearingCart}
       />
-    </div>
+    </motion.div>
   );
 };
 

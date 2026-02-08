@@ -1,7 +1,28 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRightIcon, PlusIcon, MinusIcon, SearchIcon } from 'lucide-react';
 import { categories, faqItems } from '../../../data/faq';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3 }
+  }
+};
 
 export const FAQ = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,17 +48,22 @@ export const FAQ = () => {
   });
 
   return (
-    <div className="container mx-auto px-4 py-6 text-copy animate-fade-in">
+    <motion.div 
+      className="container mx-auto px-4 py-6 text-copy"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {/* Breadcrumb */}
-      <nav className="flex mb-4 text-xs">
+      <motion.nav className="flex mb-4 text-xs" variants={itemVariants}>
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
         <ChevronRightIcon size={12} className="mx-1" />
         <span className="text-copy">Frequently Asked Questions</span>
-      </nav>
+      </motion.nav>
 
-      <div className="max-w-4xl mx-auto">
+      <motion.div className="max-w-4xl mx-auto" variants={itemVariants}>
         <div className="text-center mb-6">
           <h1 className="text-base md:text-lg font-semibold text-copy mb-2">Frequently Asked Questions</h1>
           <p className="text-xs text-copy-light max-w-2xl mx-auto">
@@ -47,7 +73,7 @@ export const FAQ = () => {
         </div>
 
         {/* Search bar */}
-        <div className="mb-4">
+        <motion.div className="mb-4" variants={itemVariants}>
           <div className="relative">
             <input
               type="text"
@@ -58,10 +84,10 @@ export const FAQ = () => {
             />
             <SearchIcon size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-copy-lighter" />
           </div>
-        </div>
+        </motion.div>
 
         {/* Categories */}
-        <div className="mb-4 overflow-x-auto">
+        <motion.div className="mb-4 overflow-x-auto" variants={itemVariants}>
           <div className="flex space-x-2 min-w-max">
             {categories.map((category) => (
               <button
@@ -76,13 +102,17 @@ export const FAQ = () => {
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* FAQ items */}
-        <div className="space-y-2">
+        <motion.div className="space-y-2" variants={containerVariants}>
           {filteredQuestions.length > 0 ? (
             filteredQuestions.map((item) => (
-              <div key={item.id} className="bg-surface rounded-lg shadow-sm border border-border-light overflow-hidden">
+              <motion.div 
+                key={item.id} 
+                className="bg-surface rounded-lg shadow-sm border border-border-light overflow-hidden"
+                variants={itemVariants}
+              >
                 <button
                   className="flex justify-between items-center w-full p-3 text-left"
                   onClick={() => toggleQuestion(item.id)}>
@@ -93,14 +123,22 @@ export const FAQ = () => {
                     <PlusIcon size={14} className="text-primary flex-shrink-0" />
                   )}
                 </button>
-                {openQuestions.includes(item.id) && (
-                  <div className="px-3 pb-3">
-                    <div className="pt-2 border-t border-border-light">
-                      <p className="text-xs text-copy-light mt-2">{item.answer}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+                <AnimatePresence>
+                  {openQuestions.includes(item.id) && (
+                    <motion.div 
+                      className="px-3 pb-3"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="pt-2 border-t border-border-light">
+                        <p className="text-xs text-copy-light mt-2">{item.answer}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             ))
           ) : (
             <div className="text-center py-8 bg-surface rounded-lg shadow-sm">
@@ -113,10 +151,10 @@ export const FAQ = () => {
               </p>
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Contact section */}
-        <div className="mt-8 bg-primary/10 rounded-lg p-4 text-center">
+        <motion.div className="mt-8 bg-primary/10 rounded-lg p-4 text-center" variants={itemVariants}>
           <h2 className="text-sm font-semibold text-copy mb-2">Still have questions?</h2>
           <p className="text-xs text-copy-light mb-3 max-w-md mx-auto">
             If you couldn't find the answer you were looking for, our support team is here to help.
@@ -126,9 +164,9 @@ export const FAQ = () => {
             className="inline-block bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
             Contact Support
           </Link>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 

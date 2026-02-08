@@ -3,6 +3,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../cart/contexts/CartContext';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { useTheme } from '../../../../components/shared/contexts/ThemeContext';
@@ -10,6 +11,26 @@ import { AuthAPI } from '../api/auth';
 import { CartAPI } from '../../../../api/cart';
 import { toast } from 'react-hot-toast';
 import SmartCheckoutForm from '../components/SmartCheckoutForm';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 }
+  }
+};
 
 export const Checkout = () => {
   const navigate = useNavigate();
@@ -132,18 +153,30 @@ export const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-surface-dark py-6">
+    <motion.div 
+      className="min-h-screen bg-surface dark:bg-surface-dark py-6"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-4">
+        <motion.div className="mb-4" variants={itemVariants}>
           <h1 className="text-lg font-bold text-copy dark:text-copy-dark mb-1">Checkout</h1>
           <p className="text-xs text-copy-light dark:text-copy-light-dark">
             Complete your purchase quickly and securely
           </p>
-        </div>
+        </motion.div>
 
         {/* Stock Validation Warning */}
-        {!stockValidation.valid && stockValidation.issues.length > 0 && (
-          <div className="mb-4 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg p-3">
+        <AnimatePresence>
+          {!stockValidation.valid && stockValidation.issues.length > 0 && (
+            <motion.div 
+              className="mb-4 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg p-3"
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, y: -20 }}
+            >
             <div className="flex gap-2">
               <div className="flex-shrink-0">
                 <svg className="h-4 w-4 text-destructive dark:text-destructive-dark" viewBox="0 0 20 20" fill="currentColor">
@@ -173,17 +206,20 @@ export const Checkout = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
 
         {/* Checkout */}
         {stockValidation.valid && (
-          <SmartCheckoutForm
-            onSuccess={handleSmartCheckoutSuccess}
-          />
+          <motion.div variants={itemVariants}>
+            <SmartCheckoutForm
+              onSuccess={handleSmartCheckoutSuccess}
+            />
+          </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

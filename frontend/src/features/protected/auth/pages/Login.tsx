@@ -1,11 +1,34 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { Input } from '../../../../components/generic/Input';
 import { Checkbox } from '../../../../components/generic/Checkbox';
 import SocialAuth from '../components/SocialAuth';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3 }
+  }
+};
 
 /**
  * Login component for user authentication.
@@ -159,22 +182,35 @@ export const Login = ({ isInitialLoading = false }) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 text-copy">
-      <div className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light">
+    <motion.div 
+      className="container mx-auto px-4 py-8 text-copy"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <motion.div 
+        className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light"
+        variants={itemVariants}
+      >
         {/* Show message if redirected from another page */}
         {(location.search.includes('redirect=') || location.state?.from?.pathname) && (
-          <div className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-md">
+          <motion.div 
+            className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-md"
+            variants={itemVariants}
+          >
             <p className="text-sm text-copy">
               {location.state?.from?.pathname 
                 ? 'Please log in to continue with your cart operation.'
                 : 'Please log in to continue to your requested page.'
               }
             </p>
-          </div>
+          </motion.div>
         )}
         
-        <h1 className="text-xl font-bold text-main mb-4 text-center">Login to Your Account</h1>
-        <form className="space-y-3" onSubmit={handleSubmit}>
+        <motion.h1 className="text-xl font-bold text-main mb-4 text-center" variants={itemVariants}>
+          Login to Your Account
+        </motion.h1>
+        <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
           {/* Email Address Input */}
           <Input
             label="Email Address"
@@ -258,9 +294,10 @@ export const Login = ({ isInitialLoading = false }) => {
               'Login'
             )}
           </button>
-        </form>
+        </motion.form>
         {/* Social Authentication Section */}
-        <div className="relative flex items-center justify-center my-4">
+        <motion.div variants={itemVariants}>
+          <div className="relative flex items-center justify-center my-4">
           <div className="border-t border-border-light w-full"></div>
           <span className="bg-surface px-3 text-sm text-copy-light absolute">Or continue with</span>
         </div>
@@ -295,11 +332,11 @@ export const Login = ({ isInitialLoading = false }) => {
           }}
         />
         {/* Register Link */}
-        <p className="text-center mt-4 text-sm text-copy-light">
+        <motion.p className="text-center mt-4 text-sm text-copy-light" variants={itemVariants}>
           Don&apos;t have an account? <Link to="/register" className="text-primary hover:underline font-medium">Register</Link>
-        </p>
-      </div>
-    </div>
+        </motion.p>
+      </motion.div>
+    </motion.div>
   );
 };
 
