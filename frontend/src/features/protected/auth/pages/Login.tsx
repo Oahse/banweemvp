@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { Input } from '../../../../components/generic/Input';
 import { Checkbox } from '../../../../components/generic/Checkbox';
-import { SkeletonLoginForm } from '../components/ui/SkeletonForm';
 import SocialAuth from '../components/SocialAuth';
 
 /**
@@ -160,8 +159,8 @@ export const Login = ({ isInitialLoading = false }) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 text-copy">
-      <div className="max-w-md mx-auto bg-surface p-8 rounded-lg shadow-sm border border-border-light">
+    <div className="container mx-auto px-4 py-8 text-copy">
+      <div className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light">
         {/* Show message if redirected from another page */}
         {(location.search.includes('redirect=') || location.state?.from?.pathname) && (
           <div className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-md">
@@ -174,8 +173,8 @@ export const Login = ({ isInitialLoading = false }) => {
           </div>
         )}
         
-        <h1 className="text-2xl font-bold text-main mb-6 text-center">Login to Your Account</h1>
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <h1 className="text-xl font-bold text-main mb-4 text-center">Login to Your Account</h1>
+        <form className="space-y-3" onSubmit={handleSubmit}>
           {/* Email Address Input */}
           <Input
             label="Email Address"
@@ -232,7 +231,7 @@ export const Login = ({ isInitialLoading = false }) => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-md transition-colors flex justify-center items-center"
+            className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-md transition-colors flex justify-center items-center text-sm font-medium"
             disabled={loading}>
             {loading ? (
               <span className="flex items-center">
@@ -261,7 +260,7 @@ export const Login = ({ isInitialLoading = false }) => {
           </button>
         </form>
         {/* Social Authentication Section */}
-        <div className="relative flex items-center justify-center my-6">
+        <div className="relative flex items-center justify-center my-4">
           <div className="border-t border-border-light w-full"></div>
           <span className="bg-surface px-3 text-sm text-copy-light absolute">Or continue with</span>
         </div>
@@ -296,8 +295,8 @@ export const Login = ({ isInitialLoading = false }) => {
           }}
         />
         {/* Register Link */}
-        <p className="text-center mt-6 text-sm text-copy-light">
-          Don&apos;t have an account? <Link to="/register" className="text-primary hover:underline">Register</Link>
+        <p className="text-center mt-4 text-sm text-copy-light">
+          Don&apos;t have an account? <Link to="/register" className="text-primary hover:underline font-medium">Register</Link>
         </p>
       </div>
     </div>

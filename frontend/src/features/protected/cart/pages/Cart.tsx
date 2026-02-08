@@ -425,39 +425,39 @@ export const Cart = () => {
   });
   
   return (
-    <div className="container mx-auto px-4 py-8 text-copy" key={`cart-${cart?.id || 'empty'}-${cartItems.length}`}>
+    <div className="container mx-auto px-4 py-6 text-copy" key={`cart-${cart?.id || 'empty'}-${cartItems.length}`}>
       {/* Breadcrumb */}
-      <nav className="flex mb-6 text-sm">
+      <nav className="flex mb-4 text-xs">
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
-        <ChevronRightIcon size={16} className="mx-2" />
+        <ChevronRightIcon size={14} className="mx-2" />
         <span className="text-copy">Shopping Cart</span>
       </nav>
 
-      <h1 className="text-xl font-bold text-copy mb-6 flex items-center justify-between">
+      <h1 className="text-lg font-bold text-copy mb-4 flex items-center justify-between">
         <span>Your Shopping Cart</span>
       </h1>
 
       {cartItems.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-background flex items-center justify-center">
-            <ShoppingCartIcon size={32} className="text-copy-lighter" />
+        <div className="text-center py-8">
+          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-background flex items-center justify-center">
+            <ShoppingCartIcon size={24} className="text-copy-lighter" />
           </div>
-          <h2 className="text-base font-medium text-copy mb-2">Your cart is empty</h2>
-          <p className="text-copy-light mb-6">Looks like you haven't added any products to your cart yet.</p>
+          <h2 className="text-sm font-medium text-copy mb-2">Your cart is empty</h2>
+          <p className="text-xs text-copy-light mb-4">Looks like you haven't added any products to your cart yet.</p>
           <Link
             to="/products"
-            className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors">
+            className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
             Continue Shopping
           </Link>
         </div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-4">
           {/* Cart Items */}
           <div className="lg:w-2/3">
             <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
-              <div className="hidden md:grid grid-cols-12 gap-4 p-4 bg-background text-copy font-medium">
+              <div className="hidden md:grid grid-cols-12 gap-4 p-3 bg-background text-copy font-medium text-xs">
                 <div className="col-span-6">Product</div>
                 <div className="col-span-2 text-center">Price</div>
                 <div className="col-span-2 text-center">Quantity</div>
@@ -470,23 +470,23 @@ export const Cart = () => {
                   ))}
                 </AnimatePresence>
               </div>
-              <div className="p-4 bg-background flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <div className="p-3 bg-background flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <div className="flex items-center">
                   <button
                     onClick={handleClearCart}
                     disabled={clearingCart || cartItems.length === 0}
-                    className="text-sm text-error hover:text-error-dark flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                    className="text-xs text-error hover:text-error-dark flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
                     {clearingCart ? (
-                      <Loader2 size={14} className="mr-1 animate-spin" />
+                      <Loader2 size={12} className="mr-1 animate-spin" />
                     ) : (
-                      <TrashIcon size={14} className="mr-1" />
+                      <TrashIcon size={12} className="mr-1" />
                     )}
                     Clear Cart ({cartItems.length})
                   </button>
                 </div>
-                <Link to="/products" className="text-sm text-primary hover:underline flex items-center">
+                <Link to="/products" className="text-xs text-primary hover:underline flex items-center">
                   Continue Shopping
-                  <ChevronRightIcon size={16} className="ml-1" />
+                  <ChevronRightIcon size={14} className="ml-1" />
                 </Link>
               </div>
             </div>
