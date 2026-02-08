@@ -37,13 +37,13 @@ export const ForgotPassword = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 text-copy">
-      <div className="max-w-md mx-auto bg-surface p-8 rounded-lg shadow-sm border border-border-light">
-        <h1 className="text-2xl font-bold text-main mb-6 text-center">Forgot Your Password?</h1>
-        <p className="text-copy-light text-center mb-6">
+    <div className="container mx-auto px-4 py-8 text-copy">
+      <div className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light">
+        <h1 className="text-xl font-bold text-main mb-4 text-center">Forgot Your Password?</h1>
+        <p className="text-xs text-copy-light text-center mb-4">
           Enter your email address below and we'll send you a link to reset your password.
         </p>
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-3" onSubmit={handleSubmit}>
           <Input
             label="Email Address"
             id="email"
@@ -57,7 +57,7 @@ export const ForgotPassword = () => {
           />
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-md transition-colors flex justify-center items-center"
+            className="w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md transition-colors flex justify-center items-center text-sm"
             disabled={loading}>
             {loading ? (
               <span className="flex items-center">
@@ -85,7 +85,7 @@ export const ForgotPassword = () => {
             )}
           </button>
         </form>
-        <p className="text-center mt-6 text-sm text-copy-light">
+        <p className="text-center mt-4 text-xs text-copy-light">
           Remember your password? <Link to="/login" className="text-primary hover:underline">Login</Link>
         </p>
       </div>

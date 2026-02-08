@@ -81,10 +81,10 @@ export const Orders = ({
   }, [currentPage]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Your Orders</h2>
-        <p className="text-gray-600">
+        <h2 className="text-lg font-semibold">Your Orders</h2>
+        <p className="text-xs text-gray-600">
           {totalOrders} order{totalOrders !== 1 ? 's' : ''}
         </p>
       </div>
@@ -92,42 +92,42 @@ export const Orders = ({
       {loading ? (
         <SkeletonOrderTable />
       ) : error ? (
-        <div className="text-center py-8">
-          <p className="text-red-600">Error loading orders</p>
+        <div className="text-center py-6">
+          <p className="text-xs text-red-600">Error loading orders</p>
         </div>
       ) : paginatedData?.data?.length === 0 ? (
-        <div className="text-center py-8">
-          <ShoppingBagIcon className="mx-auto h-12 w-12 text-gray-400" />
+        <div className="text-center py-6">
+          <ShoppingBagIcon className="mx-auto h-10 w-10 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No orders</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-xs text-gray-500">
             You haven't placed any orders yet.
           </p>
-          <div className="mt-6">
+          <div className="mt-4">
             <Link
               to="/products"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark"
+              className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-primary hover:bg-primary-dark"
             >
               Start Shopping
             </Link>
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {paginatedData?.data?.map((order: Order) => (
             <div key={order.id} className="bg-white shadow rounded-lg">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-lg font-medium">Order #{order.id}</h3>
-                    <p className="text-sm text-gray-500">
+                    <h3 className="text-sm font-medium">Order #{order.id}</h3>
+                    <p className="text-xs text-gray-500">
                       {new Date(order.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-semibold">
+                    <p className="text-sm font-semibold">
                       {formatCurrency(order.total_amount)}
                     </p>
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${
                       order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                       order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
                       order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
@@ -143,12 +143,12 @@ export const Orders = ({
                     onClick={() => setExpandedOrderId(
                       expandedOrderId === order.id ? null : order.id
                     )}
-                    className="flex items-center text-sm text-gray-600 hover:text-gray-900"
+                    className="flex items-center text-xs text-gray-600 hover:text-gray-900"
                   >
                     {expandedOrderId === order.id ? (
-                      <ChevronUpIcon className="h-4 w-4 mr-1" />
+                      <ChevronUpIcon className="h-3 w-3 mr-1" />
                     ) : (
-                      <ChevronDownIcon className="h-4 w-4 mr-1" />
+                      <ChevronDownIcon className="h-3 w-3 mr-1" />
                     )}
                     {expandedOrderId === order.id ? 'Hide' : 'Show'} details
                   </button>
@@ -156,32 +156,32 @@ export const Orders = ({
                   <div className="flex space-x-2">
                     <Link
                       to={`/account/orders/${order.id}`}
-                      className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50"
                     >
-                      <EyeIcon className="h-4 w-4 mr-1" />
+                      <EyeIcon className="h-3 w-3 mr-1" />
                       View
                     </Link>
                   </div>
                 </div>
 
                 {expandedOrderId === order.id && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="space-y-2">
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="space-y-1.5">
                       {order.items?.map((item: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between py-2">
+                        <div key={index} className="flex items-center justify-between py-1.5">
                           <div className="flex-1">
-                            <p className="text-sm font-medium">{item.product_name}</p>
-                            <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                            <p className="text-xs font-medium">{item.product_name}</p>
+                            <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                           </div>
-                          <p className="text-sm font-medium">
+                          <p className="text-xs font-medium">
                             {formatCurrency(item.total_price || 0)}
                           </p>
                         </div>
                       ))}
                     </div>
                     
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <div className="space-y-1 text-sm">
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="space-y-0.5 text-xs">
                         <div className="flex justify-between">
                           <span>Subtotal:</span>
                           <span>{formatCurrency(calculatePricingBreakdown(order).subtotal)}</span>
@@ -215,19 +215,19 @@ export const Orders = ({
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="p-2 border border-gray-300 rounded-md disabled:opacity-50"
+                  className="p-1.5 border border-gray-300 rounded-md disabled:opacity-50"
                 >
-                  <ChevronLeftIcon className="h-4 w-4" />
+                  <ChevronLeftIcon className="h-3 w-3" />
                 </button>
-                <span className="text-sm text-gray-600">
+                <span className="text-xs text-gray-600">
                   Page {currentPage} of {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="p-2 border border-gray-300 rounded-md disabled:opacity-50"
+                  className="p-1.5 border border-gray-300 rounded-md disabled:opacity-50"
                 >
-                  <ChevronRightIcon className="h-4 w-4" />
+                  <ChevronRightIcon className="h-3 w-3" />
                 </button>
               </div>
             </div>

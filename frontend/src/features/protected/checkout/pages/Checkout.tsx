@@ -132,30 +132,30 @@ export const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-surface-dark py-8">
+    <div className="min-h-screen bg-surface dark:bg-surface-dark py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-copy dark:text-copy-dark mb-2">Checkout</h1>
-          <p className="text-sm text-copy-light dark:text-copy-light-dark">
+        <div className="mb-4">
+          <h1 className="text-lg font-bold text-copy dark:text-copy-dark mb-1">Checkout</h1>
+          <p className="text-xs text-copy-light dark:text-copy-light-dark">
             Complete your purchase quickly and securely
           </p>
         </div>
 
         {/* Stock Validation Warning */}
         {!stockValidation.valid && stockValidation.issues.length > 0 && (
-          <div className="mb-6 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg p-4">
-            <div className="flex gap-3">
+          <div className="mb-4 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg p-3">
+            <div className="flex gap-2">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-destructive dark:text-destructive-dark" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-4 w-4 text-destructive dark:text-destructive-dark" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-destructive dark:text-destructive-dark">
+                <h3 className="text-xs font-semibold text-destructive dark:text-destructive-dark">
                   Stock Issues Detected
                 </h3>
-                <div className="mt-2 text-sm text-destructive dark:text-destructive-dark">
-                  <ul className="list-disc pl-5 space-y-1">
+                <div className="mt-1 text-xs text-destructive dark:text-destructive-dark">
+                  <ul className="list-disc pl-4 space-y-0.5">
                     {stockValidation.issues.map((issue, index) => (
                       <li key={index} className="text-destructive/80 dark:text-destructive-dark/80">
                         {issue.message}
@@ -163,10 +163,10 @@ export const Checkout = () => {
                     ))}
                   </ul>
                 </div>
-                <div className="mt-4">
+                <div className="mt-2">
                   <button
                     onClick={() => navigate('/cart')}
-                    className="bg-destructive dark:bg-destructive-dark text-copy-inverse dark:text-copy-inverse-dark px-4 py-2 rounded-lg text-sm font-medium hover:bg-destructive/90 dark:hover:bg-destructive-dark/90 transition-colors"
+                    className="bg-destructive dark:bg-destructive-dark text-copy-inverse dark:text-copy-inverse-dark px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-destructive/90 dark:hover:bg-destructive-dark/90 transition-colors"
                   >
                     Review Cart
                   </button>

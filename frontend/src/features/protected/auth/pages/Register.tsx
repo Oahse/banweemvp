@@ -14,7 +14,6 @@ import { validation } from '../../../../utils/validation';
  */
 export const Register = () => {
   // State variables for form fields
-  // FIXED: Split name into firstname and lastname to match backend schema
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
@@ -85,7 +84,7 @@ export const Register = () => {
    * Performs comprehensive client-side validation before attempting to register the user
    * via the authentication context.
    */
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission behavior
 
     // Comprehensive client-side validation using validation utility
@@ -145,7 +144,7 @@ export const Register = () => {
       );
       toast.success('Registration successful! Welcome to Banwee Organics.');
       // Navigation to dashboard/home is handled by the useEffect hook based on authentication status
-    } catch (error) {
+    } catch (error: any) {
       // Display specific error message if available
       const errorMessage = error?.response?.data?.message || error?.message || 'Registration failed. Please try again with different credentials.';
       toast.error(errorMessage);
@@ -160,10 +159,10 @@ export const Register = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-12 text-copy">
-      <div className="max-w-md mx-auto bg-surface p-8 rounded-lg shadow-sm border border-border-light">
-        <h1 className="text-2xl font-bold text-main mb-6 text-center">Create an Account</h1>
-        <form className="space-y-4" onSubmit={handleSubmit}>
+    <div className="container mx-auto px-4 py-8 text-copy">
+      <div className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light">
+        <h1 className="text-xl font-bold text-main mb-4 text-center">Create an Account</h1>
+        <form className="space-y-3" onSubmit={handleSubmit}>
           {/* FIXED: First Name Input */}
           <Input
             label="First Name"
@@ -196,22 +195,22 @@ export const Register = () => {
           />
           {/* Account Type Selection */}
           <div>
-            <label htmlFor="userType" className="block text-sm font-medium text-main mb-1">
+            <label htmlFor="userType" className="block text-xs font-medium text-main mb-1">
               Account Type
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
               {userTypeOptions.map((option) => (
                 <div
                   key={option.value}
                   onClick={() => setUserType(option.value)}
-                  className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                  className={`border rounded-lg p-2 cursor-pointer transition-all ${
                     userType === option.value
                       ? 'border-primary bg-primary/5'
                       : 'border-border hover:border-primary/50'
                   }`}>
                   <div className="flex justify-between items-center mb-1">
-                    <h3 className="font-medium text-main">{option.label}</h3>
-                    {userType === option.value && <CheckCircle size={16} className="text-primary" />}
+                    <h3 className="text-sm font-medium text-main">{option.label}</h3>
+                    {userType === option.value && <CheckCircle size={14} className="text-primary" />}
                   </div>
                   <p className="text-xs text-copy-light">{option.description}</p>
                 </div>
@@ -220,7 +219,7 @@ export const Register = () => {
           </div>
           {/* Password Input */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-main mb-1">
+            <label htmlFor="password" className="block text-xs font-medium text-main mb-1">
               Password
             </label>
             <div className="relative">
@@ -238,9 +237,9 @@ export const Register = () => {
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? (
-                  <EyeOff size={18} className="text-copy-lighter" />
+                  <EyeOff size={14} className="text-copy-lighter" />
                 ) : (
-                  <Eye size={18} className="text-copy-lighter" />
+                  <Eye size={14} className="text-copy-lighter" />
                 )}
               </button>
             </div>
@@ -266,7 +265,7 @@ export const Register = () => {
           </div>
           {/* Confirm Password Input */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-main mb-1">
+            <label htmlFor="confirmPassword" className="block text-xs font-medium text-main mb-1">
               Confirm Password
             </label>
             <div className="relative">
@@ -284,9 +283,9 @@ export const Register = () => {
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                 {showConfirmPassword ? (
-                  <EyeOff size={18} className="text-copy-lighter" />
+                  <EyeOff size={14} className="text-copy-lighter" />
                 ) : (
-                  <Eye size={18} className="text-copy-lighter" />
+                  <Eye size={14} className="text-copy-lighter" />
                 )}
               </button>
             </div>
@@ -301,11 +300,13 @@ export const Register = () => {
             id="terms"
             checked={acceptTerms}
             onChange={() => setAcceptTerms(!acceptTerms)}
-            required
+            required={true}
+            error=""
+            className=""
           />
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-md transition-colors flex justify-center items-center"
+            className="w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md transition-colors flex justify-center items-center text-sm"
             disabled={loading}>
             {loading ? (
               <span className="flex items-center">
@@ -333,12 +334,12 @@ export const Register = () => {
             )}
           </button>
         </form>
-        <div className="relative flex items-center justify-center my-6">
+        <div className="relative flex items-center justify-center my-4">
           <div className="border-t border-border-light w-full"></div>
-          <span className="bg-surface px-3 text-sm text-copy-light absolute">Or continue with</span>
+          <span className="bg-surface px-3 text-xs text-copy-light absolute">Or continue with</span>
         </div>
         <SocialAuth mode="register" />
-        <p className="text-center mt-6 text-sm text-copy-light">
+        <p className="text-center mt-4 text-xs text-copy-light">
           Already have an account? <Link to="/login" className="text-primary hover:underline">Login</Link>
         </p>
       </div>

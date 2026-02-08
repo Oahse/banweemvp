@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { CheckCircle, XCircle, Loader } from 'lucide-react';
 import { extractErrorMessage } from '../../../../utils/api-response';
 
 export const EmailVerification = () => {
@@ -37,16 +38,43 @@ export const EmailVerification = () => {
   }, [token]);
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-      <h1>Email Verification</h1>
-      {verificationStatus === 'pending' && <p>Verifying your email...</p>}
-      {verificationStatus === 'success' && (
-        <div>
-          <p>{message}</p>
-          <Link to="/login">Go to Login</Link>
-        </div>
-      )}
-      {verificationStatus === 'error' && <p style={{ color: 'red' }}>{message}</p>}
+    <div className="container mx-auto px-4 py-8 text-copy">
+      <div className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light text-center">
+        <h1 className="text-xl font-bold text-main mb-4">Email Verification</h1>
+        
+        {verificationStatus === 'pending' && (
+          <div className="space-y-3">
+            <Loader size={48} className="mx-auto text-primary animate-spin" />
+            <p className="text-sm text-copy-light">Verifying your email...</p>
+          </div>
+        )}
+        
+        {verificationStatus === 'success' && (
+          <div className="space-y-3">
+            <CheckCircle size={48} className="mx-auto text-green-500" />
+            <p className="text-sm text-copy">{message}</p>
+            <Link 
+              to="/login" 
+              className="inline-block w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md transition-colors text-sm mt-3"
+            >
+              Go to Login
+            </Link>
+          </div>
+        )}
+        
+        {verificationStatus === 'error' && (
+          <div className="space-y-3">
+            <XCircle size={48} className="mx-auto text-red-500" />
+            <p className="text-sm text-red-600">{message}</p>
+            <Link 
+              to="/login" 
+              className="inline-block text-primary hover:underline text-xs mt-2"
+            >
+              Back to Login
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
