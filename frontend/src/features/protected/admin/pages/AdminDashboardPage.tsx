@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../components/AdminLayout';
-import { AdminAPI } from '@/api/admin';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
@@ -11,6 +10,8 @@ import {
   Users, ShoppingCart, Package, DollarSign, TrendingUp, 
   Activity, ArrowUpRight, ArrowDownRight 
 } from 'lucide-react';
+import Dropdown from '@/components/ui/Dropdown';
+import { AdminAPI } from '@/api/admin';
 
 // Color palette
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -118,21 +119,22 @@ const AdminDashboard: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">Welcome back! Here's what's happening.</p>
           </div>
           <div className="flex items-center space-x-2">
-            <select
+            <Dropdown
+              options={[
+                { value: 'today', label: 'Today' },
+                { value: 'week', label: 'Last 7 Days' },
+                { value: 'month', label: 'Last 30 Days' },
+                { value: 'quarter', label: 'Last 90 Days' },
+                { value: 'year', label: 'Last Year' }
+              ]}
               value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="today">Today</option>
-              <option value="week">Last 7 Days</option>
-              <option value="month">Last 30 Days</option>
-              <option value="quarter">Last 90 Days</option>
-              <option value="year">Last Year</option>
-            </select>
+              onChange={setDateRange}
+              placeholder="Select time range"
+              className="w-48"
+            />
           </div>
         </div>
 

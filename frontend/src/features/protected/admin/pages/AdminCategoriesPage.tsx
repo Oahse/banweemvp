@@ -266,7 +266,6 @@ const AdminCategoriesPage = () => {
       <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
-          <h1 className="text-xl lg:text-2xl font-semibold">Category Management</h1>
           <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product categories</p>
         </div>
         <button

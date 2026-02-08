@@ -5,7 +5,9 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { getCountryOptions, getProvinceOptions } from '@/data/countries';
-import { AdminLayout } from '@/components/layout/Layout';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { TaxRatesListSkeleton } from '../components/skeletons/TaxRatesSkeleton';
 
 const LIMIT = 10;
 
@@ -349,20 +351,15 @@ export const AdminTaxRates = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
-      </div>
-    );
+  if (loading && initialLoading) {
+    return <AdminLayoutSkeleton />;
   }
 
   return (
     <AdminLayout>
-    <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-semibold">Tax Rates Management</h1>
           <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</p>
         </div>
         <div className="flex gap-2 w-full lg:w-auto">
