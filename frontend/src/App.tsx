@@ -31,6 +31,7 @@ import {
   ProgressBar 
 } from './components/ui/AnimatedLoader';
 import LoadingSpinner from './components/shared/LoadingSpinner';
+import SupportFloat from './components/layout/SupportFloat';
 import './animations.css';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
@@ -133,6 +134,7 @@ export const App: React.FC = () => {
                   <SubscriptionProvider>
                     <WishlistProvider>
                       <Elements stripe={stripePromise}>
+                        <SupportFloat />
                         <Suspense fallback={<LoadingSpinner size="lg" text="Loading page..." fullScreen />}> 
                           <Routes>
                         <Route path="/" element={<Layout><Home /></Layout>} />

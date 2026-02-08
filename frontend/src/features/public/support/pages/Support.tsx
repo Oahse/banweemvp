@@ -4,17 +4,10 @@
  */
 
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
 import CustomerSupport from '../components/CustomerSupport';
 import { MessageCircle, Phone, Mail, Clock, HelpCircle } from 'lucide-react';
 
 const Support: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  
-  // Get context from URL parameters
-  const orderNumber = searchParams.get('order') || undefined;
-  const productId = searchParams.get('product') || undefined;
-  const issueType = (searchParams.get('type') as 'order' | 'payment' | 'product' | 'account' | 'general') || 'general';
 
   const faqItems = [
     {
@@ -41,7 +34,7 @@ const Support: React.FC = () => {
 
   const contactMethods = [
     {
-      icon: <MessageCircle className="w-8 h-8 text-green-600" />,
+      icon: <MessageCircle />,
       title: "WhatsApp Support",
       description: "Get instant help via WhatsApp",
       availability: "24/7",
@@ -50,7 +43,7 @@ const Support: React.FC = () => {
       primary: true
     },
     {
-      icon: <Phone className="w-8 h-8 text-blue-600" />,
+      icon: <Phone />,
       title: "Phone Support",
       description: "Speak directly with our team",
       availability: "9 AM - 9 PM EST",
@@ -59,7 +52,7 @@ const Support: React.FC = () => {
       primary: false
     },
     {
-      icon: <Mail className="w-8 h-8 text-purple-600" />,
+      icon: <Mail />,
       title: "Email Support",
       description: "Send us a detailed message",
       availability: "24/7",
@@ -70,60 +63,60 @@ const Support: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-6">
+          <h1 className="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-2">
             How Can We Help You? 🤝
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xs text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Our customer support team is here to help you 24/7. Get instant assistance via WhatsApp 
             or choose from our other support options below.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Main Support Widget */}
           <div className="lg:col-span-2">
-            <CustomerSupport
-              orderNumber={orderNumber}
-              productId={productId}
-              issueType={issueType}
-            />
+            <CustomerSupport />
           </div>
 
           {/* Contact Methods */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
+          <div className="space-y-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-3">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">
                 Contact Methods
               </h3>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {contactMethods.map((method, index) => (
                   <div
                     key={index}
-                    className={`p-4 rounded-lg border-2 ${
+                    className={`p-3 rounded-lg border-2 ${
                       method.primary 
-                        ? 'border-green-500 bg-green-50' 
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-blue-500 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/20' 
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     } transition-colors`}
                   >
-                    <div className="flex items-start space-x-3">
+                    <div className="flex items-start space-x-2">
                       <div className="flex-shrink-0">
-                        {method.icon}
+                        <div className="w-6 h-6 flex items-center justify-center">
+                          {React.cloneElement(method.icon as React.ReactElement, { 
+                            className: `w-6 h-6 ${method.primary ? 'text-blue-600 dark:text-blue-400' : 'text-blue-600 dark:text-blue-400'}` 
+                          })}
+                        </div>
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-1">
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-0.5">
                           {method.title}
                         </h4>
-                        <p className="text-sm text-gray-600 mb-2">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
                           {method.description}
                         </p>
-                        <div className="flex items-center justify-between text-xs text-gray-500">
+                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                           <span>{method.availability}</span>
-                          <span className="font-medium text-green-600">
+                          <span className="font-medium text-blue-600 dark:text-blue-400">
                             {method.responseTime}
                           </span>
                         </div>
@@ -135,24 +128,24 @@ const Support: React.FC = () => {
             </div>
 
             {/* Support Hours */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <Clock className="w-5 h-5 mr-2" />
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-3">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center">
+                <Clock className="w-4 h-4 mr-1" />
                 Support Hours
               </h3>
               
-              <div className="space-y-2 text-sm">
+              <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">WhatsApp Support:</span>
-                  <span className="font-medium text-green-600">24/7</span>
+                  <span className="text-gray-600 dark:text-gray-400">WhatsApp Support:</span>
+                  <span className="font-medium text-blue-600 dark:text-blue-400">24/7</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Phone Support:</span>
-                  <span className="font-medium">9 AM - 9 PM EST</span>
+                  <span className="text-gray-600 dark:text-gray-400">Phone Support:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">9 AM - 9 PM EST</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Email Support:</span>
-                  <span className="font-medium">24/7</span>
+                  <span className="text-gray-600 dark:text-gray-400">Email Support:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">24/7</span>
                 </div>
               </div>
             </div>
@@ -160,31 +153,31 @@ const Support: React.FC = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-12">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <HelpCircle className="w-6 h-6 mr-2" />
+        <div className="mt-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4">
+            <h2 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center">
+              <HelpCircle className="w-4 h-4 mr-1" />
               Frequently Asked Questions
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {faqItems.map((item, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2">
+                <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-900/50">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
                     {item.question}
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     {item.answer}
                   </p>
                 </div>
               ))}
             </div>
             
-            <div className="mt-6 text-center">
-              <p className="text-gray-600 mb-4">
+            <div className="mt-4 text-center">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                 Can't find what you're looking for?
               </p>
-              <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+              <button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-4 py-2 rounded-lg transition-colors text-sm">
                 Contact Support
               </button>
             </div>
@@ -192,18 +185,18 @@ const Support: React.FC = () => {
         </div>
 
         {/* Emergency Support */}
-        <div className="mt-8 bg-red-50 border border-red-200 rounded-lg p-6">
-          <div className="flex items-center space-x-3">
+        <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+          <div className="flex items-center space-x-2">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">!</span>
+              <div className="w-6 h-6 bg-red-600 dark:bg-red-700 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-xs">!</span>
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-red-800">
+              <h3 className="text-sm font-semibold text-red-800 dark:text-red-400">
                 Emergency Support
               </h3>
-              <p className="text-red-700">
+              <p className="text-xs text-red-700 dark:text-red-300">
                 For urgent issues like payment problems or order emergencies, 
                 use our WhatsApp urgent support for immediate assistance.
               </p>
