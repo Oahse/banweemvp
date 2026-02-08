@@ -77,13 +77,17 @@ const ContactMessages: React.FC = () => {
   };
 
   const calculateStats = async (currentMessages: ContactMessage[], totalCount: number) => {
+    console.log('Calculating stats - currentMessages:', currentMessages.length, 'totalCount:', totalCount);
+    
     // If filters are applied, we need to fetch all messages to calculate accurate stats
     // Otherwise, use the current page data
     if (statusFilter || priorityFilter || debouncedSearchTerm) {
       // When filtered, calculate from current filtered results
-      const newCount = messages.filter(m => m.status === 'new').length;
-      const inProgressCount = messages.filter(m => m.status === 'in_progress').length;
-      const resolvedCount = messages.filter(m => m.status === 'resolved').length;
+      const newCount = currentMessages.filter(m => m.status === 'new').length;
+      const inProgressCount = currentMessages.filter(m => m.status === 'in_progress').length;
+      const resolvedCount = currentMessages.filter(m => m.status === 'resolved').length;
+      
+      console.log('Filtered stats - new:', newCount, 'inProgress:', inProgressCount, 'resolved:', resolvedCount);
       
       setStats({
         total: totalCount,
@@ -92,26 +96,19 @@ const ContactMessages: React.FC = () => {
         resolved: resolvedCount
       });
     } else {
-      // When not filtered, fetch all messages to calculate accurate stats
-      try {
-        const allResponse = await ContactMessagesAPI.getAll({
-          page: 1,
-          page_size: 1000, // Get all messages for stats calculation
-        });
-        
-        const newCount = allResponse.messages.filter(m => m.status === 'new').length;
-        const inProgressCount = allResponse.messages.filter(m => m.status === 'in_progress').length;
-        const resolvedCount = allResponse.messages.filter(m => m.status === 'resolved').length;
-        
-        setStats({
-          total: allResponse.total,
-          new: newCount,
-          in_progress: inProgressCount,
-          resolved: resolvedCount
-        });
-      } catch (error) {
-        console.error('Error calculating stats:', error);
-      }
+      // When not filtered, use the current messages since they represent all data
+      const newCount = currentMessages.filter(m => m.status === 'new').length;
+      const inProgressCount = currentMessages.filter(m => m.status === 'in_progress').length;
+      const resolvedCount = currentMessages.filter(m => m.status === 'resolved').length;
+      
+      console.log('Unfiltered stats - new:', newCount, 'inProgress:', inProgressCount, 'resolved:', resolvedCount);
+      
+      setStats({
+        total: currentMessages.length,
+        new: newCount,
+        in_progress: inProgressCount,
+        resolved: resolvedCount
+      });
     }
   };
 
