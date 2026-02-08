@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { XIcon, ChevronRightIcon } from 'lucide-react';
+import { XIcon, ChevronRightIcon, UserIcon, HeartIcon, ShoppingCartIcon } from 'lucide-react';
 import { useCategories } from '../shared/contexts/CategoryContext';
+import { useAuth } from '../../features/protected/auth/contexts/AuthContext';
+import { useCart } from '../../features/protected/cart/contexts/CartContext';
+import { useWishlist } from '../../features/protected/wishlist/contexts/WishlistContext';
 
 /**
  * @typedef {object} MobileCategoriesProps
@@ -14,6 +17,9 @@ export const MobileCategories = ({
   onClose
 }) => {
   const { categories, loading, error } = useCategories();
+  const { isAuthenticated, user, logout } = useAuth();
+  const { totalItems } = useCart();
+  const { defaultWishlist } = useWishlist();
 
   useEffect(() => {
     if (isOpen) {
@@ -50,22 +56,58 @@ export const MobileCategories = ({
 
         {/* User Actions */}
         <div className="p-4 border-b border-border-light">
-          <Link
-            to="/login"
-            className="flex items-center justify-between py-2 px-3 bg-primary text-white rounded-md mb-2"
-            onClick={onClose}
-          >
-            <span>Sign In / Register</span>
-            <ChevronRightIcon size={20} />
-          </Link>
-          <div className="grid grid-cols-2 gap-2 mt-3">
-            <Link to="/account/orders" className="py-2 px-3 bg-background rounded-md text-center text-sm hover:bg-border" onClick={onClose}>
-              My Orders
-            </Link>
-            <Link to="/account/wishlist" className="py-2 px-3 bg-background rounded-md text-center text-sm hover:bg-border" onClick={onClose}>
-              Wishlist
-            </Link>
-          </div>
+          {isAuthenticated ? (
+            <>
+              <div className="flex items-center justify-between py-2 px-3 bg-primary/10 rounded-md mb-2">
+                <div className="flex items-center">
+                  <UserIcon size={20} className="mr-2" />
+                  <div>
+                    <div className="font-medium">
+                      Hello, {user?.firstname || user?.full_name?.split(' ')[0] || 'User'}
+                    </div>
+                    <div className="text-sm opacity-75">My Account</div>
+                  </div>
+                </div>
+                <ChevronRightIcon size={20} />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Link to="/account/orders" className="py-2 px-3 bg-background rounded-md text-center text-sm hover:bg-border" onClick={onClose}>
+                  My Orders
+                </Link>
+                <Link to="/account/wishlist" className="py-2 px-3 bg-background rounded-md text-center text-sm hover:bg-border" onClick={onClose}>
+                  Wishlist
+                </Link>
+              </div>
+              <button
+                onClick={() => {
+                  logout();
+                  onClose();
+                }}
+                className="w-full py-2 px-3 bg-red-500 text-white rounded-md text-center text-sm hover:bg-red-600 mt-2"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="flex items-center justify-between py-2 px-3 bg-primary text-white rounded-md mb-2"
+                onClick={onClose}
+              >
+                <span>Sign In / Register</span>
+                <ChevronRightIcon size={20} />
+              </Link>
+              <div className="grid grid-cols-2 gap-2 mt-3">
+                <Link to="/account/orders" className="py-2 px-3 bg-background rounded-md text-center text-sm hover:bg-border" onClick={onClose}>
+                  My Orders
+                </Link>
+                <Link to="/account/wishlist" className="py-2 px-3 bg-background rounded-md text-center text-sm hover:bg-border" onClick={onClose}>
+                  Wishlist
+                </Link>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Categories */}

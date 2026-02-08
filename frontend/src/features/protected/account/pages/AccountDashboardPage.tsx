@@ -97,18 +97,27 @@ export const Dashboard = ({
       className="space-y-6"
     >
       {/* Stats Cards */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-          <div className="text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Orders</div>
-          <div className="text-lg font-bold text-primary">{paginatedOrders?.total || 0}</div>
+      <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-center gap-3">
+          <ShoppingBagIcon className="h-5 w-5 text-primary" />
+          <div>
+            <Link to="/account/orders" className="text-sm font-medium mb-1 text-gray-700 dark:text-gray-200 hover:underline">Orders</Link>
+            <div className="text-lg font-bold text-primary">{paginatedOrders?.total || 0}</div>
+          </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-          <div className="text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Subscriptions</div>
-          <div className="text-lg font-bold text-primary">{subscriptions?.length || 0}</div>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-center gap-3">
+          <CreditCardIcon className="h-5 w-5 text-primary" />
+          <div>
+            <Link to="/account/subscriptions" className="text-sm font-medium mb-1 text-gray-700 dark:text-gray-200 hover:underline">Subscriptions</Link>
+            <div className="text-lg font-bold text-primary">{subscriptions?.length || 0}</div>
+          </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-          <div className="text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Wishlist</div>
-          <div className="text-lg font-bold text-primary">-</div>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-center gap-3">
+          <HeartIcon className="h-5 w-5 text-primary" />
+          <div>
+            <Link to="/account/wishlist" className="text-sm font-medium mb-1 text-gray-700 dark:text-gray-200 hover:underline">Wishlist</Link>
+            <div className="text-lg font-bold text-primary">-</div>
+          </div>
         </div>
       </motion.div>
 

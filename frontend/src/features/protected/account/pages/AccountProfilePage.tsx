@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { UserIcon, MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, GlobeIcon, SaveIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../auth/contexts/AuthContext';
-import { AuthAPI } from '../../api';
-import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { AuthAPI } from '@/api';
+import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { SkeletonProfile } from '../ui/SkeletonProfile';
 import { AdminDashboardSkeleton } from '@/components/ui/SkeletonLoader';
 
@@ -26,6 +26,43 @@ export const Profile = () => {
     timezone: '',
     is_active: true,
   });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!formData.firstname) newErrors.firstname = 'First name is required.';
+    if (!formData.lastname) newErrors.lastname = 'Last name is required.';
+    if (!formData.phone) newErrors.phone = 'Phone is required.';
+    if (!formData.country) newErrors.country = 'Country is required.';
+    if (!formData.age) newErrors.age = 'Date of birth is required.';
+    return newErrors;
+  };
+
+  const handleSave = async () => {
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error('Please fill all required fields.');
+      return;
+    }
+    setLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(res => setTimeout(res, 800));
+      updateUser({ ...user, ...formData });
+      toast.success('Profile updated successfully!');
+      setIsEditing(false);
+    } catch (err) {
+      toast.error('Failed to update profile.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -54,26 +91,33 @@ export const Profile = () => {
         <h2 className="text-base font-semibold mb-2 text-gray-900 dark:text-white">Profile Details</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> First Name</label>
             <input
+              name="firstname"
               type="text"
               value={formData.firstname}
               disabled={!isEditing}
+              onChange={handleChange}
               className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
+            {errors.firstname && <span className="text-xs text-red-500">{errors.firstname}</span>}
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Last Name</label>
             <input
+              name="lastname"
               type="text"
               value={formData.lastname}
               disabled={!isEditing}
+              onChange={handleChange}
               className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
+            {errors.lastname && <span className="text-xs text-red-500">{errors.lastname}</span>}
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><MailIcon size={16}/> Email</label>
             <input
+              name="email"
               type="email"
               value={formData.email}
               disabled
@@ -81,11 +125,132 @@ export const Profile = () => {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><PhoneIcon size={16}/> Phone</label>
             <input
+              name="phone"
               type="text"
               value={formData.phone}
               disabled={!isEditing}
+              onChange={handleChange}
+              className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
+            />
+            {errors.phone && <span className="text-xs text-red-500">{errors.phone}</span>}
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><CalendarIcon size={16}/> Date of Birth</label>
+            <input
+              name="age"
+              type="date"
+              value={formData.age}
+              disabled={!isEditing}
+              onChange={handleChange}
+              className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
+            />
+            {errors.age && <span className="text-xs text-red-500">{errors.age}</span>}
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Gender</label>
+            <div className="relative">
+              <button
+                type="button"
+                disabled={!isEditing}
+                className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
+                onClick={() => {
+                  if (!isEditing) return;
+                  setShowGenderDropdown((prev) => !prev);
+                }}
+              >
+                {formData.gender ? formData.gender.charAt(0).toUpperCase() + formData.gender.slice(1) : 'Select'}
+              </button>
+              {isEditing && showGenderDropdown && (
+                <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded shadow">
+                  {['male', 'female', 'other'].map(option => (
+                    <li
+                      key={option}
+                      className="px-3 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, gender: option }));
+                        setShowGenderDropdown(false);
+                      }}
+                    >{option.charAt(0).toUpperCase() + option.slice(1)}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><MapPinIcon size={16}/> Country</label>
+            <div className="relative">
+              <button
+                type="button"
+                disabled
+                className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
+              >
+                {formData.country || 'Select'}
+              </button>
+            </div>
+            {errors.country && <span className="text-xs text-red-500">{errors.country}</span>}
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><GlobeIcon size={16}/> Language</label>
+            <div className="relative">
+              <button
+                type="button"
+                disabled={!isEditing}
+                className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
+                onClick={() => {
+                  if (!isEditing) return;
+                  setShowLanguageDropdown((prev) => !prev);
+                }}
+              >
+                {languageOptions.find(opt => opt.value === formData.language)?.label || 'Select'}
+              </button>
+              {isEditing && showLanguageDropdown && (
+                <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded shadow">
+                  {languageOptions.map(option => (
+                    <li
+                      key={option.value}
+                      className="px-3 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, language: option.value }));
+                        setShowLanguageDropdown(false);
+                      }}
+                    >{option.label}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><GlobeIcon size={16}/> Timezone</label>
+            <div className="relative">
+              <button
+                type="button"
+                disabled
+                className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
+              >
+                {formData.timezone || 'Select'}
+              </button>
+            </div>
+          </div>
+            // Dropdown state
+            const [showGenderDropdown, setShowGenderDropdown] = useState(false);
+            const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+            const languageOptions = [
+              { value: 'en', label: 'English' },
+              { value: 'es', label: 'Spanish' },
+              { value: 'fr', label: 'French' },
+              { value: 'de', label: 'German' },
+              { value: 'zh', label: 'Chinese' },
+              { value: 'ar', label: 'Arabic' },
+            ];
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><SaveIcon size={16}/> Account Status</label>
+            <input
+              name="is_active"
+              type="text"
+              value={formData.is_active ? 'Active' : 'Inactive'}
+              disabled
               className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
           </div>
@@ -93,12 +258,13 @@ export const Profile = () => {
         <div className="mt-4 flex gap-2">
           <button
             className="px-4 py-1.5 text-xs font-medium rounded bg-primary text-white disabled:opacity-50"
-            disabled={!isEditing}
-            onClick={() => setIsEditing(false)}
+            disabled={!isEditing || loading}
+            onClick={handleSave}
           >Save</button>
           <button
             className="px-4 py-1.5 text-xs font-medium rounded bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
             onClick={() => setIsEditing(!isEditing)}
+            disabled={loading}
           >{isEditing ? 'Cancel' : 'Edit'}</button>
         </div>
       </div>
