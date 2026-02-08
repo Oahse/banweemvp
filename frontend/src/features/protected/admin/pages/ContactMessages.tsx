@@ -369,10 +369,14 @@ const ContactMessages: React.FC = () => {
               <span className="text-sm text-copy-light">Updating messages...</span>
             </div>
           </div>
-        ) : messages.length > 0 ? (
+        ) : (
           <>
-            {/* Desktop Table */}
-            <div className="overflow-x-auto hidden md:block">
+            {/* Debug: Log messages state */}
+            {console.log('About to render messages - length:', messages.length, 'messages:', messages)}
+            {messages.length > 0 ? (
+              <>
+                {/* Desktop Table */}
+                <div className="overflow-x-auto hidden md:block">
               <table className="w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
                   <tr>
