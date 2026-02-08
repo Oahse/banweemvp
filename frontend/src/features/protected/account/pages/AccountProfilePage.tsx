@@ -6,6 +6,7 @@ import { AuthAPI } from '@/api';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { SkeletonProfile } from '../ui/SkeletonProfile';
 import { AdminDashboardSkeleton } from '@/components/ui/SkeletonLoader';
+import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
 
 /**
  * Profile component allows users to view and edit their personal information.
@@ -27,6 +28,17 @@ export const Profile = () => {
     is_active: true,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  // Dropdown state and language options
+  const [showGenderDropdown, setShowGenderDropdown] = useState(false);
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  const languageOptions = [
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Spanish' },
+    { value: 'fr', label: 'French' },
+    { value: 'de', label: 'German' },
+    { value: 'zh', label: 'Chinese' },
+    { value: 'ar', label: 'Arabic' },
+  ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -138,13 +150,12 @@ export const Profile = () => {
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><CalendarIcon size={16}/> Date of Birth</label>
-            <input
-              name="age"
-              type="date"
+            <DateTimeDropdown
               value={formData.age}
+              onChange={date => setFormData(prev => ({ ...prev, age: date }))}
+              placeholder="Select date"
+              className="w-full"
               disabled={!isEditing}
-              onChange={handleChange}
-              className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
             {errors.age && <span className="text-xs text-red-500">{errors.age}</span>}
           </div>
@@ -178,19 +189,7 @@ export const Profile = () => {
               )}
             </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><MapPinIcon size={16}/> Country</label>
-            <div className="relative">
-              <button
-                type="button"
-                disabled
-                className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
-              >
-                {formData.country || 'Select'}
-              </button>
-            </div>
-            {errors.country && <span className="text-xs text-red-500">{errors.country}</span>}
-          </div>
+          
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><GlobeIcon size={16}/> Language</label>
             <div className="relative">
@@ -221,29 +220,7 @@ export const Profile = () => {
               )}
             </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><GlobeIcon size={16}/> Timezone</label>
-            <div className="relative">
-              <button
-                type="button"
-                disabled
-                className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
-              >
-                {formData.timezone || 'Select'}
-              </button>
-            </div>
-          </div>
-            // Dropdown state
-            const [showGenderDropdown, setShowGenderDropdown] = useState(false);
-            const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-            const languageOptions = [
-              { value: 'en', label: 'English' },
-              { value: 'es', label: 'Spanish' },
-              { value: 'fr', label: 'French' },
-              { value: 'de', label: 'German' },
-              { value: 'zh', label: 'Chinese' },
-              { value: 'ar', label: 'Arabic' },
-            ];
+          
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><SaveIcon size={16}/> Account Status</label>
             <input
