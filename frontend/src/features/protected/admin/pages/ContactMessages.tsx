@@ -268,7 +268,7 @@ const ContactMessages: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => viewMessage(message)}
-                        className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
+                        className="p-1 text-primary hover:bg-primary/10 rounded"
                       >
                         <Eye className="w-4 h-4" />
                       </button>

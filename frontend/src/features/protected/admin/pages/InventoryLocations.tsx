@@ -202,7 +202,7 @@ export const AdminInventoryLocations = () => {
                       </td>
                       <td className="px-4 py-3 text-xs">
                         <div className="flex items-center gap-2">
-                          <button className={`p-1 rounded transition-colors ${currentTheme === 'dark' ? 'text-blue-400 hover:bg-blue-400/10' : 'text-blue-600 hover:bg-blue-600/10'}`}>
+                          <button className={`p-1 rounded transition-colors ${currentTheme === 'dark' ? 'text-primary hover:bg-primary/10' : 'text-primary hover:bg-primary/10'}`}>
                             <Edit className="w-4 h-4" />
                           </button>
                           <button className={`p-1 rounded transition-colors ${currentTheme === 'dark' ? 'text-error hover:bg-error/10' : 'text-error hover:bg-error/10'}`}>

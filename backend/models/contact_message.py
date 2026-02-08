@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
 import enum
-from backend.core.db import Base
+from core.db import Base
 
 
 class MessageStatus(str, enum.Enum):

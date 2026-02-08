@@ -533,7 +533,7 @@ export const AdminTaxRates = () => {
                         <div className="flex gap-1 lg:gap-2">
                           <button 
                             onClick={() => openEditModal(taxRate)}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
                           >
                             <EditIcon size={14} className="hidden sm:block" />
                             <span className="sm:hidden">Edit</span>
@@ -577,7 +577,7 @@ export const AdminTaxRates = () => {
                   <div className="flex gap-1 lg:gap-2 mt-2">
                     <button 
                       onClick={() => openEditModal(taxRate)}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs"
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-xs"
                     >
                       <EditIcon size={14} />
                       Edit

@@ -142,7 +142,7 @@ const AdminDashboard: React.FC = () => {
           <div className="text-red-600 dark:text-red-400 text-lg mb-3">{error}</div>
           <button
             onClick={fetchDashboardData}
-            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-3 py-1.5 text-sm bg-primary hover:bg-primary-dark text-white rounded-lg"
           >
             Retry
           </button>

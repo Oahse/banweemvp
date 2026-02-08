@@ -179,7 +179,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
             {filters.length > 3 && (
               <button
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="flex items-center space-x-2 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-md transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 text-sm text-primary hover:text-primary-dark bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
               >
                 <FilterIcon className="h-4 w-4" />
                 <span className="hidden sm:inline">{showAdvanced ? 'Show Less' : 'Show More'}</span>
@@ -202,7 +202,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
             <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
             
             {hasActiveSearch && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">
                 Search: {searchValue}
                 <button
                   onClick={() => onSearchChange('')}
