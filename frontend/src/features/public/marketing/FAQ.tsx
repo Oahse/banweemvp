@@ -27,46 +27,46 @@ export const FAQ = () => {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8 text-copy">
+    <div className="container mx-auto px-4 py-6 text-copy">
       {/* Breadcrumb */}
-      <nav className="flex mb-6 text-sm">
+      <nav className="flex mb-4 text-xs">
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
-        <ChevronRightIcon size={16} className="mx-2" />
+        <ChevronRightIcon size={12} className="mx-1" />
         <span className="text-copy">Frequently Asked Questions</span>
       </nav>
 
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-xl md:text-2xl font-semibold text-copy mb-4">Frequently Asked Questions</h1>
-          <p className="text-copy-light max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-lg md:text-xl font-semibold text-copy mb-3">Frequently Asked Questions</h1>
+          <p className="text-xs text-copy-light max-w-2xl mx-auto">
             Find answers to common questions about our products, shipping, returns, and more. Can't find what you're
             looking for? Contact our support team.
           </p>
         </div>
 
         {/* Search bar */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="relative">
             <input
               type="text"
               placeholder="Search for questions..."
-              className="w-full px-4 py-3 pl-12 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-transparent"
+              className="w-full px-3 py-2 pl-10 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-transparent text-xs"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <SearchIcon size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-copy-lighter" />
+            <SearchIcon size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-copy-lighter" />
           </div>
         </div>
 
         {/* Categories */}
-        <div className="mb-8 overflow-x-auto">
+        <div className="mb-6 overflow-x-auto">
           <div className="flex space-x-2 min-w-max">
             {categories.map((category) => (
               <button
                 key={category.id}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
                   activeCategory === category.id
                     ? 'bg-primary text-white'
                     : 'bg-surface text-copy hover:bg-border'
@@ -79,24 +79,24 @@ export const FAQ = () => {
         </div>
 
         {/* FAQ items */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredQuestions.length > 0 ? (
             filteredQuestions.map((item) => (
               <div key={item.id} className="bg-surface rounded-lg shadow-sm border border-border-light overflow-hidden">
                 <button
-                  className="flex justify-between items-center w-full p-6 text-left"
+                  className="flex justify-between items-center w-full p-4 text-left"
                   onClick={() => toggleQuestion(item.id)}>
-                  <h3 className="font-medium text-copy text-lg">{item.question}</h3>
+                  <h3 className="font-medium text-copy text-sm">{item.question}</h3>
                   {openQuestions.includes(item.id) ? (
-                    <MinusIcon size={20} className="text-primary flex-shrink-0" />
+                    <MinusIcon size={16} className="text-primary flex-shrink-0" />
                   ) : (
-                    <PlusIcon size={20} className="text-primary flex-shrink-0" />
+                    <PlusIcon size={16} className="text-primary flex-shrink-0" />
                   )}
                 </button>
                 {openQuestions.includes(item.id) && (
-                  <div className="px-6 pb-6">
+                  <div className="px-4 pb-4">
                     <div className="pt-2 border-t border-border-light">
-                      <p className="text-copy-light mt-4">{item.answer}</p>
+                      <p className="text-xs text-copy-light mt-3">{item.answer}</p>
                     </div>
                   </div>
                 )}

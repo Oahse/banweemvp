@@ -53,41 +53,41 @@ export const Contact = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 text-copy">
+    <div className="container mx-auto px-4 py-6 text-copy">
       {/* Breadcrumb */}
-      <nav className="flex mb-6 text-sm">
+      <nav className="flex mb-4 text-xs">
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
-        <ChevronRightIcon size={16} className="mx-2" />
+        <ChevronRightIcon size={12} className="mx-1" />
         <span className="text-copy">Contact Us</span>
       </nav>
 
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-xl md:text-2xl font-semibold text-copy mb-4">Get In Touch</h1>
-          <p className="text-copy-light max-w-2xl mx-auto">
+        <div className="text-center mb-6">
+          <h1 className="text-base md:text-lg font-semibold text-copy mb-2">Get In Touch</h1>
+          <p className="text-xs text-copy-light max-w-2xl mx-auto">
             Have questions about our products, shipping, or anything else? We're here to help. Fill out the form
             below or contact us directly.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-4">
           {/* Contact Form */}
           <div className="lg:w-2/3">
-            <div className="bg-surface rounded-lg shadow-sm p-6 md:p-8">
-              <h2 className="text-lg font-semibold text-copy mb-6">Send Us a Message</h2>
+            <div className="bg-surface rounded-lg shadow-sm p-3">
+              <h2 className="text-sm font-semibold text-copy mb-3">Send Us a Message</h2>
               {formSubmitted ? (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                  <CheckCircleIcon size={48} className="text-green-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-bold text-green-800 mb-2">Message Sent!</h3>
-                  <p className="text-green-700">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                  <CheckCircleIcon size={24} className="text-green-500 mx-auto mb-2" />
+                  <h3 className="text-sm font-bold text-green-800 mb-1">Message Sent!</h3>
+                  <p className="text-xs text-green-700">
                     Thank you for reaching out. We'll get back to you as soon as possible.
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                     <Input
                       label="Your Name *"
                       id="name"
@@ -106,7 +106,7 @@ export const Contact = () => {
                       required
                     />
                   </div>
-                  <div className="mb-6">
+                  <div className="mb-3">
                     <Select
                       label="Subject *"
                       id="subject"
@@ -117,7 +117,7 @@ export const Contact = () => {
                       required
                     />
                   </div>
-                  <div className="mb-6">
+                  <div className="mb-3">
                     <Textarea
                       label="Your Message *"
                       id="message"
@@ -130,7 +130,7 @@ export const Contact = () => {
                   </div>
                   <button
                     type="submit"
-                    className="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md transition-colors">
+                    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
                     Send Message
                   </button>
                 </form>
@@ -140,18 +140,18 @@ export const Contact = () => {
 
           {/* Contact Info */}
           <div className="lg:w-1/3">
-            <div className="bg-surface rounded-lg shadow-sm p-6 md:p-8 mb-6">
-              <h2 className="text-lg font-semibold text-copy mb-6">Contact Information</h2>
-              <div className="space-y-6">
+            <div className="bg-surface rounded-lg shadow-sm p-3 mb-4">
+              <h2 className="text-sm font-semibold text-copy mb-3">Contact Information</h2>
+              <div className="space-y-3">
                 <div className="flex">
-                  <div className="mr-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <MapPinIcon size={20} className="text-primary" />
+                  <div className="mr-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <MapPinIcon size={14} className="text-primary" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-bold text-copy mb-1">Our Location</h3>
-                    <p className="text-copy-light">
+                    <h3 className="text-sm font-bold text-copy mb-0.5">Our Location</h3>
+                    <p className="text-xs text-copy-light">
                       1234 Fashion Street, Suite 567
                       <br />
                       New York, NY 10001
@@ -161,14 +161,14 @@ export const Contact = () => {
                   </div>
                 </div>
                 <div className="flex">
-                  <div className="mr-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <PhoneIcon size={20} className="text-primary" />
+                  <div className="mr-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <PhoneIcon size={14} className="text-primary" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-bold text-copy mb-1">Phone Number</h3>
-                    <p className="text-copy-light">
+                    <h3 className="text-sm font-bold text-copy mb-0.5">Phone Number</h3>
+                    <p className="text-xs text-copy-light">
                       Customer Service: (212) 555-1234
                       <br />
                       Wholesale Inquiries: (212) 555-5678
@@ -176,14 +176,14 @@ export const Contact = () => {
                   </div>
                 </div>
                 <div className="flex">
-                  <div className="mr-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <MailIcon size={20} className="text-primary" />
+                  <div className="mr-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <MailIcon size={14} className="text-primary" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-bold text-copy mb-1">Email Address</h3>
-                    <p className="text-copy-light">
+                    <h3 className="text-sm font-bold text-copy mb-0.5">Email Address</h3>
+                    <p className="text-xs text-copy-light">
                       Customer Support:{' '}
                       <a href="mailto:support@banwee.com" className="text-primary hover:underline">
                         support@banwee.com
@@ -197,14 +197,14 @@ export const Contact = () => {
                   </div>
                 </div>
                 <div className="flex">
-                  <div className="mr-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <ClockIcon size={20} className="text-primary" />
+                  <div className="mr-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <ClockIcon size={14} className="text-primary" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-bold text-copy mb-1">Working Hours</h3>
-                    <p className="text-copy-light">
+                    <h3 className="text-sm font-bold text-copy mb-0.5">Working Hours</h3>
+                    <p className="text-xs text-copy-light">
                       Monday - Friday: 9:00 AM - 6:00 PM EST
                       <br />
                       Saturday: 10:00 AM - 4:00 PM EST
@@ -216,12 +216,12 @@ export const Contact = () => {
               </div>
             </div>
             {/* FAQ Link */}
-            <div className="bg-primary/10 rounded-lg p-6">
-              <h3 className="font-bold text-copy mb-2">Have a Question?</h3>
-              <p className="text-copy-light mb-4">
+            <div className="bg-primary/10 rounded-lg p-3">
+              <h3 className="text-sm font-bold text-copy mb-1">Have a Question?</h3>
+              <p className="text-xs text-copy-light mb-2">
                 Check our frequently asked questions for quick answers to common inquiries.
               </p>
-              <Link to="/faq" className="inline-block text-primary hover:underline font-medium">
+              <Link to="/faq" className="inline-block text-xs text-primary hover:underline font-medium">
                 View FAQs
               </Link>
             </div>
@@ -229,10 +229,10 @@ export const Contact = () => {
         </div>
 
         {/* Map */}
-        <div className="mt-12">
-          <div className="bg-surface rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-copy mb-6">Find Us</h2>
-            <div className="h-80 bg-border rounded-lg overflow-hidden">
+        <div className="mt-6">
+          <div className="bg-surface rounded-lg shadow-sm p-3">
+            <h2 className="text-sm font-semibold text-copy mb-3">Find Us</h2>
+            <div className="h-64 bg-border rounded-lg overflow-hidden">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.9663095343008!2d-74.00425872418978!3d40.74076097138946!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1685290225594!5m2!1sen!2sus"
                 width="100%"

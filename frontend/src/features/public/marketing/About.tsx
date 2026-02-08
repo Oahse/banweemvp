@@ -42,19 +42,19 @@ export const About = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 text-copy">
+    <div className="container mx-auto px-4 py-6 text-copy">
       {/* Breadcrumb */}
-      <nav className="flex mb-6 text-sm">
+      <nav className="flex mb-4 text-xs">
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
-        <ChevronRightIcon size={16} className="mx-2" />
+        <ChevronRightIcon size={12} className="mx-1" />
         <span className="text-copy">About Us</span>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative mb-16">
-        <div className="h-[300px] md:h-[400px] w-full">
+      <div className="relative mb-8">
+        <div className="h-[200px] md:h-[250px] w-full">
           <div className="absolute inset-0 bg-black/40 z-10"></div>
           <img
             src="https://images.unsplash.com/photo-1595356161904-6708c97be89c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80"
@@ -63,8 +63,8 @@ export const About = () => {
           />
           <div className="relative z-20 container mx-auto px-4 h-full flex items-center">
             <div className="max-w-2xl text-white">
-              <h1 className="text-xl md:text-2xl font-semibold mb-4">Our Story</h1>
-              <p className="text-lg">
+              <h1 className="text-base md:text-lg font-semibold mb-2">Our Story</h1>
+              <p className="text-xs">
                 Connecting African producers with global markets through ethical, sustainable, and transparent trade.
               </p>
             </div>
@@ -73,30 +73,30 @@ export const About = () => {
       </div>
 
       {/* Mission & Vision */}
-      <div className="max-w-4xl mx-auto mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Our Mission & Vision</h2>
-          <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
+      <div className="max-w-4xl mx-auto mb-8">
+        <div className="text-center mb-6">
+          <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Mission & Vision</h2>
+          <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-surface p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-copy mb-4">Our Mission</h3>
-            <p className="text-copy-light mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-surface p-3 rounded-lg shadow-sm">
+            <h3 className="text-sm font-semibold text-copy mb-2">Our Mission</h3>
+            <p className="text-xs text-copy-light mb-2">
               Banwee exists to create sustainable economic opportunities for African producers by connecting them with
               global markets through ethical trade practices.
             </p>
-            <p className="text-copy-light">
+            <p className="text-xs text-copy-light">
               We are committed to ensuring that our producers receive fair compensation, work in safe conditions, and
               can invest in their communities and futures.
             </p>
           </div>
-          <div className="bg-surface p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-copy mb-4">Our Vision</h3>
-            <p className="text-copy-light mb-4">
+          <div className="bg-surface p-3 rounded-lg shadow-sm">
+            <h3 className="text-sm font-semibold text-copy mb-2">Our Vision</h3>
+            <p className="text-xs text-copy-light mb-2">
               We envision a world where African products are recognized globally for their exceptional quality and where
               the people who create them prosper through fair and direct trade relationships.
             </p>
-            <p className="text-copy-light">
+            <p className="text-xs text-copy-light">
               We believe in a future where sustainability and profitability go hand in hand, creating lasting positive
               impact for all stakeholders.
             </p>
@@ -105,44 +105,44 @@ export const About = () => {
       </div>
 
       {/* Our Story */}
-      <div className="max-w-4xl mx-auto mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">The Banwee Journey</h2>
-          <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
+      <div className="max-w-4xl mx-auto mb-8">
+        <div className="text-center mb-6">
+          <h2 className="text-sm md:text-base font-semibold text-copy mb-2">The Banwee Journey</h2>
+          <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
         </div>
-        <div className="bg-surface p-8 rounded-lg shadow-sm">
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-copy mb-3">The Beginning</h3>
-            <p className="text-copy-light mb-4">
+        <div className="bg-surface p-4 rounded-lg shadow-sm">
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold text-copy mb-2">The Beginning</h3>
+            <p className="text-xs text-copy-light mb-2">
               Banwee began in 2019 when our founder, Amara Okafor, returned to her ancestral home in Ghana and
               witnessed the incredible quality of local products that struggled to reach international markets.
             </p>
-            <p className="text-copy-light">
+            <p className="text-xs text-copy-light">
               Recognizing both the exceptional craftsmanship and the economic challenges faced by producers, Amara set
               out to create a bridge between these skilled artisans and global consumers seeking authentic,
               sustainable products.
             </p>
           </div>
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-copy mb-3">Growth & Impact</h3>
-            <p className="text-copy-light mb-4">
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold text-copy mb-2">Growth & Impact</h3>
+            <p className="text-xs text-copy-light mb-2">
               What started with a single cooperative of women producing shea butter has grown into partnerships with
               over 25 producer groups across 8 African countries. Today, Banwee offers a diverse range of products,
               from gourmet foods to skincare to home goods.
             </p>
-            <p className="text-copy-light">
+            <p className="text-xs text-copy-light">
               Along the way, we've remained committed to our core values of fair trade, sustainability, and
               transparency. Every product tells a story, and we ensure that the story includes fair compensation,
               sustainable practices, and community investment.
             </p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-copy mb-3">Looking Forward</h3>
-            <p className="text-copy-light mb-4">
+            <h3 className="text-sm font-semibold text-copy mb-2">Looking Forward</h3>
+            <p className="text-xs text-copy-light mb-2">
               As we continue to grow, we're expanding our impact through educational initiatives, infrastructure
               development, and increased market access for our producer partners.
             </p>
-            <p className="text-copy-light">
+            <p className="text-xs text-copy-light">
               We're also innovating in sustainable packaging, carbon-neutral shipping, and digital traceability to
               ensure that our environmental footprint remains as positive as our social impact.
             </p>
@@ -151,22 +151,22 @@ export const About = () => {
       </div>
 
       {/* Our Values */}
-      <div className="max-w-4xl mx-auto mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Our Values</h2>
-          <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
+      <div className="max-w-4xl mx-auto mb-8">
+        <div className="text-center mb-6">
+          <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Values</h2>
+          <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {values.map((value, index) => (
             <div key={index} className="flex">
-              <div className="mr-4 mt-1">
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <CheckIcon size={16} className="text-primary" />
+              <div className="mr-3 mt-0.5">
+                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+                  <CheckIcon size={12} className="text-primary" />
                 </div>
               </div>
               <div>
-                <h3 className="font-bold text-copy mb-2">{value.title}</h3>
-                <p className="text-copy-light">{value.description}</p>
+                <h3 className="text-sm font-bold text-copy mb-1">{value.title}</h3>
+                <p className="text-xs text-copy-light">{value.description}</p>
               </div>
             </div>
           ))}
@@ -174,26 +174,26 @@ export const About = () => {
       </div>
 
       {/* Our Team */}
-      <div className="max-w-4xl mx-auto mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Meet Our Team</h2>
-          <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
-          <p className="text-copy-light max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto mb-8">
+        <div className="text-center mb-6">
+          <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Meet Our Team</h2>
+          <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
+          <p className="text-xs text-copy-light max-w-2xl mx-auto">
             Our diverse team brings together expertise in sustainable development, international trade, product
             curation, and community building.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {teamMembers.map((member, index) => (
             <div key={index} className="bg-surface rounded-lg shadow-sm overflow-hidden">
               <div className="flex flex-col sm:flex-row">
                 <div className="sm:w-1/3">
                   <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                 </div>
-                <div className="p-6 sm:w-2/3">
-                  <h3 className="font-bold text-copy text-lg mb-1">{member.name}</h3>
-                  <p className="text-primary font-medium mb-3">{member.position}</p>
-                  <p className="text-copy-light">{member.bio}</p>
+                <div className="p-3 sm:w-2/3">
+                  <h3 className="text-sm font-bold text-copy mb-0.5">{member.name}</h3>
+                  <p className="text-xs text-primary font-medium mb-2">{member.position}</p>
+                  <p className="text-xs text-copy-light">{member.bio}</p>
                 </div>
               </div>
             </div>
@@ -202,24 +202,24 @@ export const About = () => {
       </div>
 
       {/* Impact Stats */}
-      <div className="bg-primary/10 py-12 mb-16">
+      <div className="bg-primary/10 py-6 mb-8">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Our Impact</h2>
-            <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
+          <div className="text-center mb-6">
+            <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Impact</h2>
+            <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
             <div>
-              <div className="text-2xl font-semibold text-primary mb-2">1,000+</div>
-              <p className="text-copy-light font-medium">Producers Supported</p>
+              <div className="text-lg font-semibold text-primary mb-1">1,000+</div>
+              <p className="text-xs text-copy-light font-medium">Producers Supported</p>
             </div>
             <div>
-              <div className="text-2xl font-semibold text-primary mb-2">8</div>
-              <p className="text-copy-light font-medium">African Countries</p>
+              <div className="text-lg font-semibold text-primary mb-1">8</div>
+              <p className="text-xs text-copy-light font-medium">African Countries</p>
             </div>
             <div>
-              <div className="text-2xl font-semibold text-primary mb-2">12</div>
-              <p className="text-copy-light font-medium">Community Projects</p>
+              <div className="text-lg font-semibold text-primary mb-1">12</div>
+              <p className="text-xs text-copy-light font-medium">Community Projects</p>
             </div>
           </div>
         </div>
@@ -227,20 +227,20 @@ export const About = () => {
 
       {/* Join Us CTA */}
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-lg md:text-xl font-semibold text-copy mb-4">Join Our Journey</h2>
-        <p className="text-copy-light mb-6 max-w-2xl mx-auto">
+        <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Join Our Journey</h2>
+        <p className="text-xs text-copy-light mb-4 max-w-2xl mx-auto">
           Be part of our mission to support sustainable development in Africa while enjoying exceptional products with
           authentic stories.
         </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-3">
           <Link
             to="/products"
-            className="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md transition-colors">
+            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
             Shop Our Products
           </Link>
           <Link
             to="/account/subscriptions"
-            className="bg-surface border border-primary text-primary hover:bg-primary/5 px-6 py-3 rounded-md transition-colors">
+            className="bg-surface border border-primary text-primary hover:bg-primary/5 px-4 py-2 rounded-md transition-colors text-sm">
             Manage Subscriptions
           </Link>
         </div>

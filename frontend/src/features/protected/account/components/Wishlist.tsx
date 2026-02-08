@@ -17,8 +17,9 @@ import {
   ChevronRightIcon
 } from 'lucide-react';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
-import { ProductCard } from ./components/ProductCard';
+import { ProductCard } from '../../../components/generic/ProductCard';
 import { Product, ProductVariant } from '../../types';
+import { WishlistSkeleton } from './skeletons/WishlistSkeleton';
 interface WishlistItem {
   id: string;
   product_id: string;
@@ -158,14 +159,14 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
   // Handle errors gracefully - show empty UI instead of error message
   if (!defaultWishlist && !loading) {
     return (
-      <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-        <HeartIcon size={48} className="mx-auto text-gray-400 mb-4" />
-        <p className="text-gray-500 dark:text-gray-400 mb-3">
+      <div className="text-center py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+        <HeartIcon size={32} className="mx-auto text-gray-400 mb-3" />
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
           Unable to load wishlist
         </p>
         <button 
           onClick={() => window.location.reload()} 
-          className="text-primary hover:underline"
+          className="text-xs text-primary hover:underline"
         >
           Try again
         </button>
@@ -174,12 +175,7 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="ml-4 text-gray-600 dark:text-gray-400">Loading wishlist...</p>
-      </div>
-    );
+    return <WishlistSkeleton animation="shimmer" />;
   }
 
   // List mode - show all wishlist items
@@ -215,11 +211,11 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
 
         {/* Wishlist Items Grid */}
         {items.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-              <HeartIcon size={20} className="text-gray-500 dark:text-gray-400" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 text-center">
+            <div className="w-10 h-10 mx-auto mb-2 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+              <HeartIcon size={16} className="text-gray-500 dark:text-gray-400" />
             </div>
-            <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+            <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-1">
               Your wishlist is empty
             </h2>
             <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
@@ -228,9 +224,9 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
             <div className="flex gap-2 justify-center">
               <button
                 onClick={() => navigate('/products')}
-                className="inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs"
               >
-                <PlusIcon size={16} />
+                <PlusIcon size={14} />
                 Browse Products
               </button>
             </div>
@@ -245,17 +241,17 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
                 // If no product data, show a simple placeholder
                 if (!product) {
                   return (
-                    <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700">
-                      <div className="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg mb-3 flex items-center justify-center">
-                        <PackageIcon size={24} className="text-gray-400" />
+                    <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 border border-gray-200 dark:border-gray-700">
+                      <div className="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg mb-2 flex items-center justify-center">
+                        <PackageIcon size={20} className="text-gray-400" />
                       </div>
-                      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1 line-clamp-2">
+                      <h3 className="text-xs font-medium text-gray-900 dark:text-white mb-1 line-clamp-2">
                         Loading product...
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         Product ID: {item.product_id}
                       </p>
-                      <div className="mt-3">
+                      <div className="mt-2">
                         <button
                           onClick={() => handleRemoveFromWishlist(item.id)}
                           className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
