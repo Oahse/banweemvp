@@ -515,7 +515,7 @@ const ContactMessages: React.FC = () => {
           <p className="text-sm text-copy-light">
             {total > 0
               ? `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, total)} of ${total} items`
-              : 'No items to display'}
+              : 'No contact messages found'}
           </p>
           <div className="flex items-center gap-2">
             <button
