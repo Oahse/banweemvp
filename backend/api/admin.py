@@ -278,11 +278,15 @@ async def get_dashboard_data(
     try:
         admin_service = AdminService(db)
         
-        # Get platform overview
-        overview = await admin_service.get_platform_overview()
+        # Get dashboard stats with date filters
+        stats = await admin_service.get_dashboard_stats(
+            date_from=date_from,
+            date_to=date_to,
+            status=status,
+            category=category
+        )
         
-        
-        return Response.success(data=overview)
+        return Response.success(data=stats)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

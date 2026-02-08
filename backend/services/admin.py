@@ -222,8 +222,8 @@ class AdminService:
                 select(func.count(Product.id)).where(Product.is_active == True)
             )
             
-            # Get revenue data
-            revenue_conditions = [Order.order_status.in_(['DELIVERED', 'SHIPPED', 'PROCESSING'])]
+            # Get revenue data (include confirmed, processing, shipped, and delivered orders)
+            revenue_conditions = [Order.order_status.in_(['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'])]
             if status:
                 revenue_conditions.append(Order.order_status == status)
             
@@ -234,7 +234,7 @@ class AdminService:
             revenue_today = await self.db.scalar(
                 select(func.coalesce(func.sum(Order.total_amount), 0)).where(
                     and_(
-                        Order.order_status.in_(['DELIVERED', 'SHIPPED', 'PROCESSING']),
+                        Order.order_status.in_(['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED']),
                         func.date(Order.created_at) == today
                     )
                 )
@@ -243,7 +243,7 @@ class AdminService:
             revenue_this_month = await self.db.scalar(
                 select(func.coalesce(func.sum(Order.total_amount), 0)).where(
                     and_(
-                        Order.order_status.in_(['DELIVERED', 'SHIPPED', 'PROCESSING']),
+                        Order.order_status.in_(['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED']),
                         Order.created_at >= last_month
                     )
                 )
@@ -273,6 +273,49 @@ class AdminService:
             )
             recent_orders = recent_orders_result.scalars().all()
             
+            # Recent users (excluding admin users)
+            recent_users_result = await self.db.execute(
+                select(User)
+                .where(User.role != 'admin')
+                .order_by(desc(User.created_at))
+                .limit(5)
+            )
+            recent_users = recent_users_result.scalars().all()
+            
+            # Top products by sales (within date range)
+            top_products_query = await self.db.execute(
+                select(
+                    Product.id,
+                    Product.name,
+                    func.sum(OrderItem.quantity).label('sales'),
+                    func.sum(OrderItem.quantity * OrderItem.price_per_unit).label('revenue')
+                )
+                .select_from(OrderItem)
+                .join(ProductVariant, OrderItem.variant_id == ProductVariant.id)
+                .join(Product, ProductVariant.product_id == Product.id)
+                .join(Order, OrderItem.order_id == Order.id)
+                .where(
+                    and_(
+                        Order.created_at >= start_date,
+                        Order.created_at <= end_date,
+                        Order.order_status.in_(['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'])
+                    )
+                )
+                .group_by(Product.id, Product.name)
+                .order_by(func.sum(OrderItem.quantity * OrderItem.price_per_unit).desc())
+                .limit(6)
+            )
+            
+            top_products = [
+                {
+                    "id": str(product.id),
+                    "name": product.name,
+                    "sales": int(product.sales or 0),
+                    "revenue": float(product.revenue or 0)
+                }
+                for product in top_products_query.all()
+            ]
+            
             return {
                 "overview": {
                     "total_users": total_users,
@@ -301,6 +344,18 @@ class AdminService:
                     }
                     for order in recent_orders
                 ],
+                "recent_users": [
+                    {
+                        "id": str(user.id),
+                        "email": user.email,
+                        "firstname": user.firstname,
+                        "lastname": user.lastname,
+                        "is_active": user.is_active,
+                        "created_at": user.created_at.isoformat() if user.created_at else None
+                    }
+                    for user in recent_users
+                ],
+                "top_products": top_products,
                 "generated_at": datetime.utcnow().isoformat()
             }
             
@@ -376,10 +431,10 @@ class AdminService:
         while current_date <= end_date:
             next_date = current_date + timedelta(days=1)
             
-            # Build conditions for this day
+            # Build conditions for this day (include confirmed, processing, shipped, delivered)
             date_conditions = [
                 func.date(Order.created_at) == current_date,
-                Order.order_status.in_(['DELIVERED', 'SHIPPED', 'PROCESSING'])
+                Order.order_status.in_(['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'])
             ]
             if status:
                 date_conditions.append(Order.order_status == status)
@@ -460,7 +515,7 @@ class AdminService:
                 .where(
                     and_(
                         Order.created_at >= last_30_days,
-                        Order.order_status.in_(['DELIVERED', 'SHIPPED', 'PROCESSING'])
+                        Order.order_status.in_(['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'])
                     )
                 )
                 .group_by(Product.id, Product.name)

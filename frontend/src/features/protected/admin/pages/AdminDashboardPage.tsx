@@ -73,7 +73,47 @@ const AdminDashboard: React.FC = () => {
     setError(null);
     
     try {
-      const response = await AdminAPI.getDashboardData({});
+      // Calculate date range based on selected filter
+      const now = new Date();
+      let date_from: string | undefined;
+      let date_to: string | undefined = now.toISOString();
+      
+      switch (dateRange) {
+        case 'today':
+          const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          date_from = startOfToday.toISOString();
+          break;
+        case 'week':
+          const weekAgo = new Date(now);
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          date_from = weekAgo.toISOString();
+          break;
+        case 'month':
+          const monthAgo = new Date(now);
+          monthAgo.setDate(monthAgo.getDate() - 30);
+          date_from = monthAgo.toISOString();
+          break;
+        case 'quarter':
+          const quarterAgo = new Date(now);
+          quarterAgo.setDate(quarterAgo.getDate() - 90);
+          date_from = quarterAgo.toISOString();
+          break;
+        case 'year':
+          const yearAgo = new Date(now);
+          yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+          date_from = yearAgo.toISOString();
+          break;
+        default:
+          // Default to last 30 days
+          const defaultStart = new Date(now);
+          defaultStart.setDate(defaultStart.getDate() - 30);
+          date_from = defaultStart.toISOString();
+      }
+      
+      const response = await AdminAPI.getDashboardData({
+        date_from,
+        date_to
+      });
       console.log('Dashboard data:', response); // Debug log
       const data = response.data || response;
       setStats(data);
@@ -120,7 +160,6 @@ const AdminDashboard: React.FC = () => {
   const totalRevenue = revenue.total_revenue || overview.total_revenue || 0;
   const totalOrders = overview.total_orders || 0;
   const totalUsers = overview.total_users || overview.users_count || 0;
-  const activeUsers = overview.active_users || overview.active_users_count || 0;
   const totalProducts = overview.total_products || overview.products_count || 0;
   
   // Ensure chartData is an array
