@@ -180,14 +180,18 @@ class AdminService:
             else:
                 end_date = today
             
-            # Get total users
-            total_users = await self.db.scalar(select(func.count(User.id)))
-            logger.info(f"👥 Total users: {total_users}")
+            # Get total users (excluding admin users for customer count)
+            total_users = await self.db.scalar(
+                select(func.count(User.id)).where(User.role != 'admin')
+            )
+            logger.info(f"👥 Total users (customers): {total_users}")
             
             active_users = await self.db.scalar(
-                select(func.count(User.id)).where(User.is_active == True)
+                select(func.count(User.id)).where(
+                    and_(User.is_active == True, User.role != 'admin')
+                )
             )
-            logger.info(f"✅ Active users: {active_users}")
+            logger.info(f"✅ Active users (customers): {active_users}")
             
             # Get total orders with optional status filter
             order_conditions = []
@@ -392,10 +396,13 @@ class AdminService:
                 )
             ) or 0
             
-            # Get daily new users
+            # Get daily new users (excluding admin users)
             daily_users = await self.db.scalar(
                 select(func.count(User.id)).where(
-                    func.date(User.created_at) == current_date
+                    and_(
+                        func.date(User.created_at) == current_date,
+                        User.role != 'admin'
+                    )
                 )
             ) or 0
             
@@ -429,7 +436,9 @@ class AdminService:
             
             # Growth metrics
             new_users_last_30_days = await self.db.scalar(
-                select(func.count(User.id)).where(User.created_at >= last_30_days)
+                select(func.count(User.id)).where(
+                    and_(User.created_at >= last_30_days, User.role != 'admin')
+                )
             ) or 0
             
             new_orders_last_30_days = await self.db.scalar(

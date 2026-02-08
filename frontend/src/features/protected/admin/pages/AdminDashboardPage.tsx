@@ -74,7 +74,9 @@ const AdminDashboard: React.FC = () => {
     
     try {
       const response = await AdminAPI.getDashboardData({});
-      setStats(response.data || response);
+      console.log('Dashboard data:', response); // Debug log
+      const data = response.data || response;
+      setStats(data);
     } catch (err: any) {
       console.error('Failed to fetch dashboard data:', err);
       if (err.response?.status === 401) {
@@ -109,9 +111,22 @@ const AdminDashboard: React.FC = () => {
     );
   }
 
-  const overview = stats?.overview || {};
+  // Handle different response structures
+  const overview = stats?.overview || stats || {};
   const revenue = stats?.revenue || {};
-  const chartData = stats?.chart_data || [];
+  let chartData = stats?.chart_data || stats?.revenue_trend || [];
+  
+  // Calculate revenue from overview if not in revenue object
+  const totalRevenue = revenue.total_revenue || overview.total_revenue || 0;
+  const totalOrders = overview.total_orders || 0;
+  const totalUsers = overview.total_users || overview.users_count || 0;
+  const activeUsers = overview.active_users || overview.active_users_count || 0;
+  const totalProducts = overview.total_products || overview.products_count || 0;
+  
+  // Ensure chartData is an array
+  if (!Array.isArray(chartData)) {
+    chartData = [];
+  }
 
   return (
     <AdminLayout>
@@ -142,28 +157,28 @@ const AdminDashboard: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
             title="Total Revenue"
-            value={`${revenue.total_revenue?.toLocaleString() || '0'}`}
+            value={`$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             change={12.5}
             icon={<DollarSign className="w-5 h-5 text-white" />}
             color="bg-gradient-to-br from-green-500 to-green-600"
           />
           <StatCard
             title="Total Orders"
-            value={overview.total_orders?.toLocaleString() || '0'}
+            value={totalOrders.toLocaleString()}
             change={8.2}
             icon={<ShoppingCart className="w-5 h-5 text-white" />}
             color="bg-gradient-to-br from-blue-500 to-blue-600"
           />
           <StatCard
             title="Total Users"
-            value={overview.total_users?.toLocaleString() || '0'}
+            value={totalUsers.toLocaleString()}
             change={15.3}
             icon={<Users className="w-5 h-5 text-white" />}
             color="bg-gradient-to-br from-purple-500 to-purple-600"
           />
           <StatCard
             title="Total Products"
-            value={overview.total_products?.toLocaleString() || '0'}
+            value={totalProducts.toLocaleString()}
             change={-2.4}
             icon={<Package className="w-5 h-5 text-white" />}
             color="bg-gradient-to-br from-orange-500 to-orange-600"
@@ -178,39 +193,45 @@ const AdminDashboard: React.FC = () => {
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue Trend</h3>
               <TrendingUp className="w-4 h-4 text-green-600" />
             </div>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="#6b7280"
-                  style={{ fontSize: '11px' }}
-                />
-                <YAxis 
-                  stroke="#6b7280"
-                  style={{ fontSize: '11px' }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                    fontSize: '12px'
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: '12px' }} />
-                <Line 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#10b981" 
-                  strokeWidth={2}
-                  dot={{ fill: '#10b981', r: 3 }}
-                  activeDot={{ r: 5 }}
-                  name="Revenue ($)"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#6b7280"
+                    style={{ fontSize: '11px' }}
+                  />
+                  <YAxis 
+                    stroke="#6b7280"
+                    style={{ fontSize: '11px' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#fff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="#10b981" 
+                    strokeWidth={2}
+                    dot={{ fill: '#10b981', r: 3 }}
+                    activeDot={{ r: 5 }}
+                    name="Revenue ($)"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[250px] text-gray-400 dark:text-gray-500 text-sm">
+                No revenue data available
+              </div>
+            )}
           </div>
 
           {/* Orders Chart */}
@@ -219,36 +240,42 @@ const AdminDashboard: React.FC = () => {
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Orders Trend</h3>
               <Activity className="w-4 h-4 text-blue-600" />
             </div>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="#6b7280"
-                  style={{ fontSize: '11px' }}
-                />
-                <YAxis 
-                  stroke="#6b7280"
-                  style={{ fontSize: '11px' }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                    fontSize: '12px'
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: '12px' }} />
-                <Bar 
-                  dataKey="orders" 
-                  fill="#3b82f6" 
-                  radius={[6, 6, 0, 0]}
-                  name="Orders"
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#6b7280"
+                    style={{ fontSize: '11px' }}
+                  />
+                  <YAxis 
+                    stroke="#6b7280"
+                    style={{ fontSize: '11px' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#fff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  <Bar 
+                    dataKey="orders" 
+                    fill="#3b82f6" 
+                    radius={[6, 6, 0, 0]}
+                    name="Orders"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[250px] text-gray-400 dark:text-gray-500 text-sm">
+                No orders data available
+              </div>
+            )}
           </div>
         </div>
 
@@ -342,49 +369,93 @@ const AdminDashboard: React.FC = () => {
             </div>
           )}
 
-          {/* Recent Users */}
-          {stats?.recent_users && stats.recent_users.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Users</h3>
-                <button
-                  onClick={() => navigate('/admin/users')}
-                  className="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  View All →
-                </button>
-              </div>
-              <div className="space-y-2">
-                {stats.recent_users.slice(0, 5).map((user: any) => (
-                  <div 
-                    key={user.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/admin/users/${user.id}`)}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
-                        {user.firstname?.[0]}{user.lastname?.[0]}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {user.firstname} {user.lastname}
-                        </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                    <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${
-                      user.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {user.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                ))}
-              </div>
+          {/* Users Growth Chart */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Users Growth</h3>
+              <Users className="w-4 h-4 text-purple-600" />
             </div>
-          )}
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#6b7280"
+                    style={{ fontSize: '11px' }}
+                  />
+                  <YAxis 
+                    stroke="#6b7280"
+                    style={{ fontSize: '11px' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#fff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  <Bar 
+                    dataKey="users" 
+                    fill="#8b5cf6" 
+                    radius={[6, 6, 0, 0]}
+                    name="New Users"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[250px] text-gray-400 dark:text-gray-500 text-sm">
+                No users data available
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Recent Users */}
+        {stats?.recent_users && stats.recent_users.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Users</h3>
+              <button
+                onClick={() => navigate('/admin/users')}
+                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+              >
+                View All →
+              </button>
+            </div>
+            <div className="space-y-2">
+              {stats.recent_users.slice(0, 5).map((user: any) => (
+                <div 
+                  key={user.id}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  onClick={() => navigate(`/admin/users/${user.id}`)}
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                      {user.firstname?.[0]}{user.lastname?.[0]}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {user.firstname} {user.lastname}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${
+                    user.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {user.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Top Products */}
         {stats?.top_products && stats.top_products.length > 0 && (
