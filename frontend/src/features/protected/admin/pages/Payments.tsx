@@ -416,40 +416,38 @@ export const Payments = () => {
         ) : payments.length > 0 ? (
           <>
             {/* Desktop table */}
-            <div className="overflow-x-auto hidden md:block max-w-full">
-              <table className="min-w-full">
-                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
+            <div className="overflow-x-auto hidden md:block">
+              <table className="w-full">
+                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200 dark:border-gray-600`}>
                   <tr>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Payment ID</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Order ID</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Customer</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Amount</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Method</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Status</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Date</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Payment ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Order ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Customer</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Method</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {payments.map((payment: any) => (
-                    <tr key={payment.id} className={`border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono text-primary`}>{String(payment.id).slice(0, 8)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{String(payment.order_id).slice(0, 8)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{payment.customer_name || 'N/A'}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(payment.amount, payment.currency)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{payment.payment_method || 'N/A'}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">{statusBadge(payment.status)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(payment.created_at || '').toLocaleDateString()}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">
-                        <div className="flex gap-1 lg:gap-2">
-                          <button 
-                            onClick={() => handleView(payment)}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                          >
-                            <EyeIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">View</span>
-                          </button>
-                        </div>
+                    <tr key={payment.id} className={`border-b border-gray-200 dark:border-gray-700 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                      <td className="px-4 py-3 text-xs font-mono text-primary">{String(payment.id).slice(0, 8)}</td>
+                      <td className="px-4 py-3 text-xs font-mono text-gray-600 dark:text-gray-300">{String(payment.order_id).slice(0, 8)}</td>
+                      <td className="px-4 py-3 text-xs font-medium text-gray-900 dark:text-white max-w-[150px] truncate">{payment.customer_name || 'N/A'}</td>
+                      <td className="px-4 py-3 text-xs font-semibold text-gray-900 dark:text-white">{formatCurrency(payment.amount, payment.currency)}</td>
+                      <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[100px] truncate">{payment.payment_method || 'N/A'}</td>
+                      <td className="px-4 py-3 text-xs">{statusBadge(payment.status)}</td>
+                      <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300">{new Date(payment.created_at || '').toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-xs">
+                        <button 
+                          onClick={() => handleView(payment)}
+                          className="inline-flex items-center gap-1 px-2 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                        >
+                          <EyeIcon size={14} />
+                          View
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -458,30 +456,40 @@ export const Payments = () => {
             </div>
 
             {/* Mobile cards */}
-            <div className={`md:hidden divide-y ${currentTheme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+            <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
               {payments.map((payment: any) => (
                 <div
                   key={payment.id}
-                  className={`p-3 lg:p-4 flex flex-col gap-2 ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
+                  className={`p-4 flex flex-col gap-2 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs lg:text-sm font-mono text-primary">{String(payment.id).slice(0, 8)}</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-mono text-primary truncate flex-1">{String(payment.id).slice(0, 8)}</span>
                     {statusBadge(payment.status)}
                   </div>
-                  <div className={`text-sm lg:text-base font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{payment.customer_name || 'N/A'}</div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Order: {String(payment.order_id).slice(0, 8)}</div>
-                  <div className={`text-xs lg:text-sm font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(payment.amount, payment.currency)}</div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{payment.payment_method || 'N/A'}</div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(payment.created_at || '').toLocaleDateString()}</div>
-                  <div className="flex gap-1 lg:gap-2 mt-2">
-                    <button 
-                      onClick={() => handleView(payment)}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs"
-                    >
-                      <EyeIcon size={14} />
-                      View
-                    </button>
+                  <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{payment.customer_name || 'N/A'}</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-gray-600 dark:text-gray-300">Order:</span>
+                    <span className="text-xs font-mono text-gray-600 dark:text-gray-300">{String(payment.order_id).slice(0, 8)}</span>
                   </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-gray-600 dark:text-gray-300">Amount:</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(payment.amount, payment.currency)}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-gray-600 dark:text-gray-300">Method:</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-300 truncate max-w-[150px]">{payment.payment_method || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-gray-600 dark:text-gray-300">Date:</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-300">{new Date(payment.created_at || '').toLocaleDateString()}</span>
+                  </div>
+                  <button 
+                    onClick={() => handleView(payment)}
+                    className="mt-2 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm w-full"
+                  >
+                    <EyeIcon size={14} />
+                    View Details
+                  </button>
                 </div>
               ))}
             </div>

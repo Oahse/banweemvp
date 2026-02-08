@@ -5,7 +5,9 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import { AdminLayout } from '@/components/layout/Layout';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { UsersListSkeleton } from '../components/skeletons/UsersSkeleton';
 
 const LIMIT = 10;
 const FETCH_LIMIT = 100;
@@ -259,14 +261,7 @@ export const Users = () => {
   };
 
   if (initialLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading users...</p>
-        </div>
-      </div>
-    );
+    return <AdminLayoutSkeleton />;
   }
 
   return (
@@ -449,11 +444,11 @@ export const Users = () => {
               <table className="w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Name</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Email</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Role</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Email</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Role</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -463,11 +458,11 @@ export const Users = () => {
                       onClick={() => handleView(user)}
                       className={`border-b border-gray-200 transition-colors cursor-pointer ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                     >
-                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{`${user.firstname || ''} ${user.lastname || ''}`.trim() || 'N/A'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{user.email || 'N/A'}</td>
-                      <td className="px-6 py-4 text-sm">{roleBadge(user.role)}</td>
-                      <td className="px-6 py-4 text-sm">{statusBadge(user.status)}</td>
-                      <td className="px-6 py-4 text-sm">
+                      <td className="px-4 py-3 text-xs text-gray-900 dark:text-white max-w-[150px] truncate">{`${user.firstname || ''} ${user.lastname || ''}`.trim() || 'N/A'}</td>
+                      <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[180px] truncate">{user.email || 'N/A'}</td>
+                      <td className="px-4 py-3 text-xs">{roleBadge(user.role)}</td>
+                      <td className="px-4 py-3 text-xs">{statusBadge(user.status)}</td>
+                      <td className="px-4 py-3 text-xs">
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
@@ -496,28 +491,27 @@ export const Users = () => {
             </div>
 
             {/* Mobile cards */}
-            <div className="md:hidden divide-y divide-gray-200">
+            <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
               {users.map((user: any) => (
                 <div
                   key={user.id}
                   onClick={() => handleView(user)}
                   className={`p-4 flex flex-col gap-2 bg-white dark:bg-gray-800 transition-colors cursor-pointer ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900 dark:text-white">{`${user.firstname || ''} ${user.lastname || ''}`.trim() || 'N/A'}</span>
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="font-medium text-sm text-gray-900 dark:text-white truncate flex-1">{`${user.firstname || ''} ${user.lastname || ''}`.trim() || 'N/A'}</span>
                     {statusBadge(user.status)}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">{user.email || 'N/A'}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 truncate">{user.email || 'N/A'}</div>
                   <div className="flex items-center justify-between">
                     {roleBadge(user.role)}
-                    {statusBadge(user.status)}
                   </div>
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       handleView(user);
                     }}
-                    className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm w-fit"
+                    className="mt-2 w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
                   >
                     <EyeIcon size={14} />
                     View Details
@@ -529,7 +523,7 @@ export const Users = () => {
                         setDeletingUser(user);
                         setShowDeleteModal(true);
                       }}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors text-sm"
+                      className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors text-sm"
                     >
                       Delete
                     </button>

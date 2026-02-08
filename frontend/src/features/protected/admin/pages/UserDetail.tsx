@@ -5,7 +5,9 @@ import toast from 'react-hot-toast';
 import AdminAPI from '@/api/admin';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import { AdminLayout } from '@/components/layout/Layout';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { UserDetailSkeleton } from '../components/skeletons/UsersSkeleton';
 
 interface UserDetailData {
   id: string;
@@ -127,14 +129,7 @@ export const UserDetail = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading user...</p>
-        </div>
-      </div>
-    );
+    return <AdminLayoutSkeleton />;
   }
 
   return (

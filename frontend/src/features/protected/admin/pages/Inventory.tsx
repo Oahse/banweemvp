@@ -4,7 +4,9 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import { AdminLayout } from '@/components/layout/Layout';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { InventoryListSkeleton } from '../components/skeletons/InventorySkeleton';
 
 const LIMIT = 10;
 
@@ -326,14 +328,7 @@ export const AdminInventory = () => {
   };
 
   if (initialLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading inventory...</p>
-        </div>
-      </div>
-    );
+    return <AdminLayoutSkeleton />;
   }
 
   return (
@@ -488,12 +483,12 @@ export const AdminInventory = () => {
               <table className="w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Variant</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">SKU</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Location</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Stock Level</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Variant</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">SKU</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Location</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Stock Level</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -502,16 +497,16 @@ export const AdminInventory = () => {
                     const d = getItemDisplay(item);
                     return (
                       <tr key={item.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
-                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{d.productName}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{d.variantSku}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{d.locationName}</td>
-                        <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">{d.stockLevel}</td>
-                        <td className="px-6 py-4 text-sm">
+                        <td className="px-4 py-3 text-xs text-gray-900 dark:text-white max-w-[150px] truncate">{d.productName}</td>
+                        <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[100px] truncate">{d.variantSku}</td>
+                        <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[120px] truncate">{d.locationName}</td>
+                        <td className="px-4 py-3 text-xs font-semibold text-gray-900 dark:text-white">{d.stockLevel}</td>
+                        <td className="px-4 py-3 text-xs">
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.cls}`}>
                             {status.label}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm">
+                        <td className="px-4 py-3 text-xs">
                           <button 
                             onClick={() => openEditModal(item)}
                             className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
@@ -528,7 +523,7 @@ export const AdminInventory = () => {
             </div>
 
             {/* Mobile cards */}
-            <div className="md:hidden divide-y divide-gray-200">
+            <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
               {inventory.map((item) => {
                 const status = stockStatus(item);
                 const d = getItemDisplay(item);
@@ -537,20 +532,26 @@ export const AdminInventory = () => {
                     key={item.id}
                     className={`p-4 flex flex-col gap-2 bg-white dark:bg-gray-800 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="font-medium text-gray-900 dark:text-white block">{d.productName}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">SKU: {d.variantSku}</span>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-medium text-sm text-gray-900 dark:text-white block truncate">{d.productName}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 truncate block">SKU: {d.variantSku}</span>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.cls}`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${status.cls}`}>
                         {status.label}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">{d.locationName}</div>
-                    <div className="text-sm font-semibold text-gray-900 dark:text-white">Stock: {d.stockLevel}</div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-500 dark:text-gray-400">Location:</span>
+                      <span className="text-gray-900 dark:text-white truncate ml-2 flex-1 text-right">{d.locationName}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-500 dark:text-gray-400">Stock:</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{d.stockLevel}</span>
+                    </div>
                     <button 
                       onClick={() => openEditModal(item)}
-                      className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm w-fit"
+                      className="mt-2 w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
                     >
                       <EditIcon size={14} />
                       Edit Stock

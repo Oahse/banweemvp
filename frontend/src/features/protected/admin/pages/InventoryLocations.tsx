@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Loader, AlertCircle, Plus, Edit, Trash2, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import { AdminLayout } from '@/components/layout/Layout';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { InventoryLocationsSkeleton } from '../components/skeletons/InventorySkeleton';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
 
 const LIMIT = 20;
 
@@ -33,8 +36,10 @@ interface WarehouseLocation {
 }
 
 export const AdminInventoryLocations = () => {
+  const { currentTheme } = useTheme();
   const [locations, setLocations] = useState<WarehouseLocation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationInfo>({ 
@@ -48,6 +53,9 @@ export const AdminInventoryLocations = () => {
     const fetchLocations = async () => {
       try {
         setLoading(true);
+        if (page === 1) {
+          setInitialLoading(true);
+        }
         setError(null);
         const response = await AdminAPI.getWarehouseLocations();
         const data = response?.data || response;
@@ -58,6 +66,7 @@ export const AdminInventoryLocations = () => {
         toast.error(message);
       } finally {
         setLoading(false);
+        setInitialLoading(false);
       }
     };
 
@@ -67,7 +76,7 @@ export const AdminInventoryLocations = () => {
   const statusBadge = (isActive: boolean) => {
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-        isActive ? 'bg-success/20 text-success' : 'bg-destructive/20 text-destructive'
+        isActive ? 'bg-success/20 text-success' : 'bg-error/20 text-error'
       }`}>
         {isActive ? 'Active' : 'Inactive'}
       </span>
@@ -76,126 +85,127 @@ export const AdminInventoryLocations = () => {
 
   const capacityBadge = (current?: number, total?: number) => {
     if (current === undefined || total === undefined) {
-      return <span className="text-sm text-copy-light">N/A</span>;
+      return <span className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>N/A</span>;
     }
     
     const percentage = (current / total) * 100;
     const colorClass = 
-      percentage >= 90 ? 'text-destructive' :
+      percentage >= 90 ? 'text-error' :
       percentage >= 75 ? 'text-warning' :
-      percentage >= 50 ? 'text-blue' :
+      percentage >= 50 ? 'text-blue-500' :
       'text-success';
     
     return (
-      <span className={`text-sm font-medium ${colorClass}`}>
+      <span className={`text-xs font-medium ${colorClass}`}>
         {current}/{total} ({percentage.toFixed(1)}%)
       </span>
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
-      </div>
-    );
+  if (initialLoading) {
+    return <AdminLayoutSkeleton />;
   }
 
   return (
     <AdminLayout>
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-1">
         <div>
-          <h1 className="text-3xl font-bold text-copy">Warehouse Locations</h1>
-          <p className="text-copy-light mt-2">Manage warehouse and storage locations</p>
+          <h1 className="text-xl lg:text-2xl font-semibold">Warehouse Locations</h1>
+          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage warehouse and storage locations</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+        <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm">
           <Plus className="w-4 h-4" />
           Add Location
         </button>
       </div>
 
       {error && (
-        <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+        <div className={`p-4 rounded-lg border flex items-start gap-3 ${
+          currentTheme === 'dark' 
+            ? 'bg-error/10 border-error/30 text-error' 
+            : 'bg-error/10 border-error/30 text-error'
+        }`}>
+          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-destructive">Error</p>
-            <p className="text-destructive/80 text-sm">{error}</p>
+            <p className="font-semibold">Error</p>
+            <p className="text-sm">{error}</p>
           </div>
         </div>
       )}
 
-      <div className="bg-surface rounded-lg border border-border-light overflow-hidden">
-        <div className="p-6 border-b border-border-light">
-          <h2 className="text-xl font-bold text-copy">All Locations ({locations.length})</h2>
+      <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold">All Locations ({locations.length})</h2>
         </div>
 
         {locations.length > 0 ? (
           <>
-            <div className="overflow-x-auto">
+            {/* Desktop table */}
+            <div className="overflow-x-auto hidden md:block">
               <table className="w-full">
-                <thead className="bg-surface-dark border-b border-border-light">
+                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200 dark:border-gray-600`}>
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Location</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Address</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Contact</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Capacity</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Status</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Created</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-copy-light">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Location</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Address</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Contact</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Capacity</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Created</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {locations.map((location) => (
-                    <tr key={location.id} className="border-b border-border-light hover:bg-surface-light">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
+                    <tr key={location.id} className={`border-b border-gray-200 dark:border-gray-700 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
                           <div className="p-2 bg-primary/10 rounded-lg">
                             <MapPin className="w-4 h-4 text-primary" />
                           </div>
-                          <div>
-                            <p className="text-sm font-medium text-copy">{location.name}</p>
-                            <p className="text-xs text-copy-light">Code: {location.code}</p>
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium truncate max-w-[120px]">{location.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Code: {location.code}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm">
-                          <p className="text-copy">{location.address}</p>
-                          <p className="text-copy-light">
+                      <td className="px-4 py-3">
+                        <div className="text-xs max-w-[150px]">
+                          <p className="truncate">{location.address}</p>
+                          <p className="text-gray-500 dark:text-gray-400 truncate">
                             {location.city}, {location.state} {location.postal_code}
                           </p>
-                          <p className="text-copy-light">{location.country}</p>
+                          <p className="text-gray-500 dark:text-gray-400 truncate">{location.country}</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm">
+                      <td className="px-4 py-3">
+                        <div className="text-xs max-w-[120px]">
                           {location.manager_name && (
-                            <p className="text-copy font-medium">{location.manager_name}</p>
+                            <p className="font-medium truncate">{location.manager_name}</p>
                           )}
                           {location.phone && (
-                            <p className="text-copy-light">{location.phone}</p>
+                            <p className="text-gray-500 dark:text-gray-400 truncate">{location.phone}</p>
                           )}
                           {location.email && (
-                            <p className="text-copy-light">{location.email}</p>
+                            <p className="text-gray-500 dark:text-gray-400 truncate">{location.email}</p>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         {capacityBadge(location.current_capacity, location.total_capacity)}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         {statusBadge(location.is_active)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-copy-light">
+                      <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
                         {new Date(location.created_at).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 text-sm">
+                      <td className="px-4 py-3 text-xs">
                         <div className="flex items-center gap-2">
-                          <button className="p-1 text-blue hover:bg-blue/10 rounded transition-colors">
+                          <button className={`p-1 rounded transition-colors ${currentTheme === 'dark' ? 'text-blue-400 hover:bg-blue-400/10' : 'text-blue-600 hover:bg-blue-600/10'}`}>
                             <Edit className="w-4 h-4" />
                           </button>
-                          <button className="p-1 text-destructive hover:bg-destructive/10 rounded transition-colors">
+                          <button className={`p-1 rounded transition-colors ${currentTheme === 'dark' ? 'text-error hover:bg-error/10' : 'text-error hover:bg-error/10'}`}>
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -206,27 +216,85 @@ export const AdminInventoryLocations = () => {
               </table>
             </div>
 
+            {/* Mobile cards */}
+            <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
+              {locations.map((location) => (
+                <div key={location.id} className={`p-4 flex flex-col gap-2 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <MapPin className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{location.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Code: {location.code}</p>
+                      </div>
+                    </div>
+                    {statusBadge(location.is_active)}
+                  </div>
+                  <div className="text-xs space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-500 dark:text-gray-400">Address:</span>
+                      <span className="truncate ml-2 flex-1 text-right">{location.address}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-500 dark:text-gray-400">City:</span>
+                      <span className="truncate ml-2 flex-1 text-right">{location.city}, {location.state}</span>
+                    </div>
+                    {location.manager_name && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-500 dark:text-gray-400">Manager:</span>
+                        <span className="truncate ml-2 flex-1 text-right">{location.manager_name}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-500 dark:text-gray-400">Capacity:</span>
+                      <span className="ml-2">{capacityBadge(location.current_capacity, location.total_capacity)}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <button className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm">
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <button className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors text-sm">
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             {/* Pagination */}
-            <div className="px-6 py-4 border-t border-border-light flex flex-wrap items-center justify-between gap-4">
-              <p className="text-sm text-copy-light">
+            <div className={`px-4 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+              <p className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 Showing {locations.length} warehouse locations
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border-light bg-surface text-copy text-sm font-medium hover:bg-surface-light disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
+                    currentTheme === 'dark' 
+                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Previous
                 </button>
-                <span className="text-sm text-copy-light px-2">
+                <span className={`text-xs px-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                   Page {page}
                 </span>
                 <button
                   onClick={() => setPage((p) => p + 1)}
                   disabled={locations.length < LIMIT}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border-light bg-surface text-copy text-sm font-medium hover:bg-surface-light disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
+                    currentTheme === 'dark' 
+                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
                 >
                   Next
                   <ChevronRight className="w-4 h-4" />
@@ -235,11 +303,11 @@ export const AdminInventoryLocations = () => {
             </div>
           </>
         ) : (
-          <div className="p-6 text-center text-copy-light">
+          <div className={`p-8 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             <div className="flex flex-col items-center gap-3">
-              <MapPin className="w-12 h-12 text-copy-light/50" />
-              <p>No warehouse locations found</p>
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+              <MapPin className={`w-12 h-12 ${currentTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
+              <p className="text-sm">No warehouse locations found</p>
+              <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm">
                 <Plus className="w-4 h-4" />
                 Add Your First Location
               </button>
