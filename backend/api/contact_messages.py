@@ -9,9 +9,9 @@ from typing import Optional
 from uuid import UUID
 import math
 
-from backend.core.db import get_db
-from backend.core.dependencies import get_current_user, require_admin
-from backend.schemas.contact_message import (
+from core.db import get_db
+from core.dependencies import get_current_user, require_admin
+from schemas.contact_message import (
     ContactMessageCreate,
     ContactMessageUpdate,
     ContactMessageResponse,
@@ -19,14 +19,16 @@ from backend.schemas.contact_message import (
     MessageStatus,
     MessagePriority
 )
-from backend.schemas.response import SuccessResponse
-from backend.services.contact_message import ContactMessageService
-from backend.core.logging import logger
+from core.utils.response import Response
+from core.errors import APIException
+from services.contact_message import ContactMessageService
+from core.logging import get_logger
 
+logger = get_logger(__name__)
 router = APIRouter(prefix="/contact-messages", tags=["Contact Messages"])
 
 
-@router.post("", response_model=ContactMessageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("")
 def create_contact_message(
     message_data: ContactMessageCreate,
     db: Session = Depends(get_db)
@@ -36,16 +38,33 @@ def create_contact_message(
     """
     try:
         message = ContactMessageService.create_message(db, message_data)
-        return message
+        return Response.success(
+            data={
+                "id": str(message.id),
+                "name": message.name,
+                "email": message.email,
+                "subject": message.subject,
+                "message": message.message,
+                "status": message.status.value,
+                "priority": message.priority.value,
+                "admin_notes": message.admin_notes,
+                "assigned_to": str(message.assigned_to) if message.assigned_to else None,
+                "created_at": message.created_at.isoformat() if hasattr(message.created_at, 'isoformat') else str(message.created_at),
+                "updated_at": message.updated_at.isoformat() if hasattr(message.updated_at, 'isoformat') else str(message.updated_at),
+                "resolved_at": message.resolved_at.isoformat() if message.resolved_at and hasattr(message.resolved_at, 'isoformat') else str(message.resolved_at) if message.resolved_at else None
+            },
+            message="Contact message created successfully",
+            status_code=status.HTTP_201_CREATED
+        )
     except Exception as e:
         logger.error(f"Error creating contact message: {str(e)}")
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create contact message"
+            message="Failed to create contact message"
         )
 
 
-@router.get("", response_model=ContactMessageListResponse)
+@router.get("")
 def get_all_contact_messages(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
@@ -70,18 +89,39 @@ def get_all_contact_messages(
         
         total_pages = math.ceil(total / page_size) if total > 0 else 0
         
-        return ContactMessageListResponse(
-            messages=messages,
-            total=total,
-            page=page,
-            page_size=page_size,
-            total_pages=total_pages
+        return Response.success(
+            data={
+                "messages": [
+                    {
+                        "id": str(msg.id),
+                        "name": msg.name,
+                        "email": msg.email,
+                        "subject": msg.subject,
+                        "message": msg.message,
+                        "status": msg.status.value,
+                        "priority": msg.priority.value,
+                        "admin_notes": msg.admin_notes,
+                        "assigned_to": str(msg.assigned_to) if msg.assigned_to else None,
+                        "created_at": msg.created_at.isoformat() if hasattr(msg.created_at, 'isoformat') else str(msg.created_at),
+                        "updated_at": msg.updated_at.isoformat() if hasattr(msg.updated_at, 'isoformat') else str(msg.updated_at),
+                        "resolved_at": msg.resolved_at.isoformat() if msg.resolved_at and hasattr(msg.resolved_at, 'isoformat') else str(msg.resolved_at) if msg.resolved_at else None
+                    }
+                    for msg in messages
+                ]
+            },
+            message="Contact messages retrieved successfully",
+            pagination={
+                "page": page,
+                "page_size": page_size,
+                "total": total,
+                "total_pages": total_pages
+            }
         )
     except Exception as e:
         logger.error(f"Error fetching contact messages: {str(e)}")
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch contact messages"
+            message="Failed to fetch contact messages"
         )
 
 
@@ -95,16 +135,19 @@ def get_contact_message_stats(
     """
     try:
         stats = ContactMessageService.get_message_stats(db)
-        return SuccessResponse(data=stats)
+        return Response.success(
+            data=stats,
+            message="Contact message statistics retrieved successfully"
+        )
     except Exception as e:
         logger.error(f"Error fetching contact message stats: {str(e)}")
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch statistics"
+            message="Failed to fetch statistics"
         )
 
 
-@router.get("/{message_id}", response_model=ContactMessageResponse)
+@router.get("/{message_id}")
 def get_contact_message(
     message_id: UUID,
     db: Session = Depends(get_db),
@@ -116,15 +159,31 @@ def get_contact_message(
     message = ContactMessageService.get_message_by_id(db, message_id)
     
     if not message:
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Contact message not found"
+            message="Contact message not found"
         )
     
-    return message
+    return Response.success(
+        data={
+            "id": str(message.id),
+            "name": message.name,
+            "email": message.email,
+            "subject": message.subject,
+            "message": message.message,
+            "status": message.status.value,
+            "priority": message.priority.value,
+            "admin_notes": message.admin_notes,
+            "assigned_to": str(message.assigned_to) if message.assigned_to else None,
+            "created_at": message.created_at.isoformat() if hasattr(message.created_at, 'isoformat') else str(message.created_at),
+            "updated_at": message.updated_at.isoformat() if hasattr(message.updated_at, 'isoformat') else str(message.updated_at),
+            "resolved_at": message.resolved_at.isoformat() if message.resolved_at and hasattr(message.resolved_at, 'isoformat') else str(message.resolved_at) if message.resolved_at else None
+        },
+        message="Contact message retrieved successfully"
+    )
 
 
-@router.patch("/{message_id}", response_model=ContactMessageResponse)
+@router.patch("/{message_id}")
 def update_contact_message(
     message_id: UUID,
     update_data: ContactMessageUpdate,
@@ -138,19 +197,35 @@ def update_contact_message(
         message = ContactMessageService.update_message(db, message_id, update_data)
         
         if not message:
-            raise HTTPException(
+            raise APIException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Contact message not found"
+                message="Contact message not found"
             )
         
-        return message
-    except HTTPException:
+        return Response.success(
+            data={
+                "id": str(message.id),
+                "name": message.name,
+                "email": message.email,
+                "subject": message.subject,
+                "message": message.message,
+                "status": message.status.value,
+                "priority": message.priority.value,
+                "admin_notes": message.admin_notes,
+                "assigned_to": str(message.assigned_to) if message.assigned_to else None,
+                "created_at": message.created_at.isoformat() if hasattr(message.created_at, 'isoformat') else str(message.created_at),
+                "updated_at": message.updated_at.isoformat() if hasattr(message.updated_at, 'isoformat') else str(message.updated_at),
+                "resolved_at": message.resolved_at.isoformat() if message.resolved_at and hasattr(message.resolved_at, 'isoformat') else str(message.resolved_at) if message.resolved_at else None
+            },
+            message="Contact message updated successfully"
+        )
+    except APIException:
         raise
     except Exception as e:
         logger.error(f"Error updating contact message: {str(e)}")
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update contact message"
+            message="Failed to update contact message"
         )
 
 
@@ -167,17 +242,19 @@ def delete_contact_message(
         success = ContactMessageService.delete_message(db, message_id)
         
         if not success:
-            raise HTTPException(
+            raise APIException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Contact message not found"
+                message="Contact message not found"
             )
         
-        return SuccessResponse(message="Contact message deleted successfully")
-    except HTTPException:
+        return Response.success(
+            message="Contact message deleted successfully"
+        )
+    except APIException:
         raise
     except Exception as e:
         logger.error(f"Error deleting contact message: {str(e)}")
-        raise HTTPException(
+        raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to delete contact message"
+            message="Failed to delete contact message"
         )

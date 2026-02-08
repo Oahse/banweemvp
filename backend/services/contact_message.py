@@ -9,9 +9,9 @@ from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
 
-from backend.models.contact_message import ContactMessage, MessageStatus, MessagePriority
-from backend.schemas.contact_message import ContactMessageCreate, ContactMessageUpdate
-from backend.core.logging import logger
+from models.contact_message import ContactMessage, MessageStatus, MessagePriority
+from schemas.contact_message import ContactMessageCreate, ContactMessageUpdate
+from core.logging import logger
 
 
 class ContactMessageService:
