@@ -19,9 +19,9 @@ const NotFound: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 py-12 font-sans">
-      <div className="max-w-2xl w-full text-center">
+      <div className="max-w-2xl w-full text-center animate-fade-in">
         {/* 404 Illustration */}
-        <div className="mb-8">
+        <div className="mb-8 animate-scale-in">
           <div className="relative inline-block">
             <h1 className="text-9xl md:text-[12rem] font-bold text-primary/20 dark:text-primary/10 select-none">
               404
@@ -33,7 +33,7 @@ const NotFound: React.FC = () => {
         </div>
 
         {/* Message */}
-        <div className="mb-8">
+        <div className="mb-8 animate-slide-in" style={{ animationDelay: '0.1s' }}>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
             Oops! Page Not Found
           </h2>
@@ -44,17 +44,17 @@ const NotFound: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12 animate-slide-in" style={{ animationDelay: '0.2s' }}>
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium w-full sm:w-auto"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all hover:scale-105 text-sm font-medium w-full sm:w-auto"
           >
             <ArrowLeft className="w-4 h-4" />
             Go Back
           </button>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors text-sm font-medium w-full sm:w-auto"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg transition-all hover:scale-105 text-sm font-medium w-full sm:w-auto"
           >
             <Home className="w-4 h-4" />
             Back to Home
@@ -62,16 +62,17 @@ const NotFound: React.FC = () => {
         </div>
 
         {/* Quick Links */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-8 animate-slide-in" style={{ animationDelay: '0.3s' }}>
           <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
             Quick Links
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {quickLinks.map((link) => (
+            {quickLinks.map((link, index) => (
               <Link
                 key={link.name}
                 to={link.href}
-                className="flex flex-col items-center gap-2 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-primary hover:shadow-md transition-all group"
+                className="flex flex-col items-center gap-2 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-primary hover:shadow-md transition-all hover:scale-105 group animate-scale-in"
+                style={{ animationDelay: `${0.4 + index * 0.1}s` }}
               >
                 <link.icon className="w-6 h-6 text-gray-400 group-hover:text-primary transition-colors" />
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">
@@ -83,7 +84,7 @@ const NotFound: React.FC = () => {
         </div>
 
         {/* Help Text */}
-        <div className="mt-8 text-xs text-gray-500 dark:text-gray-500">
+        <div className="mt-8 text-xs text-gray-500 dark:text-gray-500 animate-fade-in" style={{ animationDelay: '0.8s' }}>
           Need help? <Link to="/contact" className="text-primary hover:underline">Contact our support team</Link>
         </div>
       </div>

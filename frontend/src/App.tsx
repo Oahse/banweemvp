@@ -55,6 +55,8 @@ const ResetPassword = lazy(() => import('./features/protected/auth/pages/ResetPa
 const TrackOrder = lazy(() => import('./features/protected/account/pages/AccountTrackOrderPage'));
 const FAQ = lazy(() => import('./features/public/marketing/FAQ'));
 const AdminLayout = lazy(() => import('./components/layout/Layout').then(module => ({ default: module.AdminLayout })));
+const NotFound = lazy(() => import('./features/public/errors/NotFound'));
+const Maintenance = lazy(() => import('./features/public/errors/Maintenance'));
 const AdminDashboardPage = lazy(() => import('./features/protected/admin/pages/AdminDashboardPage'));
 const AdminOrders = lazy(() => import('./features/protected/admin/pages/AdminOrdersPage'));
 const AdminOrderDetail = lazy(() => import('./features/protected/admin/pages/AdminOrderDetailPage'));
@@ -185,6 +187,12 @@ export const App: React.FC = () => {
                           <Route path="contact-messages" element={<Suspense fallback={<ContactMessagesSkeleton />}><AdminContactMessages /></Suspense>} />
                         </Route>
                         <Route path="/supplier/*" element={<ProtectedRoute><Suspense fallback={<AdminDashboardSkeleton />}><SupplierDashboard /></Suspense></ProtectedRoute>} />
+                        
+                        {/* Maintenance Mode - Uncomment when needed */}
+                        {/* <Route path="*" element={<Maintenance estimatedTime="2 hours" showCountdown={true} endTime={new Date('2026-02-08T12:00:00')} />} /> */}
+                        
+                        {/* 404 Not Found - Catch all unmatched routes */}
+                        <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
                   </Elements>

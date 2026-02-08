@@ -42,9 +42,9 @@ export const About = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6 text-copy">
+    <div className="container mx-auto px-4 py-6 text-copy animate-fade-in">
       {/* Breadcrumb */}
-      <nav className="flex mb-4 text-xs">
+      <nav className="flex mb-4 text-xs animate-slide-in">
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
@@ -53,7 +53,7 @@ export const About = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative mb-8">
+      <div className="relative mb-8 animate-scale-in" style={{ animationDelay: '0.1s' }}>
         <div className="h-[200px] md:h-[250px] w-full">
           <div className="absolute inset-0 bg-black/40 z-10"></div>
           <img
