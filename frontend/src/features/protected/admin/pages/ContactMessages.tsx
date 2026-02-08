@@ -512,8 +512,8 @@ const ContactMessages: React.FC = () => {
         {/* Pagination */}
         <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
           <p className="text-sm text-copy-light">
-            {total > 0
-              ? `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, total)} of ${total} items`
+            {messages.length > 0
+              ? `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, messages.length)} of ${messages.length} items`
               : 'No contact messages found'}
           </p>
           <div className="flex items-center gap-2">

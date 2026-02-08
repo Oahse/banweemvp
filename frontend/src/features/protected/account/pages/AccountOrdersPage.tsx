@@ -1,13 +1,13 @@
-import { OrderItemDetails } from './OrderItemDetails';
 import { useState, useEffect } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, DownloadIcon, ShoppingBagIcon, TruckIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SkeletonOrderTable } from '../ui/SkeletonTable';
+import { SkeletonOrderTable } from '@/features/protected/account/components/SkeletonOrderTable';
 import { usePaginatedApi } from '@/components/shared/hooks/useAsync';
 import OrdersAPI from '@/api/orders';
 import { toast } from 'react-hot-toast';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
-import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
+
 
 interface Order {
   id: string;
@@ -24,15 +24,20 @@ interface Order {
   items: any[];
 }
 
+interface OrderPageResponse {
+  data: Order[];
+  total: number;
+  total_pages: number;
+}
+
 interface OrdersProps {
   animation?: 'shimmer' | 'pulse' | 'wave';
 }
 
-export const Orders = ({
   animation = 'shimmer' 
 }: OrdersProps) => {
   const { formatCurrency } = useLocale();
-  const { data: paginatedData, loading, error, execute } = usePaginatedApi();
+  const { data: paginatedData, loading, error, execute } = usePaginatedApi<OrderPageResponse>();
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -174,7 +179,11 @@ export const Orders = ({
                             <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                           </div>
                           <p className="text-xs font-medium">
-                            {formatCurrency(item.total_price || 0)}
+                            {(() => {
+                              const formatted = formatCurrency(item.total_price || 0);
+                              console.log('formatCurrency output:', formatted, 'type:', typeof formatted);
+                              return formatted;
+                            })()}
                           </p>
                         </div>
                       ))}

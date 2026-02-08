@@ -19,7 +19,7 @@ const SupportFloat: React.FC = () => {
       {/* Floating Button */}
       <button
         onClick={toggleWidget}
-        className="fixed bottom-8 right-6 z-50 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 px-4 py-3 group font-sans"
+        className="fixed bottom-16 right-6 z-50 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 px-4 py-3 group font-sans"
         aria-label="Open support widget"
       >
         {isOpen ? (
