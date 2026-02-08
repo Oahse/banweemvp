@@ -62,24 +62,41 @@ export const ContactMessagesAPI = {
   }): Promise<ContactMessageListResponse> => {
     const response = await apiClient.get('/contact-messages', { params });
     
-    // Handle case where data might be undefined or have unexpected structure
-    if (!response.data?.data?.messages) {
-      console.error('Unexpected response structure:', response.data);
+    // The backend returns: { success, data: { messages: [...] }, pagination: {...} }
+    // So we need response.data.data.messages
+    const responseData = response.data;
+    
+    // Check if we have the expected structure
+    if (responseData?.data?.messages && Array.isArray(responseData.data.messages)) {
       return {
-        messages: [],
-        total: 0,
-        page: params?.page || 1,
-        page_size: params?.page_size || 20,
-        total_pages: 0
+        messages: responseData.data.messages,
+        total: responseData.pagination?.total || 0,
+        page: responseData.pagination?.page || params?.page || 1,
+        page_size: responseData.pagination?.page_size || params?.page_size || 20,
+        total_pages: responseData.pagination?.total_pages || 0
       };
     }
     
+    // Fallback: if messages are directly in data (shouldn't happen but handle it)
+    if (responseData?.messages && Array.isArray(responseData.messages)) {
+      console.warn('Unexpected response structure - messages directly in data');
+      return {
+        messages: responseData.messages,
+        total: responseData.total || 0,
+        page: responseData.page || params?.page || 1,
+        page_size: responseData.page_size || params?.page_size || 20,
+        total_pages: responseData.total_pages || 0
+      };
+    }
+    
+    // No valid data found
+    console.error('Invalid response structure:', responseData);
     return {
-      messages: response.data.data.messages,
-      total: response.data.pagination?.total || 0,
-      page: response.data.pagination?.page || params?.page || 1,
-      page_size: response.data.pagination?.page_size || params?.page_size || 20,
-      total_pages: response.data.pagination?.total_pages || 0
+      messages: [],
+      total: 0,
+      page: params?.page || 1,
+      page_size: params?.page_size || 20,
+      total_pages: 0
     };
   },
 

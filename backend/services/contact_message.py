@@ -54,8 +54,8 @@ class ContactMessageService:
         db: AsyncSession,
         page: int = 1,
         page_size: int = 20,
-        status: Optional[MessageStatus] = None,
-        priority: Optional[MessagePriority] = None,
+        status: Optional[any] = None,
+        priority: Optional[any] = None,
         search: Optional[str] = None
     ) -> tuple[List[ContactMessage], int]:
         """Get all contact messages with pagination and filters"""
@@ -63,14 +63,16 @@ class ContactMessageService:
         stmt = select(ContactMessage)
         count_stmt = select(func.count(ContactMessage.id))
         
-        # Apply filters
+        # Apply filters - convert enum to value if needed
         if status:
-            stmt = stmt.where(ContactMessage.status == status)
-            count_stmt = count_stmt.where(ContactMessage.status == status)
+            status_value = status.value if hasattr(status, 'value') else status
+            stmt = stmt.where(ContactMessage.status == status_value)
+            count_stmt = count_stmt.where(ContactMessage.status == status_value)
         
         if priority:
-            stmt = stmt.where(ContactMessage.priority == priority)
-            count_stmt = count_stmt.where(ContactMessage.priority == priority)
+            priority_value = priority.value if hasattr(priority, 'value') else priority
+            stmt = stmt.where(ContactMessage.priority == priority_value)
+            count_stmt = count_stmt.where(ContactMessage.priority == priority_value)
         
         if search:
             search_term = f"%{search}%"
