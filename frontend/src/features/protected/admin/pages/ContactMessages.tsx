@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { ContactMessagesAPI, ContactMessage } from '../../../../api/contact-messages';
 import { Mail, Clock, CheckCircle, AlertCircle, Search, Filter, Eye, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ContactMessagesSkeleton from '../components/skeletons/ContactMessagesSkeleton';
 
 const ContactMessages: React.FC = () => {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
@@ -114,14 +115,7 @@ const ContactMessages: React.FC = () => {
   };
 
   if (loading && messages.length === 0) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
-        </div>
-      </div>
-    );
+    return <ContactMessagesSkeleton />;
   }
 
   return (

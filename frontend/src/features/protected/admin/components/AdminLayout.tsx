@@ -24,6 +24,7 @@ import {
   PieChart,
   Coins,
   LayoutDashboard,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -43,6 +44,7 @@ const adminNavigationItems = [
   { name: 'Refunds', href: '/admin/refunds', icon: Receipt },
   { name: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard },
   { name: 'Shipping', href: '/admin/shipping', icon: Truck },
+  { name: 'Contact Messages', href: '/admin/contact-messages', icon: Mail },
 ];
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {

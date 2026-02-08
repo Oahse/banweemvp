@@ -77,6 +77,7 @@ const AdminRefunds = lazy(() => import('./features/protected/admin/pages/Refunds
 const Suppliers = lazy(() => import('./features/public/products/Suppliers'));
 const SupplierDetail = lazy(() => import('./features/public/products/SupplierDetail'));
 const AdminContactMessages = lazy(() => import('./features/protected/admin/pages/ContactMessages'));
+import ContactMessagesSkeleton from './features/protected/admin/components/skeletons/ContactMessagesSkeleton';
 
 
 export const App: React.FC = () => {
@@ -181,6 +182,7 @@ export const App: React.FC = () => {
                           <Route path="shipping" element={<Suspense fallback={<AdminTableSkeleton />}><AdminShipping /></Suspense>} />
                           <Route path="payments" element={<Suspense fallback={<AdminTableSkeleton />}><AdminPayments /></Suspense>} />
                           <Route path="refunds" element={<Suspense fallback={<AdminTableSkeleton />}><AdminRefunds /></Suspense>} />
+                          <Route path="contact-messages" element={<Suspense fallback={<ContactMessagesSkeleton />}><AdminContactMessages /></Suspense>} />
                         </Route>
                         <Route path="/supplier/*" element={<ProtectedRoute><Suspense fallback={<AdminDashboardSkeleton />}><SupplierDashboard /></Suspense></ProtectedRoute>} />
                       </Routes>
