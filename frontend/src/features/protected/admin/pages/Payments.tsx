@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
-import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { PaymentsListSkeleton } from '../components/skeletons/PaymentsSkeleton';
 
 interface Payment {
@@ -263,7 +262,11 @@ export const Payments = () => {
   };
 
   if (loading) {
-    return <AdminLayoutSkeleton />;
+    return (
+      <AdminLayout>
+        <PaymentsListSkeleton />
+      </AdminLayout>
+    );
   }
 
   return (
@@ -518,7 +521,7 @@ export const Payments = () => {
                   {/* Page numbers */}
                   <div className="flex items-center gap-1 mx-1 lg:mx-2">
                     {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
-                      let pageNum;
+                      let pageNum: number;
                       if (pagination.pages <= 5) {
                         pageNum = i + 1;
                       } else if (page <= 3) {

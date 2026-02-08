@@ -6,7 +6,6 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { getCountryOptions, getProvinceOptions } from '@/data/countries';
 import AdminLayout from '../components/AdminLayout';
-import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { TaxRatesListSkeleton } from '../components/skeletons/TaxRatesSkeleton';
 
 const LIMIT = 10;
@@ -352,7 +351,11 @@ export const AdminTaxRates = () => {
   };
 
   if (loading && initialLoading) {
-    return <AdminLayoutSkeleton />;
+    return (
+      <AdminLayout>
+        <TaxRatesListSkeleton />
+      </AdminLayout>
+    );
   }
 
   return (

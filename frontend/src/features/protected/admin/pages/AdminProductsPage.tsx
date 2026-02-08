@@ -7,7 +7,6 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
-import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { ProductsListSkeleton } from '../components/skeletons/ProductsSkeleton';
 
 const LIMIT = 10;
@@ -289,7 +288,11 @@ const AdminProductsPage = () => {
   };
 
   if (initialLoading) {
-    return <AdminLayoutSkeleton />;
+    return (
+      <AdminLayout>
+        <ProductsListSkeleton />
+      </AdminLayout>
+    );
   }
 
   return (

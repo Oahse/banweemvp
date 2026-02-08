@@ -261,7 +261,11 @@ export const Users = () => {
   };
 
   if (initialLoading) {
-    return <AdminLayoutSkeleton />;
+    return (
+      <AdminLayout>
+        <UsersListSkeleton />
+      </AdminLayout>
+    );
   }
 
   return (
@@ -565,7 +569,7 @@ export const Users = () => {
           {/* Page numbers */}
           <div className="flex items-center gap-1 mx-2">
             {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
-              let pageNum;
+              let pageNum: number;
               if (pagination.pages <= 5) {
                 pageNum = i + 1;
               } else if (page <= 3) {

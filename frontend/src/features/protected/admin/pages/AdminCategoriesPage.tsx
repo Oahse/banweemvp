@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
-import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { CategoriesListSkeleton } from '../components/skeletons/CategoriesSkeleton';
 
 const LIMIT = 10;
@@ -258,7 +257,11 @@ const AdminCategoriesPage = () => {
   };
 
   if (initialLoading) {
-    return <AdminLayoutSkeleton />;
+    return (
+      <AdminLayout>
+        <CategoriesListSkeleton />
+      </AdminLayout>
+    );
   }
 
   return (

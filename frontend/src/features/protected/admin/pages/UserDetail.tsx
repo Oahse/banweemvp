@@ -129,7 +129,11 @@ export const UserDetail = () => {
   };
 
   if (loading) {
-    return <AdminLayoutSkeleton />;
+    return (
+      <AdminLayout>
+        <UserDetailSkeleton />
+      </AdminLayout>
+    );
   }
 
   return (

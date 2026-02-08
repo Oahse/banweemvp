@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
-import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { InventoryListSkeleton } from '../components/skeletons/InventorySkeleton';
 
 const LIMIT = 10;
@@ -328,7 +327,11 @@ export const AdminInventory = () => {
   };
 
   if (initialLoading) {
-    return <AdminLayoutSkeleton />;
+    return (
+      <AdminLayout>
+        <InventoryListSkeleton />
+      </AdminLayout>
+    );
   }
 
   return (
@@ -582,7 +585,7 @@ export const AdminInventory = () => {
                   {/* Page numbers */}
                   <div className="flex items-center gap-1 mx-2">
                     {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
-                      let pageNum;
+                      let pageNum: number;
                       if (pagination.pages <= 5) {
                         pageNum = i + 1;
                       } else if (page <= 3) {

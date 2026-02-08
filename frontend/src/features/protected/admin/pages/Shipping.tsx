@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
-import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { ShippingListSkeleton } from '../components/skeletons/ShippingSkeleton';
 
 const LIMIT = 10;
@@ -239,12 +238,12 @@ export const AdminShipping = () => {
 
     const payload = {
       name: formData.name.trim(),
-      description: formData.description.trim() || null,
+      description: formData.description.trim() || undefined,
       price: priceValue,
       estimated_days: estimatedDaysValue,
       is_active: formData.is_active,
-      carrier: formData.carrier.trim() || null,
-      tracking_url_template: formData.tracking_url_template.trim() || null
+      carrier: formData.carrier.trim() || undefined,
+      tracking_url_template: formData.tracking_url_template.trim() || undefined
     };
 
     if (editingMethod) {
@@ -378,7 +377,11 @@ export const AdminShipping = () => {
   };
 
   if (initialLoading) {
-    return <AdminLayoutSkeleton />;
+    return (
+      <AdminLayout>
+        <ShippingListSkeleton />
+      </AdminLayout>
+    );
   }
 
   return (
@@ -648,7 +651,7 @@ export const AdminShipping = () => {
                   {/* Page numbers */}
                   <div className="flex items-center gap-1 mx-1 lg:mx-2">
                     {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
-                      let pageNum;
+                      let pageNum: number;
                       if (pagination.pages <= 5) {
                         pageNum = i + 1;
                       } else if (page <= 3) {

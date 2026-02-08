@@ -87,6 +87,7 @@ class AdminService:
                     "lastname": user.lastname,
                     "role": user.role,
                     "is_active": user.is_active,
+                    "status": "active" if user.is_active else "inactive",
                     "verified": user.verified,
                     "created_at": user.created_at.isoformat() if user.created_at else None,
                     "last_login": user.last_login.isoformat() if user.last_login else None
@@ -180,21 +181,35 @@ class AdminService:
             else:
                 end_date = today
             
-            # Get total users (excluding admin users for customer count)
+            # Get total users (excluding admin users, filtered by date range)
             total_users = await self.db.scalar(
-                select(func.count(User.id)).where(User.role != 'admin')
+                select(func.count(User.id)).where(
+                    and_(
+                        User.role != 'admin',
+                        User.created_at >= start_date,
+                        User.created_at <= end_date
+                    )
+                )
             )
-            logger.info(f"👥 Total users (customers): {total_users}")
+            logger.info(f"👥 Total users (customers) in date range: {total_users}")
             
             active_users = await self.db.scalar(
                 select(func.count(User.id)).where(
-                    and_(User.is_active == True, User.role != 'admin')
+                    and_(
+                        User.is_active == True,
+                        User.role != 'admin',
+                        User.created_at >= start_date,
+                        User.created_at <= end_date
+                    )
                 )
             )
-            logger.info(f"✅ Active users (customers): {active_users}")
+            logger.info(f"✅ Active users (customers) in date range: {active_users}")
             
-            # Get total orders with optional status filter
-            order_conditions = []
+            # Get total orders with optional status filter (filtered by date range)
+            order_conditions = [
+                Order.created_at >= start_date,
+                Order.created_at <= end_date
+            ]
             if status:
                 order_conditions.append(Order.order_status == status)
             
@@ -264,19 +279,31 @@ class AdminService:
             # Generate chart data for selected date range
             chart_data = await self._generate_daily_metrics(start_date, end_date, status, category)
             
-            # Recent orders
+            # Recent orders (filtered by date range)
             recent_orders_result = await self.db.execute(
                 select(Order)
                 .options(selectinload(Order.user))
+                .where(
+                    and_(
+                        Order.created_at >= start_date,
+                        Order.created_at <= end_date
+                    )
+                )
                 .order_by(desc(Order.created_at))
                 .limit(5)
             )
             recent_orders = recent_orders_result.scalars().all()
             
-            # Recent users (excluding admin users)
+            # Recent users (excluding admin users, filtered by date range)
             recent_users_result = await self.db.execute(
                 select(User)
-                .where(User.role != 'admin')
+                .where(
+                    and_(
+                        User.role != 'admin',
+                        User.created_at >= start_date,
+                        User.created_at <= end_date
+                    )
+                )
                 .order_by(desc(User.created_at))
                 .limit(5)
             )
