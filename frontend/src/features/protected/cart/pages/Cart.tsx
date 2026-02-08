@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback} from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon, AlertCircle, CheckCircle, Loader2} from 'lucide-react';
-import { useCart } from '../../CartContext';
+import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { useLocale } from '../../LocaleContext';
+import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CartSkeleton } from '../components/ui/CartSkeleton';
-import { validation } from '../utils/validation';
-import { ConfirmationModal } from '../components/ui/ConfirmationModal';
-import { CartAPI } from '../api/cart';
-import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
+import { CartSkeleton } from '@/components/ui/CartSkeleton';
+import { validation } from '@/utils/validation';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
+import { CartAPI } from '@/api/cart';
+import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 
 export const Cart = () => {
   const { 

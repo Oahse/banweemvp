@@ -1,91 +1,53 @@
 import React, { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  User, 
-  ShoppingBag, 
-  Heart, 
-  CreditCard, 
-  Package, 
+import {
+  User,
+  BarChart,
+  Package,
+  CreditCard,
   LogOut,
   Menu,
   X,
   ChevronRight,
   Home,
+  Settings,
+  Shield,
+  ShoppingCart,
+  Tag,
+  Truck,
+  Warehouse,
+  Users,
+  DollarSign,
+  Receipt,
+  Layers,
   FileText,
-  MapPin
+  PieChart,
+  Coins,
 } from 'lucide-react';
-import { useAuth } from '../../auth/contexts/AuthContext';
 import { cn } from '@/utils/cn';
 
-interface AccountLayoutProps {
+interface AdminLayoutProps {
   children?: React.ReactNode;
 }
 
-const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
+const adminNavigationItems = [
+  { name: 'Dashboard', href: '/admin', icon: Home },
+  { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
+  { name: 'Products', href: '/admin/products', icon: Tag },
+  { name: 'Categories', href: '/admin/categories', icon: Layers },
+  { name: 'Payments', href: '/admin/payments', icon: DollarSign },
+  { name: 'Inventory', href: '/admin/inventory', icon: Warehouse },
+  { name: 'Users', href: '/admin/users', icon: Users },
+  { name: 'Tax', href: '/admin/tax', icon: Coins },
+  { name: 'Refunds', href: '/admin/refunds', icon: Receipt },
+  { name: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard },
+  { name: 'Shipping', href: '/admin/shipping', icon: Truck },
+];
+
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-
-  const navigationItems = [
-    {
-      name: 'Dashboard',
-      href: '/account',
-      icon: Home,
-      current: location.pathname === '/account'
-    },
-    {
-      name: 'Profile',
-      href: '/account/profile',
-      icon: User,
-      current: location.pathname === '/account/profile'
-    },
-    {
-      name: 'Orders',
-      href: '/account/orders',
-      icon: Package,
-      current: location.pathname.startsWith('/account/orders')
-    },
-    {
-      name: 'Order Tracking',
-      href: '/account/tracking',
-      icon: MapPin,
-      current: location.pathname === '/account/tracking'
-    },
-    {
-      name: 'Wishlist',
-      href: '/account/wishlist',
-      icon: Heart,
-      current: location.pathname === '/account/wishlist'
-    },
-    {
-      name: 'Subscriptions',
-      href: '/account/subscriptions',
-      icon: CreditCard,
-      current: location.pathname.startsWith('/account/subscriptions')
-    },
-    {
-      name: 'Payment Methods',
-      href: '/account/payment-methods',
-      icon: CreditCard,
-      current: location.pathname === '/account/payment-methods'
-    },
-    {
-      name: 'Addresses',
-      href: '/account/addresses',
-      icon: MapPin,
-      current: location.pathname === '/account/addresses'
-    }
-  ];
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
@@ -101,8 +63,8 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
               <User className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-sm font-medium text-gray-900 dark:text-white">My Account</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
+              <h2 className="text-sm font-medium text-gray-900 dark:text-white">Admin Panel</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400">admin@banwee.com</p>
             </div>
           </div>
           <button
@@ -112,10 +74,9 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
             <X className="h-5 w-5" />
           </button>
         </div>
-
         {/* Navigation */}
         <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-          {navigationItems.map((item) => (
+          {adminNavigationItems.map((item) => (
             <a
               key={item.name}
               href={item.href}
@@ -125,24 +86,23 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
               }}
               className={cn(
                 "flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                item.current
+                location.pathname === item.href
                   ? "bg-primary text-white"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               )}
             >
               <item.icon className="h-5 w-5" />
               <span>{item.name}</span>
-              {item.current && (
+              {location.pathname === item.href && (
                 <ChevronRight className="h-4 w-4 ml-auto" />
               )}
             </a>
           ))}
         </nav>
-
         {/* Sidebar footer */}
         <div className="border-t border-gray-200 dark:border-gray-700 p-4">
           <button
-            onClick={handleLogout}
+            onClick={() => navigate('/logout')}
             className="flex items-center space-x-3 w-full px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <LogOut className="h-5 w-5" />
@@ -150,7 +110,6 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
           </button>
         </div>
       </div>
-
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -158,7 +117,6 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-
       {/* Main content */}
       <div className="flex-1 flex flex-col lg:ml-0">
         {/* Top bar */}
@@ -173,13 +131,12 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
               </button>
               <div className="flex-1">
                 <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {navigationItems.find(item => item.current)?.name || 'Account'}
+                  {adminNavigationItems.find(item => location.pathname === item.href)?.name || 'Admin'}
                 </h1>
               </div>
             </div>
           </div>
         </div>
-
         {/* Page content */}
         <main className="flex-1">
           <div className="py-4">
@@ -193,4 +150,4 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
   );
 };
 
-export default AccountLayout;
+export default AdminLayout;

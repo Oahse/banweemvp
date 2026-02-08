@@ -30,11 +30,32 @@ export class AdminAPI {
   }
 
   /**
-   * Get platform overview
+   * Get comprehensive dashboard data
    * ACCESS: Admin Only - Requires admin role
    */
-  static async getPlatformOverview() {
-    return await apiClient.get('/admin/overview', {});
+  static async getDashboardData(filters?: {
+    date_from?: string;
+    date_to?: string;
+    status?: string;
+    category?: string;
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (filters?.date_from) queryParams.append('date_from', filters.date_from);
+    if (filters?.date_to) queryParams.append('date_to', filters.date_to);
+    if (filters?.status) queryParams.append('status', filters.status);
+    if (filters?.category) queryParams.append('category', filters.category);
+
+    const url = `/admin/dashboard${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await apiClient.get(url, {});
+  }
+
+  /**
+   * Get platform Dashoard
+   * ACCESS: Admin Only - Requires admin role
+   */
+  static async getPlatformDashboard() {
+    return await apiClient.get('/admin/dashboard', {});
   }
 
   // User Management

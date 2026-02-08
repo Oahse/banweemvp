@@ -28,9 +28,9 @@ import {
 import { 
   AnimatedLoader, 
   PageTransitionLoader, 
-  LoadingOverlay, 
   ProgressBar 
 } from './components/ui/AnimatedLoader';
+import LoadingSpinner from './components/shared/LoadingSpinner';
 import './animations.css';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
@@ -39,7 +39,7 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
 const Home = lazy(() => import('./features/public/Home'));
 const Products = lazy(() => import('./features/public/products/Products'));
 const ProductDetails = lazy(() => import('./features/public/products/ProductDetails'));
-const Cart = lazy(() => import('./features/protected/cart/CartPage'));
+const Cart = lazy(() => import('./features/protected/cart/pages/Cart'));
 const Checkout = lazy(() => import('./features/protected/checkout/pages/Checkout'));
 const Account = lazy(() => import('./features/protected/account/pages/Account'));
 const Login = lazy(() => import('./features/protected/auth/pages/Login'));
@@ -62,7 +62,7 @@ const AdminProducts = lazy(() => import('./features/protected/admin/pages/AdminP
 const AdminProductDetail = lazy(() => import('./features/protected/admin/pages/ProductDetail'));
 const CreateProduct = lazy(() => import('./features/protected/admin/pages/CreateProduct'));
 const EditProduct = lazy(() => import('./features/protected/admin/pages/EditProduct'));
-const AdminCategories = lazy(() => import('./features/protected/admin/pages/Categories'));
+const AdminCategories = lazy(() => import('./features/protected/admin/pages/AdminCategoriesPage'));
 const AdminUsers = lazy(() => import('./features/protected/admin/pages/Users'));
 const AdminUserDetail = lazy(() => import('./features/protected/admin/pages/UserDetail'));
 const AdminTaxRates = lazy(() => import('./features/protected/admin/pages/TaxRates'));
@@ -77,33 +77,6 @@ const AdminRefunds = lazy(() => import('./features/protected/admin/pages/Refunds
 const Suppliers = lazy(() => import('./features/public/products/Suppliers'));
 const SupplierDetail = lazy(() => import('./features/public/products/SupplierDetail'));
 
-// Loading component
-const PageLoading: React.FC = () => (
-  <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
-    <div className="w-16 h-16 border-4 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-  </div>
-);
-
-// Error boundary for lazy loading
-const LazyLoadError: React.FC<{ error: Error; retry: () => void }> = ({ error, retry }) => (
-  <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
-    <div className="text-center p-8">
-      <div className="text-red-500 mb-4">
-        <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-        </svg>
-      </div>
-      <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Failed to load page</h2>
-      <p className="text-gray-600 dark:text-gray-400 mb-4">{error.message}</p>
-      <button 
-        onClick={retry}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-      >
-        Try Again
-      </button>
-    </div>
-  </div>
-);
 
 export const App: React.FC = () => {
   return (
@@ -160,7 +133,7 @@ export const App: React.FC = () => {
                   <SubscriptionProvider>
                     <WishlistProvider>
                       <Elements stripe={stripePromise}>
-                        <Suspense fallback={<PageSkeleton />}>
+                        <Suspense fallback={<LoadingSpinner size="lg" text="Loading page..." fullScreen />}> 
                           <Routes>
                         <Route path="/" element={<Layout><Home /></Layout>} />
                         <Route path="/products" element={<Layout><Suspense fallback={<ProductListSkeleton />}><Products /></Suspense></Layout>} />
@@ -182,7 +155,7 @@ export const App: React.FC = () => {
                         <Route path="/privacy" element={<Layout><PrivacyPolicy /></Layout>} />
                         <Route path="/verify-email" element={<Layout><EmailVerification /></Layout>} />
                         <Route path="/reset-password" element={<Layout><ResetPassword /></Layout>} />
-                        <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+                        <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminLayout /></ProtectedRoute>}>
                           <Route index element={<Suspense fallback={<AdminDashboardSkeleton />}><AdminDashboardPage /></Suspense>} />
                           <Route path="orders" element={<Suspense fallback={<AdminTableSkeleton />}><AdminOrders /></Suspense>} />
                           <Route path="orders/:orderId" element={<Suspense fallback={<PageSkeleton />}><AdminOrderDetail /></Suspense>} />

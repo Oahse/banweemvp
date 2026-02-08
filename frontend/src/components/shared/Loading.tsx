@@ -9,7 +9,7 @@ export const Loading = ({ size = 'md', text = 'Loading...' }: { size?: 'sm' | 'm
 
   return (
     <div className="flex flex-col items-center justify-center p-8">
-      <div className={`border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin ${sizes[size]}`}></div>
+      <div className={`border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin ${sizes[size]}`}></div>
       {text && <p className="body-text mt-4 text-gray-600">{text}</p>}
     </div>
   );

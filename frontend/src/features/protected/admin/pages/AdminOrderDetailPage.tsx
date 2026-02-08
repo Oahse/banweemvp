@@ -249,33 +249,37 @@ export const AdminOrderDetail = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
-      </div>
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader className="w-12 h-12 text-primary animate-spin" />
+        </div>
+      </AdminLayout>
     );
   }
 
   if (error || !order) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate('/admin/orders')}
-            className="flex items-center gap-2 text-primary hover:text-primary/80"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back to Orders
-          </button>
-        </div>
+      <AdminLayout>
+        <div className="space-y-6 p-6">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/admin/orders')}
+              className="flex items-center gap-2 text-primary hover:text-primary/80"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Back to Orders
+            </button>
+          </div>
 
-        <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold text-destructive">Error</p>
-            <p className="text-destructive/80 text-sm">{error || 'Order not found'}</p>
+          <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-destructive">Error</p>
+              <p className="text-destructive/80 text-sm">{error || 'Order not found'}</p>
+            </div>
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
@@ -793,13 +797,7 @@ export const AdminOrderDetail = () => {
         )}
       </div>
     </AdminLayout>
-  );
+  )
 };
 
-export default function WrappedAdminOrderDetail(props) {
-  return (
-    <ErrorBoundary>
-      <AdminOrderDetail {...props} />
-    </ErrorBoundary>
-  );
-}
+export default AdminOrderDetail;

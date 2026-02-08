@@ -7,7 +7,6 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { AdminLayout } from '@/components/layout/Layout';
-import ErrorBoundary from '@/components/shared/ErrorBoundary';
 
 const LIMIT = 10;
 
@@ -730,10 +729,4 @@ const AdminProductsPage = () => {
   );
 };
 
-export default function WrappedAdminProductsPage(props) {
-  return (
-    <ErrorBoundary>
-      <AdminProductsPage {...props} />
-    </ErrorBoundary>
-  );
-}
+export default AdminProductsPage;

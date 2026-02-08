@@ -13,8 +13,8 @@ import {
   TrashIcon,
   EditIcon
 } from 'lucide-react';
-import { useTheme } from '../../../store/ThemeContext';
-import Dropdown from '../../ui/Dropdown';
+import { useTheme } from '../../../../../components/shared/contexts/ThemeContext';
+import Dropdown from '../../../../../components/ui/Dropdown';
 
 // Types
 export interface Column<T = any> {

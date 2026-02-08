@@ -1,12 +1,13 @@
-import React from 'react';
-import { Calendar, Filter, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, Filter, X, ChevronDown } from 'lucide-react';
+import { apiClient } from '@/api/client';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
 
 export interface DashboardFilters {
-  dateRange: 'today' | 'week' | 'month' | 'year' | 'custom';
+  dateRange: 'today' | 'week' | 'month' | 'year' | 'quarter' | 'custom';
   startDate?: string;
   endDate?: string;
-  status?: string;
-  category?: string;
 }
 
 interface DashboardFilterBarProps {
@@ -20,24 +21,37 @@ export const DashboardFilterBar: React.FC<DashboardFilterBarProps> = ({
   onFiltersChange,
   onReset,
 }) => {
+  const [categories, setCategories] = useState<Array<{id: string, name: string}>>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await apiClient.get('/categories');
+        setCategories(response.data?.categories || []);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        setCategories([]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   const handleDateRangeChange = (range: DashboardFilters['dateRange']) => {
     onFiltersChange({ ...filters, dateRange: range });
   };
 
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFiltersChange({ ...filters, startDate: e.target.value });
+  const handleStartDateChange = (date: string) => {
+    onFiltersChange({ ...filters, startDate: date });
   };
 
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFiltersChange({ ...filters, endDate: e.target.value });
-  };
-
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onFiltersChange({ ...filters, status: e.target.value || undefined });
-  };
-
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onFiltersChange({ ...filters, category: e.target.value || undefined });
+  const handleEndDateChange = (date: string) => {
+    onFiltersChange({ ...filters, endDate: date });
   };
 
   return (
@@ -58,12 +72,12 @@ export const DashboardFilterBar: React.FC<DashboardFilterBarProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Date Range Buttons */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-5">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Date Range
           </label>
           <div className="flex gap-2">
-            {['today', 'week', 'month', 'year'].map((range) => (
+            {['today', 'week', 'month', 'year', 'quarter', 'custom'].map((range) => (
               <button
                 key={range}
                 onClick={() => handleDateRangeChange(range as DashboardFilters['dateRange'])}
@@ -81,96 +95,32 @@ export const DashboardFilterBar: React.FC<DashboardFilterBarProps> = ({
 
         {/* Custom Date Range */}
         {filters.dateRange === 'custom' && (
-          <div className="lg:col-span-3 grid grid-cols-2 gap-2">
+          <div className="lg:col-span-5 grid grid-cols-2 gap-2">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Start Date
               </label>
-              <input
-                type="date"
-                value={filters.startDate || ''}
+              <DateTimeDropdown
+                value={filters.startDate}
                 onChange={handleStartDateChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                placeholder="Start Date"
+                className="w-full"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 End Date
               </label>
-              <input
-                type="date"
-                value={filters.endDate || ''}
+              <DateTimeDropdown
+                value={filters.endDate}
                 onChange={handleEndDateChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                placeholder="End Date"
+                className="w-full"
               />
             </div>
           </div>
         )}
-
-        {/* Status Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Status
-          </label>
-          <select
-            value={filters.status || ''}
-            onChange={handleStatusChange}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-          >
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-
-        {/* Category Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Category
-          </label>
-          <select
-            value={filters.category || ''}
-            onChange={handleCategoryChange}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-          >
-            <option value="">All Categories</option>
-            <option value="orders">Orders</option>
-            <option value="revenue">Revenue</option>
-            <option value="users">Users</option>
-            <option value="products">Products</option>
-          </select>
-        </div>
       </div>
-
-      {/* Active Filters Display */}
-      {(filters.status || filters.category) && (
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-          {filters.status && (
-            <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium">
-              Status: {filters.status}
-              <button
-                onClick={() => onFiltersChange({ ...filters, status: undefined })}
-                className="hover:text-blue-900 dark:hover:text-blue-100"
-              >
-                ✕
-              </button>
-            </span>
-          )}
-          {filters.category && (
-            <span className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium">
-              Category: {filters.category}
-              <button
-                onClick={() => onFiltersChange({ ...filters, category: undefined })}
-                className="hover:text-purple-900 dark:hover:text-purple-100"
-              >
-                ✕
-              </button>
-            </span>
-          )}
-        </div>
-      )}
     </div>
   );
 };

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Request
+from fastapi import APIRouter, Depends, status, HTTPException, Request, Response as FastAPIResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from core.db import get_db
@@ -6,8 +7,10 @@ from core.errors import APIException
 from core.logging import get_logger
 from core.cache import RedisKeyManager
 from services.cart import CartService
+from services.auth import AuthService
 from models.user import User
 from core.utils.response import Response
+from core.utils.uuid_utils import uuid7
 from schemas.cart import AddToCartRequest, ApplyPromocodeRequest, UpdateCartItemRequest
 from core.dependencies import get_current_auth_user
 from typing import Optional
@@ -16,68 +19,142 @@ logger = get_logger(__name__)
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
 
+# Optional bearer token for cart endpoints
+security = HTTPBearer(auto_error=False)
 
-def get_session_id(request: Request) -> Optional[str]:
-    """Extract session ID from request for guest carts"""
-    # No longer using request.session for "strictly JWT" with no cookies
-    return request.headers.get('X-Session-ID')
+# Cookie settings for guest cart
+CART_COOKIE_NAME = "guest_cart_id"
+CART_COOKIE_MAX_AGE = 30 * 24 * 60 * 60  # 30 days
+
+
+async def get_optional_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    db: AsyncSession = Depends(get_db)
+) -> Optional[User]:
+    """Get current user if authenticated, None otherwise"""
+    if not credentials:
+        return None
+    try:
+        auth_service = AuthService(db)
+        user = await auth_service.get_current_user(credentials.credentials)
+        return user
+    except Exception as e:
+        logger.debug(f"Failed to authenticate user: {e}")
+        return None
+
+
+def get_or_create_guest_cart_id(request: Request, response: FastAPIResponse) -> str:
+    """Get existing guest cart ID from cookie or create new one"""
+    # Try to get from cookie
+    guest_cart_id = request.cookies.get(CART_COOKIE_NAME)
+    
+    if not guest_cart_id:
+        # Create new guest cart ID
+        guest_cart_id = str(uuid7())
+        # Set cookie (will be set in response)
+        response.set_cookie(
+            key=CART_COOKIE_NAME,
+            value=guest_cart_id,
+            max_age=CART_COOKIE_MAX_AGE,
+            httponly=True,
+            samesite="lax",
+            secure=False  # Set to True in production with HTTPS
+        )
+        logger.info(f"Created new guest cart ID: {guest_cart_id}")
+    
+    return guest_cart_id
 
 
 @router.get("/")
 async def get_cart(
     request: Request,
-    country: Optional[str] = None,  # Country code from query param or header
-    province: Optional[str] = None,  # Province/state code from query param or header
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    response: FastAPIResponse,
+    country: Optional[str] = None,
+    province: Optional[str] = None,
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    """
+    Get cart for authenticated user or guest.
+    For guests, uses cookie-based cart ID (Amazon-style).
+    """
     try:
-        # Try to get location from query params, headers, or default to US
         country_code = country or request.headers.get('X-Country-Code', 'US')
         province_code = province or request.headers.get('X-Province-Code')
         
         cart_service = CartService(db)
-        session_id = get_session_id(request) if not current_user else None
-        cart = await cart_service.get_cart(
-            user_id=current_user.id if current_user else None,
-            session_id=session_id,
-            country_code=country_code,
-            province_code=province_code
-        )
+        
+        if current_user:
+            # Authenticated user - use user_id
+            cart = await cart_service.get_cart(
+                user_id=current_user.id,
+                session_id=None,
+                country_code=country_code,
+                province_code=province_code
+            )
+        else:
+            # Guest user - use cookie-based cart ID
+            guest_cart_id = get_or_create_guest_cart_id(request, response)
+            cart = await cart_service.get_cart(
+                user_id=None,
+                session_id=guest_cart_id,
+                country_code=country_code,
+                province_code=province_code
+            )
+        
         return Response(success=True, data=cart)
     except Exception as e:
-        raise APIException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                           message=f"Failed to retrieve cart: {e}")
+        logger.exception("Failed to retrieve cart")
+        raise APIException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=f"Failed to retrieve cart: {e}"
+        )
 
 
 @router.post("/add")
 async def add_to_cart(
     request: AddToCartRequest,
     req: Request,
+    response: FastAPIResponse,
     country: Optional[str] = None,
     province: Optional[str] = None,
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    """
+    Add item to cart for authenticated user or guest.
+    For guests, uses cookie-based cart ID.
+    """
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(req) if not current_user else None
         
-        # Add item to cart with ARQ background tasks
-        cart = await cart_service.add_to_cart(
-            user_id=current_user.id if current_user else None,
-            variant_id=request.variant_id,
-            quantity=request.quantity,
-            session_id=session_id
-        )
+        if current_user:
+            # Authenticated user
+            cart = await cart_service.add_to_cart(
+                user_id=current_user.id,
+                variant_id=request.variant_id,
+                quantity=request.quantity,
+                session_id=None
+            )
+        else:
+            # Guest user - use cookie
+            guest_cart_id = get_or_create_guest_cart_id(req, response)
+            cart = await cart_service.add_to_cart(
+                user_id=None,
+                variant_id=request.variant_id,
+                quantity=request.quantity,
+                session_id=guest_cart_id
+            )
         
         return Response(success=True, data=cart, message="Item added to cart")
     except HTTPException as e:
         raise APIException(status_code=e.status_code, message=e.detail)
     except Exception as e:
         logger.exception("Unexpected exception in add_to_cart")
-        raise APIException(status_code=status.HTTP_400_BAD_REQUEST,
-                           message=f"Failed to add item to cart {str(e)}")
+        raise APIException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=f"Failed to add item to cart {str(e)}"
+        )
 
 
 @router.put("/items/{cart_item_id}")
@@ -161,34 +238,42 @@ async def update_cart_item(
 async def remove_from_cart(
     cart_item_id: UUID,
     req: Request,
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    response: FastAPIResponse,
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    Remove item from cart by cart_item_id
-    
-    The cart_item_id is the unique ID assigned to each item when added to cart.
-    """
+    """Remove item from cart by cart_item_id"""
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(req) if not current_user else None
-        cart = await cart_service.remove_from_cart_by_item_id(
-            user_id=current_user.id if current_user else None,
-            cart_item_id=cart_item_id
-        )
+        
+        if current_user:
+            cart = await cart_service.remove_from_cart_by_item_id(
+                user_id=current_user.id,
+                cart_item_id=cart_item_id
+            )
+        else:
+            guest_cart_id = get_or_create_guest_cart_id(req, response)
+            cart = await cart_service.remove_from_cart_by_item_id(
+                user_id=None,
+                cart_item_id=cart_item_id,
+                session_id=guest_cart_id
+            )
+        
         return Response(success=True, data=cart, message="Item removed from cart")
     except HTTPException as e:
         raise APIException(status_code=e.status_code, message=e.detail)
     except Exception as e:
-        raise APIException(status_code=status.HTTP_400_BAD_REQUEST,
-                           message=f"Failed to remove item from cart: {e}")
+        raise APIException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=f"Failed to remove item from cart: {e}"
+        )
 
 
 @router.post("/promocode")
 async def apply_promocode(
     request: ApplyPromocodeRequest,
     req: Request,
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
@@ -208,7 +293,7 @@ async def apply_promocode(
 @router.delete("/promocode")
 async def remove_promocode(
     request: Request,
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
@@ -227,7 +312,7 @@ async def remove_promocode(
 @router.get("/count")
 async def get_cart_item_count(
     request: Request,
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
@@ -316,7 +401,7 @@ async def validate_cart(
 async def get_shipping_options(
     address: dict,
     request: Request,
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
@@ -337,7 +422,7 @@ async def get_shipping_options(
 async def calculate_totals(
     data: dict,
     request: Request,
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
@@ -358,7 +443,7 @@ async def calculate_totals(
 @router.post("/clear")
 async def clear_cart(
     request: Request,
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Clear all items from the cart"""
@@ -380,24 +465,46 @@ async def clear_cart(
 @router.post("/merge")
 async def merge_cart(
     request: Request,
+    response: FastAPIResponse,
     current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Merge guest cart with user cart when user logs in"""
+    """
+    Merge guest cart with user cart when user logs in (Amazon-style).
+    This should be called immediately after login.
+    """
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(request)
         
-        if session_id:
-            result = await cart_service.merge_carts(current_user.id, session_id)
-            return Response(success=True, data=result, message="Carts merged successfully")
+        # Get guest cart ID from cookie
+        guest_cart_id = request.cookies.get(CART_COOKIE_NAME)
+        
+        if guest_cart_id:
+            # Merge guest cart into user cart
+            result = await cart_service.merge_carts(current_user.id, guest_cart_id)
+            
+            # Clear the guest cart cookie since it's now merged
+            response.delete_cookie(key=CART_COOKIE_NAME)
+            
+            return Response(
+                success=True, 
+                data=result, 
+                message="Guest cart merged successfully"
+            )
         else:
-            # No session cart to merge
+            # No guest cart to merge, just return user cart
             result = await cart_service.get_cart(user_id=current_user.id)
-            return Response(success=True, data=result, message="No guest cart to merge")
+            return Response(
+                success=True, 
+                data=result, 
+                message="No guest cart to merge"
+            )
     except Exception as e:
-        raise APIException(status_code=status.HTTP_400_BAD_REQUEST,
-                           message=f"Failed to merge cart: {e}")
+        logger.exception("Failed to merge cart")
+        raise APIException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=f"Failed to merge cart: {e}"
+        )
 
 
 @router.get("/checkout-summary")

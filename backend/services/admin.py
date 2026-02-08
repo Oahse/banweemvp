@@ -6,10 +6,13 @@ from sqlalchemy import select, func, and_, or_, desc, String
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 from models.user import User
+from models.orders import Order, OrderItem
+from models.product import Product, ProductVariant
 from uuid import UUID
 from datetime import datetime, timedelta, date
 from typing import Optional, List, Dict, Any
 from decimal import Decimal
+
 from core.logging import get_structured_logger
 
 logger = get_structured_logger(__name__)
@@ -152,6 +155,8 @@ class AdminService:
             from models.subscriptions import Subscription
             from datetime import datetime, timedelta
             
+            logger.info(f"📊 Dashboard stats request: date_from={date_from}, date_to={date_to}, status={status}, category={category}")
+            
             # Parse date filters
             today = datetime.utcnow().date()
             yesterday = today - timedelta(days=1)
@@ -177,9 +182,12 @@ class AdminService:
             
             # Get total users
             total_users = await self.db.scalar(select(func.count(User.id)))
+            logger.info(f"👥 Total users: {total_users}")
+            
             active_users = await self.db.scalar(
                 select(func.count(User.id)).where(User.is_active == True)
             )
+            logger.info(f"✅ Active users: {active_users}")
             
             # Get total orders with optional status filter
             order_conditions = []
@@ -189,11 +197,14 @@ class AdminService:
             total_orders = await self.db.scalar(
                 select(func.count(Order.id)).where(and_(*order_conditions)) if order_conditions else select(func.count(Order.id))
             )
+            logger.info(f"📦 Total orders (filtered by {status}): {total_orders}")
+            
             orders_today = await self.db.scalar(
                 select(func.count(Order.id)).where(
                     func.date(Order.created_at) == today
                 )
             )
+            logger.info(f"📅 Orders today: {orders_today}")
             
             # Get total products with optional category filter
             product_conditions = []
@@ -402,9 +413,6 @@ class AdminService:
     async def get_platform_overview(self) -> Dict[str, Any]:
         """Get platform overview statistics"""
         try:
-            from models.orders import Order, OrderItem
-            from models.product import Product, ProductVariant
-            from datetime import datetime, timedelta
             
             # Get basic counts
             stats = await self.get_dashboard_stats()

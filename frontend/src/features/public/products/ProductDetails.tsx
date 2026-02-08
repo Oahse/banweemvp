@@ -120,7 +120,9 @@ export const ProductDetails = () => {
   }, [id, fetchProduct, fetchRelatedProducts]);
 
   // Extract actual data from API response with proper type guards
-  const actualProductData: any = productData?.data || productData;
+  const actualProductData: any = (productData && typeof productData === 'object' && 'data' in productData)
+    ? (productData as any).data
+    : productData;
   const actualRelatedData: any = relatedProductsData?.data || relatedProductsData;
   const actualReviewsData: any = reviewsData?.data ? {
     data: reviewsData.data.data || reviewsData.data,

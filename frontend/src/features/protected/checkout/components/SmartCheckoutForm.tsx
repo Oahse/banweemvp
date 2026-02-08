@@ -4,21 +4,21 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../../AuthContext';
-import { useCart } from '../../../CartContext';
-import { useLocale } from '../../../LocaleContext';
-import { useTheme } from '../../../ThemeContext';
-import { useShipping } from '../../../shared/hooks/useShipping';
-import { OrdersAPI } from '../../api/orders';
-import { AuthAPI } from '../../api/auth';
-import { CartAPI } from '../../api/cart';
-import { TokenManager } from '../../api/client';
-import { PaymentsAPI } from '../../api/payments';
+import { useAuth } from '../../auth/hooks/useAuth';
+import { useCart } from '../../cart/contexts/CartContext';
+import { useLocale } from '@/components/shared/contexts/LocaleContext';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import { useShipping } from '../../shipping/hooks/useShipping';
+import { OrdersAPI } from '@/api/orders';
+import { AuthAPI } from '@/api/auth';
+import { CartAPI } from '@/api/cart';
+import { TokenManager } from '@/api/client';
+import { PaymentsAPI } from '@/api/payments';
 import { toast } from 'react-hot-toast';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { CheckCircle, AlertTriangle, CreditCard, Truck, MapPin } from 'lucide-react';
-import AddAddressForm from '../forms/AddAddressForm';
+import AddAddressForm from '@/components/generic/AddAddressForm';
 
 // Debounce utility
 const debounce = (func: Function, wait: number) => {
@@ -35,6 +35,14 @@ const debounce = (func: Function, wait: number) => {
 
 interface SmartCheckoutFormProps {
   onSuccess: (orderId: string) => void;
+}
+
+interface FormData {
+  shipping_address_id: string;
+  shipping_method_id: string;
+  payment_method_id: string;
+  discount_code?: string;
+  notes?: string;
 }
 
 interface CheckoutPricing {
@@ -75,10 +83,10 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   
   // Form state
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<any>({
-    shipping_address_id: null,
-    shipping_method_id: null,
-    payment_method_id: null,
+  const [formData, setFormData] = useState<FormData>({
+    shipping_address_id: '',
+    shipping_method_id: '',
+    payment_method_id: '',
     discount_code: '',
     notes: ''
   });

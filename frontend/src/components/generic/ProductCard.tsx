@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCartIcon, HeartIcon, EyeIcon, CheckIcon, PlusIcon, StarIcon, PackageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useCart } from '../../features/protected/cart/contexts/CartContext';
-import { useWishlist } from '../../features/protected/wishlist/contexts/WishlistContext';
-import { useAuth } from '../../features/protected/auth/contexts/AuthContext';
-import { useLocale } from '../shared/contexts/LocaleContext';
-import { SkeletonCard } from '../ui/SkeletonCard';
-import { QRCodeDisplay } from '../../features/public/products/components/QRCodeDisplay';
-import { BarcodeDisplay } from '../../features/public/products/components/BarcodeDisplay';
+import { useCart } from '@/features/protected/cart/contexts/CartContext';
+import { useWishlist } from '@/features/protected/wishlist/contexts/WishlistContext';
+import { useAuth } from '@/features/protected/auth/hooks/useAuth';
+import { useLocale } from '@/components/shared/contexts/LocaleContext';
+import { SkeletonCard } from '@/components/ui/SkeletonCard';
+import { QRCodeDisplay } from '@/features/public/products/components/QRCodeDisplay';
+import { BarcodeDisplay } from '@/features/public/products/components/BarcodeDisplay';
 import { toast } from 'react-hot-toast';
-import { cn } from '../../utils/utils';
+import { cn } from '@/utils/utils';
 
 /**
  * @typedef {object} ProductVariantImage

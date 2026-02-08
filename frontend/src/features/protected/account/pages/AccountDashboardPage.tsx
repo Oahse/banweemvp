@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
-import { useAuth } from '../../../AuthContext';
-import { useSubscription } from '../../../SubscriptionContext';
+import { useAuth } from '../../auth/contexts/AuthContext';
+import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
 import { ShoppingBagIcon, HeartIcon, MapPinIcon, CreditCardIcon, PackageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SkeletonDashboard } from '../ui/SkeletonDashboard';
-import { usePaginatedApi } from '../../../shared/hooks/useAsync';
-import OrdersAPI from '../../api/orders';
-import SubscriptionAPI from '../../api/subscription';
-import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { SkeletonDashboard } from '@/components/ui/SkeletonDashboard';
+import { usePaginatedApi } from '@/components/shared/hooks/useAsync';
+import OrdersAPI from '@/api/orders';
+import SubscriptionAPI from '@/api/subscription';
+import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 
 interface DashboardProps {
   animation?: 'shimmer' | 'pulse' | 'wave';

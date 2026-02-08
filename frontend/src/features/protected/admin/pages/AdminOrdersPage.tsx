@@ -7,7 +7,6 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
-import ErrorBoundary from '@/components/shared/ErrorBoundary';
 
 const LIMIT = 10;
 
@@ -503,10 +502,4 @@ const AdminOrdersPage: React.FC = () => {
   );
 };
 
-export default function WrappedAdminOrdersPage(props) {
-  return (
-    <ErrorBoundary>
-      <AdminOrdersPage {...props} />
-    </ErrorBoundary>
-  );
-}
+export default AdminOrdersPage;

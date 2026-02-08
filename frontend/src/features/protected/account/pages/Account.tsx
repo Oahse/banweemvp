@@ -2,7 +2,7 @@ import { useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import AccountLayout from '../components/AccountLayout';
-import { ProtectedRoute } from '../components/shared/ProtectedRoute';
+import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
 // Account Skeleton for loading states
 const AccountSkeleton = () => (
   <div className="animate-pulse space-y-4">
@@ -17,14 +17,14 @@ const AccountProfilePage = lazy(() => import('./AccountProfilePage'));
 const AccountOrdersPage = lazy(() => import('./AccountOrdersPage'));
 const AccountOrderDetailPage = lazy(() => import('./AccountOrderDetailPage'));
 const AccountTrackOrderPage = lazy(() => import('./AccountTrackOrderPage'));
-// const ShipmentTracking = lazy(() => import('../../shipping/pages/ShipmentTracking')); // TODO: Implement shipping module
+const ShipmentTracking = lazy(() => import('@/features/shipping/pages/ShipmentTracking')); // TODO: Implement shipping module
 const AccountWishlistPage = lazy(() => import('./AccountWishlistPage'));
 const AccountWishlistEditPage = lazy(() => import('./AccountWishlistEditPage'));
 const AccountAddressesPage = lazy(() => import('./AccountAddressesPage'));
 const AccountMySubscriptionsPage = lazy(() => import('./AccountMySubscriptionsPage').then(module => ({ default: module.AccountMySubscriptionsPage })));
 const AccountSubscriptionEditPage = lazy(() => import('./AccountSubscriptionEditPage'));
 const SubscriptionDetails = lazy(() => import('./SubscriptionDetails'));
-// const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage').then(module => ({ default: module.AccountPaymentMethodsPage }))); // TODO: Implement payment methods
+const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage').then(module => ({ default: module.AccountPaymentMethodsPage }))); // TODO: Implement payment methods
 
 // Loading Spinner
 const LoadingSpinner = () => (

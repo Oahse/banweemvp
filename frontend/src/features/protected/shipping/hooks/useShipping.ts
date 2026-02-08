@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react';
-import { apiClient } from '../api/client';
+import { apiClient } from '@/api/client';
 
 export interface ShippingMethod {
   id: string;
   name: string;
-  cost: number;
-  estimatedDays: number;
+  price: number;
+  estimated_days: number;
   carrier?: string;
   description?: string;
 }
@@ -24,8 +24,8 @@ export const useShipping = (options?: UseShippingOptions) => {
     setLoading(true);
     setError(null);
     try {
-      console.log('🚚 Loading shipping methods from /shipping/methods');
-      const response = await apiClient.get('/shipping/methods');
+      console.log('🚚 Loading shipping methods using getShippingMethods()');
+      const response = await apiClient.getShippingMethods();
       console.log('✅ Shipping methods loaded successfully:', response.data);
       setShippingMethods(response.data?.data || response.data || []);
     } catch (err: any) {
@@ -47,7 +47,7 @@ export const useShipping = (options?: UseShippingOptions) => {
   const getCheapestMethod = useCallback(() => {
     if (shippingMethods.length === 0) return null;
     return shippingMethods.reduce((cheapest, method) => 
-      method.cost < cheapest.cost ? method : cheapest
+      method.price < cheapest.price ? method : cheapest
     );
   }, [shippingMethods]);
 

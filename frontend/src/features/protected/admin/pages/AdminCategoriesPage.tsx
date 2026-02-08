@@ -4,7 +4,6 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import ErrorBoundary from '@/components/shared/ErrorBoundary';
 
 const LIMIT = 10;
 
@@ -726,36 +725,24 @@ const AdminCategoriesPage = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-lg border" style={{
-                borderColor: currentTheme === 'dark' ? '#374151' : '#e5e7eb',
-                backgroundColor: currentTheme === 'dark' ? 'rgba(55, 65, 81, 0.3)' : 'rgba(249, 250, 251, 0.5)'
-              }}>
-                <label htmlFor="is_active" className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Active Status
-                </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newData = { ...formData, is_active: !formData.is_active };
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</label>
+                <Dropdown
+                  options={[
+                    { value: true, label: 'Active' },
+                    { value: false, label: 'Inactive' }
+                  ]}
+                  value={formData.is_active}
+                  onChange={val => {
+                    const newData = { ...formData, is_active: val };
                     setFormData(newData);
                     if (editingCategory) {
                       handleQuickUpdate(editingCategory.id, newData);
                     }
                   }}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    formData.is_active
-                      ? 'bg-success'
-                      : currentTheme === 'dark'
-                        ? 'bg-gray-600'
-                        : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      formData.is_active ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
+                  placeholder="Select status"
+                  className="min-w-[120px]"
+                />
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-600">
@@ -788,10 +775,4 @@ const AdminCategoriesPage = () => {
   );
 };
 
-export default function WrappedAdminCategoriesPage(props) {
-  return (
-    <ErrorBoundary>
-      <AdminCategoriesPage {...props} />
-    </ErrorBoundary>
-  );
-}
+export default AdminCategoriesPage;

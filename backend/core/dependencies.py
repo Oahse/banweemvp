@@ -342,7 +342,9 @@ async def require_supplier(current_user: User = Depends(get_current_active_user)
 
 async def require_admin_or_supplier(current_user: User = Depends(get_current_active_user)) -> User:
     """Require Admin or Supplier role"""
-    if current_user.role not in ["Admin", "Supplier"]:
+    # Case-insensitive role check
+    user_role = (current_user.role or "").lower()
+    if user_role not in ["admin", "supplier", "superadmin", "manager"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin or Supplier access required"

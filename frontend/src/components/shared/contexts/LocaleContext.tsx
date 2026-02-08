@@ -6,6 +6,8 @@ interface LocaleContextType {
   formatNumber: (num: number, options?: Intl.NumberFormatOptions) => string;
   formatPercentage: (value: number, decimals?: number) => string;
   locale: string;
+  currency: string;
+  countryCode: string;
 }
 
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
@@ -21,6 +23,8 @@ export const LocaleProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     formatPercentage: (value, decimals = 0) =>
       formatPercentage(value, locale, decimals),
     locale,
+    currency: 'USD',
+    countryCode: 'US',
   };
 
   return (

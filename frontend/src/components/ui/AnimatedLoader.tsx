@@ -164,24 +164,18 @@ export const ShimmerCard: React.FC<{
 };
 
 // Loading overlay for specific components
+import LoadingSpinner from '../shared/LoadingSpinner';
+
 export const LoadingOverlay: React.FC<{
   isLoading: boolean;
   text?: string;
-  variant?: 'spinner' | 'dots' | 'pulse';
   size?: 'sm' | 'md' | 'lg';
-}> = ({ isLoading, text, variant = 'spinner', size = 'md' }) => {
+}> = ({ isLoading, text, size = 'md' }) => {
   if (!isLoading) return null;
 
   return (
     <div className="absolute inset-0 bg-white dark:bg-gray-900 bg-opacity-90 dark:bg-opacity-90 flex items-center justify-center z-10">
-      <div className="text-center">
-        <AnimatedLoader size={size} variant={variant} color="primary" />
-        {text && (
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {text}
-          </p>
-        )}
-      </div>
+      <LoadingSpinner size={size} text={text} fullScreen={false} />
     </div>
   );
 };

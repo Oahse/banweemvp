@@ -265,20 +265,28 @@ async def get_admin_stats(
             message=f"Failed to fetch admin stats {str(e)}"
         )
 
-@router.get("/overview")
-async def get_platform_overview(
+@router.get("/dashboard")
+async def get_dashboard_data(
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get platform overview."""
+    """Get comprehensive dashboard data."""
     try:
         admin_service = AdminService(db)
+        
+        # Get platform overview
         overview = await admin_service.get_platform_overview()
+        
+        
         return Response.success(data=overview)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to fetch platform overview  {str(e)}"
+            message=f"Failed to fetch dashboard data {str(e)}"
         )
 
 # Order Management Routes
@@ -725,62 +733,25 @@ async def get_user_by_id(
             message=f"Failed to fetch user: {str(e)}"
         )
 
-@router.put("/users/{user_id}")
-async def update_user_admin(
-    user_id: str,
-    payload: AdminUserUpdate,
+@router.get("/dashboard")
+async def get_dashboard_data(
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
     current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    """Update user details (admin only)."""
+    """Get comprehensive dashboard data."""
     try:
-        from services.user import UserService
-        from services.auth import AuthService
-
-        user_uuid = UUID(user_id)
-        user_service = UserService(db)
-        auth_service = AuthService(db)
-
-        user_data = UserUpdate(
-            firstname=payload.firstname,
-            lastname=payload.lastname,
-            email=payload.email,
-            is_active=payload.is_active
-        )
-
-        user = await user_service.update_user(user_uuid, user_data)
-        if not user:
-            raise APIException(status_code=status.HTTP_404_NOT_FOUND, message="User not found")
-
-        if payload.role:
-            user.role = payload.role
-
-        if payload.password:
-            user.hashed_password = auth_service.get_password_hash(payload.password)
-
-        await db.commit()
-        await db.refresh(user)
-
-        return Response.success(
-            data={
-                "id": str(user.id),
-                "email": user.email,
-                "firstname": user.firstname,
-                "lastname": user.lastname,
-                "role": user.role,
-                "is_active": user.is_active,
-                "verified": user.verified,
-                "created_at": user.created_at.isoformat() if user.created_at else None,
-                "last_login": user.last_login.isoformat() if user.last_login else None
-            },
-            message="User updated successfully"
-        )
-    except APIException:
-        raise
+        admin_service = AdminService(db)
+        # Get platform overview (includes all dashboard stats, recent users, orders, top products, metrics)
+        overview = await admin_service.get_platform_overview()
+        return Response.success(data=overview)
     except Exception as e:
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to update user: {str(e)}"
+            message=f"Failed to fetch dashboard data {str(e)}"
         )
 
 @router.put("/users/{user_id}/status")

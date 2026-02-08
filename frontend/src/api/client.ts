@@ -735,7 +735,7 @@ class APIClient {
 
   // Shipping methods
   async getShippingMethods() {
-    return this.get('/shipping-methods');
+    return this.get('/shipping/methods');
   }
 
   async calculateShipping(addressId, items) {

@@ -38,7 +38,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     const userRole = user.role;
     const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
     
-    if (!allowedRoles.includes(userRole)) {
+    if (!allowedRoles.some(role => role.toLowerCase() === userRole.toLowerCase())) {
       return (
         <Navigate 
           to="/" 
