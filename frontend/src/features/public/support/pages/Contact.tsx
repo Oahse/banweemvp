@@ -4,6 +4,8 @@ import { ChevronRightIcon, MapPinIcon, PhoneIcon, MailIcon, ClockIcon, CheckCirc
 import { Input } from '../../../../components/generic/Input';
 import { Textarea } from '../../../../components/generic/Textarea';
 import { Select } from '../../../../components/generic/Select';
+import { ContactMessagesAPI } from '../../../../api/contact-messages';
+import toast from 'react-hot-toast';
 
 export const Contact = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +15,7 @@ export const Contact = () => {
     message: '',
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -22,23 +25,35 @@ export const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // In a real app, you would send this data to your backend
+    setIsSubmitting(true);
     
-    // Show success message
-    setFormSubmitted(true);
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: '',
-    });
-    // Hide success message after 5 seconds
-    setTimeout(() => {
-      setFormSubmitted(false);
-    }, 5000);
+    try {
+      await ContactMessagesAPI.create(formData);
+      
+      // Show success message
+      setFormSubmitted(true);
+      toast.success('Message sent successfully! We\'ll get back to you soon.');
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+      });
+      
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        setFormSubmitted(false);
+      }, 5000);
+    } catch (error: any) {
+      console.error('Error sending message:', error);
+      toast.error(error.response?.data?.detail || 'Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const subjectOptions = [
@@ -216,8 +231,9 @@ export const Contact = () => {
                   </div>
                   <button
                     type="submit"
-                    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
-                    Send Message
+                    disabled={isSubmitting}
+                    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
                   </button>
                 </form>
               )}

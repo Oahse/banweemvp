@@ -76,6 +76,7 @@ const AdminPayments = lazy(() => import('./features/protected/admin/pages/Paymen
 const AdminRefunds = lazy(() => import('./features/protected/admin/pages/Refunds'));
 const Suppliers = lazy(() => import('./features/public/products/Suppliers'));
 const SupplierDetail = lazy(() => import('./features/public/products/SupplierDetail'));
+const AdminContactMessages = lazy(() => import('./features/protected/admin/pages/ContactMessages'));
 
 
 export const App: React.FC = () => {
