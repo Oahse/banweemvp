@@ -8,8 +8,6 @@ import { SkeletonDashboard } from '@/components/ui/SkeletonDashboard';
 import { usePaginatedApi } from '@/components/shared/hooks/useAsync';
 import OrdersAPI from '@/api/orders';
 import SubscriptionAPI from '@/api/subscription';
-import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
-import { AdminDashboardSkeleton } from '@/components/ui/SkeletonLoader';
 
 // Animation variants
 const containerVariants = {
@@ -65,7 +63,7 @@ export const Dashboard = ({
 
   // Handle loading state
   if (loading || subscriptionsLoading) {
-    return <AdminDashboardSkeleton />;
+    return <SkeletonDashboard />;
   }
 
   // Handle both array and object responses - moved before useEffect
@@ -92,9 +90,14 @@ export const Dashboard = ({
   })();
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-6"
+    >
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
           <div className="text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Orders</div>
           <div className="text-lg font-bold text-primary">{paginatedOrders?.total || 0}</div>
@@ -107,10 +110,10 @@ export const Dashboard = ({
           <div className="text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Wishlist</div>
           <div className="text-lg font-bold text-primary">-</div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Recent Orders */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+      <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
         <h3 className="text-base font-semibold mb-2 text-gray-900 dark:text-white">Recent Orders</h3>
         {Array.isArray(paginatedOrders?.data) ? (
           <div className="space-y-2">
@@ -130,7 +133,7 @@ export const Dashboard = ({
         ) : (
           <div className="text-center text-xs text-gray-500">No recent orders found.</div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
