@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRightIcon, MapPinIcon, PhoneIcon, MailIcon, ClockIcon, CheckCircleIcon } from 'lucide-react';
+import { ChevronRightIcon, MapPinIcon, PhoneIcon, MailIcon, ClockIcon, CheckCircleIcon, MessageCircle } from 'lucide-react';
 import { Input } from '../../../../components/generic/Input';
 import { Textarea } from '../../../../components/generic/Textarea';
 import { Select } from '../../../../components/generic/Select';
@@ -14,7 +14,7 @@ export const Contact = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -22,7 +22,7 @@ export const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // In a real app, you would send this data to your backend
     
@@ -53,7 +53,7 @@ export const Contact = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6 text-copy">
+    <div className="container mx-auto px-4 py-6 text-copy font-sans">
       {/* Breadcrumb */}
       <nav className="flex mb-4 text-xs">
         <Link to="/" className="text-copy-lighter hover:text-primary">
@@ -70,6 +70,92 @@ export const Contact = () => {
             Have questions about our products, shipping, or anything else? We're here to help. Fill out the form
             below or contact us directly.
           </p>
+        </div>
+
+        {/* Contact Methods */}
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-copy mb-3">Contact Methods</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* WhatsApp */}
+            <a
+              href="https://wa.me/18002269333"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`p-3 rounded-lg border-2 border-primary bg-primary/10 hover:bg-primary/20 transition-colors cursor-pointer`}
+            >
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-copy mb-0.5">
+                    WhatsApp Support
+                  </h4>
+                  <p className="text-xs text-copy-light mb-1">
+                    Get instant help via WhatsApp
+                  </p>
+                  <div className="text-xs text-copy-lighter space-y-0.5">
+                    <div>24/7</div>
+                    <div className="font-medium text-primary">
+                      &lt; 2 minutes
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+
+            {/* Phone */}
+            <a
+              href="tel:+12125551234"
+              className={`p-3 rounded-lg border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer`}
+            >
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <PhoneIcon className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-copy mb-0.5">
+                    Phone Support
+                  </h4>
+                  <p className="text-xs text-copy-light mb-1">
+                    Speak directly with our team
+                  </p>
+                  <div className="text-xs text-copy-lighter space-y-0.5">
+                    <div>9 AM - 9 PM EST</div>
+                    <div className="font-medium text-primary">
+                      Immediate
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+
+            {/* Email */}
+            <a
+              href="mailto:support@banwee.com"
+              className={`p-3 rounded-lg border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-colors cursor-pointer`}
+            >
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <MailIcon className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-copy mb-0.5">
+                    Email Support
+                  </h4>
+                  <p className="text-xs text-copy-light mb-1">
+                    Send us a detailed message
+                  </p>
+                  <div className="text-xs text-copy-lighter space-y-0.5">
+                    <div>24/7</div>
+                    <div className="font-medium text-primary">
+                      &lt; 4 hours
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4">

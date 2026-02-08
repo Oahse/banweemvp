@@ -53,7 +53,6 @@ const PrivacyPolicy = lazy(() => import('./features/public/marketing/PrivacyPoli
 const EmailVerification = lazy(() => import('./features/protected/auth/pages/EmailVerification'));
 const ResetPassword = lazy(() => import('./features/protected/auth/pages/ResetPassword'));
 const TrackOrder = lazy(() => import('./features/protected/account/pages/AccountTrackOrderPage'));
-const Support = lazy(() => import('./features/public/support/pages/Support'));
 const FAQ = lazy(() => import('./features/public/marketing/FAQ'));
 const AdminLayout = lazy(() => import('./components/layout/Layout').then(module => ({ default: module.AdminLayout })));
 const AdminDashboardPage = lazy(() => import('./features/protected/admin/pages/AdminDashboardPage'));
@@ -151,7 +150,6 @@ export const App: React.FC = () => {
                         <Route path="/suppliers/:id" element={<Layout><Suspense fallback={<PageSkeleton />}><SupplierDetail /></Suspense></Layout>} />
                         <Route path="/about" element={<Layout><About /></Layout>} />
                         <Route path="/contact" element={<Layout><Contact /></Layout>} />
-                        <Route path="/support" element={<Layout><Support /></Layout>} />
                         <Route path="/faq" element={<Layout><FAQ /></Layout>} />
                         <Route path="/terms" element={<Layout><TermsAndConditions /></Layout>} />
                         <Route path="/privacy" element={<Layout><PrivacyPolicy /></Layout>} />
