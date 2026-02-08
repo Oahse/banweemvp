@@ -21,10 +21,10 @@ const ShipmentTracking = lazy(() => import('@/features/shipping/pages/ShipmentTr
 const AccountWishlistPage = lazy(() => import('./AccountWishlistPage'));
 const AccountWishlistEditPage = lazy(() => import('./AccountWishlistEditPage'));
 const AccountAddressesPage = lazy(() => import('./AccountAddressesPage'));
-const AccountMySubscriptionsPage = lazy(() => import('./AccountMySubscriptionsPage').then(module => ({ default: module.AccountMySubscriptionsPage })));
+const AccountMySubscriptionsPage = lazy(() => import('./AccountMySubscriptionsPage').then(module => ({ default: module.MySubscriptions })));
 const AccountSubscriptionEditPage = lazy(() => import('./AccountSubscriptionEditPage'));
 const SubscriptionDetails = lazy(() => import('./SubscriptionDetails'));
-const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage').then(module => ({ default: module.AccountPaymentMethodsPage }))); // TODO: Implement payment methods
+// const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage').then(module => ({ default: module.AccountPaymentMethodsPage }))); // TODO: Implement payment methods
 
 // Loading Spinner
 const LoadingSpinner = () => (

@@ -226,10 +226,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIntendedDestination(destination);
   }, []);
 
-  // Derived roles
-  const isAdmin = user?.role === 'Admin';
-  const isSupplier = user?.role === 'Supplier';
-  const isCustomer = user?.role === 'Customer';
+  // Derived roles - case-insensitive for robustness
+  const isAdmin = user?.role?.toLowerCase() === 'admin' || user?.role?.toLowerCase() === 'superadmin';
+  const isSupplier = user?.role?.toLowerCase() === 'supplier';
+  const isCustomer = user?.role?.toLowerCase() === 'customer';
 
   const value = {
     user,

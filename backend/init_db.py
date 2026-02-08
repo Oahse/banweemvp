@@ -142,6 +142,7 @@ GLOBAL_TAX_RATES = [
     {"country_code": "RU", "country_name": "Russia", "province_code": None, "province_name": None, "tax_rate": 0.20, "tax_name": "VAT"},
     {"country_code": "UA", "country_name": "Ukraine", "province_code": None, "province_name": None, "tax_rate": 0.20, "tax_name": "VAT"},
     {"country_code": "TR", "country_name": "Turkey", "province_code": None, "province_name": None, "tax_rate": 0.18, "tax_name": "VAT"},
+]
 
 # Sample data constants for Agricultural E-commerce
 CATEGORIES = [
