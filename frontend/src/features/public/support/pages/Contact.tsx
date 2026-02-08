@@ -68,9 +68,9 @@ export const Contact = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6 text-copy font-sans">
+    <div className="container mx-auto px-4 py-6 text-copy font-sans animate-fade-in">
       {/* Breadcrumb */}
-      <nav className="flex mb-4 text-xs">
+      <nav className="flex mb-4 text-xs animate-slide-in">
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
@@ -88,7 +88,7 @@ export const Contact = () => {
         </div>
 
         {/* Contact Methods */}
-        <div className="mb-6">
+        <div className="mb-6 animate-slide-in" style={{ animationDelay: '0.1s' }}>
           <h2 className="text-sm font-semibold text-copy mb-3">Contact Methods</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* WhatsApp */}
@@ -173,7 +173,7 @@ export const Contact = () => {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col lg:flex-row gap-4 animate-slide-in" style={{ animationDelay: '0.2s' }}>
           {/* Contact Form */}
           <div className="lg:w-2/3">
             <div className="bg-surface rounded-lg shadow-sm p-3">
@@ -331,7 +331,7 @@ export const Contact = () => {
         </div>
 
         {/* Map */}
-        <div className="mt-6">
+        <div className="mt-6 animate-slide-in" style={{ animationDelay: '0.3s' }}>
           <div className="bg-surface rounded-lg shadow-sm p-3">
             <h2 className="text-sm font-semibold text-copy mb-3">Find Us</h2>
             <div className="h-64 bg-border rounded-lg overflow-hidden">

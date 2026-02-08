@@ -27,7 +27,7 @@ export const FAQ = () => {
   });
 
   return (
-    <div className="container mx-auto px-4 py-6 text-copy">
+    <div className="container mx-auto px-4 py-6 text-copy animate-fade-in">
       {/* Breadcrumb */}
       <nav className="flex mb-4 text-xs">
         <Link to="/" className="text-copy-lighter hover:text-primary">

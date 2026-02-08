@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Wrench, Clock, Mail, Twitter, Facebook, Instagram, RefreshCw } from 'lucide-react';
 
 interface MaintenanceProps {
@@ -49,48 +50,88 @@ const Maintenance: React.FC<MaintenanceProps> = ({
     { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/banwee', color: 'hover:text-pink-600' },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
+
+  const scaleVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-12 font-sans">
-      <div className="max-w-2xl w-full animate-fade-in">
+    <motion.div
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-6 font-sans"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <div className="max-w-2xl w-full">
         {/* Logo/Brand */}
-        <div className="text-center mb-8 animate-scale-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-4">
-            <Wrench className="w-10 h-10 text-primary animate-pulse" />
+        <motion.div className="text-center mb-6" variants={scaleVariants}>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-3">
+            <Wrench className="w-8 h-8 text-primary animate-pulse" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">
             Under Maintenance
           </h1>
-        </div>
+        </motion.div>
 
         {/* Main Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden animate-slide-in" style={{ animationDelay: '0.1s' }}>
+        <motion.div
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+          variants={itemVariants}
+        >
           {/* Progress Bar */}
           <div className="h-2 bg-gray-200 dark:bg-gray-700">
             <div className="h-full bg-primary animate-pulse" style={{ width: '60%' }}></div>
           </div>
 
-          <div className="p-8">
+          <div className="p-6">
             {/* Message */}
-            <div className="text-center mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <p className="text-base text-gray-700 dark:text-gray-300 mb-6">
+            <motion.div className="text-center mb-6" variants={itemVariants}>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
                 {message}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-gray-600 dark:text-gray-400">
                 We'll be back online shortly. Thank you for your patience!
               </p>
-            </div>
+            </motion.div>
 
             {/* Time Estimate */}
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6 mb-6 animate-scale-in" style={{ animationDelay: '0.3s' }}>
-              <div className="flex items-center justify-center gap-3 mb-3">
-                <Clock className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+            <motion.div
+              className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4"
+              variants={scaleVariants}
+            >
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white">
                   Estimated Downtime
                 </h3>
               </div>
               {showCountdown && timeRemaining ? (
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary mb-1 animate-pulse">
+                  <div className="text-xl font-bold text-primary mb-1 animate-pulse">
                     {timeRemaining}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -99,42 +140,45 @@ const Maintenance: React.FC<MaintenanceProps> = ({
                 </div>
               ) : (
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl font-bold text-primary">
                     {estimatedTime}
                   </div>
                 </div>
               )}
-            </div>
+            </motion.div>
 
             {/* What's Happening */}
-            <div className="mb-6 animate-slide-in" style={{ animationDelay: '0.4s' }}>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+            <motion.div className="mb-4" variants={itemVariants}>
+              <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-2">
                 What we're working on:
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 {[
                   'System performance improvements',
                   'Security updates and patches',
                   'New features and enhancements',
                   'Database optimization',
                 ].map((item, index) => (
-                  <li 
-                    key={index} 
-                    className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400 animate-slide-in"
-                    style={{ animationDelay: `${0.5 + index * 0.1}s` }}
+                  <motion.li
+                    key={index}
+                    className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400"
+                    variants={itemVariants}
                   >
                     <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 flex-shrink-0 animate-pulse"></div>
                     <span>{item}</span>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
 
             {/* Contact */}
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-6 animate-fade-in" style={{ animationDelay: '0.9s' }}>
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <motion.div
+              className="border-t border-gray-200 dark:border-gray-700 pt-4"
+              variants={itemVariants}
+            >
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-400" />
+                  <Mail className="w-3 h-3 text-gray-400" />
                   <a
                     href="mailto:support@banwee.com"
                     className="text-xs text-primary hover:underline"
@@ -142,49 +186,55 @@ const Maintenance: React.FC<MaintenanceProps> = ({
                     support@banwee.com
                   </a>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-600 dark:text-gray-400">Follow us:</span>
-                  {socialLinks.map((social, index) => (
-                    <a
+                  {socialLinks.map((social) => (
+                    <motion.a
                       key={social.name}
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`text-gray-400 ${social.color} transition-all hover:scale-110 animate-scale-in`}
-                      style={{ animationDelay: `${1.0 + index * 0.1}s` }}
+                      className={`text-gray-400 ${social.color} transition-all`}
                       aria-label={social.name}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                     >
-                      <social.icon className="w-4 h-4" />
-                    </a>
+                      <social.icon className="w-3 h-3" />
+                    </motion.a>
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Refresh Button */}
-            <div className="mt-6 text-center animate-scale-in" style={{ animationDelay: '1.3s' }}>
-              <button
+            <motion.div className="mt-4 text-center" variants={itemVariants}>
+              <motion.button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg transition-all hover:scale-105 text-sm font-medium"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition-all text-sm font-medium"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <RefreshCw className="w-4 h-4" />
                 Check Status
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Footer Note */}
-        <div className="text-center mt-6 text-xs text-gray-500 dark:text-gray-500 animate-fade-in" style={{ animationDelay: '1.4s' }}>
+        <motion.div
+          className="text-center mt-4 text-xs text-gray-500 dark:text-gray-500"
+          variants={itemVariants}
+        >
           <p>
             For urgent matters, please contact us at{' '}
             <a href="tel:+18002269333" className="text-primary hover:underline">
               1-800-BANWEE
             </a>
           </p>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

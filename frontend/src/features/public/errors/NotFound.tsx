@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Home, Search, ArrowLeft, Package, ShoppingBag, HelpCircle } from 'lucide-react';
 
 const NotFound: React.FC = () => {
@@ -17,11 +18,45 @@ const NotFound: React.FC = () => {
     { name: 'Help Center', href: '/faq', icon: HelpCircle },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
+
+  const scaleVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 py-12 font-sans">
-      <div className="max-w-2xl w-full text-center animate-fade-in">
+    <motion.div
+      className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 py-6 font-sans"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <div className="max-w-2xl w-full text-center">
         {/* 404 Illustration */}
-        <div className="mb-8 animate-scale-in">
+        <motion.div className="mb-6" variants={scaleVariants}>
           <div className="relative inline-block">
             <h1 className="text-9xl md:text-[12rem] font-bold text-primary/20 dark:text-primary/10 select-none">
               404
@@ -30,65 +65,83 @@ const NotFound: React.FC = () => {
               <Search className="w-16 h-16 md:w-24 md:h-24 text-primary animate-pulse" />
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Message */}
-        <div className="mb-8 animate-slide-in" style={{ animationDelay: '0.1s' }}>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+        <motion.div className="mb-6" variants={itemVariants}>
+          <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-2">
             Oops! Page Not Found
           </h2>
-          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+          <p className="text-xs text-gray-600 dark:text-gray-400 max-w-md mx-auto">
             The page you're looking for doesn't exist or has been moved. 
             Don't worry, let's get you back on track!
           </p>
-        </div>
+        </motion.div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12 animate-slide-in" style={{ animationDelay: '0.2s' }}>
-          <button
+        <motion.div
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8"
+          variants={itemVariants}
+        >
+          <motion.button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all hover:scale-105 text-sm font-medium w-full sm:w-auto"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all text-sm font-medium w-full sm:w-auto"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-4 h-4" />
             Go Back
-          </button>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg transition-all hover:scale-105 text-sm font-medium w-full sm:w-auto"
-          >
-            <Home className="w-4 h-4" />
-            Back to Home
-          </Link>
-        </div>
+          </motion.button>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition-all text-sm font-medium w-full sm:w-auto"
+            >
+              <Home className="w-4 h-4" />
+              Back to Home
+            </Link>
+          </motion.div>
+        </motion.div>
 
         {/* Quick Links */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-8 animate-slide-in" style={{ animationDelay: '0.3s' }}>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
+        <motion.div
+          className="border-t border-gray-200 dark:border-gray-700 pt-6"
+          variants={itemVariants}
+        >
+          <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3">
             Quick Links
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {quickLinks.map((link, index) => (
-              <Link
+            {quickLinks.map((link) => (
+              <motion.div
                 key={link.name}
-                to={link.href}
-                className="flex flex-col items-center gap-2 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-primary hover:shadow-md transition-all hover:scale-105 group animate-scale-in"
-                style={{ animationDelay: `${0.4 + index * 0.1}s` }}
+                variants={itemVariants}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <link.icon className="w-6 h-6 text-gray-400 group-hover:text-primary transition-colors" />
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">
-                  {link.name}
-                </span>
-              </Link>
+                <Link
+                  to={link.href}
+                  className="flex flex-col items-center gap-2 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-primary hover:shadow-md transition-all group"
+                >
+                  <link.icon className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">
+                    {link.name}
+                  </span>
+                </Link>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Help Text */}
-        <div className="mt-8 text-xs text-gray-500 dark:text-gray-500 animate-fade-in" style={{ animationDelay: '0.8s' }}>
+        <motion.div
+          className="mt-6 text-xs text-gray-500 dark:text-gray-500"
+          variants={itemVariants}
+        >
           Need help? <Link to="/contact" className="text-primary hover:underline">Contact our support team</Link>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -105,7 +105,7 @@ export const About = () => {
       </div>
 
       {/* Our Story */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <div className="max-w-4xl mx-auto mb-8 animate-slide-in" style={{ animationDelay: '0.2s' }}>
         <div className="text-center mb-6">
           <h2 className="text-sm md:text-base font-semibold text-copy mb-2">The Banwee Journey</h2>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
@@ -151,7 +151,7 @@ export const About = () => {
       </div>
 
       {/* Our Values */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <div className="max-w-4xl mx-auto mb-8 animate-slide-in" style={{ animationDelay: '0.3s' }}>
         <div className="text-center mb-6">
           <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Values</h2>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
@@ -174,7 +174,7 @@ export const About = () => {
       </div>
 
       {/* Our Team */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <div className="max-w-4xl mx-auto mb-8 animate-slide-in" style={{ animationDelay: '0.4s' }}>
         <div className="text-center mb-6">
           <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Meet Our Team</h2>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
@@ -202,7 +202,7 @@ export const About = () => {
       </div>
 
       {/* Impact Stats */}
-      <div className="bg-primary/10 py-6 mb-8">
+      <div className="bg-primary/10 py-6 mb-8 animate-slide-in" style={{ animationDelay: '0.5s' }}>
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-6">
             <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Impact</h2>

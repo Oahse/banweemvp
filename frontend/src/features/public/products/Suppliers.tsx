@@ -73,9 +73,9 @@ export const Suppliers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       {/* Header */}
-      <div className="bg-surface border-b border-border">
+      <div className="bg-surface border-b border-border animate-slide-in">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-main mb-2">Our Suppliers</h1>
