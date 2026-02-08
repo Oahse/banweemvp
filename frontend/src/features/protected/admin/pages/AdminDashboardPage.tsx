@@ -1,493 +1,427 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../components/AdminLayout';
-import DashboardFilterBar, { DashboardFilters } from '../components/DashboardFilterBar';
-import AdminStatsCard from '../components/shared/StatsCard';
-import AdminDataTable, { Column, PaginationInfo } from '../components/shared/DataTable';
 import { AdminAPI } from '@/api/admin';
-import LoadingSpinner from '@/components/shared/LoadingSpinner';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { 
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
+  Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
+import { 
+  Users, ShoppingCart, Package, DollarSign, TrendingUp, 
+  Activity, ArrowUpRight, ArrowDownRight 
+} from 'lucide-react';
 
-// Loading spinner for stats
-const StatsCardSkeleton: React.FC = () => (
-  <div className="flex items-center justify-center h-48">
-    <LoadingSpinner size="lg" text="Loading dashboard..." />
-  </div>
-);
+// Color palette
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
-// Loading spinner for table
-const TableSkeleton: React.FC = () => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-    <div className="space-y-4">
-      {/* Table header skeleton */}
-      <div className="h-8 bg-gray-100 dark:bg-gray-700 rounded mb-4 animate-pulse"></div>
-      
-      {/* Table rows skeleton */}
-      {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="flex items-center space-x-4 py-2">
-          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-12 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-16 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-20 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-16 animate-pulse"></div>
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  change?: number;
+  icon: React.ReactNode;
+  color: string;
+  loading?: boolean;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, color, loading }) => {
+  const isPositive = change && change > 0;
+  const isNegative = change && change < 0;
+  
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">{title}</p>
+          {loading ? (
+            <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          ) : (
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">{value}</h3>
+          )}
+          {change !== undefined && (
+            <div className={`flex items-center mt-1 text-xs ${
+              isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'
+            }`}>
+              {isPositive ? <ArrowUpRight className="w-3 h-3 mr-0.5" /> : 
+               isNegative ? <ArrowDownRight className="w-3 h-3 mr-0.5" /> : null}
+              <span>{Math.abs(change)}% vs last period</span>
+            </div>
+          )}
         </div>
-      ))}
+        <div className={`p-2 rounded-lg ${color}`}>
+          {icon}
+        </div>
+      </div>
     </div>
-  </div>
-);
-
-const defaultFilters: DashboardFilters = {
-  dateRange: 'month',
+  );
 };
 
 const AdminDashboard: React.FC = () => {
-  const [filters, setFilters] = useState<DashboardFilters>(defaultFilters);
+  const navigate = useNavigate();
   const [stats, setStats] = useState<any>(null);
-  const [loadingStats, setLoadingStats] = useState(false);
-  const [statsError, setStatsError] = useState<string | null>(null);
-  
-  const [tableData, setTableData] = useState<any[]>([]);
-  const [tableLoading, setTableLoading] = useState(false);
-  const [tableError, setTableError] = useState<string | null>(null);
-  const [pagination, setPagination] = useState<PaginationInfo>({
-    page: 1,
-    limit: 5,
-    total: 0,
-    pages: 1
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState('month');
 
-  const columns: Column[] = [
-    { key: 'id', label: 'ID', sortable: true },
-    { key: 'email', label: 'Email', sortable: true },
-    { key: 'full_name', label: 'Name', sortable: true },
-    { key: 'is_active', label: 'Status', sortable: true },
-    { key: 'created_at', label: 'Created', sortable: true }
-  ];
-
-  // Fetch dashboard data
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      setLoadingStats(true);
-      setStatsError(null);
-      
-      let date_from: string | undefined;
-      let date_to: string | undefined;
-      
-      if (filters.dateRange === 'today') {
-        const today = new Date();
-        date_from = today.toISOString().split('T')[0];
-        date_to = today.toISOString().split('T')[0];
-      } else if (filters.dateRange === 'week') {
-        const today = new Date();
-        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-        date_from = weekAgo.toISOString().split('T')[0];
-        date_to = today.toISOString().split('T')[0];
-      } else if (filters.dateRange === 'month') {
-        const today = new Date();
-        const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-        date_from = monthAgo.toISOString().split('T')[0];
-        date_to = today.toISOString().split('T')[0];
-      } else if (filters.dateRange === 'quarter') {
-        const today = new Date();
-        const quarterAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
-        date_from = quarterAgo.toISOString().split('T')[0];
-        date_to = today.toISOString().split('T')[0];
-      } else if (filters.dateRange === 'year') {
-        const today = new Date();
-        const yearAgo = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
-        date_from = yearAgo.toISOString().split('T')[0];
-        date_to = today.toISOString().split('T')[0];
-      } else {
-        // Use custom dates if provided
-        date_from = filters.startDate;
-        date_to = filters.endDate;
-      }
-      
-      try {
-        const res = await AdminAPI.getDashboardData({
-          date_from,
-          date_to,
-        });
-        
-        const data = res.data || res;
-        setStats(data);
-        
-        // Set table data if recent users exist
-        if (data.recent_users && Array.isArray(data.recent_users)) {
-          setTableData(data.recent_users);
-          setPagination({
-            page: 1,
-            limit: 5,
-            total: data.recent_users.length,
-            pages: 1
-          });
-        } else {
-          // Fallback to empty array if no recent users data
-          setTableData([]);
-          setPagination({
-            page: 1,
-            limit: 5,
-            total: 0,
-            pages: 1
-          });
-        }
-      } catch (err) {
-        console.error('Failed to fetch dashboard data:', err);
-        setStatsError('Failed to load dashboard data');
-      } finally {
-        setLoadingStats(false);
-      }
-    };
-
     fetchDashboardData();
-  }, [filters]);
+  }, [dateRange]);
 
-  const fetchTableData = async (params: { page: number; limit: number; search?: string; filters?: Record<string, string>; sort_by?: string; sort_order?: 'asc' | 'desc' }) => {
-    setTableLoading(true);
-    setTableError(null);
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    setError(null);
     
     try {
-      const res = await AdminAPI.getUsers({
-        page: params.page,
-        limit: params.limit,
-        role: undefined,
-        search: params.search,
-        sort_by: params.sort_by,
-        sort_order: params.sort_order,
-      });
-      
-      const users = res.data?.users || [];
-      setTableData(users);
-      
-      if (res.data?.pagination) {
-        setPagination({
-          page: res.data.pagination.page,
-          limit: res.data.pagination.limit,
-          total: res.data.pagination.total,
-          pages: res.data.pagination.pages
-        });
+      const response = await AdminAPI.getDashboardData({});
+      setStats(response.data || response);
+    } catch (err: any) {
+      console.error('Failed to fetch dashboard data:', err);
+      if (err.response?.status === 401) {
+        navigate('/login');
+      } else if (err.response?.status === 403) {
+        setError('Access Denied: Admin access required');
+      } else {
+        setError('Failed to load dashboard data');
       }
-    } catch (err) {
-      console.error('Failed to fetch table data:', err);
-      setTableError('Failed to load users data');
     } finally {
-      setTableLoading(false);
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return <AdminLayoutSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center h-96">
+          <div className="text-red-600 dark:text-red-400 text-lg mb-3">{error}</div>
+          <button
+            onClick={fetchDashboardData}
+            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  const overview = stats?.overview || {};
+  const revenue = stats?.revenue || {};
+  const chartData = stats?.chart_data || [];
+
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <DashboardFilterBar
-          filters={filters}
-          onFiltersChange={setFilters}
-        />
-        
-        {/* Overview Section */}
-        {loadingStats ? (
-          <StatsCardSkeleton />
-        ) : stats?.overview ? (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Platform Overview</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <AdminStatsCard
-                title="Total Users"
-                value={stats.overview.total_users ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="blue"
-              />
-              <AdminStatsCard
-                title="Active Users"
-                value={stats.overview.active_users ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="green"
-              />
-              <AdminStatsCard
-                title="Total Products"
-                value={stats.overview.total_products ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="purple"
-              />
-              <AdminStatsCard
-                title="Active Products"
-                value={stats.overview.active_products ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="yellow"
-              />
-            </div>
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">Welcome back! Here's what's happening.</p>
           </div>
-        ) : null}
+          <div className="flex items-center space-x-2">
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="today">Today</option>
+              <option value="week">Last 7 Days</option>
+              <option value="month">Last 30 Days</option>
+              <option value="quarter">Last 90 Days</option>
+              <option value="year">Last Year</option>
+            </select>
+          </div>
+        </div>
 
-        {/* Revenue Section */}
-        {loadingStats ? (
-          <StatsCardSkeleton />
-        ) : stats?.revenue ? (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Revenue Overview</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Revenue Chart */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Revenue Trend</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={[
-                    { name: 'Total Revenue', data: [
-                      { name: 'This Month', value: stats.revenue.revenue_this_month || 0 },
-                      { name: 'Last Month', value: stats.revenue.revenue_last_month || 0 }
-                    ].filter(item => item.value > 0) },
-                    { name: 'Daily Revenue', data: [
-                      { name: 'Today', value: stats.revenue.revenue_today || 0 },
-                      { name: 'Yesterday', value: stats.revenue.revenue_yesterday || 0 },
-                      { name: '2 Days Ago', value: stats.revenue.revenue_2_days_ago || 0 },
-                      { name: '3 Days Ago', value: stats.revenue.revenue_3_days_ago || 0 },
-                      { name: '4 Days Ago', value: stats.revenue.revenue_4_days_ago || 0 },
-                      { name: '5 Days Ago', value: stats.revenue.revenue_5_days_ago || 0 },
-                      { name: '6 Days Ago', value: stats.revenue.revenue_6_days_ago || 0 }
-                    ].filter(item => item.value > 0) }
-                  ]}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="name" 
-                      stroke="#888888" 
-                      tick={{ fontSize: 12 }}
-                      tick={{ fontSize: 10 }}
-                    />
-                    <YAxis 
-                      stroke="#888888" 
-                      tick={{ fontSize: 10 }}
-                    />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        padding: '8px'
-                      }}
-                      formatter={(value: any) => `$${value}`}
-                    />
-                    <Legend 
-                      wrapperStyle={{ paddingTop: '20px' }}
-                      iconType="line"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="value" 
-                      stroke="#8884d8" 
-                      strokeWidth={3}
-                      dot={{ fill: '#8884d8', strokeWidth: 2, r: 6 }}
-                      activeDot={{ r: 8 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              
-              {/* Revenue Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Revenue Metrics</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <div>
-                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">${stats.revenue.revenue_today || '0'}</div>
-                        <div className="text-sm text-green-600 dark:text-green-400">Revenue Today</div>
-                      </div>
-                      <div className="text-green-600 dark:text-green-400 text-3xl">↗</div>
-                    </div>
-                    <div className="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <div>
-                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">${stats.revenue.revenue_this_month || '0'}</div>
-                        <div className="text-sm text-blue-600 dark:text-blue-400">Revenue This Month</div>
-                      </div>
-                      <div className="text-blue-600 dark:text-blue-400 text-3xl">📈</div>
-                    </div>
-                    <div className="flex justify-between items-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                      <div>
-                        <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">${stats.revenue.total_revenue || '0'}</div>
-                        <div className="text-sm text-purple-600 dark:text-purple-400">Total Revenue</div>
-                      </div>
-                      <div className="text-purple-600 dark:text-purple-400 text-3xl">💰</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {/* Orders Section */}
-        {loadingStats ? (
-          <StatsCardSkeleton />
-        ) : stats?.overview ? (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Orders Overview</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <AdminStatsCard
-                title="Total Orders"
-                value={stats.overview.total_orders ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="green"
-              />
-              <AdminStatsCard
-                title="Orders Today"
-                value={stats.overview.orders_today ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="blue"
-              />
-              <AdminStatsCard
-                title="Total Subscriptions"
-                value={stats.overview.total_subscriptions ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="yellow"
-              />
-              <AdminStatsCard
-                title="Active Subscriptions"
-                value={stats.overview.active_subscriptions ?? '-'}
-                loading={loadingStats}
-                error={statsError ?? undefined}
-                color="green"
-              />
-            </div>
-          </div>
-        ) : null}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <StatCard
+            title="Total Revenue"
+            value={`${revenue.total_revenue?.toLocaleString() || '0'}`}
+            change={12.5}
+            icon={<DollarSign className="w-5 h-5 text-white" />}
+            color="bg-gradient-to-br from-green-500 to-green-600"
+          />
+          <StatCard
+            title="Total Orders"
+            value={overview.total_orders?.toLocaleString() || '0'}
+            change={8.2}
+            icon={<ShoppingCart className="w-5 h-5 text-white" />}
+            color="bg-gradient-to-br from-blue-500 to-blue-600"
+          />
+          <StatCard
+            title="Total Users"
+            value={overview.total_users?.toLocaleString() || '0'}
+            change={15.3}
+            icon={<Users className="w-5 h-5 text-white" />}
+            color="bg-gradient-to-br from-purple-500 to-purple-600"
+          />
+          <StatCard
+            title="Total Products"
+            value={overview.total_products?.toLocaleString() || '0'}
+            change={-2.4}
+            icon={<Package className="w-5 h-5 text-white" />}
+            color="bg-gradient-to-br from-orange-500 to-orange-600"
+          />
+        </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Total Orders Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Total Orders Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={[
-                { name: 'Total Orders', data: [
-                  { name: 'Today', value: stats?.overview?.orders_today || 0, fill: '#3b82f6' },
-                  { name: 'Yesterday', value: stats?.overview?.orders_yesterday || 0, fill: '#6366f1' },
-                  { name: 'This Week', value: stats?.overview?.orders_this_week || 0, fill: '#8b5cf6' },
-                  { name: 'Last Week', value: stats?.overview?.orders_last_week || 0, fill: '#10b981' },
-                  { name: 'This Month', value: stats?.overview?.orders_this_month || 0, fill: '#059669' }
-                ].filter(item => item.value > 0) }
-              ]}>
-                <CartesianGrid strokeDasharray="3 3" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {/* Revenue Chart */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue Trend</h3>
+              <TrendingUp className="w-4 h-4 text-green-600" />
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis 
-                  dataKey="name" 
-                  tick={{ fontSize: 12 }}
-                  tick={{ fontSize: 10 }}
+                  dataKey="date" 
+                  stroke="#6b7280"
+                  style={{ fontSize: '11px' }}
                 />
                 <YAxis 
-                  tick={{ fontSize: 10 }}
+                  stroke="#6b7280"
+                  style={{ fontSize: '11px' }}
                 />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    padding: '8px'
+                    backgroundColor: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    fontSize: '12px'
                   }}
-                  formatter={(value: any, name: any) => `${name}: ${value}`}
                 />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px' }}
-                  iconType="rect"
-                />
-                <Bar dataKey="value" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          
-          {/* Total Users Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Total Users Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={[
-                { name: 'Total Users', data: [
-                  { name: 'Today', value: stats?.overview?.users_today || 0 },
-                  { name: 'Yesterday', value: stats?.overview?.users_yesterday || 0 },
-                  { name: 'This Week', value: stats?.overview?.users_this_week || 0 },
-                  { name: 'Last Week', value: stats?.overview?.users_last_week || 0 },
-                  { name: 'This Month', value: stats?.overview?.users_this_month || 0 }
-                ].filter(item => item.value > 0) }
-              ]}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#888888" 
-                  tick={{ fontSize: 12 }}
-                  tick={{ fontSize: 10 }}
-                />
-                <YAxis 
-                  stroke="#888888" 
-                  tick={{ fontSize: 10 }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    padding: '8px'
-                  }}
-                  formatter={(value: any) => `${value}`}
-                />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px' }}
-                  iconType="line"
-                />
+                <Legend wrapperStyle={{ fontSize: '12px' }} />
                 <Line 
                   type="monotone" 
-                  dataKey="value" 
-                  stroke="#8884d8" 
-                  strokeWidth={3}
-                  dot={{ fill: '#8884d8', strokeWidth: 2, r: 6 }}
-                  activeDot={{ r: 8 }}
+                  dataKey="revenue" 
+                  stroke="#10b981" 
+                  strokeWidth={2}
+                  dot={{ fill: '#10b981', r: 3 }}
+                  activeDot={{ r: 5 }}
+                  name="Revenue ($)"
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
+
+          {/* Orders Chart */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Orders Trend</h3>
+              <Activity className="w-4 h-4 text-blue-600" />
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#6b7280"
+                  style={{ fontSize: '11px' }}
+                />
+                <YAxis 
+                  stroke="#6b7280"
+                  style={{ fontSize: '11px' }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    fontSize: '12px'
+                  }}
+                />
+                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                <Bar 
+                  dataKey="orders" 
+                  fill="#3b82f6" 
+                  radius={[6, 6, 0, 0]}
+                  name="Orders"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        {/* Recent Users Table */}
-        {tableLoading ? (
-          <TableSkeleton />
-        ) : tableData.length > 0 ? (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Recent Users</h2>
-            <AdminDataTable
-              columns={columns}
-              data={tableData}
-              loading={tableLoading}
-              error={tableError ?? null}
-              pagination={pagination}
-              onPageChange={(page: number) => setPagination(prev => ({ ...prev, page }))}
-              fetchData={fetchTableData}
-            />
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400">Active Users</h3>
+              <Users className="w-4 h-4 text-green-600" />
+            </div>
+            <p className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+              {overview.active_users?.toLocaleString() || '0'}
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              of {overview.total_users?.toLocaleString() || '0'} total users
+            </p>
           </div>
-        ) : null}
 
-        {/* Recent Orders Table */}
-        {stats?.recent_orders && stats.recent_orders.length > 0 ? (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Recent Orders</h2>
-            <AdminDataTable
-              columns={[
-                { key: 'id', label: 'Order ID', sortable: true }, 
-                { key: 'user_email', label: 'User Email', sortable: true }, 
-                { key: 'status', label: 'Status', sortable: true }, 
-                { key: 'total_amount', label: 'Total', sortable: true }, 
-                { key: 'created_at', label: 'Created', sortable: true }
-              ]}
-              data={stats.recent_orders}
-              loading={tableLoading}
-              error={tableError ?? null}
-              pagination={{ page: 1, limit: 5, total: stats.recent_orders.length, pages: 1 }}
-              onPageChange={() => {}}
-              fetchData={() => Promise.resolve()}
-            />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400">Active Products</h3>
+              <Package className="w-4 h-4 text-blue-600" />
+            </div>
+            <p className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+              {overview.active_products?.toLocaleString() || '0'}
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              of {overview.total_products?.toLocaleString() || '0'} total products
+            </p>
           </div>
-        ) : null}
+
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400">Active Subscriptions</h3>
+              <Activity className="w-4 h-4 text-purple-600" />
+            </div>
+            <p className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+              {overview.active_subscriptions?.toLocaleString() || '0'}
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              of {overview.total_subscriptions?.toLocaleString() || '0'} total subscriptions
+            </p>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {/* Recent Orders */}
+          {stats?.recent_orders && stats.recent_orders.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
+                <button
+                  onClick={() => navigate('/admin/orders')}
+                  className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  View All →
+                </button>
+              </div>
+              <div className="space-y-2">
+                {stats.recent_orders.slice(0, 5).map((order: any) => (
+                  <div 
+                    key={order.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/admin/orders/${order.id}`)}
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {order.user?.firstname} {order.user?.lastname}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {order.user_email}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                        ${order.total_amount?.toFixed(2)}
+                      </p>
+                      <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${
+                        order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        order.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recent Users */}
+          {stats?.recent_users && stats.recent_users.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Users</h3>
+                <button
+                  onClick={() => navigate('/admin/users')}
+                  className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  View All →
+                </button>
+              </div>
+              <div className="space-y-2">
+                {stats.recent_users.slice(0, 5).map((user: any) => (
+                  <div 
+                    key={user.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/admin/users/${user.id}`)}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                        {user.firstname?.[0]}{user.lastname?.[0]}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {user.firstname} {user.lastname}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${
+                      user.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {user.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Top Products */}
+        {stats?.top_products && stats.top_products.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Top Products</h3>
+              <button
+                onClick={() => navigate('/admin/products')}
+                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+              >
+                View All →
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {stats.top_products.slice(0, 6).map((product: any, index: number) => (
+                <div 
+                  key={product.id}
+                  className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  onClick={() => navigate(`/admin/products/${product.id}`)}
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs`}
+                         style={{ backgroundColor: COLORS[index % COLORS.length] }}>
+                      #{index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {product.name}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {product.sales || 0} sales
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

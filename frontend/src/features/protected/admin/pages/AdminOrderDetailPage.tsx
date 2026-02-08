@@ -5,8 +5,10 @@ import AdminAPI from '@/api/admin';
 import apiClient from '@/api/client';
 import { Dropdown } from '@/components/ui/Dropdown';
 import toast from 'react-hot-toast';
-import { AdminLayout } from '@/components/layout/Layout';
+import AdminLayout from '../components/AdminLayout';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { OrderDetailSkeleton } from '../components/skeletons/OrdersSkeleton';
 
 interface OrderDetail {
   id: string;
@@ -248,13 +250,7 @@ export const AdminOrderDetail = () => {
   };
 
   if (loading) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader className="w-12 h-12 text-primary animate-spin" />
-        </div>
-      </AdminLayout>
-    );
+    return <AdminLayoutSkeleton />;
   }
 
   if (error || !order) {

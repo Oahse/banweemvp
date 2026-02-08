@@ -2,8 +2,14 @@
  * Shopping Cart API endpoints
  * 
  * ACCESS LEVELS:
- * - Authenticated: All cart operations require user login
- * - Public: Stock checking (no authentication required)
+ * - Guest Users: Can use cart without login (uses cookie-based cart ID)
+ * - Authenticated Users: Cart is linked to user account
+ * - Cart Merge: Guest cart automatically merges with user cart on login
+ * 
+ * CART FLOW (Amazon-style):
+ * 1. Guest adds items → Backend creates guest_cart_id cookie
+ * 2. User logs in → Call mergeCart() to merge guest cart with user cart
+ * 3. Cookie is cleared, cart is now linked to user account
  */
 
 import { apiClient } from './client';
@@ -13,8 +19,8 @@ import { apiClient } from './client';
 
 export class CartAPI {
   /**
-   * Get user's cart
-   * ACCESS: Authenticated - Requires user login
+   * Get user's cart (works for both guest and authenticated users)
+   * ACCESS: Public - Works without authentication (uses cookie for guests)
    */
   static async getCart(country?: string, province?: string) {
     const params = new URLSearchParams();
@@ -31,8 +37,8 @@ export class CartAPI {
   }
 
   /**
-   * Add item to cart
-   * ACCESS: Authenticated - Requires user login
+   * Add item to cart (works for both guest and authenticated users)
+   * ACCESS: Public - Works without authentication (uses cookie for guests)
    */
   static async addToCart(item: any, country?: string, province?: string) {
     const _country = country || localStorage.getItem('detected_country') || 'US';
@@ -196,9 +202,15 @@ export class CartAPI {
     return await apiClient.get('/cart/saved-items');
   }
 
-  static async mergeCart(guestCartItems: any[]) {
+  /**
+   * Merge guest cart with user cart after login
+   * ACCESS: Authenticated - Requires user login
+   * This is called automatically after login to merge any guest cart items
+   */
+  static async mergeCart() {
     // Token is automatically added by interceptor
-    return await apiClient.post('/cart/merge', { items: guestCartItems });
+    // Backend will read guest_cart_id from cookie and merge automatically
+    return await apiClient.post('/cart/merge', {});
   }
 
   static async getCheckoutSummary() {

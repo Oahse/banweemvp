@@ -6,7 +6,9 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
-import { AdminLayout } from '@/components/layout/Layout';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { ProductsListSkeleton } from '../components/skeletons/ProductsSkeleton';
 
 const LIMIT = 10;
 
@@ -141,7 +143,9 @@ const AdminProductsPage = () => {
         
         const normalizedProducts = allProducts.map((product: any) => ({
           ...product,
-          stock: product.stock ?? product.total_stock ?? product.primary_variant?.stock ?? 0
+          stock: product.stock ?? product.total_stock ?? product.primary_variant?.stock ?? 0,
+          status: product.is_active ? 'active' : 'inactive',
+          price: product.price ?? product.min_price ?? 0
         }));
         
         // Apply client-side filtering and sorting if needed
@@ -285,14 +289,7 @@ const AdminProductsPage = () => {
   };
 
   if (initialLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading products...</p>
-        </div>
-      </div>
-    );
+    return <AdminLayoutSkeleton />;
   }
 
   return (

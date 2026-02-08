@@ -507,7 +507,10 @@ class AdminService:
             
             offset = (page - 1) * limit
             
-            query = select(Order).options(selectinload(Order.user))
+            query = select(Order).options(
+                selectinload(Order.user),
+                selectinload(Order.items)
+            )
             count_query = select(func.count(Order.id))
             
             conditions = []
@@ -559,16 +562,24 @@ class AdminService:
                 "data": [
                     {
                         "id": str(order.id),
+                        "order_number": order.order_number,
                         "user_email": order.user.email if order.user else "Unknown",
+                        "user_name": f"{order.user.firstname or ''} {order.user.lastname or ''}".strip() if order.user else None,
                         "user": {
                             "firstname": order.user.firstname if order.user else None,
                             "lastname": order.user.lastname if order.user else None,
                             "email": order.user.email if order.user else "Unknown"
                         } if order.user else None,
                         "total_amount": float(order.total_amount),
-                        "status": order.order_status,
+                        "status": order.order_status.value if hasattr(order.order_status, "value") else order.order_status,
+                        "order_status": order.order_status.value if hasattr(order.order_status, "value") else order.order_status,
+                        "payment_status": order.payment_status.value if hasattr(order.payment_status, "value") else order.payment_status,
+                        "fulfillment_status": order.fulfillment_status.value if hasattr(order.fulfillment_status, "value") else order.fulfillment_status,
                         "created_at": order.created_at.isoformat() if order.created_at else None,
-                        "updated_at": order.updated_at.isoformat() if order.updated_at else None
+                        "updated_at": order.updated_at.isoformat() if order.updated_at else None,
+                        "shipped_at": order.shipped_at.isoformat() if order.shipped_at else None,
+                        "delivered_at": order.delivered_at.isoformat() if order.delivered_at else None,
+                        "items_count": len(order.items) if order.items else 0
                     }
                     for order in orders
                 ],

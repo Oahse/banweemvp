@@ -4,7 +4,9 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import { AdminLayout } from '@/components/layout/Layout';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { PaymentsListSkeleton } from '../components/skeletons/PaymentsSkeleton';
 
 interface Payment {
   id: string;
@@ -261,17 +263,13 @@ export const Payments = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
-      </div>
-    );
+    return <AdminLayoutSkeleton />;
   }
 
   return (
     <AdminLayout>
-    <div className={`space-y-6 overflow-x-hidden ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
           <h1 className="text-xl lg:text-2xl font-semibold">Payments Management</h1>
           <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage payment transactions and processing</p>
@@ -388,23 +386,34 @@ export const Payments = () => {
       {error && (
         <div className={`p-4 rounded-lg border flex items-start gap-3 ${
           currentTheme === 'dark' 
-            ? 'bg-red-900/20 border-red-800 text-red-200' 
-            : 'bg-red-50 border-red-200 text-red-800'
+            ? 'bg-error/10 border-error/30 text-error' 
+            : 'bg-error/10 border-error/30 text-error'
         }`}>
           <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold">Error</p>
-            <p className="text-sm">{error}</p>
+          <div className="flex-1">
+            <p className="font-semibold">Error Loading Payments</p>
+            <p className="text-sm mt-1">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className={`mt-2 text-sm underline hover:no-underline ${
+                currentTheme === 'dark' ? 'text-error hover:text-error-light' : 'text-error hover:text-error-dark'
+              }`}
+            >
+              Try again
+            </button>
           </div>
         </div>
       )}
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className="text-base lg:text-lg font-semibold">All Payments</h2>
-        </div>
-
-        {payments.length > 0 ? (
+        {loading && !initialLoading ? (
+          <div className="p-8">
+            <div className="flex items-center justify-center">
+              <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
+              <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating payments...</span>
+            </div>
+          </div>
+        ) : payments.length > 0 ? (
           <>
             {/* Desktop table */}
             <div className="overflow-x-auto hidden md:block max-w-full">

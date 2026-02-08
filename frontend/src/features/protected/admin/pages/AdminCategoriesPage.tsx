@@ -4,6 +4,9 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { CategoriesListSkeleton } from '../components/skeletons/CategoriesSkeleton';
 
 const LIMIT = 10;
 
@@ -255,18 +258,12 @@ const AdminCategoriesPage = () => {
   };
 
   if (initialLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading categories...</p>
-        </div>
-      </div>
-    );
+    return <AdminLayoutSkeleton />;
   }
 
   return (
-    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <AdminLayout>
+      <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
           <h1 className="text-xl lg:text-2xl font-semibold">Category Management</h1>
@@ -772,6 +769,7 @@ const AdminCategoriesPage = () => {
         </div>
       )}
     </div>
+    </AdminLayout>
   );
 };
 

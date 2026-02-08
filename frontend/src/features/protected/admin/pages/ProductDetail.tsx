@@ -3,7 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, ArrowLeft, Package, DollarSign, Tag, User, Image as ImageIcon, Warehouse, RefreshCw, Edit, FileText, Salad } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import { AdminLayout } from '@/components/layout/Layout';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { ProductDetailSkeleton } from '../components/skeletons/ProductsSkeleton';
 
 export const AdminProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -43,41 +45,39 @@ export const AdminProductDetail = () => {
   }, [productId]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
-      </div>
-    );
+    return <AdminLayoutSkeleton />;
   }
 
   if (error || !product) {
     return (
-      <div className="space-y-6">
-        <button
-          onClick={() => navigate('/admin/products')}
-          className="inline-flex items-center gap-2 text-copy-light hover:text-copy transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Products
-        </button>
-        
-        {error && (
-          <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="font-semibold text-destructive">Error</p>
-              <p className="text-destructive/80 text-sm">{error}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-destructive text-white rounded text-sm hover:bg-destructive/90 transition-colors"
-              >
-                <RefreshCw className="w-3 h-3" />
-                Retry
-              </button>
+      <AdminLayout>
+        <div className="space-y-6">
+          <button
+            onClick={() => navigate('/admin/products')}
+            className="inline-flex items-center gap-2 text-copy-light hover:text-copy transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Products
+          </button>
+          
+          {error && (
+            <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-semibold text-destructive">Error</p>
+                <p className="text-destructive/80 text-sm">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-destructive text-white rounded text-sm hover:bg-destructive/90 transition-colors"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  Retry
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </AdminLayout>
     );
   }
 

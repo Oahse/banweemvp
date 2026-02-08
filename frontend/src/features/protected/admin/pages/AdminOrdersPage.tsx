@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, ArrowUpDownIcon, EyeIcon, PackageIcon } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
+import { OrdersListSkeleton } from '../components/skeletons/OrdersSkeleton';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
@@ -195,6 +197,11 @@ const AdminOrdersPage: React.FC = () => {
   const handleView = (order: Order) => {
     navigate(`/admin/orders/${order.id}`);
   };
+
+  // Show full page skeleton on initial load
+  if (initialLoading) {
+    return <AdminLayoutSkeleton />;
+  }
 
   return (
     <AdminLayout>
