@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   User,
   BarChart,
@@ -27,6 +28,7 @@ import {
   Mail,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { containerFastVariants, itemFastVariants } from '@/utils/pageAnimations';
 
 interface AdminLayoutProps {
   children?: React.ReactNode;
@@ -158,11 +160,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
         {/* Page content */}
         <main className="flex-1">
-          <div className="py-4">
+          <motion.div 
+            className="py-4"
+            initial="hidden"
+            animate="visible"
+            variants={containerFastVariants}
+          >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               {children || <Outlet />}
             </div>
-          </div>
+          </motion.div>
         </main>
       </div>
     </div>

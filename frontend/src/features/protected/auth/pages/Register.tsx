@@ -67,7 +67,13 @@ export const Register = () => {
     if (isAuthenticated) {
       // Determines the appropriate redirect path after successful login/registration
       const getRedirectPath = () => {
-        // First priority: intended destination (from protected route)
+        // First priority: Check if user was redirected from another page
+        if (location.state?.from?.pathname && location.state.from.pathname !== '/register') {
+          console.log('Redirecting back to:', location.state.from.pathname);
+          return location.state.from.pathname + (location.state.from.search || '');
+        }
+        
+        // Second priority: intended destination (from protected route)
         if (intendedDestination && (intendedDestination as any).path !== '/register') {
           const destination = intendedDestination as any;
           // Always redirect back to the original page where the user was
@@ -75,7 +81,7 @@ export const Register = () => {
           return destination.path;
         }
         
-        // Second priority: redirect query parameter
+        // Third priority: redirect query parameter
         const params = new URLSearchParams(location.search);
         const redirect = params.get('redirect');
         if (redirect) return redirect;
@@ -192,6 +198,21 @@ export const Register = () => {
         className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light"
         variants={itemVariants}
       >
+        {/* Show message if redirected from another page */}
+        {(location.search.includes('redirect=') || location.state?.from?.pathname) && (
+          <motion.div 
+            className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-md"
+            variants={itemVariants}
+          >
+            <p className="text-sm text-copy">
+              {location.state?.from?.pathname 
+                ? 'Please create an account or log in to continue.'
+                : 'Please create an account to continue to your requested page.'
+              }
+            </p>
+          </motion.div>
+        )}
+        
         <motion.h1 className="text-xl font-bold text-main mb-4 text-center" variants={itemVariants}>
           Create an Account
         </motion.h1>

@@ -16,25 +16,60 @@ export const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
   className = ''
 }) => {
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16'
+    sm: 'w-6 h-6',
+    md: 'w-12 h-12',
+    lg: 'w-18 h-18',
+    xl: 'w-24 h-24'
   };
 
   const colorClasses = {
-    primary: 'border-blue-600 dark:border-blue-400',
-    secondary: 'border-gray-600 dark:border-gray-400',
-    success: 'border-green-600 dark:border-green-400',
-    error: 'border-red-600 dark:border-red-400',
-    warning: 'border-yellow-600 dark:border-yellow-400'
+    primary: 'fill-green-600 dark:fill-green-400',
+    secondary: 'fill-gray-600 dark:fill-gray-400',
+    success: 'fill-green-600 dark:fill-green-400',
+    error: 'fill-red-600 dark:fill-red-400',
+    warning: 'fill-yellow-600 dark:fill-yellow-400'
+  };
+
+  const bgColorClasses = {
+    primary: 'bg-green-600 dark:bg-green-400',
+    secondary: 'bg-gray-600 dark:bg-gray-400',
+    success: 'bg-green-600 dark:bg-green-400',
+    error: 'bg-red-600 dark:bg-red-400',
+    warning: 'bg-yellow-600 dark:bg-yellow-400'
   };
 
   const renderLoader = () => {
     switch (variant) {
       case 'spinner':
         return (
-          <div className={`${sizeClasses[size]} border-4 ${colorClasses[color]} border-t-transparent rounded-full animate-spin`} />
+          <div className={`${sizeClasses[size]} relative`}>
+            <svg
+              className="animate-spin"
+              viewBox="0 0 100 100"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* Rotating petals */}
+              {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
+                <ellipse
+                  key={index}
+                  cx="50"
+                  cy="20"
+                  rx="8"
+                  ry="18"
+                  className={colorClasses[color]}
+                  opacity={1 - (index * 0.12)}
+                  transform={`rotate(${index * 45} 50 50)`}
+                />
+              ))}
+              {/* Center circle */}
+              <circle
+                cx="50"
+                cy="50"
+                r="8"
+                className={colorClasses[color]}
+              />
+            </svg>
+          </div>
         );
       
       case 'dots':
@@ -43,7 +78,7 @@ export const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
             {[0, 1, 2].map((index) => (
               <div
                 key={index}
-                className={`${sizeClasses[size]} ${colorClasses[color]} rounded-full animate-bounce`}
+                className={`w-3 h-3 ${bgColorClasses[color]} rounded-full animate-bounce`}
                 style={{
                   animationDelay: `${index * 0.1}s`,
                   animationDuration: '0.6s'
@@ -55,7 +90,7 @@ export const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
       
       case 'pulse':
         return (
-          <div className={`${sizeClasses[size]} ${colorClasses[color]} rounded-full animate-pulse`} />
+          <div className={`${sizeClasses[size]} ${bgColorClasses[color]} rounded-full animate-pulse`} />
         );
       
       case 'wave':
@@ -64,7 +99,7 @@ export const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
             {[0, 1, 2, 3, 4].map((index) => (
               <div
                 key={index}
-                className={`${sizeClasses[size]} ${colorClasses[color]} rounded-full animate-pulse`}
+                className={`w-2 h-8 ${bgColorClasses[color]} rounded-full animate-pulse`}
                 style={{
                   animationDelay: `${index * 0.1}s`,
                   animationDuration: '1s'
@@ -75,7 +110,34 @@ export const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
         );
       
       default:
-        return <div className={`${sizeClasses[size]} ${colorClasses[color]} rounded-full animate-spin`} />;
+        return (
+          <div className={`${sizeClasses[size]} relative`}>
+            <svg
+              className="animate-spin"
+              viewBox="0 0 100 100"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
+                <ellipse
+                  key={index}
+                  cx="50"
+                  cy="20"
+                  rx="8"
+                  ry="18"
+                  className={colorClasses[color]}
+                  opacity={1 - (index * 0.12)}
+                  transform={`rotate(${index * 45} 50 50)`}
+                />
+              ))}
+              <circle
+                cx="50"
+                cy="50"
+                r="8"
+                className={colorClasses[color]}
+              />
+            </svg>
+          </div>
+        );
     }
   };
 
@@ -83,7 +145,7 @@ export const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
     <div className={`flex flex-col items-center justify-center space-y-4 ${className}`}>
       {renderLoader()}
       {text && (
-        <p className="text-sm text-gray-600 dark:text-gray-400 animate-pulse">
+        <p className="text-sm text-gray-700 dark:text-gray-300 animate-pulse">
           {text}
         </p>
       )}
@@ -106,10 +168,10 @@ export const PageTransitionLoader: React.FC<{ children: React.ReactNode }> = ({ 
   return (
     <div className="relative">
       {isLoading && (
-        <div className="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 flex items-center justify-center transition-colors duration-200">
           <div className="text-center">
             <AnimatedLoader size="xl" variant="spinner" color="primary" />
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 animate-pulse">
+            <p className="mt-4 text-lg text-gray-700 dark:text-gray-300 animate-pulse">
               Loading...
             </p>
           </div>
@@ -130,7 +192,7 @@ export const ShimmerCard: React.FC<{
   className?: string;
 }> = ({ lines = 3, showAvatar = false, showButton = false, className = '' }) => {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 ${className}`}>
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors duration-200 ${className}`}>
       <div className="animate-pulse">
         {showAvatar && (
           <div className="flex items-center space-x-4 mb-4">
@@ -174,7 +236,7 @@ export const LoadingOverlay: React.FC<{
   if (!isLoading) return null;
 
   return (
-    <div className="absolute inset-0 bg-white dark:bg-gray-900 bg-opacity-90 dark:bg-opacity-90 flex items-center justify-center z-10">
+    <div className="absolute inset-0 bg-gray-50 dark:bg-gray-900 bg-opacity-95 dark:bg-opacity-95 flex items-center justify-center z-10 transition-colors duration-200">
       <LoadingSpinner size={size} text={text} fullScreen={false} />
     </div>
   );
@@ -189,7 +251,7 @@ export const ProgressBar: React.FC<{
   className?: string;
 }> = ({ progress, color = 'primary', showText = true, animated = true, className = '' }) => {
   const colorClasses = {
-    primary: 'bg-blue-600 dark:bg-blue-400',
+    primary: 'bg-green-600 dark:bg-green-400',
     secondary: 'bg-gray-600 dark:bg-gray-400',
     success: 'bg-green-600 dark:bg-green-400',
     error: 'bg-red-600 dark:bg-red-400',
@@ -200,11 +262,11 @@ export const ProgressBar: React.FC<{
     <div className={`w-full ${className}`}>
       {showText && (
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Loading</span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">{Math.round(progress)}%</span>
+          <span className="text-sm text-gray-700 dark:text-gray-300">Loading</span>
+          <span className="text-sm text-gray-700 dark:text-gray-300">{Math.round(progress)}%</span>
         </div>
       )}
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden transition-colors duration-200">
         <div
           className={`h-full ${colorClasses[color]} ${animated ? 'transition-all duration-300 ease-out' : ''}`}
           style={{ width: `${progress}%` }}

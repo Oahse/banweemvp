@@ -28,9 +28,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!isAuthenticated) {
-    // Use intendedDestination if available, otherwise use current location
-    const redirectTo = intendedDestination || location.pathname;
-    return <Navigate to="/login" state={{ from: redirectTo }} replace />;
+    // Save the full location (pathname + search + hash) for redirect after login
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // Check role requirements

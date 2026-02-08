@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   ChevronRightIcon,
   HeartIcon,
@@ -31,6 +32,7 @@ import { useApi } from '../../../components/shared/hooks/useAsync';
 import { useSubscriptionAction } from '../../protected/subscriptions/hooks/useSubscription';
 import { ProductsAPI, ReviewsAPI } from '../../../api';
 import { Product, ProductVariant, ProductImage } from '../../../types';
+import { containerVariants, itemVariants } from '../../../utils/pageAnimations';
 
 import ErrorMessage from '../../../components/shared/Error';
 import { toast } from 'react-hot-toast';
@@ -345,9 +347,14 @@ export const ProductDetails = () => {
 
 
   return (
-    <div className="pb-16 md:pb-0">
+    <motion.div 
+      className="pb-16 md:pb-0"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {/* Breadcrumb */}
-      <div className="bg-surface py-4">
+      <motion.div className="bg-surface py-4" variants={itemVariants}>
         <div className="container mx-auto px-4">
           <nav className="flex items-center space-x-2 text-sm text-copy-light">
             <Link to="/" className="hover:text-primary">Home</Link>
@@ -1325,8 +1332,8 @@ export const ProductDetails = () => {
             }}
           />
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

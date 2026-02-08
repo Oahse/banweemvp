@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { 
   PackageIcon, 
   TruckIcon, 
@@ -12,6 +13,7 @@ import {
 import { OrdersAPI } from '../api/orders';
 import { toast } from 'react-hot-toast';
 import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
+import { containerVariants, itemVariants } from '../../../utils/pageAnimations';
 
 interface TrackingEvent {
   id: string;
@@ -147,8 +149,13 @@ export const TrackOrder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="max-w-4xl mx-auto">
+    <motion.div 
+      className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <motion.div className="max-w-4xl mx-auto" variants={itemVariants}>
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-4"
@@ -303,8 +310,8 @@ export const TrackOrder = () => {
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

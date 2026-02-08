@@ -17,45 +17,52 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Create enum types
-    op.execute("CREATE TYPE messagestatus AS ENUM ('new', 'in_progress', 'resolved', 'closed')")
-    op.execute("CREATE TYPE messagepriority AS ENUM ('low', 'medium', 'high', 'urgent')")
+    # Create enum types if they don't exist
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE messagestatus AS ENUM ('new', 'in_progress', 'resolved', 'closed');
+        EXCEPTION
+            WHEN duplicate_object THEN null;
+        END $$;
+    """)
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE messagepriority AS ENUM ('low', 'medium', 'high', 'urgent');
+        EXCEPTION
+            WHEN duplicate_object THEN null;
+        END $$;
+    """)
     
-    # Create contact_messages table
-    op.create_table(
-        'contact_messages',
-        sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column('name', sa.String(length=255), nullable=False),
-        sa.Column('email', sa.String(length=255), nullable=False),
-        sa.Column('subject', sa.String(length=255), nullable=False),
-        sa.Column('message', sa.Text(), nullable=False),
-        sa.Column('status', postgresql.ENUM('new', 'in_progress', 'resolved', 'closed', name='messagestatus'), nullable=False),
-        sa.Column('priority', postgresql.ENUM('low', 'medium', 'high', 'urgent', name='messagepriority'), nullable=False),
-        sa.Column('admin_notes', sa.Text(), nullable=True),
-        sa.Column('assigned_to', postgresql.UUID(as_uuid=True), nullable=True),
-        sa.Column('created_at', sa.DateTime(), nullable=False),
-        sa.Column('updated_at', sa.DateTime(), nullable=False),
-        sa.Column('resolved_at', sa.DateTime(), nullable=True),
-        sa.PrimaryKeyConstraint('id')
-    )
+    # Create contact_messages table using raw SQL to avoid enum creation issues
+    op.execute("""
+        CREATE TABLE IF NOT EXISTS contact_messages (
+            id UUID PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            subject VARCHAR(255) NOT NULL,
+            message TEXT NOT NULL,
+            status messagestatus NOT NULL DEFAULT 'new',
+            priority messagepriority NOT NULL DEFAULT 'medium',
+            admin_notes TEXT,
+            assigned_to UUID,
+            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+            resolved_at TIMESTAMP WITH TIME ZONE
+        )
+    """)
     
     # Create indexes for better query performance
-    op.create_index('ix_contact_messages_status', 'contact_messages', ['status'])
-    op.create_index('ix_contact_messages_priority', 'contact_messages', ['priority'])
-    op.create_index('ix_contact_messages_created_at', 'contact_messages', ['created_at'])
-    op.create_index('ix_contact_messages_email', 'contact_messages', ['email'])
+    op.execute("CREATE INDEX IF NOT EXISTS ix_contact_messages_status ON contact_messages(status)")
+    op.execute("CREATE INDEX IF NOT EXISTS ix_contact_messages_priority ON contact_messages(priority)")
+    op.execute("CREATE INDEX IF NOT EXISTS ix_contact_messages_created_at ON contact_messages(created_at)")
+    op.execute("CREATE INDEX IF NOT EXISTS ix_contact_messages_email ON contact_messages(email)")
 
 
 def downgrade() -> None:
-    # Drop indexes
-    op.drop_index('ix_contact_messages_email', table_name='contact_messages')
-    op.drop_index('ix_contact_messages_created_at', table_name='contact_messages')
-    op.drop_index('ix_contact_messages_priority', table_name='contact_messages')
-    op.drop_index('ix_contact_messages_status', table_name='contact_messages')
-    
     # Drop table
     op.drop_table('contact_messages')
     
     # Drop enum types
-    op.execute('DROP TYPE messagepriority')
-    op.execute('DROP TYPE messagestatus')
+    op.execute('DROP TYPE IF EXISTS messagepriority')
+    op.execute('DROP TYPE IF EXISTS messagestatus')
+

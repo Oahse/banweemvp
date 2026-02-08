@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { 
   User, 
   ShoppingBag, 
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { cn } from '@/utils/cn';
+import { containerFastVariants } from '@/utils/pageAnimations';
 
 interface AccountLayoutProps {
   children?: React.ReactNode;
@@ -182,11 +184,16 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
 
         {/* Page content */}
         <main className="flex-1">
-          <div className="py-4">
+          <motion.div 
+            className="py-4"
+            initial="hidden"
+            animate="visible"
+            variants={containerFastVariants}
+          >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               {children || <Outlet />}
             </div>
-          </div>
+          </motion.div>
         </main>
       </div>
     </div>
