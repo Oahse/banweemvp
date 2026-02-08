@@ -12,6 +12,7 @@ from .analytics import UserSession, AnalyticsEvent, ConversionFunnel, CustomerLi
 from .refunds import Refund, RefundItem
 from .tax_rates import TaxRate
 from .shipping_tracking import ShipmentTracking, ShippingCarrier,ShipmentTrackingEvent
+from .contact_message import ContactMessage, MessageStatus, MessagePriority
 
 # Consolidated models - single source of truth
 from .orders import Order, OrderItem, TrackingEvent
@@ -114,5 +115,10 @@ __all__ = [
     # Shipping tracking models
     "ShipmentTracking", 
     "ShippingCarrier",
-    "ShipmentTrackingEvent"
+    "ShipmentTrackingEvent",
+    
+    # Contact message models
+    "ContactMessage",
+    "MessageStatus",
+    "MessagePriority"
 ]

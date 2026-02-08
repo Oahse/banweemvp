@@ -43,6 +43,7 @@ from api import (
     webhooks_router,
     wishlist_router,
 )
+from api.contact_messages import router as contact_messages_router
 
 from contextlib import asynccontextmanager
 from arq import Worker
@@ -338,6 +339,7 @@ v1_router.include_router(shipping_router)
 v1_router.include_router(tax_router)
 v1_router.include_router(webhooks_router)
 v1_router.include_router(categories_router)
+v1_router.include_router(contact_messages_router)
 
 # Include the v1 router into the main app
 app.include_router(v1_router)
