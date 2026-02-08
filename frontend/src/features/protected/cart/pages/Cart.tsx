@@ -252,12 +252,12 @@ export const Cart = () => {
       <motion.div 
         ref={ref}
         key={item.id} 
-        className="p-4"
+        className="p-3"
         initial={{ opacity: 1 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
           <div className="col-span-6 flex items-center">
             <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-gray-100 relative">
               {(() => {
@@ -303,13 +303,13 @@ export const Cart = () => {
               
               {/* Processing overlay - removed since not using processing state */}
             </div>
-            <div className="ml-4">
+            <div className="ml-3">
               <Link
                 to={`/products/${item.product_id}`}
-                className="font-medium text-copy hover:text-primary block"
+                className="font-medium text-copy hover:text-primary block text-sm"
               >
                 {(item.variant?.product_name || (item.variant as any)?.product?.name) && (
-                  <div className="text-sm font-medium">{item.variant?.product_name || (item.variant as any)?.product?.name}</div>
+                  <div className="text-xs font-medium">{item.variant?.product_name || (item.variant as any)?.product?.name}</div>
                 )}
                 <div className="text-xs text-copy-light">{item.variant?.name || 'Product'}</div>
               </Link>
@@ -353,16 +353,16 @@ export const Cart = () => {
               <button
                 onClick={() => handleRemoveItem(item.id)}
                 aria-label={`Remove ${item.variant?.product_name || 'item'} from cart`}
-                className="text-sm text-error hover:text-error-dark flex items-center mt-1">
-                <TrashIcon size={14} className="mr-1" />
+                className="text-xs text-error hover:text-error-dark flex items-center mt-1">
+                <TrashIcon size={12} className="mr-1" />
                 Remove
               </button>
             </div>
           </div>
-          <div className="col-span-2 text-center">
-            <span className="md:hidden font-medium text-copy">Price: </span>
+          <div className="col-span-2 text-center text-sm">
+            <span className="md:hidden font-medium text-copy text-xs">Price: </span>
             <div>
-              <span className="font-medium text-primary">
+              <span className="font-medium text-primary text-sm">
                 {formatCurrency(
                   !isNaN(item.price_per_unit) && item.price_per_unit > 0 
                     ? item.price_per_unit 
@@ -405,9 +405,9 @@ export const Cart = () => {
               </button>
             </div>
           </div>
-          <div className="col-span-2 text-center">
-            <span className="md:hidden font-medium text-copy">Subtotal: </span>
-            <span className="font-medium text-copy">
+          <div className="col-span-2 text-center text-sm">
+            <span className="md:hidden font-medium text-copy text-xs">Subtotal: </span>
+            <span className="font-medium text-copy text-sm">
               {formatCurrency(
                 !isNaN(item.total_price) && item.total_price > 0 
                   ? item.total_price 
@@ -494,11 +494,11 @@ export const Cart = () => {
 
           {/* Order Summary */}
           <div className="lg:w-1/3">
-            <div className="bg-surface rounded-lg shadow-sm p-6">
-              <h2 className="text-base font-semibold text-copy mb-4">Order Summary</h2>
+            <div className="bg-surface rounded-lg shadow-sm p-4">
+              <h2 className="text-sm font-semibold text-copy mb-3">Order Summary</h2>
               
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between">
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm">
                   <span className="text-copy-light">Total</span>
                   <span className="font-medium text-copy">{formatCurrency(subtotal)}</span>
                 </div>
@@ -506,14 +506,14 @@ export const Cart = () => {
                   Tax and shipping will be calculated at checkout
                 </div>
               </div>
-              <form onSubmit={handleApplyCoupon} className="mb-6">
-                <label htmlFor="coupon-code" className="block text-sm font-medium mb-2 text-copy">Promo Code (Optional)</label>
+              <form onSubmit={handleApplyCoupon} className="mb-4">
+                <label htmlFor="coupon-code" className="block text-xs font-medium mb-2 text-copy">Promo Code (Optional)</label>
                 <div className="flex">
                   <input
                     id="coupon-code"
                     type="text"
                     placeholder="Enter coupon code"
-                    className="flex-grow px-4 py-2 border border-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary bg-transparent"
+                    className="flex-grow px-3 py-2 border border-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary bg-transparent text-sm"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     aria-label="Coupon code"
@@ -521,7 +521,7 @@ export const Cart = () => {
                   <button
                     type="submit"
                     aria-label="Apply coupon code"
-                    className="bg-primary text-white px-4 py-2 rounded-r-md hover:bg-primary-dark transition-colors">
+                    className="bg-primary text-white px-3 py-2 rounded-r-md hover:bg-primary-dark transition-colors text-sm">
                     Apply
                   </button>
                 </div>
@@ -529,7 +529,7 @@ export const Cart = () => {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <button
                   onClick={handleCheckout}
-                  className="w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md transition-colors flex items-center justify-center">
+                  className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-md transition-colors flex items-center justify-center text-sm font-medium">
                   {isAuthenticated ? 'Proceed to Checkout' : 'Login to Checkout'}
                 </button>
               </motion.div>
