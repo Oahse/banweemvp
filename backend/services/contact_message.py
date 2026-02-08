@@ -9,7 +9,7 @@ from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
 
-from models.contact_message import ContactMessage, MessageStatus, MessagePriority
+from models.contact_message import ContactMessage
 from schemas.contact_message import ContactMessageCreate, ContactMessageUpdate
 from core.logging import logger
 
@@ -26,8 +26,8 @@ class ContactMessageService:
                 email=message_data.email,
                 subject=message_data.subject,
                 message=message_data.message,
-                status=MessageStatus.NEW,
-                priority=MessagePriority.MEDIUM
+                status='new',
+                priority='medium'
             )
             
             db.add(message)
@@ -115,7 +115,7 @@ class ContactMessageService:
             # Update fields
             if update_data.status is not None:
                 message.status = update_data.status
-                if update_data.status == MessageStatus.RESOLVED:
+                if update_data.status == 'resolved':
                     message.resolved_at = datetime.utcnow()
             
             if update_data.priority is not None:
@@ -170,19 +170,19 @@ class ContactMessageService:
         total = total_result.scalar()
         
         new_stmt = select(func.count(ContactMessage.id)).where(
-            ContactMessage.status == MessageStatus.NEW
+            ContactMessage.status == 'new'
         )
         new_result = await db.execute(new_stmt)
         new = new_result.scalar()
         
         in_progress_stmt = select(func.count(ContactMessage.id)).where(
-            ContactMessage.status == MessageStatus.IN_PROGRESS
+            ContactMessage.status == 'in_progress'
         )
         in_progress_result = await db.execute(in_progress_stmt)
         in_progress = in_progress_result.scalar()
         
         resolved_stmt = select(func.count(ContactMessage.id)).where(
-            ContactMessage.status == MessageStatus.RESOLVED
+            ContactMessage.status == 'resolved'
         )
         resolved_result = await db.execute(resolved_stmt)
         resolved = resolved_result.scalar()

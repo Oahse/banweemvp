@@ -3,8 +3,8 @@ Contact Message Model
 Stores customer contact form submissions
 """
 
-from sqlalchemy import Column, String, Text, DateTime, Enum as SQLEnum
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, Text, DateTime
+from sqlalchemy.dialects.postgresql import UUID, ENUM
 from datetime import datetime
 import uuid
 import enum
@@ -37,8 +37,8 @@ class ContactMessage(Base):
     email = Column(String(255), nullable=False)
     subject = Column(String(255), nullable=False)
     message = Column(Text, nullable=False)
-    status = Column(SQLEnum(MessageStatus), default=MessageStatus.NEW, nullable=False)
-    priority = Column(SQLEnum(MessagePriority), default=MessagePriority.MEDIUM, nullable=False)
+    status = Column(ENUM('new', 'in_progress', 'resolved', 'closed', name='messagestatus', create_type=False), default='new', nullable=False)
+    priority = Column(ENUM('low', 'medium', 'high', 'urgent', name='messagepriority', create_type=False), default='medium', nullable=False)
     admin_notes = Column(Text, nullable=True)
     assigned_to = Column(UUID(as_uuid=True), nullable=True)  # Admin user ID
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

@@ -17,6 +17,9 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # Ensure uuid-ossp extension is enabled
+    op.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
+    
     # Create enum types if they don't exist
     op.execute("""
         DO $$ BEGIN
@@ -36,7 +39,7 @@ def upgrade() -> None:
     # Create contact_messages table using raw SQL to avoid enum creation issues
     op.execute("""
         CREATE TABLE IF NOT EXISTS contact_messages (
-            id UUID PRIMARY KEY,
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
             name VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL,
             subject VARCHAR(255) NOT NULL,

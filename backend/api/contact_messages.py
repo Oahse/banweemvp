@@ -60,7 +60,7 @@ async def create_contact_message(
         logger.error(f"Error creating contact message: {str(e)}")
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Failed to create contact message"
+            message=f"Failed to create contact message {str(e)}"
         )
 
 
@@ -121,7 +121,7 @@ async def get_all_contact_messages(
         logger.error(f"Error fetching contact messages: {str(e)}")
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Failed to fetch contact messages"
+            message=f"Failed to fetch contact messages {str(e)}"
         )
 
 

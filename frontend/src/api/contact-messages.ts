@@ -61,12 +61,25 @@ export const ContactMessagesAPI = {
     search?: string;
   }): Promise<ContactMessageListResponse> => {
     const response = await apiClient.get('/contact-messages', { params });
+    
+    // Handle case where data might be undefined or have unexpected structure
+    if (!response.data?.data?.messages) {
+      console.error('Unexpected response structure:', response.data);
+      return {
+        messages: [],
+        total: 0,
+        page: params?.page || 1,
+        page_size: params?.page_size || 20,
+        total_pages: 0
+      };
+    }
+    
     return {
       messages: response.data.data.messages,
-      total: response.data.pagination.total,
-      page: response.data.pagination.page,
-      page_size: response.data.pagination.page_size,
-      total_pages: response.data.pagination.total_pages
+      total: response.data.pagination?.total || 0,
+      page: response.data.pagination?.page || params?.page || 1,
+      page_size: response.data.pagination?.page_size || params?.page_size || 20,
+      total_pages: response.data.pagination?.total_pages || 0
     };
   },
 
@@ -79,8 +92,13 @@ export const ContactMessagesAPI = {
     in_progress: number;
     resolved: number;
   }> => {
-    const response = await apiClient.get('/contact-messages/stats');
-    return response.data.data;
+    try {
+      const response = await apiClient.get('/contact-messages/stats');
+      return response.data.data || { total: 0, new: 0, in_progress: 0, resolved: 0 };
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      return { total: 0, new: 0, in_progress: 0, resolved: 0 };
+    }
   },
 
   /**
