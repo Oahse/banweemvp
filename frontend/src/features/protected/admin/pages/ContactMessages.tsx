@@ -199,316 +199,315 @@ const ContactMessages: React.FC = () => {
 
   return (
     <AdminLayout>
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-main mb-2">Contact Messages</h1>
-        <p className="text-sm text-copy-light">
-          Manage customer inquiries and support requests
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className={`rounded-lg shadow-sm border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-copy-light">Total Messages</p>
-              <p className="text-2xl font-bold text-main">{stats.total}</p>
-            </div>
-            <Mail className="w-8 h-8 text-primary" />
-          </div>
-        </div>
-        <div className={`rounded-lg shadow-sm border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-copy-light">New</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.new}</p>
-            </div>
-            <AlertCircle className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-          </div>
-        </div>
-        <div className={`rounded-lg shadow-sm border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-copy-light">In Progress</p>
-              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.in_progress}</p>
-            </div>
-            <Clock className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
-          </div>
-        </div>
-        <div className={`rounded-lg shadow-sm border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-copy-light">Resolved</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.resolved}</p>
-            </div>
-            <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-          </div>
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className={`p-4 rounded-lg border ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-main">Search & Filters</h3>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors ${
-              currentTheme === 'dark' 
-                ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
-                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-            }`}
-          >
-            <Filter size={16} />
-            {showFilters ? 'Hide' : 'Show'} Filters
-          </button>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-main mb-2">Contact Messages</h1>
+          <p className="text-sm text-copy-light">
+            Manage customer inquiries and support requests
+          </p>
         </div>
 
-        {showFilters && (
-          <div className="space-y-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
-              <input
-                type="text"
-                placeholder="Search messages..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm ${
-                  currentTheme === 'dark' 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }`}
-              />
-              {searchTerm !== debouncedSearchTerm && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className={`rounded-lg shadow-sm border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-copy-light">Total Messages</p>
+                <p className="text-2xl font-bold text-main">{stats.total}</p>
+              </div>
+              <Mail className="w-8 h-8 text-primary" />
+            </div>
+          </div>
+          <div className={`rounded-lg shadow-sm border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-copy-light">New</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.new}</p>
+              </div>
+              <AlertCircle className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            </div>
+          </div>
+          <div className={`rounded-lg shadow-sm border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-copy-light">In Progress</p>
+                <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.in_progress}</p>
+              </div>
+              <Clock className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
+            </div>
+          </div>
+          <div className={`rounded-lg shadow-sm border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-copy-light">Resolved</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.resolved}</p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        {/* Search and Filters */}
+        <div className={`p-4 rounded-lg border ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-main">Search & Filters</h3>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                currentTheme === 'dark' 
+                  ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              }`}
+            >
+              <Filter size={16} />
+              {showFilters ? 'Hide' : 'Show'} Filters
+            </button>
+          </div>
+
+          {showFilters && (
+            <div className="space-y-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
+                <input
+                  type="text"
+                  placeholder="Search messages..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm ${
+                    currentTheme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                {searchTerm !== debouncedSearchTerm && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
+
+              {/* Filter Dropdowns */}
+              <div className="flex flex-wrap gap-2">
+                <Dropdown
+                  options={[
+                    { value: '', label: 'All Statuses' },
+                    { value: 'new', label: 'New' },
+                    { value: 'in_progress', label: 'In Progress' },
+                    { value: 'resolved', label: 'Resolved' },
+                    { value: 'closed', label: 'Closed' }
+                  ]}
+                  value={statusFilter}
+                  onChange={setStatusFilter}
+                  placeholder="All Statuses"
+                  className="min-w-[140px]"
+                />
+                <Dropdown
+                  options={[
+                    { value: '', label: 'All Priorities' },
+                    { value: 'urgent', label: 'Urgent' },
+                    { value: 'high', label: 'High' },
+                    { value: 'medium', label: 'Medium' },
+                    { value: 'low', label: 'Low' }
+                  ]}
+                  value={priorityFilter}
+                  onChange={setPriorityFilter}
+                  placeholder="All Priorities"
+                  className="min-w-[140px]"
+                />
+                {(statusFilter || priorityFilter || debouncedSearchTerm) && (
+                  <button
+                    onClick={() => {
+                      setStatusFilter('');
+                      setPriorityFilter('');
+                      setSearchTerm('');
+                    }}
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                      currentTheme === 'dark' 
+                        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      }`}
+                  >
+                    <X size={14} />
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              {/* Active Filters */}
+              {(debouncedSearchTerm || statusFilter || priorityFilter) && (
+                <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+                  {debouncedSearchTerm && (
+                    <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">
+                      Search: {debouncedSearchTerm}
+                    </span>
+                  )}
+                  {statusFilter && (
+                    <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">
+                      Status: {statusFilter.replace('_', ' ')}
+                    </span>
+                  )}
+                  {priorityFilter && (
+                    <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">
+                      Priority: {priorityFilter}
+                    </span>
+                  )}
                 </div>
               )}
             </div>
+          )}
+        </div>
 
-            {/* Filter Dropdowns */}
-            <div className="flex flex-wrap gap-2">
-              <Dropdown
-                options={[
-                  { value: '', label: 'All Statuses' },
-                  { value: 'new', label: 'New' },
-                  { value: 'in_progress', label: 'In Progress' },
-                  { value: 'resolved', label: 'Resolved' },
-                  { value: 'closed', label: 'Closed' }
-                ]}
-                value={statusFilter}
-                onChange={setStatusFilter}
-                placeholder="All Statuses"
-                className="min-w-[140px]"
-              />
-              <Dropdown
-                options={[
-                  { value: '', label: 'All Priorities' },
-                  { value: 'urgent', label: 'Urgent' },
-                  { value: 'high', label: 'High' },
-                  { value: 'medium', label: 'Medium' },
-                  { value: 'low', label: 'Low' }
-                ]}
-                value={priorityFilter}
-                onChange={setPriorityFilter}
-                placeholder="All Priorities"
-                className="min-w-[140px]"
-              />
-              {(statusFilter || priorityFilter || debouncedSearchTerm) && (
-                <button
-                  onClick={() => {
-                    setStatusFilter('');
-                    setPriorityFilter('');
-                    setSearchTerm('');
-                  }}
-                  className={`inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                    currentTheme === 'dark' 
-                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  <X size={14} />
-                  Clear
-                </button>
-              )}
-            </div>
-
-            {/* Active Filters */}
-            {(debouncedSearchTerm || statusFilter || priorityFilter) && (
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
-                {debouncedSearchTerm && (
-                  <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">
-                    Search: {debouncedSearchTerm}
-                  </span>
-                )}
-                {statusFilter && (
-                  <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">
-                    Status: {statusFilter.replace('_', ' ')}
-                  </span>
-                )}
-                {priorityFilter && (
-                  <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">
-                    Priority: {priorityFilter}
-                  </span>
-                )}
+        {/* Messages Table/Cards */}
+        <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          {loading && !initialLoading ? (
+            <div className="p-8">
+              <div className="flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mr-3"></div>
+                <span className="text-sm text-copy-light">Updating messages...</span>
               </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Messages Table/Cards */}
-      <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        {loading && !initialLoading ? (
-          <div className="p-8">
-            <div className="flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mr-3"></div>
-              <span className="text-sm text-copy-light">Updating messages...</span>
             </div>
-          </div>
-        ) : (
-          <>
-            {/* Debug: Log messages state */}
-            {console.log('About to render messages - length:', messages.length, 'messages:', messages)}
-            {messages.length > 0 ? (
+          ) : (
+            messages.length > 0 ? (
               <>
                 {/* Desktop Table */}
                 <div className="overflow-x-auto hidden md:block">
-              <table className="w-full">
-                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-main">Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-main">Email</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-main">Subject</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-main">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-main">Priority</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-main">Date</th>
-                    <th className="px-4 py-3 text-center text-xs font-semibold text-main">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {messages.map((message) => (
-                    <tr key={message.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
-                      <td className="px-4 py-3 text-sm text-main">{message.name}</td>
-                      <td className="px-4 py-3 text-sm text-copy-light">{message.email}</td>
-                      <td className="px-4 py-3 text-sm text-main">{message.subject}</td>
-                      <td className="px-4 py-3">
-                        <div className="inline-block">
-                          <Dropdown
-                            options={[
-                              { value: 'new', label: 'New' },
-                              { value: 'in_progress', label: 'In Progress' },
-                              { value: 'resolved', label: 'Resolved' },
-                              { value: 'closed', label: 'Closed' }
-                            ]}
-                            value={message.status}
-                            onChange={(value) => handleStatusChange(message.id, value)}
-                            placeholder="Status"
-                            className="min-w-[120px]"
-                          />
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="inline-block">
-                          <Dropdown
-                            options={[
-                              { value: 'low', label: 'Low' },
-                              { value: 'medium', label: 'Medium' },
-                              { value: 'high', label: 'High' },
-                              { value: 'urgent', label: 'Urgent' }
-                            ]}
-                            value={message.priority}
-                            onChange={(value) => handlePriorityChange(message.id, value)}
-                            placeholder="Priority"
-                            className="min-w-[100px]"
-                          />
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-copy-light">
-                        {new Date(message.created_at).toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => viewMessage(message)}
-                            className="inline-flex items-center gap-1 px-2 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
-                          >
-                            <Eye size={14} />
-                            View
-                          </button>
-                          <button
-                            onClick={() => handleDelete(message.id)}
-                            className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                            title="Delete message"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Cards */}
-            <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`p-4 flex flex-col gap-3 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-main truncate">{message.name}</p>
-                      <p className="text-sm text-copy-light truncate">{message.email}</p>
-                    </div>
-                    {statusBadge(message.status)}
-                  </div>
-                  <p className="text-sm text-main font-medium">{message.subject}</p>
-                  <div className="flex items-center justify-between">
-                    {priorityBadge(message.priority)}
-                    <span className="text-xs text-copy-light">
-                      {new Date(message.created_at).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'short', 
-                        day: 'numeric' 
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <button
-                      onClick={() => viewMessage(message)}
-                      className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
-                    >
-                      <Eye size={14} />
-                      View Details
-                    </button>
-                    <button
-                      onClick={() => handleDelete(message.id)}
-                      className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+                  <table className="w-full">
+                    <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Name</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Email</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Subject</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Priority</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Date</th>
+                        <th className="px-4 py-3 text-center text-xs font-semibold text-main">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {messages.map((message) => (
+                        <tr key={message.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                          <td className="px-4 py-3 text-sm text-main">{message.name}</td>
+                          <td className="px-4 py-3 text-sm text-copy-light">{message.email}</td>
+                          <td className="px-4 py-3 text-sm text-main">{message.subject}</td>
+                          <td className="px-4 py-3">
+                            <div className="inline-block">
+                              <Dropdown
+                                options={[
+                                  { value: 'new', label: 'New' },
+                                  { value: 'in_progress', label: 'In Progress' },
+                                  { value: 'resolved', label: 'Resolved' },
+                                  { value: 'closed', label: 'Closed' }
+                                ]}
+                                value={message.status}
+                                onChange={(value) => handleStatusChange(message.id, value)}
+                                placeholder="Status"
+                                className="min-w-[120px]"
+                              />
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="inline-block">
+                              <Dropdown
+                                options={[
+                                  { value: 'low', label: 'Low' },
+                                  { value: 'medium', label: 'Medium' },
+                                  { value: 'high', label: 'High' },
+                                  { value: 'urgent', label: 'Urgent' }
+                                ]}
+                                value={message.priority}
+                                onChange={(value) => handlePriorityChange(message.id, value)}
+                                placeholder="Priority"
+                                className="min-w-[100px]"
+                              />
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-copy-light">
+                            {new Date(message.created_at).toLocaleDateString('en-US', { 
+                              year: 'numeric', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => viewMessage(message)}
+                                className="inline-flex items-center gap-1 px-2 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                              >
+                                <Eye size={14} />
+                                View
+                              </button>
+                              <button
+                                onClick={() => handleDelete(message.id)}
+                                className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                title="Delete message"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="p-8 text-center">
-            <Mail className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-sm text-copy-light">No contact messages found</p>
-          </div>
-        )}
+
+                {/* Mobile Cards */}
+                <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`p-4 flex flex-col gap-3 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-main truncate">{message.name}</p>
+                          <p className="text-sm text-copy-light truncate">{message.email}</p>
+                        </div>
+                        {statusBadge(message.status)}
+                      </div>
+                      <p className="text-sm text-main font-medium">{message.subject}</p>
+                      <div className="flex items-center justify-between">
+                        {priorityBadge(message.priority)}
+                        <span className="text-xs text-copy-light">
+                          {new Date(message.created_at).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex gap-2 pt-2">
+                        <button
+                          onClick={() => viewMessage(message)}
+                          className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
+                        >
+                          <Eye size={14} />
+                          View Details
+                        </button>
+                        <button
+                          onClick={() => handleDelete(message.id)}
+                          className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="p-8 text-center">
+                <Mail className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-sm text-copy-light">No contact messages found</p>
+              </div>
+            )
+          )}
+        </div>
 
         {/* Pagination */}
         <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
@@ -625,7 +624,7 @@ const ContactMessages: React.FC = () => {
         variant="danger"
         loading={isDeleting}
       />
-    </div>
+    
     </AdminLayout>
   );
 };
