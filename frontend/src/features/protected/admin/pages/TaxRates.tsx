@@ -360,7 +360,6 @@ export const AdminTaxRates = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl font-bold">Tax Rates</h1>
           <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
@@ -615,7 +614,7 @@ export const AdminTaxRates = () => {
                   {/* Page numbers */}
                   <div className="flex items-center gap-1 mx-1 lg:mx-2">
                     {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
-                      let pageNum;
+                      let pageNum: number;
                       if (pagination.pages <= 5) {
                         pageNum = i + 1;
                       } else if (page <= 3) {

@@ -212,7 +212,6 @@ export const AdminSubscriptions = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold">Subscriptions</h1>
             <p className={`text-sm mt-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage all customer subscriptions</p>
           </div>
         </div>
