@@ -1,10 +1,33 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Input } from '../../../../components/generic/Input';
 import { toast } from 'react-hot-toast';
 import { validation } from '../../../../utils/validation';
 import { AuthAPI } from '../../../../api';
 import { extractErrorMessage } from '../../../../utils/api-response';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3 }
+  }
+};
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -37,13 +60,23 @@ export const ForgotPassword = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 text-copy">
-      <div className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light">
-        <h1 className="text-xl font-bold text-main mb-4 text-center">Forgot Your Password?</h1>
-        <p className="text-xs text-copy-light text-center mb-4">
+    <motion.div 
+      className="container mx-auto px-4 py-8 text-copy"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <motion.div 
+        className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light"
+        variants={itemVariants}
+      >
+        <motion.h1 className="text-xl font-bold text-main mb-4 text-center" variants={itemVariants}>
+          Forgot Your Password?
+        </motion.h1>
+        <motion.p className="text-xs text-copy-light text-center mb-4" variants={itemVariants}>
           Enter your email address below and we'll send you a link to reset your password.
-        </p>
-        <form className="space-y-3" onSubmit={handleSubmit}>
+        </motion.p>
+        <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
           <Input
             label="Email Address"
             id="email"
@@ -84,12 +117,12 @@ export const ForgotPassword = () => {
               'Send Reset Link'
             )}
           </button>
-        </form>
-        <p className="text-center mt-4 text-xs text-copy-light">
+        </motion.form>
+        <motion.p className="text-center mt-4 text-xs text-copy-light" variants={itemVariants}>
           Remember your password? <Link to="/login" className="text-primary hover:underline">Login</Link>
-        </p>
-      </div>
-    </div>
+        </motion.p>
+      </motion.div>
+    </motion.div>
   );
 };
 

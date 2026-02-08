@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SearchIcon, FilterIcon, XIcon } from 'lucide-react';
 import { useAsync } from '../../../components/shared/hooks/useAsync';
 import { ProductsAPI, CategoriesAPI } from '../../../api';
@@ -9,6 +10,26 @@ import { Select } from '../../../components/generic/Select';
 import { Dropdown } from '../../../components/ui/Dropdown';
 import { themeClasses, combineThemeClasses, getInputClasses, getButtonClasses } from '../../../utils/themeClasses';
 import { cn } from '../../../utils/utils';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3 }
+  }
+};
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -164,19 +185,24 @@ const Products = () => {
   const totalPages = Math.ceil(totalProducts / 12);
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <motion.div 
+      className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {/* Header */}
-      <div className="mb-4 sm:mb-6">
+      <motion.div className="mb-4 sm:mb-6" variants={itemVariants}>
         <h1 className="text-xl font-semibold text-main dark:text-white mb-2">
           Products
         </h1>
         <p className="text-sm text-copy-light dark:text-gray-400">
           {loading && !productsData ? 'Loading products...' : `${totalProducts} products available`}
         </p>
-      </div>
+      </motion.div>
 
       {/* Search and Filters */}
-      <div className="mb-4 space-y-3">
+      <motion.div className="mb-4 space-y-3" variants={itemVariants}>
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="flex gap-2">
           <div className="flex-1 relative">
@@ -236,8 +262,15 @@ const Products = () => {
         </div>
 
         {/* Filters Panel */}
-        {showFilters && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 space-y-4">
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div 
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 space-y-4"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
             {/* Categories */}
             {categories && categories.length > 0 && (
               <div>
@@ -326,12 +359,16 @@ const Products = () => {
                 Done
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
-      </div>
+        </AnimatePresence>
+      </motion.div>
 
       {/* Products Grid - Better responsive layout */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
+      <motion.div 
+        className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6"
+        variants={containerVariants}
+      >
         {shouldShowSkeleton ? (
           // Show skeleton cards while loading or on error
           Array.from({ length: 20 }).map((_, index) => (
@@ -339,13 +376,14 @@ const Products = () => {
           ))
         ) : products.length > 0 ? (
           // Show actual products
-          products.map((product: any) => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
-              selectedVariant={product.variants?.[0] || product}
-              className=""
-            />
+          products.map((product: any, index: number) => (
+            <motion.div key={product.id} variants={itemVariants}>
+              <ProductCard 
+                product={product} 
+                selectedVariant={product.variants?.[0] || product}
+                className=""
+              />
+            </motion.div>
           ))
         ) : (
           // Show empty state - Theme responsive
@@ -376,11 +414,16 @@ const Products = () => {
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Pagination - Always show when there are products */}
       {products.length > 0 && (
-        <div className="mt-8 sm:mt-12 flex justify-center">
+        <motion.div 
+          className="mt-8 sm:mt-12 flex justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -431,19 +474,26 @@ const Products = () => {
               Next
             </button>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Loading indicator for pagination */}
-      {loading && productsData && (
-        <div className="fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50">
+      <AnimatePresence>
+        {loading && productsData && (
+          <motion.div 
+            className="fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+          >
           <div className="flex items-center gap-2">
             <div className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"></div>
             <span className="text-sm font-medium">Loading...</span>
           </div>
-        </div>
+        </motion.div>
       )}
-    </div>
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Layout, AuthLayout } from './components/layout/Layout';
+import { Layout } from './components/layout/Layout';
 import { AuthProvider } from './features/protected/auth/contexts/AuthContext';
 import { CartProvider } from './features/protected/cart/contexts/CartContext';
 import { WishlistProvider } from './features/protected/wishlist/contexts/WishlistContext';
@@ -15,7 +15,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import ErrorBoundary from './components/shared/ErrorBoundary';
 import { ProtectedRoute } from './components/shared/ProtectedRoute';
 import { 
-  Skeleton, 
   PageSkeleton, 
   ProductListSkeleton, 
   ProductDetailSkeleton, 
@@ -25,11 +24,6 @@ import {
   AdminDashboardSkeleton, 
   AdminTableSkeleton 
 } from './components/ui/SkeletonLoader';
-import { 
-  AnimatedLoader, 
-  PageTransitionLoader, 
-  ProgressBar 
-} from './components/ui/AnimatedLoader';
 import LoadingSpinner from './components/shared/LoadingSpinner';
 import SupportFloat from './components/layout/SupportFloat';
 import './animations.css';
@@ -148,6 +142,7 @@ export const App: React.FC = () => {
                         <Route path="/checkout" element={<ProtectedRoute><Layout><Suspense fallback={<CheckoutSkeleton />}><Checkout /></Suspense></Layout></ProtectedRoute>} />
                         <Route path="/account/*" element={<ProtectedRoute><Layout><Suspense fallback={<AccountSkeleton />}><Account /></Suspense></Layout></ProtectedRoute>} />
                         <Route path="/login" element={<Layout><Login /></Layout>} />
+                        <Route path="/register" element={<Layout><Register /></Layout>} />
                         <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
                         <Route path="/track-order" element={<Layout><TrackOrder /></Layout>} />
                         <Route path="/suppliers" element={<Layout><Suspense fallback={<ProductListSkeleton />}><Suppliers /></Suspense></Layout>} />

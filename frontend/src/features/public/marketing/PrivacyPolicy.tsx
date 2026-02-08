@@ -1,20 +1,46 @@
 
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ChevronRightIcon } from 'lucide-react';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 }
+  }
+};
 
 export const PrivacyPolicy = () => {
   return (
-    <div className="container mx-auto px-4 py-8 text-copy">
+    <motion.div 
+      className="container mx-auto px-4 py-8 text-copy"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {/* Breadcrumb */}
-      <nav className="flex mb-6 text-sm">
+      <motion.nav className="flex mb-6 text-sm" variants={itemVariants}>
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
         <ChevronRightIcon size={16} className="mx-2" />
         <span className="text-copy">Privacy Policy</span>
-      </nav>
+      </motion.nav>
 
-      <div className="max-w-4xl mx-auto bg-surface p-8 rounded-lg shadow-sm">
+      <motion.div className="max-w-4xl mx-auto bg-surface p-8 rounded-lg shadow-sm" variants={itemVariants}>
         <h1 className="text-3xl font-bold text-main mb-6">Privacy Policy</h1>
 
         <section className="mb-8">
@@ -112,8 +138,8 @@ export const PrivacyPolicy = () => {
             Email: <a href="mailto:privacy@banwee.com" className="text-primary hover:underline">privacy@banwee.com</a>
           </p>
         </section>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

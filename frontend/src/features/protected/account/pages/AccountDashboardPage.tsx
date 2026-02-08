@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
 import { ShoppingBagIcon, HeartIcon, MapPinIcon, CreditCardIcon, PackageIcon } from 'lucide-react';
@@ -8,6 +9,26 @@ import { usePaginatedApi } from '@/components/shared/hooks/useAsync';
 import OrdersAPI from '@/api/orders';
 import SubscriptionAPI from '@/api/subscription';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3 }
+  }
+};
 
 interface DashboardProps {
   animation?: 'shimmer' | 'pulse' | 'wave';

@@ -4,7 +4,7 @@ Business logic for contact message operations
 """
 
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, or_, func
+from sqlalchemy import desc, or_, func, select
 from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
@@ -45,7 +45,9 @@ class ContactMessageService:
     @staticmethod
     def get_message_by_id(db: Session, message_id: UUID) -> Optional[ContactMessage]:
         """Get a contact message by ID"""
-        return db.query(ContactMessage).filter(ContactMessage.id == message_id).first()
+        stmt = select(ContactMessage).where(ContactMessage.id == message_id)
+        result = db.execute(stmt)
+        return result.scalar_one_or_none()
     
     @staticmethod
     def get_all_messages(
@@ -57,33 +59,40 @@ class ContactMessageService:
         search: Optional[str] = None
     ) -> tuple[List[ContactMessage], int]:
         """Get all contact messages with pagination and filters"""
-        query = db.query(ContactMessage)
+        # Build base query
+        stmt = select(ContactMessage)
+        count_stmt = select(func.count(ContactMessage.id))
         
         # Apply filters
         if status:
-            query = query.filter(ContactMessage.status == status)
+            stmt = stmt.where(ContactMessage.status == status)
+            count_stmt = count_stmt.where(ContactMessage.status == status)
         
         if priority:
-            query = query.filter(ContactMessage.priority == priority)
+            stmt = stmt.where(ContactMessage.priority == priority)
+            count_stmt = count_stmt.where(ContactMessage.priority == priority)
         
         if search:
             search_term = f"%{search}%"
-            query = query.filter(
-                or_(
-                    ContactMessage.name.ilike(search_term),
-                    ContactMessage.email.ilike(search_term),
-                    ContactMessage.subject.ilike(search_term),
-                    ContactMessage.message.ilike(search_term)
-                )
+            search_filter = or_(
+                ContactMessage.name.ilike(search_term),
+                ContactMessage.email.ilike(search_term),
+                ContactMessage.subject.ilike(search_term),
+                ContactMessage.message.ilike(search_term)
             )
+            stmt = stmt.where(search_filter)
+            count_stmt = count_stmt.where(search_filter)
         
         # Get total count
-        total = query.count()
+        total = db.execute(count_stmt).scalar()
         
         # Apply pagination and ordering
-        messages = query.order_by(desc(ContactMessage.created_at)).offset(
+        stmt = stmt.order_by(desc(ContactMessage.created_at)).offset(
             (page - 1) * page_size
-        ).limit(page_size).all()
+        ).limit(page_size)
+        
+        result = db.execute(stmt)
+        messages = result.scalars().all()
         
         return messages, total
     
@@ -95,7 +104,9 @@ class ContactMessageService:
     ) -> Optional[ContactMessage]:
         """Update a contact message (admin only)"""
         try:
-            message = db.query(ContactMessage).filter(ContactMessage.id == message_id).first()
+            stmt = select(ContactMessage).where(ContactMessage.id == message_id)
+            result = db.execute(stmt)
+            message = result.scalar_one_or_none()
             
             if not message:
                 return None
@@ -132,7 +143,9 @@ class ContactMessageService:
     def delete_message(db: Session, message_id: UUID) -> bool:
         """Delete a contact message"""
         try:
-            message = db.query(ContactMessage).filter(ContactMessage.id == message_id).first()
+            stmt = select(ContactMessage).where(ContactMessage.id == message_id)
+            result = db.execute(stmt)
+            message = result.scalar_one_or_none()
             
             if not message:
                 return False
@@ -151,20 +164,27 @@ class ContactMessageService:
     @staticmethod
     def get_message_stats(db: Session) -> dict:
         """Get statistics about contact messages"""
-        total = db.query(func.count(ContactMessage.id)).scalar()
-        new = db.query(func.count(ContactMessage.id)).filter(
+        total_stmt = select(func.count(ContactMessage.id))
+        total = db.execute(total_stmt).scalar()
+        
+        new_stmt = select(func.count(ContactMessage.id)).where(
             ContactMessage.status == MessageStatus.NEW
-        ).scalar()
-        in_progress = db.query(func.count(ContactMessage.id)).filter(
+        )
+        new = db.execute(new_stmt).scalar()
+        
+        in_progress_stmt = select(func.count(ContactMessage.id)).where(
             ContactMessage.status == MessageStatus.IN_PROGRESS
-        ).scalar()
-        resolved = db.query(func.count(ContactMessage.id)).filter(
+        )
+        in_progress = db.execute(in_progress_stmt).scalar()
+        
+        resolved_stmt = select(func.count(ContactMessage.id)).where(
             ContactMessage.status == MessageStatus.RESOLVED
-        ).scalar()
+        )
+        resolved = db.execute(resolved_stmt).scalar()
         
         return {
-            "total": total,
-            "new": new,
-            "in_progress": in_progress,
-            "resolved": resolved
+            "total": total or 0,
+            "new": new or 0,
+            "in_progress": in_progress or 0,
+            "resolved": resolved or 0
         }

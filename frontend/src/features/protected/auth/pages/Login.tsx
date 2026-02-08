@@ -298,39 +298,40 @@ export const Login = ({ isInitialLoading = false }) => {
         {/* Social Authentication Section */}
         <motion.div variants={itemVariants}>
           <div className="relative flex items-center justify-center my-4">
-          <div className="border-t border-border-light w-full"></div>
-          <span className="bg-surface px-3 text-sm text-copy-light absolute">Or continue with</span>
-        </div>
+            <div className="border-t border-border-light w-full"></div>
+            <span className="bg-surface px-3 text-sm text-copy-light absolute">Or continue with</span>
+          </div>
 
-        <SocialAuth 
-          mode="login" 
-          onSuccess={(user) => {
-            // Handle successful social login
-            const path = getRedirectPath(user);
-            
-            // Show success message based on redirect context
-            if (location.state?.from?.pathname) {
-              toast.success('Login successful! Redirecting you back to continue shopping.');
-            } else if (intendedDestination && (intendedDestination as any).action === 'cart') {
-              toast.success('Login successful! You can now add items to your cart.');
-            } else if (intendedDestination && (intendedDestination as any).action === 'wishlist') {
-              toast.success('Login successful! You can now add items to your wishlist.');
-            } else {
-              toast.success('Login successful!');
-            }
-            
-            // Set the redirect path to prevent useEffect from overriding it
-            setRedirectPath(path);
-            
-            navigate(path, { replace: true });
-            if (intendedDestination) {
-              setIntendedDestination(null);
-            }
-          }}
-          onError={() => {
-            toast.error('Social login failed. Please try again.');
-          }}
-        />
+          <SocialAuth 
+            mode="login" 
+            onSuccess={(user) => {
+              // Handle successful social login
+              const path = getRedirectPath(user);
+              
+              // Show success message based on redirect context
+              if (location.state?.from?.pathname) {
+                toast.success('Login successful! Redirecting you back to continue shopping.');
+              } else if (intendedDestination && (intendedDestination as any).action === 'cart') {
+                toast.success('Login successful! You can now add items to your cart.');
+              } else if (intendedDestination && (intendedDestination as any).action === 'wishlist') {
+                toast.success('Login successful! You can now add items to your wishlist.');
+              } else {
+                toast.success('Login successful!');
+              }
+              
+              // Set the redirect path to prevent useEffect from overriding it
+              setRedirectPath(path);
+              
+              navigate(path, { replace: true });
+              if (intendedDestination) {
+                setIntendedDestination(null);
+              }
+            }}
+            onError={() => {
+              toast.error('Social login failed. Please try again.');
+            }}
+          />
+        </motion.div>
         {/* Register Link */}
         <motion.p className="text-center mt-4 text-sm text-copy-light" variants={itemVariants}>
           Don&apos;t have an account? <Link to="/register" className="text-primary hover:underline font-medium">Register</Link>
