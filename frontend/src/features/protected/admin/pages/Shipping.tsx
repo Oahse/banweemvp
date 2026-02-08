@@ -4,7 +4,9 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import { AdminLayout } from '@/components/layout/Layout';
+import { AdminLayout } from '../components/AdminLayout';
+import { AdminLayoutSkeleton } from '../components/skeletons/AdminLayoutSkeleton';
+import { ShippingListSkeleton } from '../components/skeletons/ShippingSkeleton';
 
 const LIMIT = 10;
 
@@ -375,31 +377,25 @@ export const AdminShipping = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className={`w-12 h-12 animate-spin ${
-          currentTheme === 'dark' ? 'text-white' : 'text-gray-900'
-        }`} />
-      </div>
-    );
+  if (initialLoading) {
+    return <AdminLayoutSkeleton />;
   }
 
   return (
     <AdminLayout>
-    <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage shipping methods and rates</p>
+          <h1 className="text-xl font-bold">Shipping Methods</h1>
+          <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage shipping methods and rates</p>
         </div>
-        <div className="flex gap-2 w-full lg:w-auto">
+        <div className="flex gap-2 w-full sm:w-auto">
           <button
             onClick={openAddModal}
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
           >
             <PlusIcon size={18} />
-            <span className="hidden sm:inline">Add Method</span>
-            <span className="sm:hidden">Add</span>
+            <span>Add Method</span>
           </button>
         </div>
       </div>
@@ -528,8 +524,8 @@ export const AdminShipping = () => {
       )}
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-            <h2 className="text-base lg:text-lg font-semibold">All Shipping Methods</h2>
+        <div className={`p-4 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+            <h2 className="text-lg font-semibold">All Shipping Methods</h2>
         </div>
 
         {methods.length > 0 ? (
@@ -539,13 +535,13 @@ export const AdminShipping = () => {
               <table className="w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                   <tr>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Method Name</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Description</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Cost</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Delivery Time</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Regions</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Status</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Method Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Description</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Cost</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Delivery Time</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Regions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -555,14 +551,14 @@ export const AdminShipping = () => {
                       onClick={() => openDetailsModal(method)}
                       className={`border-b cursor-pointer ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}
                     >
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{method.name || 'N/A'}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{method.description || 'No description'}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>${(method.price || 0).toFixed(2)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{method.estimated_days || '-'} days</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <td className={`px-4 py-3 text-xs font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'} max-w-[150px] truncate`}>{method.name || 'N/A'}</td>
+                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-[200px] truncate`}>{method.description || 'No description'}</td>
+                      <td className={`px-4 py-3 text-xs font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>${(method.price || 0).toFixed(2)}</td>
+                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{method.estimated_days || '-'} days</td>
+                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-[150px] truncate`}>
                         {method.regions?.join(', ') || 'All regions'}
                       </td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">
+                      <td className="px-4 py-3 text-xs">
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                           method.is_active 
                             ? 'bg-success/20 text-success' 
@@ -571,17 +567,16 @@ export const AdminShipping = () => {
                           {method.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">
-                        <div className="flex gap-1 lg:gap-2">
+                      <td className="px-4 py-3 text-xs">
+                        <div className="flex gap-1">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDelete(method.id);
                             }}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-xs"
                           >
-                            <TrashIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">Delete</span>
+                            <TrashIcon size={14} />
                           </button>
                         </div>
                       </td>
@@ -597,10 +592,10 @@ export const AdminShipping = () => {
                 <div
                   key={method.id}
                   onClick={() => openDetailsModal(method)}
-                  className={`p-3 lg:p-4 flex flex-col gap-2 cursor-pointer ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
+                  className={`p-4 flex flex-col gap-2 cursor-pointer ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs lg:text-sm font-medium text-primary">{method.name || 'N/A'}</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium text-primary truncate">{method.name || 'N/A'}</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       method.is_active 
                         ? 'bg-success/20 text-success' 
@@ -609,26 +604,24 @@ export const AdminShipping = () => {
                       {method.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{method.description || 'No description'}</div>
-                  <div className={`flex items-center justify-between text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>{method.description || 'No description'}</div>
+                  <div className={`flex items-center justify-between text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                     <span>{method.estimated_days || '-'} days</span>
                     <span className="font-mono font-semibold">${(method.price || 0).toFixed(2)}</span>
                   </div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>
                     {method.regions?.join(', ') || 'All regions'}
                   </div>
-                  <div className="flex gap-1 lg:gap-2 mt-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(method.id);
-                      }}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-xs"
-                    >
-                      <TrashIcon size={14} />
-                      Delete
-                    </button>
-                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(method.id);
+                    }}
+                    className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm mt-2"
+                  >
+                    <TrashIcon size={14} />
+                    Delete
+                  </button>
                 </div>
               ))}
             </div>

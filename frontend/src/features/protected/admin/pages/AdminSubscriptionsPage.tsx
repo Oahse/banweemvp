@@ -5,7 +5,9 @@ import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import { AdminLayout } from '@/components/layout/Layout';
+import { AdminLayout } from '../components/AdminLayout';
+import { AdminLayoutSkeleton } from '../components/skeletons/AdminLayoutSkeleton';
+import { SubscriptionsListSkeleton } from '../components/skeletons/SubscriptionsSkeleton';
 
 const LIMIT = 20;
 
@@ -201,38 +203,39 @@ export const AdminSubscriptions = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
-      </div>
-    );
+  if (initialLoading) {
+    return <AdminLayoutSkeleton />;
   }
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-copy-light mt-2">Manage all customer subscriptions</p>
+            <h1 className="text-xl font-bold">Subscriptions</h1>
+            <p className={`text-sm mt-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage all customer subscriptions</p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-surface rounded-lg border border-border-light p-6">
+        <div className={`rounded-lg border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-copy">Filters</h2>
+            <h2 className="text-base font-semibold">Filters</h2>
             <button
               type="button"
               onClick={() => setShowFilters((prev) => !prev)}
-              className="md:hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border-light text-xs font-medium text-copy hover:bg-surface-light transition"
+              className={`md:hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border text-xs font-medium transition ${
+                currentTheme === 'dark' 
+                  ? 'border-gray-600 text-white hover:bg-gray-700' 
+                  : 'border-gray-300 text-gray-900 hover:bg-gray-50'
+              }`}
             >
               {showFilters ? 'Hide Filters' : 'Show Filters'}
             </button>
           </div>
           <div className={`${showFilters ? 'grid' : 'hidden'} md:grid grid-cols-1 md:grid-cols-4 gap-4`}>
             <div>
-              <label className="block text-sm font-medium text-copy-light mb-1">Status</label>
+              <label className={`block text-sm font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</label>
               <Dropdown
                 options={[
                   { value: '', label: 'All Status' },
@@ -249,17 +252,17 @@ export const AdminSubscriptions = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-copy-light mb-1">Search</label>
+              <label className={`block text-sm font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Search</label>
               <input
                 type="text"
                 placeholder="Search by email, name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-400' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-500'}`}
+                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${currentTheme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder:text-gray-400' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-500'}`}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-copy-light mb-1">From Date</label>
+              <label className={`block text-sm font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>From Date</label>
               <DateTimeDropdown
                 value={dateFromFilter}
                 onChange={(value) => setDateFromFilter(value)}
@@ -268,7 +271,7 @@ export const AdminSubscriptions = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-copy-light mb-1">To Date</label>
+              <label className={`block text-sm font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>To Date</label>
               <DateTimeDropdown
                 value={dateToFilter}
                 onChange={(value) => setDateToFilter(value)}
@@ -280,48 +283,52 @@ export const AdminSubscriptions = () => {
         </div>
 
         {error && (
-          <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+          <div className={`p-4 rounded-lg border flex items-start gap-3 ${
+            currentTheme === 'dark' 
+              ? 'bg-red-900/20 border-red-800 text-red-200' 
+              : 'bg-red-50 border-red-200 text-red-800'
+          }`}>
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-destructive">Error</p>
-              <p className="text-destructive/80 text-sm">{error}</p>
+              <p className="font-semibold">Error</p>
+              <p className="text-sm">{error}</p>
             </div>
           </div>
         )}
 
-        <div className="bg-surface rounded-lg border border-border-light overflow-hidden">
-          <div className="p-6 border-b border-border-light">
-            <h2 className="text-lg font-semibold text-copy">All Subscriptions ({subscriptions.length})</h2>
+        <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <div className={`p-4 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+            <h2 className="text-lg font-semibold">All Subscriptions ({subscriptions.length})</h2>
           </div>
 
           {subscriptions.length > 0 ? (
             <>
               <div className="hidden md:block overflow-hidden">
                 <table className="w-full table-fixed">
-                  <thead className="bg-surface-dark border-b border-border-light">
+                  <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-copy-light w-[28%]">Customer</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-copy-light w-[18%] hidden lg:table-cell">Plan</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-copy-light w-[12%]">Status</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-copy-light w-[16%]">Monthly Cost</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-copy-light w-[16%]">Next Billing</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-copy-light w-[10%] hidden xl:table-cell">Created</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-copy-light w-[10%]">Actions</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold w-[28%]">Customer</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold w-[18%] hidden lg:table-cell">Plan</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold w-[12%]">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold w-[16%]">Monthly Cost</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold w-[16%]">Next Billing</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold w-[10%] hidden xl:table-cell">Created</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold w-[10%]">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {subscriptions.map((subscription) => (
-                      <tr key={subscription.id} className="border-b border-border-light hover:bg-surface-light">
+                      <tr key={subscription.id} className={`border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-primary/10 rounded-lg">
                               <User className="w-4 h-4 text-primary" />
                             </div>
-                            <div>
-                              <p className="text-sm font-medium text-copy truncate">
+                            <div className="min-w-0">
+                              <p className={`text-sm font-medium truncate ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 {subscription.user?.name || 'Unknown User'}
                               </p>
-                              <p className="text-xs text-copy-light truncate">{subscription.user?.email}</p>
+                              <p className={`text-xs truncate ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{subscription.user?.email}</p>
                             </div>
                           </div>
                         </td>
@@ -329,13 +336,13 @@ export const AdminSubscriptions = () => {
                           <div className="text-sm">
                             {subscription.subscription_plan ? (
                               <>
-                                <p className="text-copy font-medium">{subscription.subscription_plan.name}</p>
-                                <p className="text-copy-light text-xs">
+                                <p className={`font-medium truncate ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{subscription.subscription_plan.name}</p>
+                                <p className={`text-xs truncate ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                                   {subscription.subscription_plan.billing_interval}
                                 </p>
                               </>
                             ) : (
-                              <span className="text-copy-light">{subscription.name || 'Unknown plan'}</span>
+                              <span className={`${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{subscription.name || 'Unknown plan'}</span>
                             )}
                           </div>
                         </td>
@@ -344,10 +351,10 @@ export const AdminSubscriptions = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="text-sm">
-                            <p className="font-semibold text-copy">
+                            <p className={`font-semibold ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                               {formatCurrency(subscription.total_cost, subscription.currency)}
                             </p>
-                            <p className="text-copy-light text-xs">
+                            <p className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                               Base: {formatCurrency(subscription.base_cost, subscription.currency)}
                             </p>
                           </div>
@@ -355,8 +362,8 @@ export const AdminSubscriptions = () => {
                         <td className="px-4 py-3">
                           <div className="text-sm">
                             <div className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3 text-copy-light" />
-                              <span className="text-copy">
+                              <Calendar className={`w-3 h-3 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`} />
+                              <span className={`${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 {subscription.next_billing_date 
                                   ? new Date(subscription.next_billing_date).toLocaleDateString()
                                   : 'N/A'
@@ -364,13 +371,13 @@ export const AdminSubscriptions = () => {
                               </span>
                             </div>
                             {subscription.current_period_end && (
-                              <p className="text-copy-light text-xs">
+                              <p className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                                 Period: {new Date(subscription.current_period_end).toLocaleDateString()}
                               </p>
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm text-copy-light hidden xl:table-cell">
+                        <td className={`px-4 py-3 text-sm hidden xl:table-cell ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                           {new Date(subscription.created_at).toLocaleDateString()}
                         </td>
                         <td className="px-4 py-3 text-sm">
@@ -388,39 +395,39 @@ export const AdminSubscriptions = () => {
                 </table>
               </div>
 
-              <div className="md:hidden divide-y border-t border-border-light">
+              <div className={`md:hidden divide-y ${currentTheme === 'dark' ? 'divide-gray-700 border-t border-gray-700' : 'divide-gray-200 border-t border-gray-200'}`}>
                 {subscriptions.map((subscription) => (
                   <div key={subscription.id} className="p-4 flex flex-col gap-3">
                     <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-medium text-copy">
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-sm font-medium truncate ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {subscription.user?.name || 'Unknown User'}
                         </p>
-                        <p className="text-xs text-copy-light">{subscription.user?.email}</p>
+                        <p className={`text-xs truncate ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{subscription.user?.email}</p>
                       </div>
                       {statusBadge(subscription.status)}
                     </div>
 
-                    <div className="text-xs text-copy-light">
+                    <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                       {subscription.subscription_plan ? (
-                        <span className="text-copy">
+                        <span className={`${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {subscription.subscription_plan.name} • {subscription.subscription_plan.billing_interval}
                         </span>
                       ) : (
-                        <span className="text-copy">{subscription.name || 'Unknown plan'}</span>
+                        <span className={`${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{subscription.name || 'Unknown plan'}</span>
                       )}
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
                       <div>
-                        <p className="text-copy-light">Monthly</p>
-                        <p className="text-copy font-semibold">
+                        <p className={`${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Monthly</p>
+                        <p className={`font-semibold ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {formatCurrency(subscription.total_cost, subscription.currency)}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-copy-light">Next Billing</p>
-                        <p className="text-copy">
+                        <p className={`${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Next Billing</p>
+                        <p className={`${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           {subscription.next_billing_date
                             ? new Date(subscription.next_billing_date).toLocaleDateString()
                             : 'N/A'}
@@ -428,7 +435,7 @@ export const AdminSubscriptions = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs text-copy-light">
+                    <div className={`flex items-center justify-between text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                       <span>Created: {new Date(subscription.created_at).toLocaleDateString()}</span>
                       <button
                         onClick={() => handleViewSubscription(subscription)}
@@ -443,17 +450,17 @@ export const AdminSubscriptions = () => {
               </div>
             </>
           ) : (
-            <div className="p-6 text-center text-copy-light">
+            <div className={`p-6 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
               <div className="flex flex-col items-center gap-3">
-                <Package className="w-12 h-12 text-copy-light/50" />
+                <Package className={`w-12 h-12 ${currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
                 <p>No subscriptions found</p>
               </div>
             </div>
           )}
 
           {/* Pagination - Always visible */}
-          <div className="px-6 py-4 border-t border-border-light flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm text-copy-light">
+          <div className={`px-4 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-wrap items-center justify-between gap-4`}>
+            <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
               {subscriptions.length > 0 
                 ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} subscriptions`
                 : `Total: ${pagination.total} subscriptions`
@@ -463,18 +470,26 @@ export const AdminSubscriptions = () => {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border-light bg-surface text-copy text-sm font-medium hover:bg-surface-light disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition ${
+                  currentTheme === 'dark' 
+                    ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                    : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
               >
                 <ChevronLeft className="w-4 h-4" />
                 Previous
               </button>
-              <span className="text-sm text-copy-light px-2">
+              <span className={`text-sm px-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 Page {pagination.page} of {pagination.pages || 1}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
                 disabled={page >= (pagination.pages || 1)}
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border-light bg-surface text-copy text-sm font-medium hover:bg-surface-light disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition ${
+                  currentTheme === 'dark' 
+                    ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                    : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
               >
                 Next
                 <ChevronRight className="w-4 h-4" />

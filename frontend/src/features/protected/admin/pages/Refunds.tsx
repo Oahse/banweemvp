@@ -4,7 +4,9 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import { AdminLayout } from '@/components/layout/Layout';
+import { AdminLayout } from '../components/AdminLayout';
+import { AdminLayoutSkeleton } from '../components/skeletons/AdminLayoutSkeleton';
+import { RefundsListSkeleton } from '../components/skeletons/RefundsSkeleton';
 
 const LIMIT = 10;
 
@@ -315,20 +317,17 @@ export const Refunds = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-12 h-12 text-primary animate-spin" />
-      </div>
-    );
+  if (initialLoading) {
+    return <AdminLayoutSkeleton />;
   }
 
   return (
     <AdminLayout>
-    <div className={`space-y-6 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage refund requests and processing</p>
+          <h1 className="text-xl font-bold">Refunds</h1>
+          <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage refund requests and processing</p>
         </div>
       </div>
 
@@ -469,14 +468,14 @@ export const Refunds = () => {
               <table className="w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                   <tr>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Refund ID</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Order ID</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Customer</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Amount</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Status</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Reason</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Date</th>
-                    <th className="px-4 lg:px-6 py-3 text-left text-xs lg:text-sm font-semibold">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Refund ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Order ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Customer</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Reason</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -486,34 +485,23 @@ export const Refunds = () => {
                       onClick={() => handleView(refund)}
                       className={`border-b cursor-pointer ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}
                     >
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono text-primary`}>{String(refund.id).slice(0, 8)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{String(refund.order_id).slice(0, 8)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{refund.customer_name || 'N/A'}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(refund.amount, refund.currency)}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">{statusBadge(refund.status)}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{refund.reason || 'No reason provided'}</td>
-                      <td className={`px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(refund.created_at || '').toLocaleDateString()}</td>
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">
-                        <div className="flex gap-1 lg:gap-2">
+                      <td className={`px-4 py-3 text-xs font-mono text-primary max-w-[100px] truncate`}>{String(refund.id).slice(0, 8)}</td>
+                      <td className={`px-4 py-3 text-xs font-mono ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-[100px] truncate`}>{String(refund.order_id).slice(0, 8)}</td>
+                      <td className={`px-4 py-3 text-xs font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'} max-w-[150px] truncate`}>{refund.customer_name || 'N/A'}</td>
+                      <td className={`px-4 py-3 text-xs font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(refund.amount, refund.currency)}</td>
+                      <td className="px-4 py-3 text-xs">{statusBadge(refund.status)}</td>
+                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-[200px] truncate`}>{refund.reason || 'No reason provided'}</td>
+                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(refund.created_at || '').toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-xs">
+                        <div className="flex gap-1">
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
                               handleView(refund);
                             }}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-xs"
                           >
-                            <EyeIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">View</span>
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleView(refund);
-                            }}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-success text-white rounded hover:bg-success/90 transition-colors"
-                          >
-                            <CreditCardIcon size={14} className="hidden sm:block" />
-                            <span className="sm:hidden">Process</span>
+                            <EyeIcon size={14} />
                           </button>
                         </div>
                       </td>
@@ -529,39 +517,33 @@ export const Refunds = () => {
                 <div
                   key={refund.id}
                   onClick={() => handleView(refund)}
-                  className={`p-3 lg:p-4 flex flex-col gap-2 cursor-pointer ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
+                  className={`p-4 flex flex-col gap-2 cursor-pointer ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs lg:text-sm font-mono text-primary">{String(refund.id).slice(0, 8)}</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-mono text-primary truncate">{String(refund.id).slice(0, 8)}</span>
                     {statusBadge(refund.status)}
                   </div>
-                  <div className={`text-sm lg:text-base font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{refund.customer_name || 'N/A'}</div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Order: {String(refund.order_id).slice(0, 8)}</div>
-                  <div className={`text-xs lg:text-sm font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(refund.amount, refund.currency)}</div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{refund.reason || 'No reason provided'}</div>
-                  <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(refund.created_at || '').toLocaleDateString()}</div>
-                  <div className="flex gap-1 lg:gap-2 mt-2">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleView(refund);
-                      }}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-xs"
-                    >
-                      <EyeIcon size={14} />
-                      View
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleView(refund);
-                      }}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-success text-white rounded hover:bg-success/90 transition-colors text-xs"
-                    >
-                      <CreditCardIcon size={14} />
-                      Process
-                    </button>
+                  <div className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'} truncate`}>{refund.customer_name || 'N/A'}</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Order:</span>
+                    <span className={`text-xs font-mono ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>{String(refund.order_id).slice(0, 8)}</span>
                   </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Amount:</span>
+                    <span className={`text-xs font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(refund.amount, refund.currency)}</span>
+                  </div>
+                  <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>{refund.reason || 'No reason provided'}</div>
+                  <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(refund.created_at || '').toLocaleDateString()}</div>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleView(refund);
+                    }}
+                    className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-sm mt-2"
+                  >
+                    <EyeIcon size={14} />
+                    View Details
+                  </button>
                 </div>
               ))}
             </div>

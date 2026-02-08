@@ -23,6 +23,7 @@ import {
   FileText,
   PieChart,
   Coins,
+  LayoutDashboard,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -31,7 +32,7 @@ interface AdminLayoutProps {
 }
 
 const adminNavigationItems = [
-  { name: 'Dashboard', href: '/admin', icon: Home },
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Products', href: '/admin/products', icon: Tag },
   { name: 'Categories', href: '/admin/categories', icon: Layers },
@@ -134,6 +135,22 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   {adminNavigationItems.find(item => location.pathname === item.href)?.name || 'Admin'}
                 </h1>
               </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => navigate('/')}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              >
+                <Home className="w-4 h-4" />
+                <span className="hidden sm:inline">Home</span>
+              </button>
+              <button
+                onClick={() => navigate('/products')}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors"
+              >
+                <Package className="w-4 h-4" />
+                <span className="hidden sm:inline">Products</span>
+              </button>
             </div>
           </div>
         </div>
