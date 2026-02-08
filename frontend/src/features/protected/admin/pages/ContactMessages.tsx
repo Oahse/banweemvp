@@ -217,7 +217,7 @@ const ContactMessages: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-copy-light">Total Messages</p>
-              <p className="text-2xl font-bold text-main">{messages.length}</p>
+              <p className="text-2xl font-bold text-main">{stats.total}</p>
             </div>
             <Mail className="w-8 h-8 text-primary" />
           </div>
@@ -427,7 +427,11 @@ const ContactMessages: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-copy-light">
-                        {new Date(message.created_at).toLocaleDateString()}
+                        {new Date(message.created_at).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-2">
@@ -471,7 +475,11 @@ const ContactMessages: React.FC = () => {
                   <div className="flex items-center justify-between">
                     {priorityBadge(message.priority)}
                     <span className="text-xs text-copy-light">
-                      {new Date(message.created_at).toLocaleDateString()}
+                      {new Date(message.created_at).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
                     </span>
                   </div>
                   <div className="flex gap-2 pt-2">
@@ -575,7 +583,13 @@ const ContactMessages: React.FC = () => {
               <div>
                 <label className="text-sm font-semibold text-main">Created At</label>
                 <p className="text-sm text-copy mt-1">
-                  {new Date(selectedMessage.created_at).toLocaleString()}
+                  {new Date(selectedMessage.created_at).toLocaleString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
                 </p>
               </div>
             </div>
