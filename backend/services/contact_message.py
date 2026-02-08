@@ -163,35 +163,3 @@ class ContactMessageService:
             await db.rollback()
             logger.error(f"Error deleting contact message: {str(e)}")
             raise
-    
-    @staticmethod
-    async def get_message_stats(db: AsyncSession) -> dict:
-        """Get statistics about contact messages"""
-        total_stmt = select(func.count(ContactMessage.id))
-        total_result = await db.execute(total_stmt)
-        total = total_result.scalar()
-        
-        new_stmt = select(func.count(ContactMessage.id)).where(
-            ContactMessage.status == 'new'
-        )
-        new_result = await db.execute(new_stmt)
-        new = new_result.scalar()
-        
-        in_progress_stmt = select(func.count(ContactMessage.id)).where(
-            ContactMessage.status == 'in_progress'
-        )
-        in_progress_result = await db.execute(in_progress_stmt)
-        in_progress = in_progress_result.scalar()
-        
-        resolved_stmt = select(func.count(ContactMessage.id)).where(
-            ContactMessage.status == 'resolved'
-        )
-        resolved_result = await db.execute(resolved_stmt)
-        resolved = resolved_result.scalar()
-        
-        return {
-            "total": total or 0,
-            "new": new or 0,
-            "in_progress": in_progress or 0,
-            "resolved": resolved or 0
-        }

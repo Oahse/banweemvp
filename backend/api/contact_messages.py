@@ -87,6 +87,8 @@ async def get_all_contact_messages(
             search=search
         )
         
+        logger.info(f"Fetched {len(messages)} messages, total: {total}")
+        
         total_pages = math.ceil(total / page_size) if total > 0 else 0
         
         return Response.success(
@@ -122,28 +124,6 @@ async def get_all_contact_messages(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch contact messages {str(e)}"
-        )
-
-
-@router.get("/stats")
-async def get_contact_message_stats(
-    db: AsyncSession = Depends(get_db),
-    current_user = Depends(require_admin)
-):
-    """
-    Get contact message statistics (admin only)
-    """
-    try:
-        stats = await ContactMessageService.get_message_stats(db)
-        return Response.success(
-            data=stats,
-            message="Contact message statistics retrieved successfully"
-        )
-    except Exception as e:
-        logger.error(f"Error fetching contact message stats: {str(e)}")
-        raise APIException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Failed to fetch statistics"
         )
 
 

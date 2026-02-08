@@ -11,6 +11,7 @@ import ContactMessagesSkeleton from '../components/skeletons/ContactMessagesSkel
 import { useTheme } from '../../../../components/shared/contexts/ThemeContext';
 import Dropdown from '../../../../components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
+import { ConfirmationModal } from '../../../../components/ui/ConfirmationModal';
 
 const ContactMessages: React.FC = () => {
   const { currentTheme } = useTheme();
@@ -28,6 +29,9 @@ const ContactMessages: React.FC = () => {
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const PAGE_SIZE = 20;
 
@@ -41,7 +45,6 @@ const ContactMessages: React.FC = () => {
 
   useEffect(() => {
     fetchMessages();
-    fetchStats();
   }, [page, statusFilter, priorityFilter, debouncedSearchTerm]);
 
   const fetchMessages = async () => {
@@ -61,6 +64,9 @@ const ContactMessages: React.FC = () => {
       setMessages(response.messages);
       setTotalPages(response.total_pages);
       setTotal(response.total);
+      
+      // Calculate stats from the response
+      calculateStats(response.messages, response.total);
     } catch (error: any) {
       console.error('Error fetching messages:', error);
       toast.error('Failed to load messages');
@@ -70,21 +76,52 @@ const ContactMessages: React.FC = () => {
     }
   };
 
-  const fetchStats = async () => {
-    try {
-      const statsData = await ContactMessagesAPI.getStats();
-      setStats(statsData);
-    } catch (error) {
-      console.error('Error fetching stats:', error);
+  const calculateStats = async (currentMessages: ContactMessage[], totalCount: number) => {
+    // If filters are applied, we need to fetch all messages to calculate accurate stats
+    // Otherwise, use the current page data
+    if (statusFilter || priorityFilter || debouncedSearchTerm) {
+      // When filtered, calculate from current filtered results
+      const newCount = messages.filter(m => m.status === 'new').length;
+      const inProgressCount = messages.filter(m => m.status === 'in_progress').length;
+      const resolvedCount = messages.filter(m => m.status === 'resolved').length;
+      
+      setStats({
+        total: totalCount,
+        new: newCount,
+        in_progress: inProgressCount,
+        resolved: resolvedCount
+      });
+    } else {
+      // When not filtered, fetch all messages to calculate accurate stats
+      try {
+        const allResponse = await ContactMessagesAPI.getAll({
+          page: 1,
+          page_size: 1000, // Get all messages for stats calculation
+        });
+        
+        const newCount = allResponse.messages.filter(m => m.status === 'new').length;
+        const inProgressCount = allResponse.messages.filter(m => m.status === 'in_progress').length;
+        const resolvedCount = allResponse.messages.filter(m => m.status === 'resolved').length;
+        
+        setStats({
+          total: allResponse.total,
+          new: newCount,
+          in_progress: inProgressCount,
+          resolved: resolvedCount
+        });
+      } catch (error) {
+        console.error('Error calculating stats:', error);
+      }
     }
   };
+
+  
 
   const handleStatusChange = async (messageId: string, newStatus: string) => {
     try {
       await ContactMessagesAPI.update(messageId, { status: newStatus as any });
       toast.success('Status updated successfully');
       fetchMessages();
-      fetchStats();
     } catch (error) {
       toast.error('Failed to update status');
     }
@@ -101,15 +138,24 @@ const ContactMessages: React.FC = () => {
   };
 
   const handleDelete = async (messageId: string) => {
-    if (!confirm('Are you sure you want to delete this message?')) return;
+    setMessageToDelete(messageId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!messageToDelete) return;
     
+    setIsDeleting(true);
     try {
-      await ContactMessagesAPI.delete(messageId);
+      await ContactMessagesAPI.delete(messageToDelete);
       toast.success('Message deleted successfully');
-      fetchMessages();
-      fetchStats();
+      setShowDeleteConfirm(false);
+      setMessageToDelete(null);
+      fetchMessages(); // This will recalculate stats
     } catch (error) {
       toast.error('Failed to delete message');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -171,7 +217,7 @@ const ContactMessages: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-copy-light">Total Messages</p>
-              <p className="text-2xl font-bold text-main">{stats.total}</p>
+              <p className="text-2xl font-bold text-main">{messages.length}</p>
             </div>
             <Mail className="w-8 h-8 text-primary" />
           </div>
@@ -548,6 +594,22 @@ const ContactMessages: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setMessageToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Contact Message"
+        message="Are you sure you want to delete this contact message? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        loading={isDeleting}
+      />
     </div>
     </AdminLayout>
   );

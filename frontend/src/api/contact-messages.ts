@@ -63,8 +63,11 @@ export const ContactMessagesAPI = {
     const response = await apiClient.get('/contact-messages', { params });
     
     // The backend returns: { success, data: { messages: [...] }, pagination: {...} }
-    // So we need response.data.data.messages
     const responseData = response.data;
+    
+    console.log('Full response:', response);
+    console.log('Response data:', responseData);
+    console.log('Response data keys:', Object.keys(responseData));
     
     // Check if we have the expected structure
     if (responseData?.data?.messages && Array.isArray(responseData.data.messages)) {
@@ -79,7 +82,7 @@ export const ContactMessagesAPI = {
     
     // Fallback: if messages are directly in data (shouldn't happen but handle it)
     if (responseData?.messages && Array.isArray(responseData.messages)) {
-      console.warn('Unexpected response structure - messages directly in data');
+      console.warn('Using fallback - messages directly in response.data');
       return {
         messages: responseData.messages,
         total: responseData.total || 0,
@@ -98,24 +101,6 @@ export const ContactMessagesAPI = {
       page_size: params?.page_size || 20,
       total_pages: 0
     };
-  },
-
-  /**
-   * Get contact message statistics (admin only)
-   */
-  getStats: async (): Promise<{
-    total: number;
-    new: number;
-    in_progress: number;
-    resolved: number;
-  }> => {
-    try {
-      const response = await apiClient.get('/contact-messages/stats');
-      return response.data.data || { total: 0, new: 0, in_progress: 0, resolved: 0 };
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      return { total: 0, new: 0, in_progress: 0, resolved: 0 };
-    }
   },
 
   /**
