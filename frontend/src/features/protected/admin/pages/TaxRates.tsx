@@ -360,16 +360,16 @@ export const AdminTaxRates = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</p>
+          <h1 className="text-xl font-bold">Tax Rates</h1>
+          <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</p>
         </div>
-        <div className="flex gap-2 w-full lg:w-auto">
+        <div className="flex gap-2 w-full sm:w-auto">
           <button 
             onClick={openAddModal}
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
           >
             <PlusIcon size={18} />
-            <span className="hidden sm:inline">Add Tax Rate</span>
-            <span className="sm:hidden">Add</span>
+            <span>Add Tax Rate</span>
           </button>
         </div>
       </div>

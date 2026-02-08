@@ -39,7 +39,7 @@ const adminNavigationItems = [
   { name: 'Payments', href: '/admin/payments', icon: DollarSign },
   { name: 'Inventory', href: '/admin/inventory', icon: Warehouse },
   { name: 'Users', href: '/admin/users', icon: Users },
-  { name: 'Tax', href: '/admin/tax', icon: Coins },
+  { name: 'Tax Rates', href: '/admin/tax-rates', icon: Coins },
   { name: 'Refunds', href: '/admin/refunds', icon: Receipt },
   { name: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard },
   { name: 'Shipping', href: '/admin/shipping', icon: Truck },

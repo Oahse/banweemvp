@@ -4,8 +4,8 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import { AdminLayout } from '../components/AdminLayout';
-import { AdminLayoutSkeleton } from '../components/skeletons/AdminLayoutSkeleton';
+import AdminLayout from '../components/AdminLayout';
+import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { ShippingListSkeleton } from '../components/skeletons/ShippingSkeleton';
 
 const LIMIT = 10;
