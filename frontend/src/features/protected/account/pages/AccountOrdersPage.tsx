@@ -34,10 +34,13 @@ interface OrdersProps {
   animation?: 'shimmer' | 'pulse' | 'wave';
 }
 
-  animation = 'shimmer' 
-}: OrdersProps) => {
+export const Orders = (props: OrdersProps) => {
+  const { animation = 'shimmer' } = props;
   const { formatCurrency } = useLocale();
-  const { data: paginatedData, loading, error, execute } = usePaginatedApi<OrderPageResponse>();
+  const { data, loading, error, execute } = usePaginatedApi();
+  const paginatedData = (data && typeof data === 'object' && 'data' in data)
+    ? (data as OrderPageResponse)
+    : undefined;
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

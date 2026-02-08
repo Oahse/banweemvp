@@ -51,26 +51,28 @@ export const Account = () => {
 
   return (
     <AccountLayout>
-      <Routes>
-        <Route path="/" element={<AccountDashboardPage />} />
-        <Route path="/dashboard" element={<AccountDashboardPage />} />
-        <Route path="/profile" element={<AccountProfilePage />} />
-        <Route path="/orders" element={<AccountOrdersPage />} />
-        <Route path="/orders/:orderId" element={<AccountOrderDetailPage />} />
-        <Route path="/tracking" element={<AccountTrackOrderPage />} />
-        {/* <Route path="/tracking/:shipmentId" element={<ShipmentTracking />} /> */} // TODO: Implement shipping module
-        <Route path="/wishlist" element={<AccountWishlistPage />} />
-        <Route path="/wishlist/:wishlistId/edit" element={<AccountWishlistEditPage />} />
-        <Route path="/addresses" element={<AccountAddressesPage />} />
-        {/* <Route path="/payment-methods" element={<AccountPaymentMethodsPage />} /> */} // TODO: Implement payment methods
-        <Route path="/subscriptions" element={<AccountMySubscriptionsPage /> } />
-        <Route path="/subscriptions/:subscriptionId" element={<SubscriptionDetails />} />
-        <Route path="/subscriptions/:subscriptionId/edit" element={<AccountSubscriptionEditPage />} />
-        <Route path="/subscriptions/:subscriptionId/orders" element={<AccountOrdersPage />} />
-        
-        {/* Redirect root to dashboard */}
-        <Route path="*" element={<AccountDashboardPage />} />
-      </Routes>
+      <Suspense fallback={<AccountSkeleton />}>
+        <Routes>
+          <Route path="/" element={<AccountDashboardPage />} />
+          <Route path="/dashboard" element={<AccountDashboardPage />} />
+          <Route path="/profile" element={<AccountProfilePage />} />
+          <Route path="/orders" element={<AccountOrdersPage />} />
+          <Route path="/orders/:orderId" element={<AccountOrderDetailPage />} />
+          <Route path="/tracking" element={<AccountTrackOrderPage />} />
+          {/* <Route path="/tracking/:shipmentId" element={<ShipmentTracking />} /> */} // TODO: Implement shipping module
+          <Route path="/wishlist" element={<AccountWishlistPage />} />
+          <Route path="/wishlist/:wishlistId/edit" element={<AccountWishlistEditPage />} />
+          <Route path="/addresses" element={<AccountAddressesPage />} />
+          {/* <Route path="/payment-methods" element={<AccountPaymentMethodsPage />} /> */} // TODO: Implement payment methods
+          <Route path="/subscriptions" element={<AccountMySubscriptionsPage /> } />
+          <Route path="/subscriptions/:subscriptionId" element={<SubscriptionDetails />} />
+          <Route path="/subscriptions/:subscriptionId/edit" element={<AccountSubscriptionEditPage />} />
+          <Route path="/subscriptions/:subscriptionId/orders" element={<AccountOrdersPage />} />
+          
+          {/* Redirect root to dashboard */}
+          <Route path="*" element={<AccountDashboardPage />} />
+        </Routes>
+      </Suspense>
     </AccountLayout>
   );
 };
