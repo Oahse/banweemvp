@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '../../utils/utils';
 import { CheckIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Heading, Text } from '@/components/ui/Text/Text';
 
 /**
  * @typedef {object} ProductVariantAttribute
@@ -130,7 +131,7 @@ export const VariantSelector = ({
   if (layout === 'list') {
     return (
       <div className={cn('space-y-3', className)}>
-        <h3 className="text-sm font-medium text-gray-700">Select Variant</h3>
+        <Heading level={3} className="text-sm font-medium text-gray-700">Select Variant</Heading>
         <div className="space-y-2">
           {variants.map(variant => {
             const isSelected = selectedVariant.id === variant.id;
@@ -217,9 +218,9 @@ export const VariantSelector = ({
       <div className="space-y-3">
         {Object.entries(attributeGroups).map(([attributeName, values]) => (
           <div key={attributeName} className="space-y-2">
-            <h3 className="text-sm font-medium text-copy capitalize">
+            <Heading level={3} className="text-sm font-medium text-copy capitalize">
               {attributeName === 'variant_index' ? 'Option' : attributeName}
-            </h3>
+            </Heading>
             <div className="flex flex-wrap gap-2">
               {Array.from(values).map(value => {
                 // Find variant with this attribute value

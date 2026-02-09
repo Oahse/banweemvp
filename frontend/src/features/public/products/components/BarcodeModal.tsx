@@ -4,6 +4,7 @@ import { ScanLineIcon, DownloadIcon, ShareIcon, XIcon } from 'lucide-react';
 import { NotificationModal } from '@/components/ui/NotificationModal';
 import JsBarcode from 'jsbarcode';
 import { Button } from '@/components/ui/Button';
+import { Heading } from '@/components/ui/Text/Text';
 
 interface BarcodeModalProps {
   variant: {
@@ -276,7 +277,7 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <ScanLineIcon size={24} className="text-primary" />
-            <h3 className="text-lg font-semibold text-copy">{title}</h3>
+            <Heading level={3} className="text-lg font-semibold text-copy">{title}</Heading>
           </div>
           <Button
             onClick={onClose}

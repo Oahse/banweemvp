@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { SOCIAL_MEDIA_LINKS } from '../../utils/social-media-config';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 export const Footer = () => {
   const location = useLocation();
@@ -54,8 +55,8 @@ export const Footer = () => {
           <div className="bg-background rounded-lg p-6 md:p-10 mb-12">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div className="mb-6 md:mb-0 md:mr-8">
-                <h3 className="text-lg font-semibold text-main mb-2">Manage Your Subscriptions</h3>
-                <p className="text-copy-light text-sm">Explore, set up, and manage your recurring orders and subscriptions.</p>
+                <Heading level={3} className="text-lg font-semibold text-main mb-2">Manage Your Subscriptions</Heading>
+                <Body className="text-copy-light text-sm">Explore, set up, and manage your recurring orders and subscriptions.</Body>
               </div>
               <div className="flex-shrink-0 w-full md:w-auto">
                 <Link
@@ -111,7 +112,7 @@ export const Footer = () => {
 
           {/* Categories */}
           <div>
-            <h5 className="text-sm font-semibold text-main mb-3">Shop Categories</h5>
+            <Heading level={5} className="text-sm font-semibold text-main mb-3">Shop Categories</Heading>
             <ul className="space-y-3">
               {categories.map((category, index) => (
                 <li key={index}>
@@ -125,7 +126,7 @@ export const Footer = () => {
 
           {/* Help */}
           <div>
-            <h5 className="text-sm font-semibold text-main mb-3">Help</h5>
+            <Heading level={5} className="text-sm font-semibold text-main mb-3">Help</Heading>
             <ul className="space-y-3">
               {helpLinks.map((link, index) => (
                 <li key={index}>
@@ -139,7 +140,7 @@ export const Footer = () => {
 
           {/* Account */}
           <div>
-            <h5 className="text-sm font-semibold text-main mb-3">My Account</h5>
+            <Heading level={5} className="text-sm font-semibold text-main mb-3">My Account</Heading>
             <ul className="space-y-3">
               {accountLinks.map((link, index) => (
                 <li key={index}>
@@ -153,7 +154,7 @@ export const Footer = () => {
 
           {/* Mobile App */}
           <div>
-            <h5 className="text-sm font-semibold text-main mb-3">Follow Us</h5>
+            <Heading level={5} className="text-sm font-semibold text-main mb-3">Follow Us</Heading>
             <div className="space-y-3">
               <a
                 href="#"
