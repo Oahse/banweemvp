@@ -12,8 +12,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '../../utils/themeClasses';
-import { formatCurrency } from '../../utils/orderCalculations';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { formatCurrency } from '../../../../utils/orderCalculations';
 
 interface SubscriptionCardProps {
   subscription: any;

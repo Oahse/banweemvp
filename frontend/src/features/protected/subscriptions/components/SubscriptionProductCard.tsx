@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MinusIcon, PlusIcon, PackageIcon } from 'lucide-react';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '../../utils/themeClasses';
-import { useLocale } from '../../../LocaleContext';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { formatCurrency } from '../../../../utils/orderCalculations';
 import { formatPriceWithFallback, getBestPrice } from '../../utils/price-utils';
 
 interface SubscriptionProductCardProps {

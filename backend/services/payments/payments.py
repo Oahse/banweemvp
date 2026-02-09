@@ -21,6 +21,27 @@ import json
 import logging
 import time
 
+# Ensure compatibility with Stripe library code that expects a global `uuid7`
+# Some Stripe versions mistakenly call `uuid7()` without importing it. Provide
+# a safe shim and inject it into stripe._api_requestor so requests work.
+try:
+    # Prefer a real uuid7 if available (Python 3.11+ may provide uuid.uuid7)
+    from uuid import uuid7 as _native_uuid7  # type: ignore
+    def _uuid7():
+        return _native_uuid7()
+except Exception:
+    import uuid as _uuid
+    def _uuid7():
+        # Fallback: use uuid4 for uniqueness when uuid7 is not available
+        return _uuid.uuid4()
+
+try:
+    # Inject into stripe's api_requestor module namespace if present
+    import stripe._api_requestor as _stripe_api_requestor  # type: ignore
+    setattr(_stripe_api_requestor, "uuid7", _uuid7)
+except Exception:
+    # If injection fails, we'll still rely on explicit idempotency keys
+    pass
 # Configure Stripe
 stripe.api_key = getattr(settings, 'STRIPE_SECRET_KEY', '')
 
@@ -291,6 +312,81 @@ class PaymentService:
         except stripe.error.StripeError as e:
             raise HTTPException(status_code=400, detail=f"Stripe error: {str(e)}")
 
+    async def set_default_payment_method(self, payment_method_id: UUID, user_id: UUID) -> bool:
+        """Set a payment method as default for the user"""
+        try:
+            # Get the payment method to set as default
+            result = await self.db.execute(
+                select(PaymentMethod).where(
+                    and_(
+                        PaymentMethod.id == payment_method_id,
+                        PaymentMethod.user_id == user_id,
+                        PaymentMethod.is_active == True
+                    )
+                ).with_for_update()
+            )
+            new_default = result.scalar_one_or_none()
+            
+            if not new_default:
+                return False
+            
+            # Get all existing default payment methods for this user
+            existing_defaults = await self.db.execute(
+                select(PaymentMethod).where(
+                    and_(
+                        PaymentMethod.user_id == user_id,
+                        PaymentMethod.is_default == True,
+                        PaymentMethod.is_active == True
+                    )
+                ).with_for_update()
+            )
+            
+            # Unset all existing defaults
+            for pm in existing_defaults.scalars().all():
+                pm.is_default = False
+            
+            # Set the new default
+            new_default.is_default = True
+            
+            await self.db.commit()
+            return True
+            
+        except Exception as e:
+            await self.db.rollback()
+            raise HTTPException(status_code=500, detail=f"Failed to set default payment method: {str(e)}")
+
+    async def update_payment_method(self, payment_method_id: UUID, user_id: UUID, update_data: Dict[str, Any]) -> Optional[PaymentMethod]:
+        """Update a payment method"""
+        try:
+            # Get the payment method
+            result = await self.db.execute(
+                select(PaymentMethod).where(
+                    and_(
+                        PaymentMethod.id == payment_method_id,
+                        PaymentMethod.user_id == user_id,
+                        PaymentMethod.is_active == True
+                    )
+                ).with_for_update()
+            )
+            payment_method = result.scalar_one_or_none()
+            
+            if not payment_method:
+                return None
+            
+            # Update allowed fields
+            allowed_fields = ['expiry_month', 'expiry_year']
+            for field, value in update_data.items():
+                if field in allowed_fields and hasattr(payment_method, field):
+                    setattr(payment_method, field, value)
+            
+            await self.db.commit()
+            await self.db.refresh(payment_method)
+            return payment_method
+            
+        except Exception as e:
+            await self.db.rollback()
+            raise HTTPException(status_code=500, detail=f"Failed to update payment method: {str(e)}")
+
     async def create_payment_intent(
         self,
         user_id: UUID,
@@ -326,7 +422,7 @@ class PaymentService:
                 currency=currency,
                 status=stripe_intent.status,
                 client_secret=stripe_intent.client_secret,
-                payment_metadata=metadata
+                payment_intent_metadata=metadata
             )
             
             self.db.add(payment_intent)

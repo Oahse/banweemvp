@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, TrashIcon, PauseIcon, PlayIcon, AlertTriangleIcon } from 'lucide-react';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '../../utils/themeClasses';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
 
 export type SubscriptionAction = 'cancel' | 'pause' | 'resume';
 
@@ -226,7 +226,7 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
                   themeClasses.background.surface,
                   themeClasses.border.light,
                   themeClasses.text.primary,
-                  'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                  'focus:outline-none focus:ring-2 focus:ring-[#61b482] focus:border-transparent',
                   'placeholder:text-gray-400',
                   loading ? 'opacity-50 cursor-not-allowed' : ''
                 )}

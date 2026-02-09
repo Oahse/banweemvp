@@ -178,6 +178,21 @@ class PaymentIntent(BaseModel):
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
 
+    @property
+    def amount(self) -> float:
+        """Return a simple numeric total for compatibility with schemas.
+
+        The database stores an `amount_breakdown` JSONB for flexibility; many
+        API schemas expect a top-level `amount` attribute. Expose it here as a
+        read-only property so Pydantic's `from_orm` can access it.
+        """
+        try:
+            if isinstance(self.amount_breakdown, dict):
+                return float(self.amount_breakdown.get("total", 0.0) or 0.0)
+        except Exception:
+            pass
+        return 0.0
+
 
 class Transaction(BaseModel):
     """Financial transaction records - hard delete only"""

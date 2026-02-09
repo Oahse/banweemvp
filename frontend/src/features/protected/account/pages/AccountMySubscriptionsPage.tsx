@@ -286,7 +286,7 @@ export const MySubscriptions = () => {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="mt-4 sm:mt-0 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="mt-4 sm:mt-0 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#61b482] hover:bg-[#4c9066] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#61b482]"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
           New Subscription
@@ -303,7 +303,7 @@ export const MySubscriptions = () => {
           placeholder="Search subscriptions..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#61b482] focus:border-[#61b482]"
         />
       </div>
 
@@ -319,7 +319,7 @@ export const MySubscriptions = () => {
               }}
               className={`py-2 px-1 border-b-2 font-medium text-sm capitalize ${
                 activeTab === tab
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-[#61b482] text-[#61b482]'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -368,7 +368,7 @@ export const MySubscriptions = () => {
           <div className="mt-6">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#61b482] hover:bg-[#4c9066] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#61b482]"
             >
               <PlusIcon className="w-4 h-4 mr-2" />
               New Subscription
@@ -452,7 +452,7 @@ export const MySubscriptions = () => {
                       ...newSubscriptionData,
                       name: e.target.value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#61b482]"
                     placeholder="Enter subscription name"
                   />
                 </div>
@@ -466,7 +466,7 @@ export const MySubscriptions = () => {
                       ...newSubscriptionData,
                       billing_cycle: e.target.value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#61b482]"
                   >
                     <option value="monthly">Monthly</option>
                     <option value="quarterly">Quarterly</option>
@@ -483,7 +483,7 @@ export const MySubscriptions = () => {
                       ...newSubscriptionData,
                       delivery_type: e.target.value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#61b482]"
                   >
                     <option value="standard">Standard</option>
                     <option value="express">Express</option>
@@ -510,7 +510,7 @@ export const MySubscriptions = () => {
                 <button
                   onClick={handleCreateSubscription}
                   disabled={isLoading}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-white bg-[#61b482] border border-transparent rounded-md hover:bg-[#4c9066] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#61b482] disabled:opacity-50"
                 >
                   {isLoading ? 'Creating...' : 'Create Subscription'}
                 </button>

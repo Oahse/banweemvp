@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { EyeIcon, TagIcon, PackageIcon } from 'lucide-react';
-import { themeClasses, combineThemeClasses } from '../../utils/themeClasses';
-import { formatCurrency } from '../../utils/orderCalculations';
+import { themeClasses, combineThemeClasses } from '../../../../utils/themeClasses';
+import { formatCurrency } from '../../../../utils/orderCalculations';
 import { Subscription } from '../../api/subscription';
 
 interface SubscriptionItemProps {
@@ -75,7 +75,7 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
                     {/* Variant Information */}
                     {(product.variant?.sku || product.sku) && (
                       <div className="flex flex-wrap gap-2">
-                        <span className={combineThemeClasses(themeClasses.text.muted, 'text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 rounded-md font-medium')}>
+                        <span className={combineThemeClasses(themeClasses.text.muted, 'text-xs px-2 py-1 bg-[#61b482] dark:bg-[#4c9066] rounded-md font-medium')}>
                           SKU: {product.variant?.sku || product.sku}
                         </span>
                       </div>

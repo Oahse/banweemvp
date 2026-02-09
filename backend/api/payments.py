@@ -15,6 +15,7 @@ from services.payments import PaymentService
 from schemas.payments import (
     PaymentMethodResponse,
     PaymentMethodCreate,
+    PaymentMethodUpdate,
     PaymentIntentResponse,
     PaymentIntentCreate,
     TransactionResponse
@@ -100,6 +101,47 @@ async def delete_payment_method(
         )
     
     return {"message": "Payment method deleted successfully"}
+
+
+@router.put("/methods/{payment_method_id}")
+async def update_payment_method(
+    payment_method_id: UUID,
+    payment_method_data: PaymentMethodUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Update a payment method"""
+    service = PaymentService(db)
+    updated_method = await service.update_payment_method(
+        payment_method_id=payment_method_id,
+        user_id=current_user.id,
+        update_data=payment_method_data.dict(exclude_unset=True)
+    )
+    if not updated_method:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Payment method not found"
+        )
+    return Response.success(data=PaymentMethodResponse.from_orm(updated_method))
+
+
+@router.put("/methods/{payment_method_id}/default")
+async def set_default_payment_method(
+    payment_method_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Set a payment method as default"""
+    service = PaymentService(db)
+    success = await service.set_default_payment_method(payment_method_id, current_user.id)
+    
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Payment method not found"
+        )
+    
+    return {"message": "Payment method set as default successfully"}
 
 
 @router.post("/intents")

@@ -7,8 +7,8 @@ import {
   LoaderIcon,
   PlusIcon
 } from 'lucide-react';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '../../utils/themeClasses';
-import { formatCurrency } from '../../utils/orderCalculations';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { formatCurrency } from '../../../../utils/orderCalculations';
 import { toast } from 'react-hot-toast';
 
 interface AppliedDiscount {
@@ -156,7 +156,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
           <button
             onClick={() => setShowDiscountInput(true)}
             className={combineThemeClasses(
-              'text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-50 transition-colors'
+              'text-[#61b482] hover:text-[#4c9066] text-sm flex items-center gap-1 px-2 py-1 rounded hover:bg-[#61b482]/10 transition-colors'
             )}
           >
             <PlusIcon className="w-3 h-3" />

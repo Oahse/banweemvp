@@ -58,19 +58,33 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
 
       try {
         setInitializing(true);
-        const payload = { order_id: orderId || null, amount: amount || null, currency: currency || null };
+        // For adding payment methods, we don't need amount/order_id
+        // Just create a setup intent or use minimal amount
+        const payload = { 
+          amount: amount || 1.00, // Minimum amount for validation
+          currency: currency || "USD",
+          order_id: orderId || null
+        };
         // call backend to create a PaymentIntent (backend should set automatic_payment_methods if needed)
-        const resp: any = await apiClient.post('/orders/create-payment-intent', payload);
+        const resp: any = await apiClient.post('/payments/intents', payload);
         const cs = resp?.client_secret || resp?.data?.client_secret || null;
         if (cs) {
           setClientSecret(cs);
         } else {
           throw new Error('No client secret returned');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to initialize payment', err);
-        toast.error('Failed to initialize payment. Please try again.');
-        onPaymentError('Failed to initialize payment.');
+        if (err?.statusCode === 401) {
+          toast.error('Please log in again to add payment methods');
+          onPaymentError('Authentication required');
+        } else if (err?.statusCode === 422) {
+          toast.error('Invalid payment information');
+          onPaymentError('Invalid payment information');
+        } else {
+          toast.error('Failed to initialize payment. Please try again.');
+          onPaymentError('Failed to initialize payment.');
+        }
       } finally {
         setInitializing(false);
       }

@@ -62,6 +62,7 @@ class PaymentIntentResponse(PaymentIntentBase):
     user_id: UUID
     order_id: Optional[UUID] = None
     stripe_payment_intent_id: Optional[str] = None
+    client_secret: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 

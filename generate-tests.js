@@ -1,173 +1,58 @@
-#!/usr/bin/env node
+// Here are the Stripe test cards you can use for testing payments:
 
-/**
- * Script to generate test files for all .tsx components
- */
+// ## **Most Common Test Cards**
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+// **Visa Success Card**
+// - Card Number: `4242 4242 4242 4242`
+// - Expiry: Any future date (e.g., `12/34`)
+// - CVC: Any 3 digits (e.g., `123`)
+// - ZIP: Any 5 digits (e.g., `12345`)
 
-// Get all .tsx files that don't have tests
-function getTsxFilesWithoutTests() {
-  const command = `find frontend/src -name "*.tsx" -not -path "*/node_modules/*" -not -name "*.test.tsx"`;
-  const output = execSync(command, { encoding: 'utf8' });
-  return output.trim().split('\n').filter(Boolean);
-}
+// **Mastercard Success Card**
+// - Card Number: `5555 5555 5555 4444`
+// - Expiry: Any future date
+// - CVC: Any 3 digits
 
-// Check if test file exists
-function hasTestFile(tsxFile) {
-  const testFile = tsxFile.replace('.tsx', '.test.tsx');
-  return fs.existsSync(testFile);
-}
+// ## **Test Cards for Different Scenarios**
 
-// Generate test template
-function generateTestTemplate(tsxFile) {
-  const componentName = path.basename(tsxFile, '.tsx');
-  const relativePath = path.relative('frontend/src/__tests__', tsxFile).replace(/\\/g, '/');
-  const importPath = relativePath.startsWith('../') ? relativePath : `../${relativePath}`;
-  
-  return `/**
- * Tests for ${componentName}.tsx
- */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
-import ${componentName} from '${importPath.replace('.tsx', '')}';
+// **3D Secure Required**
+// - Card Number: `4000 0025 0000 3155`
+// - Use this to test 3D Secure authentication flow
 
-// Mock dependencies as needed
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => vi.fn(),
-    useLocation: () => ({ pathname: '/', search: '', hash: '', state: null }),
-    useParams: () => ({}),
-    Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
-      <a href={to}>{children}</a>
-    )
-  };
-});
+// **Card Declined - Insufficient Funds**
+// - Card Number: `4000 0000 0000 9995`
+// - Tests declined payment scenario
 
-const TestWrapper = ({ children }: { children: React.ReactNode }) => (
-  <BrowserRouter>
-    {children}
-  </BrowserRouter>
-);
+// **Card Declined - Lost/Stolen**
+// - Card Number: `4000 0000 0000 9987`
+// - Tests fraud detection
 
-describe('${componentName}', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+// **Card Declined - Expired**
+// - Card Number: `4000 0000 0000 9927`
+// - Tests expired card scenario
 
-  it('should render without crashing', () => {
-    render(
-      <TestWrapper>
-        <${componentName} />
-      </TestWrapper>
-    );
-    
-    // Add specific assertions based on component
-    expect(screen.getByRole('main') || screen.getByTestId('${componentName.toLowerCase()}') || document.body).toBeInTheDocument();
-  });
+// **Generic Error**
+// - Card Number: `4000 0000 0000 0119`
+// - Tests processing errors
 
-  it('should handle user interactions', async () => {
-    const user = userEvent.setup();
-    
-    render(
-      <TestWrapper>
-        <${componentName} />
-      </TestWrapper>
-    );
+// ## **International Cards**
 
-    // Add interaction tests based on component functionality
-    // Example: await user.click(screen.getByRole('button'));
-  });
+// **UK Debit Card**
+// - Card Number: `4000 0000 0000 0002`
+// - Expiry: Any future date
+// - CVC: Any 3 digits
 
-  it('should be accessible', () => {
-    render(
-      <TestWrapper>
-        <${componentName} />
-      </TestWrapper>
-    );
+// **Brazilian Card**
+// - Card Number: `4000 0000 0000 0010`
+// - Expiry: Any future date
+// - CVC: Any 3 digits
 
-    // Add accessibility tests
-    // Example: expect(screen.getByRole('button')).toBeInTheDocument();
-  });
+// ## **Testing Tips**
 
-  // Add more specific tests based on component functionality
-});
-`;
-}
+// 1. **Use any future expiry date** - Stripe doesn't validate the exact date, just that it's in the future
+// 2. **Use any 3-digit CVC** for Visa/Mastercard
+// 3. **Use any 5-digit ZIP code** for US addresses
+// 4. **Test different scenarios** using the special cards above
+// 5. **For 3D Secure testing**, use the `4000 0025 0000 3155` card and follow the authentication prompts
 
-// Create test directory if it doesn't exist
-function ensureTestDirectory(testFilePath) {
-  const dir = path.dirname(testFilePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-}
-
-// Main function
-function main() {
-  console.log('🔍 Finding .tsx files without tests...\n');
-  
-  const tsxFiles = getTsxFilesWithoutTests();
-  const filesWithoutTests = tsxFiles.filter(file => !hasTestFile(file));
-  
-  console.log(`Found ${filesWithoutTests.length} files without tests:\n`);
-  
-  let created = 0;
-  let skipped = 0;
-  
-  filesWithoutTests.forEach(tsxFile => {
-    const componentName = path.basename(tsxFile, '.tsx');
-    const testFile = tsxFile.replace('.tsx', '.test.tsx');
-    
-    // Skip certain files that don't need tests
-    const skipPatterns = [
-      'index.tsx',
-      'vite-env.d.ts',
-      'validation.tsx' // utility file
-    ];
-    
-    if (skipPatterns.some(pattern => tsxFile.includes(pattern))) {
-      console.log(`⏭️  Skipping ${componentName} (${tsxFile})`);
-      skipped++;
-      return;
-    }
-    
-    try {
-      ensureTestDirectory(testFile);
-      const testContent = generateTestTemplate(tsxFile);
-      fs.writeFileSync(testFile, testContent);
-      console.log(`✅ Created test for ${componentName} (${testFile})`);
-      created++;
-    } catch (error) {
-      console.error(`❌ Failed to create test for ${componentName}: ${error.message}`);
-    }
-  });
-  
-  console.log(`\n📊 Summary:`);
-  console.log(`   Created: ${created} test files`);
-  console.log(`   Skipped: ${skipped} files`);
-  console.log(`   Total .tsx files: ${tsxFiles.length}`);
-  console.log(`   Files with tests: ${tsxFiles.length - filesWithoutTests.length + created}`);
-  
-  const coverage = Math.round(((tsxFiles.length - filesWithoutTests.length + created) / tsxFiles.length) * 100);
-  console.log(`   Test coverage: ${coverage}%`);
-  
-  console.log('\n🎉 Test generation complete!');
-  console.log('\n💡 Next steps:');
-  console.log('   1. Review generated tests and add specific assertions');
-  console.log('   2. Add proper mocks for component dependencies');
-  console.log('   3. Run tests: npm run test');
-  console.log('   4. Update tests based on actual component behavior');
-}
-
-if (require.main === module) {
-  main();
-}
-
-module.exports = { generateTestTemplate, getTsxFilesWithoutTests };
+// The `4242 4242 4242 4242` Visa card is the most commonly used for successful payment testing.

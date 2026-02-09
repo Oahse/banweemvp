@@ -2,8 +2,8 @@ import React, { useRef, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { CardElement, Elements, useStripe, useElements } from '@stripe/react-stripe-js';
 import { toast } from 'react-hot-toast';
-import { PaymentsAPI } from '../../api/payments';
-import { Button } from '../ui/Button';
+import { PaymentsAPI } from '@/api/payments';
+import { Button } from '@/components/ui/Button';
 import { AlertTriangle } from 'lucide-react';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
@@ -21,6 +21,7 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [cardholderName, setCardholderName] = useState('');
+  const [zipCode, setZipCode] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,6 +37,12 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
       return;
     }
 
+    // ZIP code is optional - only validate if provided
+    if (zipCode.trim() && zipCode.length < 3) {
+      setError('ZIP code must be at least 3 characters if provided');
+      return;
+    }
+
     setError(null);
     setLoading(true);
 
@@ -46,12 +53,22 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
       }
 
       // Create payment method using Stripe Elements
+      const billingDetails: any = {
+        name: cardholderName,
+      };
+      
+      // Only include address if ZIP code is provided
+      if (zipCode.trim()) {
+        billingDetails.address = {
+          postal_code: zipCode,
+          country: 'US',
+        };
+      }
+      
       const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
         type: 'card',
         card: cardElement,
-        billing_details: {
-          name: cardholderName,
-        },
+        billing_details: billingDetails,
       });
 
       if (stripeError) {
@@ -126,6 +143,25 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
           onChange={(e) => setCardholderName(e.target.value)}
           disabled={loading}
         />
+      </div>
+
+      {/* ZIP Code */}
+      <div>
+        <label className="block text-xs font-medium text-copy dark:text-copy-dark mb-2">
+          ZIP Code (Optional)
+        </label>
+        <input
+          type="text"
+          className="w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-copy dark:text-copy-dark text-xs focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark"
+          placeholder="12345 (US only)"
+          value={zipCode}
+          onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+          disabled={loading}
+          maxLength={5}
+        />
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          Required for US cards, optional for international cards
+        </p>
       </div>
 
       {/* Card Details using Stripe Elements */}

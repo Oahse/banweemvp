@@ -49,7 +49,7 @@ export interface ThemeClasses {
 }
 
 export const themeClasses: ThemeClasses = {
-  primary: 'bg-blue-600 hover:bg-blue-700 text-white',
+  primary: 'bg-[#61b482] hover:bg-[#4c9066] text-white',
   secondary: 'bg-gray-600 hover:bg-gray-700 text-white',
   success: 'bg-green-600 hover:bg-green-700 text-white',
   warning: 'bg-yellow-600 hover:bg-yellow-700 text-white',
@@ -70,17 +70,17 @@ export const themeClasses: ThemeClasses = {
   background: {
     surface: 'bg-white dark:bg-gray-800',
     elevated: 'bg-gray-50 dark:bg-gray-900',
-    primary: 'bg-blue-600',
+    primary: 'bg-[#61b482]',
   },
   input: {
-    base: 'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+    base: 'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#61b482]',
     default: 'border-gray-300 dark:border-gray-600',
   },
   card: {
     base: 'bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm',
   },
   loading: {
-    spinner: 'animate-spin border-4 border-blue-600 border-t-transparent rounded-full',
+    spinner: 'animate-spin border-4 border-[#61b482] border-t-transparent rounded-full',
   },
   layout: {
     container: 'container mx-auto px-4',
@@ -102,7 +102,7 @@ export function combineThemeClasses(...classes: (string | undefined | null | fal
 }
 
 export function getInputClasses(error?: string): string {
-  const baseClasses = 'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
+  const baseClasses = 'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#61b482]';
   const errorClasses = error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300';
   return combineThemeClasses(baseClasses, errorClasses);
 }

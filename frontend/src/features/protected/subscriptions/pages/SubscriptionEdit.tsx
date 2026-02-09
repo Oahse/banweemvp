@@ -323,9 +323,9 @@ export const SubscriptionEdit = () => {
         {activeTab === 'details' && (
           <div className="p-6 space-y-8">
             {/* Main Subscription Info */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-6 border border-blue-100 dark:border-gray-600">
+            <div className="bg-gradient-to-r from-[#61b482]/10 to-[#4c9066]/10 dark:from-gray-700 dark:to-gray-600 rounded-xl p-6 border border-[#61b482]/20 dark:border-gray-600">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                <div className="w-8 h-8 bg-[#61b482] rounded-lg flex items-center justify-center mr-3">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -343,7 +343,7 @@ export const SubscriptionEdit = () => {
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Enter subscription name (e.g., Premium Coffee Plan)"
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium transition-all duration-200"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-500 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium transition-all duration-200"
                     maxLength={255}
                   />
                   <div className="flex items-center justify-between mt-2">
@@ -363,7 +363,7 @@ export const SubscriptionEdit = () => {
                   <select
                     value={formData.billing_cycle}
                     onChange={(e) => setFormData(prev => ({ ...prev, billing_cycle: e.target.value }))}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium transition-all duration-200"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-500 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium transition-all duration-200"
                   >
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
@@ -397,8 +397,8 @@ export const SubscriptionEdit = () => {
                     <div className="flex items-center space-x-3">
                       <button
                         onClick={() => setFormData(prev => ({ ...prev, auto_renew: !prev.auto_renew }))}
-                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          formData.auto_renew ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-500'
+                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#61b482] focus:ring-offset-2 ${
+                          formData.auto_renew ? 'bg-[#61b482]' : 'bg-gray-300 dark:bg-gray-500'
                         }`}
                       >
                         <span
@@ -463,9 +463,9 @@ export const SubscriptionEdit = () => {
                   </span>
                 </div>
                 
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-gray-700 dark:to-gray-600 rounded-xl border border-blue-100 dark:border-gray-600">
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#61b482]/10 to-[#4c9066]/10 dark:from-gray-700 dark:to-gray-600 rounded-xl border border-[#61b482]/20 dark:border-gray-600">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[#61b482] rounded-full flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
