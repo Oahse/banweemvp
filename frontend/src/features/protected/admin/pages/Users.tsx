@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import AdminLayout from '../components/AdminLayout';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { UsersListSkeleton } from '../components/skeletons/UsersSkeleton';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 const LIMIT = 10;
 const FETCH_LIMIT = 100;
@@ -615,10 +616,10 @@ export const Users = () => {
       {showDeleteModal && deletingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowDeleteModal(false)}>
           <div className={`w-full max-w-md rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold mb-2">Delete user</h3>
-            <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            <Heading level={3} className="text-lg font-semibold mb-2">Delete user</Heading>
+            <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
               Are you sure you want to delete {deletingUser.email}? This action cannot be undone.
-            </p>
+            </Body>
             <div className="mt-6 flex justify-end gap-2">
               <Button
                 onClick={() => {

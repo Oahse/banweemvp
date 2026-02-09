@@ -495,7 +495,7 @@ export const ProductDetails = () => {
                 )}
               </div>
 
-              <p className="text-sm text-copy-light mb-6">{product.description}</p>
+              <Body className="text-sm text-copy-light mb-6">{product.description}</Body>
               
               {/* Variant Selection - Moved under description */}
               {actualProductData?.variants && actualProductData.variants.length > 0 && (
@@ -843,7 +843,7 @@ export const ProductDetails = () => {
           <div className="prose max-w-none">
             {activeTab === 'description' && (
               <div>
-                <p className="text-sm text-copy-light mb-4">{product.description || 'No description available.'}</p>
+                <Body className="text-sm text-copy-light mb-4">{product.description || 'No description available.'}</Body>
                 
                 {/* Product Tags */}
                 {(Array.isArray(selectedVariant?.tags) && selectedVariant?.tags.length > 0) || (Array.isArray(product.tags) && product.tags.length > 0) ? (
@@ -882,8 +882,8 @@ export const ProductDetails = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {Object.entries(selectedVariant.attributes).map(([key, value]) => (
                         <div key={key} className="flex justify-between py-1">
-                          <span className="text-sm font-medium text-main capitalize">{key.replace('_', ' ')}:</span>
-                          <span className="text-sm text-copy-light">{String(value)}</span>
+                          <Text className="text-sm font-medium text-main capitalize">{key.replace('_', ' ')}:</Text>
+                          <Text className="text-sm text-copy-light">{String(value)}</Text>
                         </div>
                       ))}
                     </div>
@@ -1244,7 +1244,7 @@ export const ProductDetails = () => {
                     )}
                   </div>
                 ) : (
-                  <p className="text-copy-light">No reviews yet.</p>
+                  <Body className="text-copy-light">No reviews yet.</Body>
                 )}
               </div>
             )}

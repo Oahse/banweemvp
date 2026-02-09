@@ -9,6 +9,7 @@ import { useTheme } from '../../components/shared/contexts/ThemeContext';
 import { useAsync } from '../../components/shared/hooks/useAsync';
 import { ProductsAPI } from '../../api/products';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 // Filter categories configuration system
 const FILTER_CATEGORIES: Record<string, {
@@ -330,29 +331,29 @@ export const Home = () => {
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <TruckIcon size={24} className="text-primary" />
               </div>
-              <h3 className="font-medium text-main">Free Delivery</h3>
-              <p className="text-sm text-copy-light">From $49.99</p>
+              <Heading level={3} className="font-medium text-main">Free Delivery</Heading>
+              <Body className="text-sm text-copy-light">From $49.99</Body>
             </div>
             <div className="flex flex-col items-center text-center p-4">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <BadgeCheckIcon size={24} className="text-primary" />
               </div>
-              <h3 className="font-medium text-main">Certified Organic</h3>
-              <p className="text-sm text-copy-light">100% Guarantee</p>
+              <Heading level={3} className="font-medium text-main">Certified Organic</Heading>
+              <Body className="text-sm text-copy-light">100% Guarantee</Body>
             </div>
             <div className="flex flex-col items-center text-center p-4">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <ShieldIcon size={24} className="text-primary" />
               </div>
-              <h3 className="font-medium text-main">Secure Payments</h3>
-              <p className="text-sm text-copy-light">100% Protected</p>
+              <Heading level={3} className="font-medium text-main">Secure Payments</Heading>
+              <Body className="text-sm text-copy-light">100% Protected</Body>
             </div>
             <div className="flex flex-col items-center text-center p-4">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <HeadphonesIcon size={24} className="text-primary" />
               </div>
-              <h3 className="font-medium text-main">24/7 Support</h3>
-              <p className="text-sm text-copy-light">Dedicated Support</p>
+              <Heading level={3} className="font-medium text-main">24/7 Support</Heading>
+              <Body className="text-sm text-copy-light">Dedicated Support</Body>
             </div>
           </div>
         </div>
@@ -363,8 +364,8 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <span className="text-primary font-medium">Explore our product range</span>
-              <h2 className="text-2xl md:text-3xl font-bold text-main mt-1">Shop Categories</h2>
+              <Text className="text-primary font-medium">Explore our product range</Text>
+              <Heading level={2} className="text-2xl md:text-3xl font-bold text-main mt-1">Shop Categories</Heading>
             </div>
             <div className="flex items-center space-x-2 mt-4 md:mt-0">
               <Button 
@@ -412,8 +413,8 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <span className="text-primary font-medium text-sm">Featured Products</span>
-              <h2 className="text-lg md:text-xl font-semibold text-main mt-1">Featured Products</h2>
+              <Text className="text-primary font-medium text-sm">Featured Products</Text>
+              <Heading level={2} className="text-lg md:text-xl font-semibold text-main mt-1">Featured Products</Heading>
             </div>
             <Link
               to="/products?featured=true"
@@ -468,8 +469,8 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <span className="text-primary font-medium text-sm">Best Sellers</span>
-              <h2 className="text-lg md:text-xl font-semibold text-main mt-1">Popular Products</h2>
+              <Text className="text-primary font-medium text-sm">Best Sellers</Text>
+              <Heading level={2} className="text-lg md:text-xl font-semibold text-main mt-1">Popular Products</Heading>
             </div>
             <Link to="/products?popular=true" className="inline-flex items-center text-primary hover:underline mt-4 md:mt-0">
               All Popular
@@ -581,8 +582,8 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <span className="text-primary text-sm font-medium">Best deals</span>
-              <h2 className="text-lg md:text-xl font-semibold text-main mt-1">Top Deals of the Day</h2>
+              <Text className="text-primary text-sm font-medium">Best deals</Text>
+              <Heading level={2} className="text-lg md:text-xl font-semibold text-main mt-1">Top Deals of the Day</Heading>
             </div>
             <Link to="/products?sale=true" className="inline-flex items-center text-primary hover:underline mt-4 md:mt-0">
               All Deals
@@ -633,14 +634,14 @@ export const Home = () => {
                           Ends in {product.endsIn || '2d 15h 22m'}
                         </span>
                       </div>
-                      <h3 className="text-lg font-semibold text-main mb-2">{product.name}</h3>
-                      <p className="text-sm text-copy-light mb-4">
+                      <Heading level={3} className="text-lg font-semibold text-main mb-2">{product.name}</Heading>
+                      <Body className="text-sm text-copy-light mb-4">
                         {typeof product.category === 'object' && product.category.name 
                           ? product.category.name 
                           : (typeof product.category === 'string' 
                             ? product.category 
                             : 'Uncategorized')}
-                      </p>
+                      </Body>
                       <div className="flex items-center gap-2 mb-4">
                         <div className="flex items-center">
                           {Array.from({ length: 5 }).map((_, i) => (

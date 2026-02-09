@@ -6,6 +6,7 @@ import { AuthAPI } from '@/api';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 import { SkeletonProfile } from '../ui/SkeletonProfile';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 /**
  * Profile component allows users to view and edit their personal information.
  */
@@ -127,10 +128,10 @@ export const Profile = () => {
               {user.firstname?.charAt(0) || user.full_name?.charAt(0) || 'U'}
             </div>
             <div className="ml-3">
-              <h2 className="text-base font-medium text-main dark:text-white">
+              <Heading level={2} className="text-base font-medium text-main dark:text-white">
                 {user.full_name || `${user.firstname} ${user.lastname}`}
-              </h2>
-              <p className="text-xs text-gray-600 dark:text-gray-300">{user.email}</p>
+              </Heading>
+              <Body className="text-xs text-gray-600 dark:text-gray-300">{user.email}</Body>
               <div className="flex items-center mt-1">
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                   user.verified 
@@ -160,18 +161,18 @@ export const Profile = () => {
 
       {/* Profile Information */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3">
-        <h3 className="text-base font-medium text-main dark:text-white mb-3">
+        <Heading level={3} className="text-base font-medium text-main dark:text-white mb-3">
           Personal Information
-        </h3>
+        </Heading>
 
         {isEditing ? (
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {/* First Name */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                   First Name *
-                </label>
+                </Label>
                 <input
                   type="text"
                   name="firstname"
@@ -467,21 +468,21 @@ export const Profile = () => {
 
       {/* Account Information */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-        <h3 className="text-base font-medium text-gray-900 dark:text-white mb-3">
+        <Heading level={3} className="text-base font-medium text-gray-900 dark:text-white mb-3">
           Account Details
-        </h3>
+        </Heading>
         <div className="space-y-2">
           <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Member Since</span>
-            <span className="text-sm text-gray-900 dark:text-white font-medium">
+            <Text className="text-sm text-gray-500 dark:text-gray-400">Member Since</Text>
+            <Text className="text-sm text-gray-900 dark:text-white font-medium">
               {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
-            </span>
+            </Text>
           </div>
           <div className="flex justify-between items-center py-2">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Last Updated</span>
-            <span className="text-sm text-gray-900 dark:text-white font-medium">
+            <Text className="text-sm text-gray-500 dark:text-gray-400">Last Updated</Text>
+            <Text className="text-sm text-gray-900 dark:text-white font-medium">
               {user.updated_at ? new Date(user.updated_at).toLocaleDateString() : 'N/A'}
-            </span>
+            </Text>
           </div>
           {(user as any).last_login && (
             <div className="flex justify-between items-center py-2">

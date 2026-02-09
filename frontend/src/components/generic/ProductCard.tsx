@@ -360,31 +360,35 @@ export const ProductCard = ({
           </span>
         )}
         {/* Quick action buttons - hidden on mobile for grid view */}
-        <div
+        <Button
+          onClick={handleAddToWishlist}
+          variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
+          size="sm"
           className={cn(
+            'absolute top-2 right-2 w-8 h-8 rounded-full p-0 transition-colors',
+            wishlistMode || isInWishlist(product.id, displayVariant?.id)
                 ? 'bg-error text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              )}`}
-            aria-label={isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
+          )}
+          aria-label={isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
             {isInWishlist(product.id, displayVariant?.id) ? <HeartIcon size={16} /> : <HeartIcon size={16} />}
-          </Button>
-          <Link
-            to={`/products/${product.id}`}
-            className="w-9 h-9 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-            aria-label="View product">
-            <EyeIcon size={16} />
-          </div>
-        </div>
+        </Button>
+        <Link
+          to={`/products/${product.id}`}
+          className="absolute top-2 left-2 w-8 h-8 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
+          aria-label="View product">
+          <EyeIcon size={16} />
+        </Link>
       </div>
       <div className={cn('flex flex-col flex-grow p-2 sm:p-3', viewMode === 'list' && 'p-0')}>
         <div className="space-y-1">
-          <span className="text-xs text-copy-light dark:text-gray-400 line-clamp-1 uppercase tracking-wide">
+          <Text className="text-xs text-copy-light dark:text-gray-400 line-clamp-1 uppercase tracking-wide">
             {(typeof product.category === 'object' && product.category.name) 
               ? product.category.name 
               : (typeof product.category === 'string' 
                 ? product.category 
                 : 'Uncategorized')}
-          </span>
+          </Text>
           <Link to={`/products/${product.id || ''}`}>
             <Heading level={3} className="font-semibold text-xs sm:text-sm text-main dark:text-white hover:text-primary transition-colors line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
               {product.name || 'Unknown Product'}

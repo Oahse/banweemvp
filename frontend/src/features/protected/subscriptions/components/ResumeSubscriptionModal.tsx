@@ -2,6 +2,7 @@ import React from 'react';
 import { X, PlayIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body } from '@/components/ui/Text/Text';
 
 interface ResumeSubscriptionModalProps {
   isOpen: boolean;
@@ -69,18 +70,18 @@ export const ResumeSubscriptionModal: React.FC<ResumeSubscriptionModalProps> = (
               )} />
             </div>
             <div>
-              <h3 className={combineThemeClasses(
+              <Heading level={3} className={combineThemeClasses(
                 themeClasses.text.heading,
                 'text-lg font-semibold'
               )}>
                 Resume Subscription
-              </h3>
-              <p className={combineThemeClasses(
+              </Heading>
+              <Body className={combineThemeClasses(
                 themeClasses.text.muted,
                 'text-sm'
               )}>
                 {planName} Plan
-              </p>
+              </Body>
             </div>
           </div>
           
@@ -130,12 +131,12 @@ export const ResumeSubscriptionModal: React.FC<ResumeSubscriptionModalProps> = (
               themeClasses.background.elevated,
               themeClasses.border.light
             )}>
-              <h4 className={combineThemeClasses(
+              <Heading level={4} className={combineThemeClasses(
                 themeClasses.text.heading,
                 'text-sm font-medium mb-2'
               )}>
                 What happens when you resume:
-              </h4>
+              </Heading>
               <ul className={combineThemeClasses(
                 themeClasses.text.secondary,
                 'text-sm space-y-1'

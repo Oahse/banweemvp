@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, ArrowUpDownIcon, EyeIcon, PackageIcon, Trash2, AlertTriangle, X } from 'lucide-react';
-import AdminAPI from '@/api/admin';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import { useLocale } from '@/components/shared/contexts/LocaleContext';
-import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
-import { ProductsListSkeleton } from '../components/skeletons/ProductsSkeleton';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
+import { ProductsListSkeleton } from '../components/skeletons/ProductsSkeleton';
+import { useLocale } from '@/i18n';
+import { AlertCircle, ArrowUpDownIcon, EyeIcon, PackageIcon, SearchIcon } from 'lucide-react';
+import Dropdown from '@/components/ui/Dropdown';
 
 const LIMIT = 10;
 
@@ -301,8 +301,8 @@ const AdminProductsPage = () => {
       <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
           <div>
-            <h1 className="text-xl font-bold">Products</h1>
-            <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product catalog and inventory</p>
+            <Heading level={1} className="text-xl font-bold">Products</Heading>
+            <Body className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product catalog and inventory</Body>
           </div>
         <div className="flex gap-2 w-full lg:w-auto">
           <Button
@@ -541,10 +541,10 @@ const AdminProductsPage = () => {
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h3 className="font-medium text-sm">{product.name || 'N/A'}</h3>
-                      <p className="text-xs text-gray-600 dark:text-gray-300">{product.category || 'N/A'}</p>
-                      <p className="text-sm font-semibold">{formatCurrency(product.price)}</p>
-                      <p className="text-xs">{stockBadge(product.stock)}</p>
+                      <Heading level={3} className="font-medium text-sm">{product.name || 'N/A'}</Heading>
+                      <Body className="text-xs text-gray-600 dark:text-gray-300">{product.category || 'N/A'}</Body>
+                      <Body className="text-sm font-semibold">{formatCurrency(product.price)}</Body>
+                      <Body className="text-xs">{stockBadge(product.stock)}</Body>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button 
@@ -577,8 +577,8 @@ const AdminProductsPage = () => {
           }`}>
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="font-semibold">Error Loading Products</p>
-              <p className="text-sm mt-1">{error}</p>
+              <Body className="font-semibold">Error Loading Products</Body>
+              <Body className="text-sm mt-1">{error}</Body>
               <Button
                 onClick={() => window.location.reload()}
                 variant="link"
@@ -599,7 +599,7 @@ const AdminProductsPage = () => {
             <div className="p-8">
               <div className="flex items-center justify-center">
                 <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
-                <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating products...</span>
+                <Text className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating products...</Text>
               </div>
             </div>
           ) : products.length > 0 ? (
@@ -810,23 +810,18 @@ const AdminProductsPage = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className={`text-lg font-semibold text-center mb-1.5 ${
+                <Heading level={3} className={`text-lg font-semibold text-center mb-1.5 ${
                   currentTheme === 'dark' ? 'text-white' : 'text-gray-900'
                 }`}>
                   Delete Product
-                </h3>
+                </Heading>
 
                 {/* Message */}
-                <p className={`text-sm text-center mb-4 ${
+                <Body className={`text-sm text-center mb-4 ${
                   currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                 }`}>
-                  Are you sure you want to delete{' '}
-                  <span className="font-semibold">"{productToDelete.name}"</span>?
-                  <br />
-                  <span className="text-xs text-red-500">
-                    This will permanently delete all variants, inventory, reviews, and cart items.
-                  </span>
-                </p>
+                  Are you sure you want to delete "{productToDelete?.name || 'this product'}"? This action cannot be undone.
+                </Body>
 
                 {/* Action Buttons */}
                 <div className="flex gap-2">

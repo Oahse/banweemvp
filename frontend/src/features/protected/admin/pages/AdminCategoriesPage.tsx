@@ -7,6 +7,7 @@ import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { CategoriesListSkeleton } from '../components/skeletons/CategoriesSkeleton';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 const LIMIT = 10;
 
@@ -515,13 +516,12 @@ const AdminCategoriesPage = () => {
                 <FolderIcon className={`w-8 h-8 ${currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
               </div>
             </div>
-            <h3 className="text-lg font-medium mb-2">No categories found</h3>
-            <p className="text-sm mb-4">
+            <Heading level={3} className="text-lg font-medium mb-2">No categories found</Heading>
+            <Body className="text-sm mb-4">
               {searchQuery 
                 ? 'Try adjusting your search to find what you\'re looking for.'
-                : 'Get started by adding categories to organize your products.'
-              }
-            </p>
+                : 'Get started by adding your first category.'}
+            </Body>
             {searchQuery && (
               <Button
                 onClick={() => setSearchQuery('')}
@@ -620,10 +620,10 @@ const AdminCategoriesPage = () => {
                 <AlertTriangle className="text-error" size={20} />
               </div>
               <div className="flex-1">
-                <h3 className="text-base font-semibold mb-1">Delete Category</h3>
-                <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                <Heading level={3} className="text-base font-semibold mb-1">Delete Category</Heading>
+                <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                   Are you sure you want to delete "{categoryToDelete.name}"? This action cannot be undone.
-                </p>
+                </Body>
               </div>
             </div>
             <div className="flex gap-2 justify-end">
@@ -661,10 +661,10 @@ const AdminCategoriesPage = () => {
           <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold">{editingCategory ? 'Edit Category' : 'Add Category'}</h3>
-                <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                <Heading level={3} className="text-lg font-semibold">{editingCategory ? 'Edit Category' : 'Add Category'}</Heading>
+                <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                   {editingCategory ? 'Update category information' : 'Fill in the details below'}
-                </p>
+                </Body>
               </div>
               <Button
                 onClick={() => {
@@ -681,9 +681,9 @@ const AdminCategoriesPage = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                <Label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Name *
-                </label>
+                </Label>
                 <input
                   type="text"
                   value={formData.name}
@@ -705,9 +705,9 @@ const AdminCategoriesPage = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                <Label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Description
-                </label>
+                </Label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => {
@@ -728,9 +728,9 @@ const AdminCategoriesPage = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                <Label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Image URL
-                </label>
+                </Label>
                 <input
                   type="url"
                   value={formData.image_url}
@@ -751,7 +751,7 @@ const AdminCategoriesPage = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</label>
+                <Label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</Label>
                 <Dropdown
                   options={[
                     { value: true, label: 'Active' },

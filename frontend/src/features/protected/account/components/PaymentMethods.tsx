@@ -8,6 +8,7 @@ import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { TokenManager } from '../../api/client';
 import { StripeCardForm } from '../checkout/StripeCardForm';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 
 
@@ -167,18 +168,19 @@ export const PaymentMethods = () => {
       
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 mb-3">
         <div className="flex justify-between items-center mb-3">
-          <h2 className="text-base font-medium text-main dark:text-white">
+          <Heading level={2} className="text-base font-medium text-main dark:text-white">
             Saved Payment Methods
-          </h2>
+          </Heading>
           {/* Button to toggle the add card form */}
           <Button
             onClick={() => setShowAddCardForm(!showAddCardForm)} 
             variant="ghost"
             size="sm"
-            className="flex items-center text-primary hover:text-primary-dark text-xs"
           >
-            <PlusCircle size={14} className="mr-1" />
-            <span>Add New Card</span>
+            <Text className="flex items-center text-primary hover:text-primary-dark text-xs">
+              <PlusCircle size={14} className="mr-1" />
+              Add New Card
+            </Text>
           </Button>
         </div>
         {/* Display existing payment methods or a message if none are saved */}
@@ -240,9 +242,9 @@ export const PaymentMethods = () => {
         {/* Add Card Form */}
         {showAddCardForm && (
           <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">
-            <h3 className="text-base font-medium text-main dark:text-white mb-3">
+            <Heading level={3} className="text-base font-medium text-main dark:text-white mb-3">
               Add New Payment Method
-            </h3>
+            </Heading>
             <StripeCardForm
               onSuccess={handleAddCardSuccess}
               onCancel={() => resetForm()}
@@ -252,17 +254,17 @@ export const PaymentMethods = () => {
       </div>
       {/* Payment Security Information */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-medium text-main dark:text-white mb-4">
+        <Heading level={2} className="text-lg font-medium text-main dark:text-white mb-4">
           Payment Security
-        </h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-3">
+        </Heading>
+        <Body className="text-gray-600 dark:text-gray-300 mb-3">
           Your payment information is securely stored using industry-standard
           encryption. We never store your full card details on our servers.
-        </p>
-        <p className="text-gray-600 dark:text-gray-300">
+        </Body>
+        <Body className="text-gray-600 dark:text-gray-300">
           All transactions are processed through our secure payment gateway
           partners and comply with PCI DSS standards.
-        </p>
+        </Body>
       </div>
     </div>
   );

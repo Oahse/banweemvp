@@ -8,6 +8,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import AdminLayout from '../components/AdminLayout';
 import { SubscriptionsListSkeleton } from '../components/skeletons/SubscriptionsSkeleton';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 const LIMIT = 20;
 
@@ -223,7 +224,7 @@ export const AdminSubscriptions = () => {
         {/* Filters */}
         <div className={`rounded-lg border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold">Filters</h2>
+            <Heading level={2} className="text-base font-semibold">Filters</Heading>
             <Button
               type="button"
               onClick={() => setShowFilters((prev) => !prev)}
