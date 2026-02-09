@@ -9,11 +9,13 @@ import {
   DollarSignIcon,
   MapPinIcon,
   CreditCardIcon,
-  SettingsIcon
+  SettingsIcon,
+  TrashIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { ProductVariantModal } from '../components/ui/ProductVariantModal';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
+import { Button } from '@/components/ui/Button';
 interface SubscriptionDetail {
   id: string;
   status: 'active' | 'paused' | 'cancelled' | 'expired';
@@ -250,9 +252,12 @@ export const SubscriptionEdit = () => {
     return (
       <div className="text-center p-6">
         <p className="text-red-600 dark:text-red-400">Error: {error || 'Subscription not found'}</p>
-        <button
+        <Button
           onClick={() => navigate('/account/subscriptions')}
+          variant="link"
+          size="sm"
           className="mt-4 text-primary hover:underline"
+          leftIcon={<ArrowLeftIcon size={16} />}
         >
           Back to Subscriptions
         </button>
@@ -265,13 +270,16 @@ export const SubscriptionEdit = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <button
+          <Button
             onClick={() => navigate('/account/subscriptions')}
+            variant="ghost"
+            size="sm"
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+            leftIcon={<ArrowLeftIcon size={16} />}
           >
             <ArrowLeftIcon size={20} />
             Back to Subscriptions
-          </button>
+          </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Edit Subscription
@@ -283,14 +291,18 @@ export const SubscriptionEdit = () => {
         </div>
         <div className="flex items-center gap-3">
           {getStatusBadge(subscription.status)}
-          <button
+          <Button
             onClick={handleSave}
             disabled={saving}
+            variant="primary"
+            size="sm"
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 transition-colors"
+            leftIcon={<SaveIcon size={16} />}
+            isLoading={saving}
           >
             <SaveIcon size={16} />
             {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -302,18 +314,20 @@ export const SubscriptionEdit = () => {
           { key: 'billing', label: 'Billing', icon: <DollarSignIcon size={16} /> },
           { key: 'delivery', label: 'Delivery', icon: <MapPinIcon size={16} /> },
         ].map(tab => (
-          <button
+          <Button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
+            variant={activeTab === tab.key ? 'primary' : 'ghost'}
+            size="sm"
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                ? 'bg-primary text-white'
+                : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
             }`}
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -395,8 +409,10 @@ export const SubscriptionEdit = () => {
                   </label>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <button
+                      <Button
                         onClick={() => setFormData(prev => ({ ...prev, auto_renew: !prev.auto_renew }))}
+                        variant="ghost"
+                        size="sm"
                         className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#61b482] focus:ring-offset-2 ${
                           formData.auto_renew ? 'bg-[#61b482]' : 'bg-gray-300 dark:bg-gray-500'
                         }`}
@@ -406,7 +422,7 @@ export const SubscriptionEdit = () => {
                             formData.auto_renew ? 'translate-x-7' : 'translate-x-1'
                           }`}
                         />
-                      </button>
+                      </Button>
                       <div>
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
                           {formData.auto_renew ? 'Enabled' : 'Disabled'}
@@ -514,17 +530,19 @@ export const SubscriptionEdit = () => {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Products ({subscription.product_variants?.length || 0})
               </h3>
-              <button
+              <Button
                 onClick={() => {
                   setSelectedVariants([]);
                   setShowAddProductsModal(true);
-                  setShowProductModal(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                variant="primary"
+                size="sm"
+                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+                leftIcon={<PlusIcon size={16} />}
               >
                 <PackageIcon size={16} />
                 Add Products
-              </button>
+              </Button>
             </div>
 
             <div className="space-y-4">
@@ -551,15 +569,18 @@ export const SubscriptionEdit = () => {
                       {formatCurrency(variant.price, subscription.currency)}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Qty: {variant.quantity}</p>
-                    <button
+                    <Button
                       onClick={() => {
                         setVariantToRemove(variant.id);
                         setShowRemoveModal(true);
                       }}
-                      className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm"
+                      variant="destructive"
+                      size="sm"
+                      className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                      leftIcon={<TrashIcon size={16} />}
                     >
                       Remove
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -622,9 +643,12 @@ export const SubscriptionEdit = () => {
                 ) : (
                   <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-gray-600 dark:text-gray-400">No payment method on file</p>
-                    <button className="mt-2 text-primary hover:underline text-sm">
-                      Add Payment Method
-                    </button>
+                    <Button 
+                      variant="link" 
+                      size="sm" 
+                      className="mt-2 text-primary hover:underline text-sm"
+                      leftIcon={<CreditCardIcon size={16} />}
+                    >
                   </div>
                 )}
               </div>

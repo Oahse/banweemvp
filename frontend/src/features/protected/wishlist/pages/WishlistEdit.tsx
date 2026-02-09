@@ -14,6 +14,7 @@ import { toast } from 'react-hot-toast';
 import { ProductVariantModal } from '@/components/ui/ProductVariantModal';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Label } from '@/components/ui/Text/Text';
 import { Product, ProductVariant } from '@/types';
 interface WishlistDetail {
   id: string;
@@ -242,12 +243,12 @@ export const WishlistEdit = () => {
             Back to Wishlist
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <Heading level={1} className="text-2xl font-bold text-gray-900 dark:text-white">
               Edit Wishlist
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            </Heading>
+            <Body className="text-gray-600 dark:text-gray-400">
               {wishlist.items.length} {wishlist.items.length === 1 ? 'item' : 'items'}
-            </p>
+            </Body>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -276,13 +277,13 @@ export const WishlistEdit = () => {
         {/* Settings */}
         <div className="lg:col-span-1">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Wishlist Settings</h3>
+            <Heading level={3} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Wishlist Settings</Heading>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Name
-                </label>
+                </Label>
                 <input
                   type="text"
                   value={formData.name}
@@ -292,9 +293,9 @@ export const WishlistEdit = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Description
-                </label>
+                </Label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -342,20 +343,20 @@ export const WishlistEdit = () => {
         <div className="lg:col-span-2">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <Heading level={3} className="text-lg font-semibold text-gray-900 dark:text-white">
                 Items ({wishlist.items.length})
-              </h3>
+              </Heading>
             </div>
 
             {wishlist.items.length === 0 ? (
               <div className="p-12 text-center">
                 <HeartIcon size={48} className="text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                <Heading level={3} className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                   No items yet
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                </Heading>
+                <Body className="text-gray-600 dark:text-gray-400 mb-4">
                   Add some products to get started
-                </p>
+                </Body>
                 <Button
                   onClick={() => {
                     setSelectedVariants([]);
@@ -412,23 +413,27 @@ export const WishlistEdit = () => {
 
                         {/* Actions */}
                         <div className="flex items-center gap-2">
-                          <button
+                          <Button
                             onClick={() => navigate(`/products/${product?.id}`)}
+                            variant="ghost"
+                            size="sm"
                             className="p-2 text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
                             title="View Product"
                           >
                             <PackageIcon size={18} />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => {
                               setItemToRemove(item.id);
                               setShowRemoveModal(true);
                             }}
-                            className="p-2 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
-                            title="Remove from Wishlist"
+                            variant="ghost"
+                            size="sm"
+                            className="p-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                            title="Remove Item"
                           >
                             <TrashIcon size={18} />
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </div>

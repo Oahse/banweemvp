@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CheckIcon, ImageIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses } from '../../../../utils/themeClasses';
 import { formatCurrency } from '../../../../utils/locale-config';
+import { Button } from '@/components/ui/Button';
 
 interface Variant {
   id: string;
@@ -117,19 +118,18 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
           const lowStock = isLowStock(variant);
 
           return (
-            <button
+            <Button
               key={variant.id}
               onClick={() => !outOfStock && onVariantSelect(variant)}
               disabled={outOfStock}
+              variant={isSelected ? 'primary' : 'outline'}
+              size="sm"
               className={combineThemeClasses(
-                'w-full flex items-center space-x-3 rounded-lg border-2 transition-all duration-200',
-                currentSize.padding,
-                isSelected 
-                  ? 'border-primary bg-primary/5' 
-                  : combineThemeClasses(themeClasses.border.light, 'hover:border-primary/50'),
-                outOfStock 
-                  ? 'opacity-50 cursor-not-allowed' 
-                  : 'cursor-pointer hover:shadow-md'
+                'flex items-center gap-2 p-3 border rounded-lg transition-all',
+                isSelected
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600',
+                outOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
               )}
             >
               {/* Variant Image */}
@@ -251,7 +251,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                   </div>
                 )}
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -272,19 +272,18 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
         const lowStock = isLowStock(variant);
 
         return (
-          <button
+          <Button
             key={variant.id}
             onClick={() => !outOfStock && onVariantSelect(variant)}
             disabled={outOfStock}
+            variant={isSelected ? 'primary' : 'outline'}
+            size="sm"
             className={combineThemeClasses(
-              'relative flex flex-col rounded-lg border-2 transition-all duration-200',
-              currentSize.padding,
-              isSelected 
-                ? 'border-primary bg-primary/5' 
-                : combineThemeClasses(themeClasses.border.light, 'hover:border-primary/50'),
-              outOfStock 
-                ? 'opacity-50 cursor-not-allowed' 
-                : 'cursor-pointer hover:shadow-md'
+              'flex items-center gap-2 p-3 border rounded-lg transition-all',
+              isSelected
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600',
+              outOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
             )}
           >
             {/* Selection Indicator */}
@@ -391,7 +390,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                 )}
               </div>
             </div>
-          </button>
+          </Button>
         );
       })}
     </div>

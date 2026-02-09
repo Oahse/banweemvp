@@ -4,6 +4,7 @@ import { UsersAPI } from '../../api/users';
 import { useAuth } from '../../../AuthContext';
 import { Loading } from '../Loading';
 import { Error } from '../Error';
+import { Button } from '@/components/ui/Button';
 
 interface UserData {
   id: string;
@@ -156,28 +157,34 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
         <div className="flex items-center justify-between">
           <h2 className="heading text-xl">Profile Information</h2>
           {!isEditing ? (
-            <button
+            <Button
               onClick={() => setIsEditing(true)}
+              variant="primary"
+              size="sm"
               className="button-text px-4 py-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
             >
               Edit Profile
-            </button>
+            </Button>
           ) : (
             <div className="flex gap-2">
-              <button
+              <Button
                 onClick={handleCancel}
                 disabled={saving}
+                variant="outline"
+                size="sm"
                 className="button-text px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleSave}
                 disabled={saving}
+                variant="primary"
+                size="sm"
                 className="button-text px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded-lg transition-colors disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
-              </button>
+              </Button>
             </div>
           )}
         </div>

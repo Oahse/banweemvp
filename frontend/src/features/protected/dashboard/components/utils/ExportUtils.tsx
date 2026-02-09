@@ -1,5 +1,6 @@
 import React from 'react';
 import { DownloadIcon, FileTextIcon, TableIcon, ImageIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 /**
  * @typedef {object} ExportOptions
@@ -54,25 +55,31 @@ export const ExportButton = ({
 
   return (
     <div className="relative">
-      <button
+      <Button
         onClick={() => setShowMenu(!showMenu)}
+        variant="ghost"
+        size="sm"
         className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors"
+        leftIcon={<DownloadIcon size={16} />}
         title="Export"
       >
         <DownloadIcon size={16} />
-      </button>
+      </Button>
       
       {showMenu && (
         <div className="absolute right-0 top-10 bg-white shadow-lg rounded-md py-2 z-10 min-w-32 border border-gray-200">
           {formats.map(format => (
-            <button
+            <Button
               key={format}
               onClick={() => handleExport(format)}
+              variant="ghost"
+              size="sm"
               className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              leftIcon={getIconForFormat(format)}
             >
               {getFormatIcon(format)}
               <span>Export {getFormatLabel(format)}</span>
-            </button>
+            </Button>
           ))}
         </div>
       )}

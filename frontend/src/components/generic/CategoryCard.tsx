@@ -1,7 +1,6 @@
 
 import { Link } from 'react-router-dom';
-
-
+import { Heading, Body } from '@/components/ui/Text/Text';
 
 export const CategoryCard = ({ category }) => {
   return (
@@ -15,11 +14,11 @@ export const CategoryCard = ({ category }) => {
           />
         </div>
         <div className="p-4 text-center">
-          <h3 className="font-medium text-copy group-hover:text-primary transition-colors">
+          <Heading level={3} className="font-medium group-hover:text-primary transition-colors">
             {category.name}
-          </h3>
+          </Heading>
           {category.count !== undefined && category.count > 0 && (
-            <p className="text-sm text-copy-light">{category.count} items</p>
+            <Body tone="secondary">{category.count} items</Body>
           )}
         </div>
       </div>

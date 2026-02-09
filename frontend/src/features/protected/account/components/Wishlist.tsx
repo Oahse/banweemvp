@@ -4,6 +4,7 @@ import { useWishlist } from '../../../WishlistContext';
 import { useCart } from '../../../CartContext';
 import { useAuth } from '../../../AuthContext';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 import { 
   HeartIcon, 
   ShoppingCartIcon, 
@@ -16,8 +17,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from 'lucide-react';
-import { ConfirmationModal } from '../ui/ConfirmationModal';
-import { ProductCard } from '../../../components/generic/ProductCard';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
+import { ProductCard } from '@/components/generic/ProductCard';
 import { Product, ProductVariant } from '../../types';
 import { WishlistSkeleton } from './skeletons/WishlistSkeleton';
 interface WishlistItem {
@@ -164,12 +165,14 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
           Unable to load wishlist
         </p>
-        <button 
+        <Button
           onClick={() => window.location.reload()} 
+          variant="link"
+          size="sm"
           className="text-xs text-primary hover:underline"
         >
           Try again
-        </button>
+        </Button>
       </div>
     );
   }
@@ -190,21 +193,27 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
             </p>
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={() => navigate('/products')}
+              variant="primary"
+              size="sm"
               className="flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs"
+              leftIcon={<PackageIcon size={16} />}
             >
               <PlusIcon size={16} />
               Browse Products
-            </button>
+            </Button>
             {items.length > 0 && (
-              <button
+              <Button
                 onClick={() => setShowClearModal(true)}
+                variant="destructive"
+                size="sm"
                 className="flex items-center gap-2 px-3 py-2 border border-red-600 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-xs"
+                leftIcon={<TrashIcon size={16} />}
               >
                 <TrashIcon size={16} />
                 Clear All
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -222,13 +231,16 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
               Save items you like to your wishlist and they'll appear here.
             </p>
             <div className="flex gap-2 justify-center">
-              <button
+              <Button
                 onClick={() => navigate('/products')}
+                variant="primary"
+                size="sm"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs"
+                leftIcon={<PackageIcon size={16} />}
               >
                 <PlusIcon size={14} />
                 Browse Products
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
@@ -252,19 +264,11 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
                         Product ID: {item.product_id}
                       </p>
                       <div className="mt-2">
-                        <button
+                        <Button
                           onClick={() => handleRemoveFromWishlist(item.id)}
-                          className="w-full flex items-center justify-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                        >
-                          <TrashIcon size={12} />
-                          Remove
-                        </button>
+                          variant="destructive"
+                        ></Button>
                       </div>
-                    </div>
-                  );
-                }
-
-                return (
                   <ProductCard
                     key={item.id}
                     product={product}
@@ -278,14 +282,14 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
 
             {/* Pagination */}
             <div className="flex justify-center items-center space-x-2 pt-4">
-              <button
+              <Button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
                 className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeftIcon size={14} className="mr-1" />
                 Previous
-              </button>
+              </Button>
               
               <div className="flex items-center space-x-1">
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -301,7 +305,7 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
                   }
                   
                   return (
-                    <button
+                    <Button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
                       className={`px-3 py-2 text-xs rounded transition-colors ${
@@ -316,7 +320,7 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
                 })}
               </div>
               
-              <button
+              <Button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -349,12 +353,14 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
     <div className="p-4 sm:p-6">
       <div className="text-center">
         <p>Wishlist management view would be implemented here</p>
-        <button 
+        <Button
           onClick={() => navigate('/account/wishlist')}
+          variant="link"
+          size="sm"
           className="mt-4 text-primary hover:underline"
         >
           Back to Wishlist
-        </button>
+        </Button>
       </div>
     </div>
   );

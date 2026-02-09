@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeftIcon, PackageIcon, DownloadIcon, MapPinIcon } from 'lucide-react';
-import { OrdersAPI } from '../../api/orders';
+import { OrdersAPI } from '@/api/orders';
 import { toast } from 'react-hot-toast';
-import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { Button } from '@/components/ui/Button';
 export const OrderDetail = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
@@ -82,13 +82,16 @@ export const OrderDetail = () => {
 
   return (
     <div className="p-3 sm:p-6">
-      <button
+      <Button
         onClick={() => navigate('/account/orders')}
+        variant="ghost"
+        size="sm"
         className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-6 transition-colors"
+        leftIcon={<ArrowLeftIcon size={16} />}
       >
         <ArrowLeftIcon size={20} className="mr-2" />
         Back to Orders
-      </button>
+      </Button>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 gap-4">
@@ -115,13 +118,16 @@ export const OrderDetail = () => {
                 <MapPinIcon size={16} className="mr-1 sm:mr-2" />
                 Track Order
               </Link>
-              <button
+              <Button
                 onClick={handleDownloadInvoice}
+                variant="outline"
+                size="sm"
                 className="flex items-center px-3 py-2 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                leftIcon={<DownloadIcon size={16} />}
               >
                 <DownloadIcon size={16} className="mr-1 sm:mr-2" />
                 Download Invoice
-              </button>
+              </Button>
             </div>
           </div>
         </div>

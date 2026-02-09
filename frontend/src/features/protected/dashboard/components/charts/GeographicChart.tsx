@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import { GlobeIcon, MapIcon, ListIcon, BarChart3Icon } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
+import { Button } from '@/components/ui/Button';
 
 // Fix for default markers in react-leaflet
 import L from 'leaflet';
@@ -131,6 +132,9 @@ export const GeographicChart = ({
               click: () => handleCountryClick(point)
             }}
           >
+            <Button>
+              <MapIcon size={16} />
+            </Button>
             {showTooltips && (
               <Tooltip>
                 <div className="text-sm">
@@ -269,47 +273,7 @@ export const GeographicChart = ({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <GlobeIcon size={20} className="text-gray-500" />
-          {title && <h3 className="font-semibold text-gray-900">{title}</h3>}
-        </div>
-        
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-          <button
-            onClick={() => handleViewModeChange('map')}
-            className={`p-2 rounded-md transition-colors ${
-              currentViewMode === 'map'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-            title="Map View"
-          >
-            <MapIcon size={16} />
-          </button>
-          <button
-            onClick={() => handleViewModeChange('list')}
-            className={`p-2 rounded-md transition-colors ${
-              currentViewMode === 'list'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-            title="List View"
-          >
-            <ListIcon size={16} />
-          </button>
-          <button
-            onClick={() => handleViewModeChange('chart')}
-            className={`p-2 rounded-md transition-colors ${
-              currentViewMode === 'chart'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-            title="Chart View"
-          >
-            <BarChart3Icon size={16} />
-          </button>
-        </div>
       </div>
-
       {/* Content */}
       <div className="p-4">
         {currentViewMode === 'map' && renderMap()}

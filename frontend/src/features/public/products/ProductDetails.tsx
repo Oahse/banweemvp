@@ -17,6 +17,7 @@ import {
   CalendarIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 import { ProductImageGallery } from './components/ProductImageGallery';
 import { VariantSelector } from './components/VariantSelector';
@@ -448,7 +449,7 @@ export const ProductDetails = () => {
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-xl font-bold text-main mb-2">{product.name}</h1>
+              <Heading level={1} className="text-xl font-bold text-main mb-2">{product.name}</Heading>
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center">
                   <div className="flex text-yellow-400">
@@ -499,7 +500,7 @@ export const ProductDetails = () => {
               {/* Variant Selection - Moved under description */}
               {actualProductData?.variants && actualProductData.variants.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-main mb-2">Available Variants</h3>
+                  <Heading level={3} className="text-sm font-medium text-main mb-2">Available Variants</Heading>
                   <div className="space-y-1">
                     {actualProductData.variants.map((variant: any, index: number) => {
                       const isSelected = selectedVariant?.id === variant.id;
@@ -618,7 +619,7 @@ export const ProductDetails = () => {
             {/* Quantity Selection */}
             {selectedVariant && (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 && (
               <div>
-                <h3 className="text-xs font-medium text-main mb-3">Quantity:</h3>
+                <Heading level={3} className="text-xs font-medium text-main mb-3">Quantity:</Heading>
                 <div className="flex items-center space-x-2">
                   <Button
                     onClick={() => handleQuantityChange(quantity - 1)}
@@ -809,33 +810,33 @@ export const ProductDetails = () => {
         <div className="mb-8">
           <div className="border-b border-gray-200 mb-4">
             <nav className="flex space-x-6">
-              <button
+              <Button
                 onClick={() => setActiveTab('description')}
+                variant="ghost"
                 className={`py-2 px-1 border-b-2 font-medium text-xs ${activeTab === 'description'
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-copy-light hover:text-copy'
-                  }`}
+                  : 'border-transparent text-copy-light hover:text-copy'}`}
               >
                 Description
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setActiveTab('specifications')}
+                variant="ghost"
                 className={`py-2 px-1 border-b-2 font-medium text-xs ${activeTab === 'specifications'
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-copy-light hover:text-copy'
-                  }`}
+                  : 'border-transparent text-copy-light hover:text-copy'}`}
               >
                 Specifications
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setActiveTab('reviews')}
+                variant="ghost"
                 className={`py-2 px-1 border-b-2 font-medium text-xs ${activeTab === 'reviews'
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-copy-light hover:text-copy'
-                  }`}
+                  : 'border-transparent text-copy-light hover:text-copy'}`}
               >
                 Reviews ({product.review_count || product.reviewCount || totalReviews})
-              </button>
+              </Button>
             </nav>
           </div>
 
@@ -847,7 +848,7 @@ export const ProductDetails = () => {
                 {/* Product Tags */}
                 {(Array.isArray(selectedVariant?.tags) && selectedVariant?.tags.length > 0) || (Array.isArray(product.tags) && product.tags.length > 0) ? (
                   <div className="mb-6">
-                    <h4 className="text-sm font-medium text-main mb-2">Tags:</h4>
+                    <Heading level={4} className="text-sm font-medium text-main mb-2">Tags:</Heading>
                     <div className="flex flex-wrap gap-2">
                       {(Array.isArray(selectedVariant?.tags) && selectedVariant?.tags.length > 0 ? selectedVariant?.tags : product.tags).map((tag: any, index: number) => (
                         <span
@@ -865,7 +866,7 @@ export const ProductDetails = () => {
                 {/* Product Features */}
                 {product.features && product.features.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="text-sm font-medium text-main mb-2">Features:</h4>
+                    <Heading level={4} className="text-sm font-medium text-main mb-2">Features:</Heading>
                     <ul className="list-disc list-inside space-y-1">
                       {product.features.map((feature: string, index: number) => (
                         <li key={index} className="text-sm text-copy-light">{feature}</li>
@@ -877,7 +878,7 @@ export const ProductDetails = () => {
                 {/* Variant Attributes */}
                 {selectedVariant?.attributes && Object.keys(selectedVariant.attributes).length > 0 && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium text-main mb-2">Variant Attributes:</h4>
+                    <Heading level={4} className="text-sm font-medium text-main mb-2">Variant Attributes:</Heading>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {Object.entries(selectedVariant.attributes).map(([key, value]) => (
                         <div key={key} className="flex justify-between py-1">
@@ -909,9 +910,9 @@ export const ProductDetails = () => {
                           )}
                         </div>
                         <div>
-                          <h4 className="text-sm font-semibold text-main">
+                          <Heading level={4} className="text-sm font-semibold text-main">
                             {product.supplier.company || `${product.supplier.firstname} ${product.supplier.lastname}`}
-                          </h4>
+                          </Heading>
                         </div>
                       </div>
                       
@@ -1193,13 +1194,14 @@ export const ProductDetails = () => {
                     {/* Reviews Pagination */}
                     {actualReviewsData.total > actualReviewsData.limit && (
                       <div className="flex items-center justify-center space-x-2 mt-8">
-                        <button
+                        <Button
                           onClick={() => setReviewsPage(prev => Math.max(1, prev - 1))}
                           disabled={reviewsPage === 1}
+                          variant="outline"
                           className="px-3 py-2 rounded-md bg-surface border border-border text-copy hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Previous
-                        </button>
+                        </Button>
                         
                         {Array.from({ length: Math.ceil(actualReviewsData.total / actualReviewsData.limit) }, (_, i) => {
                           const page = i + 1;
@@ -1212,17 +1214,17 @@ export const ProductDetails = () => {
                             (page >= reviewsPage - 1 && page <= reviewsPage + 1)
                           ) {
                             return (
-                              <button
+                              <Button
                                 key={page}
                                 onClick={() => setReviewsPage(page)}
                                 className={`px-3 py-2 rounded-md ${
                                   page === reviewsPage
-                                    ? 'bg-primary text-white'
+                                    ? 'bg-primary text-white border-primary'
                                     : 'bg-surface border border-border text-copy hover:bg-surface-hover'
                                 }`}
                               >
                                 {page}
-                              </button>
+                              </Button>
                             );
                           } else if (page === reviewsPage - 2 || page === reviewsPage + 2) {
                             return <span key={page} className="px-2">...</span>;
@@ -1230,13 +1232,14 @@ export const ProductDetails = () => {
                           return null;
                         })}
                         
-                        <button
+                        <Button
                           onClick={() => setReviewsPage(prev => Math.min(Math.ceil(actualReviewsData.total / actualReviewsData.limit), prev + 1))}
                           disabled={reviewsPage === Math.ceil(actualReviewsData.total / actualReviewsData.limit)}
+                          variant="outline"
                           className="px-3 py-2 rounded-md bg-surface border border-border text-copy hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Next
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -1251,7 +1254,7 @@ export const ProductDetails = () => {
         {/* Related Products */}
         <section className="py-8 bg-surface">
           <div className="container mx-auto px-4">
-            <h2 className="text-lg sm:text-xl font-semibold text-main mb-4">Related Products</h2>
+            <Heading level={2} className="text-lg sm:text-xl font-semibold text-main mb-4">Related Products</Heading>
 
             {relatedError && (
               <ErrorMessage

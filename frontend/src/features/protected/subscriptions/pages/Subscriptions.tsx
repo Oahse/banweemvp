@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/contexts/AuthContext';
-import { useSubscription } from '../../shared/hooks/useSubscription';
+import { useSubscription } from '@/components/shared/hooks/useSubscription';
 import { 
   UserIcon,
   ShoppingBagIcon,
@@ -16,7 +16,8 @@ import {
   AlertCircleIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { MySubscriptions } from '../features/subscriptions/components/MySubscriptions';
+import { MySubscriptions } from '@/features/subscriptions/components/MySubscriptions';
+import { Button } from '@/components/ui/Button';
 export const Subscriptions = () => {
   const { user, logout, isAdmin, isSupplier } = useAuth();
   const { subscriptions, loading, error, refreshSubscriptions } = useSubscription();
@@ -125,13 +126,16 @@ export const Subscriptions = () => {
                     </li>
                   ))}
                   <li>
-                    <button
+                    <Button
                       onClick={handleLogout}
+                      variant="destructive"
+                      size="sm"
                       className="flex items-center px-4 py-2 rounded-md text-red-500 hover:bg-red-50 w-full text-left"
+                      leftIcon={<LogOutIcon size={16} />}
                     >
                       <LogOutIcon size={20} className="mr-3" />
                       <span>Logout</span>
-                    </button>
+                    </Button>
                   </li>
                 </ul>
               </nav>
@@ -143,13 +147,16 @@ export const Subscriptions = () => {
               <AlertCircleIcon size={48} className="mx-auto text-error mb-4" />
               <h2 className="text-xl font-medium text-main mb-2">Unable to Load Subscriptions</h2>
               <p className="text-copy-light mb-4">{error}</p>
-              <button
+              <Button
                 onClick={refreshSubscriptions}
+                variant="primary"
+                size="sm"
                 className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors inline-flex items-center"
+                leftIcon={<RefreshCwIcon size={16} />}
               >
                 <RefreshCwIcon size={18} className="mr-2" />
                 Try Again
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -192,13 +199,16 @@ export const Subscriptions = () => {
                   </li>
                 ))}
                 <li>
-                  <button
+                  <Button
                     onClick={handleLogout}
+                    variant="destructive"
+                    size="sm"
                     className="flex items-center px-4 py-2 rounded-md text-red-500 hover:bg-red-50 w-full text-left"
+                    leftIcon={<LogOutIcon size={16} />}
                   >
                     <LogOutIcon size={20} className="mr-3" />
                     <span>Logout</span>
-                  </button>
+                  </Button>
                 </li>
               </ul>
             </nav>
@@ -209,13 +219,16 @@ export const Subscriptions = () => {
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-main">My Subscriptions</h1>
-            <button
+            <Button
               onClick={() => navigate('/account/subscriptions')}
+              variant="primary"
+              size="sm"
               className="flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
+              leftIcon={<PlusIcon size={16} />}
             >
               <PlusIcon size={20} className="mr-2" />
               Manage Subscriptions
-            </button>
+            </Button>
           </div>
           
           {/* Use the existing MySubscriptions component */}

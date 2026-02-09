@@ -12,6 +12,7 @@ import { BarcodeDisplay } from '@/features/public/products/components/BarcodeDis
 import { toast } from 'react-hot-toast';
 import { cn } from '@/utils/utils';
 import { Button } from '@/components/ui/Button';
+import { Heading, Text } from '@/components/ui/Text/Text';
 
 /**
  * @typedef {object} ProductVariantImage
@@ -385,9 +386,9 @@ export const ProductCard = ({
                 : 'Uncategorized')}
           </span>
           <Link to={`/products/${product.id || ''}`}>
-            <h3 className="font-semibold text-xs sm:text-sm text-main dark:text-white hover:text-primary transition-colors line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
+            <Heading level={3} className="font-semibold text-xs sm:text-sm text-main dark:text-white hover:text-primary transition-colors line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
               {product.name || 'Unknown Product'}
-            </h3>
+            </Heading>
           </Link>
           <div className="flex items-center space-x-1">
             <div className="flex text-yellow-400 text-xs">

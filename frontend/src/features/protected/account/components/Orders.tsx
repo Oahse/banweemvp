@@ -8,6 +8,7 @@ import OrdersAPI from '../../api/orders';
 import { toast } from 'react-hot-toast';
 import { useLocale } from '../../../LocaleContext';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { Heading, Body } from '@/components/ui/Text/Text';
 import { Button } from '@/components/ui/Button';
 interface Order {
   id: string;
@@ -197,8 +198,8 @@ export const Orders = ({
             <svg className="w-10 h-10 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 className="text-base font-medium mb-2">Unable to Load Orders</h3>
-            <p className="text-sm text-gray-600">{getErrorMessage(error)}</p>
+            <Heading level={3} className="text-base font-medium mb-2">Unable to Load Orders</Heading>
+            <Body className="text-sm text-gray-600">{getErrorMessage(error)}</Body>
           </div>
           <Button 
             onClick={() => {
@@ -421,12 +422,12 @@ export const Orders = ({
           <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
             <ShoppingBagIcon size={20} className="text-gray-500 dark:text-gray-400" />
           </div>
-          <h2 className="text-base font-medium text-gray-900 dark:text-white mb-2">
+          <Heading level={2} className="text-base font-medium text-gray-900 dark:text-white mb-2">
             No orders yet
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+          </Heading>
+          <Body className="text-sm text-gray-500 dark:text-gray-400 mb-3">
             You haven't placed any orders yet.
-          </p>
+          </Body>
           <div className="space-y-2">
             <Link to="/products" className="inline-block px-3 py-2 bg-primary hover:bg-primary-dark text-white rounded-md text-sm">
               Start Shopping

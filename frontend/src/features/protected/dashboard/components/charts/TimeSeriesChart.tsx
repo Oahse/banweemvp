@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { InteractiveChart } from './InteractiveChart';
 import { CalendarIcon, ClockIcon, TrendingUpIcon, TrendingDownIcon } from 'lucide-react';
 import { subDays, subYears, startOfDay, endOfDay } from 'date-fns';
+import { Button } from '@/components/ui/Button';
 
 export const TimeSeriesChart = ({
   datasets,
@@ -164,18 +165,20 @@ export const TimeSeriesChart = ({
         
         <div className="flex items-center gap-2 flex-wrap">
           {timeRangeOptions.map(option => (
-            <button
+            <Button
               key={option.value}
               onClick={() => handleTimeRangeChange(option.value)}
+              variant={selectedTimeRange === option.value ? 'primary' : 'ghost'}
+              size="sm"
               className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
                 selectedTimeRange === option.value
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
               }`}
               title={option.description}
             >
               {option.label}
-            </button>
+            </Button>
           ))}
         </div>
         
@@ -200,12 +203,14 @@ export const TimeSeriesChart = ({
                   setCustomDateRange(prev => ({ start: prev?.start || new Date(), end }));
                 }}
               />
-              <button
+              <Button
                 onClick={() => handleTimeRangeChange('custom')}
+                variant="primary"
+                size="sm"
                 className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
               >
                 Apply
-              </button>
+              </Button>
             </div>
           </div>
         )}

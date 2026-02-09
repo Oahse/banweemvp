@@ -84,9 +84,10 @@ export const ResumeSubscriptionModal: React.FC<ResumeSubscriptionModalProps> = (
             </div>
           </div>
           
-          <button
+          <Button
             onClick={handleClose}
             disabled={loading}
+            variant="ghost"
             className={combineThemeClasses(
               'p-1 rounded-md transition-colors',
               themeClasses.text.muted,
@@ -95,7 +96,7 @@ export const ResumeSubscriptionModal: React.FC<ResumeSubscriptionModalProps> = (
             )}
           >
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
         {/* Content */}

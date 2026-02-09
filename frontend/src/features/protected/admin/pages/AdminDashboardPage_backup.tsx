@@ -6,6 +6,7 @@ import AdminDataTable, { Column, PaginationInfo } from '../components/shared/Dat
 import { AdminAPI } from '@/api/admin';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { Button } from '@/components/ui/Button';
 
 // Loading spinner for stats
 const StatsCardSkeleton: React.FC = () => (
@@ -180,12 +181,13 @@ const AdminDashboard: React.FC = () => {
       <div className="space-y-6">
         {/* Toggle filter bar */}
         <div className="flex items-center mb-2">
-          <button
+          <Button
+            variant="outline"
             className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-medium mr-2 focus:outline-none focus:ring"
             onClick={() => setShowFilters((prev) => !prev)}
           >
             {showFilters ? 'Hide Filters' : 'Show Filters'}
-          </button>
+          </Button>
         </div>
         {showFilters && (
           <DashboardFilterBar

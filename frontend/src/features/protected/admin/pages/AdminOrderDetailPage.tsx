@@ -259,13 +259,14 @@ export const AdminOrderDetail = () => {
       <AdminLayout>
         <div className="space-y-6 p-6">
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={() => navigate('/admin/orders')}
+              variant="ghost"
               className="flex items-center gap-2 text-primary hover:text-primary/80"
             >
               <ArrowLeft className="w-5 h-5" />
               Back to Orders
-            </button>
+            </Button>
           </div>
 
           <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
@@ -288,13 +289,14 @@ export const AdminOrderDetail = () => {
         {/* Header with Back Button */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <button
+            <Button
               onClick={() => navigate('/admin/orders')}
+              variant="ghost"
               className="flex items-center gap-2 text-primary hover:text-primary/80"
             >
               <ArrowLeft className="w-5 h-5" />
               Back to Orders
-            </button>
+            </Button>
             <div>
               <h1 className="text-xl font-bold text-copy">Order #{order.order_number}</h1>
               <p className="text-xs text-copy-light">{order.id}</p>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../AuthContext';
+import { Button } from '@/components/ui/Button';
 
 import { 
   BarChart3Icon, 
@@ -231,36 +232,45 @@ const DashboardWidgetComponent = ({
         
         <div className="flex items-center gap-2">
           {widget.refreshable && (
-            <button
+            <Button
               onClick={onRefresh}
               disabled={refreshing}
+              variant="ghost"
+              size="sm"
               className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              leftIcon={<RefreshCwIcon size={16} />}
             >
               <RefreshCwIcon 
                 size={16} 
                 className={refreshing ? 'animate-spin' : ''} 
               />
-            </button>
-          )}
+            </Button>
           
           {widget.exportable && (
             <div className="relative group">
-              <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                <DownloadIcon size={16} />
-              </button>
+              <Button
+                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                variant="ghost"
+                size="sm"
+                leftIcon={<DownloadIcon size={16} />}
+              >
               <div className="absolute right-0 top-8 bg-white dark:bg-gray-700 shadow-lg rounded-md py-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                <button
+                <Button
                   onClick={() => onExport('csv')}
+                  variant="ghost"
+                  size="sm"
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left"
                 >
                   Export CSV
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => onExport('excel')}
+                  variant="ghost"
+                  size="sm"
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left"
                 >
                   Export Excel
-                </button>
+                </Button>
               </div>
             </div>
           )}

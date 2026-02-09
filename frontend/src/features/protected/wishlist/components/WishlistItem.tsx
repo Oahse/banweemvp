@@ -316,7 +316,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
             <span className="text-xs">{isAddingToCart ? 'Adding...' : 'Add to Cart'}</span>
           </Button>
 
-          <button
+          <Button
             onClick={handleRemove}
             disabled={isRemoving}
             className="p-2 text-red-500 hover:bg-red-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -327,7 +327,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
             ) : (
               <TrashIcon size={16} />
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Added date */}

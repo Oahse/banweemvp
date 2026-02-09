@@ -7,6 +7,7 @@ import { unwrapResponse, extractErrorMessage } from '../../../../utils/api-respo
 import { SkeletonAddresses } from '../../../../components/ui/SkeletonAddresses';
 import { Dropdown } from '../../../../components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
+import { Heading, Text, Label } from '@/components/ui/Text/Text';
 import { countries, getCountryOptions, getProvinceOptions, getCountryByCode, getProvincesByCountry, getCityOptions, getCitiesByProvince } from '../../../../data/countries';
 /**
  * Addresses component allows users to manage their saved addresses.
@@ -185,9 +186,9 @@ export const Addresses = () => {
     <div>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-medium text-main dark:text-white">
+          <Heading level={2} className="text-lg font-medium text-main dark:text-white">
             Saved Addresses
-          </h2>
+          </Heading>
           {/* Button to toggle the add/edit address form */}
           <Button onClick={() => setShowAddressForm(!showAddressForm)} className="flex items-center text-primary hover:text-primary-dark">
             <PlusCircleIcon size={18} className="mr-1" />
@@ -201,23 +202,23 @@ export const Addresses = () => {
                 <div key={address.id} className="border rounded-lg p-3 border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between mb-2">
                   <div className="flex items-center">
-                    <span className="mr-1">
+                    <Text className="mr-1">
                       {getAddressTypeIcon(address.kind)}
-                    </span>
-                      <span className="text-sm font-medium text-main dark:text-white capitalize">
+                    </Text>
+                      <Text className="text-sm font-medium text-main dark:text-white capitalize">
                       {address.kind}
-                    </span>
+                    </Text>
                   </div>
                 </div>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  <Text className="text-gray-600 dark:text-gray-300 text-sm">
                   {address.street}
-                </p>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                </Text>
+                  <Text className="text-gray-600 dark:text-gray-300 text-sm">
                   {address.city}, {address.state} {address.post_code}
-                </p>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                </Text>
+                  <Text className="text-gray-600 dark:text-gray-300 text-sm">
                   {getCountryByCode(address.country)?.name || address.country}
-                </p>
+                </Text>
                 <div className="flex mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                   {/* Edit and Delete buttons for each address */}
                     <Button onClick={() => handleEditAddress(address)} variant="ghost" size="sm" className="flex items-center text-sm text-gray-600 hover:text-primary dark:text-gray-300 mr-3">
@@ -246,23 +247,23 @@ export const Addresses = () => {
         {/* Add/Edit Address Form */}
         {showAddressForm && (
           <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">
-            <h3 className="text-base font-medium text-main dark:text-white mb-3">
+            <Heading level={3} className="text-base font-medium text-main dark:text-white mb-3">
               {editingAddressId ? 'Edit Address' : 'Add New Address'}
-            </h3>
+            </Heading>
             <form onSubmit={handleAddressSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Street Address Input */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Street Address
-                  </label>
+                  </Label>
                   <input type="text" name="street" value={formData.street} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white" required />
                 </div>
                 {/* City Input */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     City
-                  </label>
+                  </Label>
                   {getCitiesByProvince(formData.country, formData.state).length > 0 ? (
                     <Dropdown
                       options={getCityOptions(formData.country, formData.state)}

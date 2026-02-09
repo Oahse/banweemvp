@@ -216,13 +216,12 @@ export const SubscriptionList: React.FC = () => {
             size="sm"
             className={combineThemeClasses(getButtonClasses('outline'), 'text-sm')}
           >
-            <RefreshCwIcon className="w-4 h-4 mr-1" />
             Refresh
           </Button>
           <Button
             className={combineThemeClasses(getButtonClasses('primary'), 'text-sm')}
+            leftIcon={<PlusIcon className="w-4 h-4 mr-1" />}
           >
-            <PlusIcon className="w-4 h-4 mr-1" />
             Create Subscription
           </Button>
         </div>
@@ -244,11 +243,12 @@ export const SubscriptionList: React.FC = () => {
           <p className={combineThemeClasses(themeClasses.text.secondary, 'text-sm mb-4')}>
             Create your first subscription to get started
           </p>
-          <button
+          <Button
             className={combineThemeClasses(getButtonClasses('primary'), 'text-sm')}
+            leftIcon={<PlusIcon className="w-4 h-4 mr-1" />}
           >
             Create Subscription
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="grid gap-4">

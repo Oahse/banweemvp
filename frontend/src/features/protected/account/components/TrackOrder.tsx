@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchIcon, PackageIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 const TrackOrder = () => {
   const [orderNumber, setOrderNumber] = useState('');
   const navigate = useNavigate();
@@ -43,24 +44,25 @@ const TrackOrder = () => {
             </p>
           </div>
 
-          <button
+          <Button
             type="submit"
             className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 font-medium text-xs"
           >
             <SearchIcon size={20} />
             Track Order
-          </button>
+          </Button>
         </form>
 
         <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
           <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
             Already have an account?{' '}
-            <button
+            <Button
               onClick={() => navigate('/account/orders')}
+              variant="link"
               className="text-primary hover:underline font-medium"
             >
               View all your orders
-            </button>
+            </Button>
           </p>
         </div>
       </div>
@@ -72,12 +74,13 @@ const TrackOrder = () => {
           <p>• If you can&apos;t find your order number, check your email confirmation</p>
           <p>• For urgent inquiries, contact our support team</p>
         </div>
-        <button
+        <Button
           onClick={() => navigate('/contact')}
+          variant="link"
           className="mt-4 text-primary hover:underline text-xs font-medium"
         >
           Contact Support →
-        </button>
+        </Button>
       </div>
     </div>
   );

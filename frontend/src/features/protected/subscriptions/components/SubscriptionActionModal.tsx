@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, TrashIcon, PauseIcon, PlayIcon, AlertTriangleIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 export type SubscriptionAction = 'cancel' | 'pause' | 'resume';
 
@@ -127,24 +128,25 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
               )} />
             </div>
             <div>
-              <h3 className={combineThemeClasses(
+              <Heading level={3} className={combineThemeClasses(
                 themeClasses.text.heading,
                 'text-lg font-semibold'
               )}>
                 {config.title}
-              </h3>
-              <p className={combineThemeClasses(
+              </Heading>
+              <Body className={combineThemeClasses(
                 themeClasses.text.muted,
                 'text-sm'
               )}>
                 {planName} Plan
-              </p>
+              </Body>
             </div>
           </div>
           
-          <button
+          <Button
             onClick={handleClose}
             disabled={loading}
+            variant="ghost"
             className={combineThemeClasses(
               'p-1 rounded-md transition-colors',
               themeClasses.text.muted,
@@ -153,7 +155,7 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
             )}
           >
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
@@ -168,12 +170,12 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
                 <div className="flex items-start gap-3">
                   <AlertTriangleIcon className="w-5 h-5 mt-0.5 flex-shrink-0 text-red-500" />
                   <div>
-                    <h4 className="font-semibold text-sm mb-1 text-red-800">
+                    <Heading level={4} className="font-semibold text-sm mb-1 text-red-800">
                       {config.warning}
-                    </h4>
-                    <p className="text-sm text-red-700">
+                    </Heading>
+                    <Body className="text-sm text-red-700">
                       {config.description}
-                    </p>
+                    </Body>
                   </div>
                 </div>
               </div>
@@ -182,12 +184,12 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
             {/* Info for non-destructive actions */}
             {action !== 'cancel' && (
               <>
-                <p className={combineThemeClasses(
+                <Body className={combineThemeClasses(
                   themeClasses.text.secondary,
                   'text-sm mb-3'
                 )}>
                   {config.description}
-                </p>
+                </Body>
                 
                 {config.warning && (
                   <div className={combineThemeClasses(
@@ -195,9 +197,9 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
                     themeClasses.background.elevated,
                     'border-yellow-300 border-opacity-30'
                   )}>
-                    <p className="text-sm font-medium text-yellow-700">
+                    <Text className="text-sm font-medium text-yellow-700">
                       Note: {config.warning}
-                    </p>
+                    </Text>
                   </div>
                 )}
               </>
@@ -205,15 +207,15 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
 
             {/* Reason input */}
             <div className="mb-4">
-              <label 
+              <Label 
                 htmlFor="action-reason"
                 className={combineThemeClasses(
-                  themeClasses.text.primary,
-                  'block text-sm font-medium mb-2'
+                  'block text-sm font-medium mb-2',
+                  themeClasses.text.primary
                 )}
               >
-                {config.reasonLabel}
-              </label>
+                {config.requiresConfirmation ? 'Please confirm by typing "CANCEL"' : 'Reason (optional)'}
+              </Label>
               <textarea
                 id="action-reason"
                 value={reason}

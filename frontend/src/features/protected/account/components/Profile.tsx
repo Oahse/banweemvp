@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { UserIcon, MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, GlobeIcon, SaveIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../../AuthContext';
-import { AuthAPI } from '../../api';
+import { AuthAPI } from '@/api';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 import { SkeletonProfile } from '../ui/SkeletonProfile';
+import { Button } from '@/components/ui/Button';
 /**
  * Profile component allows users to view and edit their personal information.
  */
@@ -145,12 +146,14 @@ export const Profile = () => {
             </div>
           </div>
           {!isEditing && (
-            <button
+            <Button
               onClick={() => setIsEditing(true)}
+              variant="primary"
+              size="sm"
               className="px-3 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors text-sm"
             >
               Edit Profile
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -320,18 +323,23 @@ export const Profile = () => {
 
             {/* Form Actions */}
             <div className="mt-4 flex justify-end space-x-2">
-              <button
+              <Button
                 type="button"
                 onClick={handleCancel}
+                variant="outline"
+                size="sm"
                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm"
                 disabled={loading}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
+                variant="primary"
+                size="sm"
                 className="px-3 py-2 bg-primary hover:bg-primary-dark text-white rounded-md flex items-center text-sm"
                 disabled={loading}
+                isLoading={loading}
               >
                 {loading ? (
                   <>
@@ -344,7 +352,7 @@ export const Profile = () => {
                     Save Changes
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </form>
         ) : (

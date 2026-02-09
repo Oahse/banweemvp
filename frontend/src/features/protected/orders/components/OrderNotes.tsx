@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-
-
-
+import { Button } from '@/components/ui/Button';
 
 
 const OrderNotes = ({
@@ -86,14 +84,16 @@ const OrderNotes = ({
                   {attachments.map((file, index) => (
                     <div key={index} className="flex items-center justify-between bg-white rounded px-3 py-2 text-sm">
                       <span className="text-gray-700">{file.name}</span>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => removeAttachment(index)}
+                        variant="ghost"
+                        size="sm"
                         className="text-red-500 hover:text-red-700"
                         disabled={isSubmitting}
                       >
                         ✕
-                      </button>
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -101,13 +101,14 @@ const OrderNotes = ({
             </div>
 
             <div className="flex justify-end">
-              <button
+              <Button
                 type="submit"
                 disabled={!newNote.trim() || isSubmitting}
+                variant="primary"
                 className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Adding...' : 'Add Note'}
-              </button>
+              </Button>
             </div>
           </div>
         </form>

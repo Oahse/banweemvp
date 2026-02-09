@@ -435,47 +435,6 @@ export const AdminDataTable = <T extends Record<string, any>>({
                         >
                           {renderCell(column, row)}
                         </td>
-                      ))}
-                      {(onView || onEdit || onDelete) && (
-                        <td className="px-3 py-2 text-right text-xs font-medium">
-                          <div className="flex items-center justify-end gap-2">
-                            {onView && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onView(row);
-                                }}
-                                className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
-                                title="View"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </button>
-                            )}
-                            {onEdit && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onEdit(row);
-                                }}
-                                className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
-                                title="Edit"
-                              >
-                                <EditIcon className="h-4 w-4" />
-                              </button>
-                            )}
-                            {onDelete && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onDelete(row);
-                                }}
-                                className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                title="Delete"
-                              >
-                                <TrashIcon className="h-4 w-4" />
-                              </button>
-                            )}
-                          </div>
                         </td>
                       )}
                     </tr>
@@ -500,25 +459,29 @@ export const AdminDataTable = <T extends Record<string, any>>({
                   </span>
                 </div>
                 <div className="flex items-center justify-center sm:justify-end gap-1">
-                  <button
+                  <Button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page <= 1}
+                    variant="outline"
+                    size="sm"
                     className="p-1.5 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
                   >
                     <ChevronLeft className="h-3 w-3" />
-                  </button>
+                  </Button>
                   
                   <span className="text-xs text-gray-700 dark:text-gray-300 hidden sm:block min-w-[80px] text-center">
                     Page {pagination.page} of {pagination.pages || 1}
                   </span>
                   
-                  <button
+                  <Button
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page >= (pagination.pages || 1)}
+                    variant="outline"
+                    size="sm"
                     className="p-1.5 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
                   >
                     <ChevronRight className="h-3 w-3" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { CreditCard, PlusCircle, Trash2, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useApi } from '../../../shared/hooks/useAsync';
-import { PaymentsAPI } from '../../api/payments';
-import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { PaymentsAPI } from '@/api/payments';
+import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { TokenManager } from '../../api/client';
 import { StripeCardForm } from '../checkout/StripeCardForm';
+import { Button } from '@/components/ui/Button';
 
 
 
@@ -170,13 +171,15 @@ export const PaymentMethods = () => {
             Saved Payment Methods
           </h2>
           {/* Button to toggle the add card form */}
-          <button 
+          <Button
             onClick={() => setShowAddCardForm(!showAddCardForm)} 
+            variant="ghost"
+            size="sm"
             className="flex items-center text-primary hover:text-primary-dark text-xs"
           >
             <PlusCircle size={14} className="mr-1" />
             <span>Add New Card</span>
-          </button>
+          </Button>
         </div>
         {/* Display existing payment methods or a message if none are saved */}
         {localPaymentMethods && localPaymentMethods.length > 0 ? (
@@ -203,19 +206,21 @@ export const PaymentMethods = () => {
                         <CheckCircle size={12} className="mr-1" /> Default
                       </span>
                     ) : (
-                      <button onClick={() => handleSetDefault(method.id)} className="text-xs text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary mr-2">
+                      <Button onClick={() => handleSetDefault(method.id)} className="text-xs text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary mr-2" variant="ghost" size="sm">
                         Set as default
-                      </button>
+                      </Button>
                     )}
                     {/* Delete button */}
-                    <button 
+                    <Button 
                       onClick={() => handleDeleteCard(method.id)} 
+                      variant="ghost"
+                      size="sm"
                       className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 p-1" 
                       disabled={method.is_default}
                       title={method.is_default ? "Cannot delete default payment method" : "Delete payment method"}
                     >
                       <Trash2 size={14} />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -227,9 +232,9 @@ export const PaymentMethods = () => {
             <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
               No payment methods saved yet
             </p>
-            <button onClick={() => setShowAddCardForm(true)} className="text-primary hover:underline text-xs">
+            <Button onClick={() => setShowAddCardForm(true)} className="text-primary hover:underline text-xs" variant="link" size="sm">
               Add your first payment method
-            </button>
+            </Button>
           </div>
         )}
         {/* Add Card Form */}

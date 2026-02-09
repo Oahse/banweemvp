@@ -7,6 +7,7 @@ import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { RefundsListSkeleton } from '../components/skeletons/RefundsSkeleton';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 const LIMIT = 10;
 
@@ -391,8 +392,10 @@ export const Refunds = () => {
               className="min-w-[120px]"
             />
             
-            <button
+            <Button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              variant="outline"
+              size="sm"
               className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
                 currentTheme === 'dark' 
                   ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
@@ -402,7 +405,7 @@ export const Refunds = () => {
               <ArrowUpDownIcon size={16} />
               <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
               <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-            </button>
+            </Button>
           </div>
 
           {/* Active Filters */}
@@ -467,7 +470,7 @@ export const Refunds = () => {
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className="text-base lg:text-lg font-semibold">All Refunds</h2>
+          <Heading level={2} className="text-base lg:text-lg font-semibold">All Refunds</Heading>
         </div>
 
         {refunds.length > 0 ? (
@@ -503,15 +506,17 @@ export const Refunds = () => {
                       <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(refund.created_at || '').toLocaleDateString()}</td>
                       <td className="px-4 py-3 text-xs">
                         <div className="flex gap-1">
-                          <button 
+                          <Button 
                             onClick={(e) => {
                               e.stopPropagation();
                               handleView(refund);
                             }}
+                            variant="primary"
+                            size="sm"
                             className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-xs"
                           >
                             <EyeIcon size={14} />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -543,16 +548,17 @@ export const Refunds = () => {
                   </div>
                   <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>{refund.reason || 'No reason provided'}</div>
                   <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(refund.created_at || '').toLocaleDateString()}</div>
-                  <button 
+                  <Button 
                     onClick={(e) => {
                       e.stopPropagation();
                       handleView(refund);
                     }}
+                    variant="primary"
                     className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-sm mt-2"
                   >
                     <EyeIcon size={14} />
                     View Details
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -571,19 +577,13 @@ export const Refunds = () => {
             {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
           </p>
           <div className="flex items-center gap-1">
-              <button
+              <Button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
+                variant="outline"
+                size="sm"
                 className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
                   currentTheme === 'dark' 
-                    ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                    : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                }`}
-              >
-                <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
-                <span className="hidden sm:inline">Previous</span>
-              </button>
-              
               {/* Page numbers */}
               <div className="flex items-center gap-1 mx-1 lg:mx-2">
                 {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
@@ -599,7 +599,7 @@ export const Refunds = () => {
                   }
                   
                   return (
-                    <button
+                    <Button
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
                       className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium transition-colors ${
@@ -611,14 +611,16 @@ export const Refunds = () => {
                       }`}
                     >
                       {pageNum}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
               
-              <button
+              <Button
                 onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
                 disabled={page >= (pagination.pages || 1)}
+                variant="outline"
+                size="sm"
                 className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
                   currentTheme === 'dark' 
                     ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
@@ -627,7 +629,7 @@ export const Refunds = () => {
               >
                 <span className="hidden sm:inline">Next</span>
                 <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
-              </button>
+              </Button>
           </div>
         </div>
       </div>
@@ -637,17 +639,19 @@ export const Refunds = () => {
           <div className={`w-full max-w-4xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold">Refund Details</h3>
-                <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                <Heading level={3} className="text-lg font-semibold">Refund Details</Heading>
+                <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                   {viewingRefund.refund_number || viewingRefund.id}
-                </p>
+                </Body>
               </div>
-              <button
+              <Button
                 onClick={() => setShowDetailsModal(false)}
+                variant="ghost"
+                size="sm"
                 className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
               >
                 <span className="text-xl">×</span>
-              </button>
+              </Button>
             </div>
 
             {detailsLoading ? (
@@ -658,62 +662,62 @@ export const Refunds = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer</p>
-                    <p>{viewingRefund.customer_name || 'N/A'}</p>
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer</Text>
+                    <Text>{viewingRefund.customer_name || 'N/A'}</Text>
                   </div>
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</p>
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</Text>
                     {statusBadge(viewingRefund.status)}
                   </div>
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Order ID</p>
-                    <p className="font-mono break-all">{viewingRefund.order_id}</p>
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Order ID</Text>
+                    <Text className="font-mono break-all">{viewingRefund.order_id}</Text>
                   </div>
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Reason</p>
-                    <p>{viewingRefund.reason || 'N/A'}</p>
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Reason</Text>
+                    <Text>{viewingRefund.reason || 'N/A'}</Text>
                   </div>
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Refund Type</p>
-                    <p>{viewingRefund.refund_type || 'N/A'}</p>
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Refund Type</Text>
+                    <Text>{viewingRefund.refund_type || 'N/A'}</Text>
                   </div>
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Requested Amount</p>
-                    <p className="font-mono">
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Requested Amount</Text>
+                    <Text className="font-mono">
                       {formatCurrency(viewingRefund.requested_amount ?? viewingRefund.amount, viewingRefund.currency)}
-                    </p>
+                    </Text>
                   </div>
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Approved Amount</p>
-                    <p className="font-mono">
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Approved Amount</Text>
+                    <Text className="font-mono">
                       {viewingRefund.approved_amount != null
                         ? formatCurrency(viewingRefund.approved_amount, viewingRefund.currency)
                         : '—'}
-                    </p>
+                    </Text>
                   </div>
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Processed Amount</p>
-                    <p className="font-mono">
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Processed Amount</Text>
+                    <Text className="font-mono">
                       {viewingRefund.processed_amount != null
                         ? formatCurrency(viewingRefund.processed_amount, viewingRefund.currency)
                         : '—'}
-                    </p>
+                    </Text>
                   </div>
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Reason</p>
-                    <p>{viewingRefund.customer_reason || '—'}</p>
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Reason</Text>
+                    <Text>{viewingRefund.customer_reason || '—'}</Text>
                   </div>
                   <div>
-                    <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Notes</p>
-                    <p>{viewingRefund.customer_notes || '—'}</p>
+                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Notes</Text>
+                    <Text>{viewingRefund.customer_notes || '—'}</Text>
                   </div>
                 </div>
 
                 {viewingRefund.refund_items && viewingRefund.refund_items.length > 0 && (
                   <div className="border rounded-lg overflow-hidden">
-                    <div className={`px-4 py-2 text-sm font-semibold ${currentTheme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
+                    <Text className={`px-4 py-2 text-sm font-semibold ${currentTheme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
                       Refunded Items
-                    </div>
+                    </Text>
                     <div className="divide-y">
                       {viewingRefund.refund_items.map((item) => (
                         <div key={item.id} className={`px-4 py-2 text-sm ${currentTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
@@ -723,9 +727,9 @@ export const Refunds = () => {
                             <span className="font-mono">${item.total_refund_amount.toFixed(2)}</span>
                           </div>
                           {item.condition_notes && (
-                            <p className={`mt-1 text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <Body className={`mt-1 text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                               Notes: {item.condition_notes}
-                            </p>
+                            </Body>
                           )}
                         </div>
                       ))}
@@ -734,9 +738,9 @@ export const Refunds = () => {
                 )}
 
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <Label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     Admin Notes
-                  </label>
+                  </Label>
                   <textarea
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}

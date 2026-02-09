@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface Props {
   children: ReactNode;
@@ -54,12 +55,12 @@ class ErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            <h1 className="text-base font-medium text-main dark:text-white mb-1">
+            <Heading level={1} className="mb-1">
               Oops! Something went wrong
-            </h1>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
+            </Heading>
+            <Body tone="secondary" className="mb-3">
               We encountered an unexpected error. Please try reloading the page.
-            </p>
+            </Body>
             {this.state.error && (
               <details className="mb-3 text-left">
                 <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:text-main dark:hover:text-white">

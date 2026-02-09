@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
 import { toast } from 'react-hot-toast';
 import { CalendarIcon, DollarSignIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 const AccountMySubscriptionEditPage: React.FC = () => {
   const { subscriptionId } = useParams();
@@ -108,11 +109,14 @@ const AccountMySubscriptionEditPage: React.FC = () => {
         />
         <label className="text-xs font-medium">Auto Renew</label>
       </div>
-      <button
+      <Button
         className="px-4 py-2 bg-primary text-white rounded"
         onClick={handleSave}
         disabled={loading}
-      >Save Changes</button>
+        variant="primary"
+      >
+        {loading ? 'Saving...' : 'Save Changes'}
+      </Button>
     </div>
   );
 };
