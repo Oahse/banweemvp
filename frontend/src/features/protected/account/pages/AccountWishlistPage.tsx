@@ -60,7 +60,7 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <span className="text-gray-500 text-sm">Loading wishlist...</span>
+        <Text className="text-gray-500 text-sm">Loading wishlist...</Text>
       </div>
     );
   }
@@ -69,7 +69,7 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <HeartIcon size={28} className="text-gray-300 mb-2" />
-        <span className="text-sm text-gray-500 mb-2">Your wishlist is empty.</span>
+        <Text className="text-sm text-gray-500 mb-2">Your wishlist is empty.</Text>
         <Button
           variant="primary"
           size="sm"
@@ -126,7 +126,7 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
           >
             Prev
           </Button>
-          <span className="text-xs">Page {currentPage} of {totalPages}</span>
+          <Text as="span" className="text-xs">Page {currentPage} of {totalPages}</Text>
           <Button
             variant="secondary"
             size="sm"

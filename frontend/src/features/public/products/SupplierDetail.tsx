@@ -18,6 +18,7 @@ import { useApi } from '../../../components/shared/hooks/useAsync';
 import { SuppliersAPI } from '../../../api';
 import ErrorMessage from '../components/Error';
 import { ProductCard } from '../../../components/generic/ProductCard';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 export const SupplierDetail = () => {
   const { id } = useParams();
@@ -114,11 +115,11 @@ export const SupplierDetail = () => {
                 <UserIcon className="w-10 h-10 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-main mb-2">
+                <Heading level={1} className="text-2xl font-bold text-main mb-2">
                   {supplier.firstname} {supplier.lastname}
-                </h1>
+                </Heading>
                 {supplier.company && (
-                  <p className="text-lg text-copy-light mb-2">{supplier.company}</p>
+                  <Body className="text-lg text-copy-light mb-2">{supplier.company}</Body>
                 )}
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center">
@@ -172,7 +173,7 @@ export const SupplierDetail = () => {
           <div className="lg:col-span-1">
             {/* Stats */}
             <div className="bg-surface rounded-lg p-6 mb-6">
-              <h3 className="font-semibold text-main mb-4">Statistics</h3>
+              <Heading level={3} className="font-semibold text-main mb-4">Statistics</Heading>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-primary">{supplier.product_count || 0}</div>
@@ -225,14 +226,14 @@ export const SupplierDetail = () => {
                   <div className="space-y-4">
                     {supplier.bio && (
                       <div>
-                        <h4 className="font-medium text-main mb-2">About</h4>
-                        <p className="text-sm text-copy-light">{supplier.bio}</p>
+                        <Heading level={4} className="font-medium text-main mb-2">About</Heading>
+                        <Body className="text-sm text-copy-light">{supplier.bio}</Body>
                       </div>
                     )}
 
                     {supplier.specialties && supplier.specialties.length > 0 && (
                       <div>
-                        <h4 className="font-medium text-main mb-2">Specialties</h4>
+                        <Heading level={4} className="font-medium text-main mb-2">Specialties</Heading>
                         <div className="flex flex-wrap gap-2">
                           {supplier.specialties.map((specialty: any, index: number) => (
                             <span
@@ -248,14 +249,14 @@ export const SupplierDetail = () => {
 
                     {supplier.founded_year && (
                       <div>
-                        <h4 className="font-medium text-main mb-2">Founded</h4>
-                        <p className="text-sm text-copy-light">{supplier.founded_year}</p>
+                        <Heading level={4} className="font-medium text-main mb-2">Founded</Heading>
+                        <Body className="text-sm text-copy-light">{supplier.founded_year}</Body>
                       </div>
                     )}
 
                     {supplier.website && (
                       <div>
-                        <h4 className="font-medium text-main mb-2">Website</h4>
+                        <Heading level={4} className="font-medium text-main mb-2">Website</Heading>
                         <a
                           href={supplier.website}
                           target="_blank"
@@ -273,21 +274,21 @@ export const SupplierDetail = () => {
                 {activeTab === 'contact' && (
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-medium text-main mb-2">Business Hours</h4>
-                      <p className="text-sm text-copy-light">
+                      <Heading level={4} className="font-medium text-main mb-2">Business Hours</Heading>
+                      <Body className="text-sm text-copy-light">
                         {supplier.business_hours || 'Monday - Friday: 9:00 AM - 6:00 PM'}
-                      </p>
+                      </Body>
                     </div>
 
                     <div>
-                      <h4 className="font-medium text-main mb-2">Response Time</h4>
-                      <p className="text-sm text-copy-light">
+                      <Heading level={4} className="font-medium text-main mb-2">Response Time</Heading>
+                      <Body className="text-sm text-copy-light">
                         {supplier.response_time || 'Usually responds within 24 hours'}
-                      </p>
+                      </Body>
                     </div>
 
                     <div>
-                      <h4 className="font-medium text-main mb-2">Languages</h4>
+                      <Heading level={4} className="font-medium text-main mb-2">Languages</Heading>
                       <div className="flex flex-wrap gap-2">
                         {(supplier.languages || ['English']).map((lang: any, index: number) => (
                           <span
@@ -309,7 +310,7 @@ export const SupplierDetail = () => {
           <div className="lg:col-span-2">
             <div className="bg-surface rounded-lg p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-main">Products</h3>
+                <Heading level={3} className="text-lg font-semibold text-main">Products</Heading>
                 <div className="flex items-center text-sm text-copy-light">
                   <PackageIcon className="w-4 h-4 mr-1" />
                   {products.length} products
@@ -351,10 +352,10 @@ export const SupplierDetail = () => {
               ) : (
                 <div className="text-center py-12">
                   <PackageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-main mb-2">No products available</h3>
-                  <p className="text-copy-light">
+                  <Heading level={3} className="text-lg font-medium text-main mb-2">No products available</Heading>
+                  <Body className="text-copy-light">
                     This supplier hasn't added any products yet.
-                  </p>
+                  </Body>
                 </div>
               )}
             </div>

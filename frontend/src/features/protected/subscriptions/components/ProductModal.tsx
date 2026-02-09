@@ -12,6 +12,7 @@ import { toast } from 'react-hot-toast';
 import { getSubscription } from '../../api/subscription';
 import type { Subscription } from '../../types';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface SubscriptionProduct {
   id: string;
@@ -138,12 +139,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           <div className="p-6 border-b border-border flex-shrink-0">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className={combineThemeClasses(themeClasses.text.heading, 'text-2xl font-bold')}>
+                <Heading level={2} className={combineThemeClasses(themeClasses.text.heading, 'text-2xl font-bold')}>
                   Subscription Products
-                </h2>
-                <p className={combineThemeClasses(themeClasses.text.secondary, 'text-sm mt-1')}>
+                </Heading>
+                <Body className={combineThemeClasses(themeClasses.text.secondary, 'text-sm mt-1')}>
                   Manage products in your subscription
-                </p>
+                </Body>
               </div>
               <Button
                 onClick={handleClose}
@@ -231,12 +232,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
                         {/* Product Details */}
                         <div className="flex-1 min-w-0">
-                          <h3 className={combineThemeClasses(
+                          <Heading level={3} className={combineThemeClasses(
                             themeClasses.text.primary,
                             'font-semibold text-lg mb-1 truncate'
                           )}>
                             {product.name}
-                          </h3>
+                          </Heading>
                           
                           <div className="flex items-center gap-2 mb-2">
                             <span className={combineThemeClasses(
@@ -318,9 +319,9 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                   themeClasses.text.warning,
                   'w-6 h-6'
                 )} />
-                <h3 className={combineThemeClasses(themeClasses.text.heading, 'text-lg font-semibold')}>
+                <Heading level={3} className={combineThemeClasses(themeClasses.text.heading, 'text-lg font-semibold')}>
                   Remove Product
-                </h3>
+                </Heading>
               </div>
               
               <p className={combineThemeClasses(themeClasses.text.secondary, 'mb-6')}>

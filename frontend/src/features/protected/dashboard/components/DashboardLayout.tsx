@@ -282,9 +282,9 @@ const DashboardWidgetComponent = ({
         {widget.loading ? (
           <WidgetSkeleton type={widget.type} />
         ) : widget.error ? (
-          <div className="flex items-center justify-center h-32 text-red-500">
+            <div className="flex items-center justify-center h-32 text-red-500">
             <AlertCircleIcon size={24} className="mr-2" />
-            <span>Error loading data</span>
+            <Text>Error loading data</Text>
           </div>
         ) : (
           <WidgetContentComponent widget={widget} />

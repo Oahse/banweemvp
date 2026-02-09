@@ -5,6 +5,7 @@ import apiClient from '@/api';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text';
 
 interface StripePaymentFormProps {
   orderId?: string | null;
@@ -161,9 +162,9 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         {initializing ? (
-          <div className="text-sm text-gray-500">Loading payment options...</div>
+          <Text as="div" className="text-sm text-gray-500">Loading payment options...</Text>
         ) : !isSecure ? (
-          <div className="text-sm text-red-600">Payment requires a secure (HTTPS) connection.</div>
+          <Text as="div" className="text-sm text-red-600">Payment requires a secure (HTTPS) connection.</Text>
         ) : (
           <CardElement options={{ style: cardStyle }} />
         )}

@@ -15,6 +15,7 @@ import { toast } from 'react-hot-toast';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '../../../../utils/orderCalculations';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface SubscriptionCardProps {
   subscription: any;
@@ -241,13 +242,13 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
             </div>
           ) : (
             <>
-              <h3 className={combineThemeClasses(themeClasses.text.primary, 'text-xs font-medium')}>
+              <Heading level={3} className={combineThemeClasses(themeClasses.text.primary, 'text-xs font-medium')}>
                 {subscription.name}
-              </h3>
+              </Heading>
               <div className="flex items-center gap-2 mt-1">
-                <span className={combineThemeClasses(themeClasses.text.primary, 'font-medium text-xs')}>
+                <Text className={combineThemeClasses(themeClasses.text.primary, 'font-medium text-xs')}>
                   {formatCurrency(subscription.price, subscription.currency)}
-                </span>
+                </Text>
                 <span className={themeClasses.text.secondary}>
                   / {subscription.billing_cycle}
                 </span>
@@ -397,10 +398,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowDeleteModal(false)}>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold mb-2">Delete Subscription</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <Heading level={3} className="text-lg font-semibold mb-2">Delete Subscription</Heading>
+            <Body className="text-gray-600 dark:text-gray-300 mb-4">
               Are you sure you want to delete this subscription? This action cannot be undone.
-            </p>
+            </Body>
             <div className="flex gap-2 justify-end">
               <Button
                 onClick={() => setShowDeleteModal(false)}

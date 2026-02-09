@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { apiClient } from '@/api/client';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface NegotiationRound {
   round: number;
@@ -251,8 +252,8 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Negotiate Price</h2>
-              <p className="text-sm text-gray-600">{product.name}</p>
+              <Heading level={2} className="text-xl font-bold text-gray-900">Negotiate Price</Heading>
+              <Body className="text-sm text-gray-600">{product.name}</Body>
             </div>
             <Button
               onClick={onClose}
@@ -363,7 +364,7 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
 
                 {rounds.length > 0 && (
                   <div className="space-y-4">
-                    <h3 className="font-medium text-gray-900">Negotiation Rounds</h3>
+                    <Heading level={3} className="font-medium text-gray-900">Negotiation Rounds</Heading>
                     <div className="space-y-3 max-h-60 overflow-y-auto">
                       {rounds.map((round) => (
                         <motion.div
@@ -445,7 +446,7 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
 
                 {rounds.length > 0 && (
                   <div className="space-y-4">
-                    <h3 className="font-medium text-gray-900">Final Negotiation Summary</h3>
+                    <Heading level={3} className="font-medium text-gray-900">Final Negotiation Summary</Heading>
                     <div className="space-y-3 max-h-60 overflow-y-auto">
                       {rounds.map((round) => (
                         <div

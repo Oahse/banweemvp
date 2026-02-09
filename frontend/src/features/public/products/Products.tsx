@@ -10,6 +10,7 @@ import { Dropdown } from '@/components/ui/Dropdown';
 import { themeClasses, combineThemeClasses, getInputClasses, getButtonClasses } from '../../../utils/themeClasses';
 import { cn } from '../../../utils/utils';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -193,12 +194,12 @@ const Products = () => {
     >
       {/* Header */}
       <motion.div className="mb-4 sm:mb-6" variants={itemVariants}>
-        <h1 className="text-xl font-semibold text-main dark:text-white mb-2">
+        <Heading level={1} className="text-xl font-semibold text-main dark:text-white mb-2">
           Products
-        </h1>
-        <p className="text-sm text-copy-light dark:text-gray-400">
+        </Heading>
+        <Body className="text-sm text-copy-light dark:text-gray-400">
           {loading && !productsData ? 'Loading products...' : `${totalProducts} products available`}
-        </p>
+        </Body>
       </motion.div>
 
       {/* Search and Filters */}
@@ -273,9 +274,9 @@ const Products = () => {
             {/* Categories */}
             {categories && categories.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-main dark:text-white mb-2">
+                <Heading level={3} className="text-sm font-medium text-main dark:text-white mb-2">
                   Categories
-                </h3>
+                </Heading>
                 <div className="flex flex-wrap gap-1">
                   {categories.map((category) => (
                     <Button
@@ -299,14 +300,14 @@ const Products = () => {
 
             {/* Price Range */}
             <div>
-              <h3 className="text-sm font-medium text-main dark:text-white mb-2">
+              <Heading level={3} className="text-sm font-medium text-main dark:text-white mb-2">
                 Price Range
-              </h3>
+              </Heading>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  <label className="block text-xs text-copy-light dark:text-gray-400 mb-1">
+                  <Label className="block text-xs text-copy-light dark:text-gray-400 mb-1">
                     Min Price
-                  </label>
+                  </Label>
                   <input
                     type="number"
                     placeholder="0"
@@ -401,12 +402,12 @@ const Products = () => {
               )}>
                 <SearchIcon size={24} className={themeClasses.text.muted} />
               </div>
-              <h3 className={combineThemeClasses(themeClasses.text.heading, 'text-lg mb-2')}>
+              <Heading level={3} className={combineThemeClasses(themeClasses.text.heading, 'text-lg mb-2')}>
                 No products found
-              </h3>
-              <p className={combineThemeClasses(themeClasses.text.secondary, 'mb-4')}>
+              </Heading>
+              <Body className={combineThemeClasses(themeClasses.text.secondary, 'mb-4')}>
                 Try adjusting your search or filter criteria
-              </p>
+              </Body>
               <Button
                 onClick={clearFilters}
                 variant="primary"

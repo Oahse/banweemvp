@@ -19,6 +19,7 @@ import { ConfirmationModal } from '../ui/ConfirmationModal';
 import { AutoRenewToggle } from '../subscription/AutoRenewToggle';
 import ProductsAPI from '../../api/products';
 import { Product } from '../../types';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 export const MySubscriptions = () => {
   const navigate = useNavigate();
   const { 
@@ -320,9 +321,9 @@ export const MySubscriptions = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-base font-medium text-main dark:text-white">
+                <Heading level={2} className="text-base font-medium text-main dark:text-white">
                   Create New Subscription
-                </h2>
+                </Heading>
                 <Button
                   onClick={() => {
                     setShowCreateModal(false);
@@ -429,22 +430,22 @@ export const MySubscriptions = () => {
                           <div key={product.id} className="p-4">
                             {/* Product Header */}
                             <div className="mb-3">
-                              <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                              <Heading level={4} className="text-sm font-medium text-gray-900 dark:text-white">
                                 {product.name}
-                              </h4>
+                              </Heading>
                               {product.description && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <Body className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                   {product.description}
-                                </p>
+                                </Body>
                               )}
                             </div>
 
                             {/* Variants */}
                             {product.variants && product.variants.length > 0 ? (
                               <div className="space-y-2">
-                                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                                <Body className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                                   Available Variants:
-                                </p>
+                                </Body>
                                 {product.variants.map((variant: any) => (
                                   <label
                                     key={variant.id}

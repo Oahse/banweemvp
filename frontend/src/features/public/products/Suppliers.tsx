@@ -15,6 +15,7 @@ import {
 import { useApi } from '../../shared/hooks/useAsync';
 import { SuppliersAPI } from '../api';
 import ErrorMessage from '../components/Error';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 export const Suppliers = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,10 +79,10 @@ export const Suppliers = () => {
       <div className="bg-surface border-b border-border animate-slide-in">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-main mb-2">Our Suppliers</h1>
-            <p className="text-copy-light max-w-2xl mx-auto">
+            <Heading level={1} className="text-3xl font-bold text-main mb-2">Our Suppliers</Heading>
+            <Body className="text-copy-light max-w-2xl mx-auto">
               Connect with our trusted network of verified suppliers who provide the highest quality agricultural products
-            </p>
+            </Body>
           </div>
 
           {/* Search and Filters */}
@@ -143,10 +144,10 @@ export const Suppliers = () => {
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <UserIcon className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-main mb-2">No suppliers found</h3>
-            <p className="text-copy-light">
+            <Heading level={3} className="text-lg font-medium text-main mb-2">No suppliers found</Heading>
+            <Body className="text-copy-light">
               {searchQuery ? 'Try adjusting your search terms' : 'Check back later for new suppliers'}
-            </p>
+            </Body>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -166,11 +167,11 @@ export const Suppliers = () => {
                         <UserIcon className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-main">
+                        <Heading level={3} className="font-semibold text-main">
                           {supplier.firstname} {supplier.lastname}
-                        </h3>
+                        </Heading>
                         {supplier.company && (
-                          <p className="text-sm text-copy-light">{supplier.company}</p>
+                          <Body className="text-sm text-copy-light">{supplier.company}</Body>
                         )}
                       </div>
                     </div>

@@ -217,7 +217,7 @@ export const AdminSubscriptions = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className={`text-sm mt-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage all customer subscriptions</p>
+            <Body className={`text-sm mt-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage all customer subscriptions</Body>
           </div>
         </div>
 
@@ -247,7 +247,7 @@ export const AdminSubscriptions = () => {
 
         <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className={`p-4 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-            <h2 className="text-lg font-semibold">All Subscriptions ({subscriptions.length})</h2>
+            <Heading level={2} className="text-lg font-semibold">All Subscriptions ({subscriptions.length})</Heading>
           </div>
 
           {/* ... */}
@@ -316,10 +316,10 @@ export const AdminSubscriptions = () => {
             <div className={`w-full max-w-3xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Subscription Details</h3>
-                  <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <Heading level={3} className="text-lg font-semibold">Subscription Details</Heading>
+                  <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                     {selectedSubscription.name || 'Subscription'}
-                  </p>
+                  </Body>
                 </div>
                 <Button
                   onClick={() => setShowDetailsModal(false)}
