@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader, AlertCircle, PlusIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon, UserIcon } from 'lucide-react';
+import { Loader, AlertCircle, PlusIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon, UserIcon, X } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { PaymentsListSkeleton } from '../components/skeletons/PaymentsSkeleton';
+import { Button } from '@/components/ui/Button';
 
 interface Payment {
   id: string;
@@ -331,18 +332,15 @@ export const Payments = () => {
               className="min-w-[120px]"
             />
             
-            <button
+            <Button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
-                currentTheme === 'dark' 
-                  ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
-                  : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-              }`}
+              variant="outline"
+              size="sm"
+              leftIcon={<ArrowUpDownIcon size={14} />}
+              className="inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium"
             >
-              <ArrowUpDownIcon size={16} />
-              <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
-              <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-            </button>
+              Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+            </Button>
           </div>
 
           {/* Active Filters */}
@@ -352,34 +350,38 @@ export const Payments = () => {
               {debouncedSearchQuery && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Search: "{debouncedSearchQuery}"
-                  <button
+                  <Button
                     onClick={() => setSearchQuery('')}
-                    className="ml-1 hover:text-primary-dark"
+                    variant="ghost"
+                    size="sm"
                   >
                     ×
-                  </button>
+                  </Button>
                 </span>
               )}
               {statusFilter && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
-                  <button
+                  <Button
                     onClick={() => setStatusFilter('')}
+                    variant="ghost"
+                    size="sm"
                     className="ml-1 hover:text-primary-dark"
+                    leftIcon={<X size={12} />}
                   >
-                    ×
-                  </button>
+                  </Button>
                 </span>
               )}
-              <button
+              <Button
                 onClick={() => {
                   setSearchQuery('');
                   setStatusFilter('');
                 }}
-                className="text-xs text-primary hover:text-primary-dark underline"
+                variant="ghost"
+                size="sm"
               >
                 Clear all
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -395,14 +397,13 @@ export const Payments = () => {
           <div className="flex-1">
             <p className="font-semibold">Error Loading Payments</p>
             <p className="text-sm mt-1">{error}</p>
-            <button
+            <Button
               onClick={() => window.location.reload()}
-              className={`mt-2 text-sm underline hover:no-underline ${
-                currentTheme === 'dark' ? 'text-error hover:text-error-light' : 'text-error hover:text-error-dark'
-              }`}
+              variant="ghost"
+              size="sm"
             >
-              Try again
-            </button>
+              Try Again
+            </Button>
           </div>
         </div>
       )}
@@ -443,13 +444,15 @@ export const Payments = () => {
                       <td className="px-4 py-3 text-xs">{statusBadge(payment.status)}</td>
                       <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300">{new Date(payment.created_at || '').toLocaleDateString()}</td>
                       <td className="px-4 py-3 text-xs">
-                        <button 
+                        <Button
                           onClick={() => handleView(payment)}
-                          className="inline-flex items-center gap-1 px-2 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                          variant="primary"
+                          size="sm"
+                          leftIcon={<EyeIcon size={14} />}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                         >
-                          <EyeIcon size={14} />
                           View
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -485,13 +488,15 @@ export const Payments = () => {
                     <span className="text-xs text-gray-600 dark:text-gray-300">Date:</span>
                     <span className="text-xs text-gray-600 dark:text-gray-300">{new Date(payment.created_at || '').toLocaleDateString()}</span>
                   </div>
-                  <button 
+                  <Button
                     onClick={() => handleView(payment)}
+                    variant="primary"
+                    size="sm"
+                    leftIcon={<EyeIcon size={14} />}
                     className="mt-2 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm w-full"
                   >
-                    <EyeIcon size={14} />
                     View Details
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -505,63 +510,53 @@ export const Payments = () => {
                 {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
               </p>
               <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
-                    <span className="hidden sm:inline">Previous</span>
-                  </button>
-                  
-                  {/* Page numbers */}
-                  <div className="flex items-center gap-1 mx-1 lg:mx-2">
-                    {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
-                      let pageNum: number;
-                      if (pagination.pages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (page >= pagination.pages - 2) {
-                        pageNum = pagination.pages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-                      
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium transition-colors ${
-                            pageNum === page
-                              ? 'bg-primary text-white'
-                              : currentTheme === 'dark'
-                                ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                                : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  
-                  <button
-                    onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
-                    disabled={page >= (pagination.pages || 1)}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <span className="hidden sm:inline">Next</span>
-                    <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
-                  </button>
+                <Button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  variant="outline"
+                  size="sm"
+                >
+                  Previous
+                </Button>
+                
+                {/* Page numbers */}
+                <div className="flex items-center gap-1 mx-1 lg:mx-2">
+                  {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
+                    let pageNum: number;
+                    if (pagination.pages <= 5) {
+                      pageNum = i + 1;
+                    } else if (page <= 3) {
+                      pageNum = i + 1;
+                    } else if (page >= pagination.pages - 2) {
+                      pageNum = pagination.pages - 4 + i;
+                    } else {
+                      pageNum = page - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        variant={page === pageNum ? 'primary' : 'ghost'}
+                        size="sm"
+                        className={`w-6 h-6 rounded-md text-sm font-medium transition-colors ${
+                          page === pageNum ? 'bg-primary text-white' : 'border border-gray-300 bg-white text-gray-700'
+                        }`}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+                
+                <Button
+                  onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
+                  disabled={page >= pagination.pages || pagination.pages <= 1}
+                  variant="outline"
+                  size="sm"
+                >
+                  Next
+                </Button>
               </div>
             </div>
           </>
@@ -575,38 +570,32 @@ export const Payments = () => {
                 Total: 0 items
               </p>
               <div className="flex items-center gap-1">
-                <button
+                <Button
                   disabled
-                  className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors opacity-50 cursor-not-allowed ${
-                    currentTheme === 'dark' 
-                      ? 'border-gray-600 bg-gray-800 text-white' 
-                      : 'border-gray-300 bg-white text-gray-900'
-                  }`}
+                  variant="outline"
+                  size="sm"
                 >
-                  <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
-                  <span className="hidden sm:inline">Previous</span>
-                </button>
+                  Previous
+                </Button>
                 
                 <div className="flex items-center gap-1 mx-1 lg:mx-2">
-                  <button
+                  <Button
                     disabled
-                    className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium bg-primary text-white`}
+                    variant="primary"
+                    size="sm"
+                    className={`w-6 h-6 rounded-md text-sm font-medium bg-primary text-white`}
                   >
                     1
-                  </button>
+                  </Button>
                 </div>
                 
-                <button
+                <Button
                   disabled
-                  className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors opacity-50 cursor-not-allowed ${
-                    currentTheme === 'dark' 
-                      ? 'border-gray-600 bg-gray-800 text-white' 
-                      : 'border-gray-300 bg-white text-gray-900'
-                  }`}
+                  variant="outline"
+                  size="sm"
                 >
-                  <span className="hidden sm:inline">Next</span>
-                  <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
-                </button>
+                  Next
+                </Button>
               </div>
             </div>
           </>
@@ -618,12 +607,13 @@ export const Payments = () => {
           <div className={`w-full max-w-lg rounded-lg p-6 ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Payment Details</h2>
-              <button
+              <Button
                 onClick={() => setIsViewOpen(false)}
-                className="text-sm text-gray-500 hover:text-gray-700"
+                variant="ghost"
+                size="sm"
               >
                 Close
-              </button>
+              </Button>
             </div>
             <div className="space-y-2 text-sm">
               <div><strong>ID:</strong> {selectedPayment.id}</div>

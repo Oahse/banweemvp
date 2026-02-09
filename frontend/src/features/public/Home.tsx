@@ -8,6 +8,7 @@ import { useLocale } from '../../components/shared/contexts/LocaleContext';
 import { useTheme } from '../../components/shared/contexts/ThemeContext';
 import { useAsync } from '../../components/shared/hooks/useAsync';
 import { ProductsAPI } from '../../api/products';
+import { Button } from '@/components/ui/Button';
 
 // Filter categories configuration system
 const FILTER_CATEGORIES: Record<string, {
@@ -284,29 +285,38 @@ export const Home = () => {
             </motion.div>
           </AnimatePresence>
           {/* Navigation buttons */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white w-10 h-10 rounded-full"
             aria-label="Previous slide"
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center">
+          >
             ❮
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white w-10 h-10 rounded-full"
             aria-label="Next slide"
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center">
+          >
             ❯
-          </button>
+          </Button>
           {/* Pagination dots */}
           <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center">
             {heroSlides.map((_, index) => (
-              <button
+              <Button
                 key={index}
                 type="button"
+                variant={currentSlide === index ? "primary" : "ghost"}
+                size="sm"
                 aria-label={`Go to slide ${index + 1}`}
                 onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full mx-1 ${currentSlide === index ? 'bg-white' : 'bg-white/50'}`} />
+                className={`w-3 h-3 rounded-full mx-1 ${currentSlide === index ? 'bg-white' : 'bg-white/50'}`}
+              />
             ))}
           </div>
         </motion.div>
@@ -357,12 +367,22 @@ export const Home = () => {
               <h2 className="text-2xl md:text-3xl font-bold text-main mt-1">Shop Categories</h2>
             </div>
             <div className="flex items-center space-x-2 mt-4 md:mt-0">
-              <button onClick={() => scrollCategories('left')} className="p-2 rounded-full bg-surface hover:bg-surface-hover">
+              <Button 
+                onClick={() => scrollCategories('left')} 
+                variant="ghost" 
+                size="icon" 
+                className="p-2 rounded-full bg-surface hover:bg-surface-hover"
+              >
                 <ChevronLeftIcon size={20} />
-              </button>
-              <button onClick={() => scrollCategories('right')} className="p-2 rounded-full bg-surface hover:bg-surface-hover">
+              </Button>
+              <Button 
+                onClick={() => scrollCategories('right')} 
+                variant="ghost" 
+                size="icon" 
+                className="p-2 rounded-full bg-surface hover:bg-surface-hover"
+              >
                 <ChevronRightIcon size={20} />
-              </button>
+              </Button>
               <Link to="/products" className="inline-flex items-center text-primary hover:underline">
                 All Categories
                 <ArrowRightIcon size={16} className="ml-2" />
@@ -459,46 +479,46 @@ export const Home = () => {
 
           {/* Category Tabs */}
           <div className="flex flex-wrap gap-2 mb-6">
-            <button
+            <Button
               onClick={() => setActiveTab('all')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105 ${activeTab === 'all'
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-surface text-copy hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary'
-                }`}>
+              variant={activeTab === 'all' ? 'primary' : 'ghost'}
+              size="sm"
+              className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
+            >
               All Products
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setActiveTab('cereal-crops')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105 ${activeTab === 'cereal-crops'
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-surface text-copy hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary'
-                }`}>
+              variant={activeTab === 'cereal-crops' ? 'primary' : 'ghost'}
+              size="sm"
+              className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
+            >
               Cereal Crops
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setActiveTab('legumes')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105 ${activeTab === 'legumes'
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-surface text-copy hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary'
-                }`}>
+              variant={activeTab === 'legumes' ? 'primary' : 'ghost'}
+              size="sm"
+              className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
+            >
               Legumes
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setActiveTab('fruits-vegetables')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105 ${activeTab === 'fruits-vegetables'
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-surface text-copy hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary'
-                }`}>
+              variant={activeTab === 'fruits-vegetables' ? 'primary' : 'ghost'}
+              size="sm"
+              className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
+            >
               Fruits & Vegetables
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setActiveTab('oilseeds')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105 ${activeTab === 'oilseeds'
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-surface text-copy hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary'
-                }`}>
-              Oilseeds
-            </button>
+              variant={activeTab === 'oilseeds' ? 'primary' : 'ghost'}
+              size="sm"
+              className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
+            >
+              Oil Seeds
+            </Button>
           </div>
 
           {/* Product Grid or Empty State */}

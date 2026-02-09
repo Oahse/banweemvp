@@ -5,6 +5,7 @@ import { useCart } from '../../features/protected/cart/contexts/CartContext';
 import { useWishlist } from '../../features/protected/wishlist/contexts/WishlistContext';
 import { ChevronDownIcon, SearchIcon, UserIcon, HeartIcon, ShoppingCartIcon, MenuIcon, PhoneIcon, ShieldIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/Button';
 
 import { SkeletonHeader } from '../ui/SkeletonNavigation';
 import { getCountryByCode } from '../../data/countries';
@@ -268,11 +269,14 @@ export const Header = ({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <button
+                <Button
                   type="submit"
-                  className="bg-primary text-white px-4 py-2 rounded-r-md hover:bg-primary-dark transition-colors">
+                  variant="primary"
+                  size="sm"
+                  className="rounded-r-md"
+                >
                   <SearchIcon size={20} />
-                </button>
+                </Button>
               </form>
             </div>)}
 
@@ -323,15 +327,25 @@ export const Header = ({
               </Link>
 
               {/* Mobile menu button */}
-              <button className="md:hidden p-1 z-10" onClick={onCategoriesClick}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="md:hidden p-1 z-10" 
+                onClick={onCategoriesClick}
+              >
                 <MenuIcon size={24} />
-              </button>
+              </Button>
 
               {/* Mobile search button */}
               {!isProductsPage && ( 
-              <button className="md:hidden p-1 z-10" onClick={onSearchClick}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="md:hidden p-1 z-10" 
+                onClick={onSearchClick}
+              >
                 <SearchIcon size={24} />
-              </button>)}
+              </Button>)}
             </div>
           </div>
         </div>
@@ -343,11 +357,13 @@ export const Header = ({
           <div className="flex items-center justify-between">
             {/* Categories Dropdown */}
             <div className="group relative">
-              <button className="flex items-center bg-primary text-white px-6 py-3 hover:bg-primary-dark transition-colors">
-                <MenuIcon size={20} className="mr-2" />
+              <Button 
+                variant="primary" 
+                leftIcon={<MenuIcon size={20} />}
+                rightIcon={<ChevronDownIcon size={20} />}
+              >
                 <span className="font-semibold">Browse Categories</span>
-                <ChevronDownIcon size={20} className="ml-2" />
-              </button>
+              </Button>
               <div className="absolute left-0 top-full hidden group-hover:block bg-surface shadow-lg rounded-b-md py-2 w-64 z-50">
                 {categories.map((category, index) => (
                   <Link

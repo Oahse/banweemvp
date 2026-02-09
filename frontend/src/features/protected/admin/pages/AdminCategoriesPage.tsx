@@ -6,6 +6,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { CategoriesListSkeleton } from '../components/skeletons/CategoriesSkeleton';
+import { Button } from '@/components/ui/Button';
 
 const LIMIT = 10;
 
@@ -271,13 +272,15 @@ const AdminCategoriesPage = () => {
         <div>
           <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product categories</p>
         </div>
-        <button
-          onClick={openAddModal}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-        >
-          <Plus size={16} />
-          Add Category
-        </button>
+          <Button
+            onClick={openAddModal}
+            variant="primary"
+            size="sm"
+            leftIcon={<Plus size={14} />}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+          >
+            Add Category
+          </Button>
       </div>
 
       {/* Search and Filters */}
@@ -318,18 +321,19 @@ const AdminCategoriesPage = () => {
               className="min-w-[120px]"
             />
             
-            <button
+            <Button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              variant="outline"
+              size="sm"
               className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
                 currentTheme === 'dark' 
-                  ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
-                  : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
+                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
+              leftIcon={<ArrowUpDownIcon size={14} />}
             >
-              <ArrowUpDownIcon size={16} />
-              <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
-              <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-            </button>
+              {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+            </Button>
           </div>
 
           {/* Active Filters */}
@@ -338,19 +342,23 @@ const AdminCategoriesPage = () => {
               <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                 Search: "{debouncedSearchQuery}"
-                <button
+                <Button
                   onClick={() => setSearchQuery('')}
+                  variant="ghost"
+                  size="sm"
                   className="ml-1 hover:text-primary-dark"
+                  leftIcon={<X size={14} />}
                 >
-                  ×
-                </button>
+                </Button>
               </span>
-              <button
+              <Button
                 onClick={() => setSearchQuery('')}
+                variant="link"
+                size="sm"
                 className="text-xs text-primary hover:text-primary-dark underline"
               >
                 Clear all
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -366,14 +374,16 @@ const AdminCategoriesPage = () => {
           <div className="flex-1">
             <p className="font-semibold">Error Loading Categories</p>
             <p className="text-sm mt-1">{error}</p>
-            <button
+            <Button
               onClick={() => window.location.reload()}
+              variant="link"
+              size="sm"
               className={`mt-2 text-sm underline hover:no-underline ${
                 currentTheme === 'dark' ? 'text-error hover:text-error-light' : 'text-error hover:text-error-dark'
               }`}
             >
-              Try again
-            </button>
+              Try Again
+            </Button>
           </div>
         </div>
       )}
@@ -422,20 +432,24 @@ const AdminCategoriesPage = () => {
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <button 
+                          <Button 
                             onClick={() => openEditModal(category)}
+                            variant="ghost"
+                            size="sm"
                             className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                            leftIcon={<Edit2 size={14} />}
                           >
-                            <Edit2 size={14} />
                             Edit
-                          </button>
-                          <button 
+                          </Button>
+                          <Button 
                             onClick={() => handleDelete(category)}
+                            variant="ghost"
+                            size="sm"
                             className="inline-flex items-center gap-1 px-3 py-1.5 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors"
+                            leftIcon={<Trash2 size={14} />}
                           >
-                            <Trash2 size={14} />
                             Delete
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -468,20 +482,24 @@ const AdminCategoriesPage = () => {
                     <div className="text-sm text-gray-600 dark:text-gray-300">{category.description}</div>
                   )}
                   <div className="flex gap-2 mt-2">
-                    <button 
+                    <Button 
                       onClick={() => openEditModal(category)}
+                      variant="ghost"
+                      size="sm"
                       className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
                     >
                       <Edit2 size={14} />
                       Edit
-                    </button>
-                    <button 
+                    </Button>
+                    <Button 
                       onClick={() => handleDelete(category)}
+                      variant="ghost"
+                      size="sm"
                       className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors text-sm"
                     >
                       <Trash2 size={14} />
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -505,12 +523,14 @@ const AdminCategoriesPage = () => {
               }
             </p>
             {searchQuery && (
-              <button
+              <Button
                 onClick={() => setSearchQuery('')}
+                variant="link"
+                size="sm"
                 className="text-sm text-primary hover:text-primary-dark underline"
               >
                 Clear search
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -524,18 +544,20 @@ const AdminCategoriesPage = () => {
             }
           </p>
           <div className="flex items-center gap-1">
-            <button
+            <Button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
+              variant="outline"
+              size="sm"
               className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                currentTheme === 'dark' 
-                  ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                  : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                currentTheme === 'dark'
+                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:border-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed'
               }`}
+              leftIcon={<ChevronLeft size={16} />}
             >
-              <ChevronLeft className="w-4 h-4" />
               Previous
-            </button>
+            </Button>
             
             {/* Page numbers */}
             <div className="flex items-center gap-1 mx-2">
@@ -552,35 +574,39 @@ const AdminCategoriesPage = () => {
                 }
                 
                 return (
-                  <button
+                  <Button
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
+                    variant={page === pageNum ? "primary" : "ghost"}
+                    size="sm"
                     className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
-                      pageNum === page
+                      page === pageNum
                         ? 'bg-primary text-white'
                         : currentTheme === 'dark'
-                          ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                          : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                          ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     {pageNum}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
             
-            <button
+            <Button
               onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
               disabled={page >= pagination.pages || pagination.pages <= 1}
+              variant="outline"
+              size="sm"
               className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                currentTheme === 'dark' 
-                  ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                  : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                currentTheme === 'dark'
+                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:border-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed'
               }`}
+              leftIcon={<ChevronRight size={16} />}
             >
               Next
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -601,31 +627,29 @@ const AdminCategoriesPage = () => {
               </div>
             </div>
             <div className="flex gap-2 justify-end">
-              <button
+              <Button
                 onClick={cancelDelete}
                 disabled={isDeleting}
+                variant="outline"
+                size="sm"
                 className={`px-4 py-2 rounded-lg border text-sm font-medium ${
-                  currentTheme === 'dark' 
-                    ? 'border-gray-600 text-gray-200 hover:bg-gray-700' 
+                  currentTheme === 'dark'
+                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                } disabled:opacity-50`}
+                }`}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={confirmDelete}
                 disabled={isDeleting}
+                variant="danger"
+                size="sm"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-error text-white rounded-lg hover:bg-error-dark transition-colors text-sm font-medium disabled:opacity-50"
+                leftIcon={<AlertTriangle size={16} />}
               >
-                {isDeleting ? (
-                  <>
-                    <Loader className="animate-spin" size={14} />
-                    Deleting...
-                  </>
-                ) : (
-                  'Delete'
-                )}
-              </button>
+                {isDeleting ? 'Deleting...' : 'Delete Category'}
+              </Button>
             </div>
           </div>
         </div>
@@ -642,15 +666,17 @@ const AdminCategoriesPage = () => {
                   {editingCategory ? 'Update category information' : 'Fill in the details below'}
                 </p>
               </div>
-              <button
+              <Button
                 onClick={() => {
                   setShowModal(false);
                   setEditingCategory(null);
                 }}
+                variant="ghost"
+                size="sm"
                 className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                leftIcon={<X size={20} />}
               >
-                <X size={20} />
-              </button>
+              </Button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -745,26 +771,31 @@ const AdminCategoriesPage = () => {
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-600">
-                <button
-                  type="button"
+                <Button
                   onClick={() => {
                     setShowModal(false);
                     setEditingCategory(null);
+                    resetForm();
                   }}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${
-                    currentTheme === 'dark' 
-                      ? 'border-gray-600 text-gray-200 hover:bg-gray-700' 
+                  variant="outline"
+                  size="sm"
+                  className={`px-4 py-2 rounded-lg border text-sm font-medium ${
+                    currentTheme === 'dark'
+                      ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
                       : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
+                  variant="primary"
+                  size="sm"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+                  leftIcon={editingCategory ? <AlertTriangle size={16} /> : null}
                 >
                   {editingCategory ? 'Update Category' : 'Add Category'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

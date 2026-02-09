@@ -7,6 +7,7 @@ import Dropdown from '@/components/ui/Dropdown';
 import { getCountryOptions, getProvinceOptions } from '@/data/countries';
 import AdminLayout from '../components/AdminLayout';
 import { TaxRatesListSkeleton } from '../components/skeletons/TaxRatesSkeleton';
+import { Button } from '@/components/ui/Button';
 
 const LIMIT = 10;
 
@@ -366,13 +367,13 @@ export const AdminTaxRates = () => {
           <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
-          <button 
+          <Button 
             onClick={openAddModal}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+            variant="primary"
+            leftIcon={<PlusIcon size={16} />}
           >
-            <PlusIcon size={18} />
-            <span>Add Tax Rate</span>
-          </button>
+            Add Tax Rate
+          </Button>
         </div>
       </div>
 
@@ -427,18 +428,14 @@ export const AdminTaxRates = () => {
               className="min-w-[120px]"
             />
             
-            <button
+            <Button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
-                currentTheme === 'dark' 
-                  ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
-                  : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-              }`}
+              variant="outline"
+              size="sm"
+              leftIcon={<ArrowUpDownIcon size={14} />}
             >
-              <ArrowUpDownIcon size={16} />
-              <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
-              <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-            </button>
+              Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+            </Button>
           </div>
 
           {/* Active Filters */}
@@ -448,34 +445,39 @@ export const AdminTaxRates = () => {
               {debouncedSearchQuery && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Search: "{debouncedSearchQuery}"
-                  <button
+                  <Button
                     onClick={() => setSearchQuery('')}
-                    className="ml-1 hover:text-primary-dark"
+                    variant="ghost"
+                    size="icon"
+                    className="ml-1"
                   >
-                    ×
-                  </button>
+                    <X size={12} />
+                  </Button>
                 </span>
               )}
               {statusFilter && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Status: {statusFilter === 'active' ? 'Active Only' : 'Inactive Only'}
-                  <button
+                  <Button
                     onClick={() => setStatusFilter('')}
-                    className="ml-1 hover:text-primary-dark"
+                    variant="ghost"
+                    size="icon"
+                    className="ml-1"
                   >
-                    ×
-                  </button>
+                    <X size={12} />
+                  </Button>
                 </span>
               )}
-              <button
+              <Button
                 onClick={() => {
                   setSearchQuery('');
                   setStatusFilter('');
                 }}
-                className="text-xs text-primary hover:text-primary-dark underline"
+                variant="ghost"
+                size="sm"
               >
                 Clear all
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -531,20 +533,24 @@ export const AdminTaxRates = () => {
                       <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">{statusBadge(taxRate.is_active)}</td>
                       <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm">
                         <div className="flex gap-1 lg:gap-2">
-                          <button 
+                          <Button 
                             onClick={() => openEditModal(taxRate)}
+                            variant="primary"
+                            size="sm"
                             className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
                           >
                             <EditIcon size={14} className="hidden sm:block" />
                             <span className="sm:hidden">Edit</span>
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => handleDeleteTaxRate(taxRate.id)}
+                            variant="danger"
+                            size="sm"
                             className="inline-flex items-center gap-1 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                           >
                             <TrashIcon size={14} className="hidden sm:block" />
                             <span className="sm:hidden">Delete</span>
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -575,20 +581,24 @@ export const AdminTaxRates = () => {
                   </div>
                   <div className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{taxRate.tax_name || 'General Tax'}</div>
                   <div className="flex gap-1 lg:gap-2 mt-2">
-                    <button 
+                    <Button 
                       onClick={() => openEditModal(taxRate)}
+                      variant="primary"
+                      size="sm"
                       className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-xs"
                     >
                       <EditIcon size={14} />
                       Edit
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleDeleteTaxRate(taxRate.id)}
+                      variant="danger"
+                      size="sm"
                       className="inline-flex items-center gap-1 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-xs"
                     >
                       <TrashIcon size={14} />
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -601,20 +611,20 @@ export const AdminTaxRates = () => {
                   {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
                 </p>
                 <div className="flex items-center gap-1">
-                  <button
+                  <Button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page <= 1}
+                    variant="outline"
+                    size="sm"
                     className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
                       currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
+                        ? 'bg-gray-800 border-gray-700 text-gray-200' 
+                        : 'bg-white border-gray-300 text-gray-700'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
-                    <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
-                    <span className="hidden sm:inline">Previous</span>
-                  </button>
-                  
-                  {/* Page numbers */}
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
                   <div className="flex items-center gap-1 mx-1 lg:mx-2">
                     {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
                       let pageNum: number;
@@ -629,35 +639,36 @@ export const AdminTaxRates = () => {
                       }
                       
                       return (
-                        <button
+                        <Button
                           key={pageNum}
                           onClick={() => setPage(pageNum)}
                           className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium transition-colors ${
                             pageNum === page
                               ? 'bg-primary text-white'
                               : currentTheme === 'dark'
-                                ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                                : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                ? 'bg-gray-800 text-gray-200 hover:bg-gray-700'
+                                : 'bg-white text-gray-700 hover:bg-gray-100'
                           }`}
                         >
                           {pageNum}
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
-                  
-                  <button
+                  <Button
                     onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
                     disabled={page >= pagination.pages || pagination.pages <= 1}
+                    variant="outline"
+                    size="sm"
                     className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
                       currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
+                        ? 'bg-gray-800 border-gray-700 text-gray-200' 
+                        : 'bg-white border-gray-300 text-gray-700'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
-                    <span className="hidden sm:inline">Next</span>
-                    <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
-                  </button>
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             )}
@@ -680,16 +691,18 @@ export const AdminTaxRates = () => {
                 }`}>
                   {editingTaxRate ? 'Edit Tax Rate' : 'Add Tax Rate'}
                 </h2>
-                <button
+                <Button
                   onClick={() => setShowModal(false)}
+                  variant="ghost"
+                  size="icon"
                   className={`p-1 rounded-lg transition-colors ${
                     currentTheme === 'dark' 
-                      ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
-                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                      ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800' 
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                   }`}
                 >
-                  <X size={20} />
-                </button>
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -790,7 +803,7 @@ export const AdminTaxRates = () => {
                           required
                         />
                         {(formData.country_name || countrySearch) && (
-                          <button
+                          <Button
                             type="button"
                             onClick={() => {
                               setFormData(prev => ({
@@ -808,7 +821,7 @@ export const AdminTaxRates = () => {
                             }`}
                           >
                             <X size={16} />
-                          </button>
+                          </Button>
                         )}
                       </div>
                       {showCountryDropdown && filteredCountries.length > 0 && (
@@ -818,7 +831,7 @@ export const AdminTaxRates = () => {
                             : 'bg-white border-gray-300'
                         }`}>
                           {filteredCountries.map((country, index) => (
-                            <button
+                            <Button
                               key={country.value}
                               type="button"
                               onClick={() => {
@@ -834,14 +847,14 @@ export const AdminTaxRates = () => {
                                 setShowCountryDropdown(false);
                                 setSelectedCountryIndex(-1);
                               }}
-                              className={`w-full px-3 py-2 text-left text-sm hover:bg-primary/10 transition-colors ${
+                              className={`block w-full px-3 py-2 text-left text-sm hover:bg-primary/10 transition-colors ${
                                 index === selectedCountryIndex ? 'bg-primary/20' : ''
                               } ${
                                 currentTheme === 'dark' ? 'text-white' : 'text-gray-900'
                               }`}
                             >
                               {country.label}
-                            </button>
+                            </Button>
                           ))}
                         </div>
                       )}
@@ -909,7 +922,7 @@ export const AdminTaxRates = () => {
                           placeholder="Search or select province/state..."
                         />
                         {(formData.province_name || provinceSearch) && (
-                          <button
+                          <Button
                             type="button"
                             onClick={() => {
                               setFormData(prev => ({
@@ -924,7 +937,7 @@ export const AdminTaxRates = () => {
                             }`}
                           >
                             <X size={16} />
-                          </button>
+                          </Button>
                         )}
                       </div>
                       {showProvinceDropdown && filteredProvinces.length > 0 && (
@@ -934,7 +947,7 @@ export const AdminTaxRates = () => {
                             : 'bg-white border-gray-300'
                         }`}>
                           {filteredProvinces.map((province, index) => (
-                            <button
+                            <Button
                               key={province.value}
                               type="button"
                               onClick={() => {
@@ -947,14 +960,14 @@ export const AdminTaxRates = () => {
                                 setShowProvinceDropdown(false);
                                 setSelectedProvinceIndex(-1);
                               }}
-                              className={`w-full px-3 py-2 text-left text-sm hover:bg-primary/10 transition-colors ${
+                              className={`block w-full px-3 py-2 text-left text-sm hover:bg-primary/10 transition-colors ${
                                 index === selectedProvinceIndex ? 'bg-primary/20' : ''
                               } ${
                                 currentTheme === 'dark' ? 'text-white' : 'text-gray-900'
                               }`}
                             >
                               {province.label}
-                            </button>
+                            </Button>
                           ))}
                         </div>
                       )}
@@ -1008,24 +1021,21 @@ export const AdminTaxRates = () => {
                 </div>
 
                 <div className="flex items-center gap-2 pt-2">
-                  <button
+                  <Button
                     type="button"
                     role="switch"
                     aria-checked={formData.is_active}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setFormData(prev => ({...prev, is_active: !prev.is_active}));
-                    }}
+                    onClick={() => setFormData(prev => ({ ...prev, is_active: !prev.is_active }))}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                      formData.is_active ? 'bg-primary' : currentTheme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'
+                      formData.is_active
+                        ? 'bg-primary'
+                        : 'bg-gray-200'
                     }`}
                   >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        formData.is_active ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      formData.is_active ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </Button>
                   <span 
                     className={`text-sm font-medium cursor-pointer select-none ${
                       currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
@@ -1042,24 +1052,28 @@ export const AdminTaxRates = () => {
                 <div className={`flex gap-3 pt-4 border-t ${
                   currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                 }`}>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setShowModal(false)}
+                    variant="secondary"
+                    size="sm"
                     className={`flex-1 px-4 py-2 text-sm font-medium border rounded-lg transition-colors ${
                       currentTheme === 'dark'
-                        ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                        ? 'border-gray-600 text-gray-300 hover:bg-gray-800'
                         : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
                     disabled={loading}
+                    variant="primary"
+                    size="sm"
                     className="flex-1 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Saving...' : (editingTaxRate ? 'Update' : 'Create')}
-                  </button>
+                    {loading ? 'Saving...' : (editingTaxRate ? 'Update Tax Rate' : 'Add Tax Rate')}
+                  </Button>
                 </div>
               </form>
             </div>

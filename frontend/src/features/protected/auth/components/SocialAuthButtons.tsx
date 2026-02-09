@@ -9,6 +9,7 @@ import FacebookLogin from '@greatsumini/react-facebook-login';
 import { FaFacebook, FaTiktok } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '../../../../api';
+import { Button } from '@/components/ui/Button';
 
 // Extend Window interface for Facebook SDK
 declare global {
@@ -274,30 +275,31 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
           appId={facebookAppId}
           onSuccess={handleFacebookSuccess}
           onFail={handleFacebookError}
-          onProfileSuccess={(response) => {
-            // Handle profile data if needed
-          }}
-          className="w-full"
-          render={({ onClick }) => (
-            <button
-              onClick={onClick}
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          render={(renderProps: any) => (
+            <Button
+              onClick={renderProps.onClick}
+              variant="outline"
+              fullWidth={true}
+              leftIcon={<FaFacebook className="w-5 h-5 text-blue-600" />}
+              className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              disabled={renderProps.isDisabled}
             >
-              <FaFacebook className="w-5 h-5 text-blue-600 mr-3" />
               {mode === 'login' ? 'Sign in' : 'Sign up'} with Facebook
-            </button>
+            </Button>
           )}
         />
       )}
 
       {/* TikTok OAuth */}
-      <button
+      <Button
         onClick={handleTikTokAuth}
-        className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors"
+        variant="outline"
+        fullWidth={true}
+        leftIcon={<FaTiktok className="w-5 h-5 text-black dark:text-white" />}
+        className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
       >
-        <FaTiktok className="w-5 h-5 text-black dark:text-white mr-3" />
         {mode === 'login' ? 'Sign in' : 'Sign up'} with TikTok
-      </button>
+      </Button>
     </div>
   );
 };

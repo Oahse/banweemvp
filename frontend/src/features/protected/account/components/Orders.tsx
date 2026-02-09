@@ -8,6 +8,7 @@ import OrdersAPI from '../../api/orders';
 import { toast } from 'react-hot-toast';
 import { useLocale } from '../../../LocaleContext';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { Button } from '@/components/ui/Button';
 interface Order {
   id: string;
   created_at: string;
@@ -199,7 +200,7 @@ export const Orders = ({
             <h3 className="text-base font-medium mb-2">Unable to Load Orders</h3>
             <p className="text-sm text-gray-600">{getErrorMessage(error)}</p>
           </div>
-          <button 
+          <Button 
             onClick={() => {
               const retryFetch = async () => {
                 try {
@@ -210,10 +211,10 @@ export const Orders = ({
               };
               retryFetch();
             }}
-            className="mt-3 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
+            className="mt-3 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
             Try Again
-          </button>
+          </Button>
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-3 text-xs text-gray-600">
               <p>Debug info:</p>
@@ -333,7 +334,7 @@ export const Orders = ({
                           <EyeIcon size={12} className="mr-1 flex-shrink-0" />
                           <span>Details</span>
                         </Link>
-                        <button 
+                        <Button 
                           onClick={async () => {
                             try {
                               await OrdersAPI.getOrderInvoice(order.id);
@@ -342,11 +343,13 @@ export const Orders = ({
                               toast.error('Failed to download invoice');
                             }
                           }}
+                          variant="outline"
+                          size="sm"
                           className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-w-[80px] justify-center"
                         >
                           <DownloadIcon size={12} className="mr-1 flex-shrink-0" />
                           <span>Invoice</span>
-                        </button>
+                        </Button>
                       </div>
                     </div>
                 </div>}
@@ -354,14 +357,16 @@ export const Orders = ({
             
             {/* Pagination - Always show for testing */}
             <div className="flex justify-center items-center space-x-2 pt-4">
-              <button
+              <Button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
+                variant="outline"
+                size="sm"
                 className="flex items-center px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                leftIcon={<ChevronLeftIcon size={12} />}
               >
-                <ChevronLeftIcon size={16} className="mr-1" />
                 Previous
-              </button>
+              </Button>
               
               <div className="flex items-center space-x-1">
                 {Array.from({ length: Math.min(5, totalPages > 0 ? totalPages : 1) }, (_, i) => {
@@ -379,9 +384,11 @@ export const Orders = ({
                   }
                   
                   return (
-                    <button
+                    <Button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
+                      variant={pageNum === currentPage ? "primary" : "ghost"}
+                      size="sm"
                       className={`px-3 py-2 text-sm rounded transition-colors ${
                         currentPage === pageNum
                           ? 'bg-primary text-white'
@@ -389,19 +396,21 @@ export const Orders = ({
                       }`}
                     >
                       {pageNum}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
               
-              <button
+              <Button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage >= totalPages}
+                variant="outline"
+                size="sm"
                 className="flex items-center px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                rightIcon={<ChevronRightIcon size={12} />}
               >
                 Next
-                <ChevronRightIcon size={16} className="ml-1" />
-              </button>
+              </Button>
             </div>
             
             {/* Debug Info */}
@@ -423,15 +432,17 @@ export const Orders = ({
               Start Shopping
             </Link>
             <div className="text-xs text-gray-500 dark:text-gray-400">
-              <button 
+              <Button 
                 onClick={() => execute(() => OrdersAPI.getOrders({
                   page: currentPage,
                   limit: ordersPerPage
                 }))}
+                variant="link"
+                size="sm"
                 className="text-primary hover:underline"
               >
                 Refresh Orders
-              </button>
+              </Button>
             </div>
           </div>
           <div className="mt-3 text-xs text-gray-400 dark:text-gray-500">

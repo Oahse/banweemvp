@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ScanLineIcon, DownloadIcon, ShareIcon, XIcon } from 'lucide-react';
-import { NotificationModal } from '../../../../components/ui/NotificationModal';
+import { NotificationModal } from '@/components/ui/NotificationModal';
 import JsBarcode from 'jsbarcode';
+import { Button } from '@/components/ui/Button';
 
 interface BarcodeModalProps {
   variant: {
@@ -277,12 +278,14 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
             <ScanLineIcon size={24} className="text-primary" />
             <h3 className="text-lg font-semibold text-copy">{title}</h3>
           </div>
-          <button
+          <Button
             onClick={onClose}
+            variant="ghost"
+            size="sm"
             className="text-copy-lighter hover:text-copy transition-colors"
+            leftIcon={<XIcon size={20} />}
           >
-            <XIcon size={20} />
-          </button>
+          </Button>
         </div>
 
         <p className="text-copy-light text-sm mb-4">
@@ -313,49 +316,35 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
               {Object.keys(barcodeData.attributes).length > 0 && (
                 <div><span className="font-medium">Attributes:</span> {JSON.stringify(barcodeData.attributes)}</div>
               )}
-            </div>
+            )}
           </div>
         </div>
+      </div>
 
-        <div className="flex space-x-2">
-          <button
-            onClick={handleDownload}
-            disabled={isDownloading}
-            className="flex-1 flex items-center justify-center space-x-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isDownloading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                <span>Downloading...</span>
-              </>
-            ) : (
-              <>
-                <DownloadIcon size={16} />
-                <span>Download</span>
-              </>
-            )}
-          </button>
-          <button
-            onClick={handleShare}
-            disabled={isSharing}
-            className="flex-1 flex items-center justify-center space-x-2 bg-surface-hover text-copy px-4 py-2 rounded-md hover:bg-surface-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSharing ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                <span>Sharing...</span>
-              </>
-            ) : (
-              <>
-                <ShareIcon size={16} />
-                <span>Share</span>
-              </>
-            )}
-          </button>
-        </div>
-      </motion.div>
-
-      {/* Notification Modal */}
+      <div className="flex space-x-2">
+        <Button
+          onClick={handleDownload}
+          disabled={isDownloading}
+          variant="primary"
+          size="sm"
+          className="flex-1 flex items-center justify-center space-x-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          leftIcon={<DownloadIcon size={16} />}
+          isLoading={isDownloading}
+        >
+          {isDownloading ? 'Downloading...' : 'Download'}
+        </Button>
+        <Button
+          onClick={handleShare}
+          disabled={isSharing}
+          variant="outline"
+          size="sm"
+          className="flex-1 flex items-center justify-center space-x-2 bg-surface-hover text-copy px-4 py-2 rounded-md hover:bg-surface-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          leftIcon={<ShareIcon size={16} />}
+          isLoading={isSharing}
+        >
+          {isSharing ? 'Sharing...' : 'Share'}
+        </Button>
+      </div>
       <NotificationModal
         isOpen={showNotification}
         onClose={() => setShowNotification(false)}

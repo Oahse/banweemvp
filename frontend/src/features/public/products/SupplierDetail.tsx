@@ -13,6 +13,7 @@ import {
   ArrowLeftIcon,
   ExternalLinkIcon
 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { useApi } from '../../../components/shared/hooks/useAsync';
 import { SuppliersAPI } from '../../../api';
 import ErrorMessage from '../components/Error';
@@ -192,8 +193,10 @@ export const SupplierDetail = () => {
             <div className="bg-surface rounded-lg">
               <div className="border-b border-border">
                 <div className="flex">
-                  <button
+                  <Button
                     onClick={() => setActiveTab('about')}
+                    variant={activeTab === 'about' ? "link" : "ghost"}
+                    size="sm"
                     className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
                       activeTab === 'about'
                         ? 'text-primary border-b-2 border-primary'
@@ -201,9 +204,11 @@ export const SupplierDetail = () => {
                     }`}
                   >
                     About
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => setActiveTab('contact')}
+                    variant={activeTab === 'contact' ? "link" : "ghost"}
+                    size="sm"
                     className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
                       activeTab === 'contact'
                         ? 'text-primary border-b-2 border-primary'
@@ -211,7 +216,7 @@ export const SupplierDetail = () => {
                     }`}
                   >
                     Contact
-                  </button>
+                  </Button>
                 </div>
               </div>
 

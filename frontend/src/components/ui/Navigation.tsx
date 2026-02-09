@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../../utils/utils';
 import { ChevronDownIcon, MenuIcon, XIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 
 
@@ -101,12 +102,14 @@ export const Navigation = ({
     if (hasChildren) {
       return (
         <div key={item.label} className="relative">
-          <button
+          <Button
             onClick={() => toggleDropdown(item.label)}
+            variant="ghost"
+            size="sm"
             className="w-full text-left"
           >
             {itemContent}
-          </button>
+          </Button>
           {isDropdownOpen && (
             <div className={cn(
               'mt-1 space-y-1',
@@ -148,13 +151,14 @@ export const Navigation = ({
 
       {/* Mobile Navigation */}
       <div className="md:hidden">
-        <button
+        <Button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className={cn(
-            'flex items-center justify-center',
-            sizeStyles[size],
+          variant="ghost"
+          size="sm"
+          className={`flex items-center justify-center ${
+            sizeStyles[size] + ' ' +
             variantStyles[variant].item
-          )}
+          }`}
           aria-label="Toggle mobile menu"
         >
           {isMobileMenuOpen ? (
@@ -162,7 +166,7 @@ export const Navigation = ({
           ) : (
             <MenuIcon className="w-5 h-5" />
           )}
-        </button>
+        </Button>
 
         {isMobileMenuOpen && (
           <div className="absolute top-full left-0 right-0 bg-surface border-t border-border shadow-lg z-50">

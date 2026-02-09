@@ -7,6 +7,7 @@ import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { SkeletonProfile } from '../ui/SkeletonProfile';
 import { AdminDashboardSkeleton } from '@/components/ui/SkeletonLoader';
 import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Profile component allows users to view and edit their personal information.
@@ -161,9 +162,11 @@ export const Profile = () => {
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Gender</label>
             <div className="relative">
-              <button
+              <Button
                 type="button"
                 disabled={!isEditing}
+                variant="outline"
+                size="sm"
                 className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
                 onClick={() => {
                   if (!isEditing) return;
@@ -171,7 +174,7 @@ export const Profile = () => {
                 }}
               >
                 {formData.gender ? formData.gender.charAt(0).toUpperCase() + formData.gender.slice(1) : 'Select'}
-              </button>
+              </Button>
               {isEditing && showGenderDropdown && (
                 <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded shadow">
                   {['male', 'female', 'other'].map(option => (
@@ -192,9 +195,11 @@ export const Profile = () => {
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><GlobeIcon size={16}/> Language</label>
             <div className="relative">
-              <button
+              <Button
                 type="button"
                 disabled={!isEditing}
+                variant="outline"
+                size="sm"
                 className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
                 onClick={() => {
                   if (!isEditing) return;
@@ -202,7 +207,7 @@ export const Profile = () => {
                 }}
               >
                 {languageOptions.find(opt => opt.value === formData.language)?.label || 'Select'}
-              </button>
+              </Button>
               {isEditing && showLanguageDropdown && (
                 <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded shadow">
                   {languageOptions.map(option => (
@@ -232,16 +237,23 @@ export const Profile = () => {
           </div>
         </div>
         <div className="mt-4 flex gap-2">
-          <button
-            className="px-3 py-2 text-sm font-medium rounded bg-primary text-white disabled:opacity-50"
+          <Button
+            variant="primary"
+            size="sm"
             disabled={!isEditing || loading}
             onClick={handleSave}
-          >Save</button>
-          <button
-            className="px-3 py-2 text-sm font-medium rounded bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+            leftIcon={<SaveIcon size={16} />}
+          >
+            Save
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => setIsEditing(!isEditing)}
             disabled={loading}
-          >{isEditing ? 'Cancel' : 'Edit'}</button>
+          >
+            {isEditing ? 'Cancel' : 'Edit'}
+          </Button>
         </div>
       </div>
     </div>

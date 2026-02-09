@@ -5,6 +5,7 @@ import { useCategories } from '../shared/contexts/CategoryContext';
 import { useAuth } from '../../features/protected/auth/contexts/AuthContext';
 import { useCart } from '../../features/protected/cart/contexts/CartContext';
 import { useWishlist } from '../../features/protected/wishlist/contexts/WishlistContext';
+import { Button } from '@/components/ui/Button';
 
 /**
  * @typedef {object} MobileCategoriesProps
@@ -48,9 +49,9 @@ export const MobileCategories = ({
         <div className="p-4 border-b border-border-light">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-main">Categories</h3>
-            <button onClick={onClose} className="p-1 hover:bg-background rounded-md">
+            <Button onClick={onClose} variant="ghost" size="sm" className="p-1 hover:bg-background rounded-md">
               <XIcon size={24} />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -78,15 +79,17 @@ export const MobileCategories = ({
                   Wishlist
                 </Link>
               </div>
-              <button
+              <Button
                 onClick={() => {
                   logout();
                   onClose();
                 }}
+                variant="danger"
+                size="sm"
                 className="w-full py-2 px-3 bg-red-500 text-white rounded-md text-center text-sm hover:bg-red-600 mt-2"
               >
                 Sign Out
-              </button>
+              </Button>
             </>
           ) : (
             <>

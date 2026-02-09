@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Plus, Trash2, Package } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2, Package, X } from 'lucide-react';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import AdminAPI from '@/api/admin';
 import { CategoriesAPI } from '@/api';
@@ -9,6 +9,7 @@ import { DIETARY_TAGS } from '@/config/product';
 import Dropdown from '@/components/ui/Dropdown';
 import { getCountryOptions } from '@/data/countries';
 import { AdminLayout } from '@/components/layout/Layout';
+import { Button } from '@/components/ui/Button';
 
 interface Category {
   id: string;
@@ -219,14 +220,16 @@ const CreateProduct: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
         <div className="mb-4">
-          <button
+          <Button
             type="button"
             onClick={() => navigate('/admin/products')}
+            variant="ghost"
+            size="sm"
             className={`flex items-center gap-2 mb-3 text-sm ${currentTheme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
+            leftIcon={<ArrowLeft size={16} />}
           >
-            <ArrowLeft className="w-4 h-4" />
             Back to Products
-          </button>
+          </Button>
           <h1 className={`text-2xl font-semibold ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Create New Product
           </h1>
@@ -350,9 +353,11 @@ const CreateProduct: React.FC = () => {
                     <label className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                       Featured Product
                     </label>
-                    <button
+                    <Button
                       type="button"
                       onClick={() => updateField('is_featured', !formData.is_featured)}
+                      variant="ghost"
+                      size="sm"
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                         formData.is_featured ? 'bg-primary' : 'bg-gray-200'
                       }`}
@@ -362,15 +367,17 @@ const CreateProduct: React.FC = () => {
                           formData.is_featured ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
-                    </button>
+                    </Button>
                   </div>
                   <div className="flex items-center justify-between">
                     <label className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                       Bestseller
                     </label>
-                    <button
+                    <Button
                       type="button"
                       onClick={() => updateField('is_bestseller', !formData.is_bestseller)}
+                      variant="ghost"
+                      size="sm"
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                         formData.is_bestseller ? 'bg-primary' : 'bg-gray-200'
                       }`}
@@ -380,7 +387,7 @@ const CreateProduct: React.FC = () => {
                           formData.is_bestseller ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -393,14 +400,16 @@ const CreateProduct: React.FC = () => {
               <h2 className={`text-lg font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 Product Variants
               </h2>
-              <button
+              <Button
                 type="button"
                 onClick={addVariant}
+                variant="primary"
+                size="sm"
                 className="flex items-center gap-2 px-2 py-1 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+                leftIcon={<Plus size={14} />}
               >
-                <Plus className="w-4 h-4" />
                 Add Variant
-              </button>
+              </Button>
             </div>
 
             <div className="space-y-4">
@@ -419,13 +428,14 @@ const CreateProduct: React.FC = () => {
                       </h3>
                     </div>
                     {formData.variants.length > 1 && (
-                      <button
+                      <Button
                         type="button"
                         onClick={() => removeVariant(index)}
+                        variant="ghost"
+                        size="sm"
                         className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
+                        leftIcon={<Trash2 size={14} />}
+                      />
                     )}
                   </div>
 
@@ -526,9 +536,11 @@ const CreateProduct: React.FC = () => {
                       <label className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                         Active
                       </label>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => updateVariant(index, 'is_active', !variant.is_active)}
+                        variant="ghost"
+                        size="sm"
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                           variant.is_active ? 'bg-primary' : 'bg-gray-200'
                         }`}
@@ -538,7 +550,7 @@ const CreateProduct: React.FC = () => {
                             variant.is_active ? 'translate-x-6' : 'translate-x-1'
                           }`}
                         />
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
@@ -577,13 +589,14 @@ const CreateProduct: React.FC = () => {
                             className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white text-xs rounded-full"
                           >
                             {tag}
-                            <button
+                            <Button
                               type="button"
                               onClick={() => updateVariant(index, 'dietary_tags', variant.dietary_tags.filter(t => t !== tag))}
+                              variant="ghost"
+                              size="sm"
                               className="hover:bg-white hover:bg-opacity-20 rounded-full p-0.5"
-                            >
-                              ×
-                            </button>
+                              leftIcon={<X size={12} />}
+                            />
                           </span>
                         ))}
                       </div>
@@ -629,13 +642,16 @@ const CreateProduct: React.FC = () => {
                         } focus:ring-2 focus:ring-primary`}
                         placeholder="Enter image URL"
                       />
-                      <button
+                      <Button
                         type="button"
                         onClick={() => addImageToVariant(index)}
+                        variant="primary"
+                        size="sm"
                         className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                        leftIcon={<Plus size={14} />}
                       >
-                        <Plus className="w-4 h-4" />
-                      </button>
+                        Add Image
+                      </Button>
                     </div>
                     {variant.image_urls.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
@@ -647,13 +663,14 @@ const CreateProduct: React.FC = () => {
                             }`}
                           >
                             <img src={url} alt="" className="w-20 h-20 object-cover" />
-                            <button
+                            <Button
                               type="button"
                               onClick={() => removeImageFromVariant(index, imgIndex)}
+                              variant="ghost"
+                              size="sm"
                               className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
+                              leftIcon={<Trash2 size={12} />}
+                            />
                           </div>
                         ))}
                       </div>
@@ -666,26 +683,30 @@ const CreateProduct: React.FC = () => {
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-4">
-            <button
+            <Button
               type="button"
               onClick={() => navigate('/admin/products')}
+              variant="outline"
+              size="sm"
               className={`px-5 py-2.5 rounded-lg text-sm ${
                 currentTheme === 'dark'
-                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
-              disabled={loading}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={loading}
+              variant="primary"
+              size="sm"
               className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              leftIcon={<Save size={16} />}
+              isLoading={loading}
             >
-              <Save className="w-4 h-4" />
-              {loading ? 'Creating...' : 'Create Product'}
-            </button>
+              {loading ? 'Saving...' : 'Save Product'}
+            </Button>
           </div>
         </form>
       </div>

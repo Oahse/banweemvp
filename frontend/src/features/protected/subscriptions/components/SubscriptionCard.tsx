@@ -13,6 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '../../../../utils/orderCalculations';
 
 interface SubscriptionCardProps {
@@ -262,13 +263,14 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           )}>
             {subscription.status?.charAt(0).toUpperCase() + subscription.status?.slice(1)}
           </span>
-          <button
+          <Button
             onClick={() => navigate(`/account/subscriptions/${subscription.id}`)}
-            className="p-1 rounded text-primary hover:bg-primary/10 transition-colors"
+            variant="primary"
+            size="sm"
             title="View details"
           >
-            <EyeIcon className="w-3 h-3" />
-          </button>
+            View Details
+          </Button>
         </div>
       </div>
 
@@ -290,17 +292,15 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       {/* Auto-renew toggle */}
       <div className="flex items-center justify-between">
         <span className="text-xs">Auto-renew</span>
-        <button
+        <Button
           onClick={handleAutoRenewToggle}
           disabled={isTogglingAutoRenew}
+          variant="ghost"
+          size="sm"
           className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
         >
-          {subscription.auto_renew ? (
-            <ToggleRightIcon className="w-4 h-4 text-green-600" />
-          ) : (
-            <ToggleLeftIcon className="w-4 h-4 text-gray-400" />
-          )}
-        </button>
+          {subscription.auto_renew ? 'Disable' : 'Enable'}
+        </Button>
       </div>
 
       {/* Actions */}
@@ -308,77 +308,85 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
         <div className="flex flex-wrap gap-2">
           {isEditing ? (
             <>
-              <button
+              <Button
                 onClick={handleUpdate}
                 disabled={isUpdating}
-                className={getButtonClasses('primary', 'sm')}
+                variant="primary"
+                size="sm"
               >
                 {isUpdating ? 'Saving...' : 'Save'}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleCancelEdit}
-                className={getButtonClasses('secondary', 'sm')}
+                variant="secondary"
+                size="sm"
               >
                 Cancel
-              </button>
+              </Button>
             </>
           ) : (
             <>
-              <button
+              <Button
                 onClick={() => setIsEditing(true)}
-                className={getButtonClasses('secondary', 'sm')}
+                variant="secondary"
+                size="sm"
               >
-                <EditIcon className="w-3 h-3" />
-              </button>
+                Edit
+              </Button>
               
               {subscription.status === 'active' && onPause && (
-                <button
+                <Button
                   onClick={handlePause}
                   disabled={isPausing}
-                  className={getButtonClasses('warning', 'sm')}
+                  variant="warning"
+                  size="sm"
                 >
-                  <PauseIcon className="w-3 h-3" />
-                </button>
+                  Pause
+                </Button>
               )}
               
               {subscription.status === 'paused' && onResume && (
-                <button
+                <Button
                   onClick={handleResume}
                   disabled={isResuming}
-                  className={getButtonClasses('success', 'sm')}
+                  variant="success"
+                  size="sm"
                 >
-                  <PlayIcon className="w-3 h-3" />
-                </button>
+                  Resume
+                </Button>
               )}
               
               {(subscription.status === 'cancelled' || subscription.status === 'expired') && onActivate && (
-                <button
+                <Button
                   onClick={handleReactivate}
                   disabled={isReactivating}
-                  className={getButtonClasses('success', 'sm')}
+                  variant="success"
+                  size="sm"
                 >
                   Reactivate
-                </button>
+                </Button>
               )}
               
               {subscription.status === 'active' && onCancel && (
-                <button
+                <Button
                   onClick={handleCancel}
                   disabled={isCancelling}
-                  className={getButtonClasses('error', 'sm')}
+                  variant="error"
+                  size="sm"
                 >
                   Cancel
-                </button>
+                </Button>
               )}
               
               {onDelete && (
-                <button
+                <Button
                   onClick={() => setShowDeleteModal(true)}
                   disabled={isDeleting}
-                  className={getButtonClasses('error', 'sm')}
+                  variant="error"
+                  size="sm"
                 >
-                  <TrashIcon className="w-3 h-3" />
-                </button>
+                  Delete
+                </Button>
               )}
             </>
           )}
@@ -394,18 +402,21 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               Are you sure you want to delete this subscription? This action cannot be undone.
             </p>
             <div className="flex gap-2 justify-end">
-              <button
+              <Button
                 onClick={() => setShowDeleteModal(false)}
-                className={getButtonClasses('secondary')}
+                variant="secondary"
+                size="sm"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className={getButtonClasses('error')}
+                variant="error"
+                size="sm"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
+              </Button>
               </button>
             </div>
           </div>

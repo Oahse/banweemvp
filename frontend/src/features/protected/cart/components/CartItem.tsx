@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { MinusIcon, PlusIcon, TrashIcon } from 'lucide-react';
-import { useCart } from '../../../CartContext';
+import { useCart } from '../contexts/CartContext';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 
 interface CartItemProps {
   item: {
@@ -249,14 +250,15 @@ export const CartItem: React.FC<CartItemProps> = ({
 
       {/* Quantity Controls */}
       <div className="flex items-center gap-2">
-        <button
+        <Button
           onClick={handleDecrease}
+          variant="outline"
+          size="icon"
           disabled={isUpdating || isRemoving}
-          className="p-1 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           title={quantity <= 1 ? 'Remove item' : 'Decrease quantity'}
         >
           <MinusIcon size={14} />
-        </button>
+        </Button>
         
         <input
           type="number"
@@ -271,14 +273,15 @@ export const CartItem: React.FC<CartItemProps> = ({
           className="w-16 px-2 py-1 text-center border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50"
         />
         
-        <button
+        <Button
           onClick={handleIncrease}
+          variant="outline"
+          size="icon"
           disabled={isUpdating || isRemoving || quantity >= item.variant.stock}
-          className="p-1 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           title="Increase quantity"
         >
           <PlusIcon size={14} />
-        </button>
+        </Button>
       </div>
 
       {/* Price */}
@@ -292,14 +295,15 @@ export const CartItem: React.FC<CartItemProps> = ({
       </div>
 
       {/* Remove Button */}
-      <button
+      <Button
         onClick={handleRemove}
+        variant="danger"
+        size="icon"
         disabled={isRemoving}
-        className="p-2 text-red-500 hover:bg-red-50 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
         title="Remove item"
       >
         <TrashIcon size={16} />
-      </button>
+      </Button>
 
       {/* Loading overlay */}
       {(isUpdating || isRemoving) && (

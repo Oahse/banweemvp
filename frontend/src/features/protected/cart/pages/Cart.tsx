@@ -11,6 +11,7 @@ import { validation } from '@/utils/validation';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { CartAPI } from '@/api/cart';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
+import { Button } from '@/components/ui/Button';
 
 export const Cart = () => {
   const { 
@@ -350,13 +351,16 @@ export const Cart = () => {
                 </div>
               )}
               
-              <button
+              <Button
                 onClick={() => handleRemoveItem(item.id)}
+                variant="danger"
+                size="sm"
+                leftIcon={<TrashIcon size={12} />}
+                className="mt-1"
                 aria-label={`Remove ${item.variant?.product_name || 'item'} from cart`}
-                className="text-xs text-error hover:text-error-dark flex items-center mt-1">
-                <TrashIcon size={12} className="mr-1" />
+              >
                 Remove
-              </button>
+              </Button>
             </div>
           </div>
           <div className="col-span-2 text-center text-sm">
@@ -379,12 +383,16 @@ export const Cart = () => {
           </div>
           <div className="col-span-2 flex justify-center">
             <div className="flex items-center border border-border rounded-md">
-              <button
+              <Button
                 onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                className="px-2 py-1 text-copy-light hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={`Decrease ${item.variant?.product_name || 'item'} quantity`}>
+                variant="ghost"
+                size="icon"
+                className="px-2 py-1"
+                disabled={item.quantity <= 1}
+                aria-label={`Decrease ${item.variant?.product_name || 'item'} quantity`}
+              >
                 <MinusIcon size={14} />
-              </button>
+              </Button>
               <input
                 type="number"
                 min="1"
@@ -396,13 +404,16 @@ export const Cart = () => {
                 className="w-10 text-center border-none focus:outline-none focus:ring-1 focus:ring-primary bg-transparent"
                 aria-label={`Quantity for ${item.variant?.product_name || 'item'}`}
               />
-              <button
+              <Button
                 onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                variant="ghost"
+                size="icon"
+                className="px-2 py-1"
                 disabled={item.variant?.stock !== undefined && item.quantity >= item.variant.stock}
-                className="px-2 py-1 text-copy-light hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={`Increase ${item.variant?.product_name || 'item'} quantity`}>
+                aria-label={`Increase ${item.variant?.product_name || 'item'} quantity`}
+              >
                 <PlusIcon size={14} />
-              </button>
+              </Button>
             </div>
           </div>
           <div className="col-span-2 text-center text-sm">
@@ -496,25 +507,6 @@ export const Cart = () => {
                   ))}
                 </AnimatePresence>
               </div>
-              <div className="p-3 bg-background flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                <div className="flex items-center">
-                  <button
-                    onClick={handleClearCart}
-                    disabled={clearingCart || cartItems.length === 0}
-                    className="text-xs text-error hover:text-error-dark flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
-                    {clearingCart ? (
-                      <Loader2 size={12} className="mr-1 animate-spin" />
-                    ) : (
-                      <TrashIcon size={12} className="mr-1" />
-                    )}
-                    Clear Cart ({cartItems.length})
-                  </button>
-                </div>
-                <Link to="/products" className="text-xs text-primary hover:underline flex items-center">
-                  Continue Shopping
-                  <ChevronRightIcon size={14} className="ml-1" />
-                </Link>
-              </div>
             </div>
           </div>
 
@@ -532,6 +524,23 @@ export const Cart = () => {
                   Tax and shipping will be calculated at checkout
                 </div>
               </div>
+              
+              <div className="p-3 bg-background flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                <div className="flex items-center">
+                  <Button
+                    onClick={handleClearCart}
+                    variant="danger"
+                    size="sm"
+                    disabled={clearingCart || cartItems.length === 0}
+                    leftIcon={<TrashIcon size={12} />}
+                  >
+                    Clear Cart ({cartItems.length})
+                  </Button>
+                </div>
+                <Link to="/products" className="text-xs text-primary hover:underline flex items-center">
+                  Continue Shopping
+                </Link>
+              </div>
               <form onSubmit={handleApplyCoupon} className="mb-4">
                 <label htmlFor="coupon-code" className="block text-xs font-medium mb-2 text-copy">Promo Code (Optional)</label>
                 <div className="flex">
@@ -544,20 +553,26 @@ export const Cart = () => {
                     onChange={(e) => setCouponCode(e.target.value)}
                     aria-label="Coupon code"
                   />
-                  <button
+                  <Button
                     type="submit"
+                    variant="primary"
+                    size="sm"
                     aria-label="Apply coupon code"
-                    className="bg-primary text-white px-3 py-2 rounded-r-md hover:bg-primary-dark transition-colors text-sm">
+                  >
                     Apply
-                  </button>
+                  </Button>
                 </div>
               </form>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <button
+                <Button
                   onClick={handleCheckout}
-                  className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-md transition-colors flex items-center justify-center text-sm font-medium">
+                  variant="primary"
+                  fullWidth={true}
+                  size="sm"
+                  className="py-2.5"
+                >
                   {isAuthenticated ? 'Proceed to Checkout' : 'Login to Checkout'}
-                </button>
+                </Button>
               </motion.div>
             </div>
           </div>

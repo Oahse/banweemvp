@@ -9,6 +9,7 @@ import AdminLayout from '../components/AdminLayout';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { OrderDetailSkeleton } from '../components/skeletons/OrdersSkeleton';
+import { Button } from '@/components/ui/Button';
 
 interface OrderDetail {
   id: string;
@@ -299,13 +300,15 @@ export const AdminOrderDetail = () => {
               <p className="text-xs text-copy-light">{order.id}</p>
             </div>
           </div>
-          <button
+          <Button
             onClick={handleDownloadInvoice}
+            variant="primary"
+            size="sm"
+            leftIcon={<DownloadIcon size={16} />}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-copy-inverse rounded-lg hover:bg-primary/90 transition"
           >
-            <DownloadIcon className="w-4 h-4" />
             Download Invoice
-          </button>
+          </Button>
         </div>
 
         {/* Invoice Preview / Download */}
@@ -321,18 +324,22 @@ export const AdminOrderDetail = () => {
               <div className="flex items-center justify-between mb-3">
                 <p className="font-semibold">Invoice Preview</p>
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     onClick={() => window.print()}
+                    variant="ghost"
+                    size="sm"
                     className="px-3 py-1 bg-muted rounded text-sm"
                   >
                     Print
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => AdminAPI.getOrderInvoice(orderId || '')}
+                    variant="primary"
+                    size="sm"
                     className="px-3 py-1 bg-primary text-copy-inverse rounded text-sm"
                   >
-                    Download
-                  </button>
+                    Download PDF
+                  </Button>
                 </div>
               </div>
               <div className="overflow-auto max-h-[60vh] border border-border-light">
@@ -390,17 +397,19 @@ export const AdminOrderDetail = () => {
         {/* Tabs */}
         <div className="flex gap-4 border-b border-border-light">
           {(['overview', 'items', 'shipping', 'notes'] as const).map((tab) => (
-            <button
+            <Button
               key={tab}
               onClick={() => setActiveTab(tab)}
+              variant={activeTab === tab ? 'primary' : 'ghost'}
+              size="sm"
               className={`px-4 py-2 font-semibold capitalize transition ${
                 activeTab === tab
                   ? 'text-primary border-b-2 border-primary'
-                  : 'text-copy-light hover:text-copy'
+                  : 'text-copy-light hover:text-copy-dark'
               }`}
             >
               {tab}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -536,13 +545,15 @@ export const AdminOrderDetail = () => {
                     className="w-full"
                   />
 
-                  <button
+                  <Button
                     onClick={handleStatusUpdate}
                     disabled={updating || newStatus === order.order_status}
+                    variant="primary"
+                    size="sm"
                     className="w-full px-4 py-2 bg-primary text-copy-inverse rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
                   >
-                    {updating ? 'Updating...' : 'Update Status'}
-                  </button>
+                    {updating ? 'Updating...' : `Update to ${newStatus}`}
+                  </Button>
                 </div>
               </div>
 

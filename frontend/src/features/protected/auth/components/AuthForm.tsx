@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { SocialAuth } from './SocialAuth';
 
 
@@ -210,13 +210,15 @@ export const AuthForm = ({
                 placeholder="Enter your password"
                 required
               />
-              <button
+              <Button
                 type="button"
-                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
+                variant="ghost"
+                size="icon"
+                className="absolute right-3 top-9"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
-              </button>
+                {showPassword ? '👁' : '�'}
+              </Button>
             </div>
           </div>
 
@@ -294,13 +296,16 @@ export const AuthForm = ({
             <div className="text-center">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {mode === 'login' ? "Don't have an account?" : "Already have an account?"}{' '}
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={onToggleMode}
-                  className="text-blue-600 hover:underline font-medium"
                 >
-                  {mode === 'login' ? 'Sign up' : 'Sign in'}
-                </button>
+                  {mode === 'login' ? "Don't have an account?" : "Already have an account?"}{' '}
+                  <span className="text-blue-600 hover:underline font-medium">
+                    {mode === 'login' ? 'Sign up' : 'Login'}
+                  </span>
+                </Button>
               </p>
             </div>
           )}

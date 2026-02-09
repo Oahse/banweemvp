@@ -13,8 +13,9 @@ import {
   DollarSignIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { ProductVariantModal } from '../ui/ProductVariantModal';
-import { ConfirmationModal } from '../ui/ConfirmationModal';
+import { Button } from '@/components/ui/Button';
+import { ProductVariantModal } from '@/components/ui/ProductVariantModal';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 interface Subscription {
   id: string;
   status: 'active' | 'paused' | 'cancelled' | 'expired';
@@ -76,10 +77,13 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
       <div className="flex flex-col items-center justify-center h-64">
         <PackageIcon size={28} className="text-gray-300 mb-2" />
         <span className="text-sm text-gray-500 mb-2">You have no subscriptions.</span>
-        <button
-          className="px-3 py-2 bg-primary text-white rounded text-sm"
+        <Button
+          variant="primary"
+          size="sm"
           onClick={() => navigate('/products')}
-        >Browse Plans</button>
+        >
+          Browse Plans
+        </Button>
       </div>
     );
   }
@@ -125,35 +129,43 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
             </div>
             <div className="flex gap-2 mt-2">
               {sub.status === 'active' && (
-                <button
-                  className="px-3 py-2 bg-yellow-100 text-yellow-700 rounded text-sm"
+                <Button
+                  variant="warning"
+                  size="sm"
+                  leftIcon={<PauseIcon size={14} />}
                   onClick={() => { setSelectedId(sub.id); setConfirmAction('pause'); setShowConfirmModal(true); }}
                 >
-                  <PauseIcon size={14} /> Pause
-                </button>
+                  Pause
+                </Button>
               )}
               {sub.status === 'paused' && (
-                <button
-                  className="px-3 py-2 bg-green-100 text-green-700 rounded text-sm"
+                <Button
+                  variant="success"
+                  size="sm"
+                  leftIcon={<PlayIcon size={14} />}
                   onClick={() => { setSelectedId(sub.id); setConfirmAction('resume'); setShowConfirmModal(true); }}
                 >
-                  <PlayIcon size={14} /> Resume
-                </button>
+                  Resume
+                </Button>
               )}
               {sub.status !== 'cancelled' && (
-                <button
-                  className="px-3 py-2 bg-red-100 text-red-700 rounded text-sm"
+                <Button
+                  variant="danger"
+                  size="sm"
+                  leftIcon={<TrashIcon size={14} />}
                   onClick={() => { setSelectedId(sub.id); setConfirmAction('cancel'); setShowConfirmModal(true); }}
                 >
-                  <TrashIcon size={14} /> Cancel
-                </button>
+                  Cancel
+                </Button>
               )}
-              <button
-                className="px-3 py-2 bg-gray-200 text-gray-700 rounded text-sm"
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<TrashIcon size={14} />}
                 onClick={() => { setSelectedId(sub.id); setConfirmAction('remove'); setShowConfirmModal(true); }}
               >
-                <TrashIcon size={14} /> Remove
-              </button>
+                Remove
+              </Button>
             </div>
           </div>
         ))}

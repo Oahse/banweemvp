@@ -13,9 +13,9 @@ import { OrdersAPI } from '@/api/orders';
 import { AuthAPI } from '@/api/auth';
 import { CartAPI } from '@/api/cart';
 import { TokenManager } from '@/api/client';
+import { Button } from '@/components/ui/Button';
 import { PaymentsAPI } from '@/api/payments';
 import { toast } from 'react-hot-toast';
-import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { CheckCircle, AlertTriangle, CreditCard, Truck, MapPin } from 'lucide-react';
 import AddAddressForm from '@/components/generic/AddAddressForm';
@@ -422,9 +422,9 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full"
+                      fullWidth={true}
                     >
-                      Add New Address
+                      Manage Addresses
                     </Button>
                   </Link>
                 </div>
@@ -433,9 +433,10 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   <p className="text-copy-light dark:text-copy-light-dark mb-4">No addresses found</p>
                   <Button
                     type="button"
+                    variant="outline"
                     onClick={() => setShowAddAddressForm(true)}
                   >
-                    Add Address
+                    Add New Address
                   </Button>
                 </div>
               )}
@@ -459,7 +460,6 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                     type="button"
                     variant="outline"
                     onClick={loadShippingMethods}
-                    className="mt-2"
                   >
                     Retry
                   </Button>
@@ -541,7 +541,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 <div className="text-center py-4">
                   <p className="text-copy-light dark:text-copy-light-dark mb-3">No payment methods available</p>
                   <Link to="/account/payment-methods">
-                    <Button type="button" variant="outline" className="w-full">
+                    <Button type="button" variant="outline" fullWidth={true}>
                       Add Payment Method
                     </Button>
                   </Link>
@@ -580,16 +580,12 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <Button
               type="submit"
               disabled={!realTimeValidation.can_proceed || processingPayment}
-              className="w-full py-2 text-xs font-medium"
+              variant="primary"
+              fullWidth={true}
+              isLoading={processingPayment}
+              className="py-2 text-xs font-medium"
             >
-              {processingPayment ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
-                  Processing Order...
-                </>
-              ) : (
-                `Place Order ${pricingData ? formatCurrency(pricingData.total) : ''}`
-              )}
+              {processingPayment ? 'Processing Payment...' : 'Complete Order'}
             </Button>
             </form>
           </div>

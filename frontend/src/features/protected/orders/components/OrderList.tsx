@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-
-
-
-
-
-
-
+import { Button } from '@/components/ui/Button';
+import { ChevronDownIcon } from 'lucide-react';
 
 
 const OrderList = ({
@@ -171,12 +166,13 @@ const OrderList = ({
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <button
+          <Button
             onClick={() => onFilterChange({})}
-            className="text-sm text-gray-600 hover:text-gray-800"
+            variant="ghost"
+            size="sm"
           >
             Clear Filters
-          </button>
+          </Button>
           <div className="text-sm text-gray-500">
             Showing {paginatedOrders.length} of {orders.length} orders
           </div>
@@ -197,34 +193,37 @@ const OrderList = ({
                 </th>
               )}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <button
+                <Button
                   onClick={() => handleSort('status')}
-                  className="flex items-center space-x-1 hover:text-gray-700"
+                  variant="ghost"
+                  size="sm"
+                  rightIcon={<ChevronDownIcon size={12} />}
                 >
-                  <span>Status</span>
-                  <span>{getSortIcon('status')}</span>
-                </button>
+                  Status {getSortIcon('status')}
+                </Button>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <button
+                <Button
                   onClick={() => handleSort('amount')}
-                  className="flex items-center space-x-1 hover:text-gray-700"
+                  variant="ghost"
+                  size="sm"
+                  rightIcon={<ChevronDownIcon size={12} />}
                 >
-                  <span>Amount</span>
-                  <span>{getSortIcon('amount')}</span>
-                </button>
+                  Amount {getSortIcon('amount')}
+                </Button>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Items
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <button
+                <Button
                   onClick={() => handleSort('date')}
-                  className="flex items-center space-x-1 hover:text-gray-700"
+                  variant="ghost"
+                  size="sm"
+                  rightIcon={<ChevronDownIcon size={12} />}
                 >
-                  <span>Date</span>
-                  <span>{getSortIcon('date')}</span>
-                </button>
+                  Date {getSortIcon('date')}
+                </Button>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -266,12 +265,13 @@ const OrderList = ({
                   {format(new Date(order.created_at), 'MMM dd, yyyy')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                  <button
+                  <Button
                     onClick={() => onOrderSelect?.(order)}
-                    className="text-blue-600 hover:text-blue-900"
+                    variant="ghost"
+                    size="sm"
                   >
                     View
-                  </button>
+                  </Button>
                   {(userRole === 'supplier' || userRole === 'admin') && onStatusUpdate && (
                     <select
                       className="text-xs border border-gray-300 rounded px-2 py-1"
@@ -314,13 +314,14 @@ const OrderList = ({
             Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, orders.length)} of {orders.length} results
           </div>
           <div className="flex items-center space-x-2">
-            <button
+            <Button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              variant="outline"
+              size="sm"
             >
               Previous
-            </button>
+            </Button>
             
             <div className="flex items-center space-x-1">
               {[...Array(totalPages)].map((_, i) => {
@@ -331,17 +332,17 @@ const OrderList = ({
                   (page >= currentPage - 1 && page <= currentPage + 1)
                 ) {
                   return (
-                    <button
+                    <Button
                       key={page}
                       onClick={() => setCurrentPage(page)}
+                      variant={page === currentPage ? 'primary' : 'ghost'}
+                      size="sm"
                       className={`px-3 py-1 text-sm rounded-md ${
-                        currentPage === page
-                          ? 'bg-blue-600 text-white'
-                          : 'border border-gray-300 hover:bg-gray-50'
+                        page === currentPage ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-gray-50'
                       }`}
                     >
                       {page}
-                    </button>
+                    </Button>
                   );
                 } else if (
                   page === currentPage - 2 ||
@@ -353,13 +354,14 @@ const OrderList = ({
               })}
             </div>
 
-            <button
+            <Button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              variant="outline"
+              size="sm"
             >
               Next
-            </button>
+            </Button>
           </div>
         </div>
       )}

@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../../../AuthContext';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/Button';
 
 export const SubscriptionList: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
@@ -151,13 +152,15 @@ export const SubscriptionList: React.FC = () => {
         <p className={combineThemeClasses(themeClasses.text.secondary, 'text-sm mb-4')}>
           Please log in to view and manage your subscriptions
         </p>
-        <button
+        <Button
           onClick={() => navigate('/login')}
+          variant="primary"
+          size="sm"
           className={combineThemeClasses(getButtonClasses('primary'), 'text-sm')}
         >
           <LogInIcon className="w-4 h-4 mr-1" />
           Log In
-        </button>
+        </Button>
       </div>
     );
   }
@@ -168,20 +171,25 @@ export const SubscriptionList: React.FC = () => {
         <p className="text-red-600 mb-4">{error}</p>
         <div className="flex items-center justify-center gap-2">
           {error.includes('log in') ? (
-            <button
+            <Button
               onClick={() => navigate('/login')}
+              variant="primary"
+              size="sm"
               className={combineThemeClasses(getButtonClasses('primary'), 'text-sm')}
             >
               <LogInIcon className="w-4 h-4 mr-1" />
               Log In
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={loadSubscriptions}
+              variant="outline"
+              size="sm"
               className={combineThemeClasses(getButtonClasses('outline'), 'text-sm')}
             >
+              <RefreshCwIcon className="w-4 h-4 mr-1" />
               Try Again
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -202,19 +210,21 @@ export const SubscriptionList: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={loadSubscriptions}
+            variant="outline"
+            size="sm"
             className={combineThemeClasses(getButtonClasses('outline'), 'text-sm')}
           >
             <RefreshCwIcon className="w-4 h-4 mr-1" />
             Refresh
-          </button>
-          <button
+          </Button>
+          <Button
             className={combineThemeClasses(getButtonClasses('primary'), 'text-sm')}
           >
             <PlusIcon className="w-4 h-4 mr-1" />
-            New Subscription
-          </button>
+            Create Subscription
+          </Button>
         </div>
       </div>
 

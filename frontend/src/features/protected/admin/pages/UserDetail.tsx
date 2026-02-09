@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Loader, ArrowLeft, AlertCircle, Save } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AdminAPI from '@/api/admin';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
@@ -8,6 +8,7 @@ import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { UserDetailSkeleton } from '../components/skeletons/UsersSkeleton';
+import { Button } from '@/components/ui/Button';
 
 interface UserDetailData {
   id: string;
@@ -141,13 +142,15 @@ export const UserDetail = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex items-center justify-between">
         <div>
-          <button
+          <Button
             onClick={() => navigate('/admin/users')}
+            variant="ghost"
+            size="sm"
             className={`inline-flex items-center gap-2 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} hover:text-primary transition-colors`}
+            leftIcon={<ArrowLeft size={16} />}
           >
-            <ArrowLeft className="w-4 h-4" />
             Back to Users
-          </button>
+          </Button>
           <h1 className="text-xl lg:text-2xl font-semibold mt-2">User Details</h1>
           <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
             {user?.email || 'User'}
@@ -265,20 +268,26 @@ export const UserDetail = () => {
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-600">
-            <button
+            <Button
               type="button"
               onClick={() => navigate('/admin/users')}
+              variant="outline"
+              size="sm"
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={saving}
+              variant="primary"
+              size="sm"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium disabled:opacity-60"
+              leftIcon={<Save size={16} />}
+              isLoading={saving}
             >
               {saving ? 'Saving...' : 'Save Changes'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

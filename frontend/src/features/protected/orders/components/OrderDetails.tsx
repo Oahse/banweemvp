@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import TrackingTimeline from './TrackingTimeline';
 import TrackingMap from './TrackingMap';
 import OrderNotes from './OrderNotes';
+import { Button } from '@/components/ui/Button';
 
 
 
@@ -105,38 +106,44 @@ const OrderDetails = ({
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <nav className="flex space-x-8 px-6">
-          <button
+          <Button
             onClick={() => setActiveTab('details')}
+            variant={activeTab === 'details' ? 'primary' : 'ghost'}
+            size="sm"
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'details'
-                ? 'border-blue-500 text-blue-600'
+                ? 'border-primary text-primary'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             Order Details
-          </button>
+          </Button>
           {showTracking && (
-            <button
+            <Button
               onClick={() => setActiveTab('tracking')}
+              variant={activeTab === 'tracking' ? 'primary' : 'ghost'}
+              size="sm"
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'tracking'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-primary text-primary'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               Tracking ({order.tracking_events.length})
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             onClick={() => setActiveTab('notes')}
+            variant={activeTab === 'notes' ? 'primary' : 'ghost'}
+            size="sm"
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'notes'
-                ? 'border-blue-500 text-blue-600'
+                ? 'border-primary text-primary'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Notes ({order.notes.length})
-          </button>
+            Notes ({order.notes?.length || 0})
+          </Button>
         </nav>
       </div>
 

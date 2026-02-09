@@ -5,6 +5,7 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
+import { Button } from '@/components/ui/Button';
 import AdminLayout from '../components/AdminLayout';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { UsersListSkeleton } from '../components/skeletons/UsersSkeleton';
@@ -344,18 +345,15 @@ export const Users = () => {
               className="min-w-[120px]"
             />
             
-            <button
+            <Button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
-                currentTheme === 'dark' 
-                  ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
-                  : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-              }`}
+              variant="outline"
+              size="sm"
+              leftIcon={<ArrowUpDownIcon size={14} />}
+              className="inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium"
             >
-              <ArrowUpDownIcon size={16} />
-              <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
-              <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-            </button>
+              Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+            </Button>
           </div>
 
           {/* Active Filters */}
@@ -365,46 +363,50 @@ export const Users = () => {
               {debouncedSearchQuery && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Search: "{debouncedSearchQuery}"
-                  <button
+                  <Button
                     onClick={() => setSearchQuery('')}
-                    className="ml-1 hover:text-primary-dark"
+                    variant="ghost"
+                    size="sm"
                   >
-                    ×
-                  </button>
+                    Clear
+                  </Button>
                 </span>
               )}
               {statusFilter && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
-                  <button
+                  <Button
                     onClick={() => setStatusFilter('')}
-                    className="ml-1 hover:text-primary-dark"
+                    variant="ghost"
+                    size="sm"
                   >
-                    ×
-                  </button>
+                    Clear
+                  </Button>
                 </span>
               )}
               {roleFilter && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Role: {roleFilter.charAt(0).toUpperCase() + roleFilter.slice(1)}
-                  <button
+                  <Button
                     onClick={() => setRoleFilter('')}
-                    className="ml-1 hover:text-primary-dark"
+                    variant="ghost"
+                    size="sm"
                   >
-                    ×
-                  </button>
+                    Clear
+                  </Button>
                 </span>
               )}
-              <button
+              <Button
                 onClick={() => {
                   setSearchQuery('');
                   setStatusFilter('');
                   setRoleFilter('');
                 }}
-                className="text-xs text-primary hover:text-primary-dark underline"
+                variant="ghost"
+                size="sm"
               >
                 Clear all
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -420,14 +422,13 @@ export const Users = () => {
           <div className="flex-1">
             <p className="font-semibold">Error Loading Users</p>
             <p className="text-sm mt-1">{error}</p>
-            <button
+            <Button
               onClick={() => window.location.reload()}
-              className={`mt-2 text-sm underline hover:no-underline ${
-                currentTheme === 'dark' ? 'text-error hover:text-error-light' : 'text-error hover:text-error-dark'
-              }`}
+              variant="ghost"
+              size="sm"
             >
-              Try again
-            </button>
+              Try Again
+            </Button>
           </div>
         </div>
       )}
@@ -466,26 +467,30 @@ export const Users = () => {
                       <td className="px-4 py-3 text-xs">{roleBadge(user.role)}</td>
                       <td className="px-4 py-3 text-xs">{statusBadge(user.status)}</td>
                       <td className="px-4 py-3 text-xs">
-                        <button 
+                        <Button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleView(user);
                           }}
+                          variant="primary"
+                          size="sm"
+                          leftIcon={<EyeIcon size={14} />}
                           className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                         >
-                          <EyeIcon size={14} />
                           View
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={(e) => {
                             e.stopPropagation();
                             setDeletingUser(user);
                             setShowDeleteModal(true);
                           }}
+                          variant="danger"
+                          size="sm"
                           className="ml-2 inline-flex items-center gap-1 px-3 py-1.5 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors"
                         >
                           Delete
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -509,27 +514,31 @@ export const Users = () => {
                   <div className="flex items-center justify-between">
                     {roleBadge(user.role)}
                   </div>
-                  <button 
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleView(user);
                     }}
+                    variant="primary"
+                    size="sm"
+                    leftIcon={<EyeIcon size={14} />}
                     className="mt-2 w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
                   >
-                    <EyeIcon size={14} />
                     View Details
-                  </button>
+                  </Button>
                   <div className="mt-2 flex items-center gap-2">
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeletingUser(user);
                         setShowDeleteModal(true);
                       }}
+                      variant="danger"
+                      size="sm"
                       className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors text-sm"
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -553,18 +562,14 @@ export const Users = () => {
           {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
         </p>
         <div className="flex items-center gap-1">
-          <button
+          <Button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-              currentTheme === 'dark' 
-                ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-            }`}
+            variant="outline"
+            size="sm"
           >
-            <ChevronLeft className="w-4 h-4" />
             Previous
-          </button>
+          </Button>
 
           {/* Page numbers */}
           <div className="flex items-center gap-1 mx-2">
@@ -581,35 +586,29 @@ export const Users = () => {
               }
 
               return (
-                <button
+                <Button
                   key={pageNum}
                   onClick={() => setPage(pageNum)}
-                  className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
-                    pageNum === page
-                      ? 'bg-primary text-white'
-                      : currentTheme === 'dark'
-                        ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                        : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
+                  variant={page === pageNum ? 'primary' : 'ghost'}
+                  size="sm"
+                  className={`w-6 h-6 rounded-md text-sm font-medium transition-colors ${
+                    page === pageNum ? 'bg-primary text-white' : 'border border-gray-300 bg-white text-gray-700'
                   }`}
                 >
                   {pageNum}
-                </button>
+                </Button>
               );
             })}
           </div>
 
-          <button
-            onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
-            disabled={page >= (pagination.pages || 1)}
-            className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-              currentTheme === 'dark' 
-                ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-            }`}
+          <Button
+            onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
+            disabled={page >= pagination.pages || pagination.pages <= 1}
+            variant="outline"
+            size="sm"
           >
             Next
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -621,23 +620,24 @@ export const Users = () => {
               Are you sure you want to delete {deletingUser.email}? This action cannot be undone.
             </p>
             <div className="mt-6 flex justify-end gap-2">
-              <button
-                type="button"
+              <Button
                 onClick={() => {
                   setShowDeleteModal(false);
                   setDeletingUser(null);
                 }}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                variant="secondary"
+                size="sm"
               >
                 Cancel
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
                 onClick={handleDelete}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-error text-white rounded-lg hover:bg-error/90 transition-colors text-sm font-medium"
+                disabled={isDeleting}
+                variant="danger"
+                size="sm"
               >
-                Delete
-              </button>
+                {isDeleting ? 'Deleting...' : 'Delete User'}
+              </Button>
             </div>
           </div>
         </div>

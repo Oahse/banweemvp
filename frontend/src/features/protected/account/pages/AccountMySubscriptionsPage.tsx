@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
-import { useLocale } from '../../../../components/shared/contexts/LocaleContext';
+import { useLocale } from '@/components/shared/contexts/LocaleContext';
+import Dropdown from '@/components/ui/Dropdown';
+import { Button } from '@/components/ui/Button';
+import TabHeader from '@/components/ui/TabHeader';
 import { 
   PlusIcon, 
   PackageIcon,
@@ -14,7 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { SubscriptionCard } from '../../subscriptions/components/SubscriptionCard';
-import { ConfirmationModal } from '../../../../components/ui/ConfirmationModal';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { AutoRenewToggle } from '../../subscriptions/components/AutoRenewToggle';
 import ProductsAPI from '@/api/products';
 import { Product } from '@/types';
@@ -46,7 +49,8 @@ export const MySubscriptions = () => {
     name: '',
     billing_cycle: 'monthly',
     delivery_type: 'standard',
-    auto_renew: true
+    auto_renew: true,
+    product_variant_ids: [] as string[]
   });
   // ...rest of the file (truncated for brevity)
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -105,6 +109,11 @@ export const MySubscriptions = () => {
       return;
     }
 
+    if (!newSubscriptionData.product_variant_ids || newSubscriptionData.product_variant_ids.length === 0) {
+      toast.error('At least one product must be selected');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await createSubscription(newSubscriptionData);
@@ -113,7 +122,8 @@ export const MySubscriptions = () => {
         name: '',
         billing_cycle: 'monthly',
         delivery_type: 'standard',
-        auto_renew: true
+        auto_renew: true,
+        product_variant_ids: []
       });
       toast.success('Subscription created successfully');
       refreshSubscriptions();
@@ -277,20 +287,22 @@ export const MySubscriptions = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-0 max-w-full overflow-hidden">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-lg md:text-xl font-bold text-gray-900">My Subscriptions</h1>
           <p className="text-sm text-gray-600 mt-1">Manage your active and past subscriptions</p>
         </div>
-        <button
+        <Button
           onClick={() => setShowCreateModal(true)}
-          className="mt-4 sm:mt-0 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#61b482] hover:bg-[#4c9066] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#61b482]"
+          variant="primary"
+          size="sm"
+          leftIcon={<PlusIcon className="w-4 h-4" />}
+          className="mt-4 sm:mt-0"
         >
-          <PlusIcon className="w-4 h-4 mr-2" />
           New Subscription
-        </button>
+        </Button>
       </div>
 
       {/* Search */}
@@ -303,37 +315,24 @@ export const MySubscriptions = () => {
           placeholder="Search subscriptions..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#61b482] focus:border-[#61b482]"
+          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#61b482] focus:border-[#61b482] text-sm"
         />
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          {['all', 'active', 'paused', 'cancelled'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveTab(tab);
-                setCurrentPage(1);
-              }}
-              className={`py-2 px-1 border-b-2 font-medium text-sm capitalize ${
-                activeTab === tab
-                  ? 'border-[#61b482] text-[#61b482]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              {tab}
-              <span className="ml-2 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs">
-                {tab === 'all' 
-                  ? subscriptions?.length || 0
-                  : subscriptions?.filter(s => s.status === tab).length || 0
-                }
-              </span>
-            </button>
-          ))}
-        </nav>
-      </div>
+      <TabHeader
+        tabs={[
+          { id: 'all', label: 'all', count: subscriptions?.length || 0 },
+          { id: 'active', label: 'active', count: subscriptions?.filter(s => s.status === 'active').length || 0 },
+          { id: 'paused', label: 'paused', count: subscriptions?.filter(s => s.status === 'paused').length || 0 },
+          { id: 'cancelled', label: 'cancelled', count: subscriptions?.filter(s => s.status === 'cancelled').length || 0 }
+        ]}
+        activeTab={activeTab}
+        onTabChange={(tabId) => {
+          setActiveTab(tabId);
+          setCurrentPage(1);
+        }}
+      />
 
       {/* Error State */}
       {error && (
@@ -345,12 +344,14 @@ export const MySubscriptions = () => {
                 {error}
               </div>
               <div className="mt-4">
-                <button
+                <Button
                   onClick={refreshSubscriptions}
+                  variant="link"
+                  size="sm"
                   className="text-sm font-medium text-red-600 hover:text-red-500"
                 >
                   Try again
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -366,68 +367,66 @@ export const MySubscriptions = () => {
             {searchQuery ? 'No subscriptions match your search.' : 'Get started by creating a new subscription.'}
           </p>
           <div className="mt-6">
-            <button
+            <Button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#61b482] hover:bg-[#4c9066] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#61b482]"
+              variant="primary"
+              leftIcon={<PlusIcon className="w-4 h-4" />}
             >
-              <PlusIcon className="w-4 h-4 mr-2" />
               New Subscription
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
         <div className="space-y-4">
           {paginatedSubscriptions.map((subscription) => (
-            <SubscriptionCard
-              key={subscription.id}
-              subscription={subscription}
-              onToggleAutoRenew={handleToggleAutoRenew}
-              onPause={(id) => {
-                setSelectedSubscription(subscription);
-                setShowPauseModal(true);
-              }}
-              onResume={handleResumeSubscription}
-              onActivate={handleActivateSubscription}
-              onCancel={(id) => {
-                setSelectedSubscription(subscription);
-                setShowCancelModal(true);
-              }}
-              onDelete={(id) => {
-                setSelectedSubscription(subscription);
-                setShowDeleteModal(true);
-              }}
-              onProductManage={handleManageProducts}
-            />
+            <div key={subscription.id} className="w-full max-w-full overflow-hidden">
+              <SubscriptionCard
+                subscription={subscription}
+                onToggleAutoRenew={handleToggleAutoRenew}
+                onPause={(id) => {
+                  setSelectedSubscription(subscription);
+                  setShowPauseModal(true);
+                }}
+                onResume={handleResumeSubscription}
+                onActivate={handleActivateSubscription}
+                onCancel={(id) => {
+                  setSelectedSubscription(subscription);
+                  setShowCancelModal(true);
+                }}
+                onDelete={handleDeleteSubscription}
+                onProductManage={handleManageProducts}
+              />
+            </div>
           ))}
         </div>
       )}
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-700">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="text-sm text-gray-700 text-center sm:text-left">
             Showing {((currentPage - 1) * itemsPerPage) + 1} to{' '}
             {Math.min(currentPage * itemsPerPage, filteredSubscriptions.length)} of{' '}
             {filteredSubscriptions.length} results
           </div>
-          <div className="flex items-center space-x-2">
-            <button
+          <div className="flex items-center justify-center space-x-2">
+            <Button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="p-2 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronLeftIcon className="w-4 h-4" />
-            </button>
+              variant="outline"
+              size="icon"
+              leftIcon={<ChevronLeftIcon className="w-4 h-4" />}
+            />
             <span className="px-3 py-1 text-sm">
               {currentPage} of {totalPages}
             </span>
-            <button
+            <Button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="p-2 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronRightIcon className="w-4 h-4" />
-            </button>
+              variant="outline"
+              size="icon"
+              leftIcon={<ChevronRightIcon className="w-4 h-4" />}
+            />
           </div>
         </div>
       )}
@@ -435,14 +434,14 @@ export const MySubscriptions = () => {
       {/* Create Subscription Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-full max-w-md sm:w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <div className="mt-3">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-4">
                 Create New Subscription
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Subscription Name
                   </label>
                   <input
@@ -452,43 +451,73 @@ export const MySubscriptions = () => {
                       ...newSubscriptionData,
                       name: e.target.value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#61b482]"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-[#61b482] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     placeholder="Enter subscription name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Billing Cycle
                   </label>
-                  <select
+                  <Dropdown
+                    options={[
+                      { value: 'monthly', label: 'Monthly' },
+                      { value: 'quarterly', label: 'Quarterly' },
+                      { value: 'yearly', label: 'Yearly' }
+                    ]}
                     value={newSubscriptionData.billing_cycle}
-                    onChange={(e) => setNewSubscriptionData({
+                    onChange={(value) => setNewSubscriptionData({
                       ...newSubscriptionData,
-                      billing_cycle: e.target.value
+                      billing_cycle: value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#61b482]"
-                  >
-                    <option value="monthly">Monthly</option>
-                    <option value="quarterly">Quarterly</option>
-                    <option value="yearly">Yearly</option>
-                  </select>
+                    placeholder="Select billing cycle"
+                    searchable={true}
+                    searchPlaceholder="Search billing cycles..."
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Delivery Type
                   </label>
-                  <select
+                  <Dropdown
+                    options={[
+                      { value: 'standard', label: 'Standard' },
+                      { value: 'express', label: 'Express' },
+                      { value: 'pickup', label: 'Pickup' }
+                    ]}
                     value={newSubscriptionData.delivery_type}
-                    onChange={(e) => setNewSubscriptionData({
+                    onChange={(value) => setNewSubscriptionData({
                       ...newSubscriptionData,
-                      delivery_type: e.target.value
+                      delivery_type: value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#61b482]"
-                  >
-                    <option value="standard">Standard</option>
-                    <option value="express">Express</option>
-                    <option value="pickup">Pickup</option>
-                  </select>
+                    placeholder="Select delivery type"
+                    searchable={true}
+                    searchPlaceholder="Search delivery types..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Products
+                  </label>
+                  <div className="space-y-2">
+                    <Button
+                      type="button"
+                      onClick={() => setShowProductModal(true)}
+                      variant="outline"
+                      fullWidth={true}
+                      className="border-dashed"
+                    >
+                      {newSubscriptionData.product_variant_ids.length > 0 
+                        ? `${newSubscriptionData.product_variant_ids.length} product(s) selected`
+                        : 'Click to select products'
+                      }
+                    </Button>
+                    {newSubscriptionData.product_variant_ids.length > 0 && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {newSubscriptionData.product_variant_ids.length} product(s) will be included in this subscription
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <AutoRenewToggle
@@ -500,20 +529,100 @@ export const MySubscriptions = () => {
                   />
                 </div>
               </div>
-              <div className="mt-6 flex justify-end space-x-3">
-                <button
+              <div className="mt-6 flex flex-col sm:flex-row sm:justify-end gap-3">
+                <Button
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  variant="secondary"
+                  size="sm"
+                  fullWidth={true}
+                  className="sm:fullWidth-auto"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleCreateSubscription}
                   disabled={isLoading}
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#61b482] border border-transparent rounded-md hover:bg-[#4c9066] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#61b482] disabled:opacity-50"
+                  variant="primary"
+                  size="sm"
+                  isLoading={isLoading}
+                  fullWidth={true}
+                  className="sm:fullWidth-auto"
                 >
                   {isLoading ? 'Creating...' : 'Create Subscription'}
-                </button>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Product Selection Modal */}
+      {showProductModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-full max-w-2xl sm:w-[600px] shadow-lg rounded-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 max-h-[80vh] overflow-y-auto">
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+                  Select Products
+                </h3>
+                <Button
+                  onClick={() => setShowProductModal(false)}
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <XIcon className="w-5 h-5" />
+                </Button>
+              </div>
+              
+              <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                {availableProducts.length > 0 ? (
+                  availableProducts.map((product) => (
+                    <div key={product.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 gap-3">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100">{product.name}</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{product.description}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatCurrencyLocale(product.price || 0)}</p>
+                      </div>
+                      <Button
+                        onClick={() => {
+                          const isSelected = newSubscriptionData.product_variant_ids.includes(product.id);
+                          if (isSelected) {
+                            setNewSubscriptionData({
+                              ...newSubscriptionData,
+                              product_variant_ids: newSubscriptionData.product_variant_ids.filter(id => id !== product.id)
+                            });
+                          } else {
+                            setNewSubscriptionData({
+                              ...newSubscriptionData,
+                              product_variant_ids: [...newSubscriptionData.product_variant_ids, product.id]
+                            });
+                          }
+                        }}
+                        variant={newSubscriptionData.product_variant_ids.includes(product.id) ? 'primary' : 'secondary'}
+                        size="sm"
+                      >
+                        {newSubscriptionData.product_variant_ids.includes(product.id) ? 'Remove' : 'Add'}
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    No products available
+                  </div>
+                )}
+              </div>
+              
+              <div className="mt-6 flex flex-col sm:flex-row sm:justify-end gap-3">
+                <Button
+                  onClick={() => setShowProductModal(false)}
+                  variant="secondary"
+                  size="sm"
+                  fullWidth={true}
+                  className="sm:fullWidth-auto"
+                >
+                  Done
+                </Button>
               </div>
             </div>
           </div>

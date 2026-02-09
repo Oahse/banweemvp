@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import AdminLayout from '../components/AdminLayout';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { ProductDetailSkeleton } from '../components/skeletons/ProductsSkeleton';
+import { Button } from '@/components/ui/Button';
 
 export const AdminProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -52,13 +53,15 @@ export const AdminProductDetail = () => {
     return (
       <AdminLayout>
         <div className="space-y-6">
-          <button
+          <Button
             onClick={() => navigate('/admin/products')}
+            variant="ghost"
+            size="sm"
+            leftIcon={<ArrowLeft size={16} />}
             className="inline-flex items-center gap-2 text-copy-light hover:text-copy transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
             Back to Products
-          </button>
+          </Button>
           
           {error && (
             <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
@@ -66,13 +69,14 @@ export const AdminProductDetail = () => {
               <div className="flex-1">
                 <p className="font-semibold text-destructive">Error</p>
                 <p className="text-destructive/80 text-sm">{error}</p>
-                <button
+                <Button
                   onClick={() => window.location.reload()}
+                  variant="danger"
+                  size="sm"
                   className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-destructive text-white rounded text-sm hover:bg-destructive/90 transition-colors"
                 >
-                  <RefreshCw className="w-3 h-3" />
-                  Retry
-                </button>
+                  Try Again
+                </Button>
               </div>
             </div>
           )}
@@ -87,26 +91,30 @@ export const AdminProductDetail = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button
+            <Button
               onClick={() => navigate('/admin/products')}
+              variant="ghost"
+              size="sm"
+              leftIcon={<ArrowLeft size={16} />}
               className="inline-flex items-center gap-2 text-copy-light hover:text-copy transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
               Back
-            </button>
+            </Button>
             <div>
               <h1 className="text-lg font-semibold text-copy">{product.name}</h1>
               <p className="text-copy-light text-[11px] mt-0.5">ID: {String(product.id).slice(0, 8)}...</p>
             </div>
           </div>
           
-          <button
+          <Button
             onClick={() => navigate(`/admin/products/${productId}/edit`)}
+            variant="primary"
+            size="sm"
+            leftIcon={<Edit size={14} />}
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors font-medium"
           >
-            <Edit className="w-4 h-4" />
-            Edit
-          </button>
+            Edit Product
+          </Button>
         </div>
 
         {/* Product Information */}

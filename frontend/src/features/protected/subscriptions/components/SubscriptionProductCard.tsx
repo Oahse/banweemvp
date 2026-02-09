@@ -4,6 +4,7 @@ import { MinusIcon, PlusIcon, PackageIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
 import { formatCurrency } from '../../../../utils/orderCalculations';
 import { formatPriceWithFallback, getBestPrice } from '../../utils/price-utils';
+import { Button } from '@/components/ui/Button';
 
 interface SubscriptionProductCardProps {
   product: {
@@ -154,37 +155,46 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
           <div className="flex items-center space-x-3">
             {onQuantityChange && (
               <div className="flex items-center space-x-2">
-                <button
+                <Button
                   onClick={() => handleQuantityChange(quantity - 1)}
                   disabled={quantity <= 1}
+                  variant="outline"
+                  size="sm"
                   className={combineThemeClasses(
                     'p-1 rounded-md border transition-colors duration-200',
                     themeClasses.border.light,
-                    'hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                    themeClasses.text.muted,
+                    'hover:bg-gray-100 dark:hover:bg-gray-800',
+                    'disabled:opacity-50 disabled:cursor-not-allowed'
                   )}
                 >
-                  <MinusIcon className="w-4 h-4" />
-                </button>
+                  <MinusIcon className="w-3 h-3" />
+                </Button>
                 <span className={combineThemeClasses(themeClasses.text.primary, 'min-w-[2rem] text-center')}>
                   {quantity}
                 </span>
-                <button
+                <Button
                   onClick={() => handleQuantityChange(quantity + 1)}
+                  variant="outline"
+                  size="sm"
                   className={combineThemeClasses(
                     'p-1 rounded-md border transition-colors duration-200',
                     themeClasses.border.light,
-                    'hover:bg-gray-50'
+                    themeClasses.text.muted,
+                    'hover:bg-gray-100 dark:hover:bg-gray-800'
                   )}
                 >
-                  <PlusIcon className="w-4 h-4" />
-                </button>
+                  <PlusIcon className="w-3 h-3" />
+                </Button>
               </div>
             )}
             
             {onRemove && (
-              <button
+              <Button
                 onClick={() => onRemove(product.id)}
                 disabled={isRemoving}
+                variant="danger"
+                size="sm"
                 className={combineThemeClasses(
                   getButtonClasses('outline'),
                   'text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300',
@@ -192,7 +202,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                 )}
               >
                 {isRemoving ? 'Removing...' : 'Remove'}
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -237,18 +247,19 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
 
         {/* Remove Button Overlay */}
         {showActions && onRemove && (
-          <button
+          <Button
             onClick={() => onRemove(product.id)}
             disabled={isRemoving}
+            variant="danger"
+            size="sm"
             className={combineThemeClasses(
-              'absolute top-2 right-2 p-2 rounded-full shadow-lg transition-all duration-200',
-              'bg-white/90 hover:bg-red-50 text-red-600 opacity-0 group-hover:opacity-100',
+              'absolute top-2 right-2 p-1.5 rounded-full transition-colors duration-200',
+              'bg-red-600 text-white hover:bg-red-700',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
-            title="Remove from subscription"
           >
-            <MinusIcon className="w-4 h-4" />
-          </button>
+            <MinusIcon className="w-3 h-3" />
+          </Button>
         )}
 
         {/* Stock Badge */}
@@ -290,30 +301,37 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
           
           {showActions && onQuantityChange && (
             <div className="flex items-center space-x-2">
-              <button
+              <Button
                 onClick={() => handleQuantityChange(quantity - 1)}
                 disabled={quantity <= 1}
+                variant="outline"
+                size="sm"
                 className={combineThemeClasses(
                   'p-1 rounded-md border transition-colors duration-200',
                   themeClasses.border.light,
-                  'hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                  themeClasses.text.muted,
+                  'hover:bg-gray-100 dark:hover:bg-gray-800',
+                  'disabled:opacity-50 disabled:cursor-not-allowed'
                 )}
               >
                 <MinusIcon className="w-3 h-3" />
-              </button>
+              </Button>
               <span className={combineThemeClasses(themeClasses.text.primary, 'min-w-[1.5rem] text-center text-sm')}>
                 {quantity}
               </span>
-              <button
+              <Button
                 onClick={() => handleQuantityChange(quantity + 1)}
+                variant="outline"
+                size="sm"
                 className={combineThemeClasses(
                   'p-1 rounded-md border transition-colors duration-200',
                   themeClasses.border.light,
-                  'hover:bg-gray-50'
+                  themeClasses.text.muted,
+                  'hover:bg-gray-100 dark:hover:bg-gray-800'
                 )}
               >
                 <PlusIcon className="w-3 h-3" />
-              </button>
+              </Button>
             </div>
           )}
         </div>

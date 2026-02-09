@@ -6,6 +6,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { ShippingListSkeleton } from '../components/skeletons/ShippingSkeleton';
+import { Button } from '@/components/ui/Button';
 
 const LIMIT = 10;
 
@@ -392,13 +393,14 @@ export const AdminShipping = () => {
           <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage shipping methods and rates</p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
-          <button
+          <Button
             onClick={openAddModal}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+            variant="primary"
+            size="sm"
+            leftIcon={<PlusIcon size={14} />}
           >
-            <PlusIcon size={18} />
-            <span>Add Method</span>
-          </button>
+            Add Shipping Method
+          </Button>
         </div>
       </div>
 
@@ -457,18 +459,14 @@ export const AdminShipping = () => {
               className="min-w-[120px]"
             />
             
-            <button
+            <Button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
-                currentTheme === 'dark' 
-                  ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
-                  : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-              }`}
+              variant="outline"
+              size="sm"
+              leftIcon={<ArrowUpDownIcon size={14} />}
             >
-              <ArrowUpDownIcon size={16} />
-              <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
-              <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-            </button>
+              Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+            </Button>
           </div>
 
           {/* Active Filters */}
@@ -478,34 +476,37 @@ export const AdminShipping = () => {
               {debouncedSearchQuery && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Search: "{debouncedSearchQuery}"
-                  <button
+                  <Button
                     onClick={() => setSearchQuery('')}
-                    className="ml-1 hover:text-primary-dark"
+                    variant="ghost"
+                    size="sm"
                   >
-                    ×
-                  </button>
+                    Clear
+                  </Button>
                 </span>
               )}
               {statusFilter && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Status: {statusFilter === 'active' ? 'Active Only' : 'Inactive Only'}
-                  <button
+                  <Button
                     onClick={() => setStatusFilter('')}
-                    className="ml-1 hover:text-primary-dark"
+                    variant="ghost"
+                    size="sm"
                   >
-                    ×
-                  </button>
+                    Clear
+                  </Button>
                 </span>
               )}
-              <button
+              <Button
                 onClick={() => {
                   setSearchQuery('');
                   setStatusFilter('');
                 }}
-                className="text-xs text-primary hover:text-primary-dark underline"
+                variant="secondary"
+                size="sm"
               >
                 Clear all
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -571,15 +572,17 @@ export const AdminShipping = () => {
                       </td>
                       <td className="px-4 py-3 text-xs">
                         <div className="flex gap-1">
-                          <button
+                          <Button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDelete(method.id);
                             }}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-xs"
+                            variant="danger"
+                            size="sm"
+                            leftIcon={<TrashIcon size={14} />}
                           >
-                            <TrashIcon size={14} />
-                          </button>
+                            Delete
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -614,16 +617,17 @@ export const AdminShipping = () => {
                   <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>
                     {method.regions?.join(', ') || 'All regions'}
                   </div>
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(method.id);
                     }}
-                    className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm mt-2"
+                    variant="danger"
+                    size="sm"
+                    leftIcon={<TrashIcon size={14} />}
                   >
-                    <TrashIcon size={14} />
                     Delete
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -635,18 +639,14 @@ export const AdminShipping = () => {
                   {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
                 </p>
                 <div className="flex items-center gap-1">
-                  <button
+                  <Button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page <= 1}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
+                    variant="outline"
+                    size="sm"
                   >
-                    <ChevronLeft className="w-3 h-3 lg:w-4 lg:h-4" />
-                    <span className="hidden sm:inline">Previous</span>
-                  </button>
+                    Previous
+                  </Button>
                   
                   {/* Page numbers */}
                   <div className="flex items-center gap-1 mx-1 lg:mx-2">
@@ -663,35 +663,26 @@ export const AdminShipping = () => {
                       }
                       
                       return (
-                        <button
+                        <Button
                           key={pageNum}
                           onClick={() => setPage(pageNum)}
-                          className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium transition-colors ${
-                            pageNum === page
-                              ? 'bg-primary text-white'
-                              : currentTheme === 'dark'
-                                ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                                : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                          }`}
+                          variant={page === pageNum ? 'primary' : 'ghost'}
+                          size="sm"
                         >
                           {pageNum}
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
                   
-                  <button
+                  <Button
                     onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
                     disabled={page >= pagination.pages || pagination.pages <= 1}
-                    className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
+                    variant="outline"
+                    size="sm"
                   >
-                    <span className="hidden sm:inline">Next</span>
-                    <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
-                  </button>
+                    Next
+                  </Button>
                 </div>
               </div>
             )}
@@ -709,12 +700,13 @@ export const AdminShipping = () => {
                 <h3 className="text-lg font-semibold">{viewingMethod.name}</h3>
                 <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Shipping method details</p>
               </div>
-              <button
+              <Button
                 onClick={() => setShowDetailsModal(false)}
-                className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                variant="ghost"
+                size="sm"
               >
-                <span className="text-xl">×</span>
-              </button>
+                Close
+              </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -745,22 +737,17 @@ export const AdminShipping = () => {
             </div>
 
             <div className="mt-6 flex justify-end gap-2">
-              <button
+              <Button
                 onClick={() => {
                   setShowDetailsModal(false);
                   openEditModal(viewingMethod);
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+                variant="primary"
+                size="sm"
+                leftIcon={<EditIcon size={16} />}
               >
-                <EditIcon size={16} />
                 Edit
-              </button>
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
-              >
-                Close
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -774,12 +761,13 @@ export const AdminShipping = () => {
                 <h3 className="text-lg font-semibold">{editingMethod ? 'Edit Shipping Method' : 'Add Shipping Method'}</h3>
                 <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fill in the details below</p>
               </div>
-              <button
+              <Button
                 onClick={() => setShowModal(false)}
-                className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                variant="ghost"
+                size="sm"
               >
-                <span className="text-xl">×</span>
-              </button>
+                Close
+              </Button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -894,7 +882,7 @@ export const AdminShipping = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <button
+                <Button
                   type="button"
                   role="switch"
                   aria-checked={formData.is_active}
@@ -902,35 +890,29 @@ export const AdminShipping = () => {
                     e.preventDefault();
                     setFormData(prev => ({ ...prev, is_active: !prev.is_active }));
                   }}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    formData.is_active ? 'bg-primary' : currentTheme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'
-                  }`}
+                  variant="primary"
+                  size="sm"
                 >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      formData.is_active ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-                <span className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   {formData.is_active ? 'Active' : 'Inactive'}
-                </span>
+                </Button>
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                  variant="secondary"
+                  size="sm"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+                  variant="primary"
+                  size="sm"
                 >
                   {editingMethod ? 'Update' : 'Create'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

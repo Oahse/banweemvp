@@ -6,6 +6,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { InventoryListSkeleton } from '../components/skeletons/InventorySkeleton';
+import { Button } from '@/components/ui/Button';
 
 const LIMIT = 10;
 
@@ -387,247 +388,278 @@ export const AdminInventory = () => {
                 { value: 'quantity', label: 'Stock Level' },
                 { value: 'location_name', label: 'Location' }
               ]}
-              value={sortBy}
-              onChange={setSortBy}
-              placeholder="Sort by"
-              className="min-w-[120px]"
+                className={currentTheme === 'dark' 
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              }
             />
-            
-            <button
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
-                currentTheme === 'dark' 
-                  ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
-                  : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-              }`}
-            >
-              <ArrowUpDownIcon size={16} />
-              <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
-              <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-            </button>
+            {searchQuery !== debouncedSearchQuery && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
           </div>
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
+          <Dropdown
+            options={[
+              { value: '', label: 'All Items' },
+              { value: 'low_stock', label: 'Low Stock Only' }
+            ]}
+            value={statusFilter}
+            onChange={setStatusFilter}
+            placeholder="All Items"
+            className="min-w-[120px]"
+          />
+          
+          <Dropdown
+            options={[
+              { value: 'created_at', label: 'Created' },
+              { value: 'product_name', label: 'Product Name' },
+              { value: 'quantity', label: 'Stock Level' },
+              { value: 'location_name', label: 'Location' }
+            ]}
+            value={sortBy}
+            onChange={setSortBy}
+            placeholder="Sort by"
+            className="min-w-[120px]"
+          />
+          
+          <Button
+            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+            variant="outline"
+            size="sm"
+            leftIcon={<ArrowUpDownIcon size={14} />}
+            className="inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium"
+          >
+            Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+          </Button>
+        </div>
 
-          {/* Active Filters */}
-          {(debouncedSearchQuery || statusFilter) && (
-            <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
-              {debouncedSearchQuery && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                  Search: "{debouncedSearchQuery}"
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="ml-1 hover:text-primary-dark"
-                  >
-                    ×
-                  </button>
-                </span>
-              )}
-              {statusFilter && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                  Filter: {statusFilter === 'low_stock' ? 'Low Stock Only' : 'All Items'}
-                  <button
-                    onClick={() => setStatusFilter('')}
-                    className="ml-1 hover:text-primary-dark"
-                  >
-                    ×
-                  </button>
-                </span>
-              )}
-              <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setStatusFilter('');
-                }}
-                className="text-xs text-primary hover:text-primary-dark underline"
-              >
-                Clear all
-              </button>
-            </div>
-          )}
+        {/* Active Filters */}
+        {(debouncedSearchQuery || statusFilter) && (
+          <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+            {debouncedSearchQuery && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                Search: "{debouncedSearchQuery}"
+                <Button
+                  onClick={() => setSearchQuery('')}
+                  variant="ghost"
+                  size="sm"
+                >
+                  Clear
+                </Button>
+              </span>
+            )}
+            {statusFilter && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                Filter: {statusFilter === 'low_stock' ? 'Low Stock Only' : 'All Items'}
+                <Button
+                  onClick={() => setStatusFilter('')}
+                  variant="ghost"
+                  size="sm"
+                >
+                  Clear
+                </Button>
+              </span>
+            )}
+            <Button
+              onClick={() => {
+                setSearchQuery('');
+                setStatusFilter('');
+              }}
+              variant="ghost"
+              size="sm"
+            >
+              Clear all
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {error && (
+      <div className={`p-4 rounded-lg border flex items-start gap-3 ${
+        currentTheme === 'dark' 
+          ? 'bg-error/10 border-error/30 text-error' 
+          : 'bg-error/10 border-error/30 text-error'
+      }`}>
+        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <p className="font-semibold">Error Loading Inventory</p>
+          <p className="text-sm mt-1">{error}</p>
+          <Button
+            onClick={() => window.location.reload()}
+            variant="ghost"
+            size="sm"
+          >
+            Try Again
+          </Button>
         </div>
       </div>
+    )}
 
-      {error && (
-        <div className={`p-4 rounded-lg border flex items-start gap-3 ${
-          currentTheme === 'dark' 
-            ? 'bg-error/10 border-error/30 text-error' 
-            : 'bg-error/10 border-error/30 text-error'
-        }`}>
-          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="font-semibold">Error Loading Inventory</p>
-            <p className="text-sm mt-1">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className={`mt-2 text-sm underline hover:no-underline ${
-                currentTheme === 'dark' ? 'text-error hover:text-error-light' : 'text-error hover:text-error-dark'
-              }`}
-            >
-              Try again
-            </button>
+    <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+      
+      {loading && !initialLoading ? (
+        <div className="p-8">
+          <div className="flex items-center justify-center">
+            <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
+            <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating inventory...</span>
           </div>
         </div>
-      )}
-
-      <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        
-        {loading && !initialLoading ? (
-          <div className="p-8">
-            <div className="flex items-center justify-center">
-              <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
-              <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating inventory...</span>
-            </div>
+      ) : inventory.length > 0 ? (
+        <>
+          {/* Desktop table */}
+          <div className="overflow-x-auto hidden md:block">
+            <table className="w-full">
+              <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Variant</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">SKU</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Location</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Stock Level</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inventory.map((item) => {
+                  const status = stockStatus(item);
+                  const d = getItemDisplay(item);
+                  return (
+                    <tr key={item.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                      <td className="px-4 py-3 text-xs text-gray-900 dark:text-white max-w-[150px] truncate">{d.productName}</td>
+                      <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[100px] truncate">{d.variantSku}</td>
+                      <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[120px] truncate">{d.locationName}</td>
+                      <td className="px-4 py-3 text-xs font-semibold text-gray-900 dark:text-white">{d.stockLevel}</td>
+                      <td className="px-4 py-3 text-xs">
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.cls}`}>
+                          {status.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditModal(item);
+                          }}
+                          variant="primary"
+                          size="sm"
+                          leftIcon={<EditIcon size={14} />}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                        >
+                          Edit
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-        ) : inventory.length > 0 ? (
-          <>
-            {/* Desktop table */}
-            <div className="overflow-x-auto hidden md:block">
-              <table className="w-full">
-                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Variant</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">SKU</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Location</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Stock Level</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inventory.map((item) => {
-                    const status = stockStatus(item);
-                    const d = getItemDisplay(item);
+
+          {/* Mobile cards */}
+          <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
+            {inventory.map((item) => {
+              const status = stockStatus(item);
+              const d = getItemDisplay(item);
+              return (
+                <div
+                  key={item.id}
+                  className={`p-4 flex flex-col gap-2 bg-white dark:bg-gray-800 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <span className="font-medium text-sm text-gray-900 dark:text-white block truncate">{d.productName}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 truncate block">SKU: {d.variantSku}</span>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${status.cls}`}>
+                      {status.label}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-500 dark:text-gray-400">Location:</span>
+                    <span className="text-gray-900 dark:text-white truncate ml-2 flex-1 text-right">{d.locationName}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-500 dark:text-gray-400">Stock:</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{d.stockLevel}</span>
+                  </div>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(item);
+                    }}
+                    variant="primary"
+                    size="sm"
+                    leftIcon={<EditIcon size={14} />}
+                    className="mt-2 w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
+                  >
+                    Edit Stock
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+              <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} items
+                {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
+              </p>
+              <div className="flex items-center gap-1">
+                <Button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  variant="outline"
+                  size="sm"
+                >
+                  Previous
+                </Button>
+                
+                {/* Page numbers */}
+                <div className="flex items-center gap-1 mx-2">
+                  {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
+                    let pageNum: number;
+                    if (pagination.pages <= 5) {
+                      pageNum = i + 1;
+                    } else if (page <= 3) {
+                      pageNum = i + 1;
+                    } else if (page >= pagination.pages - 2) {
+                      pageNum = pagination.pages - 4 + i;
+                    } else {
+                      pageNum = page - 2 + i;
+                    }
+                    
                     return (
-                      <tr key={item.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
-                        <td className="px-4 py-3 text-xs text-gray-900 dark:text-white max-w-[150px] truncate">{d.productName}</td>
-                        <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[100px] truncate">{d.variantSku}</td>
-                        <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[120px] truncate">{d.locationName}</td>
-                        <td className="px-4 py-3 text-xs font-semibold text-gray-900 dark:text-white">{d.stockLevel}</td>
-                        <td className="px-4 py-3 text-xs">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.cls}`}>
-                            {status.label}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-xs">
-                          <button 
-                            onClick={() => openEditModal(item)}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
-                          >
-                            <EditIcon size={14} />
-                            Edit
-                          </button>
-                        </td>
-                      </tr>
+                      <Button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        variant={page === pageNum ? 'primary' : 'ghost'}
+                        size="sm"
+                        className={`w-6 h-6 rounded-md text-sm font-medium transition-colors ${
+                          page === pageNum ? 'bg-primary text-white' : 'border border-gray-300 bg-white text-gray-700'
+                        }`}
+                      >
+                        {pageNum}
+                      </Button>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile cards */}
-            <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
-              {inventory.map((item) => {
-                const status = stockStatus(item);
-                const d = getItemDisplay(item);
-                return (
-                  <div
-                    key={item.id}
-                    className={`p-4 flex flex-col gap-2 bg-white dark:bg-gray-800 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <span className="font-medium text-sm text-gray-900 dark:text-white block truncate">{d.productName}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 truncate block">SKU: {d.variantSku}</span>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${status.cls}`}>
-                        {status.label}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500 dark:text-gray-400">Location:</span>
-                      <span className="text-gray-900 dark:text-white truncate ml-2 flex-1 text-right">{d.locationName}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500 dark:text-gray-400">Stock:</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{d.stockLevel}</span>
-                    </div>
-                    <button 
-                      onClick={() => openEditModal(item)}
-                      className="mt-2 w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
-                    >
-                      <EditIcon size={14} />
-                      Edit Stock
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-                <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} items
-                  {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
-                </p>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Previous
-                  </button>
-                  
-                  {/* Page numbers */}
-                  <div className="flex items-center gap-1 mx-2">
-                    {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
-                      let pageNum: number;
-                      if (pagination.pages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (page >= pagination.pages - 2) {
-                        pageNum = pagination.pages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-                      
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
-                            pageNum === page
-                              ? 'bg-primary text-white'
-                              : currentTheme === 'dark'
-                                ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                                : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  
-                  <button
-                    onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
-                    disabled={page >= pagination.pages || pagination.pages <= 1}
-                    className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
                 </div>
+                
+                <Button
+                  onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
+                  disabled={page >= pagination.pages || pagination.pages <= 1}
+                  variant="outline"
+                  size="sm"
+                >
+                  Next
+                </Button>
               </div>
+            </div>
           </>
         ) : (
           <div className={`p-8 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -644,15 +676,16 @@ export const AdminInventory = () => {
               }
             </p>
             {(searchQuery || statusFilter) && (
-              <button
+              <Button
                 onClick={() => {
                   setSearchQuery('');
                   setStatusFilter('');
                 }}
-                className="text-sm text-primary hover:text-primary-dark underline"
+                variant="ghost"
+                size="sm"
               >
                 Clear all filters
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -666,15 +699,16 @@ export const AdminInventory = () => {
                 <h3 className="text-lg font-semibold">{editingItem ? 'Edit Inventory' : 'Add Inventory Item'}</h3>
                 <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{editingItem ? 'Update stock levels and location' : 'Fill in the details below'}</p>
               </div>
-              <button
+              <Button
                 onClick={() => {
                   setShowModal(false);
                   setEditingItem(null);
                 }}
-                className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
+                variant="ghost"
+                size="sm"
               >
-                <X size={20} />
-              </button>
+                Close
+              </Button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -803,22 +837,24 @@ export const AdminInventory = () => {
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-600">
-                <button
+                <Button
                   type="button"
                   onClick={() => {
                     setShowModal(false);
                     setEditingItem(null);
                   }}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                  variant="ghost"
+                  size="sm"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+                  variant="primary"
+                  size="sm"
                 >
                   {editingItem ? 'Update Stock' : 'Add Item'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

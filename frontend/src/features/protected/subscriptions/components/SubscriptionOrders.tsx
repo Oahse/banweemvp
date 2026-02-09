@@ -5,6 +5,7 @@ import { themeClasses, getButtonClasses } from '../../../../utils/themeClasses';
 import SubscriptionAPI from '../../api/subscription';
 import { toast } from 'react-hot-toast';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { Button } from '@/components/ui/Button';
 
 interface Order {
   id: string;
@@ -73,12 +74,14 @@ export const SubscriptionOrders = () => {
     return (
       <div className="p-6 text-center">
         <p className={themeClasses.text.error}>{error}</p>
-        <button
+        <Button
           onClick={fetchSubscriptionOrders}
+          variant="primary"
+          size="sm"
           className={`${getButtonClasses('primary')} mt-4`}
         >
           Try Again
-        </button>
+        </Button>
       </div>
     );
   }

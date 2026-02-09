@@ -6,6 +6,7 @@ import { AuthAPI } from '../../../../api';
 import { unwrapResponse, extractErrorMessage } from '../../../../utils/api-response';
 import { SkeletonAddresses } from '../../../../components/ui/SkeletonAddresses';
 import { Dropdown } from '../../../../components/ui/Dropdown';
+import { Button } from '@/components/ui/Button';
 import { countries, getCountryOptions, getProvinceOptions, getCountryByCode, getProvincesByCountry, getCityOptions, getCitiesByProvince } from '../../../../data/countries';
 /**
  * Addresses component allows users to manage their saved addresses.
@@ -168,12 +169,14 @@ export const Addresses = () => {
         <p className="text-gray-500 dark:text-gray-400 mb-3">
           Unable to load addresses
         </p>
-        <button 
+        <Button 
           onClick={() => fetchAddresses(AuthAPI.getAddresses)} 
+          variant="link"
+          size="sm"
           className="text-primary hover:underline"
         >
           Try again
-        </button>
+        </Button>
       </div>
     );
   }
@@ -186,10 +189,10 @@ export const Addresses = () => {
             Saved Addresses
           </h2>
           {/* Button to toggle the add/edit address form */}
-          <button onClick={() => setShowAddressForm(!showAddressForm)} className="flex items-center text-primary hover:text-primary-dark">
+          <Button onClick={() => setShowAddressForm(!showAddressForm)} className="flex items-center text-primary hover:text-primary-dark">
             <PlusCircleIcon size={18} className="mr-1" />
             <span>Add New Address</span>
-          </button>
+          </Button>
         </div>
         {/* Display existing addresses or a message if none are saved */}
         {localAddresses && localAddresses.length > 0 ? (
@@ -217,14 +220,14 @@ export const Addresses = () => {
                 </p>
                 <div className="flex mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                   {/* Edit and Delete buttons for each address */}
-                    <button onClick={() => handleEditAddress(address)} className="flex items-center text-sm text-gray-600 hover:text-primary dark:text-gray-300 mr-3">
+                    <Button onClick={() => handleEditAddress(address)} variant="ghost" size="sm" className="flex items-center text-sm text-gray-600 hover:text-primary dark:text-gray-300 mr-3">
                       <PencilIcon size={14} className="mr-1" />
                       Edit
-                    </button>
-                    <button onClick={() => handleDeleteAddress(address.id)} className="flex items-center text-sm text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 mr-3">
+                    </Button>
+                    <Button onClick={() => handleDeleteAddress(address.id)} variant="ghost" size="sm" className="flex items-center text-sm text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 mr-3">
                       <TrashIcon size={14} className="mr-1" />
                       Delete
-                    </button>
+                    </Button>
                 </div>
               </div>
             ))}
@@ -235,9 +238,9 @@ export const Addresses = () => {
             <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
               No addresses saved yet
             </p>
-            <button onClick={() => setShowAddressForm(true)} className="text-primary hover:underline text-xs">
+            <Button onClick={() => setShowAddressForm(true)} variant="link" size="sm" className="text-primary hover:underline text-xs">
               Add your first address
-            </button>
+            </Button>
           </div>
         )}
         {/* Add/Edit Address Form */}
@@ -343,12 +346,12 @@ export const Addresses = () => {
               </div>
               {/* Form Action Buttons */}
               <div className="mt-6 flex justify-end space-x-3">
-                <button type="button" onClick={resetForm} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                <Button type="button" onClick={resetForm} variant="outline" size="sm" className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
                   Cancel
-                </button>
-                <button type="submit" className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md">
+                </Button>
+                <Button type="submit" variant="primary" size="sm" className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md">
                   {editingAddressId ? 'Update Address' : 'Add Address'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

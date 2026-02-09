@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { QrCodeIcon, ScanLineIcon } from 'lucide-react';
 import { ProductVariant, BarcodeData } from '../../../../types';
 import { ProductsAPI } from '../../../../api/products';
+import { Button } from '@/components/ui/Button';
 
 interface BarcodeDisplayProps {
   variant: ProductVariant;
@@ -69,13 +70,16 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
           {variant.name} - Codes
         </h3>
         {canGenerate && (
-          <button
+          <Button
             onClick={handleGenerateCodes}
             disabled={isGenerating}
+            variant="primary"
+            size="sm"
             className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark disabled:opacity-50 transition-colors w-full sm:w-auto"
+            isLoading={isGenerating}
           >
             {isGenerating ? 'Generating...' : 'Generate Codes'}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -89,12 +93,14 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
                 Barcode
               </h4>
               {codes.barcode && (
-                <button
+                <Button
                   onClick={() => downloadCode(codes.barcode!, `barcode-${variant.sku}.png`)}
+                  variant="link"
+                  size="sm"
                   className="text-sm text-primary hover:text-primary-dark transition-colors w-full sm:w-auto text-left sm:text-right"
                 >
                   Download
-                </button>
+                </Button>
               )}
             </div>
             {codes.barcode ? (
@@ -126,12 +132,14 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
                 QR Code
               </h4>
               {codes.qr_code && (
-                <button
+                <Button
                   onClick={() => downloadCode(codes.qr_code!, `qrcode-${variant.sku}.png`)}
+                  variant="link"
+                  size="sm"
                   className="text-sm text-primary hover:text-primary-dark transition-colors w-full sm:w-auto text-left sm:text-right"
                 >
                   Download
-                </button>
+                </Button>
               )}
             </div>
             {codes.qr_code ? (

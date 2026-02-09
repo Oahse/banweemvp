@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { AuthAPI } from '../../api/auth';
-import { Button } from '../ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Input } from '../ui/Input';
 import { X } from 'lucide-react';
 
@@ -97,13 +97,15 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
       {isModal && (
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-copy">Add New Address</h2>
-          <button
+          <Button
             type="button"
             onClick={onCancel}
+            variant="ghost"
+            size="sm"
             className="text-copy-light hover:text-copy"
           >
-            <X className="w-6 h-6" />
-          </button>
+            <X className="w-5 h-5" />
+          </Button>
         </div>
       )}
 

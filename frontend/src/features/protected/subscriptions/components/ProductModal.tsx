@@ -11,6 +11,7 @@ import { formatCurrency } from '../../../../utils/orderCalculations';
 import { toast } from 'react-hot-toast';
 import { getSubscription } from '../../api/subscription';
 import type { Subscription } from '../../types';
+import { Button } from '@/components/ui/Button';
 
 interface SubscriptionProduct {
   id: string;
@@ -144,15 +145,17 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                   Manage products in your subscription
                 </p>
               </div>
-              <button
+              <Button
                 onClick={handleClose}
+                variant="outline"
+                size="sm"
                 className={combineThemeClasses(
                   themeClasses.text.muted,
-                  'hover:text-primary p-2 rounded-full hover:bg-surface-hover transition-colors'
+                  'px-4 py-2'
                 )}
               >
-                <XIcon size={24} />
-              </button>
+                Close
+              </Button>
             </div>
           </div>
 
@@ -177,12 +180,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 <p className={combineThemeClasses(themeClasses.text.error, 'text-sm mb-4')}>
                   {state.error}
                 </p>
-                <button
+                <Button
                   onClick={loadSubscriptionDetails}
+                  variant="outline"
+                  size="sm"
                   className={getButtonClasses('outline')}
                 >
                   Try Again
-                </button>
+                </Button>
               </div>
             ) : state.products.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
@@ -255,26 +260,28 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
                           {/* Actions */}
                           <div className="flex items-center gap-2">
-                            <button
+                            <Button
                               onClick={() => confirmRemoveProduct(product.id, product.name)}
                               disabled={state.removingProductId === product.id}
+                              variant="danger"
+                              size="sm"
                               className={combineThemeClasses(
-                                'px-3 py-1 text-sm rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors flex items-center gap-1',
-                                state.removingProductId === product.id ? 'opacity-50 cursor-not-allowed' : ''
+                                'px-3 py-1.5 text-xs',
+                                state.removingProductId === product.id && 'opacity-50 cursor-not-allowed'
                               )}
                             >
                               {state.removingProductId === product.id ? (
                                 <>
-                                  <LoaderIcon className="w-3 h-3 animate-spin" />
+                                  <LoaderIcon className="w-3 h-3 animate-spin mr-1" />
                                   Removing...
                                 </>
                               ) : (
                                 <>
-                                  <TrashIcon className="w-3 h-3" />
+                                  <TrashIcon className="w-3 h-3 mr-1" />
                                   Remove
                                 </>
                               )}
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -288,12 +295,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           {/* Footer */}
           <div className="p-6 border-t border-border flex-shrink-0">
             <div className="flex justify-end">
-              <button
+              <Button
                 onClick={handleClose}
+                variant="outline"
+                size="sm"
                 className={getButtonClasses('outline')}
               >
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -320,32 +329,36 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               </p>
               
               <div className="flex justify-end gap-3">
-                <button
+                <Button
                   onClick={() => setShowConfirmDialog({ show: false, productId: '', productName: '' })}
+                  variant="outline"
+                  size="sm"
                   className={getButtonClasses('outline')}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleRemoveProduct(showConfirmDialog.productId)}
                   disabled={state.removingProductId === showConfirmDialog.productId}
+                  variant="danger"
+                  size="sm"
                   className={combineThemeClasses(
-                    'px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white font-medium transition-colors flex items-center gap-2',
-                    state.removingProductId === showConfirmDialog.productId ? 'opacity-50 cursor-not-allowed' : ''
+                    getButtonClasses('danger'),
+                    state.removingProductId === showConfirmDialog.productId && 'opacity-50 cursor-not-allowed'
                   )}
                 >
                   {state.removingProductId === showConfirmDialog.productId ? (
                     <>
-                      <LoaderIcon className="w-4 h-4 animate-spin" />
+                      <LoaderIcon className="w-4 h-4 animate-spin mr-2" />
                       Removing...
                     </>
                   ) : (
                     <>
-                      <TrashIcon className="w-4 h-4" />
+                      <TrashIcon className="w-4 h-4 mr-2" />
                       Remove Product
                     </>
                   )}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

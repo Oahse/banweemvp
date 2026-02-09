@@ -2,6 +2,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { HomeIcon, SearchIcon, ShoppingCartIcon, UserIcon, MenuIcon } from 'lucide-react';
 import { useCart } from '../../../CartContext';
+import { Button } from '@/components/ui/Button';
 /**
  * @typedef {object} MobileNavProps
  * @property {() => void} onSearchClick
@@ -27,14 +28,14 @@ export const MobileNav = ({
             Home
           </span>
         </Link>
-        <button onClick={onCategoriesClick} className="flex flex-col items-center py-1">
+        <Button onClick={onCategoriesClick} variant="ghost" size="sm" className="flex flex-col items-center py-1">
           <MenuIcon size={24} className="text-copy-light" />
           <span className="text-xs mt-1 text-copy-light">Categories</span>
-        </button>
-        <button onClick={onSearchClick} className="flex flex-col items-center py-1">
+        </Button>
+        <Button onClick={onSearchClick} variant="ghost" size="sm" className="flex flex-col items-center py-1">
           <SearchIcon size={24} className="text-copy-light" />
           <span className="text-xs mt-1 text-copy-light">Search</span>
-        </button>
+        </Button>
         <Link to="/cart" className="flex flex-col items-center py-1">
           <div className="relative">
             <ShoppingCartIcon size={24} className={isActive('/cart') ? 'text-primary' : 'text-copy-light'} />

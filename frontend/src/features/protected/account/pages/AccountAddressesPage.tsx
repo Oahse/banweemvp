@@ -6,6 +6,7 @@ import { AuthAPI } from '@/api';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { SkeletonAddresses } from '@/components/ui/SkeletonAddresses';
 import { Dropdown } from '@/components/ui/Dropdown';
+import { Button } from '@/components/ui/Button';
 import { countries, getCountryOptions, getProvinceOptions, getCountryByCode, getProvincesByCountry, getCityOptions, getCitiesByProvince } from '@/data/countries';
 
 /**
@@ -190,24 +191,27 @@ export const Addresses = () => {
     return (
       <div className="space-y-3">
         <div className="flex justify-between items-center">
-          <button
+          <Button
             onClick={() => setShowAddressForm(true)}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            variant="primary"
+            size="sm"
+            leftIcon={<PlusCircleIcon className="w-5 h-5" />}
           >
-            <PlusCircleIcon className="w-5 h-5" />
             Add Address
-          </button>
+          </Button>
         </div>
         
         <div className="text-center py-6">
           <MapPinIcon className="w-6 h-6 text-gray-400 mx-auto mb-2" />
           <p className="text-gray-600">Unable to load addresses</p>
-          <button
+          <Button
             onClick={() => fetchAddresses(() => AuthAPI.getAddresses())}
+            variant="link"
+            size="sm"
             className="mt-4 text-primary hover:text-primary/80"
           >
             Try again
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -218,13 +222,13 @@ export const Addresses = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white"></h2>
-        <button
+        <Button
           onClick={() => setShowAddressForm(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+          variant="primary"
+          leftIcon={<PlusCircleIcon className="w-5 h-5" />}
         >
-          <PlusCircleIcon className="w-5 h-5" />
           Add Address
-        </button>
+        </Button>
       </div>
 
       {/* Address Form */}
@@ -234,12 +238,14 @@ export const Addresses = () => {
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">
               {editingAddressId ? 'Edit Address' : 'Add New Address'}
             </h3>
-            <button
+            <Button
               onClick={resetForm}
+              variant="ghost"
+              size="icon"
               className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
               ×
-            </button>
+            </Button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -337,19 +343,21 @@ export const Addresses = () => {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <button
+              <Button
                 type="submit"
-                className="px-3 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                variant="primary"
+                size="sm"
               >
                 {editingAddressId ? 'Update Address' : 'Add Address'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={resetForm}
-                className="px-3 py-2 text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                variant="secondary"
+                size="sm"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -388,20 +396,24 @@ export const Addresses = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={() => handleEditAddress(address)}
-                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors"
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
                     title="Edit address"
                   >
                     <PencilIcon className="w-5 h-5" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => handleDeleteAddress(address.id)}
-                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
                     title="Delete address"
                   >
                     <TrashIcon className="w-5 h-5" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

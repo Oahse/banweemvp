@@ -11,7 +11,8 @@ import {
   MailIcon
 } from 'lucide-react';
 import { useAsync } from '../../../shared/hooks/useAsync';
-import { stockMonitor } from '../../utils/stock';
+import { stockMonitor } from '../../utils/stock-monitor';
+import { Button } from '@/components/ui/Button';
 
 interface OrderItem {
   id: string;
@@ -579,30 +580,36 @@ export const OrderManager: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">
-                      <button
+                      <Button
                         onClick={() => {
                           setSelectedOrder(order);
                           setShowOrderModal(true);
                         }}
-                        className="text-primary hover:text-primary-dark"
-                        title="View details"
+                        variant="outline"
+                        size="sm"
+                        className="text-gray-600 hover:text-gray-800"
+                        title="View order details"
                       >
                         <EyeIcon size={16} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => window.print()}
+                        variant="outline"
+                        size="sm"
                         className="text-gray-600 hover:text-gray-800"
                         title="Print order"
                       >
                         <PrinterIcon size={16} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => toast.success('Email sent to customer')}
+                        variant="outline"
+                        size="sm"
                         className="text-blue-600 hover:text-blue-800"
                         title="Send email"
                       >
                         <MailIcon size={16} />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

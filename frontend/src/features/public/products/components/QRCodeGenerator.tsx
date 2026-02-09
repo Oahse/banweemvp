@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { QrCodeIcon, DownloadIcon, Share2Icon } from 'lucide-react';
 import { ProductVariant } from '../../types';
 import { ProductsAPI } from '../../api/products';
+import { Button } from '@/components/ui/Button';
 
 interface QRCodeGeneratorProps {
   variant: ProductVariant;
@@ -127,24 +128,24 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
         </h3>
         <div className="flex space-x-2">
           {showShare && (
-            <button
+            <Button
               onClick={shareQRCode}
               disabled={!qrCodeUrl}
+              variant="ghost"
+              size="sm"
               className="p-2 text-gray-600 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              title="Share QR Code"
-            >
-              <Share2Icon className="h-4 w-4" />
-            </button>
+              leftIcon={<Share2Icon size={16} />}
+            />
           )}
           {showDownload && (
-            <button
+            <Button
               onClick={downloadQRCode}
               disabled={!qrCodeUrl}
+              variant="ghost"
+              size="sm"
               className="p-2 text-gray-600 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              title="Download QR Code"
-            >
-              <DownloadIcon className="h-4 w-4" />
-            </button>
+              leftIcon={<DownloadIcon size={16} />}
+            />
           )}
         </div>
       </div>

@@ -10,6 +10,7 @@ import {
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
 import { formatCurrency } from '../../../../utils/orderCalculations';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 
 interface AppliedDiscount {
   id: string;
@@ -153,15 +154,17 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
           Discounts {currentDiscounts.length > 0 && `(${currentDiscounts.length})`}
         </h4>
         {!showDiscountInput && !isLoading && (
-          <button
+          <Button
             onClick={() => setShowDiscountInput(true)}
+            variant="ghost"
+            size="sm"
             className={combineThemeClasses(
               'text-[#61b482] hover:text-[#4c9066] text-sm flex items-center gap-1 px-2 py-1 rounded hover:bg-[#61b482]/10 transition-colors'
             )}
+            leftIcon={<PlusIcon size={14} />}
           >
-            <PlusIcon className="w-3 h-3" />
-            Add Code
-          </button>
+            Add Discount
+          </Button>
         )}
       </div>
 
@@ -216,21 +219,17 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                 </div>
               </div>
               
-              <button
+              <Button
                 onClick={() => handleRemoveDiscount(discount.id)}
                 disabled={removingDiscountId === discount.id}
+                variant="ghost"
+                size="sm"
                 className={combineThemeClasses(
-                  'text-red-600 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors',
-                  removingDiscountId === discount.id ? 'opacity-50 cursor-not-allowed' : ''
+                  'text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
                 )}
-                title="Remove discount"
+                leftIcon={<XIcon size={14} />}
               >
-                {removingDiscountId === discount.id ? (
-                  <LoaderIcon className="w-4 h-4 animate-spin" />
-                ) : (
-                  <XIcon className="w-4 h-4" />
-                )}
-              </button>
+              </Button>
             </div>
           ))}
         </div>
@@ -281,38 +280,33 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                 disabled={isApplying}
                 autoFocus
               />
-              <button
+              <Button
                 onClick={handleApplyDiscount}
                 disabled={isApplying || !discountCode.trim()}
+                variant="primary"
+                size="sm"
                 className={combineThemeClasses(
-                  getButtonClasses('primary'),
-                  'text-sm px-4 py-2',
-                  (isApplying || !discountCode.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  getButtonClasses('primary', 'sm'),
+                  'w-full'
                 )}
+                leftIcon={<CheckIcon size={14} />}
+                isLoading={isApplying}
               >
-                {isApplying ? (
-                  <div className="flex items-center gap-2">
-                    <LoaderIcon className="w-4 h-4 animate-spin" />
-                    Applying...
-                  </div>
-                ) : (
-                  'Apply'
-                )}
-              </button>
-              <button
+                {isApplying ? 'Applying...' : 'Apply'}
+              </Button>
+              <Button
                 onClick={() => {
                   setShowDiscountInput(false);
                   setDiscountCode('');
-                  setValidationError(null);
                 }}
-                disabled={isApplying}
+                variant="ghost"
+                size="sm"
                 className={combineThemeClasses(
-                  'text-gray-600 hover:text-gray-700 p-2 rounded hover:bg-gray-50 transition-colors',
-                  isApplying ? 'opacity-50 cursor-not-allowed' : ''
+                  'text-gray-500 hover:text-gray-700 transition-colors'
                 )}
+                leftIcon={<XIcon size={14} />}
               >
-                <XIcon className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
 
             {/* Validation Error */}

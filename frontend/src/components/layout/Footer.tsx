@@ -12,6 +12,7 @@ import {
   ArrowRightIcon
 } from 'lucide-react';
 import { SOCIAL_MEDIA_LINKS } from '../../utils/social-media-config';
+import { Button } from '@/components/ui/Button';
 
 export const Footer = () => {
   const location = useLocation();

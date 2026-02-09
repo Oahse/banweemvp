@@ -5,6 +5,7 @@ import { formatCurrency } from '../../../../utils/orderCalculations';
 import { SubscriptionProductCard } from './SubscriptionProductCard';
 import { VariantSelector } from './VariantSelector';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 
 interface Product {
   id: string;
@@ -155,15 +156,18 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
           <h2 className={combineThemeClasses(themeClasses.text.heading, 'text-xl font-semibold')}>
             {title}
           </h2>
-          <button
+          <Button
             onClick={onClose}
+            variant="ghost"
+            size="icon"
             className={combineThemeClasses(
               'p-2 rounded-lg transition-colors duration-200',
-              themeClasses.text.muted
+              themeClasses.text.muted,
+              'hover:bg-gray-100 dark:hover:bg-gray-800'
             )}
           >
             <XIcon className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
         {/* Search */}
@@ -201,18 +205,20 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                 {selectedVariants.size} product{selectedVariants.size !== 1 ? 's' : ''} selected
               </span>
             </div>
-            <button
+            <Button
               onClick={() => {
                 setSelectedVariants(new Set());
                 setSelectedVariantsByProduct({});
               }}
+              variant="outline"
+              size="sm"
               className={combineThemeClasses(
-                themeClasses.text.secondary,
-                'text-sm hover:text-red-600 transition-colors duration-200'
+                'px-3 py-1.5 text-sm',
+                themeClasses.text.muted
               )}
             >
-              Clear all
-            </button>
+              Clear All
+            </Button>
           </div>
         )}
 
@@ -266,39 +272,33 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
 
                       <div className="flex items-center space-x-2">
                         {product.variants && product.variants.length > 1 && (
-                          <button
+                          <Button
                             onClick={() => toggleProductExpansion(product.id)}
+                            variant="outline"
+                            size="sm"
                             className={combineThemeClasses(
                               getButtonClasses('outline'),
-                              'text-sm'
+                              'px-3 py-1.5 text-xs'
                             )}
                           >
-                            {expandedProducts.has(product.id) ? 'Hide Variants' : 'Show Variants'}
-                          </button>
+                            {expandedProducts.has(product.id) ? 'Show Less' : 'Show Variants'}
+                          </Button>
                         )}
                         
                         {product.variants && product.variants.length === 1 && (
-                          <button
+                          <Button
                             onClick={() => toggleVariantSelection(product.variants![0].id)}
+                            variant={selectedVariants.has(product.variants![0].id) ? 'primary' : 'outline'}
+                            size="sm"
                             className={combineThemeClasses(
                               selectedVariants.has(product.variants![0].id) 
                                 ? getButtonClasses('primary')
                                 : getButtonClasses('outline'),
-                              'text-sm'
+                              'px-3 py-1.5 text-xs'
                             )}
                           >
-                            {selectedVariants.has(product.variants![0].id) ? (
-                              <>
-                                <MinusIcon className="w-4 h-4 mr-1" />
-                                Remove
-                              </>
-                            ) : (
-                              <>
-                                <PlusIcon className="w-4 h-4 mr-1" />
-                                Add
-                              </>
-                            )}
-                          </button>
+                            {selectedVariants.has(product.variants![0].id) ? 'Selected' : 'Select'}
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -325,27 +325,19 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                       
                       {selectedVariantsByProduct[product.id] && (
                         <div className="mt-4 flex justify-end">
-                          <button
+                          <Button
                             onClick={() => toggleVariantSelection(selectedVariantsByProduct[product.id])}
+                            variant={selectedVariants.has(selectedVariantsByProduct[product.id]) ? 'primary' : 'outline'}
+                            size="sm"
                             className={combineThemeClasses(
                               selectedVariants.has(selectedVariantsByProduct[product.id])
                                 ? getButtonClasses('primary')
                                 : getButtonClasses('outline'),
-                              'text-sm'
+                              'px-3 py-1.5 text-xs'
                             )}
                           >
-                            {selectedVariants.has(selectedVariantsByProduct[product.id]) ? (
-                              <>
-                                <MinusIcon className="w-4 h-4 mr-1" />
-                                Remove from Selection
-                              </>
-                            ) : (
-                              <>
-                                <PlusIcon className="w-4 h-4 mr-1" />
-                                Add to Selection
-                              </>
-                            )}
-                          </button>
+                            {selectedVariants.has(selectedVariantsByProduct[product.id]) ? 'Selected' : 'Select'}
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -366,22 +358,26 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
             {selectedVariants.size} product{selectedVariants.size !== 1 ? 's' : ''} selected
           </span>
           <div className="flex items-center space-x-3">
-            <button
+            <Button
               onClick={onClose}
+              variant="outline"
+              size="sm"
               className={combineThemeClasses(getButtonClasses('outline'))}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleConfirm}
               disabled={selectedVariants.size === 0}
+              variant="primary"
+              size="sm"
               className={combineThemeClasses(
                 getButtonClasses('primary'),
-                'disabled:opacity-50 disabled:cursor-not-allowed'
+                selectedVariants.size === 0 && 'opacity-50 cursor-not-allowed'
               )}
             >
-              Add {selectedVariants.size} Product{selectedVariants.size !== 1 ? 's' : ''}
-            </button>
+              Add to Subscription ({selectedVariants.size})
+            </Button>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import apiClient from '@/api';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/Button';
 
 interface StripePaymentFormProps {
   orderId?: string | null;
@@ -167,13 +168,16 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
           <CardElement options={{ style: cardStyle }} />
         )}
       </div>
-      <button
+      <Button
         type="submit"
         disabled={!stripe || !elements || loading || initializing || !isSecure || !clientSecret}
+        variant="primary"
+        size="sm"
         className="w-full bg-primary text-white px-3 py-2 rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+        isLoading={loading}
       >
         {loading ? 'Processing...' : (orderId || amount ? 'Pay Now' : 'Add Card')}
-      </button>
+      </Button>
     </form>
   );
 };

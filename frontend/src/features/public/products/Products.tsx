@@ -2,14 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchIcon, FilterIcon, XIcon } from 'lucide-react';
-import { useAsync } from '../../../components/shared/hooks/useAsync';
-import { ProductsAPI, CategoriesAPI } from '../../../api';
-import { ProductCard } from '../../../components/generic/ProductCard';
-import { SkeletonProductCard } from '../../../components/ui/SkeletonProductCard';
-import { Select } from '../../../components/generic/Select';
-import { Dropdown } from '../../../components/ui/Dropdown';
+import { useAsync } from '.@/components/shared/hooks/useAsync';
+import { ProductsAPI, CategoriesAPI } from '@/api';
+import { ProductCard } from '@/components/generic/ProductCard';
+import { SkeletonProductCard } from '@/components/ui/SkeletonProductCard';
+import { Dropdown } from '@/components/ui/Dropdown';
 import { themeClasses, combineThemeClasses, getInputClasses, getButtonClasses } from '../../../utils/themeClasses';
 import { cn } from '../../../utils/utils';
+import { Button } from '@/components/ui/Button';
 
 // Animation variants
 const containerVariants = {
@@ -221,33 +221,32 @@ const Products = () => {
               )}
             />
           </div>
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            size="sm"
             className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded text-sm font-medium transition-colors"
           >
             Search
-          </button>
+          </Button>
         </form>
 
         {/* Filter Toggle and Sort */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
+            variant="outline"
+            size="sm"
             className={cn(
               'flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600',
               'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300',
               'hover:border-primary hover:bg-gray-50 dark:hover:bg-gray-700',
-              'transition-colors text-sm'
+              showFilters && 'bg-primary text-white border-primary'
             )}
           >
             <FilterIcon size={14} />
-            <span>Filters</span>
-            {(selectedCategories.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000) && (
-              <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full">
-                {selectedCategories.length + (priceRange[0] > 0 || priceRange[1] < 1000 ? 1 : 0)}
-              </span>
-            )}
-          </button>
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </Button>
 
           {/* Custom Sort Dropdown */}
           <div className="w-full sm:w-auto sm:min-w-[160px]">
@@ -279,9 +278,11 @@ const Products = () => {
                 </h3>
                 <div className="flex flex-wrap gap-1">
                   {categories.map((category) => (
-                    <button
+                    <Button
                       key={category.id}
                       onClick={() => handleCategoryChange(category.id)}
+                      variant={selectedCategories.includes(category.id) ? "primary" : "ghost"}
+                      size="sm"
                       className={cn(
                         'px-3 py-1.5 rounded-full text-sm transition-all duration-200',
                         selectedCategories.includes(category.id)
@@ -290,7 +291,7 @@ const Products = () => {
                       )}
                     >
                       {category.name}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -340,24 +341,28 @@ const Products = () => {
 
             {/* Clear Filters */}
             <div className="flex items-center justify-between">
-              <button
+              <Button
                 onClick={clearFilters}
+                variant="ghost"
+                size="sm"
                 className={cn(
                   'flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg',
                   'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
                   'hover:bg-gray-200 dark:hover:bg-gray-600',
                   'transition-colors'
                 )}
+                leftIcon={<XIcon size={14} />}
               >
-                <XIcon size={14} />
                 Clear
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setShowFilters(false)}
+                variant="outline"
+                size="sm"
                 className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 Done
-              </button>
+              </Button>
             </div>
           </motion.div>
         )}
@@ -402,15 +407,17 @@ const Products = () => {
               <p className={combineThemeClasses(themeClasses.text.secondary, 'mb-4')}>
                 Try adjusting your search or filter criteria
               </p>
-              <button
+              <Button
                 onClick={clearFilters}
+                variant="primary"
+                size="sm"
                 className={combineThemeClasses(
                   getButtonClasses('primary'),
                   'transition-all duration-200 hover:scale-105'
                 )}
               >
                 Clear filters
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -425,9 +432,11 @@ const Products = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
+              variant="outline"
+              size="sm"
               className={cn(
                 'px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                 currentPage === 1
@@ -436,7 +445,7 @@ const Products = () => {
               )}
             >
               Previous
-            </button>
+            </Button>
             
             <div className="flex items-center gap-1 sm:gap-2">
               {/* Show page numbers */}
@@ -445,9 +454,11 @@ const Products = () => {
                 if (pageNum > totalPages) return null;
                 
                 return (
-                  <button
+                  <Button
                     key={pageNum}
                     onClick={() => setCurrentPage(pageNum)}
+                    variant={currentPage === pageNum ? "primary" : "ghost"}
+                    size="sm"
                     className={cn(
                       'px-3 py-2 rounded-lg text-sm font-medium transition-colors min-w-[40px]',
                       currentPage === pageNum
@@ -456,14 +467,16 @@ const Products = () => {
                     )}
                   >
                     {pageNum}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
             
-            <button
+            <Button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
+              variant="outline"
+              size="sm"
               className={cn(
                 'px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                 currentPage === totalPages
@@ -472,7 +485,7 @@ const Products = () => {
               )}
             >
               Next
-            </button>
+            </Button>
           </div>
         </motion.div>
       )}

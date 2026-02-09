@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, DollarSign, TrendingUp, TrendingDown, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { apiClient } from '../../api/client';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { apiClient } from '@/api/client';
 
 interface NegotiationRound {
   round: number;
@@ -254,12 +254,14 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
               <h2 className="text-xl font-bold text-gray-900">Negotiate Price</h2>
               <p className="text-sm text-gray-600">{product.name}</p>
             </div>
-            <button
+            <Button
               onClick={onClose}
+              variant="ghost"
+              size="sm"
               className="text-gray-400 hover:text-gray-600 transition-colors"
+              leftIcon={<X size={24} />}
             >
-              <X size={24} />
-            </button>
+            </Button>
           </div>
 
           {/* Content */}

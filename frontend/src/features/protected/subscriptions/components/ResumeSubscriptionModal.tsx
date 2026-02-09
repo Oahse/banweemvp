@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, PlayIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { Button } from '@/components/ui/Button';
 
 interface ResumeSubscriptionModalProps {
   isOpen: boolean;
@@ -153,23 +154,25 @@ export const ResumeSubscriptionModal: React.FC<ResumeSubscriptionModalProps> = (
           themeClasses.border.light,
           themeClasses.background.elevated
         )}>
-          <button
+          <Button
             onClick={handleClose}
             disabled={loading}
+            variant="ghost"
+            size="sm"
             className={combineThemeClasses(
-              getButtonClasses('outline'),
-              'px-4 py-2',
-              loading ? 'opacity-50 cursor-not-allowed' : ''
+              'p-1 rounded-lg transition-colors',
+              loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
             )}
           >
             Cancel
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={onConfirm}
             disabled={loading}
+            variant="success"
+            size="sm"
             className={combineThemeClasses(
-              getButtonClasses('success'),
               'px-4 py-2 flex items-center gap-2',
               loading ? 'opacity-50 cursor-not-allowed' : ''
             )}

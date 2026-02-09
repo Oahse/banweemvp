@@ -6,11 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../cart/contexts/CartContext';
 import { useAuth } from '../../auth/contexts/AuthContext';
-import { useTheme } from '../../../../components/shared/contexts/ThemeContext';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { AuthAPI } from '../api/auth';
-import { CartAPI } from '../../../../api/cart';
+import { CartAPI } from '@/api/cart';
 import { toast } from 'react-hot-toast';
 import SmartCheckoutForm from '../components/SmartCheckoutForm';
+import { Button } from '@/components/ui/Button';
 
 // Animation variants
 const containerVariants = {
@@ -197,12 +198,13 @@ export const Checkout = () => {
                   </ul>
                 </div>
                 <div className="mt-2">
-                  <button
+                  <Button
                     onClick={() => navigate('/cart')}
-                    className="bg-destructive dark:bg-destructive-dark text-copy-inverse dark:text-copy-inverse-dark px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-destructive/90 dark:hover:bg-destructive-dark/90 transition-colors"
+                    variant="destructive"
+                    size="sm"
                   >
-                    Review Cart
-                  </button>
+                    Back to Cart
+                  </Button>
                 </div>
               </div>
             </div>

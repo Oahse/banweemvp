@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { QrCodeIcon, ScanLineIcon, RefreshCwIcon } from 'lucide-react';
 import { ProductsAPI } from '../../api/products';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 
 interface VariantCodeGeneratorProps {
   variantId: string;
@@ -69,14 +70,17 @@ export const VariantCodeGenerator: React.FC<VariantCodeGeneratorProps> = ({
     <div className="bg-surface-hover rounded-lg p-3 border border-border-light">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
         <h4 className="text-sm font-medium text-main">Product Codes</h4>
-        <button
+        <Button
           onClick={generateCodes}
           disabled={isGenerating}
+          variant="primary"
+          size="sm"
           className="flex items-center gap-1 px-2 py-1 text-xs bg-primary text-white rounded hover:bg-primary-dark disabled:opacity-50 transition-colors"
+          leftIcon={<RefreshCwIcon size={12} className={isGenerating ? 'animate-spin' : ''} />}
+          isLoading={isGenerating}
         >
-          <RefreshCwIcon size={12} className={isGenerating ? 'animate-spin' : ''} />
           {isGenerating ? 'Generating...' : hasGenerated ? 'Regenerate' : 'Generate'}
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 gap-3">

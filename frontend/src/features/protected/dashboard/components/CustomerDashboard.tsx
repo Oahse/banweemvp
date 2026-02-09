@@ -13,6 +13,7 @@ import {
   BarChart3Icon,
   TableIcon
 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 /**
  * @typedef {object} CustomerDashboardProps
@@ -41,12 +42,14 @@ const CustomerMetricWidget = ({
     <div className="text-2xl font-bold text-gray-900 mb-1">{value}</div>
     <div className="text-sm text-gray-500 mb-3">{label}</div>
     {actionText && onAction && (
-      <button
+      <Button
         onClick={onAction}
+        variant="outline"
+        size="sm"
         className={`text-xs px-3 py-1 rounded-full bg-${color}-100 text-${color}-700 hover:bg-${color}-200 transition-colors`}
       >
         {actionText}
-      </button>
+      </Button>
     )}
   </div>
 );
@@ -153,9 +156,9 @@ const OrderHistoryWidget = () => {
       label: 'Tracking',
       render: (value) => (
         value ? (
-          <button className="text-blue-600 hover:text-blue-800 text-sm underline">
+          <Button className="text-blue-600 hover:text-blue-800 text-sm underline" variant="link" size="sm">
             Track
-          </button>
+          </Button>
         ) : (
           <span className="text-gray-400 text-sm">-</span>
         )
@@ -238,22 +241,23 @@ const WishlistWidget = () => {
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <button
+            <Button
+              variant={item.inStock ? 'primary' : 'outline'}
+              size="sm"
               className={`px-3 py-1 text-xs rounded-md ${
                 item.inStock
                   ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
-              disabled={!item.inStock}
             >
               {item.inStock ? 'Add to Cart' : 'Out of Stock'}
-            </button>
+            </Button>
           </div>
         </div>
       ))}
-      <button className="w-full py-2 text-sm text-blue-600 hover:text-blue-800 border border-blue-200 rounded-md hover:bg-blue-50">
+      <Button className="w-full py-2 text-sm text-blue-600 hover:text-blue-800 border border-blue-200 rounded-md hover:bg-blue-50" variant="outline" size="sm">
         View All Wishlist Items
-      </button>
+      </Button>
     </div>
   );
 };
@@ -333,9 +337,9 @@ const RecommendationsWidget = () => {
             </div>
             <p className="text-xs text-gray-500 mt-1">{item.reason}</p>
           </div>
-          <button className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <Button className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700" variant="primary" size="sm">
             View
-          </button>
+          </Button>
         </div>
       ))}
     </div>
@@ -367,9 +371,9 @@ const LoyaltyPointsWidget = () => {
         </div>
       </div>
       
-      <button className="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200">
+      <Button className="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200" variant="outline" size="sm">
         View Rewards
-      </button>
+      </Button>
     </div>
   );
 };

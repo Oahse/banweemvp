@@ -27,6 +27,7 @@ import {
   LayoutDashboard,
   Mail,
 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { cn } from '@/utils/cn';
 import { containerFastVariants, itemFastVariants } from '@/utils/pageAnimations';
 
@@ -72,12 +73,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <p className="text-xs text-gray-500 dark:text-gray-400">admin@banwee.com</p>
             </div>
           </div>
-          <button
+          <Button
             onClick={() => setSidebarOpen(false)}
+            variant="ghost"
+            size="sm"
             className="lg:hidden p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            leftIcon={<X className="h-5 w-5" />}
           >
-            <X className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
         {/* Navigation */}
         <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
@@ -106,13 +109,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </nav>
         {/* Sidebar footer */}
         <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-          <button
+          <Button
             onClick={() => navigate('/logout')}
+            variant="ghost"
+            size="sm"
             className="flex items-center space-x-3 w-full px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            leftIcon={<LogOut className="h-4 w-4" />}
           >
-            <LogOut className="h-5 w-5" />
-            <span>Logout</span>
-          </button>
+            Logout
+          </Button>
         </div>
       </div>
       {/* Mobile sidebar backdrop */}
@@ -128,12 +133,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
             <div className="flex items-center space-x-4">
-              <button
+              <Button
                 onClick={() => setSidebarOpen(true)}
+                variant="ghost"
+                size="sm"
                 className="lg:hidden p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                leftIcon={<Menu className="h-5 w-5" />}
               >
-                <Menu className="h-6 w-6" />
-              </button>
+              </Button>
               <div className="flex-1">
                 <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
                   {adminNavigationItems.find(item => location.pathname === item.href)?.name || 'Admin'}
@@ -141,20 +148,24 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <button
+              <Button
                 onClick={() => navigate('/')}
+                variant="outline"
+                size="sm"
                 className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                leftIcon={<Home className="w-4 h-4" />}
               >
-                <Home className="w-4 h-4" />
                 <span className="hidden sm:inline">Home</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => navigate('/products')}
+                variant="primary"
+                size="sm"
                 className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors"
+                leftIcon={<Package className="w-4 h-4" />}
               >
-                <Package className="w-4 h-4" />
                 <span className="hidden sm:inline">Products</span>
-              </button>
+              </Button>
             </div>
           </div>
         </div>

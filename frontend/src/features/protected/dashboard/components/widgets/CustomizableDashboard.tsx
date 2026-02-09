@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
+import { Button } from '@/components/ui/Button';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -190,38 +191,41 @@ export const CustomizableDashboard = ({
             <div className="flex items-center gap-1">
               {isEditMode && (
                 <>
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditingWidget(widget.id);
                     }}
-                    className="p-1 text-gray-400 hover:text-gray-600 rounded"
-                    title="Edit Widget"
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 text-gray-600 hover:text-gray-800 rounded-md"
                   >
                     <EditIcon size={14} />
-                  </button>
+                  </Button>
                   
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       duplicateWidget(widget.id);
                     }}
-                    className="p-1 text-gray-400 hover:text-gray-600 rounded"
-                    title="Duplicate Widget"
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 text-gray-600 hover:text-gray-800 rounded-md"
                   >
                     <PlusIcon size={14} />
-                  </button>
+                  </Button>
                   
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       removeWidget(widget.id);
                     }}
-                    className="p-1 text-gray-400 hover:text-red-600 rounded"
-                    title="Remove Widget"
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 text-red-600 hover:text-red-800 rounded-md"
                   >
                     <TrashIcon size={14} />
-                  </button>
+                  </Button>
                 </>
               )}
             </div>
@@ -247,12 +251,14 @@ export const CustomizableDashboard = ({
         <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Add Widget</h2>
-            <button
+            <Button
               onClick={() => setShowWidgetLibrary(false)}
+              variant="ghost"
+              size="sm"
               className="p-2 text-gray-400 hover:text-gray-600 rounded-md"
             >
-              <XIcon size={20} />
-            </button>
+              <XIcon className="w-5 h-5" />
+            </Button>
           </div>
           
           <div className="p-4 overflow-y-auto max-h-[60vh]">
@@ -297,12 +303,14 @@ export const CustomizableDashboard = ({
         <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Edit Widget</h2>
-            <button
+            <Button
               onClick={() => setEditingWidget(null)}
+              variant="ghost"
+              size="sm"
               className="p-2 text-gray-400 hover:text-gray-600 rounded-md"
             >
-              <XIcon size={20} />
-            </button>
+              <XIcon className="w-5 h-5" />
+            </Button>
           </div>
           
           <div className="p-4 space-y-4">
@@ -369,18 +377,22 @@ export const CustomizableDashboard = ({
           </div>
           
           <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200">
-            <button
+            <Button
               onClick={() => setEditingWidget(null)}
+              variant="outline"
+              size="sm"
               className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setEditingWidget(null)}
+              variant="primary"
+              size="sm"
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              Save
-            </button>
+              Save Changes
+            </Button>
           </div>
         </div>
       </div>
@@ -402,35 +414,50 @@ export const CustomizableDashboard = ({
           
           <div className="flex items-center gap-2">
             {isEditMode && (
-              <button
+              <Button
                 onClick={() => setShowWidgetLibrary(true)}
+                variant="primary"
+                size="sm"
                 className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
                 <PlusIcon size={16} />
                 Add Widget
-              </button>
+              </Button>
             )}
             
-            <button
+            <Button
               onClick={() => setIsEditMode(!isEditMode)}
+              variant={isEditMode ? 'primary' : 'outline'}
+              size="sm"
               className={`flex items-center gap-2 px-3 py-2 rounded-md ${
                 isEditMode
-                  ? 'bg-gray-600 text-white hover:bg-gray-700'
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              <SettingsIcon size={16} />
-              {isEditMode ? 'Exit Edit' : 'Edit'}
-            </button>
+              {isEditMode ? (
+                <>
+                  <SaveIcon size={16} />
+                  Save Layout
+                </>
+              ) : (
+                <>
+                  <SettingsIcon size={16} />
+                  Edit Layout
+                </>
+              )}
+            </Button>
             
             {isEditMode && (
-              <button
+              <Button
                 onClick={handleSave}
+                variant="primary"
+                size="sm"
                 className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
               >
                 <SaveIcon size={16} />
                 Save
-              </button>
+              </Button>
             )}
           </div>
         </div>

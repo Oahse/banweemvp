@@ -7,6 +7,7 @@ import { Textarea } from '../../../../components/generic/Textarea';
 import { Select } from '../../../../components/generic/Select';
 import { ContactMessagesAPI } from '../../../../api/contact-messages';
 import toast from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 
 // Animation variants
 const containerVariants = {
@@ -284,12 +285,14 @@ export const Contact = () => {
                       Minimum 10 characters required
                     </p>
                   </div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                    size="sm"
+                    className="text-sm"
+                  >
                     {isSubmitting ? 'Sending...' : 'Send Message'}
-                  </button>
+                  </Button>
                 </form>
               )}
             </div>

@@ -3,6 +3,7 @@ import { HeartIcon, ShoppingCartIcon, TrashIcon } from 'lucide-react';
 import { useWishlist } from '../../../WishlistContext';
 import { useCart } from '../../../CartContext';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 
 interface WishlistItemProps {
   item: {
@@ -220,14 +221,15 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
         )}
 
         {/* Remove button */}
-        <button
+        <Button
           onClick={handleRemove}
           disabled={isRemoving}
+          variant="danger"
+          size="icon"
           className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white rounded-full shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Remove from wishlist"
         >
-          <HeartIcon size={16} className="text-red-500 fill-current" />
-        </button>
+          <TrashIcon size={14} />
+        </Button>
       </div>
 
       {/* Product Details */}
@@ -303,20 +305,16 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={handleAddToCart}
             disabled={!isInStock() || isAddingToCart || isRemoving}
+            variant="primary"
+            size="sm"
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isAddingToCart ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <ShoppingCartIcon size={16} />
-            )}
-            <span className="button-text text-sm">
-              {isAddingToCart ? 'Adding...' : 'Add to Cart'}
-            </span>
-          </button>
+            <ShoppingCartIcon size={14} className="mr-1" />
+            <span className="text-xs">{isAddingToCart ? 'Adding...' : 'Add to Cart'}</span>
+          </Button>
 
           <button
             onClick={handleRemove}

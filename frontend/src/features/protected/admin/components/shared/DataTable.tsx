@@ -13,8 +13,9 @@ import {
   TrashIcon,
   EditIcon
 } from 'lucide-react';
-import { useTheme } from '../../../../../components/shared/contexts/ThemeContext';
-import Dropdown from '../../../../../components/ui/Dropdown';
+import { Button } from '@/components/ui/Button';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import Dropdown from '@/components/ui/Dropdown';
 
 // Types
 export interface Column<T = any> {
@@ -329,13 +330,15 @@ export const AdminDataTable = <T extends Record<string, any>>({
               <div className="flex items-center gap-2">
                 {actions}
                 {exportable && (
-                  <button
+                  <Button
                     onClick={handleExport}
+                    variant="ghost"
+                    size="sm"
                     className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
+                    leftIcon={<DownloadIcon className="h-4 w-4" />}
                   >
-                    <DownloadIcon className="h-4 w-4" />
                     <span className="hidden sm:inline">Export</span>
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

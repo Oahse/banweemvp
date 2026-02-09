@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 interface PaginationProps {
   currentPage: number;
@@ -59,45 +60,48 @@ export const Pagination: React.FC<PaginationProps> = ({
       
       <div className="flex items-center justify-center space-x-1 sm:space-x-2">
         {/* Previous button */}
-        <button
+        <Button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          variant="outline"
+          size="sm"
           className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
-          aria-label="Previous page"
         >
-          <ChevronLeftIcon size={16} className="sm:mr-1" />
-          <span className="hidden sm:inline">Previous</span>
-        </button>
+          <ChevronLeftIcon className="w-4 h-4" />
+          <span className="hidden sm:inline ml-1">Previous</span>
+        </Button>
         
         {/* Page numbers */}
         <div className="flex items-center space-x-1">
           {getPageNumbers().map((pageNum) => (
-            <button
+            <Button
               key={pageNum}
               onClick={() => onPageChange(pageNum)}
+              variant={currentPage === pageNum ? 'primary' : 'ghost'}
+              size="sm"
               className={`px-2 py-1 sm:px-3 sm:py-1 text-sm rounded-md min-w-[32px] transition-colors ${
                 currentPage === pageNum
-                  ? 'bg-primary text-white'
-                  : 'border border-border text-copy hover:bg-surface-hover'
+                  ? 'bg-primary text-white border-primary'
+                  : 'text-copy hover:bg-surface-hover border-border'
               }`}
-              aria-label={`Go to page ${pageNum}`}
               aria-current={currentPage === pageNum ? 'page' : undefined}
             >
               {pageNum}
-            </button>
+            </Button>
           ))}
         </div>
         
         {/* Next button */}
-        <button
+        <Button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
+          variant="outline"
+          size="sm"
           className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
-          aria-label="Next page"
         >
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRightIcon size={16} className="sm:ml-1" />
-        </button>
+          <span className="hidden sm:inline mr-1">Next</span>
+          <ChevronRightIcon className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );

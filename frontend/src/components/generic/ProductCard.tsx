@@ -11,6 +11,7 @@ import { QRCodeDisplay } from '@/features/public/products/components/QRCodeDispl
 import { BarcodeDisplay } from '@/features/public/products/components/BarcodeDisplay';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/utils/utils';
+import { Button } from '@/components/ui/Button';
 
 /**
  * @typedef {object} ProductVariantImage
@@ -360,39 +361,17 @@ export const ProductCard = ({
         {/* Quick action buttons - hidden on mobile for grid view */}
         <div
           className={cn(
-            'absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-20',
-            viewMode === 'grid' && 'hidden sm:flex', // Hide on mobile
-            viewMode === 'list' && 'hidden md:flex'
-          )}>
-          <div className="flex space-x-2">
-            <button
-              onClick={handleAddToCart}
-              disabled={displayVariant && (!displayVariant.inventory || displayVariant.inventory.quantity_available === 0)}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
-                displayVariant && (!displayVariant.inventory || displayVariant.inventory.quantity_available === 0)
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : isInCart
-                    ? 'bg-primary text-white'
-                    : 'bg-surface text-copy hover:bg-primary hover:text-white'
-              }`}
-              aria-label={isInCart ? "Remove from cart" : "Add to cart"}>
-              {isInCart ? <ShoppingCartIcon size={16} /> : <ShoppingCartIcon size={16} />}
-            </button>
-            <button
-              onClick={handleAddToWishlist}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${isInWishlist(product.id, displayVariant?.id)
                 ? 'bg-error text-white'
-                : 'bg-surface text-copy hover:bg-primary hover:text-white'
-                }`}
-              aria-label={isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
-              <HeartIcon size={16} />
-            </button>
-            <Link
-              to={`/products/${product.id}`}
-              className="w-9 h-9 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-              aria-label="View product">
-              <EyeIcon size={16} />
-            </Link>
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              )}`}
+            aria-label={isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
+            {isInWishlist(product.id, displayVariant?.id) ? <HeartIcon size={16} /> : <HeartIcon size={16} />}
+          </Button>
+          <Link
+            to={`/products/${product.id}`}
+            className="w-9 h-9 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
+            aria-label="View product">
+            <EyeIcon size={16} />
           </div>
         </div>
       </div>
@@ -453,9 +432,11 @@ export const ProductCard = ({
           {/* Mobile buttons - optimized for smaller cards */}
           <div className="flex flex-col gap-1 sm:hidden">
             <div className="grid grid-cols-2 gap-1">
-              <button
+              <Button
                 onClick={handleAddToCart}
                 disabled={!displayVariant?.inventory || displayVariant.inventory.quantity_available === 0}
+                variant={isInCart ? "success" : "primary"}
+                size="sm"
                 className={cn(
                   'flex items-center justify-center px-1 py-1.5 rounded-md text-xs font-medium transition-colors',
                   (!displayVariant?.inventory || displayVariant.inventory.quantity_available === 0)
@@ -464,30 +445,26 @@ export const ProductCard = ({
                       ? 'bg-green-600 text-white'
                       : 'bg-primary text-white hover:bg-primary-dark'
                 )}
-                aria-label={isInCart ? "In cart" : "Add to cart"}>
-                {isInCart ? (
-                  <>
-                    <ShoppingCartIcon size={10} />
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCartIcon size={10} />
-                  </>
-                )}
-              </button>
+                aria-label={isInCart ? "In cart" : "Add to cart"}
+                leftIcon={<ShoppingCartIcon size={10} />}
+              >
+              </Button>
               
               {/* Mobile wishlist button */}
-              <button
+              <Button
                 onClick={handleAddToWishlist}
+                variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
+                size="sm"
                 className={cn(
                   'flex items-center justify-center px-1.5 py-1.5 rounded-md text-xs font-medium transition-colors',
                   wishlistMode || isInWishlist(product.id, displayVariant?.id)
                     ? 'bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-100'
                     : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 )}
-                aria-label={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
-                <HeartIcon size={10} fill={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? 'currentColor' : 'none'} />
-              </button>
+                aria-label={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}
+                leftIcon={<HeartIcon size={10} fill={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? 'currentColor' : 'none'} />}
+              >
+              </Button>
             </div>
           </div>
 
@@ -497,9 +474,11 @@ export const ProductCard = ({
             'sm:flex',
             viewMode === 'list' && 'md:flex md:order-1'
           )}>
-            <button
+            <Button
               onClick={handleAddToCart}
               disabled={(displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0}
+              variant={isInCart ? "success" : "primary"}
+              size="sm"
               className={cn(
                 'flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors min-w-[40px]',
                 (displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0 
@@ -508,31 +487,26 @@ export const ProductCard = ({
                     ? 'bg-green-600 text-white hover:bg-green-700'
                     : 'bg-primary text-white hover:bg-primary-dark'
               )}
-              aria-label={isInCart ? "In cart" : "Add to cart"}>
-              {isInCart ? (
-                <>
-                  <ShoppingCartIcon size={12} />
-                </>
-              ) : (
-                <>
-                  <ShoppingCartIcon size={12} />
-                  <span className="ml-1 text-xs">Add</span>
-                </>
-              )}
-            </button>
+              aria-label={isInCart ? "In cart" : "Add to cart"}
+              leftIcon={<ShoppingCartIcon size={12} />}
+            >
+            </Button>
             
             {/* Desktop wishlist button */}
-            <button
+            <Button
               onClick={handleAddToWishlist}
+              variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
+              size="sm"
               className={cn(
                 'flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors min-w-[40px]',
                 wishlistMode || isInWishlist(product.id, displayVariant?.id)
                   ? 'bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-100 hover:bg-red-200 dark:hover:bg-red-700'
                   : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               )}
-              aria-label={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
-              <HeartIcon size={12} fill={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? 'currentColor' : 'none'} />
-            </button>
+              aria-label={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}
+              leftIcon={<HeartIcon size={12} fill={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? 'currentColor' : 'none'} />}
+            >
+            </Button>
           </div>
         </div>
 

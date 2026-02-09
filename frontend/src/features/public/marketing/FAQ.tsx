@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRightIcon, PlusIcon, MinusIcon, SearchIcon } from 'lucide-react';
 import { categories, faqItems } from '../../../data/faq';
+import { Button } from '@/components/ui/Button';
 
 // Animation variants
 const containerVariants = {
@@ -90,8 +91,10 @@ export const FAQ = () => {
         <motion.div className="mb-4 overflow-x-auto" variants={itemVariants}>
           <div className="flex space-x-2 min-w-max">
             {categories.map((category) => (
-              <button
+              <Button
                 key={category.id}
+                variant={activeCategory === category.id ? "primary" : "ghost"}
+                size="sm"
                 className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
                   activeCategory === category.id
                     ? 'bg-primary text-white'
@@ -99,7 +102,7 @@ export const FAQ = () => {
                 }`}
                 onClick={() => setActiveCategory(category.id)}>
                 {category.name}
-              </button>
+              </Button>
             ))}
           </div>
         </motion.div>
@@ -113,16 +116,19 @@ export const FAQ = () => {
                 className="bg-surface rounded-lg shadow-sm border border-border-light overflow-hidden"
                 variants={itemVariants}
               >
-                <button
+                <Button
                   className="flex justify-between items-center w-full p-3 text-left"
-                  onClick={() => toggleQuestion(item.id)}>
+                  onClick={() => toggleQuestion(item.id)}
+                  variant="ghost"
+                  size="sm"
+                >
                   <h3 className="text-sm font-medium text-copy">{item.question}</h3>
                   {openQuestions.includes(item.id) ? (
                     <MinusIcon size={14} className="text-primary flex-shrink-0" />
                   ) : (
                     <PlusIcon size={14} className="text-primary flex-shrink-0" />
                   )}
-                </button>
+                </Button>
                 <AnimatePresence>
                   {openQuestions.includes(item.id) && (
                     <motion.div 

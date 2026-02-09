@@ -8,6 +8,7 @@ import { SkeletonDashboard } from '@/components/ui/SkeletonDashboard';
 import { usePaginatedApi } from '@/components/shared/hooks/useAsync';
 import OrdersAPI from '@/api/orders';
 import SubscriptionAPI from '@/api/subscription';
+import { Button } from '@/components/ui/Button';
 
 // Animation variants
 const containerVariants = {

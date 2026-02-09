@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { QrCodeIcon, DownloadIcon, PrinterIcon, CopyIcon, CheckIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 /**
  * @typedef {object} QRCodeDisplayProps
@@ -146,29 +147,35 @@ export const QRCodeDisplay = ({
       {/* Controls */}
       {showControls && (
         <div className="flex items-center justify-center space-x-2">
-          <button
+          <Button
             onClick={downloadQRCode}
+            variant="ghost"
+            size="sm"
             className="p-2 text-copy-light hover:text-primary hover:bg-surface-hover rounded-md transition-colors"
+            leftIcon={<DownloadIcon size={16} />}
             title="Download QR Code"
           >
-            <DownloadIcon size={16} />
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={printQRCode}
+            variant="ghost"
+            size="sm"
             className="p-2 text-copy-light hover:text-primary hover:bg-surface-hover rounded-md transition-colors"
+            leftIcon={<PrinterIcon size={16} />}
             title="Print QR Code"
           >
-            <PrinterIcon size={16} />
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={copyToClipboard}
+            variant="ghost"
+            size="sm"
             className={`p-2 rounded-md transition-colors ${copied ? 'text-success bg-success/10' : 'text-copy-light hover:text-primary hover:bg-surface-hover'}`}
+            leftIcon={copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
             title="Copy QR Code"
           >
-            {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
-          </button>
+          </Button>
         </div>
       )}
 

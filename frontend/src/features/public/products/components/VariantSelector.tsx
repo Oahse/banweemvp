@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '../../utils/utils';
 import { CheckIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 /**
  * @typedef {object} ProductVariantAttribute
@@ -137,10 +138,12 @@ export const VariantSelector = ({
             const primaryImage = getPrimaryImage(variant);
 
             return (
-              <button
+              <Button
                 key={variant.id}
                 onClick={() => isAvailable && onVariantChange(variant)}
                 disabled={!isAvailable}
+                variant={isSelected ? "primary" : "ghost"}
+                size="sm"
                 className={cn(
                   'w-full p-3 border rounded-lg text-left transition-all',
                   isSelected
@@ -199,7 +202,7 @@ export const VariantSelector = ({
                     </div>
                   </div>
                 </div>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -234,10 +237,12 @@ export const VariantSelector = ({
                 const isAvailable = isVariantAvailable(variantWithValue);
 
                 return (
-                  <button
+                  <Button
                     key={value}
                     onClick={() => isAvailable && onVariantChange(variantWithValue)}
                     disabled={!isAvailable}
+                    variant={isSelected ? "primary" : "outline"}
+                    size="sm"
                     className={cn(
                       'px-4 py-2 border rounded-md text-sm font-medium transition-all',
                       isSelected
@@ -247,7 +252,7 @@ export const VariantSelector = ({
                     )}
                   >
                     {value}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

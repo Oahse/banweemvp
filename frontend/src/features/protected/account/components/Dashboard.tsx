@@ -8,6 +8,7 @@ import { usePaginatedApi } from '../../../shared/hooks/useAsync';
 import OrdersAPI from '../../api/orders';
 import SubscriptionAPI from '../../api/subscription';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { Button } from '@/components/ui/Button';
 interface DashboardProps {
   animation?: 'shimmer' | 'pulse' | 'wave';
 }
@@ -144,12 +145,14 @@ export const Dashboard = ({
           <h3 className="text-lg font-medium mb-2">Unable to Load Orders</h3>
           <p className="text-gray-600">{getErrorMessage(error)}</p>
         </div>
-        <button 
+        <Button 
           onClick={() => window.location.reload()} 
+          variant="primary"
+          size="sm"
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
         >
           Try Again
-        </button>
+        </Button>
       </div>
     );
   }

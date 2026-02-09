@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { EyeIcon, TagIcon, PackageIcon } from 'lucide-react';
+import { EyeIcon, TagIcon, PackageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { themeClasses, combineThemeClasses } from '../../../../utils/themeClasses';
 import { formatCurrency } from '../../../../utils/orderCalculations';
 import { Subscription } from '../../api/subscription';
+import { Button } from '@/components/ui/Button';
 
 interface SubscriptionItemProps {
   subscription: Subscription;
@@ -26,16 +27,20 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
           <h4 className={combineThemeClasses(themeClasses.text.primary, 'font-medium text-sm')}>
             Products & Services
           </h4>
-          <button
+          <Button
             onClick={(e) => {
               e.stopPropagation();
               setShowProducts(!showProducts);
             }}
-            className="text-xs text-primary hover:text-primary-dark flex items-center gap-1"
+            variant="ghost"
+            size="sm"
+            className={combineThemeClasses(
+              'ml-auto p-1 rounded transition-colors',
+              'hover:bg-gray-100 dark:hover:bg-gray-800'
+            )}
+            leftIcon={showProducts ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           >
-            <EyeIcon size={12} />
-            {showProducts ? 'Hide' : 'Show'} Details
-          </button>
+          </Button>
         </div>
         
         {showProducts && subscription.products && subscription.products.length > 0 && (
@@ -141,16 +146,20 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
           <h4 className={combineThemeClasses(themeClasses.text.primary, 'font-medium text-sm')}>
             Billing Summary
           </h4>
-          <button
+          <Button
             onClick={(e) => {
               e.stopPropagation();
               setShowBillingSummary(!showBillingSummary);
             }}
-            className="text-xs text-primary hover:text-primary-dark flex items-center gap-1"
+            variant="ghost"
+            size="sm"
+            className={combineThemeClasses(
+              'ml-auto p-1 rounded transition-colors',
+              'hover:bg-gray-100 dark:hover:bg-gray-800'
+            )}
+            leftIcon={showBillingSummary ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           >
-            <TagIcon size={12} />
-            {showBillingSummary ? 'Hide' : 'Show'} Details
-          </button>
+          </Button>
         </div>
         
         {showBillingSummary && (

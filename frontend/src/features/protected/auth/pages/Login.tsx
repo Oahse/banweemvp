@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import { Input } from '../../../../components/generic/Input';
 import { Checkbox } from '../../../../components/generic/Checkbox';
 import SocialAuth from '../components/SocialAuth';
+import { Button } from '@/components/ui/Button';
 
 // Animation variants
 const containerVariants = {
@@ -243,16 +244,15 @@ export const Login = ({ isInitialLoading = false }) => {
                 required
                 className="pr-10"
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? (
-                  <EyeOff size={18} className="text-copy-lighter" />
-                ) : (
-                  <Eye size={18} className="text-copy-lighter" />
-                )}
-              </button>
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </Button>
             </div>
           </div>
           {/* Remember Me Checkbox */}
@@ -265,35 +265,15 @@ export const Login = ({ isInitialLoading = false }) => {
             className=""
           />
           {/* Submit Button */}
-          <button
+          <Button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-md transition-colors flex justify-center items-center text-sm font-medium"
-            disabled={loading}>
-            {loading ? (
-              <span className="flex items-center">
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Logging in...
-              </span>
-            ) : (
-              'Login'
-            )}
-          </button>
+            variant="primary"
+            fullWidth={true}
+            disabled={loading}
+            isLoading={loading}
+          >
+            {loading ? 'Signing in...' : 'Login'}
+          </Button>
         </motion.form>
         {/* Social Authentication Section */}
         <motion.div variants={itemVariants}>

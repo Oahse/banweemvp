@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchIcon, XIcon } from 'lucide-react';
 import { useCategories } from '../shared/contexts/CategoryContext';
+import { Button } from '@/components/ui/Button';
 
 /**
  * @typedef {object} MobileSearchProps
@@ -49,9 +50,9 @@ export const MobileSearch = ({
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-main">Search Products</h3>
-            <button onClick={onClose} className="p-1 hover:bg-background rounded-md">
+            <Button onClick={onClose} variant="ghost" size="sm" className="p-1 hover:bg-background rounded-md">
               <XIcon size={24} />
-            </button>
+            </Button>
           </div>
 
           <form onSubmit={handleSearch} className="flex w-full mb-4">
@@ -63,12 +64,14 @@ export const MobileSearch = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              size="sm"
               className="bg-primary text-white px-4 py-3 rounded-r-md hover:bg-primary-dark transition-colors"
             >
               <SearchIcon size={20} />
-            </button>
+            </Button>
           </form>
 
           {/* Popular Searches */}
@@ -76,17 +79,18 @@ export const MobileSearch = ({
             <h4 className="text-sm font-medium text-copy-light mb-2">Popular Searches</h4>
             <div className="flex flex-wrap gap-2">
               {popularSearches.map((term, index) => (
-                <button
+                <Button
                   key={index}
+                  variant="ghost"
+                  size="sm"
                   className="px-3 py-1 bg-background rounded-full text-sm hover:bg-border"
                   onClick={() => {
                     setSearchTerm(term);
-                    navigate(`/products?q=${encodeURIComponent(term)}`);
-                    onClose();
+                    handleSearch();
                   }}
                 >
                   {term}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -101,16 +105,18 @@ export const MobileSearch = ({
                 <p>Error loading categories: {error}</p>
               ) : (
                 popularCategories?.map((category, index) => (
-                  <button
+                  <Button
                     key={index}
+                    variant="ghost"
+                    size="sm"
                     className="px-3 py-2 bg-background rounded-md text-sm hover:bg-border text-left"
                     onClick={() => {
-                      navigate(`/products?category=${encodeURIComponent(category.name)}`);
+                      navigate(`/products?category=${category.id}`);
                       onClose();
                     }}
                   >
                     {category.name}
-                  </button>
+                  </Button>
                 ))
               )}
             </div>

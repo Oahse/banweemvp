@@ -4,6 +4,7 @@ import { useWishlist } from '@/features/protected/wishlist/contexts/WishlistCont
 import { useCart } from '@/features/protected/cart/contexts/CartContext';
 import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 import { 
   HeartIcon, 
   ShoppingCartIcon, 
@@ -69,10 +70,13 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
       <div className="flex flex-col items-center justify-center h-64">
         <HeartIcon size={28} className="text-gray-300 mb-2" />
         <span className="text-sm text-gray-500 mb-2">Your wishlist is empty.</span>
-        <button
-          className="px-3 py-2 bg-primary text-white rounded text-sm"
+        <Button
+          variant="primary"
+          size="sm"
           onClick={() => navigate('/products')}
-        >Browse Products</button>
+        >
+          Browse Products
+        </Button>
       </div>
     );
   }
@@ -87,21 +91,25 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
           <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex flex-col">
             <ProductCard product={item.product} variant={item.variant} />
             <div className="mt-2 flex gap-2">
-              <button
-                className="px-3 py-2 bg-primary text-white rounded text-sm flex items-center gap-2"
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<ShoppingCartIcon size={14} />}
                 onClick={() => addToCart(item.product, item.variant)}
               >
-                <ShoppingCartIcon size={14} /> Add to Cart
-              </button>
-              <button
-                className="px-3 py-2 bg-red-100 text-red-600 rounded text-sm flex items-center gap-2"
+                Add to Cart
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                leftIcon={<TrashIcon size={14} />}
                 onClick={() => {
                   setItemToRemove(item.id);
                   setShowRemoveModal(true);
                 }}
               >
-                <TrashIcon size={14} /> Remove
-              </button>
+                Remove
+              </Button>
             </div>
           </div>
         ))}
@@ -109,21 +117,25 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-6 gap-2">
-          <button
-            className="px-2 py-1 text-xs rounded bg-gray-200"
+          <Button
+            variant="secondary"
+            size="sm"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
+            leftIcon={<ChevronLeftIcon size={14} />}
           >
-            <ChevronLeftIcon size={14} /> Prev
-          </button>
+            Prev
+          </Button>
           <span className="text-xs">Page {currentPage} of {totalPages}</span>
-          <button
-            className="px-2 py-1 text-xs rounded bg-gray-200"
+          <Button
+            variant="secondary"
+            size="sm"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
+            rightIcon={<ChevronRightIcon size={14} />}
           >
-            Next <ChevronRightIcon size={14} />
-          </button>
+            Next
+          </Button>
         </div>
       )}
       {/* Remove Modal */}
@@ -153,12 +165,15 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
         />
       )}
       {/* Clear Wishlist Button */}
-      <button
-        className="mt-6 px-4 py-2 bg-red-200 text-red-700 rounded text-xs"
+      <Button
+        variant="danger"
+        size="sm"
+        leftIcon={<TrashIcon size={16} />}
         onClick={() => setShowClearModal(true)}
+        className="mt-6"
       >
-        <TrashIcon size={16} /> Clear Wishlist
-      </button>
+        Clear Wishlist
+      </Button>
     </div>
   );
 };

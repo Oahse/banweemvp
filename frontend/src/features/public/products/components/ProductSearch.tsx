@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SearchIcon, FilterIcon, XIcon, SortAscIcon, SortDescIcon, GridIcon, ListIcon } from 'lucide-react';
 import { cn } from '../../utils/utils';
 import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Select } from '../ui/Select';
 
 export const ProductSearch = ({
@@ -270,9 +270,11 @@ export const ProductSearch = ({
               </label>
               <div className="flex flex-wrap gap-2">
                 {tags.map(tag => (
-                  <button
+                  <Button
                     key={tag.id}
                     onClick={() => toggleTag(tag.id)}
+                    variant={filters.tags.includes(tag.id) ? "primary" : "outline"}
+                    size="sm"
                     className={cn(
                       'px-3 py-1 rounded-full text-sm border transition-colors',
                       filters.tags.includes(tag.id)
@@ -281,7 +283,7 @@ export const ProductSearch = ({
                     )}
                   >
                     {tag.name} ({tag.count})
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -298,24 +300,28 @@ export const ProductSearch = ({
               {filters.query && (
                 <span className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded-md text-sm">
                   Search: "{filters.query}"
-                  <button
+                  <Button
                     onClick={() => updateFilter('query', '')}
+                    variant="ghost"
+                    size="sm"
                     className="ml-1 text-gray-400 hover:text-gray-600"
                   >
                     <XIcon size={14} />
-                  </button>
+                  </Button>
                 </span>
               )}
 
               {filters.category && (
                 <span className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded-md text-sm">
                   Category: {categories.find(c => c.id === filters.category)?.name}
-                  <button
+                  <Button
                     onClick={() => updateFilter('category', '')}
+                    variant="ghost"
+                    size="sm"
                     className="ml-1 text-gray-400 hover:text-gray-600"
                   >
                     <XIcon size={14} />
-                  </button>
+                  </Button>
                 </span>
               )}
 
@@ -324,12 +330,14 @@ export const ProductSearch = ({
                 return tag ? (
                   <span key={tagId} className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded-md text-sm">
                     Tag: {tag.name}
-                    <button
+                    <Button
                       onClick={() => toggleTag(tagId)}
+                      variant="ghost"
+                      size="sm"
                       className="ml-1 text-gray-400 hover:text-gray-600"
                     >
                       <XIcon size={14} />
-                    </button>
+                    </Button>
                   </span>
                 ) : null;
               })}

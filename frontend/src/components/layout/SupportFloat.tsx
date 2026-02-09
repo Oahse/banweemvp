@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { MessageCircle, X, Mail, HelpCircle, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/Button';
 
 const SupportFloat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,8 +18,10 @@ const SupportFloat: React.FC = () => {
   return (
     <>
       {/* Floating Button */}
-      <button
+      <Button
         onClick={toggleWidget}
+        variant="primary"
+        size="sm"
         className="fixed bottom-16 right-6 z-50 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 px-4 py-3 group font-sans"
         aria-label="Open support widget"
       >
@@ -30,7 +33,7 @@ const SupportFloat: React.FC = () => {
             <span className="text-sm font-medium hidden sm:inline">Need Help?</span>
           </>
         )}
-      </button>
+      </Button>
 
       {/* Support Widget */}
       {isOpen && (

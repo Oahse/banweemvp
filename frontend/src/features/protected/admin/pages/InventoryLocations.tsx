@@ -6,6 +6,7 @@ import AdminLayout from '../components/AdminLayout';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { InventoryLocationsSkeleton } from '../components/skeletons/InventorySkeleton';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import { Button } from '@/components/ui/Button';
 
 const LIMIT = 20;
 
@@ -114,10 +115,12 @@ export const AdminInventoryLocations = () => {
           <h1 className="text-xl lg:text-2xl font-semibold">Warehouse Locations</h1>
           <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage warehouse and storage locations</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm">
-          <Plus className="w-4 h-4" />
+        <Button
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+          leftIcon={<Plus className="w-4 h-4" />}
+        >
           Add Location
-        </button>
+        </Button>
       </div>
 
       {error && (
@@ -202,12 +205,20 @@ export const AdminInventoryLocations = () => {
                       </td>
                       <td className="px-4 py-3 text-xs">
                         <div className="flex items-center gap-2">
-                          <button className={`p-1 rounded transition-colors ${currentTheme === 'dark' ? 'text-primary hover:bg-primary/10' : 'text-primary hover:bg-primary/10'}`}>
+                          <Button
+                            className={`p-1 rounded transition-colors ${currentTheme === 'dark' ? 'text-primary hover:bg-primary/10' : 'text-primary hover:bg-primary/10'}`}
+                            variant="ghost"
+                            size="sm"
+                          >
                             <Edit className="w-4 h-4" />
-                          </button>
-                          <button className={`p-1 rounded transition-colors ${currentTheme === 'dark' ? 'text-error hover:bg-error/10' : 'text-error hover:bg-error/10'}`}>
+                          </Button>
+                          <Button
+                            className={`p-1 rounded transition-colors ${currentTheme === 'dark' ? 'text-error hover:bg-error/10' : 'text-error hover:bg-error/10'}`}
+                            variant="danger"
+                            size="sm"
+                          >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -253,14 +264,22 @@ export const AdminInventoryLocations = () => {
                     </div>
                   </div>
                   <div className="flex gap-2 mt-2">
-                    <button className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm">
-                      <Edit className="w-4 h-4" />
+                    <Button
+                      className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
+                      variant="primary"
+                      size="sm"
+                      leftIcon={<Edit className="w-4 h-4" />}
+                    >
                       Edit
-                    </button>
-                    <button className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors text-sm">
-                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors text-sm"
+                      variant="danger"
+                      size="sm"
+                      leftIcon={<Trash2 className="w-4 h-4" />}
+                    >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -272,33 +291,37 @@ export const AdminInventoryLocations = () => {
                 Showing {locations.length} warehouse locations
               </p>
               <div className="flex items-center gap-2">
-                <button
+                <Button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
+                  variant="outline"
+                  size="sm"
                   className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
                     currentTheme === 'dark' 
-                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                  }`}
+                      ? 'bg-gray-800 border-gray-700 text-gray-200' 
+                      : 'bg-white border-gray-300 text-gray-700'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Previous
-                </button>
+                </Button>
                 <span className={`text-xs px-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                   Page {page}
                 </span>
-                <button
+                <Button
                   onClick={() => setPage((p) => p + 1)}
                   disabled={locations.length < LIMIT}
+                  variant="outline"
+                  size="sm"
                   className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
                     currentTheme === 'dark' 
-                      ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                      : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                  }`}
+                      ? 'bg-gray-800 border-gray-700 text-gray-200' 
+                      : 'bg-white border-gray-300 text-gray-700'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   Next
                   <ChevronRight className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             </div>
           </>
@@ -307,10 +330,12 @@ export const AdminInventoryLocations = () => {
             <div className="flex flex-col items-center gap-3">
               <MapPin className={`w-12 h-12 ${currentTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
               <p className="text-sm">No warehouse locations found</p>
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm">
-                <Plus className="w-4 h-4" />
+              <Button
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+                leftIcon={<Plus className="w-4 h-4" />}
+              >
                 Add Your First Location
-              </button>
+              </Button>
             </div>
           </div>
         )}

@@ -4,6 +4,7 @@ import { useLocale } from '../../../LocaleContext';
 import ProductsAPI from '../../api/products';
 import { toast } from 'react-hot-toast';
 import { Product } from '../../types';
+import { Button } from '@/components/ui/Button';
 
 interface ProductVariantModalProps {
   isOpen: boolean;
@@ -112,12 +113,14 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
-            <button
+            <Button
               onClick={onClose}
+              variant="ghost"
+              size="icon"
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              <XIcon size={24} />
-            </button>
+              <XIcon className="w-5 h-5" />
+            </Button>
           </div>
           
           {/* Search */}
@@ -144,15 +147,17 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                     {selected.size} variant{selected.size !== 1 ? 's' : ''} selected
                   </span>
                 </div>
-                <button
+                <Button
                   onClick={() => {
                     setSelected(new Set());
                     onSelectionChange([]);
                   }}
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  variant="outline"
+                  size="sm"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                 >
-                  Clear all
-                </button>
+                  Clear All
+                </Button>
               </div>
             </div>
           )}
@@ -172,12 +177,14 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                 {searchQuery ? 'No products found matching your search.' : 'No products available.'}
               </p>
               {searchQuery && (
-                <button
+                <Button
                   onClick={() => setSearchQuery('')}
+                  variant="link"
+                  size="sm"
                   className="text-primary hover:underline text-sm"
                 >
                   Clear search
-                </button>
+                </Button>
               )}
             </div>
           ) : (
@@ -348,22 +355,23 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex justify-end gap-3">
-            <button
+            <Button
               onClick={onClose}
+              variant="outline"
+              size="sm"
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={onClose}
+              variant="primary"
+              size="sm"
               className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={selected.size === 0}
             >
-              {multiSelect 
-                ? `Select ${selected.size} variant${selected.size !== 1 ? 's' : ''}`
-                : selected.size > 0 ? 'Select Variant' : 'Select a Variant'
-              }
-            </button>
+              {multiSelect ? `Add ${selected.size} Variant${selected.size !== 1 ? 's' : ''}` : 'Select Variant'}
+            </Button>
           </div>
         </div>
       </div>

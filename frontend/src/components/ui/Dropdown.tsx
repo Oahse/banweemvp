@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDownIcon, CheckIcon, XIcon } from 'lucide-react';
 import { cn } from '../../utils/utils';
+import { Button } from '@/components/ui/Button';
 
 interface DropdownOption {
   value: string;
@@ -103,15 +104,17 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
-      <button
+      <Button
         type="button"
         onClick={handleToggleDropdown}
         disabled={disabled}
-        className={cn(
-          'w-full px-2 py-1.5 text-left border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors flex items-center justify-between',
-          'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm',
-          'hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
-        )}
+        variant="outline"
+        size="sm"
+        className={`w-full flex items-center justify-between px-3 py-2 text-left bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm transition-colors ${
+          disabled
+            ? 'opacity-50 cursor-not-allowed'
+            : 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer'
+        } ${className}`}
       >
         <span className={cn(
           'truncate',
@@ -122,7 +125,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         <ChevronDownIcon 
           className={`w-3 h-3 transition-transform flex-shrink-0 ml-1 ${isOpen ? 'rotate-180' : ''}`} 
         />
-      </button>
+      </Button>
 
       {isOpen && (
         <div className={cn(
@@ -145,13 +148,15 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   )}
                 />
                 {searchTerm && (
-                  <button
+                  <Button
                     type="button"
                     onClick={handleClearSearch}
+                    variant="ghost"
+                    size="sm"
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
-                    <XIcon className="w-3 h-3" />
-                  </button>
+                    <XIcon className="w-4 h-4" />
+                  </Button>
                 )}
               </div>
             </div>
@@ -160,18 +165,18 @@ export const Dropdown: React.FC<DropdownProps> = ({
           <div className="max-h-60 overflow-auto">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
-                <button
+                <Button
                   key={index}
                   type="button"
                   onClick={() => handleSelect(option)}
+                  variant="ghost"
+                  size="sm"
+                  className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between ${
+                    option.disabled ? 'opacity-50 cursor-not-allowed' : ''
+                  } ${
+                    value === option.value ? 'bg-primary text-white' : ''
+                  }`}
                   disabled={option.disabled}
-                  className={cn(
-                    'w-full text-left px-2 py-1.5 text-xs transition-colors',
-                    option.disabled
-                      ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
-                    value === option.value && 'bg-primary/10 text-primary dark:bg-primary/20'
-                  )}
                 >
                   <div className="flex items-center justify-between">
                     <span className="truncate">{option.label}</span>
@@ -179,7 +184,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                       <CheckIcon className="w-3 h-3 text-primary flex-shrink-0 ml-1" />
                     )}
                   </div>
-                </button>
+                </Button>
               ))
             ) : (
               <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, TrashIcon, PauseIcon, PlayIcon, AlertTriangleIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { Button } from '@/components/ui/Button';
 
 export type SubscriptionAction = 'cancel' | 'pause' | 'resume';
 
@@ -287,39 +288,35 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
           themeClasses.border.light,
           themeClasses.background.elevated
         )}>
-          <button
+          <Button
             onClick={handleClose}
             disabled={loading}
+            variant="ghost"
+            size="sm"
             className={combineThemeClasses(
-              getButtonClasses('outline'),
-              'px-4 py-2',
-              loading ? 'opacity-50 cursor-not-allowed' : ''
+              'p-1 rounded-lg transition-colors',
+              loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
             )}
+            leftIcon={<X size={20} />}
           >
             {action === 'cancel' ? 'Keep Subscription' : 'Cancel'}
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={handleConfirm}
             disabled={loading || !isConfirmValid}
+            variant={action === 'cancel' ? 'destructive' : action === 'pause' ? 'warning' : 'success'}
+            size="sm"
             className={combineThemeClasses(
-              getButtonClasses(config.buttonStyle as any),
-              'px-4 py-2 flex items-center gap-2',
-              (loading || !isConfirmValid) ? 'opacity-50 cursor-not-allowed' : ''
+              getButtonClasses(action === 'cancel' ? 'danger' : action === 'pause' ? 'warning' : 'success', 'sm'),
+              'flex items-center gap-2',
+              loading ? 'opacity-50 cursor-not-allowed' : ''
             )}
+            leftIcon={action === 'cancel' ? <TrashIcon size={16} /> : action === 'pause' ? <PauseIcon size={16} /> : <PlayIcon size={16} />}
+            isLoading={loading}
           >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {config.loadingText}
-              </>
-            ) : (
-              <>
-                <Icon className="w-4 h-4" />
-                {config.buttonText}
-              </>
-            )}
-          </button>
+            {loading ? getActionText(action) : getActionText(action)}
+          </Button>
         </div>
       </div>
     </div>

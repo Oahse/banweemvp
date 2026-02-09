@@ -1,6 +1,7 @@
 import React from 'react';
 import { RefreshCwIcon, XIcon } from 'lucide-react';
 import { themeClasses } from '../../../../utils/themeClasses';
+import { Button } from '@/components/ui/Button';
 
 interface AutoRenewToggleProps {
   isEnabled: boolean;
@@ -40,10 +41,11 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
   return (
     <div className="flex items-center space-x-3">
       {/* Toggle Switch */}
-      <button
+      <Button
         type="button"
         onClick={() => !disabled && !loading && onToggle(!isEnabled)}
         disabled={disabled || loading}
+        variant="ghost"
         className={`
           relative inline-flex items-center rounded-full transition-colors duration-200 ease-in-out
           ${sizeClasses[size]}
@@ -84,7 +86,7 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
             />
           )}
         </span>
-      </button>
+      </Button>
 
       {/* Label and Details */}
       <div className="flex-1">

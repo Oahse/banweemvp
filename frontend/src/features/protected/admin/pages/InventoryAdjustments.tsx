@@ -7,6 +7,7 @@ import AdminAPI from '@/api/admin';
 import Dropdown from '@/components/ui/Dropdown';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import { Button } from '@/components/ui/Button';
 
 const LIMIT = 20;
 
@@ -137,10 +138,12 @@ export const AdminInventoryAdjustments = () => {
             <h1 className="text-xl lg:text-2xl font-semibold">Inventory Adjustments</h1>
             <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Track all inventory changes and adjustments</p>
           </div>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm">
-            <Plus className="w-4 h-4" />
+          <Button
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+            leftIcon={<Plus className="w-4 h-4" />}
+          >
             New Adjustment
-          </button>
+          </Button>
         </div>
 
         {/* Filters */}
@@ -319,50 +322,16 @@ export const AdminInventoryAdjustments = () => {
               </div>
 
               {/* Pagination */}
-              <div className={`px-4 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-                <p className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Showing {adjustments.length} adjustments
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Previous
-                  </button>
-                  <span className={`text-xs px-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Page {page}
-                  </span>
-                  <button
-                    onClick={() => setPage((p) => p + 1)}
-                    disabled={adjustments.length < LIMIT}
-                    className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
-                      currentTheme === 'dark' 
-                        ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                        : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
                 </div>
-              </div>
-            </>
-          ) : (
-            <div className={`p-8 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              <div className="flex flex-col items-center gap-3">
+              ))}
                 <TrendingUp className={`w-12 h-12 ${currentTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
                 <p className="text-sm">No inventory adjustments found</p>
-                <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm">
-                  <Plus className="w-4 h-4" />
+                <Button
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+                  leftIcon={<Plus className="w-4 h-4" />}
+                >
                   Create First Adjustment
-                </button>
+                </Button>
               </div>
             </div>
           )}

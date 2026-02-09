@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon } from 'lucide-react';
+import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon, X } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { RefundsListSkeleton } from '../components/skeletons/RefundsSkeleton';
+import { Button } from '@/components/ui/Button';
 
 const LIMIT = 10;
 
@@ -411,34 +412,40 @@ export const Refunds = () => {
               {debouncedSearchQuery && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Search: "{debouncedSearchQuery}"
-                  <button
+                  <Button
                     onClick={() => setSearchQuery('')}
+                    variant="ghost"
+                    size="sm"
                     className="ml-1 hover:text-primary-dark"
+                    leftIcon={<X size={12} />}
                   >
-                    ×
-                  </button>
+                  </Button>
                 </span>
               )}
               {statusFilter && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
-                  <button
+                  <Button
                     onClick={() => setStatusFilter('')}
+                    variant="ghost"
+                    size="sm"
                     className="ml-1 hover:text-primary-dark"
+                    leftIcon={<X size={12} />}
                   >
-                    ×
-                  </button>
+                  </Button>
                 </span>
               )}
-              <button
+              <Button
                 onClick={() => {
                   setSearchQuery('');
                   setStatusFilter('');
                 }}
+                variant="ghost"
+                size="sm"
                 className="text-xs text-primary hover:text-primary-dark underline"
               >
                 Clear all
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -746,36 +753,46 @@ export const Refunds = () => {
             )}
 
             <div className="mt-6 flex flex-wrap justify-end gap-2">
-              <button
+              <Button
                 onClick={() => handleStatusUpdate(viewingRefund.id, 'approved')}
+                variant="primary"
+                size="sm"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
               >
                 Approve
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleStatusUpdate(viewingRefund.id, 'processing')}
+                variant="primary"
+                size="sm"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
               >
                 Mark Processing
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleStatusUpdate(viewingRefund.id, 'completed')}
+                variant="success"
+                size="sm"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-success text-white rounded-lg hover:bg-success/90 transition-colors text-sm font-medium"
               >
                 Mark Completed
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleStatusUpdate(viewingRefund.id, 'rejected')}
+                variant="danger"
+                size="sm"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-error text-white rounded-lg hover:bg-error/90 transition-colors text-sm font-medium"
               >
                 Reject
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setShowDetailsModal(false)}
+                variant="outline"
+                size="sm"
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
               >
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         </div>

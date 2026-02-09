@@ -3,6 +3,7 @@ import { Star } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../../../features/protected/auth/hooks/useAuth';
 import { ReviewsAPI } from '../../../../api';
+import { Button } from '@/components/ui/Button';
 
 const ReviewForm = ({ productId, onReviewSubmitted }) => {
   const { isAuthenticated } = useAuth();
@@ -70,13 +71,16 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
               placeholder="Tell us what you think about this product..."
             ></textarea>
           </div>
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            size="sm"
             className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors text-xs font-medium"
             disabled={loading}
+            isLoading={loading}
           >
-            {loading ? 'Submitting...' : 'Submit Review'}
-          </button>
+            Submit Review
+          </Button>
         </form>
       )}
     </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SearchIcon, FilterIcon, XIcon, CalendarIcon } from 'lucide-react';
 import Dropdown from '../../ui/Dropdown';
 import { useTheme } from '../../../store/ThemeContext';
+import { Button } from '@/components/ui/Button';
 
 export interface FilterOption {
   value: string;
@@ -165,26 +166,28 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
             
             {/* Clear Filters Button */}
             {(hasActiveFilters || hasActiveSearch) && (
-              <button
+              <Button
                 onClick={handleClear}
+                variant="ghost"
+                size="sm"
                 className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
               >
-                <XIcon className="h-4 w-4" />
-                <span className="hidden sm:inline">Clear Filters</span>
-                <span className="sm:hidden">Clear</span>
-              </button>
+                <XIcon size={16} />
+                Clear Filters
+              </Button>
             )}
             
             {/* Advanced Filters Toggle */}
             {filters.length > 3 && (
-              <button
+              <Button
                 onClick={() => setShowAdvanced(!showAdvanced)}
+                variant="ghost"
+                size="sm"
                 className="flex items-center space-x-2 px-4 py-2 text-sm text-primary hover:text-primary-dark bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
               >
-                <FilterIcon className="h-4 w-4" />
-                <span className="hidden sm:inline">{showAdvanced ? 'Show Less' : 'Show More'}</span>
-                <span className="sm:hidden">{showAdvanced ? 'Less' : 'More'}</span>
-              </button>
+                <FilterIcon size={16} />
+                {showAdvanced ? 'Less Filters' : 'More Filters'}
+              </Button>
             )}
           </div>
         )}
@@ -204,12 +207,14 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
             {hasActiveSearch && (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">
                 Search: {searchValue}
-                <button
+                <Button
                   onClick={() => onSearchChange('')}
+                  variant="ghost"
+                  size="sm"
                   className="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                  leftIcon={<XIcon size={14} />}
                 >
-                  <XIcon className="h-3 w-3" />
-                </button>
+                </Button>
               </span>
             )}
             
@@ -220,12 +225,14 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                   className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                 >
                   {filters.find((f) => f.key === key)?.label || key}: {value}
-                  <button
+                  <Button
                     onClick={() => handleFilterChange(key, '')}
+                    variant="ghost"
+                    size="sm"
                     className="ml-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                    leftIcon={<XIcon size={14} />}
                   >
-                    <XIcon className="h-3 w-3" />
-                  </button>
+                  </Button>
                 </span>
               )
             ))}

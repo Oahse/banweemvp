@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
+import { Button } from '@/components/ui/Button';
 
 interface DateTimeDropdownProps {
   value?: string;
@@ -145,23 +146,21 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
       const isToday = dateStr === today;
 
       days.push(
-        <button
+        <Button
           key={day}
           onClick={() => handleDateSelect(day)}
+          variant={isSelected ? 'primary' : isToday ? 'outline' : 'ghost'}
+          size="sm"
           className={`h-8 text-xs font-normal rounded transition-all ${
             isSelected
-              ? 'bg-green-500 text-white'
+              ? 'bg-primary text-white'
               : isToday
-              ? currentTheme === 'dark'
-                ? 'bg-gray-600 text-white'
-                : 'bg-blue-100 text-blue-900'
-              : currentTheme === 'dark'
-              ? 'text-gray-300 hover:bg-gray-700'
-              : 'text-gray-700 hover:bg-gray-100'
+              ? 'border-primary text-primary'
+              : 'hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           {day}
-        </button>
+        </Button>
       );
     }
 
@@ -176,21 +175,23 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
 
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
-      <button
+      <Button
         ref={buttonRef}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
-        className={`w-full px-3 py-1.5 text-sm text-left border rounded-lg font-normal transition-all flex items-center justify-between gap-2 ${
-          currentTheme === 'dark'
-            ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600 disabled:opacity-50'
-            : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50 disabled:opacity-50'
-        } ${isOpen ? 'ring-2 ring-green-500' : ''}`}
+        variant="outline"
+        size="sm"
+        className={`w-full flex items-center justify-between px-3 py-2 text-left rounded-lg border transition-all ${
+          disabled
+            ? 'bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200'
+            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:border-primary'
+        }`}
       >
         <span className={`text-sm ${selectedDate ? '' : 'text-gray-500'}`}>
           {formatDate(selectedDate)}
         </span>
         <CalendarIcon className="w-4 h-4 flex-shrink-0" />
-      </button>
+      </Button>
 
       {isOpen && (
         <div
@@ -211,19 +212,17 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-2">
-            <button
+            <Button
               onClick={() => {
                 setCurrentMonth(prevMonth);
                 setCurrentYear(prevYear);
               }}
-              className={`p-1 rounded-lg transition-all ${
-                currentTheme === 'dark'
-                  ? 'hover:bg-gray-700'
-                  : 'hover:bg-gray-100'
-              }`}
+              variant="ghost"
+              size="sm"
+              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <ChevronLeftIcon className="w-5 h-5" />
-            </button>
+              <ChevronLeftIcon className="w-4 h-4" />
+            </Button>
 
             <div className="flex-1 text-center">
               <div className="text-sm font-semibold">
@@ -231,19 +230,17 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
               </div>
             </div>
 
-            <button
+            <Button
               onClick={() => {
                 setCurrentMonth(nextMonth);
                 setCurrentYear(nextYear);
               }}
-              className={`p-1 rounded-lg transition-all ${
-                currentTheme === 'dark'
-                  ? 'hover:bg-gray-700'
-                  : 'hover:bg-gray-100'
-              }`}
+              variant="ghost"
+              size="sm"
+              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <ChevronRightIcon className="w-5 h-5" />
-            </button>
+              <ChevronRightIcon className="w-4 h-4" />
+            </Button>
           </div>
 
           {/* Day headers */}
@@ -264,18 +261,22 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
 
           {/* Action buttons */}
           <div className="flex gap-1.5">
-            <button
+            <Button
               onClick={handleToday}
+              variant="outline"
+              size="sm"
               className={`flex-1 py-1.5 px-2 text-xs rounded-lg font-normal transition-all ${
                 currentTheme === 'dark'
-                  ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
-                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               Today
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleClear}
+              variant="outline"
+              size="sm"
               className={`flex-1 py-1.5 px-2 text-xs rounded-lg font-normal transition-all flex items-center justify-center gap-1 ${
                 currentTheme === 'dark'
                   ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -284,7 +285,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
             >
               <XIcon className="w-3 h-3" />
               Clear
-            </button>
+            </Button>
           </div>
         </div>
       )}

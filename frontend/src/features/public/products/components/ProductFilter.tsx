@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Checkbox } from '../ui/Checkbox';
 import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Skeleton } from '../ui/Skeleton';
 import { FilterIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { cn } from '../../utils/utils';

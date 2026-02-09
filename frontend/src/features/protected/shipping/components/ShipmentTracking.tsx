@@ -16,6 +16,7 @@ import {
   User
 } from 'lucide-react';
 import { ShipmentTracking, ShippingTrackingAPI } from '../../api/shipping-tracking';
+import { Button } from '@/components/ui/Button';
 
 interface ShipmentTrackingProps {
   shipmentId?: string;
@@ -220,21 +221,26 @@ export const ShipmentTracking: React.FC<ShipmentTrackingProps> = ({
           
           {showActions && (
             <div className="flex items-center space-x-2">
-              <button
+              <Button
                 onClick={refreshTracking}
                 disabled={refreshing}
+                variant="ghost"
+                size="sm"
                 className="p-2 text-gray-600 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 title="Refresh tracking"
+                leftIcon={<RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />}
+                isLoading={refreshing}
               >
-                <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={openTrackingUrl}
+                variant="ghost"
+                size="sm"
                 className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
                 title="Open tracking website"
+                leftIcon={<ExternalLink className="h-4 w-4" />}
               >
-                <ExternalLink className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           )}
         </div>

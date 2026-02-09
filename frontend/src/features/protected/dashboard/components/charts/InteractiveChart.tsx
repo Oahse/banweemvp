@@ -13,6 +13,7 @@ import {
   TimeScale,
   Filler
 } from 'chart.js';
+import { Button } from '@/components/ui/Button';
 import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
 import { DownloadIcon, MaximizeIcon, RefreshCwIcon } from 'lucide-react';
 import 'chartjs-adapter-date-fns';
@@ -285,58 +286,70 @@ export const InteractiveChart = ({
           {drillDownPath.length > 0 && (
             <div className="flex items-center gap-2">
               <span className="text-gray-400">›</span>
-              <button
+              <Button
                 onClick={handleDrillUp}
+                variant="link"
+                size="sm"
                 className="text-blue-600 hover:text-blue-800 text-sm underline"
               >
-                {drillDownPath[drillDownPath.length - 1]}
-              </button>
+                Back to {drillDownPath[drillDownPath.length - 2] || 'Overview'}
+              </Button>
             </div>
           )}
         </div>
         
         <div className="flex items-center gap-2">
           {refreshable && (
-            <button
+            <Button
               onClick={onRefresh}
+              variant="ghost"
+              size="sm"
               className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
               title="Refresh"
             >
               <RefreshCwIcon size={16} />
-            </button>
+            </Button>
           )}
           
-          <button
+          <Button
             onClick={() => setShowExportMenu(!showExportMenu)}
+            variant="ghost"
+            size="sm"
             className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 relative"
             title="Export"
           >
             <DownloadIcon size={16} />
             {showExportMenu && (
               <div className="absolute right-0 top-10 bg-white shadow-lg rounded-md py-2 z-10 min-w-32">
-                <button
+                <Button
                   onClick={() => handleExport('png')}
+                  variant="ghost"
+                  size="sm"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Export PNG
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleExport('csv')}
+                  variant="ghost"
+                  size="sm"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Export CSV
-                </button>
+                </Button>
               </div>
             )}
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={() => setIsFullscreen(!isFullscreen)}
+            variant="ghost"
+            size="sm"
             className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
             title="Fullscreen"
           >
             <MaximizeIcon size={16} />
-          </button>
+          </Button>
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import {
   DollarSignIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 import { ProductVariantModal } from '../ui/ProductVariantModal';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
 interface Subscription {
@@ -212,17 +213,18 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
               {subscriptions.length} {subscriptions.length === 1 ? 'subscription' : 'subscriptions'}
             </p>
           </div>
-          <button
+          <Button
             onClick={() => {
               setSelectedVariants([]);
               setShowCreateModal(true);
-              setShowProductVariantModal(true);
             }}
-            className="flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs"
+            variant="primary"
+            size="sm"
+            className="flex items-center gap-2"
           >
             <PlusIcon size={16} />
-            New Subscription
-          </button>
+            Create Subscription
+          </Button>
         </div>
 
         {/* Tabs */}
@@ -233,17 +235,19 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
             { key: 'paused', label: 'Paused', count: subscriptions.filter((s: any) => s.status === 'paused').length },
             { key: 'cancelled', label: 'Cancelled', count: subscriptions.filter((s: any) => s.status === 'cancelled').length }
           ].map(tab => (
-            <button
+            <Button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
+              variant={activeTab === tab.key ? 'primary' : 'ghost'}
+              size="sm"
               className={`px-2 sm:px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
                 activeTab === tab.key
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-primary text-white'
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
               }`}
             >
               {tab.label} ({tab.count})
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -257,17 +261,18 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                 : `No ${activeTab} subscriptions found.`
               }
             </p>
-            <button
+            <Button
               onClick={() => {
                 setSelectedVariants([]);
                 setShowCreateModal(true);
-                setShowProductVariantModal(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+              variant="primary"
+              size="sm"
+              className="flex items-center gap-2"
             >
-              <PlusIcon size={20} />
+              <PlusIcon size={16} />
               Create Your First Subscription
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -283,23 +288,27 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                       {getStatusBadge(subscription.status)}
                     </div>
                     <div className="flex items-center gap-2">
-                      <button
+                      <Button
                         onClick={() => navigate(`/account/subscriptions/${subscription.id}/edit`)}
+                        variant="ghost"
+                        size="icon"
                         className="p-2 text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
                         title="Edit Subscription"
                       >
                         <EditIcon size={18} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => {
                           setSubscriptionToCancel(subscription.id);
                           setShowCancelModal(true);
                         }}
-                        className="p-2 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
+                        variant="ghost"
+                        size="icon"
+                        className="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                         title="Cancel Subscription"
                       >
                         <TrashIcon size={18} />
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
@@ -329,17 +338,18 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                     <h4 className="font-medium text-gray-900 dark:text-white">
                       Products ({subscription.product_variants?.length || 0})
                     </h4>
-                    <button
+                    <Button
                       onClick={() => {
                         setSelectedSubscription(subscription);
                         setSelectedVariants([]);
                         setShowAddProductModal(true);
-                        setShowProductVariantModal(true);
                       }}
-                      className="text-primary hover:text-primary-dark text-sm font-medium"
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
                     >
-                      Add Products
-                    </button>
+                      Manage Products
+                    </Button>
                   </div>
                   
                   <div className="space-y-2">
@@ -371,13 +381,15 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
 
                 {/* Actions */}
                 <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                  <button
+                  <Button
                     onClick={() => navigate(`/account/subscriptions/${subscription.id}/edit`)}
+                    variant="primary"
+                    size="sm"
                     className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                   >
-                    <EyeIcon size={16} />
-                    View Details
-                  </button>
+                    <EditIcon size={16} />
+                    Edit Subscription
+                  </Button>
                 </div>
               </div>
             ))}
@@ -459,12 +471,14 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
     <div className="p-4 sm:p-6">
       <div className="text-center">
         <p>Subscription management view would be implemented here</p>
-        <button 
+        <Button 
           onClick={() => navigate('/account/subscriptions')}
+          variant="link"
+          size="sm"
           className="mt-4 text-primary hover:underline"
         >
-          Back to Subscriptions
-        </button>
+          View All Subscriptions
+        </Button>
       </div>
     </div>
   );

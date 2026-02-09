@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export const Error = ({ message = 'Something went wrong', onRetry }: { message?: string; onRetry?: () => void }) => {
   return (
@@ -8,12 +9,14 @@ export const Error = ({ message = 'Something went wrong', onRetry }: { message?:
       <h3 className="heading text-lg mb-2">Error</h3>
       <p className="body-text text-copy-light mb-4">{message}</p>
       {onRetry && (
-        <button
+        <Button
           onClick={onRetry}
+          variant="primary"
+          size="sm"
           className="button-text bg-primary text-copy-inverse px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors"
         >
           Try Again
-        </button>
+        </Button>
       )}
     </div>
   );

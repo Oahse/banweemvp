@@ -4,7 +4,7 @@ import { describe, it, expect, vitest, beforeEach } from 'vitest';
 import { DashboardLayout } from './DashboardLayout';
 import { useAuth } from '../../../AuthContext';
 import { DashboardSkeleton } from '../ui/SkeletonDashboard'; // Assuming this exists or is created
-import { Button } from '../ui/Button'; // Mocked button
+import { Button } from '@/components/ui/Button'; // Mocked button
 import {
   BarChart3Icon, UsersIcon, ShoppingCartIcon, DollarSignIcon,
   TrendingUpIcon, AlertCircleIcon, RefreshCwIcon, SettingsIcon,

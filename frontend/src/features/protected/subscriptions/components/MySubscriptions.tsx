@@ -13,6 +13,7 @@ import {
   PauseIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 import { SubscriptionCard } from '../subscription/SubscriptionCard';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
 import { AutoRenewToggle } from '../subscription/AutoRenewToggle';
@@ -145,12 +146,13 @@ export const MySubscriptions = () => {
         <p className="text-gray-600 dark:text-gray-400 mb-3">
           Unable to load subscriptions
         </p>
-        <button 
+        <Button
           onClick={() => refreshSubscriptions()} 
-          className="text-primary hover:text-primary-dark underline"
+          variant="ghost"
+          size="sm"
         >
-          Try again
-        </button>
+          Refresh
+        </Button>
       </div>
     );
   }
@@ -165,13 +167,14 @@ export const MySubscriptions = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={() => setShowCreateModal(true)}
-            className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors flex items-center text-xs"
+            variant="primary"
+            size="sm"
+            leftIcon={<PlusIcon size={14} />}
           >
-            <PlusIcon size={16} className="mr-2" />
-            Create
-          </button>
+            Create New Subscription
+          </Button>
         </div>
       </div>
 
@@ -183,36 +186,37 @@ export const MySubscriptions = () => {
           { key: 'paused', label: 'Paused', count: subscriptions.filter((s: any) => s.status === 'paused').length },
           { key: 'cancelled', label: 'Cancelled', count: subscriptions.filter((s: any) => s.status === 'cancelled').length }
         ].map((tab) => (
-          <button
+          <Button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
+            variant={activeTab === tab.key ? 'primary' : 'ghost'}
+            size="sm"
             className={`flex-1 min-w-[80px] px-2 py-1 text-xs font-medium rounded-md transition-colors ${
-              activeTab === tab.key
-                ? 'bg-white dark:bg-gray-800 text-primary shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-main dark:hover:text-white'
+              activeTab === tab.key ? 'bg-primary text-white shadow-md' : 'border border-gray-300 hover:bg-gray-50'
             }`}
           >
-            {tab.label} ({tab.count})
-          </button>
+            {tab.label} {tab.count > 0 && `(${tab.count})`}
+          </Button>
         ))}
       </div>
 
       {/* Subscriptions List */}
       {subscriptions.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm text-center py-8">
-          <PackageIcon size={32} className="text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+          <PackageIcon size={32} className="text-gray-400 mx-auto mb-3" />
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
             {activeTab === 'all' 
               ? "You don't have any subscriptions yet." 
               : `No ${activeTab} subscriptions found.`
             }
           </p>
-          <button
+          <Button
             onClick={() => setShowCreateModal(true)}
-            className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors text-xs"
+            variant="primary"
+            size="sm"
           >
             Create Your First Subscription
-          </button>
+          </Button>
         </div>
       ) : (
         <>
@@ -260,14 +264,14 @@ export const MySubscriptions = () => {
 
           {/* Pagination */}
           <div className="flex justify-center items-center space-x-2 pt-4">
-            <button
+            <Button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              variant="outline"
+              size="sm"
             >
-              <ChevronLeftIcon size={14} className="mr-1" />
               Previous
-            </button>
+            </Button>
             
             <div className="flex items-center space-x-1">
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -283,29 +287,29 @@ export const MySubscriptions = () => {
                 }
                 
                 return (
-                  <button
+                  <Button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`px-3 py-2 text-xs rounded transition-colors ${
-                      currentPage === pageNum
-                        ? 'bg-primary text-white'
-                        : 'border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    variant={currentPage === pageNum ? 'primary' : 'ghost'}
+                    size="sm"
+                    className={`px-3 py-1 text-sm rounded-md ${
+                      currentPage === pageNum ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     {pageNum}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
             
-            <button
+            <Button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              variant="outline"
+              size="sm"
             >
               Next
-              <ChevronRightIcon size={14} className="ml-1" />
-            </button>
+            </Button>
           </div>
         </>
       )}
@@ -319,15 +323,17 @@ export const MySubscriptions = () => {
                 <h2 className="text-base font-medium text-main dark:text-white">
                   Create New Subscription
                 </h2>
-                <button
+                <Button
                   onClick={() => {
                     setShowCreateModal(false);
                     setSelectedProducts(new Set());
                   }}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<XIcon size={14} />}
                 >
-                  <XIcon size={20} />
-                </button>
+                  Close
+                </Button>
               </div>
 
               <div className="space-y-6">
@@ -543,22 +549,18 @@ export const MySubscriptions = () => {
               </div>
 
               <div className="flex justify-end space-x-3 mt-6">
-                <button
+                <Button
                   onClick={() => {
                     setShowCreateModal(false);
                     setSelectedProducts(new Set());
-                    setNewSubscriptionData({
-                      name: '',
-                      billing_cycle: 'monthly',
-                      delivery_type: 'standard',
-                      auto_renew: true
-                    });
                   }}
-                  className="px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                  variant="outline"
+                  size="sm"
+                  className="px-4 py-2"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={async () => {
                     if (selectedProducts.size === 0) {
                       toast.error('Please select at least one product');
@@ -594,10 +596,13 @@ export const MySubscriptions = () => {
                     }
                   }}
                   disabled={isLoading || selectedProducts.size === 0}
-                  className="px-4 py-2 text-xs font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  variant="primary"
+                  size="sm"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  isLoading={isLoading}
                 >
                   {isLoading ? 'Creating...' : `Create Subscription (${selectedProducts.size} variants)`}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

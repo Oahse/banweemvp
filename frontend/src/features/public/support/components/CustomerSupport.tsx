@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/Button';
 
 interface SupportTicket {
   id: string;
@@ -103,13 +104,16 @@ const CustomerSupport: React.FC<CustomerSupportProps> = ({ className = '' }) => 
           </div>
 
           <div className="flex justify-end">
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
+              variant="primary"
+              size="sm"
               className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Ticket'}
-            </button>
+              Submit Ticket
+            </Button>
           </div>
         </form>
 

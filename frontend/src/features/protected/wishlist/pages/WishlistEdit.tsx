@@ -11,9 +11,10 @@ import {
   PlusIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { ProductVariantModal } from '../components/ui/ProductVariantModal';
-import { ConfirmationModal } from '../components/ui/ConfirmationModal';
-import { Product, ProductVariant } from '../types';
+import { ProductVariantModal } from '@/components/ui/ProductVariantModal';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
+import { Button } from '@/components/ui/Button';
+import { Product, ProductVariant } from '@/types';
 interface WishlistDetail {
   id: string;
   name: string;
@@ -216,12 +217,13 @@ export const WishlistEdit = () => {
     return (
       <div className="text-center p-6">
         <p className="text-red-600 dark:text-red-400">Error: {error || 'Wishlist not found'}</p>
-        <button
+        <Button
           onClick={() => navigate('/account/wishlist')}
-          className="mt-4 text-primary hover:underline"
+          variant="secondary"
+          size="sm"
         >
-          Back to Wishlists
-        </button>
+          Back to Wishlist
+        </Button>
       </div>
     );
   }
@@ -231,13 +233,14 @@ export const WishlistEdit = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <button
+          <Button
             onClick={() => navigate('/account/wishlist')}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+            variant="secondary"
+            size="sm"
+            leftIcon={<ArrowLeftIcon size={20} />}
           >
-            <ArrowLeftIcon size={20} />
             Back to Wishlist
-          </button>
+          </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Edit Wishlist
@@ -248,21 +251,24 @@ export const WishlistEdit = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button
+          <Button
             onClick={() => setShowShareModal(true)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            variant="ghost"
+            size="sm"
+            leftIcon={<ShareIcon size={16} />}
           >
-            <ShareIcon size={16} />
             Share
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 transition-colors"
+            variant="primary"
+            size="sm"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <SaveIcon size={16} />
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+            <SaveIcon size={16} className="mr-1" />
+            {saving ? 'Saving...' : 'Save'}
+          </Button>
         </div>
       </div>
 
@@ -316,17 +322,18 @@ export const WishlistEdit = () => {
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <button
+              <Button
                 onClick={() => {
                   setSelectedVariants([]);
                   setShowAddModal(true);
                   setShowProductModal(true);
                 }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                variant="primary"
+                size="sm"
+                leftIcon={<PlusIcon size={16} />}
               >
-                <PlusIcon size={16} />
                 Add Items
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -349,17 +356,17 @@ export const WishlistEdit = () => {
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
                   Add some products to get started
                 </p>
-                <button
+                <Button
                   onClick={() => {
                     setSelectedVariants([]);
                     setShowAddModal(true);
                     setShowProductModal(true);
                   }}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                  variant="primary"
+                  size="sm"
                 >
-                  <PlusIcon size={16} />
-                  Add Items
-                </button>
+                  Add Some Products
+                </Button>
               </div>
             ) : (
               <div className="divide-y divide-gray-200 dark:divide-gray-700">

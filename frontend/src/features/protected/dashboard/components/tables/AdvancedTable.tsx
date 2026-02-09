@@ -9,6 +9,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 
 
@@ -223,56 +224,62 @@ export const AdvancedTable = ({
             )}
             
             {filterable && (
-              <button
+              <Button
                 onClick={() => setShowFilters(!showFilters)}
+                variant={showFilters ? 'primary' : 'ghost'}
+                size="sm"
                 className={`p-2 rounded-md transition-colors ${
                   showFilters ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'
                 }`}
-                title="Filters"
               >
                 <FilterIcon size={16} />
-              </button>
+              </Button>
             )}
             
-            <button
+            <Button
               onClick={() => setShowColumnSelector(!showColumnSelector)}
+              variant="ghost"
+              size="sm"
               className="p-2 text-gray-400 hover:text-gray-600 rounded-md transition-colors relative"
               title="Column Visibility"
             >
               <EyeIcon size={16} />
-              {showColumnSelector && (
-                <div className="absolute right-0 top-10 bg-white shadow-lg rounded-md py-2 z-10 min-w-48">
-                  {columns.map(column => (
-                    <label key={column.key} className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={!hiddenColumns.has(column.key)}
-                        onChange={(e) => {
-                          const newHidden = new Set(hiddenColumns);
-                          if (e.target.checked) {
-                            newHidden.delete(column.key);
-                          } else {
-                            newHidden.add(column.key);
-                          }
-                          setHiddenColumns(newHidden);
-                        }}
-                        className="mr-2"
-                      />
-                      <span className="text-sm">{column.label}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </button>
+            </Button>
+            
+            {showColumnSelector && (
+              <div className="absolute right-0 top-10 bg-white shadow-lg rounded-md py-2 z-10 min-w-48">
+                {columns.map(column => (
+                  <label key={column.key} className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!hiddenColumns.has(column.key)}
+                      onChange={(e) => {
+                        const newHidden = new Set(hiddenColumns);
+                        if (e.target.checked) {
+                          newHidden.delete(column.key);
+                        } else {
+                          newHidden.add(column.key);
+                        }
+                        setHiddenColumns(newHidden);
+                      }}
+                      className="mr-2"
+                    />
+                    <span className="text-sm">{column.label}</span>
+                  </label>
+                ))}
+              </div>
+            )}
             
             {exportable && (
-              <button
+              <Button
                 onClick={() => onExport?.('csv')}
+                variant="ghost"
+                size="sm"
                 className="p-2 text-gray-400 hover:text-gray-600 rounded-md transition-colors"
                 title="Export"
               >
                 <DownloadIcon size={16} />
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -285,12 +292,14 @@ export const AdvancedTable = ({
                 <span className="font-medium">{columns.find(c => c.key === filter.column)?.label}</span>
                 <span className="text-gray-500">{filter.operator}</span>
                 <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{filter.value}</span>
-                <button
+                <Button
                   onClick={() => removeFilter(filter.column)}
+                  variant="ghost"
+                  size="sm"
                   className="text-red-500 hover:text-red-700"
                 >
                   ×
-                </button>
+                </Button>
               </div>
             ))}
           </div>
@@ -398,40 +407,46 @@ export const AdvancedTable = ({
           </div>
           
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
+              variant="ghost"
+              size="sm"
               className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeftIcon size={16} />
-            </button>
+            </Button>
             
             <div className="flex items-center gap-1">
               {[...Array(Math.min(5, totalPages))].map((_, i) => {
                 const pageNum = i + 1;
                 return (
-                  <button
+                  <Button
                     key={pageNum}
                     onClick={() => setCurrentPage(pageNum)}
+                    variant={currentPage === pageNum ? 'primary' : 'ghost'}
+                    size="sm"
                     className={`px-3 py-1 text-sm rounded-md ${
                       currentPage === pageNum
                         ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
                     {pageNum}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
             
-            <button
+            <Button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
+              variant="ghost"
+              size="sm"
               className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronRightIcon size={16} />
-            </button>
+            </Button>
           </div>
         </div>
       )}

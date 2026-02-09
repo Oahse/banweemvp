@@ -8,6 +8,7 @@ import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { ProductsListSkeleton } from '../components/skeletons/ProductsSkeleton';
+import { Button } from '@/components/ui/Button';
 
 const LIMIT = 10;
 
@@ -300,152 +301,273 @@ const AdminProductsPage = () => {
       <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
           <div>
+            <h1 className="text-xl font-bold">Products</h1>
             <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product catalog and inventory</p>
           </div>
-          <div className="flex gap-2 w-full lg:w-auto">
-            <button
-              onClick={() => navigate('/admin/products/new')}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-            >
-              Add Product
-            </button>
-          </div>
+        <div className="flex gap-2 w-full lg:w-auto">
+          <Button
+            onClick={() => navigate('/admin/products/new')}
+            variant="primary"
+            leftIcon={<PackageIcon size={16} />}
+          >
+            Add Product
+          </Button>
         </div>
+      </div>
 
-        {/* Search and Filters */}
-        <div className={`p-4 rounded-lg border ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex flex-col gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <SearchIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm ${
-                    currentTheme === 'dark' 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                />
-                {searchQuery !== debouncedSearchQuery && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              <Dropdown
-                options={[
-                  { value: '', label: 'All Status' },
-                  { value: 'active', label: 'Active Only' },
-                  { value: 'inactive', label: 'Inactive Only' },
-                  { value: 'draft', label: 'Draft' },
-                  { value: 'discontinued', label: 'Discontinued' }
-                ]}
-                value={statusFilter}
-                onChange={setStatusFilter}
-                placeholder="All Status"
-                className="min-w-[120px]"
-              />
-              
-              <Dropdown
-                options={[
-                  { value: '', label: 'All Categories' },
-                  { value: 'electronics', label: 'Electronics' },
-                  { value: 'clothing', label: 'Clothing' },
-                  { value: 'food', label: 'Food' },
-                  { value: 'books', label: 'Books' },
-                  { value: 'toys', label: 'Toys' }
-                ]}
-                value={categoryFilter}
-                onChange={setCategoryFilter}
-                placeholder="All Categories"
-                className="min-w-[120px]"
-              />
-              
-              <Dropdown
-                options={[
-                  { value: 'created_at', label: 'Created' },
-                  { value: 'name', label: 'Name' },
-                  { value: 'price', label: 'Price' },
-                  { value: 'stock', label: 'Stock' },
-                  { value: 'category', label: 'Category' }
-                ]}
-                value={sortBy}
-                onChange={setSortBy}
-                placeholder="Sort by"
-                className="min-w-[120px]"
-              />
-              
-              <button
-                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
+      {/* Search and Filters */}
+      <div className={`p-4 rounded-lg border ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className="flex flex-col gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <SearchIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm ${
                   currentTheme === 'dark' 
-                    ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
-                    : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                 }`}
-              >
-                <ArrowUpDownIcon size={16} />
-                <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
-                <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-              </button>
+              />
+              {searchQuery !== debouncedSearchQuery && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
             </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            <Dropdown
+              options={[
+                { value: '', label: 'All Status' },
+                { value: 'active', label: 'Active Only' },
+                { value: 'inactive', label: 'Inactive Only' },
+                { value: 'draft', label: 'Draft' },
+                { value: 'discontinued', label: 'Discontinued' }
+              ]}
+              value={statusFilter}
+              onChange={setStatusFilter}
+              placeholder="All Status"
+              className="min-w-[120px]"
+            />
+            
+            <Dropdown
+              options={[
+                { value: '', label: 'All Categories' },
+                { value: 'electronics', label: 'Electronics' },
+                { value: 'clothing', label: 'Clothing' },
+                { value: 'food', label: 'Food' },
+                { value: 'books', label: 'Books' },
+                { value: 'toys', label: 'Toys' }
+              ]}
+              value={categoryFilter}
+              onChange={setCategoryFilter}
+              placeholder="All Categories"
+              className="min-w-[120px]"
+            />
+            
+            <Dropdown
+              options={[
+                { value: 'created_at', label: 'Created' },
+                { value: 'name', label: 'Name' },
+                { value: 'price', label: 'Price' },
+                { value: 'stock', label: 'Stock' },
+                { value: 'category', label: 'Category' }
+              ]}
+              value={sortBy}
+              onChange={setSortBy}
+              placeholder="Sort by"
+              className="min-w-[120px]"
+            />
+            
+            <Button
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              variant="outline"
+              size="sm"
+              leftIcon={<ArrowUpDownIcon size={14} />}
+            >
+              Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+            </Button>
+          </div>
 
-            {/* Active Filters */}
-            {(debouncedSearchQuery || statusFilter || categoryFilter) && (
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
-                {debouncedSearchQuery && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                    Search: "{debouncedSearchQuery}"
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="ml-1 hover:text-primary-dark"
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-                {statusFilter && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                    Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
-                    <button
-                      onClick={() => setStatusFilter('')}
-                      className="ml-1 hover:text-primary-dark"
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-                {categoryFilter && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                    Category: {categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
-                    <button
-                      onClick={() => setCategoryFilter('')}
-                      className="ml-1 hover:text-primary-dark"
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setStatusFilter('');
-                    setCategoryFilter('');
-                  }}
-                  className="text-xs text-primary hover:text-primary-dark underline"
-                >
-                  Clear all
-                </button>
-              </div>
-            )}
+          {/* Active Filters */}
+          {(debouncedSearchQuery || statusFilter || categoryFilter) && (
+            <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+              {debouncedSearchQuery && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                  Search: "{debouncedSearchQuery}"
+                  <Button
+                    onClick={() => setSearchQuery('')}
+                    variant="ghost"
+                    size="icon"
+                    className="ml-1"
+                  >
+                    <X size={12} />
+                  </Button>
+                </span>
+              )}
+              {statusFilter && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                  Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
+                  <Button
+                    onClick={() => setStatusFilter('')}
+                    variant="ghost"
+                    size="icon"
+                    className="ml-1"
+                  >
+                    <X size={12} />
+                  </Button>
+                </span>
+              )}
+              {categoryFilter && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                  Category: {categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
+                  <Button
+                    onClick={() => setCategoryFilter('')}
+                    variant="ghost"
+                    size="icon"
+                    className="ml-1"
+                  >
+                    <X size={12} />
+                  </Button>
+                </span>
+              )}
+              <Button
+                onClick={() => {
+                  setSearchQuery('');
+                  setStatusFilter('');
+                  setCategoryFilter('');
+                }}
+                variant="ghost"
+                size="sm"
+              >
+                Clear all
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {error && (
+        <div className={`p-4 rounded-lg border flex items-start gap-3 ${
+          currentTheme === 'dark' 
+            ? 'bg-error/10 border-error/30 text-error' 
+            : 'bg-error/10 border-error/30 text-error'
+        }`}>
+          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-semibold">Error Loading Products</p>
+            <p className="text-sm mt-1">{error}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              variant="ghost"
+              size="sm"
+            >
+              Try again
+            </Button>
           </div>
         </div>
+      )}
+
+      <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        
+        {loading && !initialLoading ? (
+          <div className="p-8">
+            <div className="flex items-center justify-center">
+              <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
+              <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating products...</span>
+            </div>
+          </div>
+        ) : products.length > 0 ? (
+          <>
+            {/* Desktop table */}
+            <div className="overflow-x-auto hidden md:block">
+              <table className="w-full">
+                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
+                  <tr>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Name</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Category</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Price</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Stock</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((product: any) => (
+                    <tr key={product.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{product.name || 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{product.category || 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(product.price)}</td>
+                      <td className="px-6 py-4 text-sm">{stockBadge(product.stock)}</td>
+                      <td className="px-6 py-4 text-sm">{statusBadge(product.status)}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            onClick={() => handleView(product)}
+                            variant="primary"
+                            size="sm"
+                            leftIcon={<EyeIcon size={14} />}
+                          >
+                            View
+                          </Button>
+                          <Button 
+                            onClick={() => handleDelete(product)}
+                            variant="danger"
+                            size="sm"
+                            leftIcon={<Trash2 size={14} />}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className="md:hidden divide-y divide-gray-200">
+              {products.map((product: any) => (
+                <div
+                  key={product.id}
+                  className={`p-4 flex flex-col gap-2 bg-white dark:bg-gray-800 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-sm">{product.name || 'N/A'}</h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-300">{product.category || 'N/A'}</p>
+                      <p className="text-sm font-semibold">{formatCurrency(product.price)}</p>
+                      <p className="text-xs">{stockBadge(product.stock)}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        onClick={() => handleView(product)}
+                        variant="primary"
+                        size="sm"
+                        leftIcon={<EyeIcon size={14} />}
+                      >
+                        View
+                      </Button>
+                      <Button 
+                        onClick={() => handleDelete(product)}
+                        variant="danger"
+                        size="sm"
+                        leftIcon={<Trash2 size={14} />}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
         {error && (
           <div className={`p-4 rounded-lg border flex items-start gap-3 ${
@@ -457,14 +579,16 @@ const AdminProductsPage = () => {
             <div className="flex-1">
               <p className="font-semibold">Error Loading Products</p>
               <p className="text-sm mt-1">{error}</p>
-              <button
+              <Button
                 onClick={() => window.location.reload()}
+                variant="link"
+                size="sm"
                 className={`mt-2 text-sm underline hover:no-underline ${
                   currentTheme === 'dark' ? 'text-error hover:text-error-light' : 'text-error hover:text-error-dark'
                 }`}
               >
                 Try again
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -503,20 +627,24 @@ const AdminProductsPage = () => {
                         <td className="px-6 py-4 text-sm">{statusBadge(product.status)}</td>
                         <td className="px-6 py-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <button 
+                            <Button 
                               onClick={() => handleView(product)}
+                              variant="ghost"
+                              size="sm"
                               className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                             >
                               <EyeIcon size={14} />
                               View
-                            </button>
-                            <button 
+                            </Button>
+                            <Button 
                               onClick={() => handleDelete(product)}
+                              variant="ghost"
+                              size="sm"
                               className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors"
                             >
                               <Trash2 size={14} />
                               Delete
-                            </button>
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -542,20 +670,24 @@ const AdminProductsPage = () => {
                       {stockBadge(product.stock)}
                     </div>
                     <div className="flex items-center gap-2 mt-2">
-                      <button 
+                      <Button 
                         onClick={() => handleView(product)}
+                        variant="ghost"
+                        size="sm"
                         className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
                       >
                         <EyeIcon size={14} />
                         View
-                      </button>
-                      <button 
+                      </Button>
+                      <Button 
                         onClick={() => handleDelete(product)}
+                        variant="ghost"
+                        size="sm"
                         className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors text-sm"
                       >
                         <Trash2 size={14} />
                         Delete
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -580,9 +712,11 @@ const AdminProductsPage = () => {
               {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
             </p>
             <div className="flex items-center gap-1">
-              <button
+              <Button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
+                variant="outline"
+                size="sm"
                 className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
                   currentTheme === 'dark' 
                     ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
@@ -591,7 +725,7 @@ const AdminProductsPage = () => {
               >
                 <ChevronLeft className="w-4 h-4" />
                 Previous
-              </button>
+              </Button>
               
               {/* Page numbers */}
               <div className="flex items-center gap-1 mx-2">
@@ -608,26 +742,30 @@ const AdminProductsPage = () => {
                   }
                   
                   return (
-                    <button
+                    <Button
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
+                      variant={pageNum === page ? "primary" : "ghost"}
+                      size="sm"
                       className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
                         pageNum === page
                           ? 'bg-primary text-white'
                           : currentTheme === 'dark'
                             ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
                             : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                    }`}
+                      }`}
                     >
                       {pageNum}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
               
-              <button
+              <Button
                 onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
                 disabled={page >= (pagination.pages || 1)}
+                variant="outline"
+                size="sm"
                 className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
                   currentTheme === 'dark' 
                     ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
@@ -636,7 +774,7 @@ const AdminProductsPage = () => {
               >
                 Next
                 <ChevronRight className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -651,9 +789,11 @@ const AdminProductsPage = () => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
-              <button
+              <Button
                 onClick={cancelDelete}
                 disabled={isDeleting}
+                variant="ghost"
+                size="sm"
                 className={`absolute top-3 right-3 p-0.5 rounded-md transition-colors ${
                   currentTheme === 'dark' 
                     ? 'hover:bg-gray-700 text-gray-400 hover:text-gray-300' 
@@ -661,7 +801,7 @@ const AdminProductsPage = () => {
                 } disabled:opacity-50`}
               >
                 <X size={16} />
-              </button>
+              </Button>
 
               <div className="p-5">
                 {/* Icon */}
@@ -690,9 +830,11 @@ const AdminProductsPage = () => {
 
                 {/* Action Buttons */}
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={cancelDelete}
                     disabled={isDeleting}
+                    variant="outline"
+                    size="sm"
                     className={`flex-1 px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
                       currentTheme === 'dark'
                         ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
@@ -700,24 +842,18 @@ const AdminProductsPage = () => {
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={confirmDelete}
                     disabled={isDeleting}
+                    variant="danger"
+                    size="sm"
+                    isLoading={isDeleting}
                     className="flex-1 px-3 py-2 text-sm bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                    leftIcon={isDeleting ? <Loader className="w-3.5 h-3.5 animate-spin" /> : <Trash2 size={14} />}
                   >
-                    {isDeleting ? (
-                      <>
-                        <Loader className="w-3.5 h-3.5 animate-spin" />
-                        Deleting...
-                      </>
-                    ) : (
-                      <>
-                        <Trash2 size={14} />
-                        Delete
-                      </>
-                    )}
-                  </button>
+                    {isDeleting ? 'Deleting...' : 'Delete'}
+                  </Button>
                 </div>
               </div>
             </div>

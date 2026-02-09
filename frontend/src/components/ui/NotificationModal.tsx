@@ -1,5 +1,6 @@
 import React from 'react';
 import { XIcon, CheckCircleIcon, InfoIcon, AlertCircleIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -77,22 +78,26 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 <p className="text-copy text-sm leading-relaxed">{message}</p>
               </div>
             </div>
-            <button
+            <Button
               onClick={onClose}
+              variant="ghost"
+              size="sm"
               className="text-copy-light hover:text-copy p-1 rounded-md hover:bg-surface-hover"
             >
-              <XIcon size={20} />
-            </button>
+              <XIcon className="w-4 h-4" />
+            </Button>
           </div>
 
           {/* Actions */}
           <div className="flex items-center justify-end p-4 border-t border-border-light">
-            <button
+            <Button
               onClick={onClose}
+              variant="primary"
+              size="sm"
               className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark"
             >
-              OK
-            </button>
+              {variant === 'success' ? 'Got it!' : variant === 'warning' ? 'Understood' : 'OK'}
+            </Button>
           </div>
         </div>
       </div>

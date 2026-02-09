@@ -79,15 +79,16 @@ export const ThemeToggle = ({
       className
     )}>
       {themes.map(({ key, label, icon: Icon }) => (
-        <button
+        <Button
           key={key}
           onClick={() => setTheme(key)}
-          className={cn(
-            'flex items-center justify-center rounded-md transition-all duration-200',
-            'hover:bg-surface-active focus:outline-none focus:ring-2 focus:ring-primary/50',
+          variant={theme === key ? 'primary' : 'ghost'}
+          size={size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'}
+          className={`flex items-center justify-center rounded-md transition-all duration-200 ${
             size === 'sm' && 'p-1.5',
             size === 'md' && 'p-2',
-            size === 'lg' && 'p-3',
+            size === 'lg' && 'p-3'
+          } ${
             theme === key ? [
               'bg-primary text-white shadow-sm',
               'hover:bg-primary-dark'
@@ -95,7 +96,7 @@ export const ThemeToggle = ({
               'text-copy-light',
               'hover:text-copy hover:bg-surface'
             ]
-          )}
+          }`}
           aria-label={`Switch to ${label} theme`}
           title={`Switch to ${label} theme`}
         >
@@ -105,16 +106,11 @@ export const ThemeToggle = ({
             size === 'lg' && 'w-6 h-6'
           )} />
           {showLabels && (
-            <span className={cn(
-              'ml-2 hidden sm:inline font-medium',
-              size === 'sm' && 'text-xs',
-              size === 'md' && 'text-sm',
-              size === 'lg' && 'text-base'
-            )}>
+            <span className="ml-2 text-sm font-medium">
               {label}
             </span>
           )}
-        </button>
+        </Button>
       ))}
     </div>
   );

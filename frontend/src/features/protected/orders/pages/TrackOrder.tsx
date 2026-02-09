@@ -14,6 +14,7 @@ import { OrdersAPI } from '../api/orders';
 import { toast } from 'react-hot-toast';
 import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
 import { containerVariants, itemVariants } from '../../../utils/pageAnimations';
+import { Button } from '@/components/ui/Button';
 
 interface TrackingEvent {
   id: string;
@@ -156,13 +157,15 @@ export const TrackOrder = () => {
       variants={containerVariants}
     >
       <motion.div className="max-w-4xl mx-auto" variants={itemVariants}>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => navigate(-1)}
-          className="flex items-center text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-4"
+          className="text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-4"
         >
           <ArrowLeftIcon size={14} className="mr-1" />
           Back
-        </button>
+        </Button>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
           <div className="flex justify-between items-start mb-3">
@@ -174,13 +177,14 @@ export const TrackOrder = () => {
                 Order ID: {tracking.order_id}
               </p>
             </div>
-            <button
+            <Button
               onClick={handleDownloadInvoice}
-              className="flex items-center gap-1.5 px-2 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs"
+              size="sm"
+              className="flex items-center gap-1.5 px-2 py-1.5 text-xs"
             >
               <PrinterIcon size={14} />
               Download Invoice
-            </button>
+            </Button>
           </div>
 
           {tracking.tracking_number && (

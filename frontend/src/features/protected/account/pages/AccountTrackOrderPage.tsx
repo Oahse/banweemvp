@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchIcon, PackageIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 const TrackOrder = () => {
   const [orderNumber, setOrderNumber] = useState('');
@@ -47,13 +48,15 @@ const TrackOrder = () => {
             </p>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-xs font-semibold"
+            variant="primary"
+            size="sm"
+            fullWidth={true}
+            leftIcon={<SearchIcon size={16} />}
           >
-            <SearchIcon size={16} className="inline-block mr-2" />
             Track Order
-          </button>
+          </Button>
         </form>
       </div>
     </div>

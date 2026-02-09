@@ -6,6 +6,7 @@ import { formatCurrency } from '../../../../utils/locale-config';
 import { themeClasses, getButtonClasses } from '../../../../utils/themeClasses';
 import { VariantSelector } from '../components/VariantSelector';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/Button';
 
 interface SubscriptionSelectorProps {
   isOpen: boolean;
@@ -84,12 +85,14 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
           <h2 className={`text-lg sm:text-xl font-semibold ${themeClasses.text.primary}`}>
             Add to Subscription
           </h2>
-          <button
+          <Button
             onClick={onClose}
+            variant="ghost"
+            size="sm"
             className={`p-2 rounded-lg ${themeClasses.text.muted} hover:${themeClasses.background.surface} transition-colors`}
+            leftIcon={<XIcon size={20} />}
           >
-            <XIcon className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
@@ -130,12 +133,14 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
               <p className={`${themeClasses.text.muted} mb-4 text-sm sm:text-base`}>
                 You don't have any subscriptions yet. Create one to start adding products.
               </p>
-              <button
+              <Button
                 onClick={handleCreateSubscription}
+                variant="primary"
+                size="sm"
                 className={getButtonClasses('primary')}
               >
                 Create New Subscription
-              </button>
+              </Button>
             </div>
           ) : (
             <>
@@ -211,27 +216,35 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <button
+                <Button
                   onClick={onClose}
+                  variant="outline"
+                  size="sm"
                   className={`${getButtonClasses('secondary')} w-full sm:w-auto`}
                   disabled={isLoading}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleCreateSubscription}
+                  variant="primary"
+                  size="sm"
                   className={`${getButtonClasses('primary')} w-full sm:w-auto`}
                   disabled={isLoading}
+                  isLoading={isLoading}
                 >
-                  Create New Subscription
-                </button>
-                <button
+                  {isLoading ? 'Creating...' : 'Create New Subscription'}
+                </Button>
+                <Button
                   onClick={handleAddToSubscription}
                   disabled={!selectedSubscriptionId || !selectedVariant || isLoading}
+                  variant="primary"
+                  size="sm"
                   className={`${getButtonClasses('primary')} w-full sm:w-auto`}
+                  isLoading={isLoading}
                 >
                   {isLoading ? 'Adding...' : 'Add to Subscription'}
-                </button>
+                </Button>
               </div>
             </>
           )}

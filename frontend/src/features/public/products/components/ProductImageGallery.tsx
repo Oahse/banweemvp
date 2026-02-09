@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, ZoomInIcon, XIcon, PackageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../../../utils/utils';
+import { Button } from '@/components/ui/Button';
 
 export const ProductImageGallery = ({
   images,
@@ -113,18 +114,22 @@ export const ProductImageGallery = ({
 
         {sortedImages.length > 1 && (
           <>
-            <button
+            <Button
               onClick={prevImage}
+              variant="ghost"
+              size="sm"
               className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
+              leftIcon={<ChevronLeftIcon size={20} />}
             >
-              <ChevronLeftIcon size={20} />
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={nextImage}
+              variant="ghost"
+              size="sm"
               className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
+              rightIcon={<ChevronRightIcon size={20} />}
             >
-              <ChevronRightIcon size={20} />
-            </button>
+            </Button>
           </>
         )}
 
@@ -138,9 +143,11 @@ export const ProductImageGallery = ({
       {showThumbnails && sortedImages.length > 1 && (
         <div className="grid grid-cols-4 gap-2">
           {sortedImages.map((image, index) => (
-            <button
+            <Button
               key={image.id}
               onClick={() => onImageSelect(index)}
+              variant={index === selectedImageIndex ? "primary" : "ghost"}
+              size="sm"
               className={cn(
                 'relative overflow-hidden rounded-md border-2 transition-all h-20',
                 selectedImageIndex === index
@@ -158,7 +165,7 @@ export const ProductImageGallery = ({
                   Primary
                 </div>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -180,33 +187,39 @@ export const ProductImageGallery = ({
                 onClick={(e) => e.stopPropagation()}
               />
               
-              <button
+              <Button
                 onClick={() => setIsFullscreen(false)}
+                variant="ghost"
+                size="sm"
                 className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                leftIcon={<XIcon size={16} />}
               >
-                <XIcon size={20} />
-              </button>
+              </Button>
 
               {sortedImages.length > 1 && (
                 <>
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       prevImage();
                     }}
+                    variant="ghost"
+                    size="sm"
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white w-12 h-12 rounded-full flex items-center justify-center transition-colors"
+                    leftIcon={<ChevronLeftIcon size={24} />}
                   >
-                    <ChevronLeftIcon size={24} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       nextImage();
                     }}
+                    variant="ghost"
+                    size="sm"
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white w-12 h-12 rounded-full flex items-center justify-center transition-colors"
+                    rightIcon={<ChevronRightIcon size={24} />}
                   >
-                    <ChevronRightIcon size={24} />
-                  </button>
+                  </Button>
                 </>
               )}
 

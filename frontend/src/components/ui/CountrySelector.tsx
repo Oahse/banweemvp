@@ -8,6 +8,7 @@ import {
   getCurrencySymbol
 } from '../../utils/countries';
 import { ChevronDownIcon, SearchIcon, XIcon, GlobeIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export const CountrySelector = ({
   value,
@@ -164,18 +165,19 @@ export const CountrySelector = ({
 
   return (
     <div className={cn('relative', className)} ref={dropdownRef}>
-      <button
+      <Button
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
-        className={cn(
-          'w-full flex items-center justify-between rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors',
-          sizeClasses[size],
-          variantClasses[variant],
-          error && 'border-error focus:ring-error',
-          disabled && 'opacity-50 cursor-not-allowed bg-surface-disabled',
+        variant="outline"
+        size="sm"
+        className={`w-full flex items-center justify-between rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
+          sizeClasses[size] + ' ' +
+          variantClasses[variant] + ' ' +
+          (error ? 'border-error focus:ring-error' : '') +
+          (disabled ? 'opacity-50 cursor-not-allowed bg-surface-disabled' : '') +
           'hover:border-border-strong'
-        )}
+        }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label="Select country"
@@ -210,14 +212,16 @@ export const CountrySelector = ({
         
         <div className="flex items-center ml-2">
           {clearable && selectedCountry && (
-            <button
+            <Button
               type="button"
               onClick={handleClear}
+              variant="ghost"
+              size="sm"
               className="p-1 hover:bg-surface-hover rounded mr-1"
               aria-label="Clear selection"
             >
               <XIcon size={14} />
-            </button>
+            </Button>
           )}
           <ChevronDownIcon 
             size={16} 
@@ -226,8 +230,8 @@ export const CountrySelector = ({
               isOpen && 'transform rotate-180'
             )} 
           />
-        </div>
-      </button>
+        </Button>
+      </div>
 
       {helperText && (
         <p className={cn(
@@ -271,15 +275,17 @@ export const CountrySelector = ({
                   const isSelected = selectedCountry?.code === country.code;
                   
                   return (
-                    <button
+                    <Button
                       key={country.code}
                       type="button"
                       onClick={() => handleSelect(country)}
-                      className={cn(
-                        'w-full px-3 py-2 text-left flex items-center hover:bg-surface-hover focus:outline-none focus:bg-surface-hover',
-                        isHighlighted && 'bg-surface-hover',
-                        isSelected && 'bg-primary text-white hover:bg-primary'
-                      )}
+                      variant="ghost"
+                      size="sm"
+                      className={`w-full px-3 py-2 text-left flex items-center hover:bg-surface-hover focus:outline-none focus:bg-surface-hover ${
+                        isHighlighted ? 'bg-surface-hover' : ''
+                      } ${
+                        isSelected ? 'bg-primary text-white hover:bg-primary' : ''
+                      }`}
                       role="option"
                       aria-selected={isSelected}
                     >
@@ -298,7 +304,7 @@ export const CountrySelector = ({
                           </div>
                         )}
                       </div>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>

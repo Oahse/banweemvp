@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import Dropdown from '@/components/ui/Dropdown';
 import { AdminAPI } from '@/api/admin';
+import { Button } from '@/components/ui/Button';
 
 // Color palette
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -140,12 +141,13 @@ const AdminDashboard: React.FC = () => {
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-96">
           <div className="text-red-600 dark:text-red-400 text-lg mb-3">{error}</div>
-          <button
+          <Button
             onClick={fetchDashboardData}
-            className="px-3 py-1.5 text-sm bg-primary hover:bg-primary-dark text-white rounded-lg"
+            variant="primary"
+            size="sm"
           >
-            Retry
-          </button>
+            Refresh Dashboard
+          </Button>
         </div>
       </AdminLayout>
     );
@@ -367,12 +369,13 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
-                <button
+                <Button
                   onClick={() => navigate('/admin/orders')}
-                  className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                  variant="primary"
+                  size="sm"
                 >
-                  View All →
-                </button>
+                  View All Orders
+                </Button>
               </div>
               <div className="space-y-2">
                 {stats.recent_orders.slice(0, 5).map((order: any) => (
@@ -458,12 +461,13 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Users</h3>
-              <button
+              <Button
                 onClick={() => navigate('/admin/users')}
-                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                variant="primary"
+                size="sm"
               >
-                View All →
-              </button>
+                View All Users
+              </Button>
             </div>
             <div className="space-y-2">
               {stats.recent_users.slice(0, 5).map((user: any) => (
@@ -501,12 +505,13 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Top Products</h3>
-              <button
+              <Button
                 onClick={() => navigate('/admin/products')}
-                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                variant="primary"
+                size="sm"
               >
-                View All →
-              </button>
+                View All Products
+              </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {stats.top_products.slice(0, 6).map((product: any, index: number) => (

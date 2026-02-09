@@ -1,5 +1,6 @@
 import React from 'react';
 import { XIcon, AlertTriangleIcon } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -65,13 +66,15 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               </div>
               <h3 className="text-lg font-semibold text-main">{title}</h3>
             </div>
-            <button
+            <Button
               onClick={onClose}
+              variant="ghost"
+              size="sm"
               className="text-copy-light hover:text-copy p-1 rounded-md hover:bg-surface-hover"
               disabled={loading}
             >
-              <XIcon size={20} />
-            </button>
+              <XIcon className="w-4 h-4" />
+            </Button>
           </div>
 
           {/* Content */}
@@ -81,17 +84,22 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
           {/* Actions */}
           <div className="flex items-center justify-end space-x-3 p-4 border-t border-border-light">
-            <button
+            <Button
               onClick={onClose}
               disabled={loading}
+              variant="outline"
+              size="sm"
               className="px-4 py-2 text-sm font-medium text-copy border border-border rounded-md hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {cancelText}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={onConfirm}
               disabled={loading}
+              variant={variant === 'danger' ? 'primary' : variant === 'warning' ? 'warning' : 'primary'}
+              size="sm"
               className={`px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center ${styles.button}`}
+              isLoading={loading}
             >
               {loading ? (
                 <>
@@ -101,7 +109,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               ) : (
                 confirmText
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

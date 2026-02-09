@@ -3,6 +3,7 @@ import { Calendar, Filter, X, ChevronDown } from 'lucide-react';
 import { apiClient } from '@/api/client';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
+import { Button } from '@/components/ui/Button';
 
 export interface DashboardFilters {
   dateRange: 'today' | 'week' | 'month' | 'year' | 'quarter' | 'custom';
@@ -61,13 +62,15 @@ export const DashboardFilterBar: React.FC<DashboardFilterBarProps> = ({
           <Filter className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           <h3 className="font-semibold text-gray-900 dark:text-white">Filters</h3>
         </div>
-        <button
+        <Button
           onClick={onReset}
+          variant="ghost"
+          size="sm"
           className="flex items-center gap-2 px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+          leftIcon={<X className="w-4 h-4" />}
         >
-          <X className="w-4 h-4" />
           Reset
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -78,9 +81,11 @@ export const DashboardFilterBar: React.FC<DashboardFilterBarProps> = ({
           </label>
           <div className="flex gap-2">
             {['today', 'week', 'month', 'year', 'quarter', 'custom'].map((range) => (
-              <button
+              <Button
                 key={range}
                 onClick={() => handleDateRangeChange(range as DashboardFilters['dateRange'])}
+                variant={filters.dateRange === range ? "primary" : "ghost"}
+                size="sm"
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-colors capitalize ${
                   filters.dateRange === range
                     ? 'bg-primary text-white'
@@ -88,7 +93,7 @@ export const DashboardFilterBar: React.FC<DashboardFilterBarProps> = ({
                 }`}
               >
                 {range}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

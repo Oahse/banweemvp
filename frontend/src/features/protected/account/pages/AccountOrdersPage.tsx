@@ -7,6 +7,7 @@ import OrdersAPI from '@/api/orders';
 import { toast } from 'react-hot-toast';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
+import { Button } from '@/components/ui/Button';
 
 
 interface Order {
@@ -149,19 +150,16 @@ export const Orders = (props: OrdersProps) => {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <button
+                  <Button
                     onClick={() => setExpandedOrderId(
                       expandedOrderId === order.id ? null : order.id
                     )}
-                    className="flex items-center text-xs text-gray-600 hover:text-gray-900"
+                    variant="ghost"
+                    size="sm"
+                    rightIcon={expandedOrderId === order.id ? <ChevronUpIcon className="h-3 w-3" /> : <ChevronDownIcon className="h-3 w-3" />}
                   >
-                    {expandedOrderId === order.id ? (
-                      <ChevronUpIcon className="h-3 w-3 mr-1" />
-                    ) : (
-                      <ChevronDownIcon className="h-3 w-3 mr-1" />
-                    )}
                     {expandedOrderId === order.id ? 'Hide' : 'Show'} details
-                  </button>
+                  </Button>
                   
                   <div className="flex space-x-2">
                     <Link
@@ -226,23 +224,23 @@ export const Orders = (props: OrdersProps) => {
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <button
+                <Button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="p-1.5 border border-gray-300 rounded-md disabled:opacity-50"
-                >
-                  <ChevronLeftIcon className="h-3 w-3" />
-                </button>
+                  variant="outline"
+                  size="icon"
+                  leftIcon={<ChevronLeftIcon className="h-3 w-3" />}
+                />
                 <span className="text-xs text-gray-600">
                   Page {currentPage} of {totalPages}
                 </span>
-                <button
+                <Button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="p-1.5 border border-gray-300 rounded-md disabled:opacity-50"
-                >
-                  <ChevronRightIcon className="h-3 w-3" />
-                </button>
+                  variant="outline"
+                  size="icon"
+                  leftIcon={<ChevronRightIcon className="h-3 w-3" />}
+                />
               </div>
             </div>
           )}
