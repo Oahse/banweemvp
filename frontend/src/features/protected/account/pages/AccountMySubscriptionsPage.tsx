@@ -4,6 +4,7 @@ import { useSubscription } from '../../subscriptions/contexts/SubscriptionContex
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading, Label } from '@/components/ui/Text/Text';
 import TabHeader from '@/components/ui/TabHeader';
 import { 
   PlusIcon, 
@@ -291,8 +292,8 @@ export const MySubscriptions = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">My Subscriptions</h1>
-          <p className="text-sm text-gray-600 mt-1">Manage your active and past subscriptions</p>
+          <Heading level={1} weight="bold">My Subscriptions</Heading>
+          <Text variant="caption" tone="secondary">Manage your active and past subscriptions</Text>
         </div>
         <Button
           onClick={() => setShowCreateModal(true)}
@@ -301,7 +302,7 @@ export const MySubscriptions = () => {
           leftIcon={<PlusIcon className="w-4 h-4" />}
           className="mt-4 sm:mt-0"
         >
-          New Subscription
+          <Text variant="body-sm">New Subscription</Text>
         </Button>
       </div>
 
@@ -436,14 +437,10 @@ export const MySubscriptions = () => {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-full max-w-md sm:w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <div className="mt-3">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-4">
-                Create New Subscription
-              </h3>
+              <Heading level={3} weight="medium">Create New Subscription</Heading>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Subscription Name
-                  </label>
+                  <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subscription Name</Label>
                   <input
                     type="text"
                     value={newSubscriptionData.name}
@@ -456,9 +453,7 @@ export const MySubscriptions = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Billing Cycle
-                  </label>
+                  <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Billing Cycle</Label>
                   <Dropdown
                     options={[
                       { value: 'monthly', label: 'Monthly' },
@@ -476,9 +471,7 @@ export const MySubscriptions = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Delivery Type
-                  </label>
+                  <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Delivery Type</Label>
                   <Dropdown
                     options={[
                       { value: 'standard', label: 'Standard' },
@@ -496,9 +489,7 @@ export const MySubscriptions = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Products
-                  </label>
+                  <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Products</Label>
                   <div className="space-y-2">
                     <Button
                       type="button"
@@ -508,14 +499,12 @@ export const MySubscriptions = () => {
                       className="border-dashed"
                     >
                       {newSubscriptionData.product_variant_ids.length > 0 
-                        ? `${newSubscriptionData.product_variant_ids.length} product(s) selected`
-                        : 'Click to select products'
+                        ? <Text variant="body-sm">{`${newSubscriptionData.product_variant_ids.length} product(s) selected`}</Text>
+                        : <Text variant="body-sm">Click to select products</Text>
                       }
                     </Button>
                     {newSubscriptionData.product_variant_ids.length > 0 && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {newSubscriptionData.product_variant_ids.length} product(s) will be included in this subscription
-                      </div>
+                      <Text variant="caption" className="text-gray-500 dark:text-gray-400">{newSubscriptionData.product_variant_ids.length} product(s) will be included in this subscription</Text>
                     )}
                   </div>
                 </div>
@@ -537,7 +526,7 @@ export const MySubscriptions = () => {
                   fullWidth={true}
                   className="sm:fullWidth-auto"
                 >
-                  Cancel
+                  <Text variant="body-sm">Cancel</Text>
                 </Button>
                 <Button
                   onClick={handleCreateSubscription}
@@ -548,7 +537,7 @@ export const MySubscriptions = () => {
                   fullWidth={true}
                   className="sm:fullWidth-auto"
                 >
-                  {isLoading ? 'Creating...' : 'Create Subscription'}
+                  <Text variant="body-sm">{isLoading ? 'Creating...' : 'Create Subscription'}</Text>
                 </Button>
               </div>
             </div>

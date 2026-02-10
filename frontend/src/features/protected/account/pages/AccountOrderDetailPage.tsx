@@ -4,6 +4,7 @@ import { ArrowLeftIcon, PackageIcon, DownloadIcon, MapPinIcon } from 'lucide-rea
 import { OrdersAPI } from '@/api/orders';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 export const OrderDetail = () => {
   const { orderId } = useParams();
@@ -34,7 +35,7 @@ export const OrderDetail = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <span className="text-gray-500 text-sm">Loading order details...</span>
+        <Text variant="body-sm" tone="secondary">Loading order details...</Text>
       </div>
     );
   }
@@ -42,12 +43,12 @@ export const OrderDetail = () => {
   if (!order) {
     return (
       <div className="flex flex-col items-center justify-center h-64">
-        <span className="text-red-500 text-sm mb-2">Order not found.</span>
+        <Text variant="caption" className="text-red-500 mb-2">Order not found.</Text>
         <Button
           variant="primary"
           onClick={() => navigate(-1)}
         >
-          Back to Orders
+          <Text variant="body-sm">Back to Orders</Text>
         </Button>
       </div>
     );
@@ -62,25 +63,25 @@ export const OrderDetail = () => {
         onClick={() => navigate(-1)}
         className="mb-4"
       >
-        Back to Orders
+        <Text variant="body-sm">Back to Orders</Text>
       </Button>
-      <h2 className="text-base md:text-lg font-semibold mb-2">Order #{order.id}</h2>
-      <p className="text-sm text-gray-500 mb-4">Placed on {order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'}</p>
+      <Heading level={2} weight="medium">Order #{order.id}</Heading>
+      <Text variant="body-sm" tone="secondary">Placed on {order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'}</Text>
       <div className="mb-4">
         <span className="inline-block px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
           {order.status || 'Unknown Status'}
         </span>
       </div>
       <div className="mb-4">
-        <h3 className="text-sm font-medium mb-2">Items</h3>
+        <Heading level={3} weight="medium">Items</Heading>
         <ul className="space-y-2">
           {order.items && order.items.length > 0 ? (
             order.items.map((item: any) => (
               <li key={item.id} className="flex items-center gap-3 border-b pb-2">
                 <PackageIcon size={18} className="text-gray-400" />
-                <span className="text-sm font-medium">{item.name || item.product_name}</span>
-                <span className="text-sm text-gray-500">x{item.quantity}</span>
-                <span className="ml-auto text-sm text-gray-700">${item.total_price?.toFixed(2) || '0.00'}</span>
+                <Text variant="body-sm" weight="medium">{item.name || item.product_name}</Text>
+                <Text variant="body-sm" tone="secondary">x{item.quantity}</Text>
+                <Text variant="body-sm" className="ml-auto">${item.total_price?.toFixed(2) || '0.00'}</Text>
               </li>
             ))
           ) : (
@@ -89,15 +90,15 @@ export const OrderDetail = () => {
         </ul>
       </div>
       <div className="mb-4">
-        <h3 className="text-sm font-medium mb-2">Shipping</h3>
+        <Heading level={3} weight="medium">Shipping</Heading>
         <div className="flex items-center gap-2">
           <MapPinIcon size={16} className="text-gray-400" />
-          <span className="text-sm">{order.shipping_address || 'N/A'}</span>
+          <Text variant="body-sm">{order.shipping_address || 'N/A'}</Text>
         </div>
       </div>
       <div className="mb-4">
-        <h3 className="text-sm font-medium mb-2">Total</h3>
-        <span className="text-base font-semibold">${order.total_amount?.toFixed(2) || '0.00'}</span>
+        <Heading level={3} weight="medium">Total</Heading>
+        <Text variant="body-sm" className="font-semibold">${order.total_amount?.toFixed(2) || '0.00'}</Text>
       </div>
       <div className="flex gap-2 mt-4">
         <Button
@@ -105,11 +106,11 @@ export const OrderDetail = () => {
           size="sm"
           leftIcon={<DownloadIcon size={16} />}
         >
-          Download Invoice
+          <Text variant="body-sm">Download Invoice</Text>
         </Button>
         <Link to="/products">
           <Button variant="secondary" size="sm">
-            Shop More
+            <Text variant="body-sm">Shop More</Text>
           </Button>
         </Link>
       </div>

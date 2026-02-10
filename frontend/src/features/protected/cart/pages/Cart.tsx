@@ -12,7 +12,7 @@ import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { CartAPI } from '@/api/cart';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
-import { Text, Heading } from '@/components/ui/Text/Text';
+import { Text, Heading, Label } from '@/components/ui/Text/Text';
 
 export const Cart = () => {
   const { 
@@ -360,15 +360,15 @@ export const Cart = () => {
             </div>
           </div>
           <div className="col-span-2 text-center text-sm">
-            <span className="md:hidden font-medium text-copy text-xs">Price: </span>
+            <Text as="span" className="md:hidden font-medium text-copy text-xs">Price: </Text>
             <div>
-              <span className="font-medium text-primary text-sm">
+              <Text as="span" className="font-medium text-primary text-sm">
                 {formatCurrency(
                   !isNaN(item.price_per_unit) && item.price_per_unit > 0 
                     ? item.price_per_unit 
                     : item.variant?.current_price || item.variant?.sale_price || item.variant?.base_price || 0
                 )}
-              </span>
+              </Text>
               {/* Show discount if applicable */}
               {item.variant?.discount_percentage && item.variant.discount_percentage > 0 && (
                 <div className="text-xs text-gray-500 line-through">
@@ -413,8 +413,8 @@ export const Cart = () => {
             </div>
           </div>
           <div className="col-span-2 text-center text-sm">
-            <span className="md:hidden font-medium text-copy text-xs">Subtotal: </span>
-            <span className="font-medium text-copy text-sm">
+            <Text as="span" className="md:hidden font-medium text-copy text-xs">Subtotal: </Text>
+            <Text as="span" className="font-medium text-copy text-sm">
               {formatCurrency(
                 !isNaN(item.total_price) && item.total_price > 0 
                   ? item.total_price 
@@ -424,7 +424,7 @@ export const Cart = () => {
                         : item.variant?.current_price || item.variant?.sale_price || item.variant?.base_price || 0
                     )
               )}
-            </span>
+            </Text>
           </div>
         </div>
       </motion.div>
@@ -537,7 +537,7 @@ export const Cart = () => {
               <Text variant="body-sm">Continue Shopping</Text>
               </div>
               <form onSubmit={handleApplyCoupon} className="mb-4">
-                <label htmlFor="coupon-code" className="block text-xs font-medium mb-2 text-copy">Promo Code (Optional)</label>
+                <Label htmlFor="coupon-code" className="block text-xs font-medium mb-2 text-copy">Promo Code (Optional)</Label>
                 <div className="flex">
                   <input
                     id="coupon-code"

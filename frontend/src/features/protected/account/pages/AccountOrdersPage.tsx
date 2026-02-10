@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 
 interface Order {
@@ -95,9 +96,7 @@ export const Orders = (props: OrdersProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-600">
-          {totalOrders} order{totalOrders !== 1 ? 's' : ''}
-        </p>
+        <Text variant="caption" tone="secondary">{totalOrders} order{totalOrders !== 1 ? 's' : ''}</Text>
       </div>
 
       {loading ? (
@@ -109,16 +108,14 @@ export const Orders = (props: OrdersProps) => {
       ) : ordersArray.length === 0 ? (
         <div className="text-center py-6">
           <ShoppingBagIcon className="mx-auto h-10 w-10 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No orders</h3>
-          <p className="mt-1 text-xs text-gray-500">
-            You haven't placed any orders yet.
-          </p>
+          <Heading level={3} weight="medium" className="mt-2">No orders</Heading>
+          <Text variant="caption" tone="secondary">You haven't placed any orders yet.</Text>
           <div className="mt-4">
             <Link
               to="/products"
               className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-primary hover:bg-primary-dark"
             >
-              Start Shopping
+              <Text variant="body-sm" className="text-white">Start Shopping</Text>
             </Link>
           </div>
         </div>
@@ -129,23 +126,17 @@ export const Orders = (props: OrdersProps) => {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-sm font-medium">Order #{order.id}</h3>
-                    <p className="text-xs text-gray-500">
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </p>
+                    <Heading level={3} weight="medium">Order #{order.id}</Heading>
+                    <Text variant="caption" tone="secondary">{new Date(order.created_at).toLocaleDateString()}</Text>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold">
-                      {formatCurrency(order.total_amount)}
-                    </p>
-                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${
+                    <Text variant="body-sm" className="font-semibold">{formatCurrency(order.total_amount)}</Text>
+                    <Text as="span" variant="caption" className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${
                       order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                       order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
                       order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
                       'bg-gray-100 text-gray-800'
-                    }`}>
-                      {order.status}
-                    </span>
+                    }`}>{order.status}</Text>
                   </div>
                 </div>
 
@@ -158,7 +149,7 @@ export const Orders = (props: OrdersProps) => {
                     size="sm"
                     rightIcon={expandedOrderId === order.id ? <ChevronUpIcon className="h-3 w-3" /> : <ChevronDownIcon className="h-3 w-3" />}
                   >
-                    {expandedOrderId === order.id ? 'Hide' : 'Show'} details
+                    <Text variant="body-sm">{expandedOrderId === order.id ? 'Hide' : 'Show'} details</Text>
                   </Button>
                   
                   <div className="flex space-x-2">
@@ -178,16 +169,14 @@ export const Orders = (props: OrdersProps) => {
                       {order.items?.map((item: any, index: number) => (
                         <div key={index} className="flex items-center justify-between py-1.5">
                           <div className="flex-1">
-                            <p className="text-xs font-medium">{item.product_name}</p>
-                            <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                            <Text variant="caption" weight="medium">{item.product_name}</Text>
+                            <Text variant="caption" tone="secondary">Qty: {item.quantity}</Text>
                           </div>
-                          <p className="text-xs font-medium">
-                            {(() => {
-                              const formatted = formatCurrency(item.total_price || 0);
-                              console.log('formatCurrency output:', formatted, 'type:', typeof formatted);
-                              return formatted;
-                            })()}
-                          </p>
+                          <Text variant="caption" weight="medium">{(() => {
+                            const formatted = formatCurrency(item.total_price || 0);
+                            console.log('formatCurrency output:', formatted, 'type:', typeof formatted);
+                            return formatted;
+                          })()}</Text>
                         </div>
                       ))}
                     </div>
@@ -195,22 +184,22 @@ export const Orders = (props: OrdersProps) => {
                     <div className="mt-3 pt-3 border-t border-gray-200">
                       <div className="space-y-0.5 text-xs">
                         <div className="flex justify-between">
-                          <span>Subtotal:</span>
-                          <span>{formatCurrency(calculatePricingBreakdown(order).subtotal)}</span>
+                          <Text variant="caption">Subtotal:</Text>
+                          <Text variant="caption">{formatCurrency(calculatePricingBreakdown(order).subtotal)}</Text>
                         </div>
                         {calculatePricingBreakdown(order).discount > 0 && (
                           <div className="flex justify-between text-green-600">
-                            <span>Discount:</span>
-                            <span>-{formatCurrency(calculatePricingBreakdown(order).discount)}</span>
+                            <Text variant="caption">Discount:</Text>
+                            <Text variant="caption">-{formatCurrency(calculatePricingBreakdown(order).discount)}</Text>
                           </div>
                         )}
                         <div className="flex justify-between">
-                          <span>Shipping:</span>
-                          <span>{formatCurrency(calculatePricingBreakdown(order).shipping)}</span>
+                          <Text variant="caption">Shipping:</Text>
+                          <Text variant="caption">{formatCurrency(calculatePricingBreakdown(order).shipping)}</Text>
                         </div>
                         <div className="flex justify-between font-semibold">
-                          <span>Total:</span>
-                          <span>{formatCurrency(calculatePricingBreakdown(order).total)}</span>
+                          <Text variant="caption">Total:</Text>
+                          <Text variant="caption">{formatCurrency(calculatePricingBreakdown(order).total)}</Text>
                         </div>
                       </div>
                     </div>

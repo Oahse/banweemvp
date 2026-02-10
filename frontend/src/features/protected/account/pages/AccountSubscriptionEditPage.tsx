@@ -4,6 +4,7 @@ import { useSubscription } from '../../../SubscriptionContext';
 import { toast } from 'react-hot-toast';
 import { CalendarIcon, DollarSignIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading, Label } from '@/components/ui/Text/Text';
 
 const AccountSubscriptionEditPage: React.FC = () => {
   const { subscriptionId } = useParams();
@@ -66,17 +67,18 @@ const AccountSubscriptionEditPage: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center h-64 text-gray-500">Loading...</div>;
-  if (error) return <div className="flex flex-col items-center h-64 text-red-500">{error}</div>;
-  if (!subscription) return <div className="flex flex-col items-center h-64 text-gray-500">Subscription not found.</div>;
+  if (loading) return <div className="flex justify-center items-center h-64"><Text variant="body-sm" className="text-gray-500">Loading...</Text></div>;
+  if (error) return <div className="flex flex-col items-center h-64"><Text variant="caption" className="text-red-500">{error}</Text></div>;
+  if (!subscription) return <div className="flex flex-col items-center h-64"><Text variant="caption" className="text-gray-500">Subscription not found.</Text></div>;
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
-      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <CalendarIcon size={20} /> Edit Subscription
-      </h2>
+      <div className="mb-4 flex items-center gap-2">
+        <CalendarIcon size={20} />
+        <Heading level={2} weight="medium">Edit Subscription</Heading>
+      </div>
       <div className="mb-4">
-        <label className="block text-xs font-medium mb-1">Plan Name</label>
+        <Label className="block text-xs font-medium mb-1">Plan Name</Label>
         <input
           name="plan"
           type="text"
@@ -86,7 +88,7 @@ const AccountSubscriptionEditPage: React.FC = () => {
         />
       </div>
       <div className="mb-4">
-        <label className="block text-xs font-medium mb-1">Billing Interval</label>
+        <Label className="block text-xs font-medium mb-1">Billing Interval</Label>
         <select
           name="billing_interval"
           value={form.billing_interval}
@@ -106,7 +108,7 @@ const AccountSubscriptionEditPage: React.FC = () => {
           onChange={handleChange}
           className="accent-primary"
         />
-        <label className="text-xs font-medium">Auto Renew</label>
+        <Label className="text-xs font-medium">Auto Renew</Label>
       </div>
       <Button
         variant="primary"
@@ -114,7 +116,7 @@ const AccountSubscriptionEditPage: React.FC = () => {
         disabled={loading}
         isLoading={loading}
       >
-        Save Changes
+        <Text variant="body-sm">Save Changes</Text>
       </Button>
     </div>
   );

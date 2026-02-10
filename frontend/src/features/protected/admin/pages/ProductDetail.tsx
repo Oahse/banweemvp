@@ -7,6 +7,7 @@ import AdminLayout from '../components/AdminLayout';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { ProductDetailSkeleton } from '../components/skeletons/ProductsSkeleton';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading, Body, Caption, Label } from '@/components/ui/Text/Text';
 
 export const AdminProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -101,8 +102,8 @@ export const AdminProductDetail = () => {
               Back
             </Button>
             <div>
-              <h1 className="text-lg font-semibold text-copy">{product.name}</h1>
-              <p className="text-copy-light text-[11px] mt-0.5">ID: {String(product.id).slice(0, 8)}...</p>
+              <Heading level={1} className="text-lg font-semibold text-copy">{product.name}</Heading>
+              <Caption className="text-copy-light text-[11px] mt-0.5">ID: {String(product.id).slice(0, 8)}...</Caption>
             </div>
           </div>
           
@@ -123,61 +124,61 @@ export const AdminProductDetail = () => {
           <div className="lg:col-span-2 space-y-3">
             {/* Basic Info */}
             <div className="bg-surface rounded-lg border border-border-light p-3">
-              <h2 className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
+              <Heading level={2} className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
                 <Package className="w-3.5 h-3.5" />
                 Product Information
-              </h2>
+              </Heading>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 <div>
-                  <label className="text-[11px] font-medium text-copy-light">Name</label>
-                  <p className="text-copy font-medium text-xs">{product.name}</p>
+                  <Label className="text-[11px] font-medium text-copy-light">Name</Label>
+                  <Text as="p" className="text-copy font-medium text-xs">{product.name}</Text>
                 </div>
                 <div>
-                  <label className="text-[11px] font-medium text-copy-light">Slug</label>
-                  <p className="text-copy font-mono text-[11px]">{product.slug}</p>
+                  <Label className="text-[11px] font-medium text-copy-light">Slug</Label>
+                  <Text as="p" className="text-copy font-mono text-[11px]">{product.slug}</Text>
                 </div>
                 <div>
-                  <label className="text-[11px] font-medium text-copy-light">SKU</label>
-                  <p className="text-copy text-xs">{product.variants?.[0]?.sku || 'N/A'}</p>
+                  <Label className="text-[11px] font-medium text-copy-light">SKU</Label>
+                  <Text as="p" className="text-copy text-xs">{product.variants?.[0]?.sku || 'N/A'}</Text>
                 </div>
                 <div>
-                  <label className="text-[11px] font-medium text-copy-light">Rating</label>
-                  <p className="text-copy text-xs">⭐ {(product.rating_average || 0).toFixed(1)} ({product.rating_count || 0} reviews)</p>
+                  <Label className="text-[11px] font-medium text-copy-light">Rating</Label>
+                  <Text as="p" className="text-copy text-xs">⭐ {(product.rating_average || 0).toFixed(1)} ({product.rating_count || 0} reviews)</Text>
                 </div>
               </div>
               
               {product.description && (
                 <div className="mt-2.5">
-                  <label className="text-[11px] font-medium text-copy-light">Description</label>
-                  <p className="text-copy mt-1 text-xs">{product.description}</p>
+                  <Label className="text-[11px] font-medium text-copy-light">Description</Label>
+                  <Text as="p" className="text-copy mt-1 text-xs">{product.description}</Text>
                 </div>
               )}
               
               {product.short_description && (
                 <div className="mt-2.5">
-                  <label className="text-[11px] font-medium text-copy-light">Short Description</label>
-                  <p className="text-copy mt-1 text-xs">{product.short_description}</p>
+                  <Label className="text-[11px] font-medium text-copy-light">Short Description</Label>
+                  <Text as="p" className="text-copy mt-1 text-xs">{product.short_description}</Text>
                 </div>
               )}
             </div>
 
             {/* Category & Supplier */}
             <div className="bg-surface rounded-lg border border-border-light p-3">
-              <h2 className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
+              <Heading level={2} className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
                 <Tag className="w-3.5 h-3.5" />
                 Category & Supplier
-              </h2>
+              </Heading>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 <div>
-                  <label className="text-[11px] font-medium text-copy-light">Category</label>
+                  <Label className="text-[11px] font-medium text-copy-light">Category</Label>
                   {product.category ? (
                     <div className="mt-1">
-                      <p className="text-copy font-medium text-xs">{product.category.name}</p>
-                      {product.category.description && (
-                        <p className="text-copy-light text-[11px]">{product.category.description}</p>
-                      )}
+                      <Text as="p" className="text-copy font-medium text-xs">{product.category.name}</Text>
+                        {product.category.description && (
+                          <Caption className="text-copy-light text-[11px]">{product.category.description}</Caption>
+                        )}
                     </div>
                   ) : (
                     <p className="text-copy-light text-xs">No category assigned</p>
@@ -185,11 +186,11 @@ export const AdminProductDetail = () => {
                 </div>
                 
                 <div>
-                  <label className="text-[11px] font-medium text-copy-light">Supplier</label>
+                  <Label className="text-[11px] font-medium text-copy-light">Supplier</Label>
                   {product.supplier ? (
                     <div className="mt-1">
-                      <p className="text-copy font-medium text-xs">{product.supplier.name}</p>
-                      <p className="text-copy-light text-[11px]">{product.supplier.email}</p>
+                      <Text as="p" className="text-copy font-medium text-xs">{product.supplier.name}</Text>
+                      <Caption className="text-copy-light text-[11px]">{product.supplier.email}</Caption>
                       {product.supplier.phone && (
                         <p className="text-copy-light text-xs">{product.supplier.phone}</p>
                       )}
@@ -203,56 +204,56 @@ export const AdminProductDetail = () => {
 
             {/* Variants */}
             <div className="bg-surface rounded-lg border border-border-light p-3">
-              <h2 className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
+              <Heading level={2} className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
                 <Package className="w-3.5 h-3.5" />
                 Variants ({product.variants?.length || 0})
-              </h2>
+              </Heading>
               
               {product.variants && product.variants.length > 0 ? (
                 <div className="space-y-2.5">
                   {product.variants.map((variant: any, index: number) => (
                     <div key={variant.id} className="border border-border-light rounded p-2.5">
                       <div className="flex items-start justify-between mb-1.5">
-                        <div>
-                          <h3 className="font-semibold text-copy text-xs">{variant.name}</h3>
-                          <p className="text-copy-light text-[11px] font-mono">SKU: {variant.sku}</p>
-                        </div>
+                          <div>
+                            <Heading level={3} className="font-semibold text-copy text-xs">{variant.name}</Heading>
+                            <Caption className="text-copy-light text-[11px] font-mono">SKU: {variant.sku}</Caption>
+                          </div>
                         <div className="text-right">
-                          <p className="text-sm font-semibold text-copy">
+                          <Text as="p" className="text-sm font-semibold text-copy">
                             ${variant.current_price?.toFixed(2) || variant.base_price?.toFixed(2)}
-                          </p>
+                          </Text>
                           {variant.sale_price && variant.sale_price < variant.base_price && (
-                            <p className="text-[11px] text-copy-light line-through">
+                            <Caption className="text-[11px] text-copy-light line-through">
                               ${variant.base_price?.toFixed(2)}
-                            </p>
+                            </Caption>
                           )}
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
                         <div>
-                          <label className="text-copy-light">Stock</label>
-                          <p className={`font-medium text-xs ${
+                          <Label className="text-copy-light">Stock</Label>
+                          <Text as="p" className={`font-medium text-xs ${
                             variant.stock > 0 ? 'text-success' : 'text-destructive'
-                          }`}>
+                          }`}> 
                             {variant.stock || 0} units
-                          </p>
+                          </Text>
                         </div>
                         <div>
-                          <label className="text-copy-light">Status</label>
-                          <p className="font-medium text-xs">
+                          <Label className="text-copy-light">Status</Label>
+                          <Text as="p" className="font-medium text-xs">
                             {variant.is_active ? 'Active' : 'Inactive'}
-                          </p>
+                          </Text>
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-1 gap-2 text-[11px]">
                         <div>
-                          <label className="text-copy-light">Attributes</label>
-                          <p className="font-medium text-xs">
+                          <Label className="text-copy-light">Attributes</Label>
+                          <Text as="p" className="font-medium text-xs">
                             {variant.attributes ? Object.entries(variant.attributes).map(([k, v]) => 
                               `${k}: ${v}`).join(', ') : 'None'}
-                          </p>
+                          </Text>
                         </div>
                       </div>
                       
@@ -272,9 +273,9 @@ export const AdminProductDetail = () => {
                                   className="w-10 h-10 object-cover rounded border border-border-light"
                                 />
                                 {image.is_primary && (
-                                  <span className="absolute top-0 right-0 bg-primary text-white text-[10px] px-1 rounded-bl">
+                                  <Text as="span" className="absolute top-0 right-0 bg-primary text-white text-[10px] px-1 rounded-bl">
                                     Primary
-                                  </span>
+                                  </Text>
                                 )}
                               </div>
                             ))}
@@ -285,7 +286,7 @@ export const AdminProductDetail = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-copy-light">No variants found</p>
+                <Caption className="text-copy-light">No variants found</Caption>
               )}
             </div>
           </div>

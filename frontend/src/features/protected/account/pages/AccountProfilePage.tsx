@@ -8,6 +8,7 @@ import { SkeletonProfile } from '../ui/SkeletonProfile';
 import { AdminDashboardSkeleton } from '@/components/ui/SkeletonLoader';
 import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
 import { Button } from '@/components/ui/Button';
+import { Text, Label } from '@/components/ui/Text/Text';
 
 /**
  * Profile component allows users to view and edit their personal information.
@@ -103,7 +104,7 @@ export const Profile = () => {
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> First Name</label>
+            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> First Name</Label>
             <input
               name="firstname"
               type="text"
@@ -112,10 +113,10 @@ export const Profile = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
-            {errors.firstname && <span className="text-xs text-red-500">{errors.firstname}</span>}
+            {errors.firstname && <Text variant="caption" className="text-xs text-red-500">{errors.firstname}</Text>}
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Last Name</label>
+            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Last Name</Label>
             <input
               name="lastname"
               type="text"
@@ -124,10 +125,10 @@ export const Profile = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
-            {errors.lastname && <span className="text-xs text-red-500">{errors.lastname}</span>}
+            {errors.lastname && <Text variant="caption" className="text-xs text-red-500">{errors.lastname}</Text>}
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><MailIcon size={16}/> Email</label>
+            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><MailIcon size={16}/> Email</Label>
             <input
               name="email"
               type="email"
@@ -137,7 +138,7 @@ export const Profile = () => {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><PhoneIcon size={16}/> Phone</label>
+            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><PhoneIcon size={16}/> Phone</Label>
             <input
               name="phone"
               type="text"
@@ -146,10 +147,10 @@ export const Profile = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
-            {errors.phone && <span className="text-xs text-red-500">{errors.phone}</span>}
+            {errors.phone && <Text variant="caption" className="text-xs text-red-500">{errors.phone}</Text>}
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><CalendarIcon size={16}/> Date of Birth</label>
+            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><CalendarIcon size={16}/> Date of Birth</Label>
             <DateTimeDropdown
               value={formData.age}
               onChange={date => setFormData(prev => ({ ...prev, age: date }))}
@@ -157,10 +158,10 @@ export const Profile = () => {
               className="w-full"
               disabled={!isEditing}
             />
-            {errors.age && <span className="text-xs text-red-500">{errors.age}</span>}
+            {errors.age && <Text variant="caption" className="text-xs text-red-500">{errors.age}</Text>}
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Gender</label>
+            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Gender</Label>
             <div className="relative">
               <Button
                 type="button"
@@ -193,7 +194,7 @@ export const Profile = () => {
           </div>
           
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><GlobeIcon size={16}/> Language</label>
+            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><GlobeIcon size={16}/> Language</Label>
             <div className="relative">
               <Button
                 type="button"
@@ -226,7 +227,7 @@ export const Profile = () => {
           </div>
           
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><SaveIcon size={16}/> Account Status</label>
+            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><SaveIcon size={16}/> Account Status</Label>
             <input
               name="is_active"
               type="text"

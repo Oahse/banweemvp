@@ -105,7 +105,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
                 sub.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
                 sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                 'bg-gray-100 text-gray-500'
-              }`}>{sub.status}</span>
+              }`}>{sub.status}</Caption>
             </div>
             <Caption className="mb-2 text-sm text-gray-500">Period: {new Date(sub.current_period_start).toLocaleDateString()} - {new Date(sub.current_period_end).toLocaleDateString()}</Caption>
             <Caption className="mb-2 text-sm text-gray-500">Next Billing: {sub.next_billing_date ? new Date(sub.next_billing_date).toLocaleDateString() : 'N/A'}</Caption>
@@ -128,7 +128,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
                   leftIcon={<PauseIcon size={14} />}
                   onClick={() => { setSelectedId(sub.id); setConfirmAction('pause'); setShowConfirmModal(true); }}
                 >
-                  Pause
+                  <Text variant="body-sm">Pause</Text>
                 </Button>
               )}
               {sub.status === 'paused' && (
@@ -138,7 +138,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
                   leftIcon={<PlayIcon size={14} />}
                   onClick={() => { setSelectedId(sub.id); setConfirmAction('resume'); setShowConfirmModal(true); }}
                 >
-                  Resume
+                  <Text variant="body-sm">Resume</Text>
                 </Button>
               )}
               {sub.status !== 'cancelled' && (
@@ -148,7 +148,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
                   leftIcon={<TrashIcon size={14} />}
                   onClick={() => { setSelectedId(sub.id); setConfirmAction('cancel'); setShowConfirmModal(true); }}
                 >
-                  Cancel
+                  <Text variant="body-sm">Cancel</Text>
                 </Button>
               )}
               <Button
@@ -157,7 +157,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
                 leftIcon={<TrashIcon size={14} />}
                 onClick={() => { setSelectedId(sub.id); setConfirmAction('remove'); setShowConfirmModal(true); }}
               >
-                Remove
+                <Text variant="body-sm">Remove</Text>
               </Button>
             </div>
           </div>

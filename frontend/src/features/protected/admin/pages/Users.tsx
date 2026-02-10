@@ -210,9 +210,9 @@ export const Users = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.active;
     
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text as="span" className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </span>
+      </Text>
     );
   };
 
@@ -229,9 +229,9 @@ export const Users = () => {
     const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.customer;
     
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text as="span" className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </span>
+      </Text>
     );
   };
 
@@ -360,9 +360,9 @@ export const Users = () => {
           {/* Active Filters */}
           {(debouncedSearchQuery || statusFilter || roleFilter) && (
             <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+              <Text as="span" className="text-sm text-gray-600 dark:text-gray-400">Active filters:</Text>
               {debouncedSearchQuery && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                <Text as="span" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Search: "{debouncedSearchQuery}"
                   <Button
                     onClick={() => setSearchQuery('')}
@@ -371,10 +371,10 @@ export const Users = () => {
                   >
                     Clear
                   </Button>
-                </span>
+                </Text>
               )}
               {statusFilter && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                <Text as="span" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
                   <Button
                     onClick={() => setStatusFilter('')}
@@ -383,10 +383,10 @@ export const Users = () => {
                   >
                     Clear
                   </Button>
-                </span>
+                </Text>
               )}
               {roleFilter && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                <Text as="span" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Role: {roleFilter.charAt(0).toUpperCase() + roleFilter.slice(1)}
                   <Button
                     onClick={() => setRoleFilter('')}
@@ -395,7 +395,7 @@ export const Users = () => {
                   >
                     Clear
                   </Button>
-                </span>
+                </Text>
               )}
               <Button
                 onClick={() => {

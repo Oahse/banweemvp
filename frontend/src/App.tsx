@@ -1,19 +1,19 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Layout } from './components/layout/Layout';
-import { AuthProvider } from './features/protected/auth/contexts/AuthContext';
-import { CartProvider } from './features/protected/cart/contexts/CartContext';
-import { WishlistProvider } from './features/protected/wishlist/contexts/WishlistContext';
-import { SubscriptionProvider } from './features/protected/subscriptions/contexts/SubscriptionContext';
-import { CategoryProvider } from './components/shared/contexts/CategoryContext';
-import { LocaleProvider } from './components/shared/contexts/LocaleContext';
-import { ThemeProvider } from './components/shared/contexts/ThemeContext';
-import { FontLoader } from './components/ui/FontLoader';
+import { Layout } from '@/components/layout/Layout';
+import { AuthProvider } from '@/features/protected/auth/contexts/AuthContext';
+import { CartProvider } from '@/features/protected/cart/contexts/CartContext';
+import { WishlistProvider } from '@/features/protected/wishlist/contexts/WishlistContext';
+import { SubscriptionProvider } from '@/features/protected/subscriptions/contexts/SubscriptionContext';
+import { CategoryProvider } from '@/components/shared/contexts/CategoryContext';
+import { LocaleProvider } from '@/components/shared/contexts/LocaleContext';
+import { ThemeProvider } from '@/components/shared/contexts/ThemeContext';
+import { FontLoader } from '@/components/ui/FontLoader';
 import { Toaster } from 'react-hot-toast';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import ErrorBoundary from './components/shared/ErrorBoundary';
-import { ProtectedRoute } from './components/shared/ProtectedRoute';
+import ErrorBoundary from '@/components/shared/ErrorBoundary';
+import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
 import { 
   PageSkeleton, 
   ProductListSkeleton, 
@@ -23,9 +23,9 @@ import {
   AccountSkeleton, 
   AdminDashboardSkeleton, 
   AdminTableSkeleton 
-} from './components/ui/SkeletonLoader';
-import LoadingSpinner from './components/shared/LoadingSpinner';
-import SupportFloat from './components/layout/SupportFloat';
+} from '@/components/ui/SkeletonLoader';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import SupportFloat from '@/components/layout/SupportFloat';
 import './animations.css';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');

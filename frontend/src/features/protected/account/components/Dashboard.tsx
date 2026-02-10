@@ -287,32 +287,32 @@ export const Dashboard = ({
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map((order: Order) => <tr key={order.id} className="border-b dark:border-gray-700">
+                {recentOrders.map((order: Order) => (
+                  <tr key={order.id} className="border-b dark:border-gray-700">
                     <td className="px-3 py-2">
-                      <Link to={`/account/orders/${order.id}`} className="text-primary hover:underline text-sm">
-                        {order.id}
+                      <Link to={`/account/orders/${order.id}`}>
+                        <Text variant="body-sm" className="text-primary hover:underline">{order.id}</Text>
                       </Link>
                     </td>
                     <td className="px-3 py-2 text-gray-600 dark:text-gray-300 text-sm">
-                      {new Date(order.created_at).toLocaleDateString()}
+                      <Text variant="body-sm" tone="secondary">{new Date(order.created_at).toLocaleDateString()}</Text>
                     </td>
                     <td className="px-3 py-2">
-                      <span className={`px-2 py-1 text-xs rounded-full ${order.status === 'Delivered' ? 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light' : 'bg-info-light text-info-dark dark:bg-info-dark dark:text-info-light'}`}>
+                      <Text as="span" variant="caption" className={`px-2 py-1 text-xs rounded-full ${order.status === 'Delivered' ? 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light' : 'bg-info-light text-info-dark dark:bg-info-dark dark:text-info-light'}`}>
                         {order.status}
-                      </span>
+                      </Text>
                     </td>
                     <td className="px-3 py-2 text-gray-600 dark:text-gray-300 text-right text-sm">
-                      ${order.total_amount.toFixed(2)}
+                      <Text variant="body-sm" tone="secondary">${order.total_amount.toFixed(2)}</Text>
                     </td>
-                  </tr>)}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div> : <div className="text-center py-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              You haven't placed any orders yet.
-            </p>
-            <Link to="/products" className="mt-2 inline-block text-primary hover:underline text-sm">
-              Start shopping
+            <Text variant="body-sm" tone="secondary">You haven't placed any orders yet.</Text>
+            <Link to="/products" className="mt-2 inline-block">
+              <Text variant="body-sm" className="text-primary hover:underline">Start shopping</Text>
             </Link>
           </div>}
       </div>
@@ -321,11 +321,9 @@ export const Dashboard = ({
       {recentSubscriptionOrders.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3">
           <div className="flex justify-between items-center mb-3">
-            <h2 className="text-base font-medium text-main dark:text-white">
-              Recent Subscription Orders
-            </h2>
-            <Link to="/account/subscriptions" className="text-primary hover:underline text-sm">
-              View all
+            <Heading level={2} weight="medium">Recent Subscription Orders</Heading>
+            <Link to="/account/subscriptions">
+              <Text variant="body-sm" className="text-primary hover:underline">View all</Text>
             </Link>
           </div>
           <div className="overflow-x-auto">
@@ -353,29 +351,29 @@ export const Dashboard = ({
                 {recentSubscriptionOrders.map((order: Order) => (
                   <tr key={order.id} className="border-b dark:border-gray-700">
                     <td className="px-3 py-2">
-                      <Link to={`/account/orders/${order.id}`} className="text-primary hover:underline text-sm">
-                        {order.order_number || order.id}
+                      <Link to={`/account/orders/${order.id}`}>
+                        <Text variant="body-sm" className="text-primary hover:underline">{order.order_number || order.id}</Text>
                       </Link>
                     </td>
                     <td className="px-3 py-2 text-gray-600 dark:text-gray-300 text-sm">
-                      {new Date(order.created_at).toLocaleDateString()}
+                      <Text variant="body-sm" tone="secondary">{new Date(order.created_at).toLocaleDateString()}</Text>
                     </td>
                     <td className="px-3 py-2">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
+                      <Text as="span" variant="caption" className={`px-2 py-1 text-xs rounded-full ${
                         order.status === 'Delivered' 
                           ? 'bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light' 
                           : 'bg-info-light text-info-dark dark:bg-info-dark dark:text-info-light'
                       }`}>
                         {order.status}
-                      </span>
+                      </Text>
                     </td>
                     <td className="px-3 py-2">
-                      <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                      <Text as="span" variant="caption" className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                         Subscription
-                      </span>
+                      </Text>
                     </td>
                     <td className="px-3 py-2 text-gray-600 dark:text-gray-300 text-right text-sm">
-                      ${order.total_amount.toFixed(2)}
+                      <Text variant="body-sm" tone="secondary">${order.total_amount.toFixed(2)}</Text>
                     </td>
                   </tr>
                 ))}

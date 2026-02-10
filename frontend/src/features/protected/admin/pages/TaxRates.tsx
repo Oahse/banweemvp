@@ -341,13 +341,13 @@ export const AdminTaxRates = () => {
 
   const statusBadge = (isActive: boolean) => {
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+      <Text as="span" className={`px-2 py-1 rounded-full text-xs font-semibold ${
         isActive 
           ? 'bg-success/20 text-success' 
           : 'bg-error/20 text-error'
       }`}>
         {isActive ? 'Active' : 'Inactive'}
-      </span>
+      </Text>
     );
   };
 
@@ -364,7 +364,7 @@ export const AdminTaxRates = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</p>
+          <Text as="p" className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</Text>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
           <Button 

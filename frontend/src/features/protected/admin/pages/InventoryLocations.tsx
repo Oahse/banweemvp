@@ -7,6 +7,7 @@ import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { InventoryLocationsSkeleton } from '../components/skeletons/InventorySkeleton';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading, Caption, Label } from '@/components/ui/Text/Text';
 
 const LIMIT = 20;
 
@@ -76,17 +77,17 @@ export const AdminInventoryLocations = () => {
 
   const statusBadge = (isActive: boolean) => {
     return (
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+      <Text as="span" className={`px-3 py-1 rounded-full text-xs font-semibold ${
         isActive ? 'bg-success/20 text-success' : 'bg-error/20 text-error'
       }`}>
         {isActive ? 'Active' : 'Inactive'}
-      </span>
+      </Text>
     );
   };
 
   const capacityBadge = (current?: number, total?: number) => {
     if (current === undefined || total === undefined) {
-      return <span className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>N/A</span>;
+      return <Text as="span" className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>N/A</Text>;
     }
     
     const percentage = (current / total) * 100;
@@ -97,9 +98,9 @@ export const AdminInventoryLocations = () => {
       'text-success';
     
     return (
-      <span className={`text-xs font-medium ${colorClass}`}>
+      <Text as="span" className={`text-xs font-medium ${colorClass}`}>
         {current}/{total} ({percentage.toFixed(1)}%)
-      </span>
+      </Text>
     );
   };
 
@@ -112,8 +113,8 @@ export const AdminInventoryLocations = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-1">
         <div>
-          <h1 className="text-xl lg:text-2xl font-semibold">Warehouse Locations</h1>
-          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage warehouse and storage locations</p>
+          <Heading level={1} className="text-xl lg:text-2xl font-semibold">Warehouse Locations</Heading>
+          <Caption className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage warehouse and storage locations</Caption>
         </div>
         <Button
           className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
@@ -167,30 +168,28 @@ export const AdminInventoryLocations = () => {
                             <MapPin className="w-4 h-4 text-primary" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-xs font-medium truncate max-w-[120px]">{location.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Code: {location.code}</p>
+                            <Text as="p" className="text-xs font-medium truncate max-w-[120px]">{location.name}</Text>
+                            <Caption className="text-xs text-gray-500 dark:text-gray-400 truncate">Code: {location.code}</Caption>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs max-w-[150px]">
-                          <p className="truncate">{location.address}</p>
-                          <p className="text-gray-500 dark:text-gray-400 truncate">
-                            {location.city}, {location.state} {location.postal_code}
-                          </p>
-                          <p className="text-gray-500 dark:text-gray-400 truncate">{location.country}</p>
+                          <Text as="p" className="truncate">{location.address}</Text>
+                          <Caption className="text-gray-500 dark:text-gray-400 truncate">{location.city}, {location.state} {location.postal_code}</Caption>
+                          <Caption className="text-gray-500 dark:text-gray-400 truncate">{location.country}</Caption>
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs max-w-[120px]">
                           {location.manager_name && (
-                            <p className="font-medium truncate">{location.manager_name}</p>
+                            <Text as="p" className="font-medium truncate">{location.manager_name}</Text>
                           )}
                           {location.phone && (
-                            <p className="text-gray-500 dark:text-gray-400 truncate">{location.phone}</p>
+                            <Caption className="text-gray-500 dark:text-gray-400 truncate">{location.phone}</Caption>
                           )}
                           {location.email && (
-                            <p className="text-gray-500 dark:text-gray-400 truncate">{location.email}</p>
+                            <Caption className="text-gray-500 dark:text-gray-400 truncate">{location.email}</Caption>
                           )}
                         </div>
                       </td>

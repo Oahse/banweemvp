@@ -235,19 +235,19 @@ const AdminProductsPage = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.active;
     
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text as="span" className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </span>
+      </Text>
     );
   };
 
   const stockBadge = (stock: number) => {
     if (stock === 0) {
-      return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-error/20 text-error">Out of Stock</span>;
+      return <Text as="span" className="px-2 py-1 rounded-full text-xs font-semibold bg-error/20 text-error">Out of Stock</Text>;
     } else if (stock <= 10) {
-      return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-warning/20 text-warning">Low Stock ({stock})</span>;
+      return <Text as="span" className="px-2 py-1 rounded-full text-xs font-semibold bg-warning/20 text-warning">Low Stock ({stock})</Text>;
     } else {
-      return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-success/20 text-success">{stock} in Stock</span>;
+      return <Text as="span" className="px-2 py-1 rounded-full text-xs font-semibold bg-success/20 text-success">{stock} in Stock</Text>;
     }
   };
 
@@ -397,7 +397,7 @@ const AdminProductsPage = () => {
           {/* Active Filters */}
           {(debouncedSearchQuery || statusFilter || categoryFilter) && (
             <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+              <Text as="span" className="text-sm text-gray-600 dark:text-gray-400">Active filters:</Text>
               {debouncedSearchQuery && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Search: "{debouncedSearchQuery}"

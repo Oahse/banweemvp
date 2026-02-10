@@ -124,7 +124,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                 className={`flex-1 px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
                 placeholder="Start"
               />
-              <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>-</span>
+              <Text as="span" className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>-</Text>
               <input
                 type="date"
                 value={value.split(',')[1] || ''}

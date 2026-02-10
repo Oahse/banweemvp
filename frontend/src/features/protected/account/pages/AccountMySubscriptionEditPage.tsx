@@ -4,7 +4,7 @@ import { useSubscription } from '../../subscriptions/contexts/SubscriptionContex
 import { toast } from 'react-hot-toast';
 import { CalendarIcon, DollarSignIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Label, Text } from '@/components/ui/Text';
+import { Label, Text, Heading } from '@/components/ui/Text/Text';
 
 const AccountMySubscriptionEditPage: React.FC = () => {
   const { subscriptionId } = useParams();
@@ -68,15 +68,16 @@ const AccountMySubscriptionEditPage: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center h-64"><Text className="text-gray-500">Loading...</Text></div>;
-  if (error) return <div className="flex flex-col items-center h-64 text-red-500">{error}</div>;
-  if (!subscription) return <div className="flex flex-col items-center h-64"><Text className="text-gray-500">Subscription not found.</Text></div>;
+  if (loading) return <div className="flex justify-center items-center h-64"><Text variant="body-sm" className="text-gray-500">Loading...</Text></div>;
+  if (error) return <div className="flex flex-col items-center h-64"><Text variant="caption" className="text-red-500">{error}</Text></div>;
+  if (!subscription) return <div className="flex flex-col items-center h-64"><Text variant="body-sm" className="text-gray-500">Subscription not found.</Text></div>;
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
-      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <CalendarIcon size={20} /> Edit My Subscription
-      </h2>
+      <div className="mb-4 flex items-center gap-2">
+        <CalendarIcon size={20} />
+        <Heading level={2} weight="medium">Edit My Subscription</Heading>
+      </div>
       <div className="mb-4">
         <Label className="block text-xs font-medium mb-1">Plan Name</Label>
         <input
