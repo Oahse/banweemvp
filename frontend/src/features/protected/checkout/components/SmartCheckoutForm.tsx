@@ -380,7 +380,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <AnimatedLoader size="md" variant="petals" text="Loading checkout..." />
+        <AnimatedLoader size="md" variant="spinner" text="Loading checkout..." />
       </div>
     );
   }

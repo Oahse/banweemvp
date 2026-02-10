@@ -2,6 +2,7 @@ import React from 'react';
 import { XIcon, AlertTriangleIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text/Text';
+import { motion } from 'framer-motion';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -99,17 +100,10 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               disabled={loading}
               variant={variant === 'danger' ? 'primary' : variant === 'warning' ? 'warning' : 'primary'}
               size="xs"
-              className={`px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center ${styles.button}`}
+              className={`px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 ${styles.button}`}
               isLoading={loading}
             >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  <Text variant="body-sm">Processing...</Text>
-                </>
-              ) : (
-                <Text variant="body-sm">{confirmText}</Text>
-              )}
+              {confirmText}
             </Button>
           </div>
         </div>

@@ -443,7 +443,7 @@ export const Refunds = () => {
           <ModalBody>
             {detailsLoading ? (
               <div className="flex items-center justify-center py-10">
-                <AnimatedLoader size="sm" variant="petals" color="primary" text="Loading details..." />
+                <AnimatedLoader size="sm" variant="spinner" color="primary" text="Loading details..." />
               </div>
             ) : viewingRefund && (
               <div className="space-y-4">

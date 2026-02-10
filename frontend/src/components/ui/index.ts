@@ -29,7 +29,6 @@ export { default as Breadcrumbs } from './Breadcrumbs';
 export { CartSkeleton } from './CartSkeleton';
 export { ConfirmationModal } from './ConfirmationModal';
 export { Container } from './Container';
-export { CountrySelector } from './CountrySelector';
 export { DateTimeDropdown } from './DateTimeDropdown';
 export { Dropdown } from './Dropdown';
 export { FontLoader } from './FontLoader';

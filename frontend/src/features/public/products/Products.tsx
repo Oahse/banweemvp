@@ -12,6 +12,7 @@ import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 import { Pagination } from '@/components/ui/Pagination';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 
 // Animation variants
 const containerVariants = {
@@ -442,7 +443,7 @@ const Products = () => {
             exit={{ opacity: 0, y: 20 }}
           >
           <div className="flex items-center gap-2">
-            <div className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"></div>
+            <AnimatedLoader size="sm" variant="spinner" color="primary" centered={false} className="border-white" />
             <Text variant="body-sm" weight="medium">Loading...</Text>
           </div>
         </motion.div>

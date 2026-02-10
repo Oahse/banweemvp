@@ -1,7 +1,6 @@
 import React from 'react';
 import { RefreshCwIcon, XIcon } from 'lucide-react';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
-import { themeClasses } from '@/utils/themeClasses';
 import { Button } from '@/components/ui/Button';
 
 interface AutoRenewToggleProps {
@@ -88,7 +87,7 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
       {/* Label and Details */}
       <div className="flex-1">
         <div className="flex items-center space-x-2">
-          <span className={`${themeClasses.text.primary} font-medium text-sm`}>
+          <span className="text-gray-900 dark:text-white font-medium text-sm">
             Auto-Renew
           </span>
           <span className={`
@@ -103,7 +102,7 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
         </div>
         
         {showDetails && (
-          <p className={`${themeClasses.text.secondary} text-sm mt-1`}>
+          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
             {isEnabled 
               ? 'Your subscription will automatically renew at the end of each billing period.'
               : 'Your subscription will not renew automatically. You\'ll need to manually renew it.'

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { XIcon, CalendarIcon, CreditCardIcon, PlusIcon } from 'lucide-react';
 import { useSubscription } from '@/features/protected/subscriptions/contexts/SubscriptionContext';
-import { useSubscriptionAction } from '@/hooks/useSubscription';
-import { formatCurrency } from '@/utils/locale-config';
-import { themeClasses, getButtonClasses } from '@/utils/themeClasses';
-import { VariantSelector } from '@/components/VariantSelector';
+import { useSubscriptionAction } from '@/features/protected/subscriptions/hooks/useSubscription';
+import { useLocale } from '@/components/shared/contexts/LocaleContext';
+import { themeClasses, getButtonClasses } from '@/components/shared/utils/themeClasses';
+import { VariantSelector } from '@/features/public/products/components/VariantSelector';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 
@@ -27,6 +27,7 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
 }) => {
   const { subscriptions } = useSubscription();
   const { addToSubscription } = useSubscriptionAction();
+  const { formatCurrency } = useLocale();
   const navigate = useNavigate();
   const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<string>('');
   const [selectedVariant, setSelectedVariant] = useState<any>(null);

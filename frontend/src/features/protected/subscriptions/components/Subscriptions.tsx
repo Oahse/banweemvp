@@ -188,7 +188,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <AnimatedLoader size="lg" variant="petals" color="primary" text="Loading subscriptions..." />
+        <AnimatedLoader size="lg" variant="spinner" color="primary" text="Loading subscriptions..." />
       </div>
     );
   }

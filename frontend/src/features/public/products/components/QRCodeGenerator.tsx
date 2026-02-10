@@ -4,6 +4,7 @@ import { ProductVariant } from '@/types';
 import { ProductsAPI } from '@/api/products';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body } from '@/components/ui/Text/Text';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 
 interface QRCodeGeneratorProps {
   variant: ProductVariant;
@@ -153,10 +154,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
 
       {isLoading ? (
         <div className={`${sizeClasses[size]} flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg`}>
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            <Body className="text-sm text-gray-600">Generating QR Code...</Body>
-          </div>
+          <AnimatedLoader size="md" variant="spinner" color="primary" text="Generating QR Code..." centered={false} />
         </div>
       ) : error ? (
         <div className={`${sizeClasses[size]} flex items-center justify-center border-2 border-dashed border-red-300 rounded-lg`}>

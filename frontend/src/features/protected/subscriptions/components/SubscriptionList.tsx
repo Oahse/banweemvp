@@ -127,7 +127,7 @@ export const SubscriptionList: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex items-center gap-2">
-          <AnimatedLoader size="sm" variant="petals" color="primary" />
+          <AnimatedLoader size="sm" variant="spinner" color="primary" />
           <span className={themeClasses.text.secondary}>
             {authLoading ? 'Checking authentication...' : 'Loading subscriptions...'}
           </span>

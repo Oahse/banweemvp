@@ -130,7 +130,7 @@ export const Checkout = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-surface-dark">
         <div className="text-center">
-          <AnimatedLoader size="xl" variant="petals" />
+          <AnimatedLoader size="xl" variant="spinner" />
           <Text variant="body-sm" tone="secondary">
             {authLoading ? 'Checking authentication...' : 'Loading checkout...'}
           </Text>

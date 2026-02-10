@@ -5,6 +5,7 @@ import PaymentsAPI from '@/api/payments';
 import StripeCardForm from '@/features/protected/checkout/components/StripeCardForm';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
+import { Pagination } from '@/components/ui/Pagination';
 
 interface PaymentMethod {
   id: string;
@@ -28,6 +29,15 @@ const AccountPaymentMethodsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showStripeForm, setShowStripeForm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{id: string, provider: string, lastFour: string} | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Calculate pagination
+  const totalItems = paymentMethods.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedMethods = paymentMethods.slice(startIndex, endIndex);
 
   const fetchMethods = async () => {
     console.log('Fetching payment methods...');
@@ -187,78 +197,96 @@ const AccountPaymentMethodsPage = () => {
               </Button>
           </div>
         ) : (
-          paymentMethods.map((method) => (
-            <div
-              key={method.id}
-              className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border ${
-                method.is_default 
-                  ? 'border-primary dark:border-primary' 
-                  : 'border-gray-200 dark:border-gray-700'
-              } p-4 md:p-4 flex items-center justify-between`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`p-1 rounded-md ${
+          <>
+            {paginatedMethods.map((method) => (
+              <div
+                key={method.id}
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border ${
                   method.is_default 
-                    ? 'bg-primary/10 text-primary dark:bg-primary/20' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-                }`}>
-                  {getPaymentIcon(method.type)}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-0">
-                    <Heading level={5} className="font-medium text-sm md:text-base text-gray-900 dark:text-white">
-                      {method.type === 'card' ? (
-                        method.provider ? method.provider.charAt(0).toUpperCase() + method.provider.slice(1) : 'Card'
-                      ) : (
-                        method.provider || 'Payment Method'
-                      )}
-                    </Heading>
-                    {method.is_default && (
-                      <Caption className="px-2 py-0.5 text-sm bg-primary/10 text-primary dark:bg-primary/20 rounded-full">Default</Caption>
-                    )}
+                    ? 'border-primary dark:border-primary' 
+                    : 'border-gray-200 dark:border-gray-700'
+                } p-4 md:p-4 flex items-center justify-between`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`p-1 rounded-md ${
+                    method.is_default 
+                      ? 'bg-primary/10 text-primary dark:bg-primary/20' 
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                  }`}>
+                    {getPaymentIcon(method.type)}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-0">
-                    {method.type === 'card' && method.last_four && (
-                      <div>
-                        <Text variant="body-sm" tone="secondary">•••• {method.last_four}</Text>
-                        <Text variant="caption" tone="secondary">{' '}Valid thru {method.expiry_month ?? 'MM'}/{method.expiry_year ? String(method.expiry_year).slice(-2) : 'YY'}</Text>
-                      </div>
-                    )}
+                  <div>
+                    <div className="flex items-center gap-2 mb-0">
+                      <Heading level={5} className="font-medium text-sm md:text-base text-gray-900 dark:text-white">
+                        {method.type === 'card' ? (
+                          method.provider ? method.provider.charAt(0).toUpperCase() + method.provider.slice(1) : 'Card'
+                        ) : (
+                          method.provider || 'Payment Method'
+                        )}
+                      </Heading>
+                      {method.is_default && (
+                        <Caption className="px-2 py-0.5 text-sm bg-primary/10 text-primary dark:bg-primary/20 rounded-full">Default</Caption>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-0">
+                      {method.type === 'card' && method.last_four && (
+                        <div>
+                          <Text variant="body-sm" tone="secondary">•••• {method.last_four}</Text>
+                          <Text variant="caption" tone="secondary">{' '}Valid thru {method.expiry_month ?? 'MM'}/{method.expiry_year ? String(method.expiry_year).slice(-2) : 'YY'}</Text>
+                        </div>
+                      )}
 
-                    <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded mt-2">
-                      <Text variant="body-sm">
-                        <Text as="span">{method.provider || 'Payment Method'}</Text>
-                        {deleteConfirm?.lastFour && <Text as="span"> {` •••• ${deleteConfirm.lastFour}`}</Text>}
-                      </Text>
-                      <Text variant="caption" tone="secondary" className="mt-1">{' '}Added on {method.created_at ? new Date(method.created_at).toLocaleDateString() : 'Unknown date'}</Text>
+                      <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded mt-2">
+                        <Text variant="body-sm">
+                          <Text as="span">{method.provider || 'Payment Method'}</Text>
+                          {deleteConfirm?.lastFour && <Text as="span"> {` •••• ${deleteConfirm.lastFour}`}</Text>}
+                        </Text>
+                        <Text variant="caption" tone="secondary" className="mt-1">{' '}Added on {method.created_at ? new Date(method.created_at).toLocaleDateString() : 'Unknown date'}</Text>
+                      </div>
                     </div>
                   </div>
-                </div>
-              <div className="flex items-center gap-2">
-                {!method.is_default && (
+                <div className="flex items-center gap-2">
+                  {!method.is_default && (
+                    <Button
+                      onClick={() => setAsDefault(method.id)}
+                      variant="warning"
+                      size="icon"
+                      className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
+                      title="Set as default"
+                    >
+                      <CreditCard className="w-4 h-4" />
+                    </Button>
+                  )}
                   <Button
-                    onClick={() => setAsDefault(method.id)}
-                    variant="warning"
+                    onClick={() => handleDelete(method)}
+                    variant="danger"
                     size="icon"
-                    className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
-                    title="Set as default"
+                    className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-600"
+                    title="Delete"
                   >
-                    <CreditCard className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
-                )}
-                <Button
-                  onClick={() => handleDelete(method)}
-                  variant="danger"
-                  size="icon"
-                  className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-600"
-                  title="Delete"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                </div>
               </div>
-            </div>
-            </div>
-          ))
+              </div>
+            ))}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                  showingStart={startIndex + 1}
+                  showingEnd={Math.min(endIndex, totalItems)}
+                  itemName="payment methods"
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
 

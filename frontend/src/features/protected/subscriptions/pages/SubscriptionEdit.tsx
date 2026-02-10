@@ -243,7 +243,7 @@ export const SubscriptionEdit = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <AnimatedLoader size="lg" variant="petals" color="primary" text="Loading subscription..." />
+        <AnimatedLoader size="lg" variant="spinner" color="primary" text="Loading subscription..." />
       </div>
     );
   }

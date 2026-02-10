@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 interface AnimatedLoaderProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  variant?: 'spinner' | 'pulse' | 'dots' | 'petals';
+  variant?: 'spinner' | 'pulse' | 'dots';
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning';
   text?: string;
   className?: string;
@@ -12,7 +12,7 @@ interface AnimatedLoaderProps {
 
 const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({ 
   size = 'md', 
-  variant = 'petals',
+  variant = 'spinner',
   color = 'primary',
   text,
   className = '',
@@ -42,22 +42,34 @@ const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
   };
 
   const baseClasses = `${sizeClasses[size]} ${className}`;
-  const wrapperClasses = centered ? 'flex flex-col items-center justify-center min-h-[200px]' : 'flex flex-col items-center gap-2';
+  const wrapperClasses = centered ? 'flex flex-col items-center justify-center' : 'inline-flex items-center gap-2';
 
   if (variant === 'spinner') {
     return (
       <div className={wrapperClasses}>
         <motion.div
-          className={`${baseClasses} border-2 border-gray-200 ${borderColors[color]} rounded-full`}
+          className={`${baseClasses} border-2 border-transparent rounded-full flex-shrink-0`}
+          style={{
+            borderTopColor: color === 'primary' ? 'var(--color-primary, #3b82f6)' : 
+                           color === 'secondary' ? 'var(--color-secondary, #6b7280)' :
+                           color === 'success' ? 'var(--color-success, #10b981)' :
+                           color === 'error' ? 'var(--color-error, #ef4444)' :
+                           'var(--color-warning, #f59e0b)',
+            borderRightColor: 'transparent',
+            borderBottomColor: 'transparent',
+            borderLeftColor: 'transparent'
+          }}
+          initial={{ rotate: 0 }}
           animate={{ rotate: 360 }}
           transition={{
-            duration: 1,
+            duration: 0.8,
             repeat: Infinity,
-            ease: "linear"
+            ease: "linear",
+            repeatType: "loop"
           }}
         />
         {text && (
-          <span className="text-sm text-gray-600 dark:text-gray-400 mt-2">{text}</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400">{text}</span>
         )}
       </div>
     );
@@ -67,7 +79,8 @@ const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
     return (
       <div className={wrapperClasses}>
         <motion.div
-          className={`${baseClasses} ${bgColors[color]} rounded-full`}
+          className={`${baseClasses} ${bgColors[color]} rounded-full flex-shrink-0`}
+          initial={{ scale: 1, opacity: 1 }}
           animate={{
             scale: [1, 1.2, 1],
             opacity: [1, 0.7, 1]
@@ -75,11 +88,12 @@ const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
           transition={{
             duration: 1.5,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
+            repeatType: "loop"
           }}
         />
         {text && (
-          <span className="text-sm text-gray-600 dark:text-gray-400 mt-2">{text}</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400">{text}</span>
         )}
       </div>
     );
@@ -88,96 +102,27 @@ const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
   if (variant === 'dots') {
     return (
       <div className={wrapperClasses}>
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           {[0, 1, 2].map((index) => (
             <motion.div
               key={index}
-              className={`${sizeClasses[size].replace('w-', 'w-').replace('h-', 'h-')} ${bgColors[color]} rounded-full`}
+              className={`w-2 h-2 ${bgColors[color]} rounded-full`}
+              initial={{ y: 0 }}
               animate={{
-                y: [0, -10, 0]
+                y: [0, -8, 0]
               }}
               transition={{
                 duration: 0.6,
                 repeat: Infinity,
-                delay: index * 0.1,
-                ease: "easeInOut"
-              }}
-            />
-          ))}
-        </div>
-        {text && (
-          <span className="text-sm text-gray-600 dark:text-gray-400 mt-2">{text}</span>
-        )}
-      </div>
-    );
-  }
-
-  if (variant === 'petals') {
-    const petalSize = {
-      sm: 'w-1 h-3',
-      md: 'w-1.5 h-4',
-      lg: 'w-2 h-6',
-      xl: 'w-3 h-8'
-    };
-
-    const containerSize = {
-      sm: 'w-10 h-10',
-      md: 'w-14 h-14',
-      lg: 'w-18 h-18',
-      xl: 'w-24 h-24'
-    };
-
-    const petalDistance = {
-      sm: 12,
-      md: 16,
-      lg: 20,
-      xl: 28
-    };
-
-    return (
-      <div className={wrapperClasses}>
-        <div className={`${containerSize[size]} relative`}>
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((rotation, index) => (
-            <motion.div
-              key={index}
-              className={`absolute top-1/2 left-1/2 ${petalSize[size]} ${bgColors[color]} rounded-full`}
-              style={{
-                transformOrigin: 'center',
-              }}
-              animate={{
-                rotate: [rotation, rotation + 360],
-                scale: [1, 1.1, 1],
-                opacity: [0.7, 1, 0.7]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
+                delay: index * 0.15,
                 ease: "easeInOut",
-                delay: index * 0.1
-              }}
-              initial={{
-                transform: `translate(-50%, -50%) rotate(${rotation}deg) translateY(-${petalDistance[size]}px)`
+                repeatType: "loop"
               }}
             />
           ))}
-          <motion.div
-            className={`absolute top-1/2 left-1/2 w-2 h-2 ${bgColors[color]} rounded-full`}
-            style={{
-              transform: 'translate(-50%, -50%)'
-            }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.8, 1, 0.8]
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
         </div>
         {text && (
-          <span className="text-sm text-gray-600 dark:text-gray-400 mt-2">{text}</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">{text}</span>
         )}
       </div>
     );

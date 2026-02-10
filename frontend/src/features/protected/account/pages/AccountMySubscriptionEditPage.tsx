@@ -68,7 +68,7 @@ const AccountMySubscriptionEditPage: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center h-64"><AnimatedLoader size="md" variant="petals" color="primary" text="Loading..." /></div>;
+  if (loading) return <div className="flex justify-center items-center h-64"><AnimatedLoader size="md" variant="spinner" color="primary" text="Loading..." /></div>;
   if (error) return <div className="flex flex-col items-center h-64"><Text variant="caption" className="text-red-500">{error}</Text></div>;
   if (!subscription) return <div className="flex flex-col items-center h-64"><Text variant="body-sm" className="text-gray-500">Subscription not found.</Text></div>;
 

@@ -21,13 +21,14 @@ const AccountTrackOrderPage = lazy(() => import('./AccountTrackOrderPage'));
 const AccountWishlistPage = lazy(() => import('./AccountWishlistPage').then(module => ({ default: module.Wishlist })));
 const AccountAddressesPage = lazy(() => import('./AccountAddressesPage').then(module => ({ default: module.Addresses })));
 const AccountMySubscriptionsPage = lazy(() => import('./AccountMySubscriptionsPage').then(module => ({ default: module.MySubscriptions })));
-const AccountSubscriptionEditPage = lazy(() => import('./AccountSubscriptionEditPage'));
+const AccountMySubscriptionDetailPage = lazy(() => import('./AccountMySubscriptionDetailPage').then(module => ({ default: module.MySubscriptionDetail })));
+const AccountSubscriptionEditPage = lazy(() => import('./AccountMySubscriptionEditPage'));
 const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage'));
 
 // Loading Spinner fallback
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
-    <AnimatedLoader size="lg" variant="petals" color="primary" />
+    <AnimatedLoader size="lg" variant="spinner" color="primary" />
   </div>
 );
 
@@ -62,6 +63,7 @@ export const Account = () => {
           <Route path="/addresses" element={<AccountAddressesPage />} />
           <Route path="/payment-methods" element={<AccountPaymentMethodsPage />} />
           <Route path="/subscriptions" element={<AccountMySubscriptionsPage /> } />
+          <Route path="/subscriptions/:subscriptionId" element={<AccountMySubscriptionDetailPage />} />
           <Route path="/subscriptions/:subscriptionId/edit" element={<AccountSubscriptionEditPage />} />
           <Route path="/subscriptions/:subscriptionId/orders" element={<AccountOrdersPage />} />
           

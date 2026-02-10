@@ -93,9 +93,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     >
           <Text as="span" className="flex items-center justify-center gap-2">
             {isLoading && (
-              <span className="flex-shrink-0" aria-hidden="true">
-                <AnimatedLoader size="sm" variant="petals" color="primary" />
-              </span>
+              <AnimatedLoader size="sm" variant="spinner" color="primary" />
             )}
             
             {!isLoading && leftIcon && (

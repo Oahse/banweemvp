@@ -38,7 +38,7 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
               disabled={tab.disabled}
               variant="ghost"
               size="xs"
-              className={`py-2 px-2 sm:px-3 border-b-2 font-medium text-sm capitalize transition-colors duration-200 flex items-center gap-1 sm:gap-2 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-0 ${
+              className={`py-2 px-2 sm:px-3 border font-medium text-sm capitalize transition-colors duration-200 flex items-center gap-1 sm:gap-2 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-0 ${
                 isActive
                   ? 'border-[#61b482] text-[#61b482]'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -47,7 +47,7 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
               }`}
             >
               <Text as="span" className="hidden sm:inline">{tab.label}</Text>
-              <Text as="span" className="sm:hidden">{tab.label.charAt(0).toUpperCase() + tab.label.slice(1, 3)}</Text>
+              <Text as="span" className="sm:hidden">{tab.label.charAt(0).toUpperCase() + tab.label.slice(1, 3)}{' '}</Text>
               
               {hasCount && (
                 <Text 

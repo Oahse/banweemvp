@@ -8,6 +8,9 @@ import {
   AlertCircle, 
   XCircle, 
   RotateCcw,
+  RefreshCw
+} from 'lucide-react';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
   ExternalLink,
   RefreshCw,
   Calendar,
@@ -165,8 +168,7 @@ export const ShipmentTracking: React.FC<ShipmentTrackingProps> = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-gray-600">Loading tracking information...</span>
+        <AnimatedLoader size="md" variant="spinner" color="primary" text="Loading tracking information..." centered={false} />
       </div>
     );
   }

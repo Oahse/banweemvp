@@ -15,10 +15,10 @@ import {
   PauseIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { SubscriptionCard } from '@/subscriptions/components/SubscriptionCard';
+import { SubscriptionCard } from '@/features/protected/subscriptions/components/SubscriptionCard';
 import { Pagination } from '@/components/ui/Pagination';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
-import { AutoRenewToggle } from '@/subscriptions/components/AutoRenewToggle';
+import { AutoRenewToggle } from '@/features/protected/subscriptions/components/AutoRenewToggle';
 import ProductsAPI from '@/api/products';
 import { Product } from '@/types';
 
@@ -137,10 +137,10 @@ export const MySubscriptions = () => {
   const handleToggleAutoRenew = async (subscriptionId: string, enabled: boolean) => {
     try {
       await updateSubscription(subscriptionId, { auto_renew: enabled });
-      toast.success(`Auto-renew ${enabled ? 'enabled' : 'disabled'}`);
+      // Toast shown in context
       refreshSubscriptions();
     } catch (error) {
-      toast.error('Failed to update auto-renew setting');
+      // Error toast shown in context
     }
   };
 
@@ -152,10 +152,10 @@ export const MySubscriptions = () => {
       await pauseSubscription(selectedSubscription.id);
       setShowPauseModal(false);
       setSelectedSubscription(null);
-      toast.success('Subscription paused');
+      // Toast shown in context
       refreshSubscriptions();
     } catch (error) {
-      toast.error('Failed to pause subscription');
+      // Error toast shown in context
     } finally {
       setActionLoading(false);
     }
@@ -164,10 +164,10 @@ export const MySubscriptions = () => {
   const handleResumeSubscription = async (subscriptionId: string) => {
     try {
       await resumeSubscription(subscriptionId);
-      toast.success('Subscription resumed');
+      // Toast shown in context
       refreshSubscriptions();
     } catch (error) {
-      toast.error('Failed to resume subscription');
+      // Error toast shown in context
     }
   };
 
@@ -179,10 +179,10 @@ export const MySubscriptions = () => {
       await cancelSubscription(selectedSubscription.id);
       setShowCancelModal(false);
       setSelectedSubscription(null);
-      toast.success('Subscription cancelled');
+      // Toast shown in context
       refreshSubscriptions();
     } catch (error) {
-      toast.error('Failed to cancel subscription');
+      // Error toast shown in context
     } finally {
       setActionLoading(false);
     }
@@ -196,10 +196,8 @@ export const MySubscriptions = () => {
       await deleteSubscription(selectedSubscription.id);
       setShowDeleteModal(false);
       setSelectedSubscription(null);
-      toast.success('Subscription deleted');
+      // Toast shown in context
       refreshSubscriptions();
-    } catch (error) {
-      toast.error('Failed to delete subscription');
     } finally {
       setActionLoading(false);
     }
@@ -208,10 +206,10 @@ export const MySubscriptions = () => {
   const handleActivateSubscription = async (subscriptionId: string) => {
     try {
       await activateSubscription(subscriptionId);
-      toast.success('Subscription activated');
+      // Toast shown in context
       refreshSubscriptions();
     } catch (error) {
-      toast.error('Failed to activate subscription');
+      // Error toast shown in context
     }
   };
 

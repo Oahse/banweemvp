@@ -209,7 +209,7 @@ export const WishlistEdit = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <AnimatedLoader size="lg" variant="petals" color="primary" text="Loading wishlist..." />
+        <AnimatedLoader size="lg" variant="spinner" color="primary" text="Loading wishlist..." />
       </div>
     );
   }

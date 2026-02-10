@@ -8,6 +8,7 @@ import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { Heading, Body, Text as TextComponent, Label } from '@/components/ui/Text/Text';
 import { Input } from '@/components/ui/Form/Input';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { ProductsListSkeleton } from '@/features/protected/admin/components/skeletons/ProductsSkeleton';
 import { ConfirmModal, useModal } from '@/components/ui/Modal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
@@ -368,7 +369,7 @@ const AdminProductsPage = () => {
                 prefix={<SearchIcon size={18} />}
                 suffix={
                   searchQuery !== debouncedSearchQuery ? (
-                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <AnimatedLoader size="sm" variant="spinner" color="primary" centered={false} />
                   ) : undefined
                 }
                 size="md"

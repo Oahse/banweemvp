@@ -12,9 +12,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '@/utils/themeClasses';
 import { Button } from '@/components/ui/Button';
-import { formatCurrency } from '@/utils/orderCalculations';
+import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface SubscriptionCardProps {
@@ -43,6 +42,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
   showActions = true
 }) => {
   const navigate = useNavigate();
+  const { formatCurrency } = useLocale();
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isPausing, setIsPausing] = useState(false);
@@ -133,10 +133,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     setIsPausing(true);
     try {
       await onPause(subscription.id);
-      toast.success('Subscription paused');
+      // toast.success('Subscription paused');
     } catch (error) {
       console.error('Failed to pause subscription:', error);
-      toast.error('Failed to pause subscription');
+      // toast.error('Failed to pause subscription');
     } finally {
       setIsPausing(false);
     }
@@ -148,10 +148,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     setIsResuming(true);
     try {
       await onResume(subscription.id);
-      toast.success('Subscription resumed');
+      // toast.success('Subscription resumed');
     } catch (error) {
       console.error('Failed to resume subscription:', error);
-      toast.error('Failed to resume subscription');
+      // toast.error('Failed to resume subscription');
     } finally {
       setIsResuming(false);
     }
@@ -163,10 +163,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     setIsReactivating(true);
     try {
       await onActivate(subscription.id);
-      toast.success('Subscription reactivated');
+      // toast.success('Subscription reactivated');
     } catch (error) {
       console.error('Failed to reactivate subscription:', error);
-      toast.error('Failed to reactivate subscription');
+      // toast.error('Failed to reactivate subscription');
     } finally {
       setIsReactivating(false);
     }
@@ -177,11 +177,11 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     
     setIsCancelling(true);
     try {
-      await onCancel(subscription.id);
-      toast.success('Subscription cancelled');
+      // await onCancel(subscription.id);
+      // toast.success('Subscription cancelled');
     } catch (error) {
       console.error('Failed to cancel subscription:', error);
-      toast.error('Failed to cancel subscription');
+      // toast.error('Failed to cancel subscription');
     } finally {
       setIsCancelling(false);
     }
@@ -204,13 +204,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
   };
 
   return (
-    <div className={combineThemeClasses(
-      themeClasses.card.base,
-      'p-3 space-y-2 max-w-md w-full'
-    )}>
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-3 space-y-2 w-full">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {isEditing ? (
             <div className="space-y-3">
               <div>
@@ -219,7 +216,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   type="text"
                   value={editData.name}
                   onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                  className={combineThemeClasses(themeClasses.input.base, themeClasses.input.default, 'text-sm')}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
                   placeholder="Enter subscription name"
                 />
               </div>
@@ -228,7 +225,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 <select
                   value={editData.billing_cycle}
                   onChange={(e) => setEditData({ ...editData, billing_cycle: e.target.value as any })}
-                  className={combineThemeClasses(themeClasses.input.base, themeClasses.input.default, 'text-sm')}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
                 >
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
@@ -238,7 +235,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
             </div>
           ) : (
             <>
-              <Heading level={5} className={combineThemeClasses(themeClasses.text.primary, 'text-sm font-medium')}>
+              <Heading level={5} className="text-gray-900 dark:text-white text-sm font-medium truncate">
                 {subscription.name}
               </Heading>
               <div className="flex items-center gap-2 mt-1">
@@ -253,21 +250,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           )}
         </div>
         
-        <div className="flex items-center gap-2">
-          <span className={combineThemeClasses(
-            'px-2 py-1 text-sm font-medium rounded-full border',
-            getStatusColor(subscription.status)
-          )}>
+        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+          <span className={`px-2 py-1 text-xs font-medium rounded-full border whitespace-nowrap ${getStatusColor(subscription.status)}`}>
             {subscription.status?.charAt(0).toUpperCase() + subscription.status?.slice(1)}
           </span>
-          <Button
-            onClick={() => navigate(`/account/subscriptions/${subscription.id}`)}
-            variant="primary"
-            size="xs"
-            title="View details"
-          >
-            View Details
-          </Button>
         </div>
       </div>
 
@@ -299,6 +285,16 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           {subscription.auto_renew ? 'Disable' : 'Enable'}
         </Button>
       </div>
+
+      {/* View Details Button */}
+      <Button
+        onClick={() => navigate(`/account/subscriptions/${subscription.id}`)}
+        variant="primary"
+        size="xs"
+        className="w-full"
+      >
+        View Details
+      </Button>
 
       {/* Actions */}
       {showActions && (

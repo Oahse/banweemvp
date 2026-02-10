@@ -8,6 +8,7 @@ import { ContactMessagesAPI, ContactMessage } from '@/api/contact-messages';
 import { Mail, Clock, CheckCircle, AlertCircle, Search, Eye, Trash2, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ContactMessagesSkeleton from '@/features/protected/admin/components/skeletons/ContactMessagesSkeleton';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
@@ -446,7 +447,7 @@ const ContactMessages: React.FC = () => {
                 />
                 {searchTerm !== debouncedSearchTerm && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <AnimatedLoader size="sm" variant="spinner" color="primary" centered={false} />
                   </div>
                 )}
               </div>

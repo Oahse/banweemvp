@@ -6,6 +6,7 @@ import ProductsAPI from '@/api/products';
 import { toast } from 'react-hot-toast';
 import { Product } from '@/types';
 import { Button } from '@/components/ui/Button';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 
 interface ProductVariantModalProps {
   isOpen: boolean;
@@ -168,8 +169,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
               <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <Text as="span" className="ml-3 text-gray-600 dark:text-gray-400">Loading products...</Text>
+              <AnimatedLoader size="md" variant="spinner" color="primary" text="Loading products..." centered={false} />
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-12">

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, Loader } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { extractErrorMessage } from '@/utils/api-response';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 
 // Animation variants
 const containerVariants = {
@@ -83,8 +84,7 @@ export const EmailVerification = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-            <Loader size={48} className="mx-auto text-primary animate-spin" />
-            <Body className="text-sm text-copy-light">Verifying your email...</Body>
+            <AnimatedLoader size="lg" variant="spinner" color="primary" text="Verifying your email..." centered={false} />
           </motion.div>
         )}
         

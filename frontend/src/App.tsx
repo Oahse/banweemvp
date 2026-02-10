@@ -130,7 +130,7 @@ export const App: React.FC = () => {
                     <WishlistProvider>
                       <Elements stripe={stripePromise}>
                         <SupportFloat />
-                        <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 z-50"><AnimatedLoader size="lg" variant="petals" color="primary" text="Loading page..." /></div>}> 
+                        <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 z-50"><AnimatedLoader size="lg" variant="spinner" color="primary" text="Loading page..." /></div>}> 
                           <Routes>
                         <Route path="/" element={<Layout><Home /></Layout>} />
                         <Route path="/products" element={<Layout><Suspense fallback={<ProductListSkeleton />}><Products /></Suspense></Layout>} />

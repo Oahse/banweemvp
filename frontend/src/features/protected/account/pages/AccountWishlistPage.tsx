@@ -49,10 +49,14 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
   const [showClearModal, setShowClearModal] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 6;
+
   // Calculate paginated items
   const wishlistItems = defaultWishlist?.items || [];
-  const totalPages = Math.ceil(wishlistItems.length / itemsPerPage);
-  const paginatedItems = wishlistItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalItems = wishlistItems.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = wishlistItems.slice(startIndex, endIndex);
 
   useEffect(() => {
     setLoading(false);
@@ -93,21 +97,26 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
       <Card.Body>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {paginatedItems.map((item: WishlistItem) => (
-            <ProductCard product={item.product} selectedVariant={item.variant} />
+            <ProductCard key={item.id} product={item.product} selectedVariant={item.variant} className="" />
           ))}
         </div>
+
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center mt-6 gap-2">
+          <div className="flex justify-center mt-6">
             <Pagination
               currentPage={currentPage}
-              totalItems={wishlistItems.length}
-              pageSize={itemsPerPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
               onPageChange={setCurrentPage}
-              size="xs"
+              showingStart={startIndex + 1}
+              showingEnd={Math.min(endIndex, totalItems)}
+              itemName="items"
             />
           </div>
         )}
+
         {/* Clear Wishlist Button */}
         <Button
           variant="danger"
@@ -122,27 +131,27 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
       {/* Remove Modal */}
       {showRemoveModal && (
         <ConfirmationModal
-          open={showRemoveModal}
+          isOpen={showRemoveModal}
           onClose={() => setShowRemoveModal(false)}
           onConfirm={() => {
-            if (itemToRemove) removeItem(itemToRemove);
+            if (itemToRemove) removeItem(itemToRemove, defaultWishlist?.id || '');
             setShowRemoveModal(false);
           }}
           title="Remove Item"
-          description="Are you sure you want to remove this item from your wishlist?"
+          message="Are you sure you want to remove this item from your wishlist?"
         />
       )}
       {/* Clear Modal */}
       {showClearModal && (
         <ConfirmationModal
-          open={showClearModal}
+          isOpen={showClearModal}
           onClose={() => setShowClearModal(false)}
           onConfirm={() => {
             clearWishlist();
             setShowClearModal(false);
           }}
           title="Clear Wishlist"
-          description="Are you sure you want to clear your entire wishlist?"
+          message="Are you sure you want to clear your entire wishlist?"
         />
       )}
     </Card>
