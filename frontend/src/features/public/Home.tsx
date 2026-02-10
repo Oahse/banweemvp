@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRightIcon, TruckIcon, BadgeCheckIcon, ShieldIcon, HeadphonesIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { ProductCard } from '@/components/generic/ProductCard';
 import { CategoryCard } from '@/components/generic/CategoryCard';
+import { Container } from '@/components/layout/Container';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useAsync } from '@/components/shared/hooks/useAsync';
@@ -246,8 +247,9 @@ return (
               alt={heroSlides[currentSlide]?.title || 'Hero image'}
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="relative z-20 container mx-auto px-4 h-full flex items-center">
-              <div className="max-w-xl text-white">
+            <div className="relative z-20 h-full flex items-center">
+              <Container>
+                <div className="max-w-xl text-white">
                 <Text variant="body-sm" className="inline-block px-4 py-1 bg-primary text-white rounded-full mb-4 font-medium">
                   {heroSlides[currentSlide]?.badge || 'Default Badge'}
                 </Text>
@@ -279,6 +281,7 @@ return (
                   </Link>
                 </motion.div>
               </div>
+              </Container>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -322,7 +325,7 @@ return (
 
     {/* Features */}
     <section className="py-10 bg-surface">
-      <div className="container mx-auto px-4">
+      <Container>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           <div className="flex flex-col items-center text-center p-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
@@ -353,12 +356,12 @@ return (
             <Text variant="body-sm" tone="secondary">Dedicated Support</Text>
           </div>
         </div>
-      </div>
+      </Container>
     </section>
 
     {/* Categories */}
     <section className="py-10 bg-background">
-      <div className="container mx-auto px-4">
+      <Container>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
             <Text variant="body-sm" weight="medium" tone="primary">Explore our product range</Text>
@@ -402,12 +405,12 @@ return (
             ))
           )}
         </div>
-      </div>
+      </Container>
     </section>
 
     {/* Featured Products */}
     <section className="py-10 bg-surface">
-      <div className="container mx-auto px-4">
+      <Container>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <Text variant="body-sm" weight="medium" tone="primary">Featured Products</Text>
@@ -458,12 +461,12 @@ return (
             </div>
           )}
         </div>
-      </div>
+      </Container>
     </section>
 
     {/* Popular Products with Tabs */}
     <section className="py-10 bg-background">
-      <div className="container mx-auto px-4">
+      <Container>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <Text variant="body-sm" weight="medium" tone="primary">Best Sellers</Text>
@@ -571,12 +574,12 @@ return (
             </div>
           )}
         </motion.div>
-      </div>
+      </Container>
     </section>
 
     {/* Deals of the day */}
     <section className="py-10 bg-surface">
-      <div className="container mx-auto px-4">
+      <Container>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
             <Text className="text-primary text-sm font-medium">Best deals</Text>
@@ -679,7 +682,7 @@ return (
             })
           )}
         </div>
-      </div>
+      </Container>
     </section>
   </div>
 );

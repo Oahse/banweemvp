@@ -1,9 +1,8 @@
 import { useEffect, Suspense, lazy } from 'react';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import AccountLayout from '@/components/layout/AccountLayout';
-import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
 // Account Skeleton for loading states
 const AccountSkeleton = () => (
   <div className="animate-pulse space-y-4">
@@ -34,9 +33,8 @@ const LoadingFallback = () => (
 
 // Main Account Component
 export const Account = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout, isAdmin, isSupplier } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!user) {

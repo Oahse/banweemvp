@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/features/protected/subscriptions/contexts/SubscriptionContext';
 import { Button } from '@/components/ui/Button';
@@ -11,8 +11,7 @@ import {
   Edit,
   Pause,
   Play,
-  X,
-  CheckCircle
+  X
 } from 'lucide-react';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
@@ -167,16 +166,14 @@ export const MySubscriptionDetail = () => {
               <Text variant="body-sm" weight="medium">{formatDate(subscription.created_at)}</Text>
             </div>
             <div>
-              <Caption tone="secondary">Current Period</Caption>
+              <Caption tone="secondary">Last Updated</Caption>
               <Text variant="body-sm" weight="medium">
-                {subscription.current_period_start && subscription.current_period_end
-                  ? `${formatDate(subscription.current_period_start)} - ${formatDate(subscription.current_period_end)}`
-                  : 'N/A'}
+                {subscription.updated_at ? formatDate(subscription.updated_at) : 'N/A'}
               </Text>
             </div>
             <div>
-              <Caption tone="secondary">Delivery Type</Caption>
-              <Text variant="body-sm" weight="medium">{subscription.delivery_type || 'Standard'}</Text>
+              <Caption tone="secondary">Currency</Caption>
+              <Text variant="body-sm" weight="medium">{subscription.currency?.toUpperCase() || 'USD'}</Text>
             </div>
           </div>
         </div>

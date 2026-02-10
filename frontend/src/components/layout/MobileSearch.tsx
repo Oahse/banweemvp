@@ -32,8 +32,8 @@ export const MobileSearch = ({
     };
   }, [isOpen]);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/products?q=${encodeURIComponent(searchTerm)}`);
       onClose();

@@ -12,6 +12,7 @@ import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 import { Pagination } from '@/components/ui/Pagination';
+import { Container } from '@/components/layout/Container';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 
 // Animation variants
@@ -188,8 +189,9 @@ const Products = () => {
   const totalPages = Math.ceil(totalProducts / 12);
 
   return (
-    <motion.div 
-      className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6"
+    <div className="py-6 sm:py-8">
+      <Container>
+        <motion.div
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -450,6 +452,8 @@ const Products = () => {
       )}
       </AnimatePresence>
     </motion.div>
+      </Container>
+    </div>
   );
 };
 

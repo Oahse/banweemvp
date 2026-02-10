@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
+from fastapi import APIRouter, Depends, Query, status, BackgroundTasks, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
@@ -813,14 +813,71 @@ async def get_subscription_details(
     db: AsyncSession = Depends(get_db)
 ):
     """Get detailed subscription information for modal display."""
+    # Fixed: Using SubscriptionService instead of non-existent EnhancedSubscriptionService
     try:
-        from services.enhanced_subscription_service import EnhancedSubscriptionService
+        subscription_service = SubscriptionService(db)
         
-        enhanced_service = EnhancedSubscriptionService(db)
-        details = await enhanced_service.get_subscription_details(
+        # Get subscription with all related data
+        subscription = await subscription_service.get_subscription_by_id(
             subscription_id=subscription_id,
             user_id=current_user.id
         )
+        
+        if not subscription:
+            raise APIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Subscription not found"
+            )
+        
+        # Get subscription products/variants
+        variant_quantities = subscription.variant_quantities or {}
+        products = []
+        
+        if variant_quantities:
+            # Fetch variant details
+            variant_ids = list(variant_quantities.keys())
+            result = await db.execute(
+                select(ProductVariant)
+                .options(selectinload(ProductVariant.product))
+                .where(ProductVariant.id.in_(variant_ids))
+            )
+            variants = result.scalars().all()
+            
+            for variant in variants:
+                quantity = variant_quantities.get(str(variant.id), 0)
+                products.append({
+                    "id": str(variant.id),
+                    "subscription_id": str(subscription.id),
+                    "product_id": str(variant.product_id),
+                    "name": variant.product.name,
+                    "quantity": quantity,
+                    "unit_price": float(variant.price),
+                    "total_price": float(variant.price * quantity),
+                    "image": variant.product.images[0].image_url if variant.product.images else None,
+                    "added_at": subscription.created_at.isoformat()
+                })
+        
+        # Build response
+        details = {
+            "subscription": {
+                "id": str(subscription.id),
+                "name": subscription.name,
+                "status": subscription.status,
+                "price": float(subscription.price),
+                "currency": subscription.currency,
+                "billing_cycle": subscription.billing_cycle,
+                "auto_renew": subscription.auto_renew,
+                "next_billing_date": subscription.next_billing_date.isoformat() if subscription.next_billing_date else None,
+                "created_at": subscription.created_at.isoformat(),
+                "updated_at": subscription.updated_at.isoformat() if subscription.updated_at else None,
+                "subtotal": float(subscription.subtotal) if subscription.subtotal else 0.0,
+                "shipping_cost": float(subscription.shipping_cost) if subscription.shipping_cost else 0.0,
+                "tax_amount": float(subscription.tax_amount) if subscription.tax_amount else 0.0,
+                "total": float(subscription.total) if subscription.total else 0.0,
+            },
+            "products": products,
+            "discounts": []
+        }
         
         return Response.success(
             data=details,
@@ -831,6 +888,8 @@ async def get_subscription_details(
             status_code=e.status_code,
             detail=e.detail
         )
+    except APIException:
+        raise
     except Exception as e:
         logger.error(f"Error getting subscription details: {e}")
         raise APIException(

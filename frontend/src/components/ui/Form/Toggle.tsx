@@ -159,7 +159,9 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
               'absolute left-0.5 top-0.5',
               'bg-white rounded-full shadow-sm',
               'transition-transform duration-200',
-              'peer-checked:' + sizeStyles[size].translate
+              size === 'sm' && 'peer-checked:translate-x-4',
+              size === 'md' && 'peer-checked:translate-x-5',
+              size === 'lg' && 'peer-checked:translate-x-7'
             )}
           />
           

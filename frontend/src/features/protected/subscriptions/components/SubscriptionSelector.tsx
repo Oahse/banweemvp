@@ -3,7 +3,7 @@ import { XIcon, CalendarIcon, CreditCardIcon, PlusIcon } from 'lucide-react';
 import { useSubscription } from '@/features/protected/subscriptions/contexts/SubscriptionContext';
 import { useSubscriptionAction } from '@/features/protected/subscriptions/hooks/useSubscription';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
-import { themeClasses, getButtonClasses } from '@/components/shared/utils/themeClasses';
+import { themeClasses, getButtonClasses } from '@/utils/themeClasses';
 import { VariantSelector } from '@/features/public/products/components/VariantSelector';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';

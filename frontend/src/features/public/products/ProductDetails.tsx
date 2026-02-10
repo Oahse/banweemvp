@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Container } from '@/components/layout/Container';
 
 import { ProductImageGallery } from './components/ProductImageGallery';
 import { VariantSelector } from './components/VariantSelector';
@@ -195,29 +196,33 @@ export const ProductDetails = () => {
 
   if (productLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-gray-200 h-96 rounded-lg"></div>
-            <div className="space-y-4">
-              <div className="bg-gray-200 h-8 rounded"></div>
-              <div className="bg-gray-200 h-6 rounded w-3/4"></div>
-              <div className="bg-gray-200 h-4 rounded w-1/2"></div>
-              <div className="bg-gray-200 h-20 rounded"></div>
+      <div className="py-8">
+        <Container>
+          <div className="animate-pulse">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-gray-200 h-96 rounded-lg"></div>
+              <div className="space-y-4">
+                <div className="bg-gray-200 h-8 rounded"></div>
+                <div className="bg-gray-200 h-6 rounded w-3/4"></div>
+                <div className="bg-gray-200 h-4 rounded w-1/2"></div>
+                <div className="bg-gray-200 h-20 rounded"></div>
+              </div>
             </div>
           </div>
-        </div>
-            </div>
+        </Container>
+      </div>
     );
   }
 
   if (productError || !actualProductData) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <ErrorMessage
-          message={productError?.message || 'Product not found'}
-          onRetry={() => fetchProduct(() => ProductsAPI.getProduct(id))}
-        />
+      <div className="py-8">
+        <Container>
+          <ErrorMessage
+            message={productError?.message || 'Product not found'}
+            onRetry={() => fetchProduct(() => ProductsAPI.getProduct(id))}
+          />
+        </Container>
       </div>
     );
   }
@@ -235,11 +240,13 @@ export const ProductDetails = () => {
   // If product data is not available, show error
   if (!product) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <ErrorMessage
-          message={'Failed to load product data'}
-          onRetry={() => fetchProduct(() => ProductsAPI.getProduct(id))}
-        />
+      <div className="py-8">
+        <Container>
+          <ErrorMessage
+            message={'Failed to load product data'}
+            onRetry={() => fetchProduct(() => ProductsAPI.getProduct(id))}
+          />
+        </Container>
       </div>
     );
   }
@@ -357,7 +364,7 @@ export const ProductDetails = () => {
     >
       {/* Breadcrumb */}
       <motion.div className="bg-surface py-4" variants={itemVariants}>
-        <div className="container mx-auto px-4">
+        <Container>
           <nav className="flex items-center space-x-2">
             <Text variant="body-sm" tone="secondary">
               <Link to="/" className="hover:text-primary">Home</Link>
@@ -369,11 +376,12 @@ export const ProductDetails = () => {
             <ChevronRightIcon size={16} />
             <Text variant="body-sm">{product.name}</Text>
           </nav>
-        </div>
+        </Container>
       </motion.div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <motion.div className="py-8">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images */}
           <div className="space-y-4">
             <ProductImageGallery
@@ -798,9 +806,13 @@ export const ProductDetails = () => {
               </div>
             </div>
           </div>
-        </div>
+        
+        </Container>
+      </motion.div>
 
-        {/* Product Details Tabs */}
+      {/* Product Details Tabs */}
+      <motion.div className="py-8">
+        <Container>
         <div className="mb-8">
           <div className="border-b border-gray-200 mb-4">
             <nav className="flex space-x-6">
@@ -1245,10 +1257,11 @@ export const ProductDetails = () => {
             )}
           </div>
         </div>
+        </Container>
 
         {/* Related Products */}
         <section className="py-8 bg-surface">
-          <div className="container mx-auto px-4">
+          <Container>
             <Heading level={5} className="text-lg sm:text-xl font-semibold text-main mb-4">Related Products</Heading>
 
             {relatedError && (
@@ -1296,7 +1309,7 @@ export const ProductDetails = () => {
                 </div>
               )}
             </div>
-          </div>
+          </Container>
         </section>
 
         {/* Subscription Selector Modal */}
@@ -1313,6 +1326,7 @@ export const ProductDetails = () => {
           />
         )}
       </motion.div>
+    </motion.div>
   );
 };
 

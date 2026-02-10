@@ -82,7 +82,7 @@ export const Layout = ({
 
       <main
         className={`flex-1 w-full transition-all duration-200 ease-in-out ${
-          showHeader ? 'pt-0' : ''
+          showHeader ? 'mt-0' : ''
         }`}
       >
         {children}
