@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { PaymentsListSkeleton } from '@/components/skeletons/PaymentsSkeleton';
+import { PaymentsListSkeleton } from '@/features/protected/admin/components/skeletons/PaymentsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
@@ -102,7 +102,7 @@ export const Payments = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
     
     return (
-      <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
         {config.label}
       </Text>
     );
@@ -354,7 +354,7 @@ export const Payments = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
-          <Body className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage payment transactions and processing</Body>
+          <Body className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage payment transactions and processing</Body>
         </div>
       </div>
 

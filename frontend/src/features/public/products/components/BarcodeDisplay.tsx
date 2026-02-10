@@ -67,7 +67,7 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <Heading level={3} className="text-lg font-semibold text-main">
+        <Heading level={5} className="text-lg font-semibold text-main">
           {variant.name} - Codes
         </Heading>
         {canGenerate && (
@@ -89,7 +89,7 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
         {(showBoth || !codes.qr_code) && (
           <div className="border border-border-light rounded-lg p-4 bg-surface">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
-              <Heading level={4} className="font-medium text-main flex items-center">
+              <Heading level={5} className="font-medium text-main flex items-center">
                 <ScanLineIcon size={16} className="mr-2 text-primary" />
                 Barcode
               </Heading>
@@ -120,7 +120,7 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
                 </div>
               </div>
             )}
-            <Body className="text-xs text-copy-light mt-2 text-center font-mono break-all">SKU: {variant.sku}</Body>
+            <Body className="text-sm text-copy-light mt-2 text-center font-mono break-all">SKU: {variant.sku}</Body>
           </div>
         )}
 
@@ -128,7 +128,7 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
         {(showBoth || !codes.barcode) && (
           <div className="border border-border-light rounded-lg p-4 bg-surface">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
-              <Heading level={4} className="font-medium text-main flex items-center">
+              <Heading level={5} className="font-medium text-main flex items-center">
                 <QrCodeIcon size={16} className="mr-2 text-primary" />
                 QR Code
               </Heading>
@@ -159,7 +159,7 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
                 </div>
               </div>
             )}
-            <Body className="text-xs text-copy-light mt-2 text-center break-words">{variant.name}</Body>
+            <Body className="text-sm text-copy-light mt-2 text-center break-words">{variant.name}</Body>
           </div>
         )}
       </div>

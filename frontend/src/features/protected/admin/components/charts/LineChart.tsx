@@ -38,7 +38,7 @@ export const CustomLineChart: React.FC<LineChartProps> = ({
 
   return (
     <div className="w-full bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-      <Heading level={3} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</Heading>
+      <Heading level={5} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</Heading>
       <ResponsiveContainer width="100%" height={height}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />

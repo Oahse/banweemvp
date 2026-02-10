@@ -186,7 +186,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               className={cn(
                 'absolute inset-y-0 right-0 flex items-center justify-center',
                 getIconContainerWidth(size),
-                'text-copy-light pointer-events-none',
+                'text-copy-light',
+                // Only disable pointer events for character count, not for interactive suffixes
+                showCount && 'pointer-events-none',
                 state === 'error' && 'text-error',
                 state === 'success' && 'text-success',
                 state === 'warning' && 'text-warning',

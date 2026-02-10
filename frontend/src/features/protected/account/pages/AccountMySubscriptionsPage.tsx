@@ -291,7 +291,7 @@ export const MySubscriptions = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Heading level={1} weight="bold">My Subscriptions</Heading>
+          <Heading level={5} weight="bold">My Subscriptions</Heading>
           <Text variant="caption" tone="secondary">Manage your active and past subscriptions</Text>
         </div>
         <Button
@@ -339,7 +339,7 @@ export const MySubscriptions = () => {
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <div className="flex">
               <div className="ml-3">
-                <Heading level={3} className="text-sm font-medium text-red-800">Error</Heading>
+                <Heading level={5} className="text-sm font-medium text-red-800">Error</Heading>
                 <Text as="div" className="mt-2 text-sm text-red-700">{error}</Text>
               </div>
               <div className="mt-4">
@@ -360,7 +360,7 @@ export const MySubscriptions = () => {
       {filteredSubscriptions.length === 0 && !loading ? (
         <div className="text-center py-12">
           <PackageIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <Heading level={3} className="mt-2 text-sm font-medium text-gray-900">No subscriptions</Heading>
+          <Heading level={5} className="mt-2 text-sm font-medium text-gray-900">No subscriptions</Heading>
           <Text as="p" className="mt-1 text-sm text-gray-500">{searchQuery ? 'No subscriptions match your search.' : 'Get started by creating a new subscription.'}</Text>
           <div className="mt-6">
             <Button
@@ -420,7 +420,7 @@ export const MySubscriptions = () => {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-full max-w-md sm:w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <div className="mt-3">
-              <Heading level={3} weight="medium">Create New Subscription</Heading>
+              <Heading level={5} weight="medium">Create New Subscription</Heading>
               <div className="space-y-4">
                 <div>
                   <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subscription Name</Label>
@@ -552,7 +552,7 @@ export const MySubscriptions = () => {
                   availableProducts.map((product) => (
                     <div key={product.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 gap-3">
                       <div className="flex-1">
-                        <Heading level={4} className="font-medium text-gray-900 dark:text-gray-100">{product.name}</Heading>
+                        <Heading level={5} className="font-medium text-gray-900 dark:text-gray-100">{product.name}</Heading>
                         <Text as="p" className="text-sm text-gray-500 dark:text-gray-400">{product.description}</Text>
                         <Text as="p" className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatCurrencyLocale(product.price || 0)}</Text>
                       </div>

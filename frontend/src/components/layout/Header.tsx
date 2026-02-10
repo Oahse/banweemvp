@@ -288,7 +288,7 @@ export const Header = ({
                 to={isAuthenticated ? '/account' : '/login'}
                 className="hidden md:flex items-center hover:text-primary">
                 <UserIcon size={24} className="mr-1" />
-                <div className="flex flex-col text-xs">
+                <div className="flex flex-col text-sm">
                 <Text variant="body-sm">{isAuthenticated ? `Hello, ${user?.firstname || user?.full_name?.split(' ')[0] || 'User'}` : 'Login'}</Text>
                   <Text variant="body-sm" weight="semibold">
                     {isAuthenticated ? 'Account' : 'My Account'}
@@ -306,7 +306,7 @@ export const Header = ({
                     </Text>
                   )}
                 </div>
-                <div className="flex flex-col ml-1 text-xs">
+                <div className="flex flex-col ml-1 text-sm">
                   <Text variant="body-sm">Favorite</Text>
                   <Text variant="body-sm" weight="semibold">Wishlist</Text>
                 </div>
@@ -322,7 +322,7 @@ export const Header = ({
                     </Text>
                   )}
                 </div>
-                <div className="hidden md:flex flex-col ml-1 text-xs">
+                <div className="hidden md:flex flex-col ml-1 text-sm">
                   <Text variant="body-sm">Your Cart</Text>
                 </div>
               </Link>

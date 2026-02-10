@@ -118,7 +118,7 @@ export const TrackOrder = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
         <div className="max-w-4xl mx-auto text-center">
           <PackageIcon size={48} className="mx-auto text-gray-400 mb-3" />
-          <Heading level={2} weight="semibold">Order Not Found</Heading>
+          <Heading level={5} weight="semibold">Order Not Found</Heading>
           <Text variant="caption" tone="secondary">
             We couldn't find tracking information for this order.
           </Text>
@@ -127,7 +127,7 @@ export const TrackOrder = () => {
           </Text>
           <Link 
             to="/account/track-order" 
-            className="inline-block px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs"
+            className="inline-block px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
           >
             <Text variant="caption">Search Another Order</Text>
           </Link>
@@ -160,7 +160,7 @@ export const TrackOrder = () => {
           variant="ghost"
           size="sm"
           onClick={() => navigate(-1)}
-          className="text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-4"
+          className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-4"
         >
           <ArrowLeftIcon size={14} className="mr-1" />
           Back
@@ -169,7 +169,7 @@ export const TrackOrder = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <Heading level={1} weight="bold">Track Your Order</Heading>
+              <Heading level={5} weight="bold">Track Your Order</Heading>
               <Text variant="caption" tone="secondary">
                 Order ID: {tracking.order_id}
               </Text>
@@ -177,7 +177,7 @@ export const TrackOrder = () => {
             <Button
               onClick={handleDownloadInvoice}
               size="sm"
-              className="flex items-center gap-1.5 px-2 py-1.5 text-xs"
+              className="flex items-center gap-1.5 px-2 py-1.5 text-sm"
             >
               <PrinterIcon size={14} />
               <Text variant="caption">Download Invoice</Text>
@@ -240,7 +240,7 @@ export const TrackOrder = () => {
 
                     {/* Label */}
                     <span
-                      className={`text-xs text-center ${
+                      className={`text-sm text-center ${
                         isCompleted
                           ? 'text-gray-900 dark:text-white font-medium'
                           : 'text-gray-500 dark:text-gray-400'
@@ -256,7 +256,7 @@ export const TrackOrder = () => {
 
           {/* Current Status */}
           <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
-            <Heading level={2} weight="semibold">Current Status</Heading>
+            <Heading level={5} weight="semibold">Current Status</Heading>
             <Text variant="caption" weight="bold" className={getStatusColor(tracking.status)}>
               {tracking.status.charAt(0).toUpperCase() + tracking.status.slice(1).replace(/_/g, ' ')}
             </Text>
@@ -271,7 +271,7 @@ export const TrackOrder = () => {
         {/* Tracking Events Timeline */}
         {tracking.tracking_events && tracking.tracking_events.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-            <Heading level={2} weight="semibold">Tracking History</Heading>
+            <Heading level={5} weight="semibold">Tracking History</Heading>
             <div className="space-y-3">
               {tracking.tracking_events
                 .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())

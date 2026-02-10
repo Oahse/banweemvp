@@ -179,7 +179,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
     const { color, label } = config[status as keyof typeof config] || config.active;
     
     return (
-      <Text as="span" className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}>
+      <Text as="span" className={`px-3 py-1 rounded-full text-sm font-semibold ${color}`}>
         {label}
       </Text>
     );
@@ -188,8 +188,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <Text as="p" className="ml-4 text-gray-600 dark:text-gray-400">Loading subscriptions...</Text>
+        <AnimatedLoader size="lg" variant="petals" color="primary" text="Loading subscriptions..." />
       </div>
     );
   }
@@ -209,8 +208,8 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
         {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-3">
           <div>
-            <Heading level={1} className="text-base font-medium text-gray-900 dark:text-white">My Subscriptions</Heading>
-            <Text as="p" className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+            <Heading level={5} className="text-base font-medium text-gray-900 dark:text-white">My Subscriptions</Heading>
+            <Text as="p" className="text-sm text-gray-600 dark:text-gray-300 mt-1">
               {subscriptions.length} {subscriptions.length === 1 ? 'subscription' : 'subscriptions'}
             </Text>
           </div>
@@ -241,7 +240,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
               onClick={() => setActiveTab(tab.key)}
               variant={activeTab === tab.key ? 'primary' : 'ghost'}
               size="sm"
-              className={`px-2 sm:px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
+              className={`px-2 sm:px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                 activeTab === tab.key
                   ? 'bg-primary text-white'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
@@ -283,7 +282,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                 <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <Heading level={3} className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      <Heading level={5} className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                         {subscription.subscription_plan?.name || 'Subscription Plan'}
                       </Heading>
                       {getStatusBadge(subscription.status)}
@@ -336,7 +335,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                 {/* Products */}
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-3">
-                    <Heading level={4} className="font-medium text-gray-900 dark:text-white">
+                    <Heading level={5} className="font-medium text-gray-900 dark:text-white">
                       Products ({subscription.product_variants?.length || 0})
                     </Heading>
                     <Button
@@ -347,7 +346,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                       }}
                       variant="outline"
                       size="sm"
-                      className="text-xs"
+                      className="text-sm"
                     >
                       Manage Products
                     </Button>
@@ -363,7 +362,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                           <Text as="p" className="text-sm font-medium text-gray-900 dark:text-white truncate">
                             {variant.name}
                           </Text>
-                          <Text as="p" className="text-xs text-gray-600 dark:text-gray-400">
+                          <Text as="p" className="text-sm text-gray-600 dark:text-gray-400">
                             {variant.product?.name}
                           </Text>
                         </div>
@@ -373,7 +372,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                       </div>
                     ))}
                     {subscription.product_variants?.length > 3 && (
-                      <Text as="p" className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                      <Text as="p" className="text-sm text-gray-500 dark:text-gray-400 text-center">
                         +{subscription.product_variants.length - 3} more items
                       </Text>
                     )}

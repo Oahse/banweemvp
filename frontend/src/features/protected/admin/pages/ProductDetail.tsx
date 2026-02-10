@@ -4,8 +4,8 @@ import { Loader, AlertCircle, ArrowLeft, Package, DollarSign, Tag, User, Image a
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import AdminLayout from '@/components/layout/AdminLayout';
-import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
-import { ProductDetailSkeleton } from '@/components/skeletons/ProductsSkeleton';
+import AdminLayoutSkeleton from '@/features/protected/admin/components/skeletons/AdminLayoutSkeleton';
+import { ProductDetailSkeleton } from '@/features/protected/admin/components/skeletons/ProductsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading, Body, Caption, Label } from '@/components/ui/Text/Text';
 
@@ -102,7 +102,7 @@ export const AdminProductDetail = () => {
               Back
             </Button>
             <div>
-              <Heading level={1} className="text-lg font-semibold text-copy">{product.name}</Heading>
+              <Heading level={5} className="text-lg font-semibold text-copy">{product.name}</Heading>
               <Caption className="text-copy-light text-[11px] mt-0.5">ID: {String(product.id).slice(0, 8)}...</Caption>
             </div>
           </div>
@@ -124,7 +124,7 @@ export const AdminProductDetail = () => {
           <div className="lg:col-span-2 space-y-3">
             {/* Basic Info */}
             <div className="bg-surface rounded-lg border border-border-light p-3">
-              <Heading level={2} className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
+              <Heading level={5} className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
                 <Package className="w-3.5 h-3.5" />
                 Product Information
               </Heading>
@@ -132,7 +132,7 @@ export const AdminProductDetail = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 <div>
                   <Label className="text-[11px] font-medium text-copy-light">Name</Label>
-                  <Text as="p" className="text-copy font-medium text-xs">{product.name}</Text>
+                  <Text as="p" className="text-copy font-medium text-sm">{product.name}</Text>
                 </div>
                 <div>
                   <Label className="text-[11px] font-medium text-copy-light">Slug</Label>
@@ -140,32 +140,32 @@ export const AdminProductDetail = () => {
                 </div>
                 <div>
                   <Label className="text-[11px] font-medium text-copy-light">SKU</Label>
-                  <Text as="p" className="text-copy text-xs">{product.variants?.[0]?.sku || 'N/A'}</Text>
+                  <Text as="p" className="text-copy text-sm">{product.variants?.[0]?.sku || 'N/A'}</Text>
                 </div>
                 <div>
                   <Label className="text-[11px] font-medium text-copy-light">Rating</Label>
-                  <Text as="p" className="text-copy text-xs">⭐ {(product.rating_average || 0).toFixed(1)} ({product.rating_count || 0} reviews)</Text>
+                  <Text as="p" className="text-copy text-sm">⭐ {(product.rating_average || 0).toFixed(1)} ({product.rating_count || 0} reviews)</Text>
                 </div>
               </div>
               
               {product.description && (
                 <div className="mt-2.5">
                   <Label className="text-[11px] font-medium text-copy-light">Description</Label>
-                  <Text as="p" className="text-copy mt-1 text-xs">{product.description}</Text>
+                  <Text as="p" className="text-copy mt-1 text-sm">{product.description}</Text>
                 </div>
               )}
               
               {product.short_description && (
                 <div className="mt-2.5">
                   <Label className="text-[11px] font-medium text-copy-light">Short Description</Label>
-                  <Text as="p" className="text-copy mt-1 text-xs">{product.short_description}</Text>
+                  <Text as="p" className="text-copy mt-1 text-sm">{product.short_description}</Text>
                 </div>
               )}
             </div>
 
             {/* Category & Supplier */}
             <div className="bg-surface rounded-lg border border-border-light p-3">
-              <Heading level={2} className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
+              <Heading level={5} className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
                 <Tag className="w-3.5 h-3.5" />
                 Category & Supplier
               </Heading>
@@ -175,13 +175,13 @@ export const AdminProductDetail = () => {
                   <Label className="text-[11px] font-medium text-copy-light">Category</Label>
                   {product.category ? (
                     <div className="mt-1">
-                      <Text as="p" className="text-copy font-medium text-xs">{product.category.name}</Text>
+                      <Text as="p" className="text-copy font-medium text-sm">{product.category.name}</Text>
                         {product.category.description && (
                           <Caption className="text-copy-light text-[11px]">{product.category.description}</Caption>
                         )}
                     </div>
                   ) : (
-                    <p className="text-copy-light text-xs">No category assigned</p>
+                    <p className="text-copy-light text-sm">No category assigned</p>
                   )}
                 </div>
                 
@@ -189,14 +189,14 @@ export const AdminProductDetail = () => {
                   <Label className="text-[11px] font-medium text-copy-light">Supplier</Label>
                   {product.supplier ? (
                     <div className="mt-1">
-                      <Text as="p" className="text-copy font-medium text-xs">{product.supplier.name}</Text>
+                      <Text as="p" className="text-copy font-medium text-sm">{product.supplier.name}</Text>
                       <Caption className="text-copy-light text-[11px]">{product.supplier.email}</Caption>
                       {product.supplier.phone && (
-                        <p className="text-copy-light text-xs">{product.supplier.phone}</p>
+                        <p className="text-copy-light text-sm">{product.supplier.phone}</p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-copy-light text-xs">No supplier assigned</p>
+                    <p className="text-copy-light text-sm">No supplier assigned</p>
                   )}
                 </div>
               </div>
@@ -204,7 +204,7 @@ export const AdminProductDetail = () => {
 
             {/* Variants */}
             <div className="bg-surface rounded-lg border border-border-light p-3">
-              <Heading level={2} className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
+              <Heading level={5} className="text-base font-semibold text-copy mb-2 flex items-center gap-2">
                 <Package className="w-3.5 h-3.5" />
                 Variants ({product.variants?.length || 0})
               </Heading>
@@ -215,7 +215,7 @@ export const AdminProductDetail = () => {
                     <div key={variant.id} className="border border-border-light rounded p-2.5">
                       <div className="flex items-start justify-between mb-1.5">
                           <div>
-                            <Heading level={3} className="font-semibold text-copy text-xs">{variant.name}</Heading>
+                            <Heading level={5} className="font-semibold text-copy text-sm">{variant.name}</Heading>
                             <Caption className="text-copy-light text-[11px] font-mono">SKU: {variant.sku}</Caption>
                           </div>
                         <div className="text-right">
@@ -233,7 +233,7 @@ export const AdminProductDetail = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
                         <div>
                           <Label className="text-copy-light">Stock</Label>
-                          <Text as="p" className={`font-medium text-xs ${
+                          <Text as="p" className={`font-medium text-sm ${
                             variant.stock > 0 ? 'text-success' : 'text-destructive'
                           }`}> 
                             {variant.stock || 0} units
@@ -241,7 +241,7 @@ export const AdminProductDetail = () => {
                         </div>
                         <div>
                           <Label className="text-copy-light">Status</Label>
-                          <Text as="p" className="font-medium text-xs">
+                          <Text as="p" className="font-medium text-sm">
                             {variant.is_active ? 'Active' : 'Inactive'}
                           </Text>
                         </div>
@@ -250,7 +250,7 @@ export const AdminProductDetail = () => {
                       <div className="grid grid-cols-1 md:grid-cols-1 gap-2 text-[11px]">
                         <div>
                           <Label className="text-copy-light">Attributes</Label>
-                          <Text as="p" className="font-medium text-xs">
+                          <Text as="p" className="font-medium text-sm">
                             {variant.attributes ? Object.entries(variant.attributes).map(([k, v]) => 
                               `${k}: ${v}`).join(', ') : 'None'}
                           </Text>
@@ -302,8 +302,8 @@ export const AdminProductDetail = () => {
               
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-copy-light text-xs">Price Range:</span>
-                  <span className="font-medium text-xs">
+                  <span className="text-copy-light text-sm">Price Range:</span>
+                  <span className="font-medium text-sm">
                     ${product.price_range?.min?.toFixed(2) || '0.00'} - 
                     ${product.price_range?.max?.toFixed(2) || '0.00'}
                   </span>
@@ -317,8 +317,8 @@ export const AdminProductDetail = () => {
               
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-copy-light text-xs">Purchases:</span>
-                  <span className="font-medium text-xs">{product.purchase_count || 0}</span>
+                  <span className="text-copy-light text-sm">Purchases:</span>
+                  <span className="font-medium text-sm">{product.purchase_count || 0}</span>
                 </div>
               </div>
             </div>
@@ -329,8 +329,8 @@ export const AdminProductDetail = () => {
               
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-copy-light text-xs">In Stock:</span>
-                  <span className={`font-medium text-xs ${product.in_stock ? 'text-success' : 'text-destructive'}`}>
+                  <span className="text-copy-light text-sm">In Stock:</span>
+                  <span className={`font-medium text-sm ${product.in_stock ? 'text-success' : 'text-destructive'}`}>
                     {product.in_stock ? 'Yes' : 'No'}
                   </span>
                 </div>
@@ -348,7 +348,7 @@ export const AdminProductDetail = () => {
                   {(typeof product.tags === 'string' ? product.tags.split(',') : product.tags).map((tag: string, index: number) => (
                     <span
                       key={index}
-                      className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs font-medium"
+                      className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-sm font-medium"
                     >
                       {tag.trim()}
                     </span>
@@ -367,10 +367,10 @@ export const AdminProductDetail = () => {
                 <div className="space-y-1.5">
                   {Object.entries(product.specifications).map(([key, value]: [string, any]) => (
                     <div key={key} className="flex justify-between items-start py-1.5 border-b border-border-light last:border-0">
-                      <span className="text-copy-light text-xs font-medium capitalize">
+                      <span className="text-copy-light text-sm font-medium capitalize">
                         {key.replace(/_/g, ' ')}:
                       </span>
-                      <span className="text-copy text-xs text-right max-w-[60%]">
+                      <span className="text-copy text-sm text-right max-w-[60%]">
                         {typeof value === 'object' ? JSON.stringify(value) : String(value)}
                       </span>
                     </div>
@@ -395,7 +395,7 @@ export const AdminProductDetail = () => {
                   ).map((tag: string, index: number) => (
                     <span
                       key={index}
-                      className="px-2 py-0.5 bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light rounded text-xs font-medium inline-flex items-center gap-1"
+                      className="px-2 py-0.5 bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light rounded text-sm font-medium inline-flex items-center gap-1"
                     >
                       <span className="w-1 h-1 rounded-full bg-primary"></span>
                       {tag.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -409,7 +409,7 @@ export const AdminProductDetail = () => {
             {product.origin && (
               <div className="bg-surface rounded-lg border border-border-light p-4">
                 <h2 className="text-base font-semibold text-copy mb-3">Origin</h2>
-                <p className="text-copy text-xs">{product.origin}</p>
+                <p className="text-copy text-sm">{product.origin}</p>
               </div>
             )}
           </div>

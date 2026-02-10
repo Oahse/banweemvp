@@ -5,9 +5,8 @@ import toast from 'react-hot-toast';
 import AdminAPI from '@/api/admin';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/components/layout/AdminLayout';
-import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
-import { UserDetailSkeleton } from '@/components/skeletons/UsersSkeleton';
+import AdminLayoutSkeleton from '@/features/protected/admin/components/skeletons/AdminLayoutSkeleton';
+import { UserDetailSkeleton } from '@/features/protected/admin/components/skeletons/UsersSkeleton';
 import { Button } from '@/components/ui/Button';
 
 interface UserDetailData {
@@ -131,14 +130,11 @@ export const UserDetail = () => {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <UserDetailSkeleton />
-      </AdminLayout>
+      <UserDetailSkeleton />
     );
   }
 
   return (
-    <AdminLayout>
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex items-center justify-between">
         <div>
@@ -152,7 +148,7 @@ export const UserDetail = () => {
             Back to Users
           </Button>
           <h1 className="text-xl lg:text-2xl font-semibold mt-2">User Details</h1>
-          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+          <p className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
             {user?.email || 'User'}
           </p>
         </div>
@@ -292,7 +288,6 @@ export const UserDetail = () => {
         </form>
       </div>
     </div>
-    </AdminLayout>
   );
 };
 

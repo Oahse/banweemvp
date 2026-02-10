@@ -115,7 +115,7 @@ export const SupplierDetail = () => {
                 <UserIcon className="w-10 h-10 text-primary" />
               </div>
               <div>
-                <Heading level={1} className="text-2xl font-bold text-main mb-2">
+                <Heading level={5} className="text-2xl font-bold text-main mb-2">
                   {supplier.firstname} {supplier.lastname}
                 </Heading>
                 {supplier.company && (
@@ -171,7 +171,7 @@ export const SupplierDetail = () => {
           <div className="lg:col-span-1">
             {/* Stats */}
             <div className="bg-surface rounded-lg p-6 mb-6">
-              <Heading level={3} className="font-semibold text-main mb-4">Statistics</Heading>
+              <Heading level={5} className="font-semibold text-main mb-4">Statistics</Heading>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-primary">{supplier.product_count || 0}</div>
@@ -224,20 +224,20 @@ export const SupplierDetail = () => {
                   <div className="space-y-4">
                     {supplier.bio && (
                       <div>
-                        <Heading level={4} className="font-medium text-main mb-2">About</Heading>
+                        <Heading level={5} className="font-medium text-main mb-2">About</Heading>
                         <Body className="text-sm text-copy-light">{supplier.bio}</Body>
                       </div>
                     )}
 
                     {supplier.specialties && supplier.specialties.length > 0 && (
                       <div>
-                        <Heading level={4} className="font-medium text-main mb-2">Specialties</Heading>
+                        <Heading level={5} className="font-medium text-main mb-2">Specialties</Heading>
                         <div className="flex flex-wrap gap-2">
                           {supplier.specialties.map((specialty: any, index: number) => (
                             <Text
                               key={index}
                               as="span"
-                              className="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                              className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full"
                             >
                               {specialty}
                             </Text>
@@ -248,14 +248,14 @@ export const SupplierDetail = () => {
 
                     {supplier.founded_year && (
                       <div>
-                        <Heading level={4} className="font-medium text-main mb-2">Founded</Heading>
+                        <Heading level={5} className="font-medium text-main mb-2">Founded</Heading>
                         <Body className="text-sm text-copy-light">{supplier.founded_year}</Body>
                       </div>
                     )}
 
                     {supplier.website && (
                       <div>
-                        <Heading level={4} className="font-medium text-main mb-2">Website</Heading>
+                        <Heading level={5} className="font-medium text-main mb-2">Website</Heading>
                         <a
                           href={supplier.website}
                           target="_blank"
@@ -273,26 +273,26 @@ export const SupplierDetail = () => {
                 {activeTab === 'contact' && (
                   <div className="space-y-4">
                     <div>
-                      <Heading level={4} className="font-medium text-main mb-2">Business Hours</Heading>
+                      <Heading level={5} className="font-medium text-main mb-2">Business Hours</Heading>
                       <Body className="text-sm text-copy-light">
                         {supplier.business_hours || 'Monday - Friday: 9:00 AM - 6:00 PM'}
                       </Body>
                     </div>
 
                     <div>
-                      <Heading level={4} className="font-medium text-main mb-2">Response Time</Heading>
+                      <Heading level={5} className="font-medium text-main mb-2">Response Time</Heading>
                       <Body className="text-sm text-copy-light">
                         {supplier.response_time || 'Usually responds within 24 hours'}
                       </Body>
                     </div>
 
                     <div>
-                      <Heading level={4} className="font-medium text-main mb-2">Languages</Heading>
+                      <Heading level={5} className="font-medium text-main mb-2">Languages</Heading>
                       <div className="flex flex-wrap gap-2">
                         {(supplier.languages || ['English']).map((lang: any, index: number) => (
                           <span
                             key={index}
-                            className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                            className="px-2 py-1 bg-gray-100 text-gray-700 text-sm rounded"
                           >
                             {lang}
                           </span>
@@ -309,7 +309,7 @@ export const SupplierDetail = () => {
           <div className="lg:col-span-2">
             <div className="bg-surface rounded-lg p-6">
               <div className="flex items-center justify-between mb-6">
-                <Heading level={3} className="text-lg font-semibold text-main">Products</Heading>
+                <Heading level={5} className="text-lg font-semibold text-main">Products</Heading>
                 <div className="flex items-center text-sm text-copy-light">
                   <PackageIcon className="w-4 h-4 mr-1" />
                   {products.length} products
@@ -351,7 +351,7 @@ export const SupplierDetail = () => {
               ) : (
                 <div className="text-center py-12">
                   <PackageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <Heading level={3} className="text-lg font-medium text-main mb-2">No products available</Heading>
+                  <Heading level={5} className="text-lg font-medium text-main mb-2">No products available</Heading>
                   <Body className="text-copy-light">
                     This supplier hasn't added any products yet.
                   </Body>

@@ -153,7 +153,7 @@ export const MobileCategories = ({
             <span className="text-primary mr-2">📞</span>
             <div>
               <span className="block text-sm font-medium text-main">1900100888</span>
-              <span className="block text-xs text-copy-light">Support Center</span>
+              <span className="block text-sm text-copy-light">Support Center</span>
             </div>
           </div>
         </div>

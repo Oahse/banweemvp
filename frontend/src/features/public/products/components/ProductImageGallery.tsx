@@ -162,7 +162,7 @@ export const ProductImageGallery = ({
                 className="w-full h-full object-cover"
               />
               {image.is_primary && (
-                <div className="absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded">
+                <div className="absolute top-1 left-1 bg-primary text-white text-sm px-1 rounded">
                   Primary
                 </div>
               )}

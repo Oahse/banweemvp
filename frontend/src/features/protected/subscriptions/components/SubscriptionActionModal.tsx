@@ -106,7 +106,7 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
             <Icon className={`w-5 h-5 ${config.iconColor}`} />
           </div>
           <div>
-            <Heading level={3} className="text-lg font-semibold">
+            <Heading level={5} className="text-lg font-semibold">
               {config.title}
             </Heading>
             <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -124,7 +124,7 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
               <div className="flex items-start gap-3">
                 <AlertTriangleIcon className="w-5 h-5 mt-0.5 flex-shrink-0 text-red-500" />
                 <div>
-                  <Heading level={4} className="font-semibold text-sm mb-1 text-red-800">
+                  <Heading level={5} className="font-semibold text-sm mb-1 text-red-800">
                     {config.warning}
                   </Heading>
                   <Body className="text-sm text-red-700">
@@ -177,10 +177,10 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
               }`}
             />
             <div className="flex justify-between items-center mt-1">
-              <p className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 {config.reasonHelp}
               </p>
-              <span className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+              <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 {reason.length}/500
               </span>
             </div>

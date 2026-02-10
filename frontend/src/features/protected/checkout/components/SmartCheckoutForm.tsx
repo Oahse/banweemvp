@@ -380,8 +380,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <AnimatedLoader size="md" variant="spinner" />
-        <span className="ml-2">Loading checkout...</span>
+        <AnimatedLoader size="md" variant="petals" text="Loading checkout..." />
       </div>
     );
   }
@@ -389,7 +388,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   return (
     <div className="min-h-screen bg-surface dark:bg-surface-dark">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        <Heading level={1} weight="medium">Checkout</Heading>
+        <Heading level={5} weight="medium">Checkout</Heading>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Form */}
           <div className="lg:col-span-2">
@@ -578,7 +577,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
               variant="primary"
               fullWidth={true}
               isLoading={processingPayment}
-              className="py-2 text-xs font-medium"
+              className="py-2 text-sm font-medium"
             >
               {processingPayment ? 'Processing Payment...' : 'Complete Order'}
             </Button>

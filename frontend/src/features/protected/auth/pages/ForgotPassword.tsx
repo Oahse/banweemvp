@@ -73,8 +73,8 @@ export const ForgotPassword = () => {
         className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light"
         variants={itemVariants}
       >
-        <Heading level={1} className="text-xl font-bold text-main mb-4 text-center">Forgot Your Password?</Heading>
-        <Body className="text-xs text-copy-light text-center mb-4">
+        <Heading level={5} className="text-xl font-bold text-main mb-4 text-center">Forgot Your Password?</Heading>
+        <Body className="text-sm text-copy-light text-center mb-4">
           Enter your email address below and we'll send you a link to reset your password.
         </Body>
         <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
@@ -98,7 +98,7 @@ export const ForgotPassword = () => {
             {loading ? 'Sending...' : 'Send Reset Link'}
           </Button>
         </motion.form>
-        <motion.p className="text-center mt-4 text-xs text-copy-light" variants={itemVariants}>
+        <motion.p className="text-center mt-4 text-sm text-copy-light" variants={itemVariants}>
           Remember your password? <Link to="/login" className="text-primary hover:underline">Login</Link>
         </motion.p>
       </motion.div>

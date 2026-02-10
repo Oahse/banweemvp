@@ -252,7 +252,7 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div>
-              <Heading level={2} className="text-xl font-bold text-gray-900">Negotiate Price</Heading>
+              <Heading level={5} className="text-xl font-bold text-gray-900">Negotiate Price</Heading>
               <Body className="text-sm text-gray-600">{product.name}</Body>
             </div>
             <Button
@@ -364,7 +364,7 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
 
                 {rounds.length > 0 && (
                   <div className="space-y-4">
-                    <Heading level={3} className="font-medium text-gray-900">Negotiation Rounds</Heading>
+                    <Heading level={5} className="font-medium text-gray-900">Negotiation Rounds</Heading>
                     <div className="space-y-3 max-h-60 overflow-y-auto">
                       {rounds.map((round) => (
                         <motion.div
@@ -446,7 +446,7 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
 
                 {rounds.length > 0 && (
                   <div className="space-y-4">
-                    <Heading level={3} className="font-medium text-gray-900">Final Negotiation Summary</Heading>
+                    <Heading level={5} className="font-medium text-gray-900">Final Negotiation Summary</Heading>
                     <div className="space-y-3 max-h-60 overflow-y-auto">
                       {rounds.map((round) => (
                         <div

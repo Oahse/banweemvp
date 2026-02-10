@@ -104,7 +104,7 @@ export const Profile = () => {
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> First Name</Label>
+            <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> First Name</Label>
             <input
               name="firstname"
               type="text"
@@ -113,10 +113,10 @@ export const Profile = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
-            {errors.firstname && <Text variant="caption" className="text-xs text-red-500">{errors.firstname}</Text>}
+            {errors.firstname && <Text variant="caption" className="text-sm text-red-500">{errors.firstname}</Text>}
           </div>
           <div>
-            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Last Name</Label>
+            <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Last Name</Label>
             <input
               name="lastname"
               type="text"
@@ -125,10 +125,10 @@ export const Profile = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
-            {errors.lastname && <Text variant="caption" className="text-xs text-red-500">{errors.lastname}</Text>}
+            {errors.lastname && <Text variant="caption" className="text-sm text-red-500">{errors.lastname}</Text>}
           </div>
           <div>
-            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><MailIcon size={16}/> Email</Label>
+            <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><MailIcon size={16}/> Email</Label>
             <input
               name="email"
               type="email"
@@ -138,7 +138,7 @@ export const Profile = () => {
             />
           </div>
           <div>
-            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><PhoneIcon size={16}/> Phone</Label>
+            <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><PhoneIcon size={16}/> Phone</Label>
             <input
               name="phone"
               type="text"
@@ -147,10 +147,10 @@ export const Profile = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
-            {errors.phone && <Text variant="caption" className="text-xs text-red-500">{errors.phone}</Text>}
+            {errors.phone && <Text variant="caption" className="text-sm text-red-500">{errors.phone}</Text>}
           </div>
           <div>
-            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><CalendarIcon size={16}/> Date of Birth</Label>
+            <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><CalendarIcon size={16}/> Date of Birth</Label>
             <DateTimeDropdown
               value={formData.age}
               onChange={date => setFormData(prev => ({ ...prev, age: date }))}
@@ -158,17 +158,17 @@ export const Profile = () => {
               className="w-full"
               disabled={!isEditing}
             />
-            {errors.age && <Text variant="caption" className="text-xs text-red-500">{errors.age}</Text>}
+            {errors.age && <Text variant="caption" className="text-sm text-red-500">{errors.age}</Text>}
           </div>
           <div>
-            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Gender</Label>
+            <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><UserIcon size={16}/> Gender</Label>
             <div className="relative">
               <Button
                 type="button"
                 disabled={!isEditing}
                 variant="outline"
                 size="sm"
-                className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
                 onClick={() => {
                   if (!isEditing) return;
                   setShowGenderDropdown((prev) => !prev);
@@ -181,7 +181,7 @@ export const Profile = () => {
                   {['male', 'female', 'other'].map(option => (
                     <li
                       key={option}
-                      className="px-3 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      className="px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                       onClick={() => {
                         setFormData(prev => ({ ...prev, gender: option }));
                         setShowGenderDropdown(false);
@@ -194,14 +194,14 @@ export const Profile = () => {
           </div>
           
           <div>
-            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><GlobeIcon size={16}/> Language</Label>
+            <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><GlobeIcon size={16}/> Language</Label>
             <div className="relative">
               <Button
                 type="button"
                 disabled={!isEditing}
                 variant="outline"
                 size="sm"
-                className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
                 onClick={() => {
                   if (!isEditing) return;
                   setShowLanguageDropdown((prev) => !prev);
@@ -214,7 +214,7 @@ export const Profile = () => {
                   {languageOptions.map(option => (
                     <li
                       key={option.value}
-                      className="px-3 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      className="px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                       onClick={() => {
                         setFormData(prev => ({ ...prev, language: option.value }));
                         setShowLanguageDropdown(false);
@@ -227,13 +227,13 @@ export const Profile = () => {
           </div>
           
           <div>
-            <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><SaveIcon size={16}/> Account Status</Label>
+            <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1"><SaveIcon size={16}/> Account Status</Label>
             <input
               name="is_active"
               type="text"
               value={formData.is_active ? 'Active' : 'Inactive'}
               disabled
-              className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
+              className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-primary focus:border-primary"
             />
           </div>
         </div>

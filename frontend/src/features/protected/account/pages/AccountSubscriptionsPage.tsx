@@ -89,16 +89,16 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
 
   return (
     <div className="max-w-3xl mx-auto p-4 bg-white rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <Heading level={2} className="text-lg font-semibold mb-4 flex items-center gap-2"><CalendarIcon size={20} /> My Subscriptions</Heading>
+      <Heading level={5} className="text-lg font-semibold mb-4 flex items-center gap-2"><CalendarIcon size={20} /> My Subscriptions</Heading>
       <div className="space-y-3">
         {subscriptions.map((sub: Subscription) => (
           <div key={sub.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
             <div className="flex items-center justify-between mb-2">
               <div>
                 <Text as="span" className="text-sm font-medium">{sub.subscription_plan?.name || 'Plan'}</Text>
-                <Caption className="ml-2 text-xs text-gray-500">{sub.subscription_plan?.billing_interval || 'Interval'}</Caption>
+                <Caption className="ml-2 text-sm text-gray-500">{sub.subscription_plan?.billing_interval || 'Interval'}</Caption>
               </div>
-              <Caption className={`px-2 py-1 text-xs rounded-full ${
+              <Caption className={`px-2 py-1 text-sm rounded-full ${
                 sub.status === 'active' ? 'bg-green-100 text-green-700' :
                 sub.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
                 sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :

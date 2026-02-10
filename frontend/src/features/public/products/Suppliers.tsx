@@ -79,7 +79,7 @@ export const Suppliers = () => {
       <div className="bg-surface border-b border-border animate-slide-in">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center mb-8">
-            <Heading level={1} className="text-3xl font-bold text-main mb-2">Our Suppliers</Heading>
+            <Heading level={5} className="text-3xl font-bold text-main mb-2">Our Suppliers</Heading>
             <Body className="text-copy-light max-w-2xl mx-auto">
               Connect with our trusted network of verified suppliers who provide the highest quality agricultural products
             </Body>
@@ -144,7 +144,7 @@ export const Suppliers = () => {
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <UserIcon className="w-8 h-8 text-gray-400" />
             </div>
-            <Heading level={3} className="text-lg font-medium text-main mb-2">No suppliers found</Heading>
+            <Heading level={5} className="text-lg font-medium text-main mb-2">No suppliers found</Heading>
             <Body className="text-copy-light">
               {searchQuery ? 'Try adjusting your search terms' : 'Check back later for new suppliers'}
             </Body>
@@ -167,7 +167,7 @@ export const Suppliers = () => {
                         <UserIcon className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <Heading level={3} className="font-semibold text-main">
+                        <Heading level={5} className="font-semibold text-main">
                           {supplier.firstname} {supplier.lastname}
                         </Heading>
                         {supplier.company && (
@@ -214,15 +214,15 @@ export const Suppliers = () => {
                   <div className="flex items-center justify-between text-sm mb-4">
                       <div className="text-center">
                       <div className="font-semibold text-main">{supplier.product_count || 0}</div>
-                      <Text as="span" className="text-copy-light text-xs">Products</Text>
+                      <Text as="span" className="text-copy-light text-sm">Products</Text>
                     </div>
                     <div className="text-center">
                       <div className="font-semibold text-main">{supplier.rating_average?.toFixed(1) || '0.0'}</div>
-                      <Text as="span" className="text-copy-light text-xs">Rating</Text>
+                      <Text as="span" className="text-copy-light text-sm">Rating</Text>
                     </div>
                     <div className="text-center">
                       <div className="font-semibold text-main">{supplier.review_count || 0}</div>
-                      <Text as="span" className="text-copy-light text-xs">Reviews</Text>
+                      <Text as="span" className="text-copy-light text-sm">Reviews</Text>
                     </div>
                   </div>
 
@@ -239,13 +239,13 @@ export const Suppliers = () => {
                           <Text
                             key={idx}
                             as="span"
-                            className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                            className="px-2 py-1 bg-primary/10 text-primary text-sm rounded-full"
                           >
                             {specialty}
                           </Text>
                         ))}
                         {supplier.specialties.length > 3 && (
-                          <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                          <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">
                             +{supplier.specialties.length - 3} more
                           </Text>
                         )}

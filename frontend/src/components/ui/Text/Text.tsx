@@ -29,7 +29,7 @@ const textVariants = cva(
         'body-lg': 'text-lg leading-relaxed tracking-normal',
         
         // UI text variants
-        caption: 'text-xs leading-normal tracking-normal',
+        caption: 'text-sm leading-normal tracking-normal',
         label: 'text-sm font-medium leading-normal tracking-normal',
         description: 'text-sm leading-relaxed tracking-normal',
         

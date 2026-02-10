@@ -360,7 +360,7 @@ export const Cart = () => {
             </div>
           </div>
           <div className="col-span-2 text-center text-sm">
-            <Text as="span" className="md:hidden font-medium text-copy text-xs">Price: </Text>
+            <Text as="span" className="md:hidden font-medium text-copy text-sm">Price: </Text>
             <div>
               <Text as="span" className="font-medium text-primary text-sm">
                 {formatCurrency(
@@ -371,7 +371,7 @@ export const Cart = () => {
               </Text>
               {/* Show discount if applicable */}
               {item.variant?.discount_percentage && item.variant.discount_percentage > 0 && (
-                <Text className="text-xs text-gray-500 line-through">
+                <Text className="text-sm text-gray-500 line-through">
                   <Text variant="caption">{formatCurrency(item.variant.base_price || 0)}</Text>
                 </Text>
               )}
@@ -415,7 +415,7 @@ export const Cart = () => {
             </div>
           </div>
           <div className="col-span-2 text-center text-sm">
-            <Text as="span" className="md:hidden font-medium text-copy text-xs">Subtotal: </Text>
+            <Text as="span" className="md:hidden font-medium text-copy text-sm">Subtotal: </Text>
             <Text as="span" className="font-medium text-copy text-sm">
               {formatCurrency(
                 !isNaN(item.total_price) && item.total_price > 0 
@@ -443,7 +443,7 @@ export const Cart = () => {
     >
       {/* Breadcrumb */}
       <motion.nav 
-        className="flex mb-4 text-xs"
+        className="flex mb-4 text-sm"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -462,7 +462,7 @@ export const Cart = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <Heading level={1} weight="bold">Shopping Cart</Heading>
+        <Heading level={5} weight="bold">Shopping Cart</Heading>
       </motion.h1>
 
       {cartItems.length === 0 ? (
@@ -475,7 +475,7 @@ export const Cart = () => {
           <Text className="w-12 h-12 mx-auto mb-3 rounded-full bg-background flex items-center justify-center">
             <ShoppingCartIcon size={24} className="text-copy-lighter" />
           </Text>
-          <Heading level={2} weight="medium">Your cart is empty</Heading>
+          <Heading level={5} weight="medium">Your cart is empty</Heading>
           <Text variant="body-sm" tone="secondary">Looks like you haven't added any products to your cart yet.</Text>
           <Link
             to="/products"
@@ -493,7 +493,7 @@ export const Cart = () => {
           {/* Cart Items */}
           <div className="lg:w-2/3">
             <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
-              <div className="hidden md:grid grid-cols-12 gap-4 p-3 bg-background text-copy font-medium text-xs">
+              <div className="hidden md:grid grid-cols-12 gap-4 p-3 bg-background text-copy font-medium text-sm">
                 <Text variant="caption" className="col-span-6">Product</Text>
                 <Text variant="caption" className="col-span-2 text-center">Price</Text>
                 <Text variant="caption" className="col-span-2 text-center">Quantity</Text>
@@ -512,7 +512,7 @@ export const Cart = () => {
           {/* Order Summary */}
           <div className="lg:w-1/3">
             <div className="bg-surface rounded-lg shadow-sm p-4">
-              <Heading level={2} weight="semibold">Order Summary</Heading>
+              <Heading level={5} weight="semibold">Order Summary</Heading>
               
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
@@ -539,7 +539,7 @@ export const Cart = () => {
                 <Text variant="body-sm">Continue Shopping</Text>
               </div>
               <form onSubmit={handleApplyCoupon} className="mb-4">
-                <Label htmlFor="coupon-code" className="block text-xs font-medium mb-2 text-copy">Promo Code (Optional)</Label>
+                <Label htmlFor="coupon-code" className="block text-sm font-medium mb-2 text-copy">Promo Code (Optional)</Label>
                 <div className="flex">
                   <Input
                     id="coupon-code"

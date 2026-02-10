@@ -234,7 +234,7 @@ export const SubscriptionEdit = () => {
     const { color, label } = config[status as keyof typeof config] || config.active;
     
     return (
-      <Text as="span" className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}>
+      <Text as="span" className={`px-3 py-1 rounded-full text-sm font-semibold ${color}`}>
         {label}
       </Text>
     );
@@ -243,8 +243,7 @@ export const SubscriptionEdit = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <Text as="p" className="ml-4 text-gray-600 dark:text-gray-400">Loading subscription...</Text>
+        <AnimatedLoader size="lg" variant="petals" color="primary" text="Loading subscription..." />
       </div>
     );
   }
@@ -282,7 +281,7 @@ export const SubscriptionEdit = () => {
             Back to Subscriptions
           </Button>
           <div>
-            <Heading level={1} className="text-2xl font-bold text-gray-900 dark:text-white">Edit Subscription</Heading>
+            <Heading level={5} className="text-2xl font-bold text-gray-900 dark:text-white">Edit Subscription</Heading>
             <Text as="p" className="text-gray-600 dark:text-gray-400">{subscription.subscription_plan?.name} • {subscription.id.slice(0, 8)}</Text>
           </div>
         </div>
@@ -335,7 +334,7 @@ export const SubscriptionEdit = () => {
           <div className="p-6 space-y-8">
             {/* Main Subscription Info */}
             <div className="bg-gradient-to-r from-[#61b482]/10 to-[#4c9066]/10 dark:from-gray-700 dark:to-gray-600 rounded-xl p-6 border border-[#61b482]/20 dark:border-gray-600">
-              <Heading level={3} className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+              <Heading level={5} className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                 <div className="w-8 h-8 bg-[#61b482] rounded-lg flex items-center justify-center mr-3">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -356,8 +355,8 @@ export const SubscriptionEdit = () => {
                     maxLength={255}
                   />
                   <div className="flex items-center justify-between mt-2">
-                    <Text as="p" className="text-xs text-gray-500 dark:text-gray-400">Give your subscription a descriptive name</Text>
-                    <Text as="span" className="text-xs text-gray-400 dark:text-gray-500">{formData.name.length}/255</Text>
+                    <Text as="p" className="text-sm text-gray-500 dark:text-gray-400">Give your subscription a descriptive name</Text>
+                    <Text as="span" className="text-sm text-gray-400 dark:text-gray-500">{formData.name.length}/255</Text>
                   </div>
                 </div>
                 
@@ -372,14 +371,14 @@ export const SubscriptionEdit = () => {
                     <option value="monthly">Monthly</option>
                     <option value="yearly">Yearly</option>
                   </select>
-                  <Text as="p" className="text-xs text-gray-500 dark:text-gray-400">Choose how often you're billed</Text>
+                  <Text as="p" className="text-sm text-gray-500 dark:text-gray-400">Choose how often you're billed</Text>
                 </div>
               </div>
             </div>
 
             {/* Settings Section */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
-              <Heading level={3} className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+              <Heading level={5} className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                 <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-3">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -410,7 +409,7 @@ export const SubscriptionEdit = () => {
                       </Button>
                       <div>
                         <Text as="span" className="text-sm font-medium text-gray-900 dark:text-white">{formData.auto_renew ? 'Enabled' : 'Disabled'}</Text>
-                        <Text as="p" className="text-xs text-gray-500 dark:text-gray-400">{formData.auto_renew ? 'Automatically renew subscription' : 'Manual renewal required'}</Text>
+                        <Text as="p" className="text-sm text-gray-500 dark:text-gray-400">{formData.auto_renew ? 'Automatically renew subscription' : 'Manual renewal required'}</Text>
                       </div>
                     </div>
                   </div>
@@ -427,7 +426,7 @@ export const SubscriptionEdit = () => {
 
             {/* Timeline Section */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
-              <Heading level={3} className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+              <Heading level={5} className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                 <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -446,7 +445,7 @@ export const SubscriptionEdit = () => {
                     </div>
                     <div>
                       <Text as="p" className="text-sm font-semibold text-gray-900 dark:text-white">Created</Text>
-                      <Text as="p" className="text-xs text-gray-500 dark:text-gray-400">Subscription start date</Text>
+                      <Text as="p" className="text-sm text-gray-500 dark:text-gray-400">Subscription start date</Text>
                     </div>
                   </div>
                   <Text as="span" className="text-sm font-medium text-gray-900 dark:text-white">
@@ -467,7 +466,7 @@ export const SubscriptionEdit = () => {
                     </div>
                     <div>
                       <Text as="p" className="text-sm font-semibold text-gray-900 dark:text-white">Current Period</Text>
-                      <Text as="p" className="text-xs text-gray-500 dark:text-gray-400">Billing period dates</Text>
+                      <Text as="p" className="text-sm text-gray-500 dark:text-gray-400">Billing period dates</Text>
                     </div>
                   </div>
                   <Text as="span" className="text-sm font-medium text-gray-900 dark:text-white">{new Date(subscription.current_period_start).toLocaleDateString()} - {new Date(subscription.current_period_end).toLocaleDateString()}</Text>
@@ -483,7 +482,7 @@ export const SubscriptionEdit = () => {
                       </div>
                       <div>
                         <Text as="p" className="text-sm font-semibold text-gray-900 dark:text-white">Next Billing</Text>
-                        <Text as="p" className="text-xs text-gray-500 dark:text-gray-400">Upcoming charge date</Text>
+                        <Text as="p" className="text-sm text-gray-500 dark:text-gray-400">Upcoming charge date</Text>
                       </div>
                     </div>
                     <Text as="span" className="text-sm font-medium text-gray-900 dark:text-white">{new Date(subscription.next_billing_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</Text>
@@ -498,7 +497,7 @@ export const SubscriptionEdit = () => {
         {activeTab === 'products' && (
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <Heading level={3} className="text-lg font-semibold text-gray-900 dark:text-white">Products ({subscription.product_variants?.length || 0})</Heading>
+              <Heading level={5} className="text-lg font-semibold text-gray-900 dark:text-white">Products ({subscription.product_variants?.length || 0})</Heading>
               <Button
                 onClick={() => {
                   setSelectedVariants([]);
@@ -529,9 +528,9 @@ export const SubscriptionEdit = () => {
                     </div>
                   )}
                   <div className="flex-1">
-                    <Heading level={4} className="font-medium text-gray-900 dark:text-white">{variant.name}</Heading>
+                    <Heading level={5} className="font-medium text-gray-900 dark:text-white">{variant.name}</Heading>
                     <Text as="p" className="text-sm text-gray-600 dark:text-gray-400">{variant.product?.name}</Text>
-                    <Text as="p" className="text-xs text-gray-500 dark:text-gray-500">SKU: {variant.sku}</Text>
+                    <Text as="p" className="text-sm text-gray-500 dark:text-gray-500">SKU: {variant.sku}</Text>
                   </div>
                   <div className="text-right">
                     <Text as="p" className="font-medium text-gray-900 dark:text-white">{formatCurrency(variant.price, subscription.currency)}</Text>
@@ -558,11 +557,11 @@ export const SubscriptionEdit = () => {
         {/* Billing Tab */}
         {activeTab === 'billing' && (
           <div className="p-6 space-y-6">
-            <Heading level={3} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Billing Information</Heading>
+            <Heading level={5} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Billing Information</Heading>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <Heading level={4} className="font-medium text-gray-900 dark:text-white">Cost Breakdown</Heading>
+                <Heading level={5} className="font-medium text-gray-900 dark:text-white">Cost Breakdown</Heading>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Text as="span" className="text-gray-600 dark:text-gray-400">Base Cost:</Text>

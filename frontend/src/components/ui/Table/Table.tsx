@@ -281,7 +281,7 @@ export const TableHeaderCell = forwardRef<HTMLTableCellElement, TableHeaderCellP
         <div className="flex items-center gap-2">
           <span>{children}</span>
           {sortable && (
-            <span className="text-xs opacity-50" aria-hidden="true">
+            <span className="text-sm opacity-50" aria-hidden="true">
               {getSortIcon(sortDirection || null)}
             </span>
           )}

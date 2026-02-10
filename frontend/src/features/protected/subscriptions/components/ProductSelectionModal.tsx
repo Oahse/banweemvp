@@ -278,7 +278,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                             size="sm"
                             className={combineThemeClasses(
                               getButtonClasses('outline'),
-                              'px-3 py-1.5 text-xs'
+                              'px-3 py-1.5 text-sm'
                             )}
                           >
                             {expandedProducts.has(product.id) ? 'Show Less' : 'Show Variants'}
@@ -294,7 +294,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                               selectedVariants.has(product.variants![0].id) 
                                 ? getButtonClasses('primary')
                                 : getButtonClasses('outline'),
-                              'px-3 py-1.5 text-xs'
+                              'px-3 py-1.5 text-sm'
                             )}
                           >
                             {selectedVariants.has(product.variants![0].id) ? 'Selected' : 'Select'}
@@ -333,7 +333,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                               selectedVariants.has(selectedVariantsByProduct[product.id])
                                 ? getButtonClasses('primary')
                                 : getButtonClasses('outline'),
-                              'px-3 py-1.5 text-xs'
+                              'px-3 py-1.5 text-sm'
                             )}
                           >
                             {selectedVariants.has(selectedVariantsByProduct[product.id]) ? 'Selected' : 'Select'}

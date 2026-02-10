@@ -6,8 +6,7 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/components/layout/AdminLayout';
-import { ProductsListSkeleton } from '@/components/skeletons/ProductsSkeleton';
+import { ProductsListSkeleton } from '@/features/protected/admin/components/skeletons/ProductsSkeleton';
 import { ConfirmModal, useModal } from '@/components/ui/Modal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
@@ -279,7 +278,7 @@ const AdminProductsPage = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.active;
     
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <span className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
         {config.label}
       </span>
     );
@@ -287,11 +286,11 @@ const AdminProductsPage = () => {
 
   const stockBadge = (stock: number) => {
     if (stock === 0) {
-      return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-error/20 text-error">Out of Stock</span>;
+      return <span className="px-2 py-1 rounded-full text-sm font-semibold bg-error/20 text-error">Out of Stock</span>;
     } else if (stock <= 10) {
-      return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-warning/20 text-warning">Low Stock ({stock})</span>;
+      return <span className="px-2 py-1 rounded-full text-sm font-semibold bg-warning/20 text-warning">Low Stock ({stock})</span>;
     } else {
-      return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-success/20 text-success">{stock} in Stock</span>;
+      return <span className="px-2 py-1 rounded-full text-sm font-semibold bg-success/20 text-success">{stock} in Stock</span>;
     }
   };
 
@@ -336,13 +335,13 @@ const AdminProductsPage = () => {
       sort_order: 'desc'
     });
   }, []);
+  
 
   return (
-    <AdminLayout>
-      <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
           <div>
-            <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product catalog and inventory</p>
+            <p className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product catalog and inventory</p>
           </div>
           <div className="flex gap-2 w-full lg:w-auto">
             <button
@@ -442,7 +441,7 @@ const AdminProductsPage = () => {
               <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
                 {debouncedSearchQuery && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
                     Search: "{debouncedSearchQuery}"
                     <button
                       onClick={() => setSearchQuery('')}
@@ -453,7 +452,7 @@ const AdminProductsPage = () => {
                   </span>
                 )}
                 {statusFilter && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
                     Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
                     <button
                       onClick={() => setStatusFilter('')}
@@ -464,7 +463,7 @@ const AdminProductsPage = () => {
                   </span>
                 )}
                 {categoryFilter && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
                     Category: {categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
                     <button
                       onClick={() => setCategoryFilter('')}
@@ -480,7 +479,7 @@ const AdminProductsPage = () => {
                     setStatusFilter('');
                     setCategoryFilter('');
                   }}
-                  className="text-xs text-primary hover:text-primary-dark underline"
+                  className="text-sm text-primary hover:text-primary-dark underline"
                 >
                   Clear all
                 </button>
@@ -524,7 +523,6 @@ const AdminProductsPage = () => {
           disabled={isDeleting}
         />
       </div>
-    </AdminLayout>
   );
 };
 

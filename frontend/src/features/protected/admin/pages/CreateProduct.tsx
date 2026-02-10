@@ -231,14 +231,14 @@ const CreateProduct: React.FC = () => {
           >
             <Text variant="body-sm">Back to Products</Text>
           </Button>
-          <Heading level={1}>Create New Product</Heading>
+          <Heading level={5}>Create New Product</Heading>
           <Text variant="body-sm" tone="secondary">Add a new product to your inventory</Text>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Basic Information */}
           <div className={`${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow p-5`}>
-            <Heading level={2} weight="medium">Basic Information</Heading>
+            <Heading level={5} weight="medium">Basic Information</Heading>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label weight="medium">Product Name *</Label>
@@ -374,7 +374,7 @@ const CreateProduct: React.FC = () => {
           {/* Variants */}
           <div className={`${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow p-5`}>
             <div className="flex items-center justify-between mb-3">
-              <Heading level={2} weight="medium">Product Variants</Heading>
+              <Heading level={5} weight="medium">Product Variants</Heading>
               <Button
                 type="button"
                 onClick={addVariant}
@@ -398,7 +398,7 @@ const CreateProduct: React.FC = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Package className="w-4 h-4 text-primary" />
-                      <Heading level={3} weight="medium">Variant {index + 1}</Heading>
+                      <Heading level={5} weight="medium">Variant {index + 1}</Heading>
                     </div>
                     {formData.variants.length > 1 && (
                       <Button

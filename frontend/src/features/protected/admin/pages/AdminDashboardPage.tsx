@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/layout/AdminLayout';
-import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
+import AdminDashboardSkeleton from '@/features/protected/admin/components/skeletons/AdminDashboardSkeleton';
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip, Legend, ResponsiveContainer
@@ -35,14 +35,14 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, color, 
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <Body className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">{title}</Body>
+          <Body className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-0.5">{title}</Body>
           {loading ? (
             <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
           ) : (
-            <Heading level={3} className="text-xl font-bold text-gray-900 dark:text-white">{value}</Heading>
+            <Heading level={5} className="text-xl font-bold text-gray-900 dark:text-white">{value}</Heading>
           )}
           {change !== undefined && (
-            <div className={`flex items-center mt-1 text-xs ${
+            <div className={`flex items-center mt-1 text-sm ${
               isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'
             }`}>
               {isPositive ? <ArrowUpRight className="w-3 h-3 mr-0.5" /> : 
@@ -134,13 +134,12 @@ const AdminDashboard: React.FC = () => {
   };
 
   if (loading) {
-    return <AdminLayoutSkeleton />;
+    return <AdminDashboardSkeleton />;
   }
 
   if (error) {
     return (
-      <AdminLayout>
-        <div className="flex flex-col items-center justify-center h-96">
+      <div className="flex flex-col items-center justify-center h-96">
           <div className="text-red-600 dark:text-red-400 text-lg mb-3">{error}</div>
           <Button
             onClick={fetchDashboardData}
@@ -150,7 +149,6 @@ const AdminDashboard: React.FC = () => {
             Refresh Dashboard
           </Button>
         </div>
-      </AdminLayout>
     );
   }
 
@@ -171,8 +169,7 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-4">
+    <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -232,7 +229,7 @@ const AdminDashboard: React.FC = () => {
           {/* Revenue Chart */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-3">
-              <Heading level={3} className="text-sm font-semibold text-gray-900 dark:text-white">Revenue Trend</Heading>
+              <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white">Revenue Trend</Heading>
               <TrendingUp className="w-4 h-4 text-green-600" />
             </div>
             {chartData.length > 0 ? (
@@ -279,7 +276,7 @@ const AdminDashboard: React.FC = () => {
           {/* Orders Chart */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-3">
-              <Heading level={3} className="text-sm font-semibold text-gray-900 dark:text-white">Orders Trend</Heading>
+              <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white">Orders Trend</Heading>
               <Activity className="w-4 h-4 text-blue-600" />
             </div>
             {chartData.length > 0 ? (
@@ -325,39 +322,39 @@ const AdminDashboard: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-2">
-              <Heading level={3} className="text-xs font-medium text-gray-600 dark:text-gray-400">Active Users</Heading>
+              <Heading level={5} className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Users</Heading>
               <Users className="w-4 h-4 text-green-600" />
             </div>
             <Body className="text-xl font-bold text-gray-900 dark:text-white mb-1">
               {overview.active_users?.toLocaleString() || '0'}
             </Body>
-            <Body className="text-xs text-gray-600 dark:text-gray-400">
+            <Body className="text-sm text-gray-600 dark:text-gray-400">
               of {overview.total_users?.toLocaleString() || '0'} total users
             </Body>
           </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-2">
-              <Heading level={3} className="text-xs font-medium text-gray-600 dark:text-gray-400">Active Products</Heading>
+              <Heading level={5} className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Products</Heading>
               <Package className="w-4 h-4 text-blue-600" />
             </div>
             <Body className="text-xl font-bold text-gray-900 dark:text-white mb-1">
               {overview.active_products?.toLocaleString() || '0'}
             </Body>
-            <Body className="text-xs text-gray-600 dark:text-gray-400">
+            <Body className="text-sm text-gray-600 dark:text-gray-400">
               of {overview.total_products?.toLocaleString() || '0'} total products
             </Body>
           </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-2">
-              <Heading level={3} className="text-xs font-medium text-gray-600 dark:text-gray-400">Active Subscriptions</Heading>
+              <Heading level={5} className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Subscriptions</Heading>
               <Activity className="w-4 h-4 text-purple-600" />
             </div>
             <Body className="text-xl font-bold text-gray-900 dark:text-white mb-1">
               {overview.active_subscriptions?.toLocaleString() || '0'}
             </Body>
-            <Body className="text-xs text-gray-600 dark:text-gray-400">
+            <Body className="text-sm text-gray-600 dark:text-gray-400">
               of {overview.total_subscriptions?.toLocaleString() || '0'} total subscriptions
             </Body>
           </div>
@@ -369,7 +366,7 @@ const AdminDashboard: React.FC = () => {
           {stats?.recent_orders && stats.recent_orders.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
               <div className="flex items-center justify-between mb-3">
-                <Heading level={3} className="text-sm font-semibold text-gray-900 dark:text-white">Recent Orders</Heading>
+                <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white">Recent Orders</Heading>
                 <Button
                   onClick={() => navigate('/admin/orders')}
                   variant="primary"
@@ -389,7 +386,7 @@ const AdminDashboard: React.FC = () => {
                       <Body className="text-sm font-medium text-gray-900 dark:text-white">
                         {order.user?.firstname} {order.user?.lastname}
                       </Body>
-                      <Body className="text-xs text-gray-600 dark:text-gray-400">
+                      <Body className="text-sm text-gray-600 dark:text-gray-400">
                         {order.user_email}
                       </Body>
                     </div>
@@ -397,7 +394,7 @@ const AdminDashboard: React.FC = () => {
                       <Body className="text-sm font-semibold text-gray-900 dark:text-white">
                         ${order.total_amount?.toFixed(2)}
                       </Body>
-                      <Text className={`inline-block px-2 py-0.5 text-xs rounded-full ${
+                      <Text className={`inline-block px-2 py-0.5 text-sm rounded-full ${
                         order.status === 'completed' ? 'bg-green-100 text-green-800' :
                         order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                         order.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
@@ -415,7 +412,7 @@ const AdminDashboard: React.FC = () => {
           {/* Users Growth Chart */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-3">
-              <Heading level={3} className="text-sm font-semibold text-gray-900 dark:text-white">Users Growth</Heading>
+              <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white">Users Growth</Heading>
               <Users className="w-4 h-4 text-purple-600" />
             </div>
             {chartData.length > 0 ? (
@@ -461,7 +458,7 @@ const AdminDashboard: React.FC = () => {
         {stats?.recent_users && stats.recent_users.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-3">
-              <Heading level={3} className="text-sm font-semibold text-gray-900 dark:text-white">Recent Users</Heading>
+              <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white">Recent Users</Heading>
               <Button
                 onClick={() => navigate('/admin/users')}
                 variant="primary"
@@ -478,19 +475,19 @@ const AdminDashboard: React.FC = () => {
                   onClick={() => navigate(`/admin/users/${user.id}`)}
                 >
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
                       {user.firstname?.[0]}{user.lastname?.[0]}
                     </div>
                     <div>
                       <Body className="text-sm font-medium text-gray-900 dark:text-white">
                         {user.firstname} {user.lastname}
                       </Body>
-                      <Body className="text-xs text-gray-600 dark:text-gray-400">
+                      <Body className="text-sm text-gray-600 dark:text-gray-400">
                         {user.email}
                       </Body>
                     </div>
                   </div>
-                  <Text className={`inline-block px-2 py-0.5 text-xs rounded-full ${
+                  <Text className={`inline-block px-2 py-0.5 text-sm rounded-full ${
                     user.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                   }`}>
                     {user.is_active ? 'Active' : 'Inactive'}
@@ -505,7 +502,7 @@ const AdminDashboard: React.FC = () => {
         {stats?.top_products && stats.top_products.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between mb-3">
-              <Heading level={3} className="text-sm font-semibold text-gray-900 dark:text-white">Top Products</Heading>
+              <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white">Top Products</Heading>
               <Button
                 onClick={() => navigate('/admin/products')}
                 variant="primary"
@@ -522,7 +519,7 @@ const AdminDashboard: React.FC = () => {
                   onClick={() => navigate(`/admin/products/${product.id}`)}
                 >
                   <div className="flex items-center space-x-2">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs`}
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-sm`}
                          style={{ backgroundColor: COLORS[index % COLORS.length] }}>
                       #{index + 1}
                     </div>
@@ -530,7 +527,7 @@ const AdminDashboard: React.FC = () => {
                       <Body className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {product.name}
                       </Body>
-                      <Body className="text-xs text-gray-600 dark:text-gray-400">
+                      <Body className="text-sm text-gray-600 dark:text-gray-400">
                         {product.sales || 0} sales
                       </Body>
                     </div>
@@ -541,7 +538,6 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
       </div>
-    </AdminLayout>
   );
 };
 

@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { RefundsListSkeleton } from '@/components/skeletons/RefundsSkeleton';
+import { RefundsListSkeleton } from '@/features/protected/admin/components/skeletons/RefundsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
@@ -389,7 +389,7 @@ export const Refunds = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center py-20">
-          <AnimatedLoader size="md" variant="spinner" color="primary" text="Loading refunds..." />
+          <AnimatedLoader size="md" variant="petals" color="primary" text="Loading refunds..." />
         </div>
       </AdminLayout>
     );
@@ -442,7 +442,7 @@ export const Refunds = () => {
         <Modal isOpen={detailsModal.isOpen} onClose={detailsModal.close} size="xl">
           <ModalHeader>
             <div>
-              <Heading level={3} className="text-lg font-semibold">Refund Details</Heading>
+              <Heading level={5} className="text-lg font-semibold">Refund Details</Heading>
               <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 {viewingRefund?.refund_number || viewingRefund?.id}
               </Body>
@@ -452,7 +452,7 @@ export const Refunds = () => {
           <ModalBody>
             {detailsLoading ? (
               <div className="flex items-center justify-center py-10">
-                <AnimatedLoader size="sm" variant="spinner" color="primary" text="Loading details..." />
+                <AnimatedLoader size="sm" variant="petals" color="primary" text="Loading details..." />
               </div>
             ) : viewingRefund && (
               <div className="space-y-4">
@@ -523,7 +523,7 @@ export const Refunds = () => {
                             <Text className="font-mono">${item.total_refund_amount.toFixed(2)}</Text>
                           </div>
                           {item.condition_notes && (
-                            <Body className={`mt-1 text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <Body className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                               Notes: {item.condition_notes}
                             </Body>
                           )}

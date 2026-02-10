@@ -175,7 +175,7 @@ export const Addresses: React.FC = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <Heading level={3}>Saved Addresses</Heading>
+        <Heading level={5}>Saved Addresses</Heading>
         <button
           onClick={openNew}
           className="inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded"
@@ -222,7 +222,7 @@ export const Addresses: React.FC = () => {
 
       {showForm && (
         <div className="mt-6 p-4 border rounded bg-surface">
-          <Heading level={4} className="mb-3">{editingId ? 'Edit Address' : 'New Address'}</Heading>
+          <Heading level={5} className="mb-3">{editingId ? 'Edit Address' : 'New Address'}</Heading>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>

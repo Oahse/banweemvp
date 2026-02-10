@@ -48,7 +48,7 @@ export const ResumeSubscriptionModal: React.FC<ResumeSubscriptionModalProps> = (
             <PlayIcon className="w-5 h-5 text-success" />
           </div>
           <div>
-            <Heading level={3} className="text-lg font-semibold">
+            <Heading level={5} className="text-lg font-semibold">
               Resume Subscription
             </Heading>
             <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -73,7 +73,7 @@ export const ResumeSubscriptionModal: React.FC<ResumeSubscriptionModalProps> = (
           )}
           
           <div className={`mt-3 p-3 rounded-lg border ${currentTheme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
-            <Heading level={4} className="text-sm font-medium mb-2">
+            <Heading level={5} className="text-sm font-medium mb-2">
               What happens when you resume:
             </Heading>
             <ul className={`text-sm space-y-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>

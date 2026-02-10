@@ -53,7 +53,7 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
                 <Text 
                   as="span"
                   className={cn(
-                    'py-0.5 px-1.5 sm:px-2 rounded-full text-xs flex-shrink-0',
+                    'py-0.5 px-1.5 sm:px-2 rounded-full text-sm flex-shrink-0',
                     isActive 
                       ? 'bg-[#61b482]/20 text-[#61b482]' 
                       : 'bg-gray-100 text-gray-600'

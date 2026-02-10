@@ -209,8 +209,7 @@ export const WishlistEdit = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <Body className="ml-4 text-gray-600 dark:text-gray-400">Loading wishlist...</Body>
+        <AnimatedLoader size="lg" variant="petals" color="primary" text="Loading wishlist..." />
       </div>
     );
   }
@@ -244,7 +243,7 @@ export const WishlistEdit = () => {
             Back to Wishlist
           </Button>
           <div>
-            <Heading level={1} className="text-2xl font-bold text-gray-900 dark:text-white">
+            <Heading level={5} className="text-2xl font-bold text-gray-900 dark:text-white">
               Edit Wishlist
             </Heading>
             <Body className="text-gray-600 dark:text-gray-400">
@@ -278,7 +277,7 @@ export const WishlistEdit = () => {
         {/* Settings */}
         <div className="lg:col-span-1">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <Heading level={3} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Wishlist Settings</Heading>
+            <Heading level={5} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Wishlist Settings</Heading>
             
             <div className="space-y-4">
               <div>
@@ -334,7 +333,7 @@ export const WishlistEdit = () => {
         <div className="lg:col-span-2">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <Heading level={3} className="text-lg font-semibold text-gray-900 dark:text-white">
+              <Heading level={5} className="text-lg font-semibold text-gray-900 dark:text-white">
                 Items ({wishlist.items.length})
               </Heading>
             </div>
@@ -342,7 +341,7 @@ export const WishlistEdit = () => {
             {wishlist.items.length === 0 ? (
               <div className="p-12 text-center">
                 <HeartIcon size={48} className="text-gray-400 mx-auto mb-4" />
-                <Heading level={3} className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                <Heading level={5} className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                   No items yet
                 </Heading>
                 <Body className="text-gray-600 dark:text-gray-400 mb-4">
@@ -384,7 +383,7 @@ export const WishlistEdit = () => {
 
                         {/* Product Info */}
                         <div className="flex-1">
-                          <Heading level={4} className="font-medium text-gray-900 dark:text-white">
+                          <Heading level={5} className="font-medium text-gray-900 dark:text-white">
                             {product?.name || 'Unknown Product'}
                           </Heading>
                           {variant && (

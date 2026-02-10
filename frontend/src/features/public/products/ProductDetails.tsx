@@ -396,7 +396,7 @@ export const ProductDetails = () => {
                 
                 
                 {/* Show SKU on mobile */}
-                <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 px-3 py-2 sm:hidden">
+                <div className="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 px-3 py-2 sm:hidden">
                   <Text variant="caption" tone="secondary">SKU: {selectedVariant?.sku || product.sku}</Text>
                 </div>
               </div>
@@ -446,7 +446,7 @@ export const ProductDetails = () => {
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <Heading level={1} className="text-xl font-bold text-main mb-2">{product.name}</Heading>
+              <Heading level={5} className="text-xl font-bold text-main mb-2">{product.name}</Heading>
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center">
                   <div className="flex text-yellow-400">
@@ -494,7 +494,7 @@ export const ProductDetails = () => {
               {/* Variant Selection - Moved under description */}
               {actualProductData?.variants && actualProductData.variants.length > 0 && (
                 <div className="mb-6">
-                  <Heading level={3} weight="medium">Available Variants</Heading>
+                  <Heading level={5} weight="medium">Available Variants</Heading>
                   <div className="space-y-1">
                     {actualProductData.variants.map((variant: any, index: number) => {
                       const isSelected = selectedVariant?.id === variant.id;
@@ -613,14 +613,14 @@ export const ProductDetails = () => {
             {/* Quantity Selection */}
             {selectedVariant && (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 && (
               <div>
-                <Heading level={3} weight="medium">Quantity:</Heading>
+                <Heading level={5} weight="medium">Quantity:</Heading>
                 <div className="flex items-center space-x-2">
                   <Button
                     onClick={() => handleQuantityChange(quantity - 1)}
                     disabled={quantity <= 1}
                     variant="outline"
                     size="sm"
-                    className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                    className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     <MinusIcon size={12} />
                   </Button>
@@ -630,7 +630,7 @@ export const ProductDetails = () => {
                     disabled={selectedVariant && quantity >= (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock)}
                     variant="outline"
                     size="sm"
-                    className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                    className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     <PlusIcon size={12} />
                   </Button>
@@ -651,10 +651,10 @@ export const ProductDetails = () => {
                         variant="ghost"
                         size="sm"
                         isLoading={isCartUpdating}
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1.5 rounded-md transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1.5 rounded-md transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         leftIcon={<MinusIcon size={12} />}
                       ></Button>
-                      <Text as="span" className="bg-primary text-white px-3 py-2 rounded-md font-medium min-w-[100px] text-center text-xs">
+                      <Text as="span" className="bg-primary text-white px-3 py-2 rounded-md font-medium min-w-[100px] text-center text-sm">
                         In Cart ({cartQuantity})
                       </Text>
                       <Button
@@ -663,7 +663,7 @@ export const ProductDetails = () => {
                         variant="primary"
                         size="sm"
                         isLoading={isCartUpdating}
-                        className="bg-primary hover:bg-primary-dark text-white p-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                        className="bg-primary hover:bg-primary-dark text-white p-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         leftIcon={<PlusIcon size={12} />}
                       ></Button>
                     </div>
@@ -691,7 +691,7 @@ export const ProductDetails = () => {
                       disabled={!selectedVariant || (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) <= 0 || isCartUpdating}
                       variant="primary"
                       size="sm"
-                      className="w-full bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-xs"
+                      className="w-full bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-sm"
                       leftIcon={isCartUpdating ? null : <ShoppingCartIcon size={16} className="mr-2" />}
                       isLoading={isCartUpdating}
                     >
@@ -742,7 +742,7 @@ export const ProductDetails = () => {
                     disabled={isWishlistUpdating}
                     variant={isInWishlistState ? "outline" : "ghost"}
                     size="sm"
-                    className={`px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center min-w-[50px] text-xs disabled:opacity-50 disabled:cursor-not-allowed ${isInWishlistState
+                    className={`px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center min-w-[50px] text-sm disabled:opacity-50 disabled:cursor-not-allowed ${isInWishlistState
                     ? 'bg-error-100 text-error-600 hover:bg-error-200'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
@@ -770,7 +770,7 @@ export const ProductDetails = () => {
                   }}
                   variant="success"
                   size="sm"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-xs"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-sm"
                   leftIcon={<CalendarIcon size={14} className="mr-1 sm:mr-2 flex-shrink-0" />}
                 >
                   <Text className="truncate">Add to Subscription</Text>
@@ -782,19 +782,19 @@ export const ProductDetails = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
                 <TruckIcon size={16} className="text-primary" />
-                <Text className="text-xs">Standard Shipping Available</Text>
+                <Text className="text-sm">Standard Shipping Available</Text>
               </div>
               <div className="flex items-center space-x-2">
                 <ShieldCheckIcon size={16} className="text-primary" />
-                <Text className="text-xs">Secure Payment</Text>
+                <Text className="text-sm">Secure Payment</Text>
               </div>
               <div className="flex items-center space-x-2">
                 <RefreshCwIcon size={16} className="text-primary" />
-                <Text className="text-xs">Easy Returns</Text>
+                <Text className="text-sm">Easy Returns</Text>
               </div>
               <div className="flex items-center space-x-2">
                 <ShareIcon size={16} className="text-primary" />
-                <Text className="text-xs">Share Product</Text>
+                <Text className="text-sm">Share Product</Text>
               </div>
             </div>
           </div>
@@ -807,7 +807,7 @@ export const ProductDetails = () => {
               <Button
                 onClick={() => setActiveTab('description')}
                 variant="ghost"
-                className={`py-2 px-1 border-b-2 font-medium text-xs ${activeTab === 'description'
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'description'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-copy-light hover:text-copy'}`}
               >
@@ -816,7 +816,7 @@ export const ProductDetails = () => {
               <Button
                 onClick={() => setActiveTab('specifications')}
                 variant="ghost"
-                className={`py-2 px-1 border-b-2 font-medium text-xs ${activeTab === 'specifications'
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'specifications'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-copy-light hover:text-copy'}`}
               >
@@ -825,7 +825,7 @@ export const ProductDetails = () => {
               <Button
                 onClick={() => setActiveTab('reviews')}
                 variant="ghost"
-                className={`py-2 px-1 border-b-2 font-medium text-xs ${activeTab === 'reviews'
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'reviews'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-copy-light hover:text-copy'}`}
               >
@@ -842,13 +842,13 @@ export const ProductDetails = () => {
                 {/* Product Tags */}
                 {(Array.isArray(selectedVariant?.tags) && selectedVariant?.tags.length > 0) || (Array.isArray(product.tags) && product.tags.length > 0) ? (
                   <div className="mb-6">
-                    <Heading level={4} className="text-sm font-medium text-main mb-2">Tags:</Heading>
+                    <Heading level={5} className="text-sm font-medium text-main mb-2">Tags:</Heading>
                     <div className="flex flex-wrap gap-2">
                       {(Array.isArray(selectedVariant?.tags) && selectedVariant?.tags.length > 0 ? selectedVariant?.tags : product.tags).map((tag: any, index: number) => (
                         <Text
                           as="span"
                           key={`${typeof tag === 'string' ? tag : tag?.name || 'tag'}-${index}`}
-                          className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                          className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
                           style={{ backgroundColor: typeof tag === 'object' && tag?.color ? `${tag.color}20` : undefined }}
                         >
                           {typeof tag === 'string' ? tag : tag?.name || 'Tag'}
@@ -861,7 +861,7 @@ export const ProductDetails = () => {
                 {/* Product Features */}
                 {product.features && product.features.length > 0 && (
                   <div className="mb-6">
-                    <Heading level={4} className="text-sm font-medium text-main mb-2">Features:</Heading>
+                    <Heading level={5} className="text-sm font-medium text-main mb-2">Features:</Heading>
                     <ul className="list-disc list-inside space-y-1">
                       {product.features.map((feature: string, index: number) => (
                         <li key={index} className="text-sm text-copy-light">{feature}</li>
@@ -873,7 +873,7 @@ export const ProductDetails = () => {
                 {/* Variant Attributes */}
                 {selectedVariant?.attributes && Object.keys(selectedVariant.attributes).length > 0 && (
                   <div className="mt-4">
-                    <Heading level={4} className="text-sm font-medium text-main mb-2">Variant Attributes:</Heading>
+                    <Heading level={5} className="text-sm font-medium text-main mb-2">Variant Attributes:</Heading>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {Object.entries(selectedVariant.attributes).map(([key, value]) => (
                         <div key={key} className="flex justify-between py-1">
@@ -905,7 +905,7 @@ export const ProductDetails = () => {
                           )}
                         </div>
                         <div>
-                          <Heading level={4} className="text-sm font-semibold text-main">
+                          <Heading level={5} className="text-sm font-semibold text-main">
                             {product.supplier.company || `${product.supplier.firstname} ${product.supplier.lastname}`}
                           </Heading>
                         </div>
@@ -954,7 +954,7 @@ export const ProductDetails = () => {
                   <div className="flex justify-between py-2 border-b border-gray-100">
                     <Text as="span" className="text-sm font-medium text-main">Status:</Text>
                     <Text as="span" className="text-sm text-copy-light">
-                      <Text as="span" className={`px-2 py-1 rounded-full text-xs ${
+                      <Text as="span" className={`px-2 py-1 rounded-full text-sm ${
                         product.is_active ? 'bg-success-100 text-success-800' : 'bg-error-100 text-error-800'
                       }`}>
                         {product.is_active ? 'Active' : 'Inactive'}
@@ -964,7 +964,7 @@ export const ProductDetails = () => {
                   <div className="flex justify-between py-2 border-b border-gray-100">
                     <Text as="span" className="text-sm font-medium text-main">Featured:</Text>
                     <Text as="span" className="text-sm text-copy-light">
-                      <Text as="span" className={`px-2 py-1 rounded-full text-xs ${
+                      <Text as="span" className={`px-2 py-1 rounded-full text-sm ${
                         (product.is_featured || product.featured) ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 text-gray-800'
                       }`}>
                         {(product.is_featured || product.featured) ? 'Featured' : 'Regular'}
@@ -978,45 +978,45 @@ export const ProductDetails = () => {
                     <div className="flex flex-wrap gap-2">
                           {Array.isArray(selectedVariant?.dietary_tags) && selectedVariant.dietary_tags.length > 0 &&
                         selectedVariant.dietary_tags.map((tag: string, index: number) => (
-                          <Text key={`${tag}-${index}`} as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                          <Text key={`${tag}-${index}`} as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
                             {tag}
                           </Text>
                         ))}
                       {/* Common dietary tags based on product category */}
                       {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('organic') || 
                         typeof product.category === 'string' && product.category.toLowerCase().includes('organic')) && (
-                        <Text as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Organic</Text>
+                        <Text as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Organic</Text>
                       )}
                       
                       {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('gluten') || 
                         typeof product.category === 'string' && product.category.toLowerCase().includes('gluten')) && (
-                        <Text as="span" className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Gluten-Free</Text>
+                        <Text as="span" className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">Gluten-Free</Text>
                       )}
                       
                       {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('vegan') || 
                         typeof product.category === 'string' && product.category.toLowerCase().includes('vegan')) && (
-                        <Text as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Vegan</Text>
+                        <Text as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Vegan</Text>
                       )}
                       
                       {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('vegetarian') || 
                         typeof product.category === 'string' && product.category.toLowerCase().includes('vegetarian')) && (
-                        <Text as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Vegetarian</Text>
+                        <Text as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Vegetarian</Text>
                       )}
                       
                       {/* Default dietary tags for agricultural products */}
-                      <Text as="span" className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Natural</Text>
-                      <Text as="span" className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">Non-GMO</Text>
-                      <Text as="span" className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">Sustainably Sourced</Text>
+                      <Text as="span" className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Natural</Text>
+                      <Text as="span" className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">Non-GMO</Text>
+                      <Text as="span" className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">Sustainably Sourced</Text>
                       
                       {/* Variant-specific dietary info */}
                       {selectedVariant?.attributes?.dietary && (
-                        <Text as="span" className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+                        <Text as="span" className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">
                           {selectedVariant.attributes.dietary}
                         </Text>
                       )}
                       
                       {selectedVariant?.attributes?.allergens && (
-                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm">
                           Contains: {selectedVariant.attributes.allergens}
                         </Text>
                       )}
@@ -1028,21 +1028,21 @@ export const ProductDetails = () => {
                     <Text as="span" className="text-sm font-medium text-main block mb-2">Allergy Information:</Text>
                     <div className="flex flex-wrap gap-2">
                       {/* Common allergens - show as safe unless specified */}
-                      <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Dairy-Free</Text>
-                      <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Nut-Free</Text>
-                      <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Soy-Free</Text>
+                      <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Dairy-Free</Text>
+                      <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Nut-Free</Text>
+                      <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Soy-Free</Text>
                       
                       {/* If product contains allergens, show them prominently */}
                       {selectedVariant?.attributes?.contains_nuts && (
-                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Nuts</Text>
+                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">Contains Nuts</Text>
                       )}
                       
                       {selectedVariant?.attributes?.contains_dairy && (
-                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Dairy</Text>
+                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">Contains Dairy</Text>
                       )}
                       
                       {selectedVariant?.attributes?.contains_soy && (
-                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Soy</Text>
+                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">Contains Soy</Text>
                       )}
                     </div>
                   </div>
@@ -1090,7 +1090,7 @@ export const ProductDetails = () => {
                 <div className="flex items-center space-x-4 mb-6 mt-8">
                   {/* Min Rating Filter */}
                   <div>
-                    <Label htmlFor="minRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Min Rating</Label>
+                    <Label htmlFor="minRating" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Min Rating</Label>
                     <Dropdown
                       options={[
                         { value: '', label: 'Any' },
@@ -1109,7 +1109,7 @@ export const ProductDetails = () => {
 
                   {/* Max Rating Filter */}
                   <div>
-                    <Label htmlFor="maxRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Max Rating</Label>
+                    <Label htmlFor="maxRating" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Max Rating</Label>
                     <Dropdown
                       options={[
                         { value: '', label: 'Any' },
@@ -1128,7 +1128,7 @@ export const ProductDetails = () => {
 
                   {/* Sort By */}
                   <div>
-                    <Label htmlFor="sortBy" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Sort By</Label>
+                    <Label htmlFor="sortBy" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Sort By</Label>
                     <Dropdown
                       options={[
                         { value: '', label: 'Newest' },
@@ -1178,7 +1178,7 @@ export const ProductDetails = () => {
                               ))}
                             </div>
                           </div>
-                          <Text as="span" className="text-xs text-copy-light">
+                          <Text as="span" className="text-sm text-copy-light">
                             {review.created_at ? new Date(review.created_at).toLocaleDateString() : ''}
                           </Text>
                         </div>
@@ -1249,7 +1249,7 @@ export const ProductDetails = () => {
         {/* Related Products */}
         <section className="py-8 bg-surface">
           <div className="container mx-auto px-4">
-            <Heading level={2} className="text-lg sm:text-xl font-semibold text-main mb-4">Related Products</Heading>
+            <Heading level={5} className="text-lg sm:text-xl font-semibold text-main mb-4">Related Products</Heading>
 
             {relatedError && (
               <ErrorMessage

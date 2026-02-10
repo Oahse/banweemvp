@@ -130,7 +130,7 @@ export const Checkout = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-surface-dark">
         <div className="text-center">
-          <AnimatedLoader size="xl" variant="spinner" />
+          <AnimatedLoader size="xl" variant="petals" />
           <Text variant="body-sm" tone="secondary">
             {authLoading ? 'Checking authentication...' : 'Loading checkout...'}
           </Text>
@@ -158,7 +158,7 @@ export const Checkout = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div className="mb-4" variants={itemVariants}>
-          <Heading level={1} weight="bold">Checkout</Heading>
+          <Heading level={5} weight="bold">Checkout</Heading>
           <Text variant="caption" tone="secondary">
             Complete your purchase quickly and securely
           </Text>

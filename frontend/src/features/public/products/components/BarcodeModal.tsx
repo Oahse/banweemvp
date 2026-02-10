@@ -277,7 +277,7 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <ScanLineIcon size={24} className="text-primary" />
-            <Heading level={3} className="text-lg font-semibold text-copy">{title}</Heading>
+            <Heading level={5} className="text-lg font-semibold text-copy">{title}</Heading>
           </div>
           <Button
             onClick={onClose}
@@ -303,7 +303,7 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
         </div>
 
         <div className="mb-4">
-          <Body className="text-xs text-copy-lighter mb-1">Barcode Data:</Body>
+          <Body className="text-sm text-copy-lighter mb-1">Barcode Data:</Body>
           <div className="text-sm text-copy-light bg-surface-hover p-2 rounded">
             <div className="space-y-1">
               <div><Text className="font-medium">URL:</Text> {barcodeData.url}</div>

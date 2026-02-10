@@ -299,7 +299,7 @@ export const CartItem: React.FC<CartItemProps> = ({
       {/* Loading overlay */}
       {(isUpdating || isRemoving) && (
         <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <AnimatedLoader size="sm" variant="petals" color="primary" />
         </div>
       )}
     </div>

@@ -71,7 +71,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </div>
             <div>
               <Heading level={5} className="text-sm font-medium text-gray-900 dark:text-white">Admin Panel</Heading>
-              <Body className="text-xs text-gray-500 dark:text-gray-400">admin@banwee.com</Body>
+              <Body className="text-sm text-gray-500 dark:text-gray-400">admin@banwee.com</Body>
             </div>
           </div>
           <Button

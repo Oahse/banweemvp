@@ -156,7 +156,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <Heading level={2} className="heading text-xl">Profile Information</Heading>
+          <Heading level={5} className="heading text-xl">Profile Information</Heading>
           {!isEditing ? (
             <Button
               onClick={() => setIsEditing(true)}
@@ -202,7 +202,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
             />
             {isEditing && (
               <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity">
-                <Text as="span" className="text-white text-xs">Change</Text>
+                <Text as="span" className="text-white text-sm">Change</Text>
                 <input
                   type="file"
                   accept="image/*"
@@ -216,14 +216,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
             )}
           </div>
           <div>
-            <Heading level={3} className="heading text-lg">{user.firstname} {user.lastname}</Heading>
+            <Heading level={5} className="heading text-lg">{user.firstname} {user.lastname}</Heading>
             <Text as="p" className="body-text text-gray-600">{user.email}</Text>
             {user.is_verified ? (
-              <Text as="span" className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+              <Text as="span" className="inline-flex items-center px-2 py-1 rounded-full text-sm bg-green-100 text-green-800">
                 ✓ Verified
               </Text>
             ) : (
-              <Text as="span" className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+              <Text as="span" className="inline-flex items-center px-2 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
                 Unverified
               </Text>
             )}

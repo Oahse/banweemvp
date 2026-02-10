@@ -103,7 +103,7 @@ export const Subscriptions = () => {
                   {user?.firstname?.charAt(0) || user?.full_name?.charAt(0) || 'U'}
                 </div>
                 <div className="ml-3">
-                  <Heading level={3} weight="medium">
+                  <Heading level={5} weight="medium">
                     {user?.full_name || `${user?.firstname} ${user?.lastname}`}
                   </Heading>
                   <Text variant="body-sm" tone="secondary">{user?.email}</Text>
@@ -146,7 +146,7 @@ export const Subscriptions = () => {
           <div className="flex-grow">
             <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
               <AlertCircleIcon size={48} className="mx-auto text-error mb-4" />
-              <Heading level={2} weight="medium">Unable to Load Subscriptions</Heading>
+              <Heading level={5} weight="medium">Unable to Load Subscriptions</Heading>
               <Text variant="body" tone="secondary">{error}</Text>
               <Button
                 onClick={refreshSubscriptions}
@@ -219,7 +219,7 @@ export const Subscriptions = () => {
         {/* Main Content */}
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-6">
-            <Heading level={1} weight="bold">My Subscriptions</Heading>
+            <Heading level={5} weight="bold">My Subscriptions</Heading>
             <Button
               onClick={() => navigate('/account/subscriptions')}
               variant="primary"

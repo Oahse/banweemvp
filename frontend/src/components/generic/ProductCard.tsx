@@ -403,12 +403,12 @@ export const ProductCard = ({
                 : 'Uncategorized')}
           </Text>
           <Link to={`/products/${product.id || ''}`}>
-            <Heading level={5} className="font-semibold text-xs sm:text-sm text-main dark:text-white hover:text-primary transition-colors line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
+            <Heading level={5} className="font-semibold text-sm sm:text-sm text-main dark:text-white hover:text-primary transition-colors line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
               {product.name || 'Unknown Product'}
             </Heading>
           </Link>
           <div className="flex items-center space-x-1">
-            <div className="flex text-yellow-400 text-xs">
+            <div className="flex text-yellow-400 text-sm">
               {Array.from({ length: 5 }, (_, i) => (
                 <StarIcon
                   key={i}
@@ -458,7 +458,7 @@ export const ProductCard = ({
                 variant={isInCart ? "success" : "primary"}
                 size="sm"
                 className={cn(
-                  'flex items-center justify-center px-1 py-1.5 rounded-md text-xs font-medium transition-colors',
+                  'flex items-center justify-center px-1 py-1.5 rounded-md text-sm font-medium transition-colors',
                   (!displayVariant?.inventory || displayVariant.inventory.quantity_available === 0)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : isInCart
@@ -474,7 +474,7 @@ export const ProductCard = ({
                 variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
                 size="sm"
                 className={cn(
-                  'flex items-center justify-center px-1.5 py-1.5 rounded-md text-xs font-medium transition-colors',
+                  'flex items-center justify-center px-1.5 py-1.5 rounded-md text-sm font-medium transition-colors',
                   wishlistMode || isInWishlist(product.id, displayVariant?.id)
                     ? 'bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-100'
                     : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'

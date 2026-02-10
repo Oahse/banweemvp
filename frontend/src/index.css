@@ -49,7 +49,7 @@
   
   /* Mobile-first responsive text sizes */
   .text-responsive-xs {
-    @apply text-xs sm:text-sm;
+    @apply text-sm sm:text-sm;
   }
   .text-responsive-sm {
     @apply text-sm sm:text-base;

@@ -125,7 +125,7 @@ export const Dashboard = ({
 
       {/* Recent Orders */}
       <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-        <Heading level={3} weight="medium">Recent Orders</Heading>
+        <Heading level={5} weight="medium">Recent Orders</Heading>
         {Array.isArray(paginatedOrders?.data) ? (
           <div className="space-y-2">
             {paginatedOrders?.data.slice(0, 5).map((order: Order) => (
@@ -135,8 +135,8 @@ export const Dashboard = ({
                   <Text variant="caption" tone="secondary">{new Date(order.created_at).toLocaleDateString()}</Text>
                 </div>
                 <div className="text-right">
-                  <Text variant="body-sm" className="text-xs font-semibold text-primary">${order.total_amount.toFixed(2)}</Text>
-                  <Text as="span" variant="caption" className="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">{order.status}</Text>
+                  <Text variant="body-sm" className="text-sm font-semibold text-primary">${order.total_amount.toFixed(2)}</Text>
+                  <Text as="span" variant="caption" className="ml-2 px-2 py-0.5 text-sm font-semibold rounded-full bg-gray-100 text-gray-800">{order.status}</Text>
                 </div>
               </div>
             ))}

@@ -119,7 +119,7 @@ export const QRCodeDisplay = ({
       <div className={`flex items-center justify-center bg-surface-hover rounded-lg border-2 border-dashed border-border ${sizeClasses[size]} ${className || ''}`}>
         <div className="text-center">
           <QrCodeIcon size={24} className="text-copy-lighter mx-auto mb-2" />
-          <Text className="text-xs text-copy-light">No QR Code</Text>
+          <Text className="text-sm text-copy-light">No QR Code</Text>
         </div>
       </div>
     );
@@ -137,7 +137,7 @@ export const QRCodeDisplay = ({
         
         {/* Hover overlay with info */}
         <div className="absolute inset-0 bg-copy/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-          <div className="text-copy-inverse text-center text-xs">
+          <div className="text-copy-inverse text-center text-sm">
             <QrCodeIcon size={16} className="mx-auto mb-1" />
             <div>QR Code</div>
             <div className="font-mono">{variant.sku}</div>
@@ -182,7 +182,7 @@ export const QRCodeDisplay = ({
 
       {/* Variant Info */}
       {size !== 'sm' && (
-        <div className="text-center text-xs text-copy-light space-y-1">
+        <div className="text-center text-sm text-copy-light space-y-1">
           <div className="font-medium">{variant.name}</div>
           <div className="font-mono text-copy-lighter">{variant.sku}</div>
         </div>

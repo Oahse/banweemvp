@@ -123,7 +123,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
-        <Heading level={3} className="text-lg font-semibold text-gray-900 flex items-center">
+        <Heading level={5} className="text-lg font-semibold text-gray-900 flex items-center">
           <QrCodeIcon className="mr-2 h-5 w-5 text-blue-600" />
           QR Code
         </Heading>
@@ -176,7 +176,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
           </div>
           <div className="text-center space-y-2">
             <Body className="text-sm font-medium text-gray-900">{variant.name}</Body>
-            <Body className="text-xs text-gray-600 font-mono">SKU: {variant.sku}</Body>
+            <Body className="text-sm text-gray-600 font-mono">SKU: {variant.sku}</Body>
             <Body className="text-sm font-semibold text-green-600">
               ${(variant.sale_price || variant.base_price).toFixed(2)}
             </Body>

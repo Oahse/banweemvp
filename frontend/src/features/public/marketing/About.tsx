@@ -218,7 +218,7 @@ export const About = () => {
               </div>
               <div className="p-3 sm:w-2/3 flex flex-col justify-center">
                 <Text variant="body-sm" weight="bold" className="text-sm text-copy">{member.name}</Text>
-                <Text variant="caption" tone="primary" weight="medium" className="text-xs mb-1">{member.position}</Text>
+                <Text variant="caption" tone="primary" weight="medium" className="text-sm mb-1">{member.position}</Text>
                 <Text variant="body-sm" tone="secondary" className="text-sm">{member.bio}</Text>
               </div>
             </div>
@@ -227,31 +227,26 @@ export const About = () => {
       </motion.div>
 
       {/* Impact Stats */}
-      <motion.div className="bg-primary/10 py-6 mb-8" variants={itemVariants}>
+      <motion.div className="bg-primary/10 py-6 mb-6 rounded-lg" variants={itemVariants}>
         <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-6">
+          <div className="text-center mb-4">
             <Heading level={5} weight="semibold" className="text-base md:text-lg mb-2">Our Impact</Heading>
-            <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
+            <div className="w-12 h-0.5 bg-primary mx-auto"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-            <div>
+            <div className="bg-white/50 rounded-lg p-3">
               <Text variant="body-lg" weight="semibold" tone="primary" className="text-lg md:text-xl">1,000+</Text>
               <Text variant="caption" weight="medium" className="text-sm text-copy-light">Producers Supported</Text>
             </div>
-            <div>
+            <div className="bg-white/50 rounded-lg p-3">
               <Text variant="body-lg" weight="semibold" tone="primary" className="text-lg md:text-xl">8</Text>
               <Text variant="caption" weight="medium" className="text-sm text-copy-light">African Countries</Text>
             </div>
-            <div>
+            <div className="bg-white/50 rounded-lg p-3">
               <Text variant="body-lg" weight="semibold" tone="primary" className="text-lg md:text-xl">12</Text>
               <Text variant="caption" weight="medium" className="text-sm text-copy-light">Community Projects</Text>
             </div>
           </div>
-          <Link
-            to="/account/subscriptions"
-            className="bg-surface border border-primary text-primary hover:bg-primary/5 px-4 py-2 rounded-md transition-colors text-sm">
-            <Text variant="body-sm">Manage Subscriptions</Text>
-          </Link>
         </div>
       </motion.div>
     </motion.div>

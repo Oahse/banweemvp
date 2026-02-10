@@ -303,7 +303,7 @@ export const ShipmentTracking: React.FC<ShipmentTrackingProps> = ({
             <span className="font-medium text-gray-900">Latest Update</span>
           </div>
           <p className="text-gray-600">{latestEvent.event_description}</p>
-          <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+          <div className="flex items-center justify-between mt-2 text-sm text-gray-500">
             <span>{formatLocation(latestEvent.event_location)}</span>
             <span>{formatDate(latestEvent.event_timestamp)}</span>
           </div>
@@ -335,7 +335,7 @@ export const ShipmentTracking: React.FC<ShipmentTrackingProps> = ({
                   <p className="text-sm font-medium text-gray-900">
                     {event.event_description}
                   </p>
-                  <div className="flex items-center justify-between mt-1 text-xs text-gray-500">
+                  <div className="flex items-center justify-between mt-1 text-sm text-gray-500">
                     <span>{formatLocation(event.event_location)}</span>
                     <span>{formatDate(event.event_timestamp)}</span>
                   </div>

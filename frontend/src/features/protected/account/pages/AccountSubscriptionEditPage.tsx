@@ -68,7 +68,7 @@ const AccountSubscriptionEditPage: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center h-64"><Text variant="body-sm" className="text-gray-500">Loading...</Text></div>;
+  if (loading) return <div className="flex justify-center items-center h-64"><AnimatedLoader size="md" variant="petals" color="primary" text="Loading..." /></div>;
   if (error) return <div className="flex flex-col items-center h-64"><Text variant="caption" className="text-red-500">{error}</Text></div>;
   if (!subscription) return <div className="flex flex-col items-center h-64"><Text variant="caption" className="text-gray-500">Subscription not found.</Text></div>;
 
@@ -76,25 +76,25 @@ const AccountSubscriptionEditPage: React.FC = () => {
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
       <div className="mb-4 flex items-center gap-2">
         <CalendarIcon size={20} />
-        <Heading level={2} weight="medium">Edit Subscription</Heading>
+        <Heading level={5} weight="medium">Edit Subscription</Heading>
       </div>
       <div className="mb-4">
-        <Label className="block text-xs font-medium mb-1">Plan Name</Label>
+        <Label className="block text-sm font-medium mb-1">Plan Name</Label>
         <input
           name="plan"
           type="text"
           value={form.plan}
           onChange={handleChange}
-          className="w-full px-3 py-2 text-xs rounded border border-gray-300"
+          className="w-full px-3 py-2 text-sm rounded border border-gray-300"
         />
       </div>
       <div className="mb-4">
-        <Label className="block text-xs font-medium mb-1">Billing Interval</Label>
+        <Label className="block text-sm font-medium mb-1">Billing Interval</Label>
         <select
           name="billing_interval"
           value={form.billing_interval}
           onChange={handleChange}
-          className="w-full px-3 py-2 text-xs rounded border border-gray-300"
+          className="w-full px-3 py-2 text-sm rounded border border-gray-300"
         >
           <option value="">Select interval</option>
           <option value="monthly">Monthly</option>
@@ -109,7 +109,7 @@ const AccountSubscriptionEditPage: React.FC = () => {
           onChange={handleChange}
           className="accent-primary"
         />
-        <Label className="text-xs font-medium">Auto Renew</Label>
+        <Label className="text-sm font-medium">Auto Renew</Label>
       </div>
       <Button
         variant="primary"

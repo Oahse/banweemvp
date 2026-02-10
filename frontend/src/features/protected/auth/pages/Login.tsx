@@ -5,7 +5,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { Input, Checkbox } from '@/components/ui/Form';
-import SocialAuth from '@/components/SocialAuth';
+import SocialAuth from '@/features/protected/auth/components/SocialAuth';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
@@ -208,7 +208,7 @@ export const Login = ({ isInitialLoading = false }) => {
           </motion.div>
         )}
         
-        <Heading level={1} className="text-xl font-bold text-main mb-4 text-center">Login to Your Account</Heading>
+        <Heading level={5} className="text-xl font-bold text-main mb-4 text-center">Login to Your Account</Heading>
         <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
           {/* Email Address Input */}
           <Input
@@ -220,7 +220,7 @@ export const Login = ({ isInitialLoading = false }) => {
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
             required
-            prefix={<Eye size={18} />}
+            // prefix={<Eye size={18} />}
           />
           {/* Password Input */}
           <Input
@@ -242,7 +242,7 @@ export const Login = ({ isInitialLoading = false }) => {
               </button>
             }
             helperText={
-              <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+              <Link to="/forgot-password" className="text-sm text-primary hover:underline">
                 Forgot password?
               </Link>
             }
@@ -262,7 +262,7 @@ export const Login = ({ isInitialLoading = false }) => {
             disabled={loading}
             isLoading={loading}
           >
-            {loading ? 'Signing in...' : 'Login'}
+            Login
           </Button>
         </motion.form>
         {/* Social Authentication Section */}

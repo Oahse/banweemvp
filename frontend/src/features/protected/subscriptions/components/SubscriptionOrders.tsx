@@ -167,7 +167,7 @@ export const SubscriptionOrders = () => {
                           <span className={`${themeClasses.text.primary} text-sm`}>
                             {item.product?.name || 'Product'}
                           </span>
-                          <span className={`${themeClasses.text.muted} text-xs ml-2`}>
+                          <span className={`${themeClasses.text.muted} text-sm ml-2`}>
                             Qty: {item.quantity}
                           </span>
                         </div>
@@ -177,7 +177,7 @@ export const SubscriptionOrders = () => {
                       </div>
                     ))}
                     {order.items.length > 3 && (
-                      <p className={`${themeClasses.text.muted} text-xs`}>
+                      <p className={`${themeClasses.text.muted} text-sm`}>
                         +{order.items.length - 3} more items
                       </p>
                     )}

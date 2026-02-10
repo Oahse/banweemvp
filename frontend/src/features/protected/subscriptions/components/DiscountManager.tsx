@@ -201,24 +201,24 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                   <div className="flex items-center gap-2 mt-1">
                     <Text variant="body-sm" className={cn(
                       "text-gray-600",
-                      'text-xs'
+                      'text-sm'
                     )}>
                       {formatDiscountValue(discount)}
                     </Text>
                     <Text variant="body-sm" className={cn(
                       "text-gray-600",
-                      'text-xs'
+                      'text-sm'
                     )}>
                       •
                     </Text>
                     <Text variant="body-sm" className={cn(
                       "text-gray-600",
-                      'text-xs font-medium'
+                      'text-sm font-medium'
                     )}>
                       Saving {formatCurrency(discount.discount_amount, currency)}
                     </Text>
                   </div>
-                  <Label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">
+                  <Label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">
                     Required for US cards, optional for international cards
                   </Label>
                 </div>
@@ -262,7 +262,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
               "text-gray-600",
               'font-medium text-sm'
             )}>
-              <Label className="block text-xs font-medium text-gray-500 dark:text-gray-400">
+              <Label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
                 Discount Code
               </Label>
             </Text>
@@ -330,7 +330,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
             {/* Help Text */}
             <div className={cn(
               "text-gray-600",
-              'text-xs'
+              'text-sm'
             )}>
               Enter a valid discount code to apply savings to your subscription.
               Press Enter to apply or Escape to cancel.

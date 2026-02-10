@@ -131,7 +131,7 @@ export const VariantSelector = ({
   if (layout === 'list') {
     return (
       <div className={cn('space-y-3', className)}>
-        <Heading level={3} className="text-sm font-medium text-gray-700">Select Variant</Heading>
+        <Heading level={5} className="text-sm font-medium text-gray-700">Select Variant</Heading>
         <div className="space-y-2">
           {variants.map(variant => {
             const isSelected = selectedVariant.id === variant.id;
@@ -192,7 +192,7 @@ export const VariantSelector = ({
                       
                       {showStock && (
                         <Text className={cn(
-                          'text-xs px-2 py-1 rounded-full',
+                          'text-sm px-2 py-1 rounded-full',
                           isAvailable
                             ? 'bg-success-100 text-success-800'
                             : 'bg-error-100 text-error-800'
@@ -218,7 +218,7 @@ export const VariantSelector = ({
       <div className="space-y-3">
         {Object.entries(attributeGroups).map(([attributeName, values]) => (
           <div key={attributeName} className="space-y-2">
-            <Heading level={3} className="text-sm font-medium text-copy capitalize">
+            <Heading level={5} className="text-sm font-medium text-copy capitalize">
               {attributeName === 'variant_index' ? 'Option' : attributeName}
             </Heading>
             <div className="flex flex-wrap gap-2">
@@ -285,7 +285,7 @@ export const VariantSelector = ({
         {showStock && selectedVariant && (
           <div className="mt-2 text-sm">
             <span className={cn(
-              'px-2 py-1 rounded-full text-xs',
+              'px-2 py-1 rounded-full text-sm',
               isVariantAvailable(selectedVariant)
                 ? 'bg-success-100 text-success-800'
                 : 'bg-error-100 text-error-800'

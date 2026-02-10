@@ -63,7 +63,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'select':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
             </Label>
             <Dropdown
@@ -79,7 +79,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'text':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
             </Label>
             <input
@@ -95,7 +95,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'date':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
             </Label>
             <input
@@ -110,7 +110,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'daterange':
         return (
           <div key={filter.key} className="min-w-[200px]">
-            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
             </Label>
             <div className="flex items-center space-x-2">
@@ -206,7 +206,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
             <Text className="text-sm text-gray-600 dark:text-gray-400">Active filters:</Text>
             
             {hasActiveSearch && (
-              <Text className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">
+              <Text className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/20 text-primary">
                 Search: {searchValue}
                 <Button
                   onClick={() => onSearchChange('')}
@@ -223,7 +223,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
               value && (
                 <Text
                   key={key}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                 >
                   {filters.find((f) => f.key === key)?.label || key}: {value}
                   <Button

@@ -141,7 +141,7 @@ const AccountPaymentMethodsPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <Heading level={1} className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Payment Methods</Heading>
+        <Heading level={5} className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Payment Methods</Heading>
         <Button
           onClick={() => setShowStripeForm(true)}
           variant="primary"
@@ -155,7 +155,7 @@ const AccountPaymentMethodsPage = () => {
       {showStripeForm && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex justify-between items-center mb-4">
-            <Heading level={3} className="text-base font-semibold">Add Payment Method</Heading>
+            <Heading level={5} className="text-base font-semibold">Add Payment Method</Heading>
             <Button
               onClick={() => setShowStripeForm(false)}
               variant="ghost"
@@ -176,8 +176,8 @@ const AccountPaymentMethodsPage = () => {
         {paymentMethods.length === 0 ? (
           <div className="text-center py-6 bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
               <CreditCard className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <Heading level={3} className="text-sm font-medium text-gray-900 dark:text-white mb-1">No payment methods</Heading>
-              <Caption className="text-xs text-gray-500 dark:text-gray-400 mb-2">Add a payment method to make checkout faster</Caption>
+              <Heading level={5} className="text-sm font-medium text-gray-900 dark:text-white mb-1">No payment methods</Heading>
+              <Caption className="text-sm text-gray-500 dark:text-gray-400 mb-2">Add a payment method to make checkout faster</Caption>
               <Button
                 onClick={() => setShowStripeForm(true)}
                 variant="primary"
@@ -206,7 +206,7 @@ const AccountPaymentMethodsPage = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-0">
-                    <Heading level={3} className="font-medium text-sm md:text-base text-gray-900 dark:text-white">
+                    <Heading level={5} className="font-medium text-sm md:text-base text-gray-900 dark:text-white">
                       {method.type === 'card' ? (
                         method.provider ? method.provider.charAt(0).toUpperCase() + method.provider.slice(1) : 'Card'
                       ) : (
@@ -214,13 +214,13 @@ const AccountPaymentMethodsPage = () => {
                       )}
                     </Heading>
                     {method.is_default && (
-                      <Caption className="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">Default</Caption>
+                      <Caption className="px-2 py-0.5 text-sm bg-primary/10 text-primary dark:bg-primary/20 rounded-full">Default</Caption>
                     )}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-0">
                     {method.type === 'card' && method.last_four && (
                       <div>
-                        <Heading level={4}>Card Details</Heading>
+                        <Heading level={5}>Card Details</Heading>
                         <Text variant="body-sm" tone="secondary">•••• {method.last_four}</Text>
                         <Text variant="caption" tone="secondary">Valid thru {method.expiry_month ?? 'MM'}/{method.expiry_year ? String(method.expiry_year).slice(-2) : 'YY'}</Text>
                       </div>
@@ -272,7 +272,7 @@ const AccountPaymentMethodsPage = () => {
                 <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <Heading level={3}>Delete Payment Method</Heading>
+                <Heading level={5}>Delete Payment Method</Heading>
                 <Text variant="body-sm" tone="secondary">This action cannot be undone</Text>
               </div>
             </div>

@@ -42,10 +42,10 @@ export const PrivacyPolicy = () => {
       </motion.nav>
 
       <motion.div className="max-w-4xl mx-auto bg-surface p-8 rounded-lg shadow-sm" variants={itemVariants}>
-        <Heading level={1} className="text-3xl font-bold text-main mb-6">Privacy Policy</Heading>
+        <Heading level={5} className="text-3xl font-bold text-main mb-6">Privacy Policy</Heading>
 
         <section className="mb-8">
-          <Heading level={2} className="text-2xl font-semibold text-main mb-4">1. Introduction</Heading>
+          <Heading level={5} className="text-2xl font-semibold text-main mb-4">1. Introduction</Heading>
           <Body className="text-copy-light mb-4">
             Welcome to Banwee. This Privacy Policy explains how we collect, use, disclose, and safeguard your
             information when you visit our website [Your Website URL], including any other media form, media channel,
@@ -63,19 +63,19 @@ export const PrivacyPolicy = () => {
         </section>
 
         <section className="mb-8">
-          <Heading level={2} className="text-2xl font-semibold text-main mb-4">2. Collection of Your Information</Heading>
+          <Heading level={5} className="text-2xl font-semibold text-main mb-4">2. Collection of Your Information</Heading>
           <Body className="text-copy-light mb-4">
             We may collect information about you in a variety of ways. The information we may collect on the Site
             includes:
           </Body>
-          <Heading level={3} className="text-xl font-medium text-main mb-2">Personal Data</Heading>
+          <Heading level={5} className="text-xl font-medium text-main mb-2">Personal Data</Heading>
           <Body className="text-copy-light mb-4">
             Personally identifiable information, such as your name, shipping address, email address, and telephone
             number, and demographic information, such as your age, gender, hometown, and interests, that you
             voluntarily give to us when you register with the Site or when you choose to participate in various
             activities related to the Site, such as online chat and message boards.
           </Body>
-          <Heading level={3} className="text-xl font-medium text-main mb-2">Derivative Data</Heading>
+          <Heading level={5} className="text-xl font-medium text-main mb-2">Derivative Data</Heading>
           <Body className="text-copy-light mb-4">
             Information our servers automatically collect when you access the Site, such as your IP address, your
             browser type, your operating system, your access times, and the pages you have viewed directly before
@@ -84,7 +84,7 @@ export const PrivacyPolicy = () => {
         </section>
 
         <section className="mb-8">
-          <Heading level={2} className="text-2xl font-semibold text-main mb-4">3. Use of Your Information</Heading>
+          <Heading level={5} className="text-2xl font-semibold text-main mb-4">3. Use of Your Information</Heading>
           <Body className="text-copy-light mb-4">
             Having accurate information about you permits us to provide you with a smooth, efficient, and customized
             experience. Specifically, we may use information collected about you via the Site to:
@@ -102,18 +102,18 @@ export const PrivacyPolicy = () => {
         </section>
 
         <section className="mb-8">
-          <Heading level={2} className="text-2xl font-semibold text-main mb-4">4. Disclosure of Your Information</Heading>
+          <Heading level={5} className="text-2xl font-semibold text-main mb-4">4. Disclosure of Your Information</Heading>
           <Body className="text-copy-light mb-4">
             We may share information we have collected about you in certain situations. Your information may be
             disclosed as follows:
           </Body>
-          <Heading level={3} className="text-xl font-medium text-main mb-2">By Law or to Protect Rights</Heading>
+          <Heading level={5} className="text-xl font-medium text-main mb-2">By Law or to Protect Rights</Heading>
           <Body className="text-copy-light mb-4">
             If we believe the release of information about you is necessary to respond to legal process, to investigate
             or remedy potential violations of our policies, or to protect the rights, property, and safety of others,
             we may share your information as permitted or required by any applicable law, rule, or regulation.
           </Body>
-          <Heading level={3} className="text-xl font-medium text-main mb-2">Third-Party Service Providers</Heading>
+          <Heading level={5} className="text-xl font-medium text-main mb-2">Third-Party Service Providers</Heading>
           <Body className="text-copy-light mb-4">
             We may share your information with third parties that perform services for us or on our behalf, including
             data analysis, email delivery, hosting services, customer service, and marketing assistance.
@@ -121,7 +121,7 @@ export const PrivacyPolicy = () => {
         </section>
 
         <section className="mb-8">
-          <Heading level={2} className="text-2xl font-semibold text-main mb-4">5. Security of Your Information</Heading>
+          <Heading level={5} className="text-2xl font-semibold text-main mb-4">5. Security of Your Information</Heading>
           <Body className="text-copy-light mb-4">
             We use administrative, technical, and physical security measures to help protect your personal
             information. While we have taken reasonable steps to secure the personal information you provide to us,
@@ -131,7 +131,7 @@ export const PrivacyPolicy = () => {
         </section>
 
         <section>
-          <Heading level={2} className="text-2xl font-semibold text-main mb-4">6. Contact Us</Heading>
+          <Heading level={5} className="text-2xl font-semibold text-main mb-4">6. Contact Us</Heading>
           <Body className="text-copy-light mb-4">
             If you have questions or comments about this Privacy Policy, please contact us at:
           </Body>

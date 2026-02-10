@@ -243,7 +243,7 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
     <div className="space-y-3">
       {/* Show warning if social auth is not properly configured */}
       {(!hasValidGoogleClientId && !hasValidFacebookAppId) && (
-        <div className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg mb-3 border border-amber-200 dark:border-amber-800">
+        <div className="text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg mb-3 border border-amber-200 dark:border-amber-800">
           <Body className="font-medium mb-1">⚙️ Social Authentication Setup Required</Body>
           <Body>Add your OAuth credentials to the .env file to enable social login.</Body>
         </div>
@@ -251,7 +251,7 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
 
       {/* Show HTTPS warning for Facebook - More prominent */}
       {hasValidFacebookAppId && !isHttps && (
-        <div className="text-xs text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg mb-3 border border-red-200 dark:border-red-800">
+        <div className="text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg mb-3 border border-red-200 dark:border-red-800">
           <Body className="font-medium mb-1">🔒 HTTPS Required for Facebook Login</Body>
           <Body>Facebook OAuth requires a secure HTTPS connection. Please access this site via HTTPS or use alternative login methods.</Body>
         </div>

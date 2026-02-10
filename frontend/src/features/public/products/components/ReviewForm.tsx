@@ -41,13 +41,13 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
 
   return (
     <div className="mt-8 p-6 bg-surface rounded-lg shadow-sm">
-      <Heading level={3} className="text-lg font-semibold text-main mb-4">Write a Review</Heading>
+      <Heading level={5} className="text-lg font-semibold text-main mb-4">Write a Review</Heading>
       {!isAuthenticated ? (
         <Body className="text-copy-light">Please log in to submit a review.</Body>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label className="block text-xs font-medium text-main mb-2">Your Rating</Label>
+            <Label className="block text-sm font-medium text-main mb-2">Your Rating</Label>
             <div className="flex items-center">
               {[1, 2, 3, 4, 5].map((star) => (
                                   <Star
@@ -62,7 +62,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
             </div>
           </div>
           <div>
-            <Label className="block text-xs font-medium text-main mb-2">Your Comment</Label>
+            <Label className="block text-sm font-medium text-main mb-2">Your Comment</Label>
             <textarea
               id="comment"
               rows={4}
@@ -76,7 +76,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
             type="submit"
             variant="primary"
             size="sm"
-            className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors text-xs font-medium"
+            className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors text-sm font-medium"
             disabled={loading}
             isLoading={loading}
           >

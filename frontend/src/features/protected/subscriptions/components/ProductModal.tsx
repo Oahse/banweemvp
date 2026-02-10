@@ -139,7 +139,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           <div className="p-6 border-b border-border flex-shrink-0">
             <div className="flex justify-between items-center">
               <div>
-                <Heading level={2} className={combineThemeClasses(themeClasses.text.heading, 'text-2xl font-bold')}>
+                <Heading level={5} className={combineThemeClasses(themeClasses.text.heading, 'text-2xl font-bold')}>
                   Subscription Products
                 </Heading>
                 <Body className={combineThemeClasses(themeClasses.text.secondary, 'text-sm mt-1')}>
@@ -232,7 +232,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
                         {/* Product Details */}
                         <div className="flex-1 min-w-0">
-                          <Heading level={3} className={combineThemeClasses(
+                          <Heading level={5} className={combineThemeClasses(
                             themeClasses.text.primary,
                             'font-semibold text-lg mb-1 truncate'
                           )}>
@@ -267,7 +267,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                               variant="danger"
                               size="sm"
                               className={combineThemeClasses(
-                                'px-3 py-1.5 text-xs',
+                                'px-3 py-1.5 text-sm',
                                 state.removingProductId === product.id && 'opacity-50 cursor-not-allowed'
                               )}
                             >
@@ -319,7 +319,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                   themeClasses.text.warning,
                   'w-6 h-6'
                 )} />
-                <Heading level={3} className={combineThemeClasses(themeClasses.text.heading, 'text-lg font-semibold')}>
+                <Heading level={5} className={combineThemeClasses(themeClasses.text.heading, 'text-lg font-semibold')}>
                   Remove Product
                 </Heading>
               </div>

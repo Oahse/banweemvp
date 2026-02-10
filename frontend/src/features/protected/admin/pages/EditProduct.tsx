@@ -191,7 +191,7 @@ export const EditProduct: React.FC = () => {
               <Text variant="body-sm">Back to Product</Text>
             </Button>
             <div>
-              <Heading level={1}>Edit Product</Heading>
+              <Heading level={5}>Edit Product</Heading>
               <Text variant="caption" tone="secondary">Update product and variant information</Text>
             </div>
           </div>

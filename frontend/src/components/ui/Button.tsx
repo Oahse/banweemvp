@@ -40,8 +40,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   };
 
   const sizeStyles = {
-    xs: 'text-xs px-2 py-1 min-h-[24px]',
-    sm: 'text-xs px-3 py-1.5 min-h-[32px]',
+    xs: 'text-sm px-2 py-1 min-h-[24px]',
+    sm: 'text-sm px-3 py-1.5 min-h-[32px]',
     md: 'text-sm px-4 py-2 min-h-[40px]',
     lg: 'text-base px-6 py-3 min-h-[48px]',
     xl: 'text-lg px-8 py-4 min-h-[56px]',
@@ -83,8 +83,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
         // Full width
         fullWidth && 'w-full',
         
-        // Loading state
-        isLoading && 'cursor-wait',
+        // Loading state - maintain width
+        isLoading && 'cursor-wait relative',
         
         className
       )}
@@ -92,21 +92,26 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       {...props}
     >
           <Text as="span" className="flex items-center justify-center gap-2">
-            {isLoading ? (
-              <span className="flex-shrink-0 mr-2" aria-hidden="true">
-                <AnimatedLoader size="sm" variant="spinner" color="primary" />
+            {isLoading && (
+              <span className="flex-shrink-0" aria-hidden="true">
+                <AnimatedLoader size="sm" variant="petals" color="primary" />
               </span>
-            ) : (
-              leftIcon && (
-                <span className="flex-shrink-0" aria-hidden="true">
-                  {leftIcon}
-                </span>
-              )
+            )}
+            
+            {!isLoading && leftIcon && (
+              <span className="flex-shrink-0" aria-hidden="true">
+                {leftIcon}
+              </span>
             )}
 
-            {children && <Text as="span" className="truncate">{children}</Text>}
+            {children && <Text as="span" className={cn("truncate", isLoading && "opacity-0 absolute")}>{children}</Text>}
+            
+            {/* Show loading text in place of children */}
+            {isLoading && children && (
+              <Text as="span" className="truncate">Loading...</Text>
+            )}
 
-            {rightIcon && (
+            {!isLoading && rightIcon && (
               <span className="flex-shrink-0" aria-hidden="true">
                 {rightIcon}
               </span>

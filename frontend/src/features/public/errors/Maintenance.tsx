@@ -93,7 +93,7 @@ const Maintenance: React.FC<MaintenanceProps> = ({
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-3">
             <Wrench className="w-8 h-8 text-primary animate-pulse" />
           </div>
-          <Heading level={1} className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">
+          <Heading level={5} className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">
             Under Maintenance
           </Heading>
         </motion.div>
@@ -114,7 +114,7 @@ const Maintenance: React.FC<MaintenanceProps> = ({
               <Body className="text-sm text-gray-700 dark:text-gray-300 mb-4">
                 {message}
               </Body>
-              <Body className="text-xs text-gray-600 dark:text-gray-400">
+              <Body className="text-sm text-gray-600 dark:text-gray-400">
                 We'll be back online shortly. Thank you for your patience!
               </Body>
             </motion.div>
@@ -126,7 +126,7 @@ const Maintenance: React.FC<MaintenanceProps> = ({
             >
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Clock className="w-4 h-4 text-primary" />
-                <Heading level={3} className="text-xs font-semibold text-gray-900 dark:text-white">
+                <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white">
                   Estimated Time
                 </Heading>
               </div>
@@ -135,7 +135,7 @@ const Maintenance: React.FC<MaintenanceProps> = ({
                   <div className="text-xl font-bold text-primary mb-1 animate-pulse">
                     {timeRemaining}
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     Time remaining
                   </div>
                 </div>
@@ -150,7 +150,7 @@ const Maintenance: React.FC<MaintenanceProps> = ({
 
             {/* What's Happening */}
             <motion.div className="mb-4" variants={itemVariants}>
-              <Heading level={3} className="text-xs font-semibold text-gray-900 dark:text-white mb-2">
+              <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
                 What we're working on:
               </Heading>
               <ul className="space-y-1.5">
@@ -162,7 +162,7 @@ const Maintenance: React.FC<MaintenanceProps> = ({
                 ].map((item, index) => (
                   <motion.li
                     key={index}
-                    className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400"
+                    className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400"
                     variants={itemVariants}
                   >
                     <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 flex-shrink-0 animate-pulse"></div>
@@ -182,13 +182,13 @@ const Maintenance: React.FC<MaintenanceProps> = ({
                   <Mail className="w-3 h-3 text-gray-400" />
                   <a
                     href="mailto:support@banwee.com"
-                    className="text-xs text-primary hover:underline"
+                    className="text-sm text-primary hover:underline"
                   >
                     support@banwee.com
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">Follow us:</Text>
+                  <Text className="text-sm text-gray-600 dark:text-gray-400">Follow us:</Text>
                   {socialLinks.map((social) => (
                     <motion.a
                       key={social.name}
@@ -224,7 +224,7 @@ const Maintenance: React.FC<MaintenanceProps> = ({
 
         {/* Footer Note */}
         <motion.div
-          className="text-center mt-4 text-xs text-gray-500 dark:text-gray-500"
+          className="text-center mt-4 text-sm text-gray-500 dark:text-gray-500"
           variants={itemVariants}
         >
           <p>

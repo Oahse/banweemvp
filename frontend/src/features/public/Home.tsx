@@ -624,7 +624,7 @@ return (
                   </div>
                   <div className="flex-1 p-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <Text className="bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
+                      <Text className="bg-red-500 text-white px-2 py-1 rounded text-sm font-medium">
                         -{discountPercent}%
                       </Text>
                       <Text className="text-red-500 text-sm font-medium">

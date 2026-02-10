@@ -27,7 +27,7 @@ const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage
 // Loading Spinner fallback
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
-    <AnimatedLoader size="lg" variant="spinner" color="primary" />
+    <AnimatedLoader size="lg" variant="petals" color="primary" />
   </div>
 );
 

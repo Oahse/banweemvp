@@ -73,7 +73,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   // Size variants
   const sizeClasses = {
     sm: {
-      button: 'h-7 min-w-[28px] text-xs px-2',
+      button: 'h-7 min-w-[28px] text-sm px-2',
       icon: 'w-3 h-3',
       gap: 'gap-0.5',
     },

@@ -167,7 +167,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                   {/* Stock Badge */}
                   {showStock && (outOfStock || lowStock) && (
                     <div className={combineThemeClasses(
-                      'absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-xs font-medium',
+                      'absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-sm font-medium',
                       outOfStock 
                         ? 'bg-red-100 text-red-800' 
                         : 'bg-orange-100 text-orange-800'
@@ -181,7 +181,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
               {/* Variant Info */}
               <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center justify-between mb-1">
-                    <Heading level={4} className={combineThemeClasses(
+                    <Heading level={5} className={combineThemeClasses(
                       themeClasses.text.heading,
                       'font-medium truncate',
                       currentSize.text
@@ -218,7 +218,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                       </Text>
                     )}
                     {priceInfo.discount && (
-                      <Text as="span" className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full font-medium">
+                      <Text as="span" className="px-1.5 py-0.5 bg-red-100 text-red-800 text-sm rounded-full font-medium">
                         -{priceInfo.discount}%
                       </Text>
                     )}
@@ -234,13 +234,13 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                       {priceInfo.original && (
                         <Text as="span" className={combineThemeClasses(
                           themeClasses.text.muted,
-                          'line-through text-xs'
+                          'line-through text-sm'
                         )}>
                           {formatCurrency(priceInfo.original, currency)}
                         </Text>
                       )}
                       {priceInfo.discount && (
-                        <Text as="span" className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full font-medium">
+                        <Text as="span" className="px-1.5 py-0.5 bg-red-100 text-red-800 text-sm rounded-full font-medium">
                           -{priceInfo.discount}%
                         </Text>
                       )}
@@ -249,7 +249,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                   {showStock && !outOfStock && (
                     <span className={combineThemeClasses(
                       themeClasses.text.muted,
-                      'text-xs',
+                      'text-sm',
                       lowStock ? 'text-orange-600' : ''
                     )}>
                       {variant.stock} in stock
@@ -258,7 +258,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                 </div>
 
                 {showSku && variant.sku && (
-                    <Text as="p" className={combineThemeClasses(themeClasses.text.muted, 'text-xs mt-1')}>
+                    <Text as="p" className={combineThemeClasses(themeClasses.text.muted, 'text-sm mt-1')}>
                       SKU: {variant.sku}
                     </Text>
                   )}
@@ -271,7 +271,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                           key={key}
                           as="span"
                           className={combineThemeClasses(
-                            'px-2 py-0.5 rounded-full text-xs',
+                            'px-2 py-0.5 rounded-full text-sm',
                             themeClasses.background.elevated,
                             themeClasses.text.secondary
                           )}
@@ -358,7 +358,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                 {/* Stock Badge */}
                 {showStock && (outOfStock || lowStock) && (
                   <div className={combineThemeClasses(
-                    'absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-xs font-medium',
+                    'absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-sm font-medium',
                     outOfStock 
                       ? 'bg-red-100 text-red-800' 
                       : 'bg-orange-100 text-orange-800'
@@ -391,7 +391,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                   {priceInfo.original && (
                     <span className={combineThemeClasses(
                       themeClasses.text.muted,
-                      'line-through text-xs'
+                      'line-through text-sm'
                     )}>
                       {formatCurrency(priceInfo.original, currency)}
                     </span>
@@ -399,7 +399,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                 </div>
 
                 {priceInfo.discount && (
-                  <div className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full font-medium inline-block">
+                  <div className="px-1.5 py-0.5 bg-red-100 text-red-800 text-sm rounded-full font-medium inline-block">
                     -{priceInfo.discount}%
                   </div>
                 )}
@@ -407,7 +407,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                 {showStock && !outOfStock && (
                   <p className={combineThemeClasses(
                     themeClasses.text.muted,
-                    'text-xs',
+                    'text-sm',
                     lowStock ? 'text-orange-600' : ''
                   )}>
                     {variant.stock} in stock
@@ -415,7 +415,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                 )}
 
                 {showSku && variant.sku && (
-                  <p className={combineThemeClasses(themeClasses.text.muted, 'text-xs')}>
+                  <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
                     {variant.sku}
                   </p>
                 )}

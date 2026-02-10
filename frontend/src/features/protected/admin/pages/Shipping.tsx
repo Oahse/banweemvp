@@ -4,8 +4,7 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/components/layout/AdminLayout';
-import { ShippingListSkeleton } from '@/components/skeletons/ShippingSkeleton';
+import { ShippingListSkeleton } from '@/features/protected/admin/components/skeletons/ShippingSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
@@ -484,14 +483,11 @@ export const AdminShipping = () => {
 
   if (initialLoading) {
     return (
-      <AdminLayout>
-        <ShippingListSkeleton />
-      </AdminLayout>
+      <ShippingListSkeleton />
     );
   }
 
   return (
-    <AdminLayout>
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -540,7 +536,7 @@ export const AdminShipping = () => {
           <>
             <ModalHeader>
               <div>
-                <Heading level={3} className="text-lg font-semibold">{viewingMethod.name}</Heading>
+                <Heading level={5} className="text-lg font-semibold">{viewingMethod.name}</Heading>
                 <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Shipping method details</Body>
               </div>
             </ModalHeader>
@@ -595,7 +591,7 @@ export const AdminShipping = () => {
       <Modal isOpen={editModal.isOpen} onClose={editModal.close} size="lg">
         <ModalHeader>
           <div>
-            <Heading level={3} className="text-lg font-semibold">{editingMethod ? 'Edit Shipping Method' : 'Add Shipping Method'}</Heading>
+            <Heading level={5} className="text-lg font-semibold">{editingMethod ? 'Edit Shipping Method' : 'Add Shipping Method'}</Heading>
             <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fill in the details below</Body>
           </div>
         </ModalHeader>
@@ -736,7 +732,6 @@ export const AdminShipping = () => {
         </ModalFooter>
       </Modal>
     </div>
-    </AdminLayout>
   );
 };
 

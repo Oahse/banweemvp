@@ -118,7 +118,7 @@ export const ProductFilter = ({
     children
   }) => <div className="mb-6">
       <div className="flex items-center justify-between cursor-pointer mb-2" onClick={onToggle}>
-        <Heading level={3} className="text-lg font-semibold text-main">{title}</Heading>
+        <Heading level={5} className="text-lg font-semibold text-main">{title}</Heading>
         {expanded ? <ChevronUpIcon size={20} className="text-gray-500" /> : <ChevronDownIcon size={20} className="text-gray-500" />}
       </div>
       {expanded && <div className="space-y-2">{children}</div>}
@@ -160,7 +160,7 @@ export const ProductFilter = ({
         </div>}
       <div className={cn('p-6', isMobile && !isOpen && 'hidden')}>
         <div className="flex items-center justify-between mb-6">
-          <Heading level={2} className="text-xl font-semibold text-main">Filters</Heading>
+          <Heading level={5} className="text-xl font-semibold text-main">Filters</Heading>
           {(selectedCategories.length > 0 || selectedBrands.length > 0 || selectedRatings.length > 0 || minPrice !== priceRange.min || maxPrice !== priceRange.max) && <Button variant="ghost" size="sm" onClick={clearAllFilters} className="text-gray-500">
               Clear all
             </Button>}
@@ -172,7 +172,7 @@ export const ProductFilter = ({
                   <Text className="ml-2 text-gray-700 flex-grow">
                     {option.label}
                   </Text>
-                  <Text className="text-xs text-gray-500">
+                  <Text className="text-sm text-gray-500">
                     ({option.count})
                   </Text>
                 </div>)}
@@ -183,7 +183,7 @@ export const ProductFilter = ({
                   <Text className="ml-2 text-gray-700 flex-grow">
                     {option.label}
                   </Text>
-                  <Text className="text-xs text-gray-500">
+                  <Text className="text-sm text-gray-500">
                     ({option.count})
                   </Text>
                 </div>)}

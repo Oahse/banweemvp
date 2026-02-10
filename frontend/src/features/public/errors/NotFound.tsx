@@ -59,7 +59,7 @@ const NotFound: React.FC = () => {
         {/* 404 Illustration */}
         <motion.div className="mb-6" variants={scaleVariants}>
           <div className="relative inline-block">
-            <Heading level={1} className="text-9xl md:text-[12rem] font-bold text-primary/20 dark:text-primary/10 select-none">
+            <Heading level={5} className="text-9xl md:text-[12rem] font-bold text-primary/20 dark:text-primary/10 select-none">
               404
             </Heading>
             <div className="absolute inset-0 flex items-center justify-center">
@@ -70,10 +70,10 @@ const NotFound: React.FC = () => {
 
         {/* Message */}
         <motion.div className="mb-6" variants={itemVariants}>
-          <Heading level={2} className="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-2">
+          <Heading level={5} className="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-2">
             Oops! Page Not Found
           </Heading>
-          <Body className="text-xs text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+          <Body className="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
             The page you're looking for doesn't exist or has been moved. 
             Don't worry, let's get you back on track!
           </Body>
@@ -109,7 +109,7 @@ const NotFound: React.FC = () => {
           className="border-t border-gray-200 dark:border-gray-700 pt-6"
           variants={itemVariants}
         >
-          <Heading level={3} className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3">
+          <Heading level={5} className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
             Quick Links
           </Heading>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -125,7 +125,7 @@ const NotFound: React.FC = () => {
                   className="flex flex-col items-center gap-2 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-primary hover:shadow-md transition-all group"
                 >
                   <link.icon className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
-                  <Text className="text-xs font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">
+                  <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">
                     {link.name}
                   </Text>
                 </Link>
@@ -136,7 +136,7 @@ const NotFound: React.FC = () => {
 
         {/* Help Text */}
         <motion.div
-          className="mt-6 text-xs text-gray-500 dark:text-gray-500"
+          className="mt-6 text-sm text-gray-500 dark:text-gray-500"
           variants={itemVariants}
         >
           Need help? <Link to="/contact" className="text-primary hover:underline">Contact our support team</Link>

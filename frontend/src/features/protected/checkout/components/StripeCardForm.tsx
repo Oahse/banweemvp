@@ -134,7 +134,7 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Cardholder Name */}
       <div>
-        <label className="block text-xs font-medium text-copy dark:text-copy-dark mb-2">
+        <label className="block text-sm font-medium text-copy dark:text-copy-dark mb-2">
           Cardholder Name
         </label>
         <Input
@@ -149,7 +149,7 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
 
       {/* ZIP Code */}
       <div>
-        <Label className="block text-xs font-medium text-copy dark:text-copy-dark mb-2">
+        <Label className="block text-sm font-medium text-copy dark:text-copy-dark mb-2">
           ZIP Code (Optional)
         </Label>
         <Input
@@ -168,7 +168,7 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
 
       {/* Card Details using Stripe Elements */}
       <div>
-        <Label className="block text-xs font-medium text-copy dark:text-copy-dark mb-2">
+        <Label className="block text-sm font-medium text-copy dark:text-copy-dark mb-2">
           Card Details
         </Label>
         <div className="p-3 border border-border-light dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark">
@@ -178,7 +178,7 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
 
       {/* Error Message */}
       {error && (
-        <Text className="flex items-start gap-2 p-3 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg text-xs text-destructive dark:text-destructive-dark">
+        <Text className="flex items-start gap-2 p-3 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg text-sm text-destructive dark:text-destructive-dark">
           <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
           {error}
         </Text>
@@ -189,7 +189,7 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
         <Button
           type="submit"
           disabled={!stripe || loading}
-          className="flex-1 text-xs font-medium"
+          className="flex-1 text-sm font-medium"
         >
           {loading ? 'Adding Card...' : 'Add Card'}
         </Button>
@@ -198,7 +198,7 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
           variant="outline"
           onClick={onCancel}
           disabled={loading}
-          className="flex-1 text-xs font-medium"
+          className="flex-1 text-sm font-medium"
         >
           Cancel
         </Button>

@@ -117,17 +117,17 @@ export const Orders = (props: OrdersProps) => {
         </Table>
       ) : error ? (
         <div className="text-center py-6">
-          <Text as="p" className="text-xs text-red-600">Error loading orders</Text>
+          <Text as="p" className="text-sm text-red-600">Error loading orders</Text>
         </div>
       ) : ordersArray.length === 0 ? (
         <div className="text-center py-6">
           <ShoppingBagIcon className="mx-auto h-10 w-10 text-gray-400" />
-          <Heading level={3} weight="medium" className="mt-2">No orders</Heading>
+          <Heading level={5} weight="medium" className="mt-2">No orders</Heading>
           <Text variant="caption" tone="secondary">You haven't placed any orders yet.</Text>
           <div className="mt-4">
             <Link
               to="/products"
-              className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-primary hover:bg-primary-dark"
+              className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark"
             >
               <Text variant="body-sm" className="text-white">Start Shopping</Text>
             </Link>
@@ -140,12 +140,12 @@ export const Orders = (props: OrdersProps) => {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <Heading level={3} weight="medium">Order #{order.id}</Heading>
+                    <Heading level={5} weight="medium">Order #{order.id}</Heading>
                     <Text variant="caption" tone="secondary">{new Date(order.created_at).toLocaleDateString()}</Text>
                   </div>
                   <div className="text-right">
                     <Text variant="body-sm" className="font-semibold">{formatCurrency(order.total_amount)}</Text>
-                    <Text as="span" variant="caption" className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${
+                    <Text as="span" variant="caption" className={`inline-flex px-2 py-0.5 text-sm font-semibold rounded-full ${
                       order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                       order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
                       order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
@@ -169,7 +169,7 @@ export const Orders = (props: OrdersProps) => {
                   <div className="flex space-x-2">
                         <Link
                           to={`/account/orders/${order.id}`}
-                          className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50"
+                          className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                         >
                           <EyeIcon className="h-3 w-3 mr-1" />
                           <Text as="span">View</Text>
@@ -196,7 +196,7 @@ export const Orders = (props: OrdersProps) => {
                     </div>
                     
                     <div className="mt-3 pt-3 border-t border-gray-200">
-                      <div className="space-y-0.5 text-xs">
+                      <div className="space-y-0.5 text-sm">
                         <div className="flex justify-between">
                           <Text variant="caption">Subtotal:</Text>
                           <Text variant="caption">{formatCurrency(calculatePricingBreakdown(order).subtotal)}</Text>

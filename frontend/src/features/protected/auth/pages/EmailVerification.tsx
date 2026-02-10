@@ -72,7 +72,7 @@ export const EmailVerification = () => {
         className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light text-center"
         variants={itemVariants}
       >
-        <Heading level={1} className="text-xl font-bold text-main mb-4">Email Verification</Heading>
+        <Heading level={5} className="text-xl font-bold text-main mb-4">Email Verification</Heading>
         
         <AnimatePresence mode="wait">
           {verificationStatus === 'pending' && (
@@ -119,7 +119,7 @@ export const EmailVerification = () => {
             <Body className="text-sm text-red-600">{message}</Body>
             <Link 
               to="/login" 
-              className="inline-block text-primary hover:underline text-xs mt-2"
+              className="inline-block text-primary hover:underline text-sm mt-2"
             >
               Back to Login
             </Link>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '@/components/layout/AdminLayout';
-import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
-import { InventoryAdjustmentsSkeleton } from '@/components/skeletons/InventorySkeleton';
+import AdminLayoutSkeleton from '@/features/protected/admin/components/skeletons/AdminLayoutSkeleton';
+import { InventoryAdjustmentsSkeleton } from '@/features/protected/admin/components/skeletons/InventorySkeleton';
 import { Loader, AlertCircle, Plus, Filter, ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import Dropdown from '@/components/ui/Dropdown';
@@ -159,7 +159,7 @@ export const AdminInventoryAdjustments = () => {
     const { icon: Icon, color, bg, label } = config[type as keyof typeof config] || config.increase;
     
     return (
-      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${bg} ${color}`}>
+      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold ${bg} ${color}`}>
         <Icon className="w-3 h-3" />
         {label}
       </span>
@@ -199,7 +199,7 @@ export const AdminInventoryAdjustments = () => {
       render: (value: any, row: any) => (
         <div>
           <span className="text-sm text-gray-900 dark:text-white">{value?.name || 'N/A'}</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{value?.sku || 'N/A'}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">{value?.sku || 'N/A'}</span>
         </div>
       ),
     },
@@ -234,7 +234,7 @@ export const AdminInventoryAdjustments = () => {
       render: (value: any, row: any) => (
         <div>
           <span className="text-sm text-gray-900 dark:text-white truncate">{value?.name || row.adjusted_by || 'N/A'}</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{value?.email || 'N/A'}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{value?.email || 'N/A'}</span>
         </div>
       ),
     },
@@ -275,7 +275,7 @@ export const AdminInventoryAdjustments = () => {
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-1">
           <div>
             <h1 className="text-xl lg:text-2xl font-semibold">Inventory Adjustments</h1>
-            <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Track all inventory changes and adjustments</p>
+            <p className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Track all inventory changes and adjustments</p>
           </div>
           <div className="flex gap-2 w-full lg:w-auto">
             <Button

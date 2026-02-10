@@ -6,7 +6,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { getCountryOptions, getProvinceOptions } from '@/data/countries';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { TaxRatesListSkeleton } from '@/components/skeletons/TaxRatesSkeleton';
+import { TaxRatesListSkeleton } from '@/features/protected/admin/components/skeletons/TaxRatesSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text/Text';
 import { Card } from '@/components/ui/Card';
@@ -134,7 +134,7 @@ export const AdminTaxRates = () => {
         <div>
           <Text className="text-sm text-gray-900 dark:text-white">{value}</Text>
           {row.province_name && (
-            <Text className="text-xs text-gray-500 dark:text-gray-400">{row.province_name}</Text>
+            <Text className="text-sm text-gray-500 dark:text-gray-400">{row.province_name}</Text>
           )}
         </div>
       ),
@@ -160,7 +160,7 @@ export const AdminTaxRates = () => {
       key: 'is_active',
       label: 'Status',
       render: (value: boolean) => (
-        <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${
+        <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${
           value ? 'bg-success/20 text-success' : 'bg-error/20 text-error'
         }`}>
           {value ? 'Active' : 'Inactive'}
@@ -361,18 +361,15 @@ export const AdminTaxRates = () => {
 
   if (initialLoading) {
     return (
-      <AdminLayout>
-        <TaxRatesListSkeleton />
-      </AdminLayout>
+      <TaxRatesListSkeleton />
     );
   }
 
   return (
-    <AdminLayout>
-      <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-1">
           <div>
-            <Text className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</Text>
+            <Text className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage tax rates by country and region</Text>
           </div>
           <div className="flex gap-2 w-full lg:w-auto">
             <Button
@@ -573,7 +570,6 @@ export const AdminTaxRates = () => {
           </ModalFooter>
         </Modal>
       </div>
-    </AdminLayout>
   );
 };
 

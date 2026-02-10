@@ -5,7 +5,7 @@ import { Eye, EyeOff, CheckCircle, User, Mail } from 'lucide-react';
 import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { Input, Checkbox, RadioGroup } from '@/components/ui/Form';
-import SocialAuth from '@/components/SocialAuth';
+import SocialAuth from '@/features/protected/auth/components/SocialAuth';
 import { validation } from '@/utils/validation';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
@@ -214,7 +214,7 @@ export const Register = () => {
           </motion.div>
         )}
         
-        <Heading level={1} className="text-xl font-bold text-main mb-4 text-center">Create an Account</Heading>
+        <Heading level={5} className="text-xl font-bold text-main mb-4 text-center">Create an Account</Heading>
         <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
           <Input
             label="First Name"
@@ -343,10 +343,10 @@ export const Register = () => {
         <motion.div variants={itemVariants}>
           <div className="relative flex items-center justify-center my-4">
           <div className="border-t border-border-light w-full"></div>
-          <Text className="bg-surface px-3 text-xs text-copy-light absolute">Or continue with</Text>
+          <Text className="bg-surface px-3 text-sm text-copy-light absolute">Or continue with</Text>
         </div>
         <SocialAuth mode="register" />
-        <Body className="text-center mt-4 text-xs text-copy-light">
+        <Body className="text-center mt-4 text-sm text-copy-light">
           Already have an account? <Link to="/login" className="text-primary hover:underline">Login</Link>
         </Body>
         </motion.div>

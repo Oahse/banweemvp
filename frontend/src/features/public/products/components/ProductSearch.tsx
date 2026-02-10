@@ -133,7 +133,7 @@ export const ProductSearch = ({
           >
             Filters
             {hasActiveFilters && (
-              <Text className="ml-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <Text className="ml-1 bg-primary text-white text-sm rounded-full w-5 h-5 flex items-center justify-center">
                 {[filters.category, ...filters.tags, filters.availability].filter(Boolean).length + 
                  (filters.minPrice !== priceRange.min ? 1 : 0) + 
                  (filters.maxPrice !== priceRange.max ? 1 : 0) + 

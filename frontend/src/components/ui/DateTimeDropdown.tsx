@@ -151,7 +151,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
           onClick={() => handleDateSelect(day)}
           variant={isSelected ? 'primary' : isToday ? 'outline' : 'ghost'}
           size="sm"
-          className={`h-8 text-xs font-normal rounded transition-all ${
+          className={`h-8 text-sm font-normal rounded transition-all ${
             isSelected
               ? 'bg-primary text-white'
               : isToday
@@ -246,7 +246,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
           {/* Day headers */}
           <div className="grid grid-cols-7 gap-1 mb-1">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-              <div key={d} className={`h-8 flex items-center justify-center text-xs font-normal ${
+              <div key={d} className={`h-8 flex items-center justify-center text-sm font-normal ${
                 currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
               }`}>
                 {d}
@@ -265,7 +265,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
               onClick={handleToday}
               variant="outline"
               size="sm"
-              className={`flex-1 py-1.5 px-2 text-xs rounded-lg font-normal transition-all ${
+              className={`flex-1 py-1.5 px-2 text-sm rounded-lg font-normal transition-all ${
                 currentTheme === 'dark'
                   ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -277,7 +277,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
               onClick={handleClear}
               variant="outline"
               size="sm"
-              className={`flex-1 py-1.5 px-2 text-xs rounded-lg font-normal transition-all flex items-center justify-center gap-1 ${
+              className={`flex-1 py-1.5 px-2 text-sm rounded-lg font-normal transition-all flex items-center justify-center gap-1 ${
                 currentTheme === 'dark'
                   ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'

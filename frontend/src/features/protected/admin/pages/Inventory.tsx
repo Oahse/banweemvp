@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { InventoryListSkeleton } from '@/components/skeletons/InventorySkeleton';
+import { InventoryListSkeleton } from '@/features/protected/admin/components/skeletons/InventorySkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
@@ -190,7 +190,7 @@ export const AdminInventory = () => {
       render: (value: number, row: any) => {
         const level = getItemDisplay(row).stockLevel;
         return (
-          <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${level.cls}`}>
+          <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${level.cls}`}>
             {level.label}
           </Text>
         );
@@ -200,7 +200,7 @@ export const AdminInventory = () => {
       key: 'status',
       label: 'Status',
       render: (value: string) => (
-        <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${
+        <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${
           value === 'active' 
             ? 'bg-success/20 text-success' 
             : 'bg-gray-500/20 text-gray-500'
@@ -425,7 +425,7 @@ export const AdminInventory = () => {
         <Modal isOpen={editModal.isOpen} onClose={editModal.close} size="lg">
           <ModalHeader>
             <div>
-              <Heading level={3} className="text-lg font-semibold">{editingItem ? 'Edit Inventory' : 'Add Inventory Item'}</Heading>
+              <Heading level={5} className="text-lg font-semibold">{editingItem ? 'Edit Inventory' : 'Add Inventory Item'}</Heading>
               <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{editingItem ? 'Update stock levels and location' : 'Fill in the details below'}</Body>
             </div>
           </ModalHeader>

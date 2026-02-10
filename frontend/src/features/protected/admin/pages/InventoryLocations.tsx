@@ -3,8 +3,8 @@ import { Loader, AlertCircle, Plus, Edit, Trash2, MapPin } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import AdminLayout from '@/components/layout/AdminLayout';
-import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
-import { InventoryLocationsSkeleton } from '@/components/skeletons/InventorySkeleton';
+import AdminLayoutSkeleton from '@/features/protected/admin/components/skeletons/AdminLayoutSkeleton';
+import { InventoryLocationsSkeleton } from '@/features/protected/admin/components/skeletons/InventorySkeleton';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading, Caption, Label } from '@/components/ui/Text/Text';
@@ -131,7 +131,7 @@ export const AdminInventoryLocations = () => {
 
   const statusBadge = (isActive: boolean) => {
     return (
-      <Text className={`px-3 py-1 rounded-full text-xs font-semibold ${
+      <Text className={`px-3 py-1 rounded-full text-sm font-semibold ${
         isActive ? 'bg-success/20 text-success' : 'bg-error/20 text-error'
       }`}>
         {isActive ? 'Active' : 'Inactive'}
@@ -141,7 +141,7 @@ export const AdminInventoryLocations = () => {
 
   const capacityBadge = (current?: number, total?: number) => {
     if (current === undefined || total === undefined) {
-      return <Text className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>N/A</Text>;
+      return <Text className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>N/A</Text>;
     }
     
     const percentage = (current / total) * 100;
@@ -152,7 +152,7 @@ export const AdminInventoryLocations = () => {
       'text-success';
     
     return (
-      <Text className={`text-xs font-medium ${colorClass}`}>
+      <Text className={`text-sm font-medium ${colorClass}`}>
         {current}/{total} ({percentage.toFixed(1)}%)
       </Text>
     );
@@ -170,8 +170,8 @@ export const AdminInventoryLocations = () => {
             <MapPin className="w-4 h-4 text-primary" />
           </div>
           <div className="min-w-0">
-            <Text className="text-xs font-medium truncate max-w-[120px]">{value}</Text>
-            <Caption className="text-xs text-gray-500 dark:text-gray-400 truncate">Code: {row.code}</Caption>
+            <Text className="text-sm font-medium truncate max-w-[120px]">{value}</Text>
+            <Caption className="text-sm text-gray-500 dark:text-gray-400 truncate">Code: {row.code}</Caption>
           </div>
         </div>
       ),
@@ -180,7 +180,7 @@ export const AdminInventoryLocations = () => {
       key: 'address',
       label: 'Address',
       render: (value: string, row: any) => (
-        <div className="text-xs max-w-[150px]">
+        <div className="text-sm max-w-[150px]">
           <Text className="truncate">{value}</Text>
           <Caption className="text-gray-500 dark:text-gray-400 truncate">{row.city}, {row.state} {row.postal_code}</Caption>
           <Caption className="text-gray-500 dark:text-gray-400 truncate">{row.country}</Caption>
@@ -191,7 +191,7 @@ export const AdminInventoryLocations = () => {
       key: 'contact',
       label: 'Contact',
       render: (_: any, row: any) => (
-        <div className="text-xs max-w-[120px]">
+        <div className="text-sm max-w-[120px]">
           {row.manager_name && (
             <Text className="font-medium truncate">{row.manager_name}</Text>
           )}
@@ -220,7 +220,7 @@ export const AdminInventoryLocations = () => {
       label: 'Created',
       sortable: true,
       render: (value: string) => (
-        <Text className="text-xs text-gray-500 dark:text-gray-400">
+        <Text className="text-sm text-gray-500 dark:text-gray-400">
           {new Date(value).toLocaleDateString()}
         </Text>
       ),
@@ -282,8 +282,8 @@ export const AdminInventoryLocations = () => {
       <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-1">
           <div>
-            <Heading level={1} className="text-xl lg:text-2xl font-semibold">Warehouse Locations</Heading>
-            <Caption className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage warehouse and storage locations</Caption>
+            <Heading level={5} className="text-xl lg:text-2xl font-semibold">Warehouse Locations</Heading>
+            <Caption className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage warehouse and storage locations</Caption>
           </div>
           <div className="flex gap-2 w-full lg:w-auto">
             <Button

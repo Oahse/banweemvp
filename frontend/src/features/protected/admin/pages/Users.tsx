@@ -7,8 +7,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import AdminLayout from '@/components/layout/AdminLayout';
-import { UsersListSkeleton } from '@/components/skeletons/UsersSkeleton';
+import { UsersListSkeleton } from '@/features/protected/admin/components/skeletons/UsersSkeleton';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 import { ConfirmModal, useModal } from '@/components/ui/Modal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
@@ -161,7 +160,7 @@ export const Users = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.active;
     
     return (
-      <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
         {config.label}
       </Text>
     );
@@ -180,7 +179,7 @@ export const Users = () => {
     const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.customer;
     
     return (
-      <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
         {config.label}
       </Text>
     );
@@ -318,19 +317,16 @@ export const Users = () => {
 
   if (initialLoading) {
     return (
-      <AdminLayout>
-        <UsersListSkeleton />
-      </AdminLayout>
+      <UsersListSkeleton />
     );
   }
 
   return (
-    <AdminLayout>
-      <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-1">
           <div>
             <h1 className="text-xl lg:text-2xl font-semibold">Users</h1>
-            <Text className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage user accounts and permissions</Text>
+            <Text className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage user accounts and permissions</Text>
           </div>
         </div>
 
@@ -361,7 +357,6 @@ export const Users = () => {
           variant="danger"
         />
       </div>
-    </AdminLayout>
   );
 };
 

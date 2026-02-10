@@ -203,7 +203,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
         
         {/* Sale badge */}
         {isOnSale() && (
-          <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
+          <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-sm font-medium">
             -{getDiscountPercentage()}%
           </div>
         )}
@@ -217,7 +217,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
 
         {/* Low stock indicator */}
         {isInStock() && item.variant && item.variant.stock <= 5 && (
-          <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-medium">
+          <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-sm font-medium">
             {item.variant.stock} left
           </div>
         )}
@@ -237,14 +237,14 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
       {/* Product Details */}
         <div className="p-4">
         <div className="mb-2">
-          <Heading level={3} className="product-title text-sm font-medium text-gray-900 line-clamp-2">{item.product?.name || 'Unknown Product'}</Heading>
+          <Heading level={5} className="product-title text-sm font-medium text-gray-900 line-clamp-2">{item.product?.name || 'Unknown Product'}</Heading>
           
           {item.variant && (
-            <Caption className="body-text text-xs text-gray-500 mt-1">{getVariantDescription()}</Caption>
+            <Caption className="body-text text-sm text-gray-500 mt-1">{getVariantDescription()}</Caption>
           )}
           
           {item.product?.category && (
-            <Caption className="body-text text-xs text-gray-400 mt-1">{(typeof item.product.category === 'object' && item.product.category.name) ? item.product.category.name : (typeof item.product.category === 'string' ? item.product.category : 'Uncategorized')}</Caption>
+            <Caption className="body-text text-sm text-gray-400 mt-1">{(typeof item.product.category === 'object' && item.product.category.name) ? item.product.category.name : (typeof item.product.category === 'string' ? item.product.category : 'Uncategorized')}</Caption>
           )}
         </div>
 
@@ -261,9 +261,9 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
             {/* Stock info */}
             <div className="mt-1">
               {isInStock() ? (
-                <Caption className="body-text text-xs text-green-600">{item.variant.stock} in stock</Caption>
+                <Caption className="body-text text-sm text-green-600">{item.variant.stock} in stock</Caption>
               ) : (
-                <Caption className="body-text text-xs text-red-600">Out of stock</Caption>
+                <Caption className="body-text text-sm text-red-600">Out of stock</Caption>
               )}
             </div>
           </div>
@@ -272,7 +272,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
         {/* Quantity selector (only if in stock) */}
         {isInStock() && item.variant && (
           <div className="mb-3">
-            <Label className="block text-xs font-medium text-gray-700 mb-1">Quantity</Label>
+            <Label className="block text-sm font-medium text-gray-700 mb-1">Quantity</Label>
             <select
               value={quantity}
               onChange={(e) => handleQuantityChange(parseInt(e.target.value))}
@@ -295,7 +295,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ShoppingCartIcon size={14} className="mr-1" />
-            <Text as="span" className="text-xs">{isAddingToCart ? 'Adding...' : 'Add to Cart'}</Text>
+            <Text as="span" className="text-sm">{isAddingToCart ? 'Adding...' : 'Add to Cart'}</Text>
           </Button>
 
           <Button
@@ -314,7 +314,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
 
         {/* Added date */}
         <div className="mt-3 pt-3 border-t border-gray-100">
-          <Caption className="body-text text-xs text-gray-400">Added {new Date(item.added_at).toLocaleDateString()}</Caption>
+          <Caption className="body-text text-sm text-gray-400">Added {new Date(item.added_at).toLocaleDateString()}</Caption>
         </div>
       </div>
     </div>

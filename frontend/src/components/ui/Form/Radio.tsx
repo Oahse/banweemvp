@@ -87,13 +87,14 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
             sizeStyles[size],
             'rounded-full border-2 transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:ring-offset-2',
+            'appearance-none',
             
             // Default state
-            'border-border bg-surface',
+            'border-border-light bg-surface',
             'checked:bg-primary checked:border-primary',
             
             // Focus state
-            'focus:ring-primary/20',
+            'focus:ring-primary/30',
             state === 'error' && 'focus:ring-error/20',
             state === 'success' && 'focus:ring-success/20',
             state === 'warning' && 'focus:ring-warning/20',
@@ -104,7 +105,8 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
             state === 'warning' && 'border-warning checked:bg-warning checked:border-warning',
             
             // Hover state
-            !disabled && !readOnly && 'hover:border-primary cursor-pointer',
+            !disabled && !readOnly && 'hover:border-primary/60 cursor-pointer',
+            !disabled && !readOnly && checked && 'hover:bg-primary-dark hover:border-primary-dark',
             
             // Disabled state
             disabled && 'opacity-50 cursor-not-allowed',

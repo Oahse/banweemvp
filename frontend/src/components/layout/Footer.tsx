@@ -79,7 +79,7 @@ export const Footer = () => {
               <div className="flex items-center">
                 <img src="/banwee_logo_text_green.png" alt="Banwee" className="h-6" />
               </div>
-            </Link>
+            </Link><br/>
             <Text variant="body-sm" tone="secondary" className="mb-6 max-w-md">
               Banwee brings you the finest organic products from Africa, ethically sourced and sustainably
               produced.
@@ -173,7 +173,7 @@ export const Footer = () => {
                       <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" opacity="0.6"/>
                     </svg>
                   </div>
-                  <div className="text-xs">
+                  <div className="text-sm">
                     <div className="text-[10px] leading-none">Download on the</div>
                     <div className="text-sm font-semibold leading-none">App Store</div>
                   </div>
@@ -211,7 +211,7 @@ export const Footer = () => {
                       <path d="M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" fill="url(#playGradient4)"/>
                     </svg>
                   </div>
-                  <div className="text-xs">
+                  <div className="text-sm">
                     <div className="text-[10px] leading-none">Get it on</div>
                     <div className="text-sm font-semibold leading-none">Google Play</div>
                   </div>

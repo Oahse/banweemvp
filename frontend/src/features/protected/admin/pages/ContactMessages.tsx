@@ -7,10 +7,9 @@ import React, { useState, useEffect } from 'react';
 import { ContactMessagesAPI, ContactMessage } from '@/api/contact-messages';
 import { Mail, Clock, CheckCircle, AlertCircle, Search, Eye, Trash2, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ContactMessagesSkeleton from '@/components/skeletons/ContactMessagesSkeleton';
+import ContactMessagesSkeleton from '@/features/protected/admin/components/skeletons/ContactMessagesSkeleton';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
@@ -348,13 +347,13 @@ const ContactMessages: React.FC = () => {
   ];
 
   const statusBadge = (status: string) => (
-    <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(status)}`}>
+    <span className={`px-2 py-1 text-sm rounded-full ${getStatusColor(status)}`}>
       {status.replace('_', ' ')}
     </span>
   );
 
   const priorityBadge = (priority: string) => (
-    <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(priority)}`}>
+    <span className={`px-2 py-1 text-sm rounded-full ${getPriorityColor(priority)}`}>
       {priority}
     </span>
   );
@@ -364,8 +363,7 @@ const ContactMessages: React.FC = () => {
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
         {/* Header */}
         <div>
           <p className="text-sm text-copy-light">
@@ -501,17 +499,17 @@ const ContactMessages: React.FC = () => {
                 <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
                   <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
                   {debouncedSearchTerm && (
-                    <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">
+                    <span className="px-2 py-1 text-sm bg-primary/10 text-primary rounded">
                       Search: {debouncedSearchTerm}
                     </span>
                   )}
                   {statusFilter && (
-                    <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">
+                    <span className="px-2 py-1 text-sm bg-primary/10 text-primary rounded">
                       Status: {statusFilter.replace('_', ' ')}
                     </span>
                   )}
                   {priorityFilter && (
-                    <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded">
+                    <span className="px-2 py-1 text-sm bg-primary/10 text-primary rounded">
                       Priority: {priorityFilter}
                     </span>
                   )}
@@ -607,7 +605,7 @@ const ContactMessages: React.FC = () => {
         loading={isDeleting}
       />
     
-    </AdminLayout>
+    </div>
   );
 };
 

@@ -65,15 +65,15 @@ export const OrderDetail = () => {
       >
         <Text variant="body-sm">Back to Orders</Text>
       </Button>
-      <Heading level={2} weight="medium">Order #{order.id}</Heading>
+      <Heading level={5} weight="medium">Order #{order.id}</Heading>
       <Text variant="body-sm" tone="secondary">Placed on {order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'}</Text>
       <div className="mb-4">
-        <span className="inline-block px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+        <span className="inline-block px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
           {order.status || 'Unknown Status'}
         </span>
       </div>
       <div className="mb-4">
-        <Heading level={3} weight="medium">Items</Heading>
+        <Heading level={5} weight="medium">Items</Heading>
         <ul className="space-y-2">
           {order.items && order.items.length > 0 ? (
             order.items.map((item: any) => (
@@ -85,19 +85,19 @@ export const OrderDetail = () => {
               </li>
             ))
           ) : (
-            <li className="text-xs text-gray-400">No items found.</li>
+            <li className="text-sm text-gray-400">No items found.</li>
           )}
         </ul>
       </div>
       <div className="mb-4">
-        <Heading level={3} weight="medium">Shipping</Heading>
+        <Heading level={5} weight="medium">Shipping</Heading>
         <div className="flex items-center gap-2">
           <MapPinIcon size={16} className="text-gray-400" />
           <Text variant="body-sm">{order.shipping_address || 'N/A'}</Text>
         </div>
       </div>
       <div className="mb-4">
-        <Heading level={3} weight="medium">Total</Heading>
+        <Heading level={5} weight="medium">Total</Heading>
         <Text variant="body-sm" className="font-semibold">${order.total_amount?.toFixed(2) || '0.00'}</Text>
       </div>
       <div className="flex gap-2 mt-4">

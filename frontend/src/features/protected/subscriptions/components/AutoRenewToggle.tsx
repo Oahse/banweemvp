@@ -92,7 +92,7 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
             Auto-Renew
           </span>
           <span className={`
-            px-2 py-1 rounded-full text-xs font-medium
+            px-2 py-1 rounded-full text-sm font-medium
             ${isEnabled 
               ? 'bg-primary/10 text-primary' 
               : 'bg-gray-100 text-gray-600'
@@ -103,7 +103,7 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
         </div>
         
         {showDetails && (
-          <p className={`${themeClasses.text.secondary} text-xs mt-1`}>
+          <p className={`${themeClasses.text.secondary} text-sm mt-1`}>
             {isEnabled 
               ? 'Your subscription will automatically renew at the end of each billing period.'
               : 'Your subscription will not renew automatically. You\'ll need to manually renew it.'

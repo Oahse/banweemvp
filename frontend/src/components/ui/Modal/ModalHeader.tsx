@@ -27,7 +27,7 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
       )}
     >
       <Heading
-        level={2}
+        level={5}
         id={id || labelledBy}
         className="text-lg font-semibold pr-8"
       >

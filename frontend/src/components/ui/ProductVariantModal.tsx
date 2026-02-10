@@ -113,7 +113,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
         {/* Header */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex justify-between items-center mb-4">
-            <Heading level={2} className="text-xl font-bold text-gray-900 dark:text-white">{title}</Heading>
+            <Heading level={5} className="text-xl font-bold text-gray-900 dark:text-white">{title}</Heading>
             <Button
               onClick={onClose}
               variant="ghost"
@@ -210,7 +210,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <Heading level={3} className="font-semibold text-gray-900 dark:text-white truncate">
+                        <Heading level={5} className="font-semibold text-gray-900 dark:text-white truncate">
                           {product.name}
                         </Heading>
                         {product.description && (
@@ -289,13 +289,13 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                                   {variant.name || "Default Variant"}
                                 </Text>
                                 {variant.sku && (
-                                  <Caption className="text-xs text-gray-500 dark:text-gray-400">
+                                  <Caption className="text-sm text-gray-500 dark:text-gray-400">
                                     SKU: {variant.sku}
                                   </Caption>
                                 )}
                               </div>
                               {showOnlyAvailable && variant.inventory && (
-                                <Caption className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <Caption className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                   Stock: {variant.inventory.quantity_available || 0}
                                 </Caption>
                               )}

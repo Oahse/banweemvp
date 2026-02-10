@@ -71,7 +71,7 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
                       </h4>
                       {/* Show variant name if available */}
                       {(product.variant?.name || product.variant_name || product.size || product.color) && (
-                        <span className={combineThemeClasses(themeClasses.text.muted, 'text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md')}>
+                        <span className={combineThemeClasses(themeClasses.text.muted, 'text-sm px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md')}>
                           {product.variant?.name || product.variant_name || product.size || product.color}
                         </span>
                       )}
@@ -80,7 +80,7 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
                     {/* Variant Information */}
                     {(product.variant?.sku || product.sku) && (
                       <div className="flex flex-wrap gap-2">
-                        <span className={combineThemeClasses(themeClasses.text.muted, 'text-xs px-2 py-1 bg-[#61b482] dark:bg-[#4c9066] rounded-md font-medium')}>
+                        <span className={combineThemeClasses(themeClasses.text.muted, 'text-sm px-2 py-1 bg-[#61b482] dark:bg-[#4c9066] rounded-md font-medium')}>
                           SKU: {product.variant?.sku || product.sku}
                         </span>
                       </div>
@@ -90,7 +90,7 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
                     {product.attributes && Object.keys(product.attributes).length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {Object.entries(product.attributes).map(([key, value]: [string, any]) => (
-                          <span key={key} className={combineThemeClasses(themeClasses.text.muted, 'text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md')}>
+                          <span key={key} className={combineThemeClasses(themeClasses.text.muted, 'text-sm px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md')}>
                             {key}: {String(value)}
                           </span>
                         ))}
@@ -99,7 +99,7 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
                     
                     {/* SKU fallback */}
                     {!(product.variant?.sku || product.sku) && (product.variant?.name || product.variant_name || product.size || product.color) && (
-                      <span className={combineThemeClasses(themeClasses.text.muted, 'text-xs')}>
+                      <span className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>
                         {product.variant?.name || product.variant_name || product.size || product.color}
                       </span>
                     )}
@@ -111,7 +111,7 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
                       <span className={combineThemeClasses(themeClasses.text.secondary, 'text-sm font-medium')}>
                         {formatCurrency(product.current_price || product.price, subscription.currency)}
                       </span>
-                      <span className="inline-flex items-center px-2 py-1 bg-primary text-white text-xs font-medium rounded-full shadow-sm">
+                      <span className="inline-flex items-center px-2 py-1 bg-primary text-white text-sm font-medium rounded-full shadow-sm">
                         <PackageIcon size={12} className="mr-1" />
                         Qty: {product.quantity || 1}
                       </span>
@@ -203,20 +203,20 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
             
             {/* Billing Cycle Info */}
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <div className="flex justify-between text-xs">
+              <div className="flex justify-between text-sm">
                 <span className={combineThemeClasses(themeClasses.text.secondary)}>Billing Cycle</span>
                 <span className={combineThemeClasses(themeClasses.text.primary)}>
                   {subscription.billing_cycle?.charAt(0).toUpperCase() + subscription.billing_cycle?.slice(1)}
                 </span>
               </div>
-              <div className="flex justify-between text-xs mt-1">
+              <div className="flex justify-between text-sm mt-1">
                 <span className={combineThemeClasses(themeClasses.text.secondary)}>Auto-renew</span>
                 <span className={combineThemeClasses(themeClasses.text.primary)}>
                   {subscription.auto_renew ? 'Enabled' : 'Disabled'}
                 </span>
               </div>
               {subscription.next_billing_date && (
-                <div className="flex justify-between text-xs mt-1">
+                <div className="flex justify-between text-sm mt-1">
                   <span className={combineThemeClasses(themeClasses.text.secondary)}>Next Billing</span>
                   <span className={combineThemeClasses(themeClasses.text.primary)}>
                     {new Date(subscription.next_billing_date).toLocaleDateString('en-US', {

@@ -195,7 +195,7 @@ const Products = () => {
     >
       {/* Header */}
       <motion.div className="mb-4 sm:mb-6" variants={itemVariants}>
-        <Heading level={1} weight="semibold">Products</Heading>
+        <Heading level={5} weight="semibold">Products</Heading>
         <Text variant="body-sm" tone="secondary">
           {loading && !productsData ? 'Loading products...' : `${totalProducts} products available`}
         </Text>
@@ -273,7 +273,7 @@ const Products = () => {
             {/* Categories */}
             {categories && categories.length > 0 && (
               <div>
-                <Heading level={3} weight="medium">Categories</Heading>
+                <Heading level={5} weight="medium">Categories</Heading>
                 <div className="flex flex-wrap gap-1">
                   {categories.map((category) => (
                     <Button
@@ -297,7 +297,7 @@ const Products = () => {
 
             {/* Price Range */}
             <div>
-              <Heading level={3} weight="medium">Price Range</Heading>
+              <Heading level={5} weight="medium">Price Range</Heading>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
                   <Label weight="medium">Min Price</Label>
@@ -393,7 +393,7 @@ const Products = () => {
               )}>
                 <SearchIcon size={24} className={themeClasses.text.muted} />
               </div>
-              <Heading level={3} className="text-lg mb-2">No products found</Heading>
+              <Heading level={5} className="text-lg mb-2">No products found</Heading>
               <Text variant="body-sm" tone="secondary" className="mb-4">
                 Try adjusting your search or filters to find what you're looking for.
               </Text>

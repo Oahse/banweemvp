@@ -5,10 +5,9 @@ import AdminAPI from '@/api/admin';
 import apiClient from '@/api/client';
 import { Dropdown } from '@/components/ui/Dropdown';
 import toast from 'react-hot-toast';
-import AdminLayout from '@/components/layout/AdminLayout';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
-import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
-import { OrderDetailSkeleton } from '@/components/skeletons/OrdersSkeleton';
+import AdminLayoutSkeleton from '@/features/protected/admin/components/skeletons/AdminLayoutSkeleton';
+import { OrderDetailSkeleton } from '@/features/protected/admin/components/skeletons/OrdersSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
@@ -257,8 +256,7 @@ export const AdminOrderDetail = () => {
 
   if (error || !order) {
     return (
-      <AdminLayout>
-        <div className="space-y-6 p-6">
+      <div className="space-y-6 p-6">
           <div className="flex items-center gap-2">
             <Button
               onClick={() => navigate('/admin/orders')}
@@ -278,15 +276,13 @@ export const AdminOrderDetail = () => {
             </div>
           </div>
         </div>
-      </AdminLayout>
     );
   }
 
   const statusOptions = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
         {/* Header with Back Button */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
@@ -299,8 +295,8 @@ export const AdminOrderDetail = () => {
               Back to Orders
             </Button>
             <div>
-              <Heading level={1} className="text-xl font-bold text-copy">Order #{order.order_number}</Heading>
-              <Body className="text-xs text-copy-light">{order.id}</Body>
+              <Heading level={5} className="text-xl font-bold text-copy">Order #{order.order_number}</Heading>
+              <Body className="text-sm text-copy-light">{order.id}</Body>
             </div>
           </div>
           <Button
@@ -362,7 +358,7 @@ export const AdminOrderDetail = () => {
               <Body className="text-sm text-copy-light">Order Status</Body>
               <Package className="w-4 h-4 text-primary" />
             </div>
-            <Text className={`px-3 py-1 rounded-full text-xs font-bold w-fit ${getStatusColor(order.order_status)}`}>
+            <Text className={`px-3 py-1 rounded-full text-sm font-bold w-fit ${getStatusColor(order.order_status)}`}>
               {formatStatus(order.order_status)}
             </Text>
           </div>
@@ -373,7 +369,7 @@ export const AdminOrderDetail = () => {
               <Body className="text-sm text-copy-light">Payment Status</Body>
               <DollarSign className="w-4 h-4 text-success" />
             </div>
-            <Text className={`px-3 py-1 rounded-full text-xs font-bold w-fit ${getPaymentStatusColor(order.payment_status)}`}>
+            <Text className={`px-3 py-1 rounded-full text-sm font-bold w-fit ${getPaymentStatusColor(order.payment_status)}`}>
               {formatStatus(order.payment_status)}
             </Text>
           </div>
@@ -384,7 +380,7 @@ export const AdminOrderDetail = () => {
               <Body className="text-sm text-copy-light">Fulfillment</Body>
               <CheckCircle className="w-4 h-4 text-success" />
             </div>
-            <Text className={`px-3 py-1 rounded-full text-xs font-small w-fit ${getFulfillmentStatusColor(order.fulfillment_status)}`}>
+            <Text className={`px-3 py-1 rounded-full text-sm font-small w-fit ${getFulfillmentStatusColor(order.fulfillment_status)}`}>
               {formatStatus(order.fulfillment_status)}
             </Text>
           </div>
@@ -425,7 +421,7 @@ export const AdminOrderDetail = () => {
             <div className="lg:col-span-2 space-y-6">
               {/* General Information */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <Heading level={3} className="text-base font-semibold text-copy mb-4">General Information</Heading>
+                <Heading level={5} className="text-base font-semibold text-copy mb-4">General Information</Heading>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Text className="text-sm text-copy-light">Order Date</Text>
@@ -452,7 +448,7 @@ export const AdminOrderDetail = () => {
 
               {/* Customer Information */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <Heading level={3} className="text-base font-semibold text-copy mb-4">Customer Information</Heading>
+                <Heading level={5} className="text-base font-semibold text-copy mb-4">Customer Information</Heading>
                 <div className="space-y-3">
                   {order.user?.firstname && (
                     <div>
@@ -477,7 +473,7 @@ export const AdminOrderDetail = () => {
 
               {/* Timeline */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <Heading level={3} className="text-base font-semibold text-copy mb-4">Order Timeline</Heading>
+                <Heading level={5} className="text-base font-semibold text-copy mb-4">Order Timeline</Heading>
                 <div className="space-y-3">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center mt-1">
@@ -540,7 +536,7 @@ export const AdminOrderDetail = () => {
             <div className="space-y-6">
               {/* Status Management */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <Heading level={3} className="text-base font-semibold text-copy mb-4">Update Status</Heading>
+                <Heading level={5} className="text-base font-semibold text-copy mb-4">Update Status</Heading>
                 <div className="space-y-4">
                   <Dropdown
                     options={statusOptions.map(status => ({ value: status, label: status }))}
@@ -564,7 +560,7 @@ export const AdminOrderDetail = () => {
 
               {/* Pricing Breakdown */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <Heading level={3} className="text-base font-semibold text-copy mb-4">Pricing Details</Heading>
+                <Heading level={5} className="text-base font-semibold text-copy mb-4">Pricing Details</Heading>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <Text className="text-copy-light">Subtotal</Text>
@@ -595,7 +591,7 @@ export const AdminOrderDetail = () => {
               {/* Tracking Information */}
               {order.tracking_number && (
                 <div className="bg-surface rounded-lg border border-border-light p-6">
-                <Heading level={3} className="text-base font-semibold text-copy mb-4">Tracking Information</Heading>
+                <Heading level={5} className="text-base font-semibold text-copy mb-4">Tracking Information</Heading>
                   <div className="space-y-3">
                     <div>
                       <Text className="text-sm text-copy-light">Tracking Number</Text>
@@ -624,7 +620,7 @@ export const AdminOrderDetail = () => {
         {activeTab === 'items' && (
           <div className="bg-surface rounded-lg border border-border-light overflow-hidden">
             <div className="p-6 border-b border-border-light">
-              <Heading level={3} className="text-base font-semibold text-copy">Order Items ({order.items?.length || 0})</Heading>
+              <Heading level={5} className="text-base font-semibold text-copy">Order Items ({order.items?.length || 0})</Heading>
             </div>
 
             {order.items && order.items.length > 0 ? (
@@ -657,14 +653,14 @@ export const AdminOrderDetail = () => {
                                 className="w-16 h-16 object-cover rounded border border-border-light"
                               />
                             ) : (
-                              <div className="w-16 h-16 rounded border border-border-light bg-surface-dark flex items-center justify-center text-copy-light text-xs">—</div>
+                              <div className="w-16 h-16 rounded border border-border-light bg-surface-dark flex items-center justify-center text-copy-light text-sm">—</div>
                             )}
                           </td>
                           <td className="px-6 py-4">
                             <Text className="text-sm font-semibold text-copy">
                               {item.product_name ?? item.product?.name ?? 'N/A'}
                             </Text>
-                            <Text className="text-xs text-copy-light mt-1">
+                            <Text className="text-sm text-copy-light mt-1">
                               ID: {item.product_id ?? 'N/A'}
                             </Text>
                           </td>
@@ -699,17 +695,17 @@ export const AdminOrderDetail = () => {
               <div className="px-6 py-4 bg-surface-light border-t border-border-light">
                 <div className="grid grid-cols-3 gap-4 text-right">
                   <div>
-                    <Text className="text-xs text-copy-light mb-1">Total Items</Text>
+                    <Text className="text-sm text-copy-light mb-1">Total Items</Text>
                     <Text className="text-base font-semibold text-copy">{order.items.reduce((sum, item) => sum + (item.quantity || 0), 0)}</Text>
                   </div>
                   <div>
-                    <Text className="text-xs text-copy-light mb-1">Total Cost</Text>
+                    <Text className="text-sm text-copy-light mb-1">Total Cost</Text>
                     <Text className="text-base font-semibold text-copy">
                       {formatCurrency(order.items.reduce((sum, item) => sum + (Number(item.total_price) || 0), 0))}
                     </Text>
                   </div>
                   <div>
-                    <Text className="text-xs text-copy-light mb-1">Average Price</Text>
+                    <Text className="text-sm text-copy-light mb-1">Average Price</Text>
                     <Text className="text-base font-semibold text-copy">
                       {formatCurrency(
                         (order.items.reduce((sum, item) => sum + (Number(item.total_price) || 0), 0)) /
@@ -730,7 +726,7 @@ export const AdminOrderDetail = () => {
             <div className="bg-surface rounded-lg border border-border-light p-6">
               <div className="flex items-center gap-2 mb-4">
                 <MapPin className="w-5 h-5 text-primary" />
-                <Heading level={3} className="text-base font-semibold text-copy">Billing Address</Heading>
+                <Heading level={5} className="text-base font-semibold text-copy">Billing Address</Heading>
               </div>
               {order.billing_address ? (
                 <div className="space-y-2 text-sm text-copy">
@@ -752,7 +748,7 @@ export const AdminOrderDetail = () => {
             <div className="bg-surface rounded-lg border border-border-light p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Truck className="w-5 h-5 text-primary" />
-                <Heading level={3} className="text-base font-semibold text-copy">Shipping Address</Heading>
+                <Heading level={5} className="text-base font-semibold text-copy">Shipping Address</Heading>
               </div>
               {order.shipping_address ? (
                 <div className="space-y-2 text-sm text-copy">
@@ -772,7 +768,7 @@ export const AdminOrderDetail = () => {
 
             {/* Shipping Details */}
             <div className="lg:col-span-2 bg-surface rounded-lg border border-border-light p-6">
-              <Heading level={3} className="text-base font-semibold text-copy mb-4">Shipping Details</Heading>
+              <Heading level={5} className="text-base font-semibold text-copy mb-4">Shipping Details</Heading>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <Text className="text-sm text-copy-light">Method</Text>
@@ -800,7 +796,7 @@ export const AdminOrderDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Customer Notes */}
             <div className="bg-surface rounded-lg border border-border-light p-6">
-              <Heading level={3} className="text-base font-semibold text-copy mb-4">Customer Notes</Heading>
+              <Heading level={5} className="text-base font-semibold text-copy mb-4">Customer Notes</Heading>
               <Body className="text-copy whitespace-pre-wrap">
                 {order.customer_notes || '(No customer notes)'}
               </Body>
@@ -808,7 +804,7 @@ export const AdminOrderDetail = () => {
 
             {/* Internal Notes */}
             <div className="bg-surface rounded-lg border border-border-light p-6">
-              <Heading level={3} className="text-base font-semibold text-copy mb-4">Internal Notes</Heading>
+              <Heading level={5} className="text-base font-semibold text-copy mb-4">Internal Notes</Heading>
               <Body className="text-copy whitespace-pre-wrap">
                 {order.internal_notes || '(No internal notes)'}
               </Body>
@@ -816,7 +812,6 @@ export const AdminOrderDetail = () => {
           </div>
         )}
       </div>
-    </AdminLayout>
   )
 };
 

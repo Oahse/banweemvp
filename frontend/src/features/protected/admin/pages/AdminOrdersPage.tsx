@@ -2,16 +2,14 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, SearchIcon, ArrowUpDownIcon, EyeIcon, PackageIcon } from 'lucide-react';
 import AdminAPI from '@/api/admin';
-import AdminLayout from '@/components/layout/AdminLayout';
-import { OrdersListSkeleton } from '@/components/skeletons/OrdersSkeleton';
+import { OrdersListSkeleton } from '@/features/protected/admin/components/skeletons/OrdersSkeleton';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
-import Dropdown from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
-import { Card } from '@/components/ui/Card';
+
 
 const LIMIT = 10;
 
@@ -167,8 +165,8 @@ const AdminOrdersPage: React.FC = () => {
       sortable: true,
       render: (value: string, row: Order) => (
         <div>
-          <Text className="text-sm font-medium text-primary">{value}</Text>
-          <Text className="text-xs text-gray-500 dark:text-gray-400">{row.items_count || 0} items</Text>
+          <Text className="text-sm font-medium text-primary">{value}<br/></Text>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">{row.items_count || 0} items</Text>
         </div>
       ),
     },
@@ -179,7 +177,7 @@ const AdminOrdersPage: React.FC = () => {
       render: (value: string, row: Order) => (
         <div>
           <Text className="text-sm text-gray-900 dark:text-white">{value || 'N/A'}</Text>
-          <Text className="text-xs text-gray-500 dark:text-gray-400">{row.user_email}</Text>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">{row.user_email}</Text>
         </div>
       ),
     },
@@ -268,7 +266,7 @@ const AdminOrdersPage: React.FC = () => {
     };
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
     return (
-      <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
         {config.label}
       </Text>
     );
@@ -284,7 +282,7 @@ const AdminOrdersPage: React.FC = () => {
     };
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
     return (
-      <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
         {config.label}
       </Text>
     );
@@ -297,19 +295,16 @@ const AdminOrdersPage: React.FC = () => {
   // Show full page skeleton on initial load
   if (initialLoading) {
     return (
-      <AdminLayout>
-        <OrdersListSkeleton />
-      </AdminLayout>
+      <OrdersListSkeleton />
     );
   }
 
   return (
-    <AdminLayout>
-      <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
           <div>
-            <Heading level={1} className="text-2xl font-bold">Orders</Heading>
-            <Body className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage customer orders and fulfillment</Body>
+            <Heading level={5} className="text-2xl font-bold">Orders</Heading>
+            <Body className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage customer orders and fulfillment</Body>
           </div>
         </div>
 
@@ -328,7 +323,6 @@ const AdminOrdersPage: React.FC = () => {
           onRowClick={handleView}
         />
       </div>
-    </AdminLayout>
   );
 };
 

@@ -5,8 +5,7 @@ import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import AdminLayout from '@/components/layout/AdminLayout';
-import { SubscriptionsListSkeleton } from '@/components/skeletons/SubscriptionsSkeleton';
+import { SubscriptionsListSkeleton } from '@/features/protected/admin/components/skeletons/SubscriptionsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, useModal } from '@/components/ui/Modal';
@@ -233,7 +232,7 @@ export const AdminSubscriptions = () => {
       render: (value: string, row: Subscription) => (
         <div>
           <Text className="text-sm text-gray-900 dark:text-white">{row.user?.name || 'N/A'}</Text>
-          <Text className="text-xs text-gray-500 dark:text-gray-400">{row.user?.email || 'N/A'}</Text>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">{row.user?.email || 'N/A'}</Text>
         </div>
       ),
     },
@@ -316,7 +315,7 @@ export const AdminSubscriptions = () => {
     const { color, label } = config[status as keyof typeof config] || config.pending;
     
     return (
-      <Text className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}>
+      <Text className={`px-3 py-1 rounded-full text-sm font-semibold ${color}`}>
         {label}
       </Text>
     );
@@ -340,16 +339,11 @@ export const AdminSubscriptions = () => {
   }, []);
 
   if (initialLoading) {
-    return (
-      <AdminLayout>
-        <SubscriptionsListSkeleton />
-      </AdminLayout>
-    );
+    return <SubscriptionsListSkeleton />;
   }
 
   return (
-    <AdminLayout>
-      <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex items-center justify-between">
           <div>
             <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage all customer subscriptions</Text>
@@ -376,7 +370,7 @@ export const AdminSubscriptions = () => {
             <>
               <ModalHeader>
                 <div>
-                  <Heading level={3} className="text-lg font-semibold">Subscription Details</Heading>
+                  <Heading level={5} className="text-lg font-semibold">Subscription Details</Heading>
                   <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                     {selectedSubscription.subscription_plan?.name || 'Subscription'}
                   </Body>
@@ -421,7 +415,7 @@ export const AdminSubscriptions = () => {
                     <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Variants</Text>
                     {selectedSubscription.variants && selectedSubscription.variants.length > 0 ? (
                       <div className="mt-2 overflow-x-auto">
-                        <table className="w-full text-xs">
+                        <table className="w-full text-sm">
                           <thead>
                             <tr>
                               <th className="text-left py-1"><Text variant="caption" weight="medium">Name</Text></th>
@@ -460,7 +454,7 @@ export const AdminSubscriptions = () => {
           )}
         </Modal>
       </div>
-    </AdminLayout>
+    </div>
   );
 };
 

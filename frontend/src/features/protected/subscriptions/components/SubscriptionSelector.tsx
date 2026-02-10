@@ -118,7 +118,7 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
               </div>
             )}
             {quantity > 1 && (
-              <p className={`text-xs sm:text-sm ${themeClasses.text.muted}`}>Quantity: {quantity}</p>
+              <p className={`text-sm sm:text-sm ${themeClasses.text.muted}`}>Quantity: {quantity}</p>
             )}
           </div>
 
@@ -180,12 +180,12 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
                             <div className={`font-medium ${textColor} text-sm sm:text-base truncate flex items-center gap-2`}>
                               {subscription.name}
                               {!isActive && (
-                                <span className="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
+                                <span className="px-2 py-1 text-sm bg-gray-200 text-gray-600 rounded-full">
                                   Inactive
                                 </span>
                               )}
                             </div>
-                            <div className={`text-xs sm:text-sm ${themeClasses.text.muted} flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1`}>
+                            <div className={`text-sm sm:text-sm ${themeClasses.text.muted} flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1`}>
                               <span className="flex items-center gap-1">
                                 <CreditCardIcon className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                                 <span className="truncate">{formatCurrency(subscription.price || 0)} / {formatBillingCycle(subscription.billing_cycle)}</span>

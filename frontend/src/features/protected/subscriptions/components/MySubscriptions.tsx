@@ -190,7 +190,7 @@ export const MySubscriptions = () => {
             onClick={() => setActiveTab(tab.key)}
             variant={activeTab === tab.key ? 'primary' : 'ghost'}
             size="sm"
-            className={`flex-1 min-w-[80px] px-2 py-1 text-xs font-medium rounded-md transition-colors ${
+            className={`flex-1 min-w-[80px] px-2 py-1 text-sm font-medium rounded-md transition-colors ${
               activeTab === tab.key ? 'bg-primary text-white shadow-md' : 'border border-gray-300 hover:bg-gray-50'
             }`}
           >
@@ -319,7 +319,7 @@ export const MySubscriptions = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <Heading level={2} className="text-base font-medium text-main dark:text-white">
+                <Heading level={5} className="text-base font-medium text-main dark:text-white">
                   Create New Subscription
                 </Heading>
                 <Button
@@ -345,7 +345,7 @@ export const MySubscriptions = () => {
                       value={newSubscriptionData.name}
                       onChange={(e) => setNewSubscriptionData({...newSubscriptionData, name: e.target.value})}
                       placeholder="Enter subscription name (e.g., Premium Coffee Plan)"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                       maxLength={255}
                     />
                     <Text variant="caption" tone="secondary">
@@ -358,7 +358,7 @@ export const MySubscriptions = () => {
                     <select
                       value={newSubscriptionData.billing_cycle}
                       onChange={(e) => setNewSubscriptionData({...newSubscriptionData, billing_cycle: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                     >
                       <option value="weekly">Weekly</option>
                       <option value="monthly">Monthly</option>
@@ -371,7 +371,7 @@ export const MySubscriptions = () => {
                     <select
                       value={newSubscriptionData.delivery_type}
                       onChange={(e) => setNewSubscriptionData({...newSubscriptionData, delivery_type: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                     >
                       <option value="standard">Standard Delivery</option>
                       <option value="express">Express Delivery</option>
@@ -405,7 +405,7 @@ export const MySubscriptions = () => {
                           loadProducts();
                         }}
                         placeholder="Search products..."
-                        className="pl-9 pr-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-48"
+                        className="pl-9 pr-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-48"
                       />
                     </div>
                   </div>
@@ -422,11 +422,11 @@ export const MySubscriptions = () => {
                           <div key={product.id} className="p-4">
                             {/* Product Header */}
                             <div className="mb-3">
-                              <Heading level={4} className="text-sm font-medium text-gray-900 dark:text-white">
+                              <Heading level={5} className="text-sm font-medium text-gray-900 dark:text-white">
                                 {product.name}
                               </Heading>
                               {product.description && (
-                                <Body className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <Body className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                   {product.description}
                                 </Body>
                               )}
@@ -435,7 +435,7 @@ export const MySubscriptions = () => {
                             {/* Variants */}
                             {product.variants && product.variants.length > 0 ? (
                               <div className="space-y-2">
-                                                                <Body className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                                <Body className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                   Available Variants:
                                 </Body>
                                 {product.variants.map((variant: any) => (
@@ -485,14 +485,14 @@ export const MySubscriptions = () => {
                                         </span>
                                       </div>
                                       {variant.sku && (
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                           SKU: {variant.sku}
                                         </p>
                                       )}
                                       {variant.attributes && Object.keys(variant.attributes).length > 0 && (
                                         <div className="flex flex-wrap gap-1 mt-1">
                                           {Object.entries(variant.attributes).map(([key, value]) => (
-                                            <span key={key} className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded">
+                                            <span key={key} className="text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded">
                                               {key}: {String(value)}
                                             </span>
                                           ))}

@@ -112,7 +112,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
             to={`/products/${productId}`}
             className="text-copy dark:text-copy-dark font-medium hover:text-primary dark:hover:text-primary-dark transition-colors duration-200 block truncate"
           >
-            <Heading level={3} className="truncate">{productName}</Heading>
+            <Heading level={5} className="truncate">{productName}</Heading>
           </Link>
           {product.variant_name && (
             <Text variant="body-sm" tone="secondary" className="mt-1">
@@ -226,7 +226,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
 
         {/* Stock Badge */}
         {product.stock !== undefined && product.stock < 10 && (
-          <div className="absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark">
+          <div className="absolute top-2 left-2 px-2 py-1 rounded-full text-sm font-medium bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark">
             {product.stock === 0 ? 'Out of Stock' : `${product.stock} left`}
           </div>
         )}
@@ -237,7 +237,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
           to={`/products/${productId}`}
           className="text-copy dark:text-copy-dark font-medium hover:text-primary dark:hover:text-primary-dark transition-colors duration-200 block mb-2 line-clamp-2"
         >
-          <Heading level={3} className="line-clamp-2 mb-2">{productName}</Heading>
+          <Heading level={5} className="line-clamp-2 mb-2">{productName}</Heading>
         </Link>
 
         {product.variant_name && (

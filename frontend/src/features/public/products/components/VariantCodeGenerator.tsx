@@ -70,13 +70,13 @@ export const VariantCodeGenerator: React.FC<VariantCodeGeneratorProps> = ({
   return (
     <div className="bg-surface-hover rounded-lg p-3 border border-border-light">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
-        <Heading level={4} className="text-sm font-medium text-main">Product Codes</Heading>
+        <Heading level={5} className="text-sm font-medium text-main">Product Codes</Heading>
         <Button
           onClick={generateCodes}
           disabled={isGenerating}
           variant="primary"
           size="sm"
-          className="flex items-center gap-1 px-2 py-1 text-xs bg-primary text-white rounded hover:bg-primary-dark disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1 px-2 py-1 text-sm bg-primary text-white rounded hover:bg-primary-dark disabled:opacity-50 transition-colors"
           leftIcon={<RefreshCwIcon size={12} className={isGenerating ? 'animate-spin' : ''} />}
           isLoading={isGenerating}
         >
@@ -89,7 +89,7 @@ export const VariantCodeGenerator: React.FC<VariantCodeGeneratorProps> = ({
         <div className="text-center">
           <div className="flex items-center justify-center mb-1">
             <ScanLineIcon size={12} className="mr-1 text-primary" />
-            <Text className="text-xs text-copy-light">Barcode</Text>
+            <Text className="text-sm text-copy-light">Barcode</Text>
           </div>
           {codes.barcode ? (
             <div className="bg-white p-2 rounded border">
@@ -104,14 +104,14 @@ export const VariantCodeGenerator: React.FC<VariantCodeGeneratorProps> = ({
               <ScanLineIcon size={16} className="text-copy-light" />
             </div>
           )}
-          <Body className="text-xs text-copy-light mt-1 font-mono break-all">{variantSku}</Body>
+          <Body className="text-sm text-copy-light mt-1 font-mono break-all">{variantSku}</Body>
         </div>
 
         {/* QR Code Preview */}
         <div className="text-center">
           <div className="flex items-center justify-center mb-1">
             <QrCodeIcon size={12} className="mr-1 text-primary" />
-            <Text className="text-xs text-copy-light">QR Code</Text>
+            <Text className="text-sm text-copy-light">QR Code</Text>
           </div>
           {codes.qr_code ? (
             <div className="bg-white p-2 rounded border">
@@ -126,13 +126,13 @@ export const VariantCodeGenerator: React.FC<VariantCodeGeneratorProps> = ({
               <QrCodeIcon size={16} className="text-copy-light" />
             </div>
           )}
-          <Body className="text-xs text-copy-light mt-1 break-words">{variantName}</Body>
+          <Body className="text-sm text-copy-light mt-1 break-words">{variantName}</Body>
         </div>
       </div>
 
       {hasGenerated && (
         <div className="mt-2 text-center">
-          <Text className="text-xs bg-success/10 text-success px-2 py-1 rounded-full">
+          <Text className="text-sm bg-success/10 text-success px-2 py-1 rounded-full">
             Codes Generated ✓
           </Text>
         </div>

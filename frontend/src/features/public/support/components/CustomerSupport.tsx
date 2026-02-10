@@ -51,7 +51,7 @@ const CustomerSupport: React.FC<CustomerSupportProps> = ({ className = '' }) => 
   return (
     <div className={`max-w-2xl mx-auto p-6 ${className}`}>
       <div className="bg-white rounded-lg shadow-md p-6">
-        <Heading level={2} className="text-2xl font-bold text-gray-900 mb-6">Customer Support</Heading>
+        <Heading level={5} className="text-2xl font-bold text-gray-900 mb-6">Customer Support</Heading>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -119,7 +119,7 @@ const CustomerSupport: React.FC<CustomerSupportProps> = ({ className = '' }) => 
         </form>
 
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <Heading level={3} className="text-lg font-semibold text-gray-900 mb-4">Other Ways to Get Help</Heading>
+          <Heading level={5} className="text-lg font-semibold text-gray-900 mb-4">Other Ways to Get Help</Heading>
           <Body className="space-y-3 text-sm text-gray-600">
             <Body>
               <Text className="font-semibold">Email:</Text> support@banwee.com

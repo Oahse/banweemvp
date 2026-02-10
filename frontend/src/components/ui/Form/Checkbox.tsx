@@ -108,14 +108,15 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             sizeStyles[size],
             'rounded border-2 transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:ring-offset-2',
+            'appearance-none',
             
             // Default state
-            'border-border bg-surface',
-            'checked:bg-primary checked:border-primary',
-            'indeterminate:bg-primary indeterminate:border-primary',
+            'border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600',
+            'checked:bg-primary checked:border-primary dark:checked:bg-primary dark:checked:border-primary',
+            'indeterminate:bg-primary indeterminate:border-primary dark:indeterminate:bg-primary dark:indeterminate:border-primary',
             
             // Focus state
-            'focus:ring-primary/20',
+            'focus:ring-primary/20 focus:border-primary',
             state === 'error' && 'focus:ring-error/20',
             state === 'success' && 'focus:ring-success/20',
             state === 'warning' && 'focus:ring-warning/20',
