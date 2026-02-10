@@ -149,7 +149,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               <Button
                 onClick={handleClose}
                 variant="outline"
-                size="sm"
+                size="xs"
                 className={combineThemeClasses(
                   themeClasses.text.muted,
                   'px-4 py-2'
@@ -184,7 +184,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 <Button
                   onClick={loadSubscriptionDetails}
                   variant="outline"
-                  size="sm"
+                  size="xs"
                   className={getButtonClasses('outline')}
                 >
                   Try Again
@@ -265,7 +265,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                               onClick={() => confirmRemoveProduct(product.id, product.name)}
                               disabled={state.removingProductId === product.id}
                               variant="danger"
-                              size="sm"
+                              size="xs"
                               className={combineThemeClasses(
                                 'px-3 py-1.5 text-sm',
                                 state.removingProductId === product.id && 'opacity-50 cursor-not-allowed'
@@ -299,7 +299,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               <Button
                 onClick={handleClose}
                 variant="outline"
-                size="sm"
+                size="xs"
                 className={getButtonClasses('outline')}
               >
                 Close
@@ -333,7 +333,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 <Button
                   onClick={() => setShowConfirmDialog({ show: false, productId: '', productName: '' })}
                   variant="outline"
-                  size="sm"
+                  size="xs"
                   className={getButtonClasses('outline')}
                 >
                   Cancel
@@ -342,7 +342,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                   onClick={() => handleRemoveProduct(showConfirmDialog.productId)}
                   disabled={state.removingProductId === showConfirmDialog.productId}
                   variant="danger"
-                  size="sm"
+                  size="xs"
                   className={combineThemeClasses(
                     getButtonClasses('danger'),
                     state.removingProductId === showConfirmDialog.productId && 'opacity-50 cursor-not-allowed'

@@ -185,13 +185,13 @@ export const AdminTaxRates = () => {
           <Button
             onClick={() => openEditModal(row)}
             variant="ghost"
-            size="sm"
+            size="xs"
             leftIcon={<EditIcon size={14} />}
           />
           <Button
             onClick={() => handleDeleteTaxRate(row.id)}
             variant="danger"
-            size="sm"
+            size="xs"
             leftIcon={<TrashIcon size={14} />}
           />
         </div>
@@ -375,7 +375,7 @@ export const AdminTaxRates = () => {
             <Button
               onClick={openAddModal}
               variant="primary"
-              size="sm"
+              size="xs"
               leftIcon={<PlusIcon className="w-4 h-4" />}
             >
               Add Tax Rate
@@ -396,7 +396,7 @@ export const AdminTaxRates = () => {
             <Button
               onClick={openAddModal}
               variant="primary"
-              size="sm"
+              size="xs"
               leftIcon={<PlusIcon className="w-4 h-4" />}
             >
               Add Tax Rate
@@ -554,7 +554,7 @@ export const AdminTaxRates = () => {
               type="button"
               onClick={() => setShowModal(false)}
               variant="outline"
-              size="sm"
+              size="xs"
             >
               Cancel
             </Button>
@@ -562,7 +562,7 @@ export const AdminTaxRates = () => {
               type="submit"
               onClick={handleSubmit}
               variant="primary"
-              size="sm"
+              size="xs"
               disabled={loading}
             >
               {editingTaxRate ? 'Update' : 'Create'} Tax Rate

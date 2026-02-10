@@ -226,7 +226,7 @@ const AdminCategoriesPage = () => {
           <Button 
             onClick={() => openEditModal(row)}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
             leftIcon={<Edit2 size={14} />}
           >
@@ -235,7 +235,7 @@ const AdminCategoriesPage = () => {
           <Button 
             onClick={() => handleDelete(row)}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="inline-flex items-center gap-1 px-3 py-1.5 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors"
             leftIcon={<Trash2 size={14} />}
           >
@@ -349,7 +349,7 @@ const AdminCategoriesPage = () => {
           <Button
             onClick={openAddModal}
             variant="primary"
-            size="sm"
+            size="xs"
             leftIcon={<Plus size={14} />}
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
           >
@@ -487,14 +487,14 @@ const AdminCategoriesPage = () => {
                 setEditingCategory(null);
               }}
               variant="secondary"
-              size="sm"
+              size="xs"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               variant="primary"
-              size="sm"
+              size="xs"
             >
               {editingCategory ? 'Update Category' : 'Add Category'}
             </Button>

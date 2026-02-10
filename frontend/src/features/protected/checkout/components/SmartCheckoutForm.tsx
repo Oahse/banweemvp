@@ -324,7 +324,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       <>
         <Card>
           <Card.Header>
-            <Card.Title size="sm">Order Summary</Card.Title>
+            <Card.Title size="xs">Order Summary</Card.Title>
           </Card.Header>
           <Card.Body>
             <div className="space-y-2">
@@ -398,7 +398,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
               <Card.Header>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-primary dark:text-primary-dark" />
-                  <Card.Title size="sm">Shipping Address</Card.Title>
+                  <Card.Title size="xs">Shipping Address</Card.Title>
                 </div>
               </Card.Header>
               <Card.Body>
@@ -444,7 +444,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
               <Card.Header>
                 <div className="flex items-center gap-2">
                   <Truck className="h-4 w-4 text-primary dark:text-primary-dark" />
-                  <Card.Title size="sm">Shipping Method</Card.Title>
+                  <Card.Title size="xs">Shipping Method</Card.Title>
                 </div>
               </Card.Header>
               <Card.Body>
@@ -507,7 +507,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
               <Card.Header>
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-primary dark:text-primary-dark" />
-                  <Card.Title size="sm">Payment Method</Card.Title>
+                  <Card.Title size="xs">Payment Method</Card.Title>
                 </div>
               </Card.Header>
               <Card.Body>
@@ -542,7 +542,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             {/* Order Notes */}
             <Card>
               <Card.Header>
-                <Card.Title size="sm">Order Notes (Optional)</Card.Title>
+                <Card.Title size="xs">Order Notes (Optional)</Card.Title>
               </Card.Header>
               <Card.Body>
                 <Textarea

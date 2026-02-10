@@ -282,7 +282,7 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
           <Button
             onClick={onClose}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="text-copy-lighter hover:text-copy transition-colors"
             leftIcon={<XIcon size={20} />}
           >
@@ -326,7 +326,7 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
             onClick={handleDownload}
             disabled={isDownloading}
             variant="primary"
-            size="sm"
+            size="xs"
             className="flex-1 flex items-center justify-center space-x-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             leftIcon={<DownloadIcon size={16} />}
             isLoading={isDownloading}
@@ -337,7 +337,7 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
             onClick={handleShare}
             disabled={isSharing}
             variant="outline"
-            size="sm"
+            size="xs"
             className="flex-1 flex items-center justify-center space-x-2 bg-surface-hover text-copy px-4 py-2 rounded-md hover:bg-surface-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             leftIcon={<ShareIcon size={16} />}
             isLoading={isSharing}

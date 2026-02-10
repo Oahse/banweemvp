@@ -144,7 +144,7 @@ export const VariantSelector = ({
                 onClick={() => isAvailable && onVariantChange(variant)}
                 disabled={!isAvailable}
                 variant={isSelected ? "primary" : "ghost"}
-                size="sm"
+                size="xs"
                 className={cn(
                   'w-full p-3 border rounded-lg text-left transition-all',
                   isSelected
@@ -243,7 +243,7 @@ export const VariantSelector = ({
                     onClick={() => isAvailable && onVariantChange(variantWithValue)}
                     disabled={!isAvailable}
                     variant={isSelected ? "primary" : "outline"}
-                    size="sm"
+                    size="xs"
                     className={cn(
                       'px-4 py-2 border rounded-md text-sm font-medium transition-all',
                       isSelected

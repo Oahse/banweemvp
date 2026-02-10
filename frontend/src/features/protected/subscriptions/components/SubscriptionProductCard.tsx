@@ -147,7 +147,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                   onClick={() => handleQuantityChange(quantity - 1)}
                   disabled={quantity <= 1}
                   variant="outline"
-                  size="sm"
+                  size="xs"
                 >
                   <MinusIcon className="w-3 h-3" />
                 </Button>
@@ -157,7 +157,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                 <Button
                   onClick={() => handleQuantityChange(quantity + 1)}
                   variant="outline"
-                  size="sm"
+                  size="xs"
                 >
                   <PlusIcon className="w-3 h-3" />
                 </Button>
@@ -169,7 +169,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                 onClick={() => onRemove(product.id)}
                 disabled={isRemoving}
                 variant="danger"
-                size="sm"
+                size="xs"
               >
                 {isRemoving ? 'Removing...' : 'Remove'}
               </Button>
@@ -217,7 +217,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
             onClick={() => onRemove(product.id)}
             disabled={isRemoving}
             variant="danger"
-            size="sm"
+            size="xs"
             className="absolute top-2 right-2 p-1.5 rounded-full"
           >
             <MinusIcon className="w-3 h-3" />
@@ -263,7 +263,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                 onClick={() => handleQuantityChange(quantity - 1)}
                 disabled={quantity <= 1}
                 variant="outline"
-                size="sm"
+                size="xs"
               >
                 <MinusIcon className="w-3 h-3" />
               </Button>
@@ -273,7 +273,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
               <Button
                 onClick={() => handleQuantityChange(quantity + 1)}
                 variant="outline"
-                size="sm"
+                size="xs"
               >
                 <PlusIcon className="w-3 h-3" />
               </Button>

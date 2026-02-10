@@ -222,7 +222,7 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
           onClick={handleClose}
           disabled={loading}
           variant="ghost"
-          size="sm"
+          size="xs"
         >
           {action === 'cancel' ? 'Keep Subscription' : 'Cancel'}
         </Button>
@@ -231,7 +231,7 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
           onClick={handleConfirm}
           disabled={loading || !isConfirmValid}
           variant={action === 'cancel' ? 'danger' : action === 'pause' ? 'warning' : 'success'}
-          size="sm"
+          size="xs"
           leftIcon={loading ? undefined : <Icon size={16} />}
           isLoading={loading}
         >

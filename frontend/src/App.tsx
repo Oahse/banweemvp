@@ -24,6 +24,7 @@ import {
   AdminDashboardSkeleton, 
   AdminTableSkeleton 
 } from '@/components/ui/SkeletonLoader';
+import ContactMessagesSkeleton from '@/features/protected/admin/components/skeletons/ContactMessagesSkeleton';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import SupportFloat from '@/components/layout/SupportFloat';
 import './animations.css';
@@ -62,8 +63,6 @@ const AdminCategories = lazy(() => import('@/features/protected/admin/pages/Admi
 const AdminUsers = lazy(() => import('@/features/protected/admin/pages/Users'));
 const AdminUserDetail = lazy(() => import('@/features/protected/admin/pages/UserDetail'));
 const AdminTaxRates = lazy(() => import('@/features/protected/admin/pages/TaxRates'));
-const AdminInventoryLocations = lazy(() => import('@/features/protected/admin/pages/InventoryLocations'));
-const AdminInventoryAdjustments = lazy(() => import('@/features/protected/admin/pages/InventoryAdjustments'));
 const AdminSubscriptions = lazy(() => import('@/features/protected/admin/pages/AdminSubscriptionsPage'));
 const AdminInventory = lazy(() => import('@/features/protected/admin/pages/Inventory'));
 const AdminShipping = lazy(() => import('@/features/protected/admin/pages/Shipping'));
@@ -73,7 +72,6 @@ const AdminRefunds = lazy(() => import('@/features/protected/admin/pages/Refunds
 const Suppliers = lazy(() => import('@/features/public/products/Suppliers'));
 const SupplierDetail = lazy(() => import('@/features/public/products/SupplierDetail'));
 const AdminContactMessages = lazy(() => import('@/features/protected/admin/pages/ContactMessages'));
-import ContactMessagesSkeleton from '@/features/protected/admin/components/skeletons/ContactMessagesSkeleton';
 
 
 export const App: React.FC = () => {
@@ -172,8 +170,6 @@ export const App: React.FC = () => {
                           <Route path="users" element={<Suspense fallback={<AdminTableSkeleton />}><AdminUsers /></Suspense>} />
                           <Route path="users/:userId" element={<Suspense fallback={<PageSkeleton />}><AdminUserDetail /></Suspense>} />
                           <Route path="tax-rates" element={<Suspense fallback={<AdminTableSkeleton />}><AdminTaxRates /></Suspense>} />
-                          <Route path="inventory/locations" element={<Suspense fallback={<AdminTableSkeleton />}><AdminInventoryLocations /></Suspense>} />
-                          <Route path="inventory/adjustments" element={<Suspense fallback={<AdminTableSkeleton />}><AdminInventoryAdjustments /></Suspense>} />
                           <Route path="subscriptions" element={<Suspense fallback={<AdminTableSkeleton />}><AdminSubscriptions /></Suspense>} />
                           <Route path="inventory" element={<Suspense fallback={<AdminTableSkeleton />}><AdminInventory /></Suspense>} />
                           <Route path="shipping" element={<Suspense fallback={<AdminTableSkeleton />}><AdminShipping /></Suspense>} />

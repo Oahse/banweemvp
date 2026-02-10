@@ -77,7 +77,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <Button
             onClick={() => setSidebarOpen(false)}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="lg:hidden p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
             leftIcon={<X className="h-5 w-5" />}
           >
@@ -113,7 +113,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <Button
             onClick={() => navigate('/logout')}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="flex items-center space-x-3 w-full px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             leftIcon={<LogOut className="h-4 w-4" />}
           >
@@ -137,7 +137,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <Button
                 onClick={() => setSidebarOpen(true)}
                 variant="ghost"
-                size="sm"
+                size="xs"
                 className="lg:hidden p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 leftIcon={<Menu className="h-5 w-5" />}
               >
@@ -152,7 +152,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <Button
                 onClick={() => navigate('/')}
                 variant="outline"
-                size="sm"
+                size="xs"
                 className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 leftIcon={<Home className="w-4 h-4" />}
               >
@@ -161,7 +161,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <Button
                 onClick={() => navigate('/products')}
                 variant="primary"
-                size="sm"
+                size="xs"
                 className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors"
                 leftIcon={<Package className="w-4 h-4" />}
               >

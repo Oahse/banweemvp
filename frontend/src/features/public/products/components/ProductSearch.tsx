@@ -165,7 +165,7 @@ export const ProductSearch = ({
 
             <Button
               variant="ghost"
-              size="sm"
+              size="xs"
               onClick={() => updateFilter('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc')}
             >
               {filters.sortOrder === 'asc' ? <SortAscIcon size={16} /> : <SortDescIcon size={16} />}
@@ -174,7 +174,7 @@ export const ProductSearch = ({
             <div className="flex border border-gray-300 rounded-md">
               <Button
                 variant={viewMode === 'grid' ? 'primary' : 'ghost'}
-                size="sm"
+                size="xs"
                 onClick={() => onViewModeChange('grid')}
                 className="rounded-r-none"
               >
@@ -182,7 +182,7 @@ export const ProductSearch = ({
               </Button>
               <Button
                 variant={viewMode === 'list' ? 'primary' : 'ghost'}
-                size="sm"
+                size="xs"
                 onClick={() => onViewModeChange('list')}
                 className="rounded-l-none border-l-0"
               >
@@ -275,7 +275,7 @@ export const ProductSearch = ({
                     key={tag.id}
                     onClick={() => toggleTag(tag.id)}
                     variant={filters.tags.includes(tag.id) ? "primary" : "outline"}
-                    size="sm"
+                    size="xs"
                     className={cn(
                       'px-3 py-1 rounded-full text-sm border transition-colors',
                       filters.tags.includes(tag.id)
@@ -304,7 +304,7 @@ export const ProductSearch = ({
                   <Button
                     onClick={() => updateFilter('query', '')}
                     variant="ghost"
-                    size="sm"
+                    size="xs"
                     className="ml-1 text-gray-400 hover:text-gray-600"
                   >
                     <XIcon size={14} />
@@ -318,7 +318,7 @@ export const ProductSearch = ({
                   <Button
                     onClick={() => updateFilter('category', '')}
                     variant="ghost"
-                    size="sm"
+                    size="xs"
                     className="ml-1 text-gray-400 hover:text-gray-600"
                   >
                     <XIcon size={14} />
@@ -334,7 +334,7 @@ export const ProductSearch = ({
                     <Button
                       onClick={() => toggleTag(tagId)}
                       variant="ghost"
-                      size="sm"
+                      size="xs"
                       className="ml-1 text-gray-400 hover:text-gray-600"
                     >
                       <XIcon size={14} />
@@ -346,7 +346,7 @@ export const ProductSearch = ({
 
             <Button
               variant="ghost"
-              size="sm"
+              size="xs"
               onClick={clearFilters}
               className="text-blue-600 hover:text-blue-800"
             >

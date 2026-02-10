@@ -88,7 +88,7 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
           <Button
             onClick={onClose}
             variant="ghost"
-            size="sm"
+            size="xs"
             className={`p-2 rounded-lg ${themeClasses.text.muted} hover:${themeClasses.background.surface} transition-colors`}
             leftIcon={<XIcon size={20} />}
           >
@@ -136,7 +136,7 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
               <Button
                 onClick={handleCreateSubscription}
                 variant="primary"
-                size="sm"
+                size="xs"
                 className={getButtonClasses('primary')}
               >
                 Create New Subscription
@@ -219,7 +219,7 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
                 <Button
                   onClick={onClose}
                   variant="outline"
-                  size="sm"
+                  size="xs"
                   className={`${getButtonClasses('secondary')} w-full sm:w-auto`}
                   disabled={isLoading}
                 >
@@ -228,7 +228,7 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
                 <Button
                   onClick={handleCreateSubscription}
                   variant="primary"
-                  size="sm"
+                  size="xs"
                   className={`${getButtonClasses('primary')} w-full sm:w-auto`}
                   disabled={isLoading}
                   isLoading={isLoading}
@@ -239,7 +239,7 @@ export const SubscriptionSelector: React.FC<SubscriptionSelectorProps> = ({
                   onClick={handleAddToSubscription}
                   disabled={!selectedSubscriptionId || !selectedVariant || isLoading}
                   variant="primary"
-                  size="sm"
+                  size="xs"
                   className={`${getButtonClasses('primary')} w-full sm:w-auto`}
                   isLoading={isLoading}
                 >

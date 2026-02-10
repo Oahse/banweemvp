@@ -159,7 +159,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
           <Button
             onClick={() => setShowDiscountInput(true)}
             variant="ghost"
-            size="sm"
+            size="xs"
             className={cn(
               'text-[#61b482] hover:text-[#4c9066] text-sm flex items-center gap-1 px-2 py-1 rounded hover:bg-[#61b482]/10 transition-colors'
             )}
@@ -228,7 +228,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                 onClick={() => handleRemoveDiscount(discount.id)}
                 disabled={removingDiscountId === discount.id}
                 variant="ghost"
-                size="sm"
+                size="xs"
                 className={cn(
                   'text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
                 )}
@@ -294,7 +294,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                 onClick={handleApplyDiscount}
                 disabled={isApplying || !discountCode.trim()}
                 variant="primary"
-                size="sm"
+                size="xs"
                 className={cn(
                   cn('primary', 'sm'),
                   'w-full'
@@ -310,7 +310,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                   setDiscountCode('');
                 }}
                 variant="ghost"
-                size="sm"
+                size="xs"
                 className={cn(
                   'text-gray-500 hover:text-gray-700 transition-colors'
                 )}

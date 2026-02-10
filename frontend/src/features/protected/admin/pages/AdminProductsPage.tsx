@@ -219,7 +219,7 @@ const AdminProductsPage = () => {
           <Button
             onClick={() => handleView(row)}
             variant="ghost"
-            size="sm"
+            size="xs"
             leftIcon={<EyeIcon size={14} />}
             className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
           >
@@ -228,7 +228,7 @@ const AdminProductsPage = () => {
           <Button
             onClick={() => handleDelete(row)}
             variant="ghost"
-            size="sm"
+            size="xs"
             leftIcon={<Trash2 size={14} />}
             className="inline-flex items-center gap-1 px-3 py-1.5 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors"
           >
@@ -349,7 +349,7 @@ const AdminProductsPage = () => {
             <Button
               onClick={() => navigate('/admin/products/new')}
               variant="primary"
-              size="sm"
+              size="xs"
             >
               Add Product
             </Button>
@@ -423,7 +423,7 @@ const AdminProductsPage = () => {
               <Button
                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                 variant="outline"
-                size="sm"
+                size="xs"
                 leftIcon={<ArrowUpDownIcon size={16} />}
                 className="inline-flex items-center gap-1"
               >
@@ -442,7 +442,7 @@ const AdminProductsPage = () => {
                     <Button
                       onClick={() => setSearchQuery('')}
                       variant="ghost"
-                      size="sm"
+                      size="xs"
                       className="ml-1 hover:text-primary-dark p-0 h-auto"
                     >
                       ×
@@ -455,7 +455,7 @@ const AdminProductsPage = () => {
                     <Button
                       onClick={() => setStatusFilter('')}
                       variant="ghost"
-                      size="sm"
+                      size="xs"
                       className="ml-1 hover:text-primary-dark p-0 h-auto"
                     >
                       ×
@@ -468,7 +468,7 @@ const AdminProductsPage = () => {
                     <Button
                       onClick={() => setCategoryFilter('')}
                       variant="ghost"
-                      size="sm"
+                      size="xs"
                       className="ml-1 hover:text-primary-dark p-0 h-auto"
                     >
                       ×
@@ -482,7 +482,7 @@ const AdminProductsPage = () => {
                     setCategoryFilter('');
                   }}
                   variant="ghost"
-                  size="sm"
+                  size="xs"
                   className="text-sm text-primary hover:text-primary-dark underline p-0 h-auto"
                 >
                   Clear all
@@ -505,7 +505,7 @@ const AdminProductsPage = () => {
             <Button
               onClick={() => navigate('/admin/products/new')}
               variant="primary"
-              size="sm"
+              size="xs"
             >
               Add Product
             </Button>

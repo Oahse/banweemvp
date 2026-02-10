@@ -65,7 +65,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size="sm"
+      size="xs"
       variant={variant}
       closeOnOverlayClick={!isLoading}
       closeOnEscape={!isLoading}
@@ -81,7 +81,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <Button
           onClick={handleCancel}
           variant="secondary"
-          size="sm"
+          size="xs"
           disabled={isLoading}
         >
           {cancelText}
@@ -89,7 +89,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <Button
           onClick={handleConfirm}
           variant={variant === 'danger' ? 'danger' : 'primary'}
-          size="sm"
+          size="xs"
           disabled={isLoading}
         >
           {isLoading ? 'Processing...' : confirmText}

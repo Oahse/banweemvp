@@ -13,7 +13,7 @@ export const Error = ({ message = 'Something went wrong', onRetry }: { message?:
         <Button
           onClick={onRetry}
           variant="primary"
-          size="sm"
+          size="xs"
           className="button-text bg-primary text-copy-inverse px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors"
         >
           <Text variant="body-sm">Try Again</Text>

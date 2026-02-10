@@ -258,7 +258,7 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
             <Button
               onClick={onClose}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="text-gray-400 hover:text-gray-600 transition-colors"
               leftIcon={<X size={24} />}
             >
@@ -429,14 +429,14 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
                       <Button
                         onClick={handleAcceptDeal}
                         variant="success"
-                        size="sm"
+                        size="xs"
                       >
                         Accept Deal
                       </Button>
                       <Button
                         onClick={handleRejectDeal}
                         variant="outline"
-                        size="sm"
+                        size="xs"
                       >
                         Reject Deal
                       </Button>

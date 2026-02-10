@@ -11,6 +11,8 @@ import { AuthAPI } from '@/api';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { SkeletonAddresses } from '@/components/ui/SkeletonAddresses';
 import { Dropdown } from '@/components/ui/Dropdown';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Form/Input';
 import {
   getCountryOptions,
   getProvinceOptions,
@@ -76,8 +78,8 @@ export const Addresses: React.FC = () => {
     const provinces = getProvinceOptions(form.country) || getProvincesByCountry(form.country) || [];
     setProvinceOptions(provinces);
     // if state present, load cities
-    if (form.state) {
-      const cities = getCityOptions(form.state) || getCitiesByProvince(form.state) || [];
+    if (form.state && form.country) {
+      const cities = getCityOptions(form.country, form.state) || getCitiesByProvince(form.country, form.state) || [];
       setCityOptions(cities);
     } else {
       setCityOptions([]);
@@ -95,8 +97,10 @@ export const Addresses: React.FC = () => {
 
   const handleProvinceChange = (value: string) => {
     setForm(prev => ({ ...prev, state: value, city: '' }));
-    const cities = getCityOptions(value) || getCitiesByProvince(value) || [];
-    setCityOptions(cities);
+    if (form.country) {
+      const cities = getCityOptions(form.country, value) || getCitiesByProvince(form.country, value) || [];
+      setCityOptions(cities);
+    }
   };
 
   const handleCityChange = (value: string) => {
@@ -162,12 +166,14 @@ export const Addresses: React.FC = () => {
     return (
       <div className="p-4">
         <Text variant="body-sm" tone="danger">Failed to load addresses.</Text>
-        <button
+        <Button
           onClick={() => fetchAddresses(() => AuthAPI.getAddresses())}
-          className="mt-2 px-3 py-2 bg-primary text-white rounded"
+          variant="primary"
+          size="sm"
+          className="mt-2"
         >
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -176,12 +182,14 @@ export const Addresses: React.FC = () => {
     <div>
       <div className="flex items-center justify-between mb-4">
         <Heading level={5}>Saved Addresses</Heading>
-        <button
+        <Button
           onClick={openNew}
-          className="inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded"
+          variant="primary"
+          size="sm"
+          leftIcon={<PlusCircleIcon size={16} />}
         >
-          <PlusCircleIcon size={16} /> Add Address
-        </button>
+          Add Address
+        </Button>
       </div>
 
       <div className="grid gap-3">
@@ -194,27 +202,28 @@ export const Addresses: React.FC = () => {
               <div>
                 <Text weight="medium">{addr.street}</Text>
                 <Text variant="body-sm" tone="secondary">
-                  {addr.city}{addr.state ? `, ${addr.state}` : ''} {addr.post_code ? `• ${addr.post_code}` : ''}
+                   {addr.post_code ? `• ${addr.post_code}` : ''} {addr.city}{addr.state ? `, ${addr.state}` : ''}
                 </Text>
-                <Text variant="caption" tone="secondary" className="mt-1">{getCountryByCode(addr.country)?.name || addr.country}</Text>
+                <Text variant="caption" tone="secondary" className="mt-1">{' '}{getCountryByCode(addr.country)?.name || addr.country}</Text>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 onClick={() => openEdit(addr)}
-                className="p-1 hover:bg-surface-hover rounded"
+                variant="ghost"
+                size="xs"
+                leftIcon={<PencilIcon size={14} />}
                 title="Edit"
-              >
-                <PencilIcon size={14} />
-              </button>
-              <button
+              />
+              <Button
                 onClick={() => removeAddress(addr.id)}
-                className="p-1 hover:bg-surface-hover rounded text-error-600"
+                variant="ghost"
+                size="xs"
+                leftIcon={<TrashIcon size={14} />}
+                className="text-error-600 hover:text-error-700"
                 title="Delete"
-              >
-                <TrashIcon size={14} />
-              </button>
+              />
             </div>
           </div>
         ))}
@@ -227,21 +236,21 @@ export const Addresses: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <Label className="block mb-1">Street</Label>
-              <input
+              <Input
                 name="street"
                 value={form.street}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded"
+                placeholder="Enter street address"
               />
             </div>
 
             <div>
               <Label className="block mb-1">Post Code</Label>
-              <input
+              <Input
                 name="post_code"
                 value={form.post_code}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded"
+                placeholder="Enter postal code"
               />
             </div>
 
@@ -252,6 +261,8 @@ export const Addresses: React.FC = () => {
                 value={form.country}
                 onChange={handleCountryChange}
                 placeholder="Select country"
+                searchable
+                searchPlaceholder="Search countries..."
               />
             </div>
 
@@ -262,6 +273,8 @@ export const Addresses: React.FC = () => {
                 value={form.state || ''}
                 onChange={handleProvinceChange}
                 placeholder="Select province"
+                searchable
+                searchPlaceholder="Search provinces..."
               />
             </div>
 
@@ -272,6 +285,8 @@ export const Addresses: React.FC = () => {
                 value={form.city || ''}
                 onChange={handleCityChange}
                 placeholder="Select city"
+                searchable
+                searchPlaceholder="Search cities..."
               />
             </div>
 
@@ -289,21 +304,23 @@ export const Addresses: React.FC = () => {
           </div>
 
           <div className="mt-4 flex items-center gap-2">
-            <button
+            <Button
               onClick={saveAddress}
-              className="px-4 py-2 bg-primary text-white rounded"
+              variant="primary"
+              size="sm"
             >
               Save
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => {
                 setShowForm(false);
                 setEditingId(null);
               }}
-              className="px-4 py-2 bg-surface border rounded"
+              variant="outline"
+              size="sm"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       )}

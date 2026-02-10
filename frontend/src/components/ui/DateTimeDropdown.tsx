@@ -150,7 +150,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
           key={day}
           onClick={() => handleDateSelect(day)}
           variant={isSelected ? 'primary' : isToday ? 'outline' : 'ghost'}
-          size="sm"
+          size="xs"
           className={`h-8 text-sm font-normal rounded transition-all ${
             isSelected
               ? 'bg-primary text-white'
@@ -180,7 +180,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         variant="outline"
-        size="sm"
+        size="xs"
         className={`w-full flex items-center justify-between px-3 py-2 text-left rounded-lg border transition-all ${
           disabled
             ? 'bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200'
@@ -218,7 +218,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
                 setCurrentYear(prevYear);
               }}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <ChevronLeftIcon className="w-4 h-4" />
@@ -236,7 +236,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
                 setCurrentYear(nextYear);
               }}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <ChevronRightIcon className="w-4 h-4" />
@@ -264,7 +264,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
             <Button
               onClick={handleToday}
               variant="outline"
-              size="sm"
+              size="xs"
               className={`flex-1 py-1.5 px-2 text-sm rounded-lg font-normal transition-all ${
                 currentTheme === 'dark'
                   ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -276,7 +276,7 @@ export const DateTimeDropdown: React.FC<DateTimeDropdownProps> = ({
             <Button
               onClick={handleClear}
               variant="outline"
-              size="sm"
+              size="xs"
               className={`flex-1 py-1.5 px-2 text-sm rounded-lg font-normal transition-all flex items-center justify-center gap-1 ${
                 currentTheme === 'dark'
                   ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'

@@ -255,7 +255,7 @@ export const SubscriptionEdit = () => {
         <Button
           onClick={() => navigate('/account/subscriptions')}
           variant="link"
-          size="sm"
+          size="xs"
           className="mt-4 text-primary hover:underline"
           leftIcon={<ArrowLeftIcon size={16} />}
         >
@@ -273,7 +273,7 @@ export const SubscriptionEdit = () => {
           <Button
             onClick={() => navigate('/account/subscriptions')}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
             leftIcon={<ArrowLeftIcon size={16} />}
           >
@@ -291,7 +291,7 @@ export const SubscriptionEdit = () => {
             onClick={handleSave}
             disabled={saving}
             variant="primary"
-            size="sm"
+            size="xs"
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 transition-colors"
             leftIcon={<SaveIcon size={16} />}
             isLoading={saving}
@@ -314,7 +314,7 @@ export const SubscriptionEdit = () => {
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             variant={activeTab === tab.key ? 'primary' : 'ghost'}
-            size="sm"
+            size="xs"
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? 'bg-primary text-white'
@@ -396,7 +396,7 @@ export const SubscriptionEdit = () => {
                       <Button
                         onClick={() => setFormData(prev => ({ ...prev, auto_renew: !prev.auto_renew }))}
                         variant="ghost"
-                        size="sm"
+                        size="xs"
                         className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#61b482] focus:ring-offset-2 ${
                           formData.auto_renew ? 'bg-[#61b482]' : 'bg-gray-300 dark:bg-gray-500'
                         }`}
@@ -504,7 +504,7 @@ export const SubscriptionEdit = () => {
                   setShowAddProductsModal(true);
                 }}
                 variant="primary"
-                size="sm"
+                size="xs"
                 className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
                 leftIcon={<PlusIcon size={16} />}
               >
@@ -541,7 +541,7 @@ export const SubscriptionEdit = () => {
                         setShowRemoveModal(true);
                       }}
                       variant="destructive"
-                      size="sm"
+                      size="xs"
                       className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                       leftIcon={<TrashIcon size={16} />}
                     >
@@ -605,7 +605,7 @@ export const SubscriptionEdit = () => {
                     <p className="text-gray-600 dark:text-gray-400">No payment method on file</p>
                     <Button 
                       variant="link" 
-                      size="sm" 
+                      size="xs" 
                       className="mt-2 text-primary hover:underline text-sm"
                       leftIcon={<CreditCardIcon size={16} />}
                     >

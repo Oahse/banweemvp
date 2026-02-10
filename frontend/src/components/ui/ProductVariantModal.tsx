@@ -154,7 +154,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                     onSelectionChange([]);
                   }}
                   variant="outline"
-                  size="sm"
+                  size="xs"
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                 >
                   Clear All
@@ -181,7 +181,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                 <Button
                   onClick={() => setSearchQuery('')}
                   variant="link"
-                  size="sm"
+                  size="xs"
                   className="text-primary hover:underline text-sm"
                 >
                   Clear search
@@ -359,7 +359,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
             <Button
               onClick={onClose}
               variant="outline"
-              size="sm"
+              size="xs"
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               Cancel
@@ -367,7 +367,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
             <Button
               onClick={onClose}
               variant="primary"
-              size="sm"
+              size="xs"
               className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={selected.size === 0}
             >

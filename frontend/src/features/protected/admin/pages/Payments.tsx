@@ -258,7 +258,7 @@ export const Payments = () => {
             detailsModal.open();
           }}
           variant="primary"
-          size="sm"
+          size="xs"
           leftIcon={<EyeIcon size={14} />}
         >
           <span className="hidden sm:inline">View</span>
@@ -377,7 +377,7 @@ export const Payments = () => {
           )}
         </ModalBody>
         <ModalFooter>
-          <Button onClick={detailsModal.close} variant="secondary" size="sm">
+          <Button onClick={detailsModal.close} variant="secondary" size="xs">
             Close
           </Button>
         </ModalFooter>

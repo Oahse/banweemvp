@@ -91,7 +91,7 @@ export const ResumeSubscriptionModal: React.FC<ResumeSubscriptionModalProps> = (
           onClick={handleClose}
           disabled={loading}
           variant="ghost"
-          size="sm"
+          size="xs"
         >
           Cancel
         </Button>
@@ -100,7 +100,7 @@ export const ResumeSubscriptionModal: React.FC<ResumeSubscriptionModalProps> = (
           onClick={onConfirm}
           disabled={loading}
           variant="success"
-          size="sm"
+          size="xs"
           leftIcon={loading ? undefined : <PlayIcon className="w-4 h-4" />}
           isLoading={loading}
         >

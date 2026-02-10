@@ -70,7 +70,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <Button
               onClick={onClose}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="text-copy-light hover:text-copy p-1 rounded-md hover:bg-surface-hover"
               disabled={loading}
             >
@@ -89,7 +89,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               onClick={onClose}
               disabled={loading}
               variant="outline"
-              size="sm"
+              size="xs"
               className="px-4 py-2 text-sm font-medium text-copy border border-border rounded-md hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Text variant="body-sm">{cancelText}</Text>
@@ -98,7 +98,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               onClick={onConfirm}
               disabled={loading}
               variant={variant === 'danger' ? 'primary' : variant === 'warning' ? 'warning' : 'primary'}
-              size="sm"
+              size="xs"
               className={`px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center ${styles.button}`}
               isLoading={loading}
             >

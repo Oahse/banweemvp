@@ -124,7 +124,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
               onClick={() => !outOfStock && onVariantSelect(variant)}
               disabled={outOfStock}
               variant={isSelected ? 'primary' : 'outline'}
-              size="sm"
+              size="xs"
               className={combineThemeClasses(
                 'flex items-center gap-2 p-3 border rounded-lg transition-all',
                 isSelected
@@ -308,7 +308,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
             onClick={() => !outOfStock && onVariantSelect(variant)}
             disabled={outOfStock}
             variant={isSelected ? 'primary' : 'outline'}
-            size="sm"
+            size="xs"
             className={combineThemeClasses(
               'flex items-center gap-2 p-3 border rounded-lg transition-all',
               isSelected

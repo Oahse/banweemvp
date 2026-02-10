@@ -221,7 +221,7 @@ export const WishlistEdit = () => {
         <Button
           onClick={() => navigate('/account/wishlist')}
           variant="secondary"
-          size="sm"
+          size="xs"
         >
           Back to Wishlist
         </Button>
@@ -237,7 +237,7 @@ export const WishlistEdit = () => {
           <Button
             onClick={() => navigate('/account/wishlist')}
             variant="secondary"
-            size="sm"
+            size="xs"
             leftIcon={<ArrowLeftIcon size={20} />}
           >
             Back to Wishlist
@@ -255,7 +255,7 @@ export const WishlistEdit = () => {
           <Button
             onClick={() => setShowShareModal(true)}
             variant="ghost"
-            size="sm"
+            size="xs"
             leftIcon={<ShareIcon size={16} />}
           >
             Share
@@ -264,7 +264,7 @@ export const WishlistEdit = () => {
             onClick={handleSave}
             disabled={saving}
             variant="primary"
-            size="sm"
+            size="xs"
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <SaveIcon size={16} className="mr-1" />
@@ -320,7 +320,7 @@ export const WishlistEdit = () => {
                   setShowProductModal(true);
                 }}
                 variant="primary"
-                size="sm"
+                size="xs"
                 leftIcon={<PlusIcon size={16} />}
               >
                 Add Items
@@ -354,7 +354,7 @@ export const WishlistEdit = () => {
                     setShowProductModal(true);
                   }}
                   variant="primary"
-                  size="sm"
+                  size="xs"
                 >
                   Add Some Products
                 </Button>
@@ -400,7 +400,7 @@ export const WishlistEdit = () => {
                           <Button
                             onClick={() => navigate(`/products/${product?.id}`)}
                             variant="ghost"
-                            size="sm"
+                            size="xs"
                             className="p-2 text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
                             title="View Product"
                           >
@@ -412,7 +412,7 @@ export const WishlistEdit = () => {
                               setShowRemoveModal(true);
                             }}
                             variant="ghost"
-                            size="sm"
+                            size="xs"
                             className="p-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                             title="Remove Item"
                           >

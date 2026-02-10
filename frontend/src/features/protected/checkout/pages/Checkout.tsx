@@ -197,7 +197,7 @@ export const Checkout = () => {
                   <Button
                     onClick={() => navigate('/cart')}
                     variant="danger"
-                    size="sm"
+                    size="xs"
                   >
                     Back to Cart
                   </Button>

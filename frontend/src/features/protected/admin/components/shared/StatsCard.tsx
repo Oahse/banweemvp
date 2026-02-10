@@ -57,11 +57,11 @@ export const AdminStatsCard: React.FC<AdminStatsCardProps> = ({
 
   if (loading) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 ${className}`}>
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-1.5"></div>
+          <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
         </div>
       </div>
     );
@@ -69,38 +69,38 @@ export const AdminStatsCard: React.FC<AdminStatsCardProps> = ({
 
   if (error) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-red-200 dark:border-red-700 p-6 ${className}`}>
-        <div className="text-red-600 dark:text-red-400 text-sm">{error}</div>
+      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-red-200 dark:border-red-700 p-3 ${className}`}>
+        <div className="text-red-600 dark:text-red-400 text-xs">{error}</div>
       </div>
     );
   }
 
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-6 hover:shadow-md transition-shadow ${
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 sm:p-3 hover:shadow-md transition-shadow ${
         onClick ? 'cursor-pointer' : ''
       } ${className}`}
       onClick={onClick}
     >
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-1.5">
         {/* Icon and Title Row */}
         <div className="flex items-start justify-between">
-          <Body className="text-sm sm:text-sm font-medium text-gray-600 dark:text-gray-400">{title}</Body>
+          <Body className="text-xs sm:text-xs font-medium text-gray-600 dark:text-gray-400">{title}</Body>
           {Icon && (
-            <div className={`p-2 sm:p-3 rounded-lg ${colorClasses[color]} shrink-0`}>
-              <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
+            <div className={`p-1.5 sm:p-2 rounded-lg ${colorClasses[color]} shrink-0`}>
+              <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           )}
         </div>
         
         {/* Value */}
-        <Body className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{value}</Body>
+        <Body className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">{value}</Body>
         
         {/* Change Indicator */}
         {change && (
           <div className="flex items-center">
-            <Text className={`inline-flex items-center px-2 py-0.5 sm:py-1 rounded-full text-sm font-medium ${changeColorClasses[change.type]}`}>
-              <Text className="mr-1">{changeIcons[change.type]}</Text>
+            <Text className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${changeColorClasses[change.type]}`}>
+              <Text className="mr-0.5">{changeIcons[change.type]}</Text>
               {Math.abs(change.value)}%
               {change.period && <Text className="hidden sm:inline"> {change.period}</Text>}
             </Text>

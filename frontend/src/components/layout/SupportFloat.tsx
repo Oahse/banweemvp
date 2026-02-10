@@ -22,88 +22,91 @@ const SupportFloat: React.FC = () => {
       <Button
         onClick={toggleWidget}
         variant="primary"
-        size="sm"
-        className="fixed bottom-24 right-6 z-50 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 px-4 py-3 group font-sans"
+        size="xs"
+        className="fixed bottom-20 right-4 z-50 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg transition-all duration-300 flex items-center gap-1.5 px-2.5 py-2 group font-sans"
         aria-label="Open support widget"
       >
         {isOpen ? (
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         ) : (
-          <Text as="span" className="text-sm font-medium hidden sm:inline">Need Help?</Text>
+          <>
+            {/* <MessageCircle className="w-4 h-4" /> */}
+            <Text as="span" className="text-xs font-medium hidden sm:inline">Need Help?</Text>
+          </>
         )}
       </Button>
 
       {/* Support Widget */}
       {isOpen && (
-        <div className="fixed bottom-36 right-6 z-50 w-80 bg-surface rounded-lg shadow-2xl border border-border overflow-hidden animate-slideUp font-sans">
+        <div className="fixed bottom-28 right-4 z-50 w-72 bg-surface rounded-lg shadow-2xl border border-border overflow-hidden animate-slideUp font-sans">
           {/* Header */}
-          <div className="bg-primary text-white p-3">
-            <Heading level={5} className="text-sm font-bold flex items-center gap-2">
+          <div className="bg-primary text-white p-2.5">
+            <Heading level={5} className="text-xs font-bold flex items-center gap-1.5">
               Customer Support
             </Heading>
-            <Caption className="text-sm mt-0.5 opacity-90">How can we help you today?</Caption>
+            <Caption className="text-xs mt-0.5 opacity-90">How can we help you today?</Caption>
           </div>
 
           {/* Quick Actions */}
-          <div className="p-3 space-y-2">
+          <div className="p-2.5 space-y-1.5">
             <a
               href="https://wa.me/18002269333"
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary hover:bg-primary/10 transition-colors group"
+              className="flex items-center gap-2.5 p-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/10 transition-colors group"
             >
-              <div className="w-7 h-7 bg-primary/20 rounded-full flex items-center justify-center group-hover:bg-primary/30">
+              <div className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center group-hover:bg-primary/30">
                 <MessageCircle className="w-3 h-3 text-primary" />
               </div>
               <div className="flex-1">
-                <Heading level={5} className="text-sm font-semibold text-copy">WhatsApp</Heading>
-                <Caption className="text-sm text-copy-light">Chat with us instantly</Caption>
+                <Heading level={5} className="text-xs font-semibold text-copy">WhatsApp</Heading>
+                <Caption className="text-xs text-copy-light">Chat with us instantly</Caption>
               </div>
-              <ExternalLink className="w-2.5 h-2.5 text-copy-lighter" />
+              <ExternalLink className="w-3 h-3 text-copy-lighter" />
             </a>
 
             <Link
               to="/contact"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary hover:bg-primary/10 transition-colors group"
+              className="flex items-center gap-2.5 p-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/10 transition-colors group"
             >
-              <div className="w-7 h-7 bg-primary/20 rounded-full flex items-center justify-center group-hover:bg-primary/30">
+              <div className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center group-hover:bg-primary/30">
                 <Mail className="w-3 h-3 text-primary" />
               </div>
               <div className="flex-1">
-                <Heading level={5} className="text-sm font-semibold text-copy">Contact Us</Heading>
-                <Caption className="text-sm text-copy-light">Send us a message</Caption>
+                <Heading level={5} className="text-xs font-semibold text-copy">Contact Us</Heading>
+                <Caption className="text-xs text-copy-light">Send us a message</Caption>
               </div>
-              <ExternalLink className="w-2.5 h-2.5 text-copy-lighter" />
+              <ExternalLink className="w-3 h-3 text-copy-lighter" />
             </Link>
 
             <Link
               to="/faq"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary hover:bg-primary/10 transition-colors group"
+              className="flex items-center gap-2.5 p-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/10 transition-colors group"
             >
-              <div className="w-7 h-7 bg-primary/20 rounded-full flex items-center justify-center group-hover:bg-primary/30">
+              <div className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center group-hover:bg-primary/30">
                 <HelpCircle className="w-3 h-3 text-primary" />
               </div>
               <div className="flex-1">
-                <Heading level={5} className="text-sm font-semibold text-copy">FAQs</Heading>
-                <Caption className="text-sm text-copy-light">Find quick answers</Caption>
+                <Heading level={5} className="text-xs font-semibold text-copy">FAQs</Heading>
+                <Caption className="text-xs text-copy-light">Find quick answers</Caption>
               </div>
-              <ExternalLink className="w-2.5 h-2.5 text-copy-lighter" />
+              <ExternalLink className="w-3 h-3 text-copy-lighter" />
             </Link>
           </div>
 
           {/* Contact Info */}
-          <div className="bg-surface-elevated p-3 border-t border-border">
-            <div className="text-sm text-copy-light space-y-1">
-              <div className="flex items-center gap-2">
-                <Mail className="w-2.5 h-2.5" />
-                <Text as="span" className="text-sm">support@banwee.com</Text>
+          <div className="bg-surface-elevated p-2.5 border-t border-border">
+            <div className="text-xs text-copy-light space-y-1">
+              <div className="flex items-center gap-1.5">
+                <Mail className="w-3 h-3" />
+                <Text as="span" className="text-xs">support@banwee.com</Text>
               </div>
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-2.5 h-2.5" />
-                <Text as="span" className="text-sm">1-800-BANWEE</Text>
+              <div className="flex items-center gap-1.5">
+                <MessageCircle className="w-3 h-3" />
+                <Text as="span" className="text-xs">1-800-BANWEE</Text>
               </div>
             </div>
           </div>

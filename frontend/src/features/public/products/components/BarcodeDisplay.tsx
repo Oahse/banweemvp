@@ -75,7 +75,7 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
             onClick={handleGenerateCodes}
             disabled={isGenerating}
             variant="primary"
-            size="sm"
+            size="xs"
             className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark disabled:opacity-50 transition-colors w-full sm:w-auto"
             isLoading={isGenerating}
           >
@@ -97,7 +97,7 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
                 <Button
                   onClick={() => downloadCode(codes.barcode!, `barcode-${variant.sku}.png`)}
                   variant="link"
-                  size="sm"
+                  size="xs"
                   className="text-sm text-primary hover:text-primary-dark transition-colors w-full sm:w-auto text-left sm:text-right"
                 >
                   Download
@@ -136,7 +136,7 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
                 <Button
                   onClick={() => downloadCode(codes.qr_code!, `qrcode-${variant.sku}.png`)}
                   variant="link"
-                  size="sm"
+                  size="xs"
                   className="text-sm text-primary hover:text-primary-dark transition-colors w-full sm:w-auto text-left sm:text-right"
                 >
                   Download

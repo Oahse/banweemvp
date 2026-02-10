@@ -350,7 +350,7 @@ export const Cart = () => {
               <Button
                 onClick={() => handleRemoveItem(item.id)}
                 variant="danger"
-                size="sm"
+                size="xs"
                 leftIcon={<TrashIcon size={12} />}
                 className="mt-1"
                 aria-label={`Remove ${item.variant?.product_name || 'item'} from cart`}
@@ -529,7 +529,7 @@ export const Cart = () => {
                   <Button
                     onClick={handleClearCart}
                     variant="danger"
-                    size="sm"
+                    size="xs"
                     disabled={clearingCart || cartItems.length === 0}
                     leftIcon={<TrashIcon size={12} />}
                   >
@@ -552,7 +552,7 @@ export const Cart = () => {
                   <Button
                     type="submit"
                     variant="primary"
-                    size="sm"
+                    size="xs"
                     aria-label="Apply coupon code"
                   >
                     Apply
@@ -564,7 +564,7 @@ export const Cart = () => {
                   onClick={handleCheckout}
                   variant="primary"
                   fullWidth={true}
-                  size="sm"
+                  size="xs"
                   className="py-2.5"
                 >
                   {isAuthenticated ? 'Proceed to Checkout' : 'Login to Checkout'}

@@ -82,7 +82,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
             <Button
               onClick={onClose}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="text-copy-light hover:text-copy p-1 rounded-md hover:bg-surface-hover"
             >
               <XIcon className="w-4 h-4" />
@@ -94,7 +94,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
             <Button
               onClick={onClose}
               variant="primary"
-              size="sm"
+              size="xs"
               className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark"
             >
               <Text variant="body-sm">

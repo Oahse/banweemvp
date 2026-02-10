@@ -161,7 +161,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
             <Button
               onClick={() => setIsEditing(true)}
               variant="primary"
-              size="sm"
+              size="xs"
               className="button-text px-4 py-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
             >
               Edit Profile
@@ -172,7 +172,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
                 onClick={handleCancel}
                 disabled={saving}
                 variant="outline"
-                size="sm"
+                size="xs"
                 className="button-text px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
               >
                 Cancel
@@ -181,7 +181,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
                 onClick={handleSave}
                 disabled={saving}
                 variant="primary"
-                size="sm"
+                size="xs"
                 className="button-text px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded-lg transition-colors disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save Changes'}

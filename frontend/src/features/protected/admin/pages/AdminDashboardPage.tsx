@@ -32,26 +32,26 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, color, 
   const isNegative = change && change < 0;
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <Body className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-0.5">{title}</Body>
+          <Body className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">{title}</Body>
           {loading ? (
-            <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
           ) : (
-            <Heading level={5} className="text-xl font-bold text-gray-900 dark:text-white">{value}</Heading>
+            <Heading level={5} className="text-lg font-bold text-gray-900 dark:text-white">{value}</Heading>
           )}
           {change !== undefined && (
-            <div className={`flex items-center mt-1 text-sm ${
+            <div className={`flex items-center mt-0.5 text-xs ${
               isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'
             }`}>
-              {isPositive ? <ArrowUpRight className="w-3 h-3 mr-0.5" /> : 
-               isNegative ? <ArrowDownRight className="w-3 h-3 mr-0.5" /> : null}
-              <Text>{Math.abs(change)}% vs last period</Text>
+              {isPositive ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : 
+               isNegative ? <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" /> : null}
+              <Text className='text-xs'>{Math.abs(change)}% vs last period</Text>
             </div>
           )}
         </div>
-        <div className={`p-2 rounded-lg ${color}`}>
+        <div className={`p-1.5 rounded-lg ${color}`}>
           {icon}
         </div>
       </div>
@@ -144,7 +144,7 @@ const AdminDashboard: React.FC = () => {
           <Button
             onClick={fetchDashboardData}
             variant="primary"
-            size="sm"
+            size="xs"
           >
             Refresh Dashboard
           </Button>
@@ -169,13 +169,13 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2.5">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <Body className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">Welcome back! Here's what's happening.</Body>
+            <Body className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Welcome back! Here's what's happening.</Body>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1.5">
             <Dropdown
               options={[
                 { value: 'today', label: 'Today' },
@@ -193,47 +193,47 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2">
           <StatCard
             title="Total Revenue"
             value={`$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             change={12.5}
-            icon={<DollarSign className="w-5 h-5 text-white" />}
+            icon={<DollarSign className="w-4 h-4 text-white" />}
             color="bg-gradient-to-br from-green-500 to-green-600"
           />
           <StatCard
             title="Total Orders"
             value={totalOrders.toLocaleString()}
             change={8.2}
-            icon={<ShoppingCart className="w-5 h-5 text-white" />}
+            icon={<ShoppingCart className="w-4 h-4 text-white" />}
             color="bg-gradient-to-br from-blue-500 to-blue-600"
           />
           <StatCard
             title="Total Users"
             value={totalUsers.toLocaleString()}
             change={15.3}
-            icon={<Users className="w-5 h-5 text-white" />}
+            icon={<Users className="w-4 h-4 text-white" />}
             color="bg-gradient-to-br from-purple-500 to-purple-600"
           />
           <StatCard
             title="Total Products"
             value={totalProducts.toLocaleString()}
             change={-2.4}
-            icon={<Package className="w-5 h-5 text-white" />}
+            icon={<Package className="w-4 h-4 text-white" />}
             color="bg-gradient-to-br from-orange-500 to-orange-600"
           />
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
           {/* Revenue Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white">Revenue Trend</Heading>
-              <TrendingUp className="w-4 h-4 text-green-600" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2.5">
+            <div className="flex items-center justify-between mb-2">
+              <Heading level={5} className="text-xs font-semibold text-gray-900 dark:text-white">Revenue Trend</Heading>
+              <TrendingUp className="w-3.5 h-3.5 text-green-600" />
             </div>
             {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis 
@@ -260,8 +260,8 @@ const AdminDashboard: React.FC = () => {
                     dataKey="revenue" 
                     stroke="#10b981" 
                     strokeWidth={2}
-                    dot={{ fill: '#10b981', r: 3 }}
-                    activeDot={{ r: 5 }}
+                    dot={{ fill: '#10b981', r: 2 }}
+                    activeDot={{ r: 4 }}
                     name="Revenue ($)"
                   />
                 </LineChart>
@@ -274,10 +274,10 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Orders Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <Heading level={5} className="text-sm font-semibold text-gray-900 dark:text-white">Orders Trend</Heading>
-              <Activity className="w-4 h-4 text-blue-600" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2.5">
+            <div className="flex items-center justify-between mb-2">
+              <Heading level={5} className="text-xs font-semibold text-gray-900 dark:text-white">Orders Trend</Heading>
+              <Activity className="w-3.5 h-3.5 text-blue-600" />
             </div>
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
@@ -319,43 +319,43 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-2">
-              <Heading level={5} className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Users</Heading>
-              <Users className="w-4 h-4 text-green-600" />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2.5">
+            <div className="flex items-center justify-between mb-1.5">
+              <Heading level={5} className="text-xs font-medium text-gray-600 dark:text-gray-400">Active Users</Heading>
+              <Users className="w-3.5 h-3.5 text-green-600" />
             </div>
-            <Body className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+            <Body className="text-lg font-bold text-gray-900 dark:text-white mb-0.5">
               {overview.active_users?.toLocaleString() || '0'}
             </Body>
-            <Body className="text-sm text-gray-600 dark:text-gray-400">
-              of {overview.total_users?.toLocaleString() || '0'} total users
+            <Body className="text-xs text-gray-600 dark:text-gray-400">
+              {' '} of {overview.total_users?.toLocaleString() || '0'} total users
             </Body>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-2">
-              <Heading level={5} className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Products</Heading>
-              <Package className="w-4 h-4 text-blue-600" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2.5">
+            <div className="flex items-center justify-between mb-1.5">
+              <Heading level={5} className="text-xs font-medium text-gray-600 dark:text-gray-400">Active Products</Heading>
+              <Package className="w-3.5 h-3.5 text-blue-600" />
             </div>
-            <Body className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+            <Body className="text-lg font-bold text-gray-900 dark:text-white mb-0.5">
               {overview.active_products?.toLocaleString() || '0'}
             </Body>
-            <Body className="text-sm text-gray-600 dark:text-gray-400">
-              of {overview.total_products?.toLocaleString() || '0'} total products
+            <Body className="text-xs text-gray-600 dark:text-gray-400">
+               {' '} of {overview.total_products?.toLocaleString() || '0'} total products
             </Body>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-2">
-              <Heading level={5} className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Subscriptions</Heading>
-              <Activity className="w-4 h-4 text-purple-600" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2.5">
+            <div className="flex items-center justify-between mb-1.5">
+              <Heading level={5} className="text-xs font-medium text-gray-600 dark:text-gray-400">Active Subscriptions</Heading>
+              <Activity className="w-3.5 h-3.5 text-purple-600" />
             </div>
-            <Body className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+            <Body className="text-lg font-bold text-gray-900 dark:text-white mb-0.5">
               {overview.active_subscriptions?.toLocaleString() || '0'}
             </Body>
-            <Body className="text-sm text-gray-600 dark:text-gray-400">
-              of {overview.total_subscriptions?.toLocaleString() || '0'} total subscriptions
+            <Body className="text-xs text-gray-600 dark:text-gray-400">
+               {' '} of {overview.total_subscriptions?.toLocaleString() || '0'} total subscriptions
             </Body>
           </div>
         </div>
@@ -370,7 +370,7 @@ const AdminDashboard: React.FC = () => {
                 <Button
                   onClick={() => navigate('/admin/orders')}
                   variant="primary"
-                  size="sm"
+                  size="xs"
                 >
                   View All Orders
                 </Button>
@@ -392,7 +392,7 @@ const AdminDashboard: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <Body className="text-sm font-semibold text-gray-900 dark:text-white">
-                        ${order.total_amount?.toFixed(2)}
+                        ${order.total_amount?.toFixed(2)} {' '} 
                       </Body>
                       <Text className={`inline-block px-2 py-0.5 text-sm rounded-full ${
                         order.status === 'completed' ? 'bg-green-100 text-green-800' :
@@ -462,7 +462,7 @@ const AdminDashboard: React.FC = () => {
               <Button
                 onClick={() => navigate('/admin/users')}
                 variant="primary"
-                size="sm"
+                size="xs"
               >
                 View All Users
               </Button>
@@ -506,7 +506,7 @@ const AdminDashboard: React.FC = () => {
               <Button
                 onClick={() => navigate('/admin/products')}
                 variant="primary"
-                size="sm"
+                size="xs"
               >
                 View All Products
               </Button>

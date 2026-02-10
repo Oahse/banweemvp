@@ -77,7 +77,7 @@ export const SubscriptionOrders = () => {
         <Button
           onClick={fetchSubscriptionOrders}
           variant="primary"
-          size="sm"
+          size="xs"
           className={`${getButtonClasses('primary')} mt-4`}
         >
           Try Again

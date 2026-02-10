@@ -531,7 +531,7 @@ export const ProductDetails = () => {
                           }}
                           disabled={!isAvailable}
                           variant={isSelected ? "primary" : "ghost"}
-                          size="sm"
+                          size="xs"
                           className={`w-full p-2 border rounded text-left transition-all text-sm ${
                             isSelected
                               ? 'border-primary bg-primary/5'
@@ -619,7 +619,7 @@ export const ProductDetails = () => {
                     onClick={() => handleQuantityChange(quantity - 1)}
                     disabled={quantity <= 1}
                     variant="outline"
-                    size="sm"
+                    size="xs"
                     className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     <MinusIcon size={12} />
@@ -629,7 +629,7 @@ export const ProductDetails = () => {
                     onClick={() => handleQuantityChange(quantity + 1)}
                     disabled={selectedVariant && quantity >= (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock)}
                     variant="outline"
-                    size="sm"
+                    size="xs"
                     className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     <PlusIcon size={12} />
@@ -649,7 +649,7 @@ export const ProductDetails = () => {
                         onClick={() => handleCartOperation('decrement')}
                         disabled={isCartUpdating}
                         variant="ghost"
-                        size="sm"
+                        size="xs"
                         isLoading={isCartUpdating}
                         className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1.5 rounded-md transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         leftIcon={<MinusIcon size={12} />}
@@ -661,7 +661,7 @@ export const ProductDetails = () => {
                         onClick={() => handleCartOperation('increment')}
                         disabled={isCartUpdating || (selectedVariant ? cartQuantity >= (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) : true)}
                         variant="primary"
-                        size="sm"
+                        size="xs"
                         isLoading={isCartUpdating}
                         className="bg-primary hover:bg-primary-dark text-white p-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         leftIcon={<PlusIcon size={12} />}
@@ -690,7 +690,7 @@ export const ProductDetails = () => {
                       }}
                       disabled={!selectedVariant || (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) <= 0 || isCartUpdating}
                       variant="primary"
-                      size="sm"
+                      size="xs"
                       className="w-full bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-sm"
                       leftIcon={isCartUpdating ? null : <ShoppingCartIcon size={16} className="mr-2" />}
                       isLoading={isCartUpdating}
@@ -741,7 +741,7 @@ export const ProductDetails = () => {
                     }}
                     disabled={isWishlistUpdating}
                     variant={isInWishlistState ? "outline" : "ghost"}
-                    size="sm"
+                    size="xs"
                     className={`px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center min-w-[50px] text-sm disabled:opacity-50 disabled:cursor-not-allowed ${isInWishlistState
                     ? 'bg-error-100 text-error-600 hover:bg-error-200'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -769,7 +769,7 @@ export const ProductDetails = () => {
                     setShowSubscriptionSelector(true);
                   }}
                   variant="success"
-                  size="sm"
+                  size="xs"
                   className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-sm"
                   leftIcon={<CalendarIcon size={14} className="mr-1 sm:mr-2 flex-shrink-0" />}
                 >

@@ -215,7 +215,7 @@ export const AdminInventory = () => {
           <Button
             onClick={() => openEditModal(row)}
             variant="ghost"
-            size="sm"
+            size="xs"
             leftIcon={<EditIcon size={14} />}
             className="inline-flex items-center gap-1 px-2 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
           >
@@ -384,7 +384,7 @@ export const AdminInventory = () => {
             <Button
               onClick={openAddModal}
               variant="primary"
-              size="sm"
+              size="xs"
               leftIcon={<PlusIcon size={14} />}
             >
               Add Item
@@ -405,7 +405,7 @@ export const AdminInventory = () => {
             <Button
               onClick={openAddModal}
               variant="primary"
-              size="sm"
+              size="xs"
               leftIcon={<PlusIcon size={14} />}
             >
               Add Item
@@ -559,14 +559,14 @@ export const AdminInventory = () => {
                     setEditingItem(null);
                   }}
                   variant="ghost"
-                  size="sm"
+                  size="xs"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   variant="primary"
-                  size="sm"
+                  size="xs"
                 >
                   {editingItem ? 'Update Stock' : 'Add Item'}
                 </Button>

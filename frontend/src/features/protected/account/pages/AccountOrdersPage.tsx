@@ -160,7 +160,7 @@ export const Orders = (props: OrdersProps) => {
                       expandedOrderId === order.id ? null : order.id
                     )}
                     variant="ghost"
-                    size="sm"
+                    size="xs"
                     rightIcon={expandedOrderId === order.id ? <ChevronUpIcon className="h-3 w-3" /> : <ChevronDownIcon className="h-3 w-3" />}
                   >
                     <Text variant="body-sm">{expandedOrderId === order.id ? 'Hide' : 'Show'} details</Text>
@@ -230,7 +230,7 @@ export const Orders = (props: OrdersProps) => {
               totalItems={totalOrders}
               pageSize={10}
               onPageChange={setCurrentPage}
-              size="sm"
+              size="xs"
             />
           )}
         </div>

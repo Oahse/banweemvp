@@ -75,7 +75,7 @@ export const VariantCodeGenerator: React.FC<VariantCodeGeneratorProps> = ({
           onClick={generateCodes}
           disabled={isGenerating}
           variant="primary"
-          size="sm"
+          size="xs"
           className="flex items-center gap-1 px-2 py-1 text-sm bg-primary text-white rounded hover:bg-primary-dark disabled:opacity-50 transition-colors"
           leftIcon={<RefreshCwIcon size={12} className={isGenerating ? 'animate-spin' : ''} />}
           isLoading={isGenerating}

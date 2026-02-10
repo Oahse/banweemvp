@@ -195,7 +195,7 @@ export const SupplierDetail = () => {
                   <Button
                     onClick={() => setActiveTab('about')}
                     variant={activeTab === 'about' ? "link" : "ghost"}
-                    size="sm"
+                    size="xs"
                     className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
                       activeTab === 'about'
                         ? 'text-primary border-b-2 border-primary'
@@ -207,7 +207,7 @@ export const SupplierDetail = () => {
                   <Button
                     onClick={() => setActiveTab('contact')}
                     variant={activeTab === 'contact' ? "link" : "ghost"}
-                    size="sm"
+                    size="xs"
                     className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
                       activeTab === 'contact'
                         ? 'text-primary border-b-2 border-primary'

@@ -315,7 +315,7 @@ export const ProductCard = ({
         className
       )}
       orientation={viewMode === 'list' ? 'horizontal' : 'vertical'}
-      size="sm"
+      size="xs"
       density="compact"
     >
       {/* Product Image with Badges and Quick Actions */}
@@ -371,10 +371,10 @@ export const ProductCard = ({
         )}
         
         {/* Quick action buttons */}
-        <Button
+        {/* <Button
           onClick={handleAddToWishlist}
           variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
-          size="sm"
+          size="xs"
           className={cn(
             'absolute top-2 right-2 w-8 h-8 rounded-full p-0 transition-colors',
             wishlistMode || isInWishlist(product.id, displayVariant?.id)
@@ -383,7 +383,7 @@ export const ProductCard = ({
           )}
           aria-label={isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}>
             {isInWishlist(product.id, displayVariant?.id) ? <HeartIcon size={16} /> : <HeartIcon size={16} />}
-        </Button>
+        </Button> */}
         <Link
           to={`/products/${product.id}`}
           className="absolute top-2 left-2 w-8 h-8 rounded-full bg-surface text-copy flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
@@ -456,7 +456,7 @@ export const ProductCard = ({
                 onClick={handleAddToCart}
                 disabled={!displayVariant?.inventory || displayVariant.inventory.quantity_available === 0}
                 variant={isInCart ? "success" : "primary"}
-                size="sm"
+                size="xs"
                 className={cn(
                   'flex items-center justify-center px-1 py-1.5 rounded-md text-sm font-medium transition-colors',
                   (!displayVariant?.inventory || displayVariant.inventory.quantity_available === 0)
@@ -472,7 +472,7 @@ export const ProductCard = ({
               <Button
                 onClick={handleAddToWishlist}
                 variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
-                size="sm"
+                size="xs"
                 className={cn(
                   'flex items-center justify-center px-1.5 py-1.5 rounded-md text-sm font-medium transition-colors',
                   wishlistMode || isInWishlist(product.id, displayVariant?.id)
@@ -495,7 +495,7 @@ export const ProductCard = ({
               onClick={handleAddToCart}
               disabled={(displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0}
               variant={isInCart ? "success" : "primary"}
-              size="sm"
+              size="xs"
               className={cn(
                 'flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors min-w-[40px]',
                 (displayVariant?.stock ?? displayVariant?.inventory_quantity_available ?? 0) === 0 
@@ -511,7 +511,7 @@ export const ProductCard = ({
             <Button
               onClick={handleAddToWishlist}
               variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
-              size="sm"
+              size="xs"
               className={cn(
                 'flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors min-w-[40px]',
                 wishlistMode || isInWishlist(product.id, displayVariant?.id)
@@ -539,7 +539,7 @@ export const ProductCard = ({
                       sku: displayVariant.sku,
                       product_name: product.name
                     }}
-                    size="sm"
+                    size="xs"
                     showControls={false}
                   />
                 </div>
@@ -561,7 +561,7 @@ export const ProductCard = ({
                       qr_code: displayVariant.qr_code
                     }}
                     showBoth={false}
-                    size="sm"
+                    size="xs"
                   />
                 </div>
               )}

@@ -73,7 +73,7 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
         <Body className="text-sm text-gray-500 mb-2">Your wishlist is empty.</Body>
         <Button
           variant="primary"
-          size="sm"
+          size="xs"
           onClick={() => navigate('/products')}
         >
           Browse Products
@@ -93,34 +93,7 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
       <Card.Body>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {paginatedItems.map((item: WishlistItem) => (
-            <Card key={item.id} variant="outlined">
-              <Card.Body density="compact">
-                <ProductCard product={item.product} selectedVariant={item.variant} />
-              </Card.Body>
-              <Card.Footer>
-                <div className="flex gap-2">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    leftIcon={<ShoppingCartIcon size={14} />}
-                    onClick={() => addToCart(item.product, item.variant)}
-                  >
-                    Add to Cart
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    leftIcon={<TrashIcon size={14} />}
-                    onClick={() => {
-                      setItemToRemove(item.id);
-                      setShowRemoveModal(true);
-                    }}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              </Card.Footer>
-            </Card>
+            <ProductCard product={item.product} selectedVariant={item.variant} />
           ))}
         </div>
         {/* Pagination */}
@@ -131,14 +104,14 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
               totalItems={wishlistItems.length}
               pageSize={itemsPerPage}
               onPageChange={setCurrentPage}
-              size="sm"
+              size="xs"
             />
           </div>
         )}
         {/* Clear Wishlist Button */}
         <Button
           variant="danger"
-          size="sm"
+          size="xs"
           leftIcon={<TrashIcon size={16} />}
           onClick={() => setShowClearModal(true)}
           className="mt-6"

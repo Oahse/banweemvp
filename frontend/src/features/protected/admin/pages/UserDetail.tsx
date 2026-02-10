@@ -141,7 +141,7 @@ export const UserDetail = () => {
           <Button
             onClick={() => navigate('/admin/users')}
             variant="ghost"
-            size="sm"
+            size="xs"
             className={`inline-flex items-center gap-2 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} hover:text-primary transition-colors`}
             leftIcon={<ArrowLeft size={16} />}
           >
@@ -268,7 +268,7 @@ export const UserDetail = () => {
               type="button"
               onClick={() => navigate('/admin/users')}
               variant="outline"
-              size="sm"
+              size="xs"
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
             >
               Cancel
@@ -277,7 +277,7 @@ export const UserDetail = () => {
               type="submit"
               disabled={saving}
               variant="primary"
-              size="sm"
+              size="xs"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium disabled:opacity-60"
               leftIcon={<Save size={16} />}
               isLoading={saving}

@@ -224,7 +224,7 @@ const Products = () => {
           <Button
             type="submit"
             variant="primary"
-            size="sm"
+            size="xs"
             className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded text-sm font-medium transition-colors"
           >
             <Text variant="body-sm">Search</Text>
@@ -236,7 +236,7 @@ const Products = () => {
           <Button
             onClick={() => setShowFilters(!showFilters)}
             variant="outline"
-            size="sm"
+            size="xs"
             className={cn(
               'flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600',
               'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300',
@@ -280,7 +280,7 @@ const Products = () => {
                       key={category.id}
                       onClick={() => handleCategoryChange(category.id)}
                       variant={selectedCategories.includes(category.id) ? "primary" : "ghost"}
-                      size="sm"
+                      size="xs"
                       className={cn(
                         'px-3 py-1.5 rounded-full text-sm transition-all duration-200',
                         selectedCategories.includes(category.id)
@@ -336,7 +336,7 @@ const Products = () => {
               <Button
                 onClick={clearFilters}
                 variant="ghost"
-                size="sm"
+                size="xs"
                 className={cn(
                   'flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg',
                   'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
@@ -350,7 +350,7 @@ const Products = () => {
               <Button
                 onClick={() => setShowFilters(false)}
                 variant="outline"
-                size="sm"
+                size="xs"
                 className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <Text variant="body-sm">Done</Text>
@@ -400,7 +400,7 @@ const Products = () => {
               <Button
                 onClick={clearFilters}
                 variant="primary"
-                size="sm"
+                size="xs"
                 className={combineThemeClasses(
                   getButtonClasses('primary'),
                   'transition-all duration-200 hover:scale-105'

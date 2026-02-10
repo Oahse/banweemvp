@@ -37,7 +37,7 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
               onClick={() => !tab.disabled && onTabChange(tab.id)}
               disabled={tab.disabled}
               variant="ghost"
-              size="sm"
+              size="xs"
               className={`py-2 px-2 sm:px-3 border-b-2 font-medium text-sm capitalize transition-colors duration-200 flex items-center gap-1 sm:gap-2 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-0 ${
                 isActive
                   ? 'border-[#61b482] text-[#61b482]'

@@ -167,7 +167,7 @@ export const Profile = () => {
                 type="button"
                 disabled={!isEditing}
                 variant="outline"
-                size="sm"
+                size="xs"
                 className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
                 onClick={() => {
                   if (!isEditing) return;
@@ -200,7 +200,7 @@ export const Profile = () => {
                 type="button"
                 disabled={!isEditing}
                 variant="outline"
-                size="sm"
+                size="xs"
                 className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-left focus:ring-primary focus:border-primary"
                 onClick={() => {
                   if (!isEditing) return;
@@ -240,7 +240,7 @@ export const Profile = () => {
         <div className="mt-4 flex gap-2">
           <Button
             variant="primary"
-            size="sm"
+            size="xs"
             disabled={!isEditing || loading}
             onClick={handleSave}
             leftIcon={<SaveIcon size={16} />}
@@ -249,7 +249,7 @@ export const Profile = () => {
           </Button>
           <Button
             variant="secondary"
-            size="sm"
+            size="xs"
             onClick={() => setIsEditing(!isEditing)}
             disabled={loading}
           >

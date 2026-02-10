@@ -65,7 +65,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           variant="outline"
-          size="sm"
+          size="xs"
           className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
         >
           <ChevronLeftIcon className="w-4 h-4" />
@@ -79,7 +79,7 @@ export const Pagination: React.FC<PaginationProps> = ({
               key={pageNum}
               onClick={() => onPageChange(pageNum)}
               variant={currentPage === pageNum ? 'primary' : 'ghost'}
-              size="sm"
+              size="xs"
               className={`px-2 py-1 sm:px-3 sm:py-1 text-sm rounded-md min-w-[32px] transition-colors ${
                 currentPage === pageNum
                   ? 'bg-primary text-white border-primary'
@@ -97,7 +97,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           variant="outline"
-          size="sm"
+          size="xs"
           className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
         >
           <Text as="span" className="hidden sm:inline mr-1">Next</Text>

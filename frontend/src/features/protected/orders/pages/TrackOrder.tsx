@@ -158,7 +158,7 @@ export const TrackOrder = () => {
       <motion.div className="max-w-4xl mx-auto" variants={itemVariants}>
         <Button
           variant="ghost"
-          size="sm"
+          size="xs"
           onClick={() => navigate(-1)}
           className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-4"
         >
@@ -176,7 +176,7 @@ export const TrackOrder = () => {
             </div>
             <Button
               onClick={handleDownloadInvoice}
-              size="sm"
+              size="xs"
               className="flex items-center gap-1.5 px-2 py-1.5 text-sm"
             >
               <PrinterIcon size={14} />

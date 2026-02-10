@@ -297,7 +297,7 @@ const ContactMessages: React.FC = () => {
           <Button
             onClick={() => viewMessage(row)}
             variant="ghost"
-            size="sm"
+            size="xs"
             leftIcon={<Eye size={14} />}
             className="inline-flex items-center gap-1 px-2 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
           >
@@ -306,7 +306,7 @@ const ContactMessages: React.FC = () => {
           <Button
             onClick={() => handleDelete(row.id)}
             variant="ghost"
-            size="sm"
+            size="xs"
             leftIcon={<Trash2 size={14} />}
             className="inline-flex items-center gap-1 px-2 py-1.5 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors"
           >
@@ -487,7 +487,7 @@ const ContactMessages: React.FC = () => {
                       setSearchTerm('');
                     }}
                     variant="ghost"
-                    size="sm"
+                    size="xs"
                   >
                     Clear All
                   </Button>
@@ -583,7 +583,7 @@ const ContactMessages: React.FC = () => {
           )}
         </ModalBody>
         <ModalFooter>
-          <Button onClick={viewModal.close} variant="secondary" size="sm">
+          <Button onClick={viewModal.close} variant="secondary" size="xs">
             Close
           </Button>
         </ModalFooter>

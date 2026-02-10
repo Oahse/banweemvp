@@ -151,7 +151,7 @@ export const QRCodeDisplay = ({
           <Button
             onClick={downloadQRCode}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="p-2 text-copy-light hover:text-primary hover:bg-surface-hover rounded-md transition-colors"
             leftIcon={<DownloadIcon size={16} />}
             title="Download QR Code"
@@ -161,7 +161,7 @@ export const QRCodeDisplay = ({
           <Button
             onClick={printQRCode}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="p-2 text-copy-light hover:text-primary hover:bg-surface-hover rounded-md transition-colors"
             leftIcon={<PrinterIcon size={16} />}
             title="Print QR Code"
@@ -171,7 +171,7 @@ export const QRCodeDisplay = ({
           <Button
             onClick={copyToClipboard}
             variant="ghost"
-            size="sm"
+            size="xs"
             className={`p-2 rounded-md transition-colors ${copied ? 'text-success bg-success/10' : 'text-copy-light hover:text-primary hover:bg-surface-hover'}`}
             leftIcon={copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
             title="Copy QR Code"

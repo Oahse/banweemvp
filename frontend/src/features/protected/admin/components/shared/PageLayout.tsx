@@ -12,7 +12,7 @@ export const AdminPageLayout: React.FC<AdminPageLayoutProps> = ({
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 ${className}`}>
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-3 py-2 text-gray-900 dark:text-gray-100">
+      <main className="max-w-7xl mx-auto px-2 py-1.5 text-gray-900 dark:text-gray-100">
         {children}
       </main>
     </div>

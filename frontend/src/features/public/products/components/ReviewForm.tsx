@@ -75,7 +75,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
           <Button
             type="submit"
             variant="primary"
-            size="sm"
+            size="xs"
             className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors text-sm font-medium"
             disabled={loading}
             isLoading={loading}

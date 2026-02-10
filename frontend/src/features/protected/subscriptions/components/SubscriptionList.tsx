@@ -156,7 +156,7 @@ export const SubscriptionList: React.FC = () => {
         <Button
           onClick={() => navigate('/login')}
           variant="primary"
-          size="sm"
+          size="xs"
           className={combineThemeClasses(getButtonClasses('primary'), 'text-sm')}
         >
           <LogInIcon className="w-4 h-4 mr-1" />
@@ -175,7 +175,7 @@ export const SubscriptionList: React.FC = () => {
             <Button
               onClick={() => navigate('/login')}
               variant="primary"
-              size="sm"
+              size="xs"
               className={combineThemeClasses(getButtonClasses('primary'), 'text-sm')}
             >
               <LogInIcon className="w-4 h-4 mr-1" />
@@ -185,7 +185,7 @@ export const SubscriptionList: React.FC = () => {
             <Button
               onClick={loadSubscriptions}
               variant="outline"
-              size="sm"
+              size="xs"
               className={combineThemeClasses(getButtonClasses('outline'), 'text-sm')}
             >
               <RefreshCwIcon className="w-4 h-4 mr-1" />
@@ -214,7 +214,7 @@ export const SubscriptionList: React.FC = () => {
           <Button
             onClick={loadSubscriptions}
             variant="outline"
-            size="sm"
+            size="xs"
             className={combineThemeClasses(getButtonClasses('outline'), 'text-sm')}
           >
             Refresh

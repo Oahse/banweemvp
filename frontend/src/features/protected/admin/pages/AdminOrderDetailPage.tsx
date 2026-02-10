@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader, AlertCircle, ArrowLeft, DownloadIcon, MapPin, Truck, Package, DollarSign, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, DownloadIcon, MapPin, Truck, Package, DollarSign, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import apiClient from '@/api/client';
 import { Dropdown } from '@/components/ui/Dropdown';
 import toast from 'react-hot-toast';
-import ErrorBoundary from '@/components/shared/ErrorBoundary';
-import AdminLayoutSkeleton from '@/features/protected/admin/components/skeletons/AdminLayoutSkeleton';
 import { OrderDetailSkeleton } from '@/features/protected/admin/components/skeletons/OrdersSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
@@ -302,7 +300,7 @@ export const AdminOrderDetail = () => {
           <Button
             onClick={handleDownloadInvoice}
             variant="primary"
-            size="sm"
+            size="xs"
             leftIcon={<DownloadIcon size={16} />}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-copy-inverse rounded-lg hover:bg-primary/90 transition"
           >
@@ -326,7 +324,7 @@ export const AdminOrderDetail = () => {
                   <Button
                     onClick={() => window.print()}
                     variant="ghost"
-                    size="sm"
+                    size="xs"
                     className="px-3 py-1 bg-muted rounded text-sm"
                   >
                     Print
@@ -334,7 +332,7 @@ export const AdminOrderDetail = () => {
                   <Button
                     onClick={() => AdminAPI.getOrderInvoice(orderId || '')}
                     variant="primary"
-                    size="sm"
+                    size="xs"
                     className="px-3 py-1 bg-primary text-copy-inverse rounded text-sm"
                   >
                     Download PDF
@@ -402,7 +400,7 @@ export const AdminOrderDetail = () => {
               key={tab}
               onClick={() => setActiveTab(tab)}
               variant={activeTab === tab ? 'primary' : 'ghost'}
-              size="sm"
+              size="xs"
               className={`px-4 py-2 font-semibold capitalize transition ${
                 activeTab === tab
                   ? 'text-primary border-b-2 border-primary'
@@ -550,7 +548,7 @@ export const AdminOrderDetail = () => {
                     onClick={handleStatusUpdate}
                     disabled={updating || newStatus === order.order_status}
                     variant="primary"
-                    size="sm"
+                    size="xs"
                     className="w-full px-4 py-2 bg-primary text-copy-inverse rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
                   >
                     {updating ? 'Updating...' : `Update to ${newStatus}`}

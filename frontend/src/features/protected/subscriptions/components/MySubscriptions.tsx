@@ -148,7 +148,7 @@ export const MySubscriptions = () => {
         <Button
           onClick={() => refreshSubscriptions()} 
           variant="ghost"
-          size="sm"
+          size="xs"
         >
           Refresh
         </Button>
@@ -169,7 +169,7 @@ export const MySubscriptions = () => {
           <Button
             onClick={() => setShowCreateModal(true)}
             variant="primary"
-            size="sm"
+            size="xs"
             leftIcon={<PlusIcon size={14} />}
           >
             Create New Subscription
@@ -189,7 +189,7 @@ export const MySubscriptions = () => {
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             variant={activeTab === tab.key ? 'primary' : 'ghost'}
-            size="sm"
+            size="xs"
             className={`flex-1 min-w-[80px] px-2 py-1 text-sm font-medium rounded-md transition-colors ${
               activeTab === tab.key ? 'bg-primary text-white shadow-md' : 'border border-gray-300 hover:bg-gray-50'
             }`}
@@ -212,7 +212,7 @@ export const MySubscriptions = () => {
           <Button
             onClick={() => setShowCreateModal(true)}
             variant="primary"
-            size="sm"
+            size="xs"
           >
             Create Your First Subscription
           </Button>
@@ -267,7 +267,7 @@ export const MySubscriptions = () => {
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
               variant="outline"
-              size="sm"
+              size="xs"
             >
               Previous
             </Button>
@@ -290,7 +290,7 @@ export const MySubscriptions = () => {
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
                     variant={currentPage === pageNum ? 'primary' : 'ghost'}
-                    size="sm"
+                    size="xs"
                     className={`px-3 py-1 text-sm rounded-md ${
                       currentPage === pageNum ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-gray-50'
                     }`}
@@ -305,7 +305,7 @@ export const MySubscriptions = () => {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
               variant="outline"
-              size="sm"
+              size="xs"
             >
               Next
             </Button>
@@ -328,7 +328,7 @@ export const MySubscriptions = () => {
                     setSelectedProducts(new Set());
                   }}
                   variant="primary"
-                  size="sm"
+                  size="xs"
                   leftIcon={<XIcon size={14} />}
                 >
                   Close
@@ -384,7 +384,7 @@ export const MySubscriptions = () => {
                       isEnabled={newSubscriptionData.auto_renew}
                       onToggle={(enabled) => setNewSubscriptionData({...newSubscriptionData, auto_renew: enabled})}
                       showDetails={false}
-                      size="sm"
+                      size="xs"
                     />
                   </div>
                 </div>
@@ -548,7 +548,7 @@ export const MySubscriptions = () => {
                     setSelectedProducts(new Set());
                   }}
                   variant="outline"
-                  size="sm"
+                  size="xs"
                   className="px-4 py-2"
                 >
                   Cancel
@@ -590,7 +590,7 @@ export const MySubscriptions = () => {
                   }}
                   disabled={isLoading || selectedProducts.size === 0}
                   variant="primary"
-                  size="sm"
+                  size="xs"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   isLoading={isLoading}
                 >

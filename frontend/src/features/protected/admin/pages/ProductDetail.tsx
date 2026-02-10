@@ -55,7 +55,7 @@ export const AdminProductDetail = () => {
         <Button
             onClick={() => navigate('/admin/products')}
             variant="ghost"
-            size="sm"
+            size="xs"
             leftIcon={<ArrowLeft size={16} />}
             className="inline-flex items-center gap-2 text-copy-light hover:text-copy transition-colors"
           >
@@ -71,7 +71,7 @@ export const AdminProductDetail = () => {
                 <Button
                   onClick={() => window.location.reload()}
                   variant="danger"
-                  size="sm"
+                  size="xs"
                   className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-destructive text-white rounded text-sm hover:bg-destructive/90 transition-colors"
                 >
                   Try Again
@@ -80,7 +80,6 @@ export const AdminProductDetail = () => {
             </div>
           )}
         </div>
-      </div>
     );
   }
 
@@ -92,7 +91,7 @@ export const AdminProductDetail = () => {
             <Button
               onClick={() => navigate('/admin/products')}
               variant="ghost"
-              size="sm"
+              size="xs"
               leftIcon={<ArrowLeft size={16} />}
               className="inline-flex items-center gap-2 text-copy-light hover:text-copy transition-colors"
             >
@@ -107,7 +106,7 @@ export const AdminProductDetail = () => {
           <Button
             onClick={() => navigate(`/admin/products/${productId}/edit`)}
             variant="primary"
-            size="sm"
+            size="xs"
             leftIcon={<Edit size={14} />}
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors font-medium"
           >

@@ -110,7 +110,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         onClick={handleToggleDropdown}
         disabled={disabled}
         className={cn(
-          'w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-sm',
+          'w-full flex items-center justify-between gap-2 px-2.5 py-2.5 text-left text-xs',
           'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm transition-colors',
           disabled
             ? 'opacity-50 cursor-not-allowed'
@@ -126,7 +126,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         </span>
         <ChevronDownIcon 
           className={cn(
-            'w-4 h-4 transition-transform flex-shrink-0',
+            'w-3.5 h-3.5 transition-transform flex-shrink-0',
             isOpen ? 'rotate-180' : ''
           )} 
         />
@@ -138,7 +138,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
         )}>
           {searchable && (
-            <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-1.5 border-b border-gray-200 dark:border-gray-700">
               <div className="relative">
                 <input
                   ref={searchInputRef}
@@ -147,7 +147,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={searchPlaceholder}
                   className={cn(
-                    'w-full pl-3 pr-8 py-2 text-sm border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary',
+                    'w-full pl-2.5 pr-7 py-1.5 text-xs border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary',
                     'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white',
                     'placeholder-gray-500 dark:placeholder-gray-400'
                   )}
@@ -157,17 +157,17 @@ export const Dropdown: React.FC<DropdownProps> = ({
                     type="button"
                     onClick={handleClearSearch}
                     variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    size="xs"
+                    className="absolute right-1.5 top-1/2 transform -translate-y-1/2 p-0.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
-                    <XIcon className="w-4 h-4" />
+                    <XIcon className="w-3.5 h-3.5" />
                   </Button>
                 )}
               </div>
             </div>
           )}
           
-          <div className="max-h-60 overflow-auto">
+          <div className="max-h-60 overflow-auto py-1">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <button
@@ -176,7 +176,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   onClick={() => handleSelect(option)}
                   disabled={option.disabled}
                   className={cn(
-                    'w-full px-3 py-2 text-left text-sm transition-colors flex items-center justify-between gap-2',
+                    'w-full px-2.5 py-1.5 text-left text-xs transition-colors flex items-center justify-between gap-2',
                     'hover:bg-gray-100 dark:hover:bg-gray-700',
                     option.disabled && 'opacity-50 cursor-not-allowed',
                     value === option.value && 'bg-primary/10 text-primary font-medium'
@@ -184,12 +184,12 @@ export const Dropdown: React.FC<DropdownProps> = ({
                 >
                   <span className="truncate flex-1">{option.label}</span>
                   {value === option.value && (
-                    <CheckIcon className="w-4 h-4 text-primary flex-shrink-0" />
+                    <CheckIcon className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                   )}
                 </button>
               ))
             ) : (
-              <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+              <div className="px-2.5 py-1.5 text-xs text-gray-500 dark:text-gray-400 text-center">
                 {searchTerm ? 'No options found' : 'No options available'}
               </div>
             )}

@@ -78,7 +78,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
         <Caption className="text-sm text-gray-500 mb-2">You have no subscriptions.</Caption>
         <Button
           variant="primary"
-          size="sm"
+          size="xs"
           onClick={() => navigate('/products')}
         >
           Browse Plans
@@ -122,7 +122,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
               {sub.status === 'active' && (
                 <Button
                   variant="warning"
-                  size="sm"
+                  size="xs"
                   leftIcon={<PauseIcon size={14} />}
                   onClick={() => { setSelectedId(sub.id); setConfirmAction('pause'); setShowConfirmModal(true); }}
                 >
@@ -132,7 +132,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
               {sub.status === 'paused' && (
                 <Button
                   variant="success"
-                  size="sm"
+                  size="xs"
                   leftIcon={<PlayIcon size={14} />}
                   onClick={() => { setSelectedId(sub.id); setConfirmAction('resume'); setShowConfirmModal(true); }}
                 >
@@ -142,7 +142,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
               {sub.status !== 'cancelled' && (
                 <Button
                   variant="danger"
-                  size="sm"
+                  size="xs"
                   leftIcon={<TrashIcon size={14} />}
                   onClick={() => { setSelectedId(sub.id); setConfirmAction('cancel'); setShowConfirmModal(true); }}
                 >
@@ -151,7 +151,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
               )}
               <Button
                 variant="secondary"
-                size="sm"
+                size="xs"
                 leftIcon={<TrashIcon size={14} />}
                 onClick={() => { setSelectedId(sub.id); setConfirmAction('remove'); setShowConfirmModal(true); }}
               >

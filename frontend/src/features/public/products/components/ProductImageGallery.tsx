@@ -118,7 +118,7 @@ export const ProductImageGallery = ({
             <Button
               onClick={prevImage}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
               leftIcon={<ChevronLeftIcon size={20} />}
             >
@@ -126,7 +126,7 @@ export const ProductImageGallery = ({
             <Button
               onClick={nextImage}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
               rightIcon={<ChevronRightIcon size={20} />}
             >
@@ -148,7 +148,7 @@ export const ProductImageGallery = ({
               key={image.id}
               onClick={() => onImageSelect(index)}
               variant={index === selectedImageIndex ? "primary" : "ghost"}
-              size="sm"
+              size="xs"
               className={cn(
                 'relative overflow-hidden rounded-md border-2 transition-all h-20',
                 selectedImageIndex === index
@@ -191,7 +191,7 @@ export const ProductImageGallery = ({
               <Button
                 onClick={() => setIsFullscreen(false)}
                 variant="ghost"
-                size="sm"
+                size="xs"
                 className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors"
                 leftIcon={<XIcon size={16} />}
               >
@@ -205,7 +205,7 @@ export const ProductImageGallery = ({
                       prevImage();
                     }}
                     variant="ghost"
-                    size="sm"
+                    size="xs"
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white w-12 h-12 rounded-full flex items-center justify-center transition-colors"
                     leftIcon={<ChevronLeftIcon size={24} />}
                   >
@@ -216,7 +216,7 @@ export const ProductImageGallery = ({
                       nextImage();
                     }}
                     variant="ghost"
-                    size="sm"
+                    size="xs"
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white w-12 h-12 rounded-full flex items-center justify-center transition-colors"
                     rightIcon={<ChevronRightIcon size={24} />}
                   >

@@ -252,7 +252,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                     <Button
                       onClick={handleExport}
                       variant="ghost"
-                      size="sm"
+                      size="xs"
                       leftIcon={<DownloadIcon className="h-4 w-4" />}
                     >
                       <TextComponent className="hidden sm:inline">Export</TextComponent>

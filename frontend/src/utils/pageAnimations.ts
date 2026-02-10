@@ -50,8 +50,14 @@ export const pageAnimations = {
 
 // Export individual variants for convenience
 export const {
-  containerFast: containerFastVariants,
-  itemFast: itemFastVariants,
-  container: containerVariants,
-  item: itemVariants
+  containerFast,
+  itemFast,
+  container,
+  item
 } = pageAnimations;
+
+// Also export with "Variants" suffix for backward compatibility
+export const containerFastVariants = containerFast;
+export const itemFastVariants = itemFast;
+export const containerVariants = container;
+export const itemVariants = item;

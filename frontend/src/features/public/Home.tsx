@@ -310,7 +310,7 @@ return (
               key={index}
               type="button"
               variant={currentSlide === index ? "primary" : "ghost"}
-              size="sm"
+              size="xs"
               aria-label={`Go to slide ${index + 1}`}
               onClick={() => setCurrentSlide(index)}
               className={`w-3 h-3 rounded-full mx-1 ${currentSlide === index ? 'bg-white' : 'bg-white/50'}`}
@@ -480,7 +480,7 @@ return (
           <Button
             onClick={() => setActiveTab('all')}
             variant={activeTab === 'all' ? 'primary' : 'ghost'}
-            size="sm"
+            size="xs"
             className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
           >
             All Products
@@ -488,7 +488,7 @@ return (
           <Button
             onClick={() => setActiveTab('cereal-crops')}
             variant={activeTab === 'cereal-crops' ? 'primary' : 'ghost'}
-            size="sm"
+            size="xs"
             className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
           >
             Cereal Crops
@@ -496,7 +496,7 @@ return (
           <Button
             onClick={() => setActiveTab('legumes')}
             variant={activeTab === 'legumes' ? 'primary' : 'ghost'}
-            size="sm"
+            size="xs"
             className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
           >
             Legumes
@@ -504,7 +504,7 @@ return (
           <Button
             onClick={() => setActiveTab('fruits-vegetables')}
             variant={activeTab === 'fruits-vegetables' ? 'primary' : 'ghost'}
-            size="sm"
+            size="xs"
             className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
           >
             Fruits & Vegetables
@@ -512,7 +512,7 @@ return (
           <Button
             onClick={() => setActiveTab('oilseeds')}
             variant={activeTab === 'oilseeds' ? 'primary' : 'ghost'}
-            size="sm"
+            size="xs"
             className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
           >
             Oil Seeds

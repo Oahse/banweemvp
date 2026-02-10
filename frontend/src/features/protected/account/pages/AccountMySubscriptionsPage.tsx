@@ -297,7 +297,7 @@ export const MySubscriptions = () => {
         <Button
           onClick={() => setShowCreateModal(true)}
           variant="primary"
-          size="sm"
+          size="xs"
           leftIcon={<PlusIcon className="w-4 h-4" />}
           className="mt-4 sm:mt-0"
         >
@@ -346,7 +346,7 @@ export const MySubscriptions = () => {
                 <Button
                   onClick={refreshSubscriptions}
                   variant="link"
-                  size="sm"
+                  size="xs"
                   className="text-sm font-medium text-red-600 hover:text-red-500"
                 >
                   Try again
@@ -410,7 +410,7 @@ export const MySubscriptions = () => {
             totalItems={filteredSubscriptions.length}
             pageSize={itemsPerPage}
             onPageChange={setCurrentPage}
-            size="sm"
+            size="xs"
           />
         </div>
       )}
@@ -505,7 +505,7 @@ export const MySubscriptions = () => {
                 <Button
                   onClick={() => setShowCreateModal(false)}
                   variant="secondary"
-                  size="sm"
+                  size="xs"
                   fullWidth={true}
                   className="sm:fullWidth-auto"
                 >
@@ -515,7 +515,7 @@ export const MySubscriptions = () => {
                   onClick={handleCreateSubscription}
                   disabled={isLoading}
                   variant="primary"
-                  size="sm"
+                  size="xs"
                   isLoading={isLoading}
                   fullWidth={true}
                   className="sm:fullWidth-auto"
@@ -572,7 +572,7 @@ export const MySubscriptions = () => {
                           }
                         }}
                         variant={newSubscriptionData.product_variant_ids.includes(product.id) ? 'primary' : 'secondary'}
-                        size="sm"
+                        size="xs"
                       >
                         {newSubscriptionData.product_variant_ids.includes(product.id) ? 'Remove' : 'Add'}
                       </Button>
@@ -589,7 +589,7 @@ export const MySubscriptions = () => {
                 <Button
                   onClick={() => setShowProductModal(false)}
                   variant="secondary"
-                  size="sm"
+                  size="xs"
                   fullWidth={true}
                   className="sm:fullWidth-auto"
                 >

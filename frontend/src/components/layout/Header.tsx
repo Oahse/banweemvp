@@ -273,7 +273,7 @@ export const Header = ({
                 <Button
                   type="submit"
                   variant="primary"
-                  size="sm"
+                  size="xs"
                   className="rounded-r-md"
                 >
                   <SearchIcon size={20} />

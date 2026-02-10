@@ -219,7 +219,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
               setShowCreateModal(true);
             }}
             variant="primary"
-            size="sm"
+            size="xs"
             className="flex items-center gap-2"
           >
             <PlusIcon size={16} />
@@ -239,7 +239,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               variant={activeTab === tab.key ? 'primary' : 'ghost'}
-              size="sm"
+              size="xs"
               className={`px-2 sm:px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                 activeTab === tab.key
                   ? 'bg-primary text-white'
@@ -267,7 +267,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                 setShowCreateModal(true);
               }}
               variant="primary"
-              size="sm"
+              size="xs"
               className="flex items-center gap-2"
             >
               <PlusIcon size={16} />
@@ -345,7 +345,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                         setShowAddProductModal(true);
                       }}
                       variant="outline"
-                      size="sm"
+                      size="xs"
                       className="text-sm"
                     >
                       Manage Products
@@ -384,7 +384,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
                   <Button
                     onClick={() => navigate(`/account/subscriptions/${subscription.id}/edit`)}
                     variant="primary"
-                    size="sm"
+                    size="xs"
                     className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                   >
                     <EditIcon size={16} />
@@ -474,7 +474,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list', sub
         <Button 
           onClick={() => navigate('/account/subscriptions')}
           variant="link"
-          size="sm"
+          size="xs"
           className="mt-4 text-primary hover:underline"
         >
           View All Subscriptions

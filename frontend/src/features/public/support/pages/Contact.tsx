@@ -286,7 +286,7 @@ export const Contact = () => {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    size="sm"
+                    size="xs"
                     className="text-sm"
                   >
                     {isSubmitting ? 'Sending...' : 'Send Message'}

@@ -112,7 +112,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
           <Button
             onClick={() => setSidebarOpen(false)}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="lg:hidden p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <X className="h-5 w-5" />
@@ -175,7 +175,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
               <Button
                 onClick={() => setSidebarOpen(true)}
                 variant="ghost"
-                size="sm"
+                size="xs"
                 className="lg:hidden p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <Menu className="h-6 w-6" />

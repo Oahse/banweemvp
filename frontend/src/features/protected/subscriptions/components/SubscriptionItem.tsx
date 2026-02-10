@@ -33,7 +33,7 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
               setShowProducts(!showProducts);
             }}
             variant="ghost"
-            size="sm"
+            size="xs"
             className={combineThemeClasses(
               'ml-auto p-1 rounded transition-colors',
               'hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -152,7 +152,7 @@ export const SubscriptionItem: React.FC<SubscriptionItemProps> = ({
               setShowBillingSummary(!showBillingSummary);
             }}
             variant="ghost"
-            size="sm"
+            size="xs"
             className={combineThemeClasses(
               'ml-auto p-1 rounded transition-colors',
               'hover:bg-gray-100 dark:hover:bg-gray-800'

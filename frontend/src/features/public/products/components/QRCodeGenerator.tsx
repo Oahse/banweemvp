@@ -133,7 +133,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
               onClick={shareQRCode}
               disabled={!qrCodeUrl}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="p-2 text-gray-600 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               leftIcon={<Share2Icon size={16} />}
             />
@@ -143,7 +143,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
               onClick={downloadQRCode}
               disabled={!qrCodeUrl}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="p-2 text-gray-600 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               leftIcon={<DownloadIcon size={16} />}
             />

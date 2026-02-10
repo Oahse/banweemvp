@@ -46,7 +46,7 @@ const TrackOrder = () => {
           <Button
             type="submit"
             variant="primary"
-            size="sm"
+            size="xs"
             fullWidth={true}
             leftIcon={<SearchIcon size={16} />}
           >

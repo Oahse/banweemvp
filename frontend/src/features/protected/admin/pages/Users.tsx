@@ -236,7 +236,7 @@ export const Users = () => {
               handleView(row);
             }}
             variant="primary"
-            size="sm"
+            size="xs"
             leftIcon={<EyeIcon size={14} />}
           >
             View

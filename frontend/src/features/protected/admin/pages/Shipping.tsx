@@ -457,7 +457,7 @@ export const AdminShipping = () => {
               handleDelete(row.id);
             }}
             variant="danger"
-            size="sm"
+            size="xs"
             leftIcon={<TrashIcon size={14} />}
           >
             Delete
@@ -497,7 +497,7 @@ export const AdminShipping = () => {
           <Button
             onClick={openAddModal}
             variant="primary"
-            size="sm"
+            size="xs"
             leftIcon={<PlusIcon size={14} />}
           >
             Add Shipping Method
@@ -518,7 +518,7 @@ export const AdminShipping = () => {
           <Button
             onClick={openAddModal}
             variant="primary"
-            size="sm"
+            size="xs"
             leftIcon={<PlusIcon size={14} />}
           >
             Add Shipping Method
@@ -578,7 +578,7 @@ export const AdminShipping = () => {
                   openEditModal(viewingMethod);
                 }}
                 variant="primary"
-                size="sm"
+                size="xs"
                 leftIcon={<EditIcon size={16} />}
               >
                 Edit
@@ -717,7 +717,7 @@ export const AdminShipping = () => {
               setEditingMethod(null);
             }}
             variant="secondary"
-            size="sm"
+            size="xs"
           >
             Cancel
           </Button>
@@ -725,7 +725,7 @@ export const AdminShipping = () => {
             type="submit"
             form="shipping-form"
             variant="primary"
-            size="sm"
+            size="xs"
           >
             {editingMethod ? 'Update Shipping Method' : 'Add Shipping Method'}
           </Button>

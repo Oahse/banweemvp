@@ -187,7 +187,7 @@ export const Modal: React.FC<ModalProps> = ({
             <Button
               onClick={onClose}
               variant="ghost"
-              size="sm"
+              size="xs"
               className={cn(
                 'absolute top-4 right-4 p-1 rounded-lg transition-colors z-10',
                 isDark

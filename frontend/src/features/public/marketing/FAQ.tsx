@@ -95,7 +95,7 @@ export const FAQ = () => {
               <Button
                 key={category.id}
                 variant={activeCategory === category.id ? "primary" : "ghost"}
-                size="sm"
+                size="xs"
                 className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap ${
                   activeCategory === category.id
                     ? 'bg-primary text-white'

@@ -263,7 +263,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           <Button
             onClick={() => navigate(`/account/subscriptions/${subscription.id}`)}
             variant="primary"
-            size="sm"
+            size="xs"
             title="View details"
           >
             View Details
@@ -293,7 +293,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           onClick={handleAutoRenewToggle}
           disabled={isTogglingAutoRenew}
           variant="ghost"
-          size="sm"
+          size="xs"
           className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
         >
           {subscription.auto_renew ? 'Disable' : 'Enable'}
@@ -309,14 +309,14 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 onClick={handleUpdate}
                 disabled={isUpdating}
                 variant="primary"
-                size="sm"
+                size="xs"
               >
                 {isUpdating ? 'Saving...' : 'Save'}
               </Button>
               <Button
                 onClick={handleCancelEdit}
                 variant="secondary"
-                size="sm"
+                size="xs"
               >
                 Cancel
               </Button>
@@ -326,7 +326,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               <Button
                 onClick={() => setIsEditing(true)}
                 variant="secondary"
-                size="sm"
+                size="xs"
               >
                 Edit
               </Button>
@@ -336,7 +336,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   onClick={handlePause}
                   disabled={isPausing}
                   variant="warning"
-                  size="sm"
+                  size="xs"
                 >
                   Pause
                 </Button>
@@ -347,7 +347,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   onClick={handleResume}
                   disabled={isResuming}
                   variant="success"
-                  size="sm"
+                  size="xs"
                 >
                   Resume
                 </Button>
@@ -358,7 +358,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   onClick={handleReactivate}
                   disabled={isReactivating}
                   variant="success"
-                  size="sm"
+                  size="xs"
                 >
                   Reactivate
                 </Button>
@@ -369,7 +369,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   onClick={handleCancel}
                   disabled={isCancelling}
                   variant="danger"
-                  size="sm"
+                  size="xs"
                 >
                   Cancel
                 </Button>
@@ -380,7 +380,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   onClick={() => setShowDeleteModal(true)}
                   disabled={isDeleting}
                   variant="danger"
-                  size="sm"
+                  size="xs"
                 >
                   Delete
                 </Button>
@@ -402,7 +402,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               <Button
                 onClick={() => setShowDeleteModal(false)}
                 variant="secondary"
-                size="sm"
+                size="xs"
               >
                 Cancel
               </Button>
@@ -410,7 +410,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 onClick={handleDelete}
                 disabled={isDeleting}
                 variant="danger"
-                size="sm"
+                size="xs"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
               </Button>

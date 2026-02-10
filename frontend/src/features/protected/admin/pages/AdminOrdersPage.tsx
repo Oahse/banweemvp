@@ -213,7 +213,7 @@ const AdminOrdersPage: React.FC = () => {
         <Button
           onClick={() => handleView(row)}
           variant="ghost"
-          size="sm"
+          size="xs"
           leftIcon={<EyeIcon size={14} />}
           className="inline-flex items-center gap-1 px-2 py-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors"
         >
@@ -300,11 +300,11 @@ const AdminOrdersPage: React.FC = () => {
   }
 
   return (
-    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-2 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
           <div>
-            <Heading level={5} className="text-2xl font-bold">Orders</Heading>
-            <Body className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage customer orders and fulfillment</Body>
+            <Heading level={5} className="text-xl font-bold">Orders</Heading>
+            <Body className={`mt-0.5 text-xs lg:text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage customer orders and fulfillment</Body>
           </div>
         </div>
 

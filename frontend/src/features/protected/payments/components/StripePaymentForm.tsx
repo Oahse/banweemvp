@@ -173,7 +173,7 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
         type="submit"
         disabled={!stripe || !elements || loading || initializing || !isSecure || !clientSecret}
         variant="primary"
-        size="sm"
+        size="xs"
         className="w-full bg-primary text-white px-3 py-2 rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
         isLoading={loading}
       >

@@ -3,6 +3,7 @@ import { AlertCircle, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, Credit
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { RefundsListSkeleton } from '@/features/protected/admin/components/skeletons/RefundsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text as TextComponent, Label } from '@/components/ui/Text/Text';
@@ -259,7 +260,7 @@ export const Refunds = () => {
             handleView(row);
           }}
           variant="primary"
-          size="sm"
+          size="xs"
           leftIcon={<EyeIcon size={14} />}
         />
       ),
@@ -396,7 +397,7 @@ export const Refunds = () => {
             <Button
               onClick={handleDownloadCSV}
               variant="outline"
-              size="sm"
+              size="xs"
               leftIcon={<DownloadIcon size={14} />}
             >
               Export CSV
@@ -417,7 +418,7 @@ export const Refunds = () => {
             <Button
               onClick={handleDownloadCSV}
               variant="outline"
-              size="sm"
+              size="xs"
               leftIcon={<DownloadIcon size={14} />}
             >
               Export CSV
@@ -547,35 +548,35 @@ export const Refunds = () => {
             <Button
               onClick={() => viewingRefund && handleStatusUpdate(viewingRefund.id, 'approved')}
               variant="primary"
-              size="sm"
+              size="xs"
             >
               Approve
             </Button>
             <Button
               onClick={() => viewingRefund && handleStatusUpdate(viewingRefund.id, 'processing')}
               variant="primary"
-              size="sm"
+              size="xs"
             >
               Mark Processing
             </Button>
             <Button
               onClick={() => viewingRefund && handleStatusUpdate(viewingRefund.id, 'completed')}
               variant="success"
-              size="sm"
+              size="xs"
             >
               Mark Completed
             </Button>
             <Button
               onClick={() => viewingRefund && handleStatusUpdate(viewingRefund.id, 'rejected')}
               variant="danger"
-              size="sm"
+              size="xs"
             >
               Reject
             </Button>
             <Button
               onClick={detailsModal.close}
               variant="outline"
-              size="sm"
+              size="xs"
             >
               Close
             </Button>

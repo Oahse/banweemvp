@@ -223,7 +223,7 @@ const CreateProduct: React.FC = () => {
             type="button"
             onClick={() => navigate('/admin/products')}
             variant="ghost"
-            size="sm"
+            size="xs"
             className={`flex items-center gap-2 mb-3 ${currentTheme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
             leftIcon={<ArrowLeft size={16} />}
           >
@@ -334,7 +334,7 @@ const CreateProduct: React.FC = () => {
                       type="button"
                       onClick={() => updateField('is_featured', !formData.is_featured)}
                       variant="ghost"
-                      size="sm"
+                      size="xs"
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                         formData.is_featured ? 'bg-primary' : 'bg-gray-200'
                       }`}
@@ -352,7 +352,7 @@ const CreateProduct: React.FC = () => {
                       type="button"
                       onClick={() => updateField('is_bestseller', !formData.is_bestseller)}
                       variant="ghost"
-                      size="sm"
+                      size="xs"
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                         formData.is_bestseller ? 'bg-primary' : 'bg-gray-200'
                       }`}
@@ -377,7 +377,7 @@ const CreateProduct: React.FC = () => {
                 type="button"
                 onClick={addVariant}
                 variant="primary"
-                size="sm"
+                size="xs"
                 className="flex items-center gap-2 px-2 py-1 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                 leftIcon={<Plus size={14} />}
               >
@@ -403,7 +403,7 @@ const CreateProduct: React.FC = () => {
                         type="button"
                         onClick={() => removeVariant(index)}
                         variant="ghost"
-                        size="sm"
+                        size="xs"
                         className="text-red-500 hover:text-red-700"
                         leftIcon={<Trash2 size={14} />}
                       />
@@ -499,7 +499,7 @@ const CreateProduct: React.FC = () => {
                         type="button"
                         onClick={() => updateVariant(index, 'is_active', !variant.is_active)}
                         variant="ghost"
-                        size="sm"
+                        size="xs"
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                           variant.is_active ? 'bg-primary' : 'bg-gray-200'
                         }`}
@@ -548,7 +548,7 @@ const CreateProduct: React.FC = () => {
                               type="button"
                               onClick={() => updateVariant(index, 'dietary_tags', variant.dietary_tags.filter(t => t !== tag))}
                               variant="ghost"
-                              size="sm"
+                              size="xs"
                               className="hover:bg-white hover:bg-opacity-20 rounded-full p-0.5"
                               leftIcon={<X size={12} />}
                             />
@@ -597,7 +597,7 @@ const CreateProduct: React.FC = () => {
                         type="button"
                         onClick={() => addImageToVariant(index)}
                         variant="primary"
-                        size="sm"
+                        size="xs"
                         className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                         leftIcon={<Plus size={14} />}
                       >
@@ -618,7 +618,7 @@ const CreateProduct: React.FC = () => {
                               type="button"
                               onClick={() => removeImageFromVariant(index, imgIndex)}
                               variant="ghost"
-                              size="sm"
+                              size="xs"
                               className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                               leftIcon={<Trash2 size={12} />}
                             />
@@ -638,7 +638,7 @@ const CreateProduct: React.FC = () => {
               type="button"
               onClick={() => navigate('/admin/products')}
               variant="outline"
-              size="sm"
+              size="xs"
               className={`px-5 py-2.5 rounded-lg text-sm ${
                 currentTheme === 'dark'
                   ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -651,7 +651,7 @@ const CreateProduct: React.FC = () => {
               type="submit"
               disabled={loading}
               variant="primary"
-              size="sm"
+              size="xs"
               className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               leftIcon={<Save size={16} />}
               isLoading={loading}

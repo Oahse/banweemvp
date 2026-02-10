@@ -58,7 +58,7 @@ export const OrderDetail = () => {
     <div className="max-w-2xl mx-auto p-4 bg-white rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
       <Button
         variant="ghost"
-        size="sm"
+        size="xs"
         leftIcon={<ArrowLeftIcon size={16} />}
         onClick={() => navigate(-1)}
         className="mb-4"
@@ -103,13 +103,13 @@ export const OrderDetail = () => {
       <div className="flex gap-2 mt-4">
         <Button
           variant="primary"
-          size="sm"
+          size="xs"
           leftIcon={<DownloadIcon size={16} />}
         >
           <Text variant="body-sm">Download Invoice</Text>
         </Button>
         <Link to="/products">
-          <Button variant="secondary" size="sm">
+          <Button variant="secondary" size="xs">
             <Text variant="body-sm">Shop More</Text>
           </Button>
         </Link>

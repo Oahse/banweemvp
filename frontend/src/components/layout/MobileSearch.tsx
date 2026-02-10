@@ -51,7 +51,7 @@ export const MobileSearch = ({
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <Heading level={5} className="text-lg font-semibold text-main">Search Products</Heading>
-            <Button onClick={onClose} variant="ghost" size="sm" className="p-1 hover:bg-background rounded-md">
+            <Button onClick={onClose} variant="ghost" size="xs" className="p-1 hover:bg-background rounded-md">
               <XIcon size={24} />
             </Button>
           </div>
@@ -68,7 +68,7 @@ export const MobileSearch = ({
             <Button
               type="submit"
               variant="primary"
-              size="sm"
+              size="xs"
               className="bg-primary text-white px-4 py-3 rounded-r-md hover:bg-primary-dark transition-colors"
             >
               <SearchIcon size={20} />
@@ -83,7 +83,7 @@ export const MobileSearch = ({
                 <Button
                   key={index}
                   variant="ghost"
-                  size="sm"
+                  size="xs"
                   className="px-3 py-1 bg-background rounded-full text-sm hover:bg-border"
                   onClick={() => {
                     setSearchTerm(term);
@@ -109,7 +109,7 @@ export const MobileSearch = ({
                   <Button
                     key={index}
                     variant="ghost"
-                    size="sm"
+                    size="xs"
                     className="px-3 py-2 bg-background rounded-md text-sm hover:bg-border text-left"
                     onClick={() => {
                       navigate(`/products?category=${category.id}`);

@@ -130,7 +130,7 @@ export const Subscriptions = () => {
                     <Button
                       onClick={handleLogout}
                       variant="destructive"
-                      size="sm"
+                      size="xs"
                       className="flex items-center px-4 py-2 rounded-md text-red-500 hover:bg-red-50 w-full text-left"
                       leftIcon={<LogOutIcon size={16} />}
                     >
@@ -151,7 +151,7 @@ export const Subscriptions = () => {
               <Button
                 onClick={refreshSubscriptions}
                 variant="primary"
-                size="sm"
+                size="xs"
                 className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors inline-flex items-center"
                 leftIcon={<RefreshCwIcon size={16} />}
               >
@@ -203,7 +203,7 @@ export const Subscriptions = () => {
                   <Button
                     onClick={handleLogout}
                     variant="destructive"
-                    size="sm"
+                    size="xs"
                     className="flex items-center px-4 py-2 rounded-md text-red-500 hover:bg-red-50 w-full text-left"
                     leftIcon={<LogOutIcon size={16} />}
                   >
@@ -223,7 +223,7 @@ export const Subscriptions = () => {
             <Button
               onClick={() => navigate('/account/subscriptions')}
               variant="primary"
-              size="sm"
+              size="xs"
               className="flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
               leftIcon={<PlusIcon size={16} />}
             >

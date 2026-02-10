@@ -211,7 +211,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                 setSelectedVariantsByProduct({});
               }}
               variant="outline"
-              size="sm"
+              size="xs"
               className={combineThemeClasses(
                 'px-3 py-1.5 text-sm',
                 themeClasses.text.muted
@@ -275,7 +275,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                           <Button
                             onClick={() => toggleProductExpansion(product.id)}
                             variant="outline"
-                            size="sm"
+                            size="xs"
                             className={combineThemeClasses(
                               getButtonClasses('outline'),
                               'px-3 py-1.5 text-sm'
@@ -289,7 +289,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                           <Button
                             onClick={() => toggleVariantSelection(product.variants![0].id)}
                             variant={selectedVariants.has(product.variants![0].id) ? 'primary' : 'outline'}
-                            size="sm"
+                            size="xs"
                             className={combineThemeClasses(
                               selectedVariants.has(product.variants![0].id) 
                                 ? getButtonClasses('primary')
@@ -320,7 +320,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                         showStock={true}
                         showSku={true}
                         layout="grid"
-                        size="sm"
+                        size="xs"
                       />
                       
                       {selectedVariantsByProduct[product.id] && (
@@ -328,7 +328,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                           <Button
                             onClick={() => toggleVariantSelection(selectedVariantsByProduct[product.id])}
                             variant={selectedVariants.has(selectedVariantsByProduct[product.id]) ? 'primary' : 'outline'}
-                            size="sm"
+                            size="xs"
                             className={combineThemeClasses(
                               selectedVariants.has(selectedVariantsByProduct[product.id])
                                 ? getButtonClasses('primary')
@@ -361,7 +361,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
             <Button
               onClick={onClose}
               variant="outline"
-              size="sm"
+              size="xs"
               className={combineThemeClasses(getButtonClasses('outline'))}
             >
               Cancel
@@ -370,7 +370,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
               onClick={handleConfirm}
               disabled={selectedVariants.size === 0}
               variant="primary"
-              size="sm"
+              size="xs"
               className={combineThemeClasses(
                 getButtonClasses('primary'),
                 selectedVariants.size === 0 && 'opacity-50 cursor-not-allowed'

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SearchIcon, FilterIcon, XIcon, CalendarIcon } from 'lucide-react';
-import Dropdown from '@/ui/Dropdown';
+import Dropdown from '@/components/ui/Dropdown';
 import { useTheme } from '@/store/ThemeContext';
 import { Button } from '@/components/ui/Button';
 import { Label, Text } from '@/components/ui/Text/Text';
@@ -63,7 +63,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'select':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <Label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-0.5`}>
               {filter.label}
             </Label>
             <Dropdown
@@ -79,7 +79,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'text':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <Label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-0.5`}>
               {filter.label}
             </Label>
             <input
@@ -87,7 +87,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
               placeholder={filter.placeholder || `Filter by ${filter.label}`}
               value={value}
               onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
             />
           </div>
         );
@@ -95,14 +95,14 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'date':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <Label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-0.5`}>
               {filter.label}
             </Label>
             <input
               type="date"
               value={value}
               onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-              className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
+              className={`w-full px-2.5 py-1.5 text-xs border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
             />
           </div>
         );
@@ -110,10 +110,10 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'daterange':
         return (
           <div key={filter.key} className="min-w-[200px]">
-            <Label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-0.5`}>
               {filter.label}
             </Label>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1.5">
               <input
                 type="date"
                 value={value.split(',')[0] || ''}
@@ -121,10 +121,10 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                   const endDate = value.split(',')[1] || '';
                   handleFilterChange(filter.key, `${e.target.value},${endDate}`);
                 }}
-                className={`flex-1 px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
+                className={`flex-1 px-2.5 py-1.5 text-xs border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
                 placeholder="Start"
               />
-              <Text as="span" className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>-</Text>
+              <Text as="span" className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>-</Text>
               <input
                 type="date"
                 value={value.split(',')[1] || ''}
@@ -132,7 +132,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                   const startDate = value.split(',')[0] || '';
                   handleFilterChange(filter.key, `${startDate},${e.target.value}`);
                 }}
-                className={`flex-1 px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
+                className={`flex-1 px-2.5 py-1.5 text-xs border rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300 bg-white text-gray-900'}`}
                 placeholder="End"
               />
             </div>
@@ -147,20 +147,20 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
   const visibleFilters = showAdvanced ? filters : filters.slice(0, 3);
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 ${className}`}>
-      <div className="flex flex-col space-y-4">
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2.5 ${className}`}>
+      <div className="flex flex-col space-y-2.5">
         {/* Search Bar */}
         {onSearchChange && (
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5">
             <div className="flex-1 max-w-md">
               <div className="relative">
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                <SearchIcon className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
                 <input
                   type="text"
                   placeholder={searchPlaceholder}
                   value={searchValue}
                   onChange={(e) => onSearchChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 />
               </div>
             </div>
@@ -170,10 +170,10 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
               <Button
                 onClick={handleClear}
                 variant="ghost"
-                size="sm"
-                className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+                size="xs"
+                className="flex items-center space-x-1.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
               >
-                <XIcon size={16} />
+                <XIcon size={14} />
                 Clear Filters
               </Button>
             )}
@@ -183,10 +183,10 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
               <Button
                 onClick={() => setShowAdvanced(!showAdvanced)}
                 variant="ghost"
-                size="sm"
-                className="flex items-center space-x-2 px-4 py-2 text-sm text-primary hover:text-primary-dark bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
+                size="xs"
+                className="flex items-center space-x-1.5 px-3 py-1.5 text-xs text-primary hover:text-primary-dark bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
               >
-                <FilterIcon size={16} />
+                <FilterIcon size={14} />
                 {showAdvanced ? 'Less Filters' : 'More Filters'}
               </Button>
             )}
@@ -195,25 +195,25 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
 
         {/* Filters */}
         {filters.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
             {visibleFilters.map(renderFilter)}
           </div>
         )}
 
         {/* Active Filters Display */}
         {(hasActiveFilters || hasActiveSearch) && (
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">Active filters:</Text>
+          <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <Text className="text-xs text-gray-600 dark:text-gray-400">Active filters:</Text>
             
             {hasActiveSearch && (
-              <Text className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/20 text-primary">
+              <Text className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
                 Search: {searchValue}
                 <Button
                   onClick={() => onSearchChange('')}
                   variant="ghost"
-                  size="sm"
-                  className="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                  leftIcon={<XIcon size={14} />}
+                  size="xs"
+                  className="ml-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                  leftIcon={<XIcon size={12} />}
                 >
                 </Button>
               </Text>
@@ -223,15 +223,15 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
               value && (
                 <Text
                   key={key}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                 >
                   {filters.find((f) => f.key === key)?.label || key}: {value}
                   <Button
                     onClick={() => handleFilterChange(key, '')}
                     variant="ghost"
-                    size="sm"
-                    className="ml-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-                    leftIcon={<XIcon size={14} />}
+                    size="xs"
+                    className="ml-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                    leftIcon={<XIcon size={12} />}
                   >
                   </Button>
                 </Text>

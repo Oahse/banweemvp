@@ -161,7 +161,7 @@ export const ProductFilter = ({
       <div className={cn('p-6', isMobile && !isOpen && 'hidden')}>
         <div className="flex items-center justify-between mb-6">
           <Heading level={5} className="text-xl font-semibold text-main">Filters</Heading>
-          {(selectedCategories.length > 0 || selectedBrands.length > 0 || selectedRatings.length > 0 || minPrice !== priceRange.min || maxPrice !== priceRange.max) && <Button variant="ghost" size="sm" onClick={clearAllFilters} className="text-gray-500">
+          {(selectedCategories.length > 0 || selectedBrands.length > 0 || selectedRatings.length > 0 || minPrice !== priceRange.min || maxPrice !== priceRange.max) && <Button variant="ghost" size="xs" onClick={clearAllFilters} className="text-gray-500">
               Clear all
             </Button>}
         </div>

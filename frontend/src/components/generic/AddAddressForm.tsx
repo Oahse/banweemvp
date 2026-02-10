@@ -102,7 +102,7 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
             type="button"
             onClick={onCancel}
             variant="ghost"
-            size="sm"
+            size="xs"
             className="text-copy-light hover:text-copy"
           >
             <X className="w-5 h-5" />

@@ -177,7 +177,7 @@ export const EditProduct: React.FC = () => {
             <Button
               onClick={() => navigate(`/admin/products/${productId}`)}
               variant="ghost"
-              size="sm"
+              size="xs"
               className="inline-flex items-center gap-2 text-copy-light hover:text-copy transition-colors"
               leftIcon={<ArrowLeft size={16} />}
             >

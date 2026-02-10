@@ -50,7 +50,7 @@ export const MobileCategories = ({
         <div className="p-4 border-b border-border-light">
           <div className="flex items-center justify-between">
             <Heading level={5} className="text-lg font-semibold text-main">Categories</Heading>
-            <Button onClick={onClose} variant="ghost" size="sm" className="p-1 hover:bg-background rounded-md">
+            <Button onClick={onClose} variant="ghost" size="xs" className="p-1 hover:bg-background rounded-md">
               <XIcon size={24} />
             </Button>
           </div>
@@ -84,7 +84,7 @@ export const MobileCategories = ({
                   onClose();
                 }}
                 variant="danger"
-                size="sm"
+                size="xs"
                 className="w-full py-2 px-3 bg-red-500 text-white rounded-md text-center text-sm hover:bg-red-600 mt-2"
               >
                 Sign Out

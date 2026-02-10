@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, CreditCard, Banknote, Smartphone, CheckCircle } from 'lucide-react';
 import { Text, Heading, Body, Caption, Code } from '@/components/ui/Text/Text';
 import PaymentsAPI from '@/api/payments';
-import StripeCardForm from '@/checkout/components/StripeCardForm';
+import StripeCardForm from '@/features/protected/checkout/components/StripeCardForm';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 
@@ -145,7 +145,7 @@ const AccountPaymentMethodsPage = () => {
         <Button
           onClick={() => setShowStripeForm(true)}
           variant="primary"
-          size="sm"
+          size="xs"
           leftIcon={<Plus className="w-5 h-5" />}
         >
           Add Payment Method
@@ -181,7 +181,7 @@ const AccountPaymentMethodsPage = () => {
               <Button
                 onClick={() => setShowStripeForm(true)}
                 variant="primary"
-                size="sm"
+                size="xs"
               >
                 Add Payment Method
               </Button>
@@ -220,9 +220,8 @@ const AccountPaymentMethodsPage = () => {
                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-0">
                     {method.type === 'card' && method.last_four && (
                       <div>
-                        <Heading level={5}>Card Details</Heading>
                         <Text variant="body-sm" tone="secondary">•••• {method.last_four}</Text>
-                        <Text variant="caption" tone="secondary">Valid thru {method.expiry_month ?? 'MM'}/{method.expiry_year ? String(method.expiry_year).slice(-2) : 'YY'}</Text>
+                        <Text variant="caption" tone="secondary">{' '}Valid thru {method.expiry_month ?? 'MM'}/{method.expiry_year ? String(method.expiry_year).slice(-2) : 'YY'}</Text>
                       </div>
                     )}
 
@@ -231,7 +230,7 @@ const AccountPaymentMethodsPage = () => {
                         <Text as="span">{method.provider || 'Payment Method'}</Text>
                         {deleteConfirm?.lastFour && <Text as="span"> {` •••• ${deleteConfirm.lastFour}`}</Text>}
                       </Text>
-                      <Text variant="caption" tone="secondary" className="mt-1">Added on {method.created_at ? new Date(method.created_at).toLocaleDateString() : 'Unknown date'}</Text>
+                      <Text variant="caption" tone="secondary" className="mt-1">{' '}Added on {method.created_at ? new Date(method.created_at).toLocaleDateString() : 'Unknown date'}</Text>
                     </div>
                   </div>
                 </div>
@@ -239,22 +238,22 @@ const AccountPaymentMethodsPage = () => {
                 {!method.is_default && (
                   <Button
                     onClick={() => setAsDefault(method.id)}
-                    variant="ghost"
+                    variant="warning"
                     size="icon"
                     className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
                     title="Set as default"
                   >
-                    <CreditCard className="w-5 h-5" />
+                    <CreditCard className="w-4 h-4" />
                   </Button>
                 )}
                 <Button
                   onClick={() => handleDelete(method)}
-                  variant="ghost"
+                  variant="danger"
                   size="icon"
                   className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-600"
                   title="Delete"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             </div>
@@ -289,7 +288,7 @@ const AccountPaymentMethodsPage = () => {
                 onClick={cancelDelete}
                 disabled={isLoading}
                 variant="secondary"
-                size="sm"
+                size="xs"
                 className="flex-1"
               >
                 Cancel
@@ -298,7 +297,7 @@ const AccountPaymentMethodsPage = () => {
                 onClick={confirmDelete}
                 disabled={isLoading}
                 variant="danger"
-                size="sm"
+                size="xs"
                 className="flex-1"
                 isLoading={isLoading}
               >
