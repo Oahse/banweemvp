@@ -15,7 +15,7 @@ import {
   Phone,
   User
 } from 'lucide-react';
-import { ShipmentTracking, ShippingTrackingAPI } from '../../api/shipping-tracking';
+import { ShipmentTracking, ShippingTrackingAPI } from '@/api/shipping-tracking';
 import { Button } from '@/components/ui/Button';
 
 interface ShipmentTrackingProps {

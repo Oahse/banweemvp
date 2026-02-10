@@ -1,8 +1,8 @@
 import { useEffect, Suspense, lazy } from 'react';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth/contexts/AuthContext';
-import AccountLayout from '../../../../components/layout/AccountLayout';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
+import AccountLayout from '@/components/layout/AccountLayout';
 import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
 // Account Skeleton for loading states
 const AccountSkeleton = () => (

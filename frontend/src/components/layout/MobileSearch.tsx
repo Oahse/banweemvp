@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchIcon, XIcon } from 'lucide-react';
-import { useCategories } from '../shared/contexts/CategoryContext';
+import { useCategories } from '@/components/shared/contexts/CategoryContext';
 import { Button } from '@/components/ui/Button';
 import { Heading, Text } from '@/components/ui/Text/Text';
 

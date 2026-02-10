@@ -23,22 +23,22 @@ import { ProductImageGallery } from './components/ProductImageGallery';
 import { VariantSelector } from './components/VariantSelector';
 import { QRCodeModal } from './components/QRCodeModal';
 import { BarcodeModal } from './components/BarcodeModal';
-import { ProductCard } from '../../../components/generic/ProductCard';
-import { SubscriptionSelector } from '../../protected/subscriptions/components/SubscriptionSelector';
+import { ProductCard } from '@/components/generic/ProductCard';
+import { SubscriptionSelector } from '@/protected/subscriptions/components/SubscriptionSelector';
 import ReviewForm from './components/ReviewForm';
-import { Dropdown } from '../../../components/ui/Dropdown';
-import { useCart } from '../../protected/cart/contexts/CartContext';
-import { useWishlist } from '../../protected/wishlist/contexts/WishlistContext';
-import { useLocale } from '../../../components/shared/contexts/LocaleContext';
-import { useApi } from '../../../components/shared/hooks/useAsync';
-import { useSubscriptionAction } from '../../protected/subscriptions/hooks/useSubscription';
-import { ProductsAPI, ReviewsAPI } from '../../../api';
-import { Product, ProductVariant, ProductImage } from '../../../types';
-import { containerVariants, itemVariants } from '../../../utils/pageAnimations';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { useCart } from '@/protected/cart/contexts/CartContext';
+import { useWishlist } from '@/protected/wishlist/contexts/WishlistContext';
+import { useLocale } from '@/components/shared/contexts/LocaleContext';
+import { useApi } from '@/components/shared/hooks/useAsync';
+import { useSubscriptionAction } from '@/protected/subscriptions/hooks/useSubscription';
+import { ProductsAPI, ReviewsAPI } from '@/api';
+import { Product, ProductVariant, ProductImage } from '@/types';
+import { containerVariants, itemVariants } from '@/utils/pageAnimations';
 
-import ErrorMessage from '../../../components/shared/Error';
+import ErrorMessage from '@/components/shared/Error';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '../../protected/auth/hooks/useAuth';
+import { useAuth } from '@/protected/auth/hooks/useAuth';
 
 // Local interfaces for component state
 interface SelectedVariant {

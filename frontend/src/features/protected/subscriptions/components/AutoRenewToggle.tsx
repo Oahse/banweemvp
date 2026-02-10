@@ -1,7 +1,7 @@
 import React from 'react';
 import { RefreshCwIcon, XIcon } from 'lucide-react';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
-import { themeClasses } from '../../../../utils/themeClasses';
+import { themeClasses } from '@/../utils/themeClasses';
 import { Button } from '@/components/ui/Button';
 
 interface AutoRenewToggleProps {

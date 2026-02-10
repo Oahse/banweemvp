@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
+import { useSubscription } from '@/subscriptions/contexts/SubscriptionContext';
 import { toast } from 'react-hot-toast';
 import { CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';

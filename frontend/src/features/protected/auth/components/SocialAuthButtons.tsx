@@ -8,7 +8,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import FacebookLogin from '@greatsumini/react-facebook-login';
 import { FaFacebook, FaTiktok } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../../../../api';
+import { apiClient } from '@/../api';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 

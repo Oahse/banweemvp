@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, CreditCard, Banknote, Smartphone, CheckCircle } from 'lucide-react';
 import { Text, Heading, Body, Caption, Code } from '@/components/ui/Text/Text';
 import PaymentsAPI from '@/api/payments';
-import StripeCardForm from '../../checkout/components/StripeCardForm';
+import StripeCardForm from '@/checkout/components/StripeCardForm';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 

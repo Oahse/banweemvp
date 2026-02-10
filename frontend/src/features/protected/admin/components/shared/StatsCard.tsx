@@ -1,6 +1,6 @@
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
-import { useTheme } from '../../../../../components/shared/contexts/ThemeContext';
+import { useTheme } from '@/../../components/shared/contexts/ThemeContext';
 import { Body, Text } from '@/components/ui/Text/Text';
 
 export interface AdminStatsCardProps {

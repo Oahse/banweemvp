@@ -12,9 +12,9 @@ import {
   ChevronRightIcon,
   UserIcon
 } from 'lucide-react';
-import { useApi } from '../../shared/hooks/useAsync';
-import { SuppliersAPI } from '../api';
-import ErrorMessage from '../components/Error';
+import { useApi } from '@/shared/hooks/useAsync';
+import { SuppliersAPI } from '@/api';
+import ErrorMessage from '@/components/Error';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 export const Suppliers = () => {

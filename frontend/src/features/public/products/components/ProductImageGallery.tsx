@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, ZoomInIcon, XIcon, PackageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../../../../utils/utils';
+import { cn } from '@/../utils/utils';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text/Text';
 

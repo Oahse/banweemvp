@@ -5,12 +5,12 @@ import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import AdminLayout from '../../../../components/layout/AdminLayout';
-import { SubscriptionsListSkeleton } from '../components/skeletons/SubscriptionsSkeleton';
+import AdminLayout from '@/../components/layout/AdminLayout';
+import { SubscriptionsListSkeleton } from '@/components/skeletons/SubscriptionsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, useModal } from '@/components/ui/Modal';
-import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
 
 const LIMIT = 20;

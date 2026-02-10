@@ -4,13 +4,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCart } from '../../cart/contexts/CartContext';
-import { useAuth } from '../../auth/contexts/AuthContext';
+import { useCart } from '@/cart/contexts/CartContext';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { AuthAPI } from '@/api/auth';
 import { CartAPI } from '@/api/cart';
 import { toast } from 'react-hot-toast';
-import SmartCheckoutForm from '../components/SmartCheckoutForm';
+import SmartCheckoutForm from '@/components/SmartCheckoutForm';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading } from '@/components/ui/Text/Text';

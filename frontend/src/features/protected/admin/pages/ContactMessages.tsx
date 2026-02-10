@@ -4,15 +4,15 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { ContactMessagesAPI, ContactMessage } from '../../../../api/contact-messages';
+import { ContactMessagesAPI, ContactMessage } from '@/../api/contact-messages';
 import { Mail, Clock, CheckCircle, AlertCircle, Search, Eye, Trash2, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ContactMessagesSkeleton from '../components/skeletons/ContactMessagesSkeleton';
-import { useTheme } from '../../../../components/shared/contexts/ThemeContext';
-import Dropdown from '../../../../components/ui/Dropdown';
-import AdminLayout from '../../../../components/layout/AdminLayout';
-import { ConfirmationModal } from '../../../../components/ui/ConfirmationModal';
-import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import ContactMessagesSkeleton from '@/components/skeletons/ContactMessagesSkeleton';
+import { useTheme } from '@/../components/shared/contexts/ThemeContext';
+import Dropdown from '@/../components/ui/Dropdown';
+import AdminLayout from '@/../components/layout/AdminLayout';
+import { ConfirmationModal } from '@/../components/ui/ConfirmationModal';
+import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';

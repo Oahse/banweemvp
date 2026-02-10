@@ -110,8 +110,9 @@ const heroSlides = [
   },
 ];
 
-// Remove type argument from useAsync
-const { data, loading: homeLoading, error: homeError, execute } = useAsync();
+const Home: React.FC = () => {
+  // Remove type argument from useAsync
+  const { data, loading: homeLoading, error: homeError, execute } = useAsync();
 
 // Add type assertion for homeData
 const homeData = data as { data: HomeDataResponse } | null;

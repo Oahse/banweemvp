@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { HeartIcon, ShoppingCartIcon, TrashIcon } from 'lucide-react';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
-import { useWishlist } from '../../../WishlistContext';
-import { useCart } from '../../../CartContext';
+import { useWishlist } from '@/WishlistContext';
+import { useCart } from '@/CartContext';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading, Body, Caption, Label } from '@/components/ui/Text/Text';

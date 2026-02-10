@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth/contexts/AuthContext';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { useSubscription } from '@/components/shared/hooks/useSubscription';
 import { 
   UserIcon,

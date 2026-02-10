@@ -14,10 +14,10 @@ import {
   ExternalLinkIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { useApi } from '../../../components/shared/hooks/useAsync';
-import { SuppliersAPI } from '../../../api';
-import ErrorMessage from '../components/Error';
-import { ProductCard } from '../../../components/generic/ProductCard';
+import { useApi } from '@/components/shared/hooks/useAsync';
+import { SuppliersAPI } from '@/api';
+import ErrorMessage from '@/components/Error';
+import { ProductCard } from '@/components/generic/ProductCard';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 export const SupplierDetail = () => {

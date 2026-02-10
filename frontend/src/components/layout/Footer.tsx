@@ -11,7 +11,7 @@ import {
   MapPinIcon,
   ArrowRightIcon
 } from 'lucide-react';
-import { SOCIAL_MEDIA_LINKS } from '../../utils/social-media-config';
+import { SOCIAL_MEDIA_LINKS } from '@/utils/social-media-config';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 

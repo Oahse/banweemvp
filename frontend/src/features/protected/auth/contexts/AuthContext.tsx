@@ -1,5 +1,5 @@
 import React, { useEffect, useState, createContext, useContext, useCallback } from 'react';
-import { TokenManager, AuthAPI } from '../../../../api';
+import { TokenManager, AuthAPI } from '@/api';
 import { toast } from 'react-hot-toast';
 
 // Define proper types for the context

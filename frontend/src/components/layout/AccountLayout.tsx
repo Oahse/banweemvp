@@ -15,7 +15,7 @@ import {
   FileText,
   MapPin
 } from 'lucide-react';
-import { useAuth } from '../../features/protected/auth/contexts/AuthContext';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { cn } from '@/utils/utils';
 import { containerFast as containerFastVariants } from '@/utils/pageAnimations';
 import { Button } from '@/components/ui/Button';

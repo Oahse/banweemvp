@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, SearchIcon, PackageIcon, PlusIcon, CheckIcon } from 'lucide-react';
-import { useLocale } from '../../../LocaleContext';
+import { useLocale } from '@/LocaleContext';
 import { Text, Heading, Caption } from '@/components/ui/Text/Text';
-import ProductsAPI from '../../api/products';
+import ProductsAPI from '@/api/products';
 import { toast } from 'react-hot-toast';
-import { Product } from '../../types';
+import { Product } from '@/types';
 import { Button } from '@/components/ui/Button';
 
 interface ProductVariantModalProps {

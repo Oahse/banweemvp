@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDownIcon, CheckIcon, XIcon } from 'lucide-react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text/Text';
 

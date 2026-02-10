@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { EyeIcon, TagIcon, PackageIcon, ChevronDown, ChevronUp } from 'lucide-react';
-import { themeClasses, combineThemeClasses } from '../../../../utils/themeClasses';
-import { formatCurrency } from '../../../../utils/orderCalculations';
-import { Subscription } from '../../api/subscription';
+import { themeClasses, combineThemeClasses } from '@/../utils/themeClasses';
+import { formatCurrency } from '@/../utils/orderCalculations';
+import { Subscription } from '@/api/subscription';
 import { Button } from '@/components/ui/Button';
 
 interface SubscriptionItemProps {

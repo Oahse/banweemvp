@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeftIcon, PackageIcon, CalendarIcon } from 'lucide-react';
-import { themeClasses, getButtonClasses } from '../../../../utils/themeClasses';
-import SubscriptionAPI from '../../api/subscription';
+import { themeClasses, getButtonClasses } from '@/../utils/themeClasses';
+import SubscriptionAPI from '@/api/subscription';
 import { toast } from 'react-hot-toast';
-import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
 
 interface Order {

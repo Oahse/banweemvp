@@ -1,6 +1,6 @@
 import { useCallback, useState, useContext } from 'react';
-import { WishlistContext } from '../../WishlistContext';
-import { useAuth } from '../../AuthContext';
+import { WishlistContext } from '@/WishlistContext';
+import { useAuth } from '@/AuthContext';
 import { toast } from 'react-hot-toast';
 
 /**

@@ -3,7 +3,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { MobileSearch } from './MobileSearch';
 import { MobileCategories } from './MobileCategories';
-import { useTheme } from '../shared/contexts/ThemeContext';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { Outlet } from 'react-router-dom';
 export const Layout = ({
   children,

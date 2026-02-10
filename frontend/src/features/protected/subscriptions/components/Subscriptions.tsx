@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../../SubscriptionContext';
+import { useSubscription } from '@/SubscriptionContext';
 import { 
   PlusIcon, 
   PackageIcon,
@@ -15,8 +15,8 @@ import {
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading } from '@/components/ui/Text';
-import { ProductVariantModal } from '../ui/ProductVariantModal';
-import { ConfirmationModal } from '../ui/ConfirmationModal';
+import { ProductVariantModal } from '@/ui/ProductVariantModal';
+import { ConfirmationModal } from '@/ui/ConfirmationModal';
 interface Subscription {
   id: string;
   status: 'active' | 'paused' | 'cancelled' | 'expired';

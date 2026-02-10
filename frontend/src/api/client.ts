@@ -5,7 +5,7 @@
 
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { config } from '../config/environment';
+import { config } from '@/config/environment';
 
 // API Configuration
 export const API_CONFIG = {

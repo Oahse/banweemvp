@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { QrCodeIcon, DownloadIcon, Share2Icon } from 'lucide-react';
-import { ProductVariant } from '../../types';
-import { ProductsAPI } from '../../api/products';
+import { ProductVariant } from '@/types';
+import { ProductsAPI } from '@/api/products';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body } from '@/components/ui/Text/Text';
 

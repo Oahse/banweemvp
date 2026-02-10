@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { cn } from '../../utils/utils';
+import { cn } from '@/utils/utils';
 import { ChevronDownIcon } from 'lucide-react';
 import { Label, Text } from '@/components/ui/Text/Text';
 

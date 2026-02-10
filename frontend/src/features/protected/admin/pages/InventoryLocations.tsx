@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { Loader, AlertCircle, Plus, Edit, Trash2, MapPin } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import AdminLayout from '../../../../components/layout/AdminLayout';
-import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
-import { InventoryLocationsSkeleton } from '../components/skeletons/InventorySkeleton';
+import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
+import { InventoryLocationsSkeleton } from '@/components/skeletons/InventorySkeleton';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading, Caption, Label } from '@/components/ui/Text/Text';
-import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
 
 const LIMIT = 20;

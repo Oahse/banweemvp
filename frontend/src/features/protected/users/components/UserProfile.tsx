@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { UsersAPI } from '../../api/users';
-import { useAuth } from '../../../AuthContext';
-import { Loading } from '../Loading';
-import { Error } from '../Error';
+import { UsersAPI } from '@/api/users';
+import { useAuth } from '@/AuthContext';
+import { Loading } from '@/Loading';
+import { Error } from '@/Error';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading, Label } from '@/components/ui/Text';
 

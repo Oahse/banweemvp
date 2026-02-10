@@ -4,10 +4,10 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../auth/hooks/useAuth';
-import { useCart } from '../../cart/contexts/CartContext';
+import { useAuth } from '@/auth/hooks/useAuth';
+import { useCart } from '@/cart/contexts/CartContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
-import { useShipping } from '../../shipping/hooks/useShipping';
+import { useShipping } from '@/shipping/hooks/useShipping';
 import { OrdersAPI } from '@/api/orders';
 import { AuthAPI } from '@/api/auth';
 import { Button } from '@/components/ui/Button';

@@ -4,12 +4,12 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '../../../../components/layout/AdminLayout';
-import { ShippingListSkeleton } from '../components/skeletons/ShippingSkeleton';
+import AdminLayout from '@/../components/layout/AdminLayout';
+import { ShippingListSkeleton } from '@/components/skeletons/ShippingSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
-import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
 
 const LIMIT = 10;

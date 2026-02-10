@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../../auth/contexts/AuthContext';
-import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
+import { useSubscription } from '@/subscriptions/contexts/SubscriptionContext';
 import { ShoppingBagIcon, HeartIcon, MapPinIcon, CreditCardIcon, PackageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SkeletonDashboard } from '@/components/ui/SkeletonDashboard';

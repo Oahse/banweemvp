@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../../SubscriptionContext';
-import { useLocale } from '../../../LocaleContext';
+import { useSubscription } from '@/SubscriptionContext';
+import { useLocale } from '@/LocaleContext';
 import { 
   PlusIcon, 
   PackageIcon,
@@ -14,11 +14,11 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
-import { SubscriptionCard } from '../subscription/SubscriptionCard';
-import { ConfirmationModal } from '../ui/ConfirmationModal';
-import { AutoRenewToggle } from '../subscription/AutoRenewToggle';
-import ProductsAPI from '../../api/products';
-import { Product } from '../../types';
+import { SubscriptionCard } from '@/subscription/SubscriptionCard';
+import { ConfirmationModal } from '@/ui/ConfirmationModal';
+import { AutoRenewToggle } from '@/subscription/AutoRenewToggle';
+import ProductsAPI from '@/api/products';
+import { Product } from '@/types';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 export const MySubscriptions = () => {
   const navigate = useNavigate();

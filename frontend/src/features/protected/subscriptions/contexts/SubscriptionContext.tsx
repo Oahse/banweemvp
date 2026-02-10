@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '../../auth/contexts/AuthContext';
-import * as SubscriptionAPI from '../../../../api/subscription';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
+import * as SubscriptionAPI from '@/api/subscription';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import type { Subscription } from '../../../../api/subscription';
+import type { Subscription } from '@/api/subscription';
 
 // Subscription product interface
 interface SubscriptionProduct {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../features/protected/auth/contexts/AuthContext';
-import { useCart } from '../../features/protected/cart/contexts/CartContext';
-import { useWishlist } from '../../features/protected/wishlist/contexts/WishlistContext';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
+import { useCart } from '@/features/protected/cart/contexts/CartContext';
+import { useWishlist } from '@/features/protected/wishlist/contexts/WishlistContext';
 import { ChevronDownIcon, SearchIcon, UserIcon, HeartIcon, ShoppingCartIcon, MenuIcon, PhoneIcon, ShieldIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';

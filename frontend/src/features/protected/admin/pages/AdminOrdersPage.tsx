@@ -2,15 +2,15 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, SearchIcon, ArrowUpDownIcon, EyeIcon, PackageIcon } from 'lucide-react';
 import AdminAPI from '@/api/admin';
-import AdminLayout from '../../../../components/layout/AdminLayout';
-import { OrdersListSkeleton } from '../components/skeletons/OrdersSkeleton';
+import AdminLayout from '@/../components/layout/AdminLayout';
+import { OrdersListSkeleton } from '@/components/skeletons/OrdersSkeleton';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
-import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
 
 const LIMIT = 10;

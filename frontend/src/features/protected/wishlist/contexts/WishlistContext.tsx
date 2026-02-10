@@ -1,9 +1,9 @@
 import React, { useEffect, useState, createContext, useCallback, useContext, ReactNode } from 'react';
-import { useAuth } from '../../auth/contexts/AuthContext';
-import { ProductsAPI } from '../../../../api/products';
-import { WishlistAPI } from '../../../../api/wishlists';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
+import { ProductsAPI } from '@/api/products';
+import { WishlistAPI } from '@/api/wishlists';
 import { toast } from 'react-hot-toast';
-import { Wishlist } from '../../../../types';
+import { Wishlist } from '@/types';
 
 interface WishlistContextType {
   wishlists: Wishlist[];

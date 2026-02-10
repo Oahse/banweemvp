@@ -12,9 +12,9 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '@/../utils/themeClasses';
 import { Button } from '@/components/ui/Button';
-import { formatCurrency } from '../../../../utils/orderCalculations';
+import { formatCurrency } from '@/../utils/orderCalculations';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface SubscriptionCardProps {

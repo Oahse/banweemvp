@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import { cn } from '../../utils/utils';
+import { cn } from '@/utils/utils';
 import { Text } from '@/components/ui/Text/Text';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../features/protected/auth/contexts/AuthContext';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { useTheme } from './contexts/ThemeContext';
 import { Text } from '@/components/ui/Text/Text';
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MinusIcon, PlusIcon, PackageIcon } from 'lucide-react';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
-import { formatPriceWithFallback } from '../../utils/price-utils';
+import { formatPriceWithFallback } from '@/utils/price-utils';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading } from '@/components/ui/Text/Text';
 import { Card } from '@/components/ui/Card';

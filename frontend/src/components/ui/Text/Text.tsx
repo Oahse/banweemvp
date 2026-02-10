@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import DOMPurify from 'dompurify';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '../../../utils/utils';
+import { cn } from '@/utils/utils';
 
 // Text component variants using class-variance-authority for type-safe styling
 const textVariants = cva(

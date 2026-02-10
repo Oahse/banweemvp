@@ -110,44 +110,23 @@ engine_db = None
 AsyncSessionDB = None
 
 class DatabaseOptimizer:
-    """PostgreSQL optimization utilities"""
+    """Simple database manager for Alembic-managed schema"""
     
     @staticmethod
-    def get_optimized_engine(database_uri: str = None, env_is_local: bool = None):
-        """Create optimized async engine with connection pooling"""
+    def get_engine(database_uri: str = None, env_is_local: bool = None):
+        """Create simple async engine"""
         # Import settings here to avoid circular dependency
         if database_uri is None or env_is_local is None:
             from core.config import settings
             database_uri = database_uri or settings.SQLALCHEMY_DATABASE_URI
             env_is_local = env_is_local if env_is_local is not None else (settings.ENVIRONMENT == "local")
-            pool_size = getattr(settings, 'DB_POOL_SIZE', 20)
-            max_overflow = getattr(settings, 'DB_MAX_OVERFLOW', 30)
-            pool_timeout = getattr(settings, 'DB_POOL_TIMEOUT', 30)
-            pool_recycle = getattr(settings, 'DB_POOL_RECYCLE', 3600)
-        else:
-            pool_size = 20
-            max_overflow = 30
-            pool_timeout = 30
-            pool_recycle = 3600
-        
 
         return create_async_engine(
             database_uri,
-            # Connection pool settings for high performance
-            pool_size=pool_size,  # Number of connections to maintain in pool
-            max_overflow=max_overflow,  # Additional connections beyond pool_size
-            pool_pre_ping=True,  # Validate connections before use
-            pool_recycle=pool_recycle,  # Recycle connections every hour
-            pool_timeout=pool_timeout,  # Timeout for getting connection from pool
-            # Async settings
-            echo=False,  # Disable SQL logging to reduce noise
+            echo=env_is_local,  # Only show SQL in local development
             future=True,
-            # Performance settings
             connect_args={
-                "server_settings": {
-                    "application_name": "banwee_backend",
-                    "jit": "off",  # Disable JIT for faster startup
-                }
+                "ssl": "require" if not env_is_local else None
             }
         )
     
@@ -156,65 +135,65 @@ class DatabaseOptimizer:
         """Create performance indexes for frequently queried columns"""
         indexes = [
             # User indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_email ON users(email);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_created_at ON users(created_at);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_is_active ON users(is_active);",
+            "CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);",
+            "CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);",
+            "CREATE INDEX IF NOT EXISTS idx_users_is_active ON users(is_active);",
             
             # Product indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_category_id ON products(category_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_is_active ON products(is_active);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_created_at ON products(created_at);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_name_gin ON products USING gin(to_tsvector('english', name));",
+            "CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);",
+            "CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active);",
+            "CREATE INDEX IF NOT EXISTS idx_products_created_at ON products(created_at);",
+            "CREATE INDEX IF NOT EXISTS idx_products_name_gin ON products USING gin(to_tsvector('english', name));",
             
             # Product variants indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_product_variants_product_id ON product_variants(product_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_product_variants_sku ON product_variants(sku);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_product_variants_stock ON product_variants(stock);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_product_variants_is_active ON product_variants(is_active);",
+            "CREATE INDEX IF NOT EXISTS idx_product_variants_product_id ON product_variants(product_id);",
+            "CREATE INDEX IF NOT EXISTS idx_product_variants_sku ON product_variants(sku);",
+            "CREATE INDEX IF NOT EXISTS idx_product_variants_stock ON product_variants(stock);",
+            "CREATE INDEX IF NOT EXISTS idx_product_variants_is_active ON product_variants(is_active);",
             
             # Order indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_orders_user_id ON orders(user_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_orders_status ON orders(status);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_orders_created_at ON orders(created_at);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_orders_user_status ON orders(user_id, status);",
+            "CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);",
+            "CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);",
+            "CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);",
+            "CREATE INDEX IF NOT EXISTS idx_orders_user_status ON orders(user_id, status);",
             
             # Order items indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_order_items_variant_id ON order_items(variant_id);",
+            "CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);",
+            "CREATE INDEX IF NOT EXISTS idx_order_items_variant_id ON order_items(variant_id);",
             
             # Payment indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_payment_methods_user_id ON payment_methods(user_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_payment_methods_is_active ON payment_methods(is_active);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_payment_intents_user_id ON payment_intents(user_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_payment_intents_status ON payment_intents(status);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_transactions_created_at ON transactions(created_at);",
+            "CREATE INDEX IF NOT EXISTS idx_payment_methods_user_id ON payment_methods(user_id);",
+            "CREATE INDEX IF NOT EXISTS idx_payment_methods_is_active ON payment_methods(is_active);",
+            "CREATE INDEX IF NOT EXISTS idx_payment_intents_user_id ON payment_intents(user_id);",
+            "CREATE INDEX IF NOT EXISTS idx_payment_intents_status ON payment_intents(status);",
+            "CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);",
+            "CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at);",
             
             # Review indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_reviews_product_id ON reviews(product_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_reviews_user_id ON reviews(user_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_reviews_rating ON reviews(rating);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_reviews_created_at ON reviews(created_at);",
+            "CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews(product_id);",
+            "CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON reviews(user_id);",
+            "CREATE INDEX IF NOT EXISTS idx_reviews_rating ON reviews(rating);",
+            "CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON reviews(created_at);",
             
-            # Notification indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_notifications_is_read ON notifications(is_read);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_notifications_created_at ON notifications(created_at);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, is_read) WHERE is_read = false;",
+            # Notification indexes - commented out (table doesn't exist)
+            # "CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);",
+            # "CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notifications(is_read);",
+            # "CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at);",
+            # "CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, is_read) WHERE is_read = false;",
             
-            # Wishlist indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_wishlist_items_user_id ON wishlist_items(user_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_wishlist_items_product_id ON wishlist_items(product_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_wishlist_items_user_product ON wishlist_items(user_id, product_id);",
+            # Wishlist indexes - commented out (table doesn't exist)
+            # "CREATE INDEX IF NOT EXISTS idx_wishlist_items_user_id ON wishlist_items(user_id);",
+            # "CREATE INDEX IF NOT EXISTS idx_wishlist_items_product_id ON wishlist_items(product_id);",
+            # "CREATE INDEX IF NOT EXISTS idx_wishlist_items_user_product ON wishlist_items(user_id, product_id);",
             
-            # Category indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_categories_parent_id ON categories(parent_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_categories_is_active ON categories(is_active);",
+            # Category indexes - commented out (table doesn't exist)
+            # "CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON categories(parent_id);",
+            # "CREATE INDEX IF NOT EXISTS idx_categories_is_active ON categories(is_active);",
             
             # Subscription indexes
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);",
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_subscriptions_next_billing ON subscriptions(next_billing_date);",
+            "CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);",
+            "CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);",
+            "CREATE INDEX IF NOT EXISTS idx_subscriptions_next_billing ON subscriptions(next_billing_date);",
         ]
         
         for index_sql in indexes:
@@ -277,7 +256,7 @@ class DatabaseOptimizer:
         tables = [
             'users', 'products', 'product_variants', 'orders', 'order_items',
             'payment_methods', 'payment_intents', 'transactions', 'reviews',
-            'notifications', 'wishlist_items', 'categories', 'subscriptions'
+            'subscriptions'  # Only include tables that exist
         ]
         
         for table in tables:
@@ -295,7 +274,7 @@ class DatabaseOptimizer:
         tables = [
             'users', 'products', 'product_variants', 'orders', 'order_items',
             'payment_methods', 'payment_intents', 'transactions', 'reviews',
-            'notifications', 'wishlist_items', 'categories', 'subscriptions'
+            'subscriptions'  # Only include tables that exist
         ]
         
         for table in tables:
@@ -395,7 +374,7 @@ class DatabaseManager:
             return
 
         if use_optimized_engine:
-            engine_db = DatabaseOptimizer.get_optimized_engine(database_uri, env_is_local)
+            engine_db = DatabaseOptimizer.get_engine(database_uri, env_is_local)
         else:
             engine_db = create_async_engine(
                 database_uri,

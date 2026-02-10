@@ -5,12 +5,12 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { getCountryOptions, getProvinceOptions } from '@/data/countries';
-import AdminLayout from '../../../../components/layout/AdminLayout';
-import { TaxRatesListSkeleton } from '../components/skeletons/TaxRatesSkeleton';
+import AdminLayout from '@/../components/layout/AdminLayout';
+import { TaxRatesListSkeleton } from '@/components/skeletons/TaxRatesSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text/Text';
 import { Card } from '@/components/ui/Card';
-import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
 import { Label } from '@/components/ui/Text/Text';
 

@@ -30,7 +30,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 import { cn } from '@/utils/utils';
-import { containerFast as containerFastVariants, itemFast as itemFastVariants } from '../../utils/pageAnimations';
+import { containerFastVariants } from '@/utils/pageAnimations';
 
 interface AdminLayoutProps {
   children?: React.ReactNode;

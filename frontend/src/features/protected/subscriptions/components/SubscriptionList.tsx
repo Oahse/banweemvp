@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCwIcon, PlusIcon, LogInIcon } from 'lucide-react';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '@/../utils/themeClasses';
 import { SubscriptionCard } from './SubscriptionCard';
 import { 
   getSubscriptions,
@@ -10,8 +10,8 @@ import {
   cancelSubscription as cancelSubscriptionAPI,
   deleteSubscription as deleteSubscriptionAPI,
   type Subscription
-} from '../../api/subscription';
-import { useAuth } from '../../../AuthContext';
+} from '@/api/subscription';
+import { useAuth } from '@/AuthContext';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';

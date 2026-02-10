@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import App from '../App';
+import App from '@/App';
 
 // Mock dependencies as needed
 vi.mock('react-router-dom', async () => {

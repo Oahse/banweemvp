@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../SubscriptionContext';
+import { useSubscription } from '@/SubscriptionContext';
 import { 
   ArrowLeftIcon,
   SaveIcon,
@@ -13,8 +13,8 @@ import {
   TrashIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { ProductVariantModal } from '../components/ui/ProductVariantModal';
-import { ConfirmationModal } from '../components/ui/ConfirmationModal';
+import { ProductVariantModal } from '@/components/ui/ProductVariantModal';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading, Label } from '@/components/ui/Text/Text';
 interface SubscriptionDetail {

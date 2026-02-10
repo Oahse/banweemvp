@@ -1,5 +1,5 @@
 import React, { createContext, ReactNode } from 'react';
-import { formatCurrency as formatCurrencyUtil, formatNumber, formatPercentage } from '../../../i18n';
+import { formatCurrency as formatCurrencyUtil, formatNumber, formatPercentage } from '@/i18n';
 
 interface LocaleContextType {
   formatCurrency: (amount: number, currency?: string) => string;

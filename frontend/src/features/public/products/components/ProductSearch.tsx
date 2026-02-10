@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { SearchIcon, FilterIcon, XIcon, SortAscIcon, SortDescIcon, GridIcon, ListIcon } from 'lucide-react';
-import { cn } from '../../utils/utils';
-import { Input } from '../ui/Input';
+import { cn } from '@/utils/utils';
+import { Input } from '@/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Select } from '../ui/Select';
+import { Select } from '@/ui/Select';
 import { Text, Label } from '@/components/ui/Text/Text';
 
 export const ProductSearch = ({

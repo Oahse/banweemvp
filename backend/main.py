@@ -9,7 +9,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.exc import SQLAlchemyError
 
-from core.db import AsyncSessionDB, initialize_db, db_manager, DatabaseOptimizer
+from core.db import AsyncSessionDB, initialize_db, db_manager
 from core.cache import redis_manager
 from core.config import settings, validate_startup_environment, get_setup_instructions
 from core.errors import (
@@ -208,15 +208,22 @@ async def lifespan(app: FastAPI):
         for warning in validation_result.warnings:
             logger.warning(warning)
 
-    # Initialize the database engine and session factory with optimization
-    from core.config import settings
+    # Initialize database
     try:
-        optimized_engine = DatabaseOptimizer.get_optimized_engine()
-        initialize_db(settings.SQLALCHEMY_DATABASE_URI, settings.ENVIRONMENT == "local", engine=optimized_engine)
+        from core.config import settings
+        from core.db import initialize_db
+        
+        # Initialize database with simple engine (no optimization)
+        initialize_db(
+            settings.SQLALCHEMY_DATABASE_URI,
+            settings.ENVIRONMENT == "local",
+            use_optimized_engine=False
+        )
+        
         logger.info("Database initialized successfully ✅")
     except Exception as e:
         logger.error(f"Database initialization failed: {e}")
-        raise RuntimeError(f"Database initialization required: {e}")
+        raise RuntimeError(f"Database initialization failed: {e}")
 
     # Initialize Redis if enabled
     if settings.ENABLE_REDIS:
@@ -245,16 +252,8 @@ async def lifespan(app: FastAPI):
             if settings.ENVIRONMENT != "local":
                 raise RuntimeError("ARQ connection required for background tasks")
 
-    # Run database maintenance and optimization first
-    try:
-        from core.db import db_manager
-        if getattr(db_manager, 'session_factory', None) is not None:
-            async with db_manager.session_factory() as db:
-                await DatabaseOptimizer.run_maintenance(db)
-        else:
-            logger.warning("Database session not available, skipping maintenance")
-    except Exception as e:
-        logger.warning(f"Database optimization warning: {e}")
+    # Skip database maintenance - using Alembic for migrations
+    logger.info("Database maintenance skipped - using Alembic for schema management")
 
     # Start background task managers
     global discount_task_manager, payment_retry_task_manager, subscription_task_manager

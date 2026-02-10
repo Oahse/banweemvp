@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import WishlistItem from '../wishlist/components/WishlistItem';
+import WishlistItem from '@/wishlist/components/WishlistItem';
 
 // Mock dependencies as needed
 vi.mock('react-router-dom', async () => {

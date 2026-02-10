@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { QrCodeIcon, ScanLineIcon } from 'lucide-react';
-import { ProductVariant, BarcodeData } from '../../../../types';
-import { ProductsAPI } from '../../../../api/products';
+import { ProductVariant, BarcodeData } from '@/../types';
+import { ProductsAPI } from '@/../api/products';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 

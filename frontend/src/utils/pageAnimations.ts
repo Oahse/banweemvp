@@ -23,11 +23,35 @@ export const pageAnimations = {
       y: 0,
       transition: { duration: 0.2 }
     }
+  },
+
+  // Standard container animation
+  container: {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.05
+      }
+    }
+  },
+
+  // Standard item animation
+  item: {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3 }
+    }
   }
 };
 
 // Export individual variants for convenience
 export const {
   containerFast: containerFastVariants,
-  itemFast: itemFastVariants
+  itemFast: itemFastVariants,
+  container: containerVariants,
+  item: itemVariants
 } = pageAnimations;

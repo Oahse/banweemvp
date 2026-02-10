@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { XIcon, ChevronRightIcon, UserIcon, HeartIcon, ShoppingCartIcon } from 'lucide-react';
-import { useCategories } from '../shared/contexts/CategoryContext';
-import { useAuth } from '../../features/protected/auth/contexts/AuthContext';
-import { useCart } from '../../features/protected/cart/contexts/CartContext';
-import { useWishlist } from '../../features/protected/wishlist/contexts/WishlistContext';
+import { useCategories } from '@/components/shared/contexts/CategoryContext';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
+import { useCart } from '@/features/protected/cart/contexts/CartContext';
+import { useWishlist } from '@/features/protected/wishlist/contexts/WishlistContext';
 import { Button } from '@/components/ui/Button';
 import { Heading, Text } from '@/components/ui/Text/Text';
 

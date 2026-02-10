@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SearchIcon, FilterIcon, XIcon, CalendarIcon } from 'lucide-react';
-import Dropdown from '../../ui/Dropdown';
-import { useTheme } from '../../../store/ThemeContext';
+import Dropdown from '@/ui/Dropdown';
+import { useTheme } from '@/store/ThemeContext';
 import { Button } from '@/components/ui/Button';
 import { Label, Text } from '@/components/ui/Text/Text';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../utils/utils';
+import { cn } from '@/utils/utils';
 import { CheckIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Heading, Text, Label } from '@/components/ui/Text/Text';

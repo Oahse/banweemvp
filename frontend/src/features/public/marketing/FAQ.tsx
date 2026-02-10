@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRightIcon, PlusIcon, MinusIcon, SearchIcon } from 'lucide-react';
-import { categories, faqItems } from '../../../data/faq';
+import { categories, faqItems } from '@/data/faq';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 

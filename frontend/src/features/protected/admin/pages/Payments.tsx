@@ -4,12 +4,12 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '../../../../components/layout/AdminLayout';
-import { PaymentsListSkeleton } from '../components/skeletons/PaymentsSkeleton';
+import AdminLayout from '@/../components/layout/AdminLayout';
+import { PaymentsListSkeleton } from '@/components/skeletons/PaymentsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
-import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
 
 interface Payment {

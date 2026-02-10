@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
+import { useSubscription } from '@/subscriptions/contexts/SubscriptionContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
@@ -15,10 +15,10 @@ import {
   PauseIcon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { SubscriptionCard } from '../../subscriptions/components/SubscriptionCard';
+import { SubscriptionCard } from '@/subscriptions/components/SubscriptionCard';
 import { Pagination } from '@/components/ui/Pagination';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
-import { AutoRenewToggle } from '../../subscriptions/components/AutoRenewToggle';
+import { AutoRenewToggle } from '@/subscriptions/components/AutoRenewToggle';
 import ProductsAPI from '@/api/products';
 import { Product } from '@/types';
 

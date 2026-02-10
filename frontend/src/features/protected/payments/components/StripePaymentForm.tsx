@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { toast } from 'react-hot-toast';
 import apiClient from '@/api';
-import { useAuth } from '../../auth/contexts/AuthContext';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
