@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
-import { extractErrorMessage } from '@/../utils/api-response';
+import { extractErrorMessage } from '@/utils/api-response';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 // Animation variants

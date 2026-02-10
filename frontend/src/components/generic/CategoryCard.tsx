@@ -14,7 +14,7 @@ export const CategoryCard = ({ category }) => {
           />
         </div>
         <div className="p-4 text-center">
-          <Heading level={3} className="font-medium group-hover:text-primary transition-colors">
+          <Heading level={5} className="font-medium group-hover:text-primary transition-colors">
             {category.name}
           </Heading>
           {category.count !== undefined && category.count > 0 && (

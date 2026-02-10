@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCwIcon, PlusIcon, LogInIcon } from 'lucide-react';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '@/../utils/themeClasses';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '@/utils/themeClasses';
 import { SubscriptionCard } from './SubscriptionCard';
 import { 
   getSubscriptions,

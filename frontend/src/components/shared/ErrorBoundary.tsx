@@ -55,7 +55,7 @@ class ErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            <Heading level={1} className="mb-1">
+            <Heading level={5} className="mb-1">
               Oops! Something went wrong
             </Heading>
             <Body tone="secondary" className="mb-3">
@@ -73,7 +73,7 @@ class ErrorBoundary extends Component<Props, State> {
               onClick={this.handleReload}
               variant="primary"
               size="sm"
-              className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition-colors text-xs"
+              className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
             >
               <Text variant="body-sm">Reload Page</Text>
             </Button>

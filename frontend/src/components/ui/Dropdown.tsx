@@ -105,26 +105,32 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
-      <Button
+      <button
         type="button"
         onClick={handleToggleDropdown}
         disabled={disabled}
-        variant="outline"
-        size="sm"
-        className={`w-full flex items-center justify-between px-3 py-2 text-left bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm transition-colors ${
+        className={cn(
+          'w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-sm',
+          'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm transition-colors',
           disabled
             ? 'opacity-50 cursor-not-allowed'
-            : 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer'
-        } ${className}`}
+            : 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer',
+          className
+        )}
       >
-        <Text as="span" className={cn(
-          'truncate',
+        <span className={cn(
+          'truncate flex-1',
           selectedOption ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'
-        )}>{displayText}</Text>
+        )}>
+          {displayText}
+        </span>
         <ChevronDownIcon 
-          className={`w-3 h-3 transition-transform flex-shrink-0 ml-1 ${isOpen ? 'rotate-180' : ''}`} 
+          className={cn(
+            'w-4 h-4 transition-transform flex-shrink-0',
+            isOpen ? 'rotate-180' : ''
+          )} 
         />
-      </Button>
+      </button>
 
       {isOpen && (
         <div className={cn(
@@ -164,26 +170,23 @@ export const Dropdown: React.FC<DropdownProps> = ({
           <div className="max-h-60 overflow-auto">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
-                <Button
+                <button
                   key={index}
                   type="button"
                   onClick={() => handleSelect(option)}
-                  variant="ghost"
-                  size="sm"
-                  className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between ${
-                    option.disabled ? 'opacity-50 cursor-not-allowed' : ''
-                  } ${
-                    value === option.value ? 'bg-primary text-white' : ''
-                  }`}
                   disabled={option.disabled}
+                  className={cn(
+                    'w-full px-3 py-2 text-left text-sm transition-colors flex items-center justify-between gap-2',
+                    'hover:bg-gray-100 dark:hover:bg-gray-700',
+                    option.disabled && 'opacity-50 cursor-not-allowed',
+                    value === option.value && 'bg-primary/10 text-primary font-medium'
+                  )}
                 >
-                  <div className="flex items-center justify-between">
-                    <Text as="span" className="truncate">{option.label}</Text>
-                    {value === option.value && (
-                      <CheckIcon className="w-3 h-3 text-primary flex-shrink-0 ml-1" />
-                    )}
-                  </div>
-                </Button>
+                  <span className="truncate flex-1">{option.label}</span>
+                  {value === option.value && (
+                    <CheckIcon className="w-4 h-4 text-primary flex-shrink-0" />
+                  )}
+                </button>
               ))
             ) : (
               <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">

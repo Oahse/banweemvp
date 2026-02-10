@@ -70,7 +70,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <User className="w-5 h-5 text-white" />
             </div>
             <div>
-              <Heading level={2} className="text-sm font-medium text-gray-900 dark:text-white">Admin Panel</Heading>
+              <Heading level={5} className="text-sm font-medium text-gray-900 dark:text-white">Admin Panel</Heading>
               <Body className="text-xs text-gray-500 dark:text-gray-400">admin@banwee.com</Body>
             </div>
           </div>
@@ -143,7 +143,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               >
               </Button>
               <div className="flex-1">
-                <Heading level={1} className="text-xl font-semibold text-gray-900 dark:text-white">
+                <Heading level={5} className="text-xl font-semibold text-gray-900 dark:text-white">
                   {adminNavigationItems.find(item => location.pathname === item.href)?.name || 'Admin'}
                 </Heading>
               </div>

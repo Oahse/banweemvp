@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CheckIcon, ImageIcon } from 'lucide-react';
-import { themeClasses, combineThemeClasses } from '@/../utils/themeClasses';
-import { formatCurrency } from '@/../utils/locale-config';
+import { themeClasses, combineThemeClasses } from '@/utils/themeClasses';
+import { formatCurrency } from '@/utils/locale-config';
 import { Button } from '@/components/ui/Button';
 import { Text, Display, Heading, Body, Caption, Label, Code, Quote } from '@/components/ui/Text/Text';
 

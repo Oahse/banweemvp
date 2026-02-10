@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCart } from '@/cart/contexts/CartContext';
+import { useCart } from '@/features/protected/cart/contexts/CartContext';
 import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { AuthAPI } from '@/api/auth';

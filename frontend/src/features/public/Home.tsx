@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRightIcon, TruckIcon, BadgeCheckIcon, ShieldIcon, HeadphonesIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
@@ -150,6 +150,9 @@ const [deals, setDeals] = useState<any[]>([]);
 const [activeTab, setActiveTab] = useState('all');
 const [currentSlide, setCurrentSlide] = useState(0);
 
+// Ref for categories container scrolling
+const categoriesContainerRef = useRef<HTMLDivElement>(null);
+
 const { formatCurrency } = useLocale();
 const { theme } = useTheme();
 
@@ -252,7 +255,7 @@ return (
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.4 }}>
-                  <Heading level={1} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+                  <Heading level={5} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
                     {heroSlides[currentSlide]?.title}
                   </Heading>
                 </motion.div>
@@ -325,28 +328,28 @@ return (
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
               <TruckIcon size={24} className="text-primary" />
             </div>
-            <Heading level={3} weight="medium">Free Delivery</Heading>
+            <Text variant="body" weight="semibold" className="mb-1">Free Delivery</Text>
             <Text variant="body-sm" tone="secondary">From $49.99</Text>
           </div>
           <div className="flex flex-col items-center text-center p-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
               <BadgeCheckIcon size={24} className="text-primary" />
             </div>
-            <Heading level={3} weight="medium">Certified Organic</Heading>
+            <Text variant="body" weight="semibold" className="mb-1">Certified Organic</Text>
             <Text variant="body-sm" tone="secondary">100% Guarantee</Text>
           </div>
           <div className="flex flex-col items-center text-center p-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
               <ShieldIcon size={24} className="text-primary" />
             </div>
-            <Heading level={3} weight="medium">Secure Payments</Heading>
+            <Text variant="body" weight="semibold" className="mb-1">Secure Payments</Text>
             <Text variant="body-sm" tone="secondary">100% Protected</Text>
           </div>
           <div className="flex flex-col items-center text-center p-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
               <HeadphonesIcon size={24} className="text-primary" />
             </div>
-            <Heading level={3} weight="medium">24/7 Support</Heading>
+            <Text variant="body" weight="semibold" className="mb-1">24/7 Support</Text>
             <Text variant="body-sm" tone="secondary">Dedicated Support</Text>
           </div>
         </div>
@@ -359,7 +362,7 @@ return (
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
             <Text variant="body-sm" weight="medium" tone="primary">Explore our product range</Text>
-            <Heading level={2} className="text-2xl md:text-3xl font-bold mt-1">Shop Categories</Heading>
+            <Heading level={5} className="text-base md:text-lg font-semibold mt-1">Shop Categories</Heading>
           </div>
           <div className="flex items-center space-x-2 mt-4 md:mt-0">
             <Button 
@@ -408,7 +411,7 @@ return (
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <Text variant="body-sm" weight="medium" tone="primary">Featured Products</Text>
-            <Heading level={2} className="text-lg md:text-xl font-semibold mt-1">Featured Products</Heading>
+            <Heading level={5} className="text-base md:text-lg font-semibold mt-1">Featured Products</Heading>
           </div>
           <Link
             to="/products?featured=true"
@@ -464,7 +467,7 @@ return (
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <Text variant="body-sm" weight="medium" tone="primary">Best Sellers</Text>
-            <Heading level={2} className="text-lg md:text-xl font-semibold mt-1">Popular Products</Heading>
+            <Heading level={5} className="text-lg md:text-xl font-semibold mt-1">Popular Products</Heading>
           </div>
           <Link to="/products?popular=true" className="inline-flex items-center text-primary hover:underline mt-4 md:mt-0">
             All Popular
@@ -577,7 +580,7 @@ return (
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
             <Text className="text-primary text-sm font-medium">Best deals</Text>
-            <Heading level={2} className="text-lg md:text-xl font-semibold text-main mt-1">Top Deals of the Day</Heading>
+            <Heading level={5} className="text-sm md:text-base font-semibold text-main mt-1">Top Deals of the Day</Heading>
           </div>
           <Link to="/products?sale=true" className="inline-flex items-center text-primary hover:underline mt-4 md:mt-0">
             All Deals
@@ -628,7 +631,7 @@ return (
                         Ends in {product.endsIn || '2d 15h 22m'}
                       </Text>
                     </div>
-                    <Heading level={3} className="text-lg font-semibold text-main mb-2">{product.name}</Heading>
+                    <Heading level={5} className="text-lg font-semibold text-main mb-2">{product.name}</Heading>
                     <Body className="text-sm text-copy-light mb-4">
                       {typeof product.category === 'object' && product.category.name 
                         ? product.category.name 

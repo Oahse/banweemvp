@@ -403,7 +403,7 @@ export const ProductCard = ({
                 : 'Uncategorized')}
           </Text>
           <Link to={`/products/${product.id || ''}`}>
-            <Heading level={3} className="font-semibold text-xs sm:text-sm text-main dark:text-white hover:text-primary transition-colors line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
+            <Heading level={5} className="font-semibold text-xs sm:text-sm text-main dark:text-white hover:text-primary transition-colors line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
               {product.name || 'Unknown Product'}
             </Heading>
           </Link>

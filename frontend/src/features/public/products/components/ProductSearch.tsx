@@ -3,7 +3,7 @@ import { SearchIcon, FilterIcon, XIcon, SortAscIcon, SortDescIcon, GridIcon, Lis
 import { cn } from '@/utils/utils';
 import { Input } from '@/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Select } from '@/ui/Select';
+import { Dropdown } from '@/ui/Dropdown';
 import { Text, Label } from '@/components/ui/Text/Text';
 
 export const ProductSearch = ({
@@ -112,7 +112,7 @@ export const ProductSearch = ({
             />
           </div>
 
-          <Select
+          <Dropdown
             value={filters.category}
             onChange={(e) => updateFilter('category', e.target.value)}
             className="min-w-[150px]"
@@ -153,9 +153,9 @@ export const ProductSearch = ({
           </div>
 
           <div className="flex items-center space-x-2">
-            <Select
+            <Dropdown
               value={filters.sortBy}
-              onChange={(e) => updateFilter('sortBy', e.target.value)}
+              onChange={(value) => updateFilter('sortBy', value)}
               className="text-sm"
               options={sortOptions.map(option => ({
                 value: option.value,
@@ -200,9 +200,9 @@ export const ProductSearch = ({
               <Label className="block text-sm font-medium text-gray-700 mb-2">
                 Availability
               </Label>
-              <Select
+              <Dropdown
                 value={filters.availability}
-                onChange={(e) => updateFilter('availability', e.target.value)}
+                onChange={(value) => updateFilter('availability', value)}
                 options={availabilityOptions}
               />
             </div>
@@ -238,9 +238,9 @@ export const ProductSearch = ({
               <Label className="block text-sm font-medium text-gray-700 mb-2">
                 Minimum Rating
               </Label>
-              <Select
+              <Dropdown
                 value={filters.minRating.toString()}
-                onChange={(e) => updateFilter('minRating', Number(e.target.value))}
+                onChange={(value) => updateFilter('minRating', Number(value))}
                 options={[
                   { value: '0', label: 'Any Rating' },
                   { value: '1', label: '1+ Stars' },

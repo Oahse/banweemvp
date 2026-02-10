@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Loader, AlertCircle, Plus, Edit, Trash2, MapPin } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
 import { InventoryLocationsSkeleton } from '@/components/skeletons/InventorySkeleton';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';

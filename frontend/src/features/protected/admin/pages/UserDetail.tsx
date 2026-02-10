@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import AdminAPI from '@/api/admin';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
 import { UserDetailSkeleton } from '@/components/skeletons/UsersSkeleton';
 import { Button } from '@/components/ui/Button';

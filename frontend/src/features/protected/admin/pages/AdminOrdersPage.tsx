@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, SearchIcon, ArrowUpDownIcon, EyeIcon, PackageIcon } from 'lucide-react';
 import AdminAPI from '@/api/admin';
-import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import { OrdersListSkeleton } from '@/components/skeletons/OrdersSkeleton';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';

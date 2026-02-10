@@ -55,7 +55,7 @@ export const Footer = () => {
           <div className="bg-background rounded-lg p-6 md:p-10 mb-12">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div className="mb-6 md:mb-0 md:mr-8">
-                <Heading level={3} weight="semibold">Manage Your Subscriptions</Heading>
+                <Heading level={5} weight="semibold">Manage Your Subscriptions</Heading>
                 <Text variant="body-sm" tone="secondary">Explore, set up, and manage your recurring orders and subscriptions.</Text>
               </div>
               <div className="flex-shrink-0 w-full md:w-auto">

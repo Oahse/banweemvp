@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSubscription } from '@/subscriptions/contexts/SubscriptionContext';
+import { useSubscription } from '@/features/protected/subscriptions/contexts/SubscriptionContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';

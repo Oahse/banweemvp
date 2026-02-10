@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, CheckCircle, User, Mail } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { Input, Checkbox, RadioGroup } from '@/components/ui/Form';
 import SocialAuth from '@/components/SocialAuth';
-import { validation } from '@/../utils/validation';
+import { validation } from '@/utils/validation';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 

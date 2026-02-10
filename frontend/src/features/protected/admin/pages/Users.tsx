@@ -7,7 +7,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import { UsersListSkeleton } from '@/components/skeletons/UsersSkeleton';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
 import { ConfirmModal, useModal } from '@/components/ui/Modal';

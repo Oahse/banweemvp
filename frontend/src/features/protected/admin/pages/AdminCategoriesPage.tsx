@@ -4,7 +4,7 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import { CategoriesListSkeleton } from '@/components/skeletons/CategoriesSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';

@@ -7,8 +7,8 @@ import {
   LoaderIcon,
   PlusIcon
 } from 'lucide-react';
-import { cn } from '@/../utils/cn';
-import { formatCurrency } from '@/../utils/orderCalculations';
+import { cn } from '@/utils/cn';
+import { formatCurrency } from '@/utils/orderCalculations';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Text, Label } from '@/components/ui/Text/Text';

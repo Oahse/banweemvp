@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, ArrowLeft, Package, DollarSign, Tag, User, Image as ImageIcon, Warehouse, RefreshCw, Edit, FileText, Salad } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
 import { ProductDetailSkeleton } from '@/components/skeletons/ProductsSkeleton';
 import { Button } from '@/components/ui/Button';

@@ -105,7 +105,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
               <User className="w-5 h-5 text-white" />
             </div>
             <div>
-              <Heading level={2} weight="medium">My Account</Heading>
+              <Heading level={5} weight="medium">My Account</Heading>
               <Text variant="caption" tone="secondary">{user?.email}</Text>
             </div>
           </div>
@@ -181,7 +181,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
                 <Menu className="h-6 w-6" />
               </Button>
               <div className="flex-1">
-                <Heading level={1} weight="semibold">
+                <Heading level={5} weight="semibold">
                   {navigationItems.find(item => item.current)?.name || 'Account'}
                 </Heading>
               </div>

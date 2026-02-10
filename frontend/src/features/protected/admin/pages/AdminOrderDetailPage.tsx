@@ -5,7 +5,7 @@ import AdminAPI from '@/api/admin';
 import apiClient from '@/api/client';
 import { Dropdown } from '@/components/ui/Dropdown';
 import toast from 'react-hot-toast';
-import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
 import { OrderDetailSkeleton } from '@/components/skeletons/OrdersSkeleton';

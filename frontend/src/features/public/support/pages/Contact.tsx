@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRightIcon, MapPinIcon, PhoneIcon, MailIcon, ClockIcon, CheckCircleIcon, MessageCircle } from 'lucide-react';
 import { Input, Textarea } from '@/components/ui/Form';
-import { Select } from '@/components/generic/Select';
+import { Dropdown } from '@/components/ui/Dropdown';
 import { ContactMessagesAPI } from '@/api/contact-messages';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
@@ -122,7 +122,7 @@ export const Contact = () => {
       variants={containerVariants}
     >
       {/* Breadcrumb */}
-      <motion.nav className="flex mb-4 text-xs" variants={itemVariants}>
+      <motion.nav className="flex mb-4 text-sm" variants={itemVariants}>
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
@@ -132,8 +132,8 @@ export const Contact = () => {
 
       <motion.div className="max-w-5xl mx-auto" variants={itemVariants}>
         <div className="text-center mb-6">
-          <Heading level={1} className="text-base md:text-lg font-semibold text-copy mb-2">Get In Touch</Heading>
-          <Body className="text-xs text-copy-light max-w-2xl mx-auto">
+          <Heading level={5} className="text-base md:text-lg font-semibold text-copy mb-2">Get In Touch</Heading>
+          <Body className="text-sm text-copy-light max-w-2xl mx-auto">
             Have questions about our products, shipping, or anything else? We're here to help. Fill out the form
             below or contact us directly.
           </Body>
@@ -141,8 +141,8 @@ export const Contact = () => {
 
         {/* Contact Methods */}
         <motion.div className="mb-6" variants={itemVariants}>
-          <Heading level={2} className="text-sm font-semibold text-copy mb-3">Contact Methods</Heading>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <Heading level={5} className="text-sm font-semibold text-copy mb-3">Contact Methods</Heading>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {/* WhatsApp */}
             <a
               href="https://wa.me/18002269333"
@@ -155,13 +155,13 @@ export const Contact = () => {
                   <MessageCircle className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <Heading level={4} className="text-sm font-semibold text-copy mb-0.5">
+                  <Heading level={5} className="text-sm font-semibold text-copy mb-0.5">
                     WhatsApp Support
                   </Heading>
-                  <Body className="text-xs text-copy-light mb-1">
+                  <Body className="text-sm text-copy-light mb-1">
                     Get instant help via WhatsApp
                   </Body>
-                  <div className="text-xs text-copy-lighter space-y-0.5">
+                  <div className="text-sm text-copy-lighter space-y-0.5">
                     <div>24/7</div>
                     <div className="font-medium text-primary">
                       &lt; 2 minutes
@@ -181,13 +181,13 @@ export const Contact = () => {
                   <PhoneIcon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <Heading level={4} className="text-sm font-semibold text-copy mb-0.5">
+                  <Heading level={5} className="text-sm font-semibold text-copy mb-0.5">
                     Phone Support
                   </Heading>
-                  <Body className="text-xs text-copy-light mb-1">
+                  <Body className="text-sm text-copy-light mb-1">
                     Speak directly with our team
                   </Body>
-                  <div className="text-xs text-copy-lighter space-y-0.5">
+                  <div className="text-sm text-copy-lighter space-y-0.5">
                     <div>9 AM - 9 PM EST</div>
                     <div className="font-medium text-primary">
                       Immediate
@@ -207,13 +207,13 @@ export const Contact = () => {
                   <MailIcon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <Heading level={4} className="text-sm font-semibold text-copy mb-0.5">
+                  <Heading level={5} className="text-sm font-semibold text-copy mb-0.5">
                     Email Support
                   </Heading>
-                  <Body className="text-xs text-copy-light mb-1">
+                  <Body className="text-sm text-copy-light mb-1">
                     Send us a detailed message
                   </Body>
-                  <div className="text-xs text-copy-lighter space-y-0.5">
+                  <div className="text-sm text-copy-lighter space-y-0.5">
                     <div>24/7</div>
                     <div className="font-medium text-primary">
                       &lt; 4 hours
@@ -229,12 +229,12 @@ export const Contact = () => {
           {/* Contact Form */}
           <div className="lg:w-2/3">
             <div className="bg-surface rounded-lg shadow-sm p-3">
-              <Heading level={2} className="text-sm font-semibold text-copy mb-3">Send Us a Message</Heading>
+              <Heading level={5} className="text-sm font-semibold text-copy mb-3">Send Us a Message</Heading>
               {formSubmitted ? (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
                   <CheckCircleIcon size={24} className="text-green-500 mx-auto mb-2" />
-                  <Heading level={3} className="text-sm font-bold text-green-800 mb-1">Message Sent!</Heading>
-                  <Body className="text-xs text-green-700">
+                  <Heading level={5} className="text-sm font-bold text-green-800 mb-1">Message Sent!</Heading>
+                  <Body className="text-sm text-green-700">
                     Thank you for reaching out. We'll get back to you as soon as possible.
                   </Body>
                 </div>
@@ -242,7 +242,7 @@ export const Contact = () => {
                 <form onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                     <Input
-                      label="Your Name *"
+                      label="Your Name"
                       id="name"
                       name="name"
                       value={formData.name}
@@ -250,7 +250,7 @@ export const Contact = () => {
                       required
                     />
                     <Input
-                      label="Your Email *"
+                      label="Your Email"
                       id="email"
                       name="email"
                       type="email"
@@ -260,8 +260,8 @@ export const Contact = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <Select
-                      label="Subject *"
+                  <Dropdown
+                      label="Subject"
                       id="subject"
                       name="subject"
                       value={formData.subject}
@@ -272,7 +272,7 @@ export const Contact = () => {
                   </div>
                   <div className="mb-3">
                     <Textarea
-                      label="Your Message *"
+                      label="Your Message"
                       id="message"
                       name="message"
                       value={formData.message}
@@ -299,7 +299,7 @@ export const Contact = () => {
           {/* Contact Info */}
           <div className="lg:w-1/3">
             <div className="bg-surface rounded-lg shadow-sm p-3 mb-4">
-              <Heading level={2} className="text-sm font-semibold text-copy mb-3">Contact Information</Heading>
+              <Heading level={5} className="text-sm font-semibold text-copy mb-3">Contact Information</Heading>
               <div className="space-y-3">
                 <div className="flex">
                   <div className="mr-2">
@@ -308,8 +308,8 @@ export const Contact = () => {
                     </div>
                   </div>
                   <div>
-                    <Heading level={3} className="text-sm font-bold text-copy mb-0.5">Phone Number</Heading>
-                    <Body className="text-xs text-copy-light">
+                    <Heading level={5} className="text-sm font-bold text-copy mb-0.5">Phone Number</Heading>
+                    <Body className="text-sm text-copy-light">
                       Customer Service: (212) 555-1234
                       <br />
                       Wholesale Inquiries: (212) 555-5678
@@ -323,8 +323,8 @@ export const Contact = () => {
                     </div>
                   </div>
                   <div>
-                    <Heading level={3} className="text-sm font-bold text-copy mb-0.5">Working Hours</Heading>
-                    <Body className="text-xs text-copy-light">
+                    <Heading level={5} className="text-sm font-bold text-copy mb-0.5">Working Hours</Heading>
+                    <Body className="text-sm text-copy-light">
                       Monday - Friday: 9:00 AM - 6:00 PM EST
                       <br />
                       Saturday: 10:00 AM - 4:00 PM EST
@@ -337,11 +337,11 @@ export const Contact = () => {
             </div>
             {/* FAQ Link */}
             <div className="bg-primary/10 rounded-lg p-3">
-              <Heading level={3} className="text-sm font-bold text-copy mb-1">Have a Question?</Heading>
-              <Body className="text-xs text-copy-light mb-2">
+              <Heading level={5} className="text-sm font-bold text-copy mb-1">Have a Question?</Heading>
+              <Body className="text-sm text-copy-light mb-2">
                 Check our frequently asked questions for quick answers to common inquiries.
               </Body>
-              <Link to="/faq" className="inline-block text-xs text-primary hover:underline font-medium">
+              <Link to="/faq" className="inline-block text-sm text-primary hover:underline font-medium">
                 View FAQs
               </Link>
             </div>
@@ -351,7 +351,7 @@ export const Contact = () => {
         {/* Map */}
         <motion.div className="mt-6" variants={itemVariants}>
           <div className="bg-surface rounded-lg shadow-sm p-3">
-            <Heading level={2} className="text-sm font-semibold text-copy mb-3">Find Us</Heading>
+            <Heading level={5} className="text-sm font-semibold text-copy mb-3">Find Us</Heading>
             <div className="h-64 bg-border rounded-lg overflow-hidden">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.9663095343008!2d-74.00425872418978!3d40.74076097138946!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1685290225594!5m2!1sen!2sus"

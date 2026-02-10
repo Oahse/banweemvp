@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '@/../features/protected/auth/hooks/useAuth';
-import { ReviewsAPI } from '@/../api';
+import { useAuth } from '@/features/protected/auth/hooks/useAuth';
+import { ReviewsAPI } from '@/api';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Label } from '@/components/ui/Text/Text';
 

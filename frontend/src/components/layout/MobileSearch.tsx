@@ -50,7 +50,7 @@ export const MobileSearch = ({
       <div className="bg-surface w-full text-copy">
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <Heading level={3} className="text-lg font-semibold text-main">Search Products</Heading>
+            <Heading level={5} className="text-lg font-semibold text-main">Search Products</Heading>
             <Button onClick={onClose} variant="ghost" size="sm" className="p-1 hover:bg-background rounded-md">
               <XIcon size={24} />
             </Button>

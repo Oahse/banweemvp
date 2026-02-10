@@ -49,7 +49,7 @@ export const MobileCategories = ({
       <div className="bg-surface w-4/5 max-w-sm h-full overflow-y-auto text-copy">
         <div className="p-4 border-b border-border-light">
           <div className="flex items-center justify-between">
-            <Heading level={3} className="text-lg font-semibold text-main">Categories</Heading>
+            <Heading level={5} className="text-lg font-semibold text-main">Categories</Heading>
             <Button onClick={onClose} variant="ghost" size="sm" className="p-1 hover:bg-background rounded-md">
               <XIcon size={24} />
             </Button>

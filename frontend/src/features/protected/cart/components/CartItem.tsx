@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MinusIcon, PlusIcon, TrashIcon } from 'lucide-react';
-import { useCart } from '@/contexts/CartContext';
+import { useCart } from '@/features/protected/cart/contexts/CartContext';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text/Text';

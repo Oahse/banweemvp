@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import AdminLayoutSkeleton from '@/components/skeletons/AdminLayoutSkeleton';
 import { InventoryAdjustmentsSkeleton } from '@/components/skeletons/InventorySkeleton';
 import { Loader, AlertCircle, Plus, Filter, ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';

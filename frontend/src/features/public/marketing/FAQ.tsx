@@ -57,7 +57,7 @@ export const FAQ = () => {
       variants={containerVariants}
     >
       {/* Breadcrumb */}
-      <motion.nav className="flex mb-4 text-xs" variants={itemVariants}>
+      <motion.nav className="flex mb-4 text-sm" variants={itemVariants}>
         <Link to="/" className="text-copy-lighter hover:text-primary">
           Home
         </Link>
@@ -67,8 +67,8 @@ export const FAQ = () => {
 
       <motion.div className="max-w-4xl mx-auto" variants={itemVariants}>
         <div className="text-center mb-6">
-          <Heading level={1} className="text-base md:text-lg font-semibold text-copy mb-2">Frequently Asked Questions</Heading>
-          <Body className="text-xs text-copy-light max-w-2xl mx-auto">
+          <Heading level={5} className="text-base md:text-lg font-semibold text-copy mb-2">Frequently Asked Questions</Heading>
+          <Body className="text-sm text-copy-light max-w-2xl mx-auto">
             Find answers to common questions about our products, shipping, returns, and more. Can't find what you're
             looking for? Contact our support team.
           </Body>
@@ -80,7 +80,7 @@ export const FAQ = () => {
             <input
               type="text"
               placeholder="Search for questions..."
-              className="w-full px-3 py-2 pl-9 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-transparent text-xs"
+              className="w-full px-3 py-2 pl-9 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-transparent text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -96,7 +96,7 @@ export const FAQ = () => {
                 key={category.id}
                 variant={activeCategory === category.id ? "primary" : "ghost"}
                 size="sm"
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap ${
                   activeCategory === category.id
                     ? 'bg-primary text-white'
                     : 'bg-surface text-copy hover:bg-border'
@@ -117,19 +117,17 @@ export const FAQ = () => {
                 className="bg-surface rounded-lg shadow-sm border border-border-light overflow-hidden"
                 variants={itemVariants}
               >
-                <Button
-                  className="flex justify-between items-center w-full p-3 text-left"
+                <button
+                  className="flex justify-between items-center w-full p-3 text-left hover:bg-surface-hover transition-colors"
                   onClick={() => toggleQuestion(item.id)}
-                  variant="ghost"
-                  size="sm"
                 >
-                  <Text className="text-sm font-medium text-copy">{item.question}</Text>
+                  <Text className="text-sm font-medium text-copy pr-2">{item.question}</Text>
                   {openQuestions.includes(item.id) ? (
-                    <MinusIcon size={14} className="text-primary flex-shrink-0" />
+                    <MinusIcon size={16} className="text-primary flex-shrink-0" />
                   ) : (
-                    <PlusIcon size={14} className="text-primary flex-shrink-0" />
+                    <PlusIcon size={16} className="text-primary flex-shrink-0" />
                   )}
-                </Button>
+                </button>
                 <AnimatePresence>
                   {openQuestions.includes(item.id) && (
                     <motion.div 
@@ -140,7 +138,7 @@ export const FAQ = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="pt-2 border-t border-border-light">
-                        <Body className="text-xs text-copy-light mt-2">{item.answer}</Body>
+                        <Body className="text-sm text-copy-light leading-relaxed">{item.answer}</Body>
                       </div>
                     </motion.div>
                   )}
@@ -153,7 +151,7 @@ export const FAQ = () => {
                 <SearchIcon size={16} className="text-copy-lighter" />
               </div>
               <Text className="text-sm font-medium text-copy mb-1">No results found</Text>
-              <Body className="text-xs text-copy-light">
+              <Body className="text-sm text-copy-light">
                 Try adjusting your search or filter to find what you're looking for
               </Body>
             </div>
@@ -162,8 +160,8 @@ export const FAQ = () => {
 
         {/* Contact section */}
         <motion.div className="mt-8 bg-primary/10 rounded-lg p-4 text-center" variants={itemVariants}>
-          <Heading level={2} className="text-sm font-semibold text-copy mb-2">Still have questions?</Heading>
-          <Body className="text-xs text-copy-light mb-3 max-w-md mx-auto">
+          <Heading level={5} className="text-sm font-semibold text-copy mb-2">Still have questions?</Heading>
+          <Body className="text-sm text-copy-light mb-3 max-w-md mx-auto">
             If you couldn't find the answer you were looking for, our support team is here to help.
           </Body>
           <Link

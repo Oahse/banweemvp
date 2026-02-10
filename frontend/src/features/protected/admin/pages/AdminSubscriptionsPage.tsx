@@ -5,7 +5,7 @@ import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import AdminLayout from '@/../components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import { SubscriptionsListSkeleton } from '@/components/skeletons/SubscriptionsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
