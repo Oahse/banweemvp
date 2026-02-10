@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchIcon, FilterIcon, XIcon } from 'lucide-react';
@@ -7,10 +7,10 @@ import { ProductsAPI, CategoriesAPI } from '@/api';
 import { ProductCard } from '@/components/generic/ProductCard';
 import { SkeletonProductCard } from '@/components/ui/SkeletonProductCard';
 import { Dropdown } from '@/components/ui/Dropdown';
-import { themeClasses, combineThemeClasses, getInputClasses, getButtonClasses } from '@/utils/themeClasses';
+import { themeClasses, combineThemeClasses, getButtonClasses } from '@/utils/themeClasses';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Text, Label } from '@/components/ui/Text/Text';
 import { Pagination } from '@/components/ui/Pagination';
 import { Container } from '@/components/layout/Container';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
@@ -45,7 +45,11 @@ const Products = () => {
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
-  const [productsData, setProductsData] = useState<any>(null);
+  const [productsData, setProductsData] = useState<{
+    data: any[];
+    total: number;
+    pagination?: { total: number; limit: number };
+  } | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
 
   const { loading, error, execute: fetchProducts } = useAsync({
@@ -159,26 +163,6 @@ const Products = () => {
     setSortOption('created_at:desc');
     setCurrentPage(1);
     setSearchParams({});
-  };
-
-  const retryFetch = () => {
-    const [sortBy, sortOrder] = sortOption.split(':');
-    const params = {
-      q: searchQuery || undefined,
-      category: selectedCategories.length > 0 ? selectedCategories.join(',') : undefined,
-      min_price: priceRange[0] > 0 ? priceRange[0] : undefined,
-      max_price: priceRange[1] < 1000 ? priceRange[1] : undefined,
-      sort_by: sortBy,
-      sort_order: sortOrder,
-      page: currentPage,
-      limit: 12,
-    };
-
-    fetchProducts(async () => {
-      const response = await ProductsAPI.getProducts(params);
-      setProductsData(response.data);
-      return response.data;
-    });
   };
 
   // Don't show error UI, just log to console and show skeleton
@@ -376,7 +360,7 @@ const Products = () => {
           ))
         ) : products.length > 0 ? (
           // Show actual products
-          products.map((product: any, index: number) => (
+          products.map((product: any) => (
             <motion.div key={product.id} variants={itemVariants}>
               <ProductCard 
                 product={product} 
@@ -398,7 +382,7 @@ const Products = () => {
               </div>
               <Heading level={5} className="text-lg mb-2">No products found</Heading>
               <Text variant="body-sm" tone="secondary" className="mb-4">
-                Try adjusting your search or filters to find what you're looking for.
+                Try adjusting your search or filters to find what you&apos;re looking for.
               </Text>
               <Button
                 onClick={clearFilters}
@@ -417,7 +401,7 @@ const Products = () => {
       </motion.div>
 
       {/* Pagination - Always show when there are products */}
-      {products.length > 0 && (
+      {products.length > 0 && totalPages > 1 && (
         <motion.div 
           className="mt-8 sm:mt-12 flex justify-center"
           initial={{ opacity: 0, y: 20 }}
@@ -426,11 +410,13 @@ const Products = () => {
         >
           <Pagination
             currentPage={currentPage}
-            totalItems={productsData?.pagination?.total || 0}
-            pageSize={productsData?.pagination?.limit || 12}
+            totalPages={totalPages}
+            totalItems={totalProducts}
+            itemsPerPage={12}
             onPageChange={setCurrentPage}
-            loading={loading}
-            size="md"
+            showingStart={(currentPage - 1) * 12 + 1}
+            showingEnd={Math.min(currentPage * 12, totalProducts)}
+            itemName="products"
           />
         </motion.div>
       )}
