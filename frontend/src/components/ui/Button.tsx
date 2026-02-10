@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../utils/utils';
 import { Text } from '@/components/ui/Text/Text';
-import LoadingSpinner from '../shared/LoadingSpinner';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'success' | 'warning' | 'info';
@@ -91,29 +91,27 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       disabled={disabled || isLoading}
       {...props}
     >
-      <Text as="span" className={cn(
-        'flex items-center justify-center gap-2',
-        isLoading && 'opacity-0'
-      )}>
-        {leftIcon && (
-          <span className="flex-shrink-0" aria-hidden="true">
-            {leftIcon}
-          </span>
-        )}
-        {children && <Text as="span" className="truncate">{children}</Text>}
-        {rightIcon && (
-          <span className="flex-shrink-0" aria-hidden="true">
-            {rightIcon}
-          </span>
-        )}
-      </Text>
-      
-      {isLoading && (
-        <span className="absolute inset-0 flex items-center justify-center">
-          <LoadingSpinner size="sm" />
-          <Text as="span" className="sr-only">Loading...</Text>
-        </span>
-      )}
+          <Text as="span" className="flex items-center justify-center gap-2">
+            {isLoading ? (
+              <span className="flex-shrink-0 mr-2" aria-hidden="true">
+                <AnimatedLoader size="sm" variant="spinner" color="primary" />
+              </span>
+            ) : (
+              leftIcon && (
+                <span className="flex-shrink-0" aria-hidden="true">
+                  {leftIcon}
+                </span>
+              )
+            )}
+
+            {children && <Text as="span" className="truncate">{children}</Text>}
+
+            {rightIcon && (
+              <span className="flex-shrink-0" aria-hidden="true">
+                {rightIcon}
+              </span>
+            )}
+          </Text>
     </button>
   );
 });

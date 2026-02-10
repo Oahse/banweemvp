@@ -1,6 +1,7 @@
 import React from 'react';
-import { cn } from '../../utils/utils';
+import { cn } from '../../utils/cn';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text/Text';
 
 interface TabHeaderProps {
   tabs: {
@@ -45,13 +46,12 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
                 tab.disabled && 'opacity-50 cursor-not-allowed'
               }`}
             >
-              <span className="hidden sm:inline">{tab.label}</span>
-              <span className="sm:hidden">
-                {tab.label.charAt(0).toUpperCase() + tab.label.slice(1, 3)}
-              </span>
+              <Text as="span" className="hidden sm:inline">{tab.label}</Text>
+              <Text as="span" className="sm:hidden">{tab.label.charAt(0).toUpperCase() + tab.label.slice(1, 3)}</Text>
               
               {hasCount && (
-                <span 
+                <Text 
+                  as="span"
                   className={cn(
                     'py-0.5 px-1.5 sm:px-2 rounded-full text-xs flex-shrink-0',
                     isActive 
@@ -60,7 +60,7 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
                   )}
                 >
                   {tab.count}
-                </span>
+                </Text>
               )}
             </Button>
           );

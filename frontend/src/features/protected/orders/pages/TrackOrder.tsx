@@ -10,12 +10,11 @@ import {
   ArrowLeftIcon,
   PrinterIcon
 } from 'lucide-react';
-import { OrdersAPI } from '../api/orders';
+import { OrdersAPI } from '@/api/orders';
 import { toast } from 'react-hot-toast';
-import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
-import { containerVariants, itemVariants } from '../../../utils/pageAnimations';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading } from '@/components/ui/Text/Text';
+import { containerVariants, itemVariants } from '@/data/variants';
 
 interface TrackingEvent {
   id: string;
@@ -33,6 +32,7 @@ interface TrackingData {
   estimated_delivery: string | null;
   tracking_events: TrackingEvent[];
 }
+// Animation variants are imported from @/data/variants
 
 const statusSteps = [
   { key: 'pending', label: 'Order Placed', icon: ClockIcon },
@@ -53,10 +53,10 @@ export const TrackOrder = () => {
         setLoading(true);
         // Use public tracking endpoint (no authentication required)
         const response = await OrdersAPI.trackOrderPublic(orderId!);
-        const trackingData = unwrapResponse(response);
+        const trackingData = response;
         setTracking(trackingData);
       } catch (error) {
-        toast.error(extractErrorMessage(error) || 'Order not found or tracking information unavailable');
+        toast.error(error as string || 'Order not found or tracking information unavailable');
         console.error('Error fetching tracking:', error);
       } finally {
         setLoading(false);

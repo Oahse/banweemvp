@@ -6,6 +6,16 @@ import QRCode from 'qrcode';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body } from '@/components/ui/Text/Text';
 
+interface QRCodeModalProps {
+  data: string;
+  size?: number;
+  title?: string;
+  description?: string;
+  isOpen: boolean;
+  onClose: () => void;
+  className?: string;
+}
+
 export const QRCodeModal = ({
   data,
   size = 200,
@@ -14,8 +24,8 @@ export const QRCodeModal = ({
   isOpen,
   onClose,
   className = '',
-}) => {
-  const canvasRef = useRef(null);
+}: QRCodeModalProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showNotification, setShowNotification] = React.useState(false);
   const [isSharing, setIsSharing] = React.useState(false);
   const [isDownloading, setIsDownloading] = React.useState(false);
@@ -33,13 +43,13 @@ export const QRCodeModal = ({
         if (error) {
           console.error('Error generating QR code:', error);
           // Fallback to simple pattern if QR code generation fails
-          generateFallbackQRCode(data, canvasRef.current);
+          generateFallbackQRCode(data, canvasRef.current!);
         }
       });
     }
   }, [data, size, isOpen]);
 
-  const generateFallbackQRCode = (text, canvas) => {
+  const generateFallbackQRCode = (text: string, canvas: HTMLCanvasElement) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -260,8 +270,11 @@ export const QRCodeModal = ({
         <div className="mb-4">
           <Body className="text-xs text-copy-lighter mb-1">Data:</Body>
           <Body className="text-sm text-copy-light bg-surface-hover p-2 rounded break-all">
+            {data}
+          </Body>
+        </div>
 
-      <div className="flex space-x-2">
+        <div className="flex space-x-2">
         <Button
           onClick={handleDownload}
           disabled={isDownloading}
@@ -284,7 +297,8 @@ export const QRCodeModal = ({
         >
           {isSharing ? 'Sharing...' : 'Share'}
         </Button>
-      </div>
+        </div>
+      </motion.div>
       <NotificationModal
         isOpen={showNotification}
         onClose={() => setShowNotification(false)}

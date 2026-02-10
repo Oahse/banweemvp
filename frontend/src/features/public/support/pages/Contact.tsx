@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRightIcon, MapPinIcon, PhoneIcon, MailIcon, ClockIcon, CheckCircleIcon, MessageCircle } from 'lucide-react';
-import { Input } from '../../../../components/generic/Input';
-import { Textarea } from '../../../../components/generic/Textarea';
-import { Select } from '../../../../components/generic/Select';
-import { ContactMessagesAPI } from '../../../../api/contact-messages';
+import { Input, Textarea } from '@/components/ui/Form';
+import { Select } from '@/components/generic/Select';
+import { ContactMessagesAPI } from '@/api/contact-messages';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
@@ -281,10 +280,8 @@ export const Contact = () => {
                       required
                       rows={6}
                       placeholder="Please describe your inquiry in detail (minimum 10 characters)"
+                      helperText="Minimum 10 characters required"
                     />
-                    <p className="text-xs text-copy-light mt-1">
-                      Minimum 10 characters required
-                    </p>
                   </div>
                   <Button
                     type="submit"
@@ -321,6 +318,8 @@ export const Contact = () => {
                 </div>
                 <div className="flex">
                   <div className="mr-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <ClockIcon size={14} className="text-primary" />
                     </div>
                   </div>
                   <div>
@@ -338,7 +337,7 @@ export const Contact = () => {
             </div>
             {/* FAQ Link */}
             <div className="bg-primary/10 rounded-lg p-3">
-              <Heading level={3} className="text-sm font-bold text-copy mb-1">Have a Question?</h3>
+              <Heading level={3} className="text-sm font-bold text-copy mb-1">Have a Question?</Heading>
               <Body className="text-xs text-copy-light mb-2">
                 Check our frequently asked questions for quick answers to common inquiries.
               </Body>

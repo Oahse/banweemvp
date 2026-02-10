@@ -7,10 +7,12 @@ import {
   LoaderIcon,
   PlusIcon
 } from 'lucide-react';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { cn } from '../../../../utils/cn';
 import { formatCurrency } from '../../../../utils/orderCalculations';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
+import { Text, Label } from '@/components/ui/Text/Text';
+import { Input } from '@/components/ui/Form';
 
 interface AppliedDiscount {
   id: string;
@@ -150,7 +152,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h4 className={combineThemeClasses(themeClasses.text.primary, 'font-medium text-sm')}>
+        <h4 className={cn("text-gray-600", 'font-medium text-sm')}>
           Discounts {currentDiscounts.length > 0 && `(${currentDiscounts.length})`}
         </h4>
         {!showDiscountInput && !isLoading && (
@@ -158,7 +160,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
             onClick={() => setShowDiscountInput(true)}
             variant="ghost"
             size="sm"
-            className={combineThemeClasses(
+            className={cn(
               'text-[#61b482] hover:text-[#4c9066] text-sm flex items-center gap-1 px-2 py-1 rounded hover:bg-[#61b482]/10 transition-colors'
             )}
             leftIcon={<PlusIcon size={14} />}
@@ -174,48 +176,51 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
           {currentDiscounts.map((discount) => (
             <div
               key={discount.id}
-              className={combineThemeClasses(
+              className={cn(
                 themeClasses.card.base,
                 'p-3 flex items-center justify-between'
               )}
             >
               <div className="flex items-center gap-3">
-                <span className="text-lg" role="img" aria-label="discount">
+                <Text variant="body-lg" className="text-lg" role="img" aria-label="discount">
                   {getDiscountIcon(discount.type)}
-                </span>
+                </Text>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className={combineThemeClasses(
-                      themeClasses.text.primary,
+                    <Text variant="body-sm" className={cn(
+                      "text-gray-600",
                       'font-medium text-sm'
                     )}>
                       {discount.code.toUpperCase()}
-                    </span>
-                    <CheckIcon className={combineThemeClasses(
-                      themeClasses.text.success,
+                    </Text>
+                    <CheckIcon className={cn(
+                      "text-gray-600",
                       'w-4 h-4'
                     )} />
                   </div>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className={combineThemeClasses(
-                      themeClasses.text.secondary,
+                    <Text variant="body-sm" className={cn(
+                      "text-gray-600",
                       'text-xs'
                     )}>
                       {formatDiscountValue(discount)}
-                    </span>
-                    <span className={combineThemeClasses(
-                      themeClasses.text.muted,
+                    </Text>
+                    <Text variant="body-sm" className={cn(
+                      "text-gray-600",
                       'text-xs'
                     )}>
                       •
-                    </span>
-                    <span className={combineThemeClasses(
-                      themeClasses.text.success,
+                    </Text>
+                    <Text variant="body-sm" className={cn(
+                      "text-gray-600",
                       'text-xs font-medium'
                     )}>
                       Saving {formatCurrency(discount.discount_amount, currency)}
-                    </span>
+                    </Text>
                   </div>
+                  <Label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">
+                    Required for US cards, optional for international cards
+                  </Label>
                 </div>
               </div>
               
@@ -224,7 +229,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                 disabled={removingDiscountId === discount.id}
                 variant="ghost"
                 size="sm"
-                className={combineThemeClasses(
+                className={cn(
                   'text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
                 )}
                 leftIcon={<XIcon size={14} />}
@@ -234,36 +239,41 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
           ))}
         </div>
       ) : (
-        <div className={combineThemeClasses(
-          themeClasses.text.muted,
+        <Text variant="body-sm" className={cn(
+          "text-gray-600",
           'text-sm py-2'
         )}>
           No discounts applied
-        </div>
+        </Text>
       )}
 
       {/* Discount Input */}
       {showDiscountInput && (
-        <div className={combineThemeClasses(
+        <div className={cn(
           themeClasses.card.base,
           'p-4 space-y-3'
         )}>
           <div className="flex items-center gap-2">
-            <TagIcon className={combineThemeClasses(
-              themeClasses.text.muted,
+            <TagIcon className={cn(
+              "text-gray-600",
               'w-4 h-4'
             )} />
-            <span className={combineThemeClasses(
-              themeClasses.text.primary,
+            <Text variant="body-sm" className={cn(
+              "text-gray-600",
               'font-medium text-sm'
             )}>
-              Apply Discount Code
-            </span>
+              <Label className="block text-xs font-medium text-gray-500 dark:text-gray-400">
+                Discount Code
+              </Label>
+            </Text>
           </div>
 
           <div className="space-y-2">
+            <Label className="block text-sm font-medium mb-2">
+              Discount Code
+            </Label>
             <div className="flex items-center gap-2">
-              <input
+              <Input
                 type="text"
                 value={discountCode}
                 onChange={(e) => {
@@ -272,7 +282,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                 }}
                 onKeyPress={handleKeyPress}
                 placeholder="Enter discount code"
-                className={combineThemeClasses(
+                className={cn(
                   themeClasses.input.base,
                   validationError ? themeClasses.input.error : themeClasses.input.default,
                   'flex-1 text-sm uppercase'
@@ -285,8 +295,8 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                 disabled={isApplying || !discountCode.trim()}
                 variant="primary"
                 size="sm"
-                className={combineThemeClasses(
-                  getButtonClasses('primary', 'sm'),
+                className={cn(
+                  cn('primary', 'sm'),
                   'w-full'
                 )}
                 leftIcon={<CheckIcon size={14} />}
@@ -301,7 +311,7 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
                 }}
                 variant="ghost"
                 size="sm"
-                className={combineThemeClasses(
+                className={cn(
                   'text-gray-500 hover:text-gray-700 transition-colors'
                 )}
                 leftIcon={<XIcon size={14} />}
@@ -318,8 +328,8 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
             )}
 
             {/* Help Text */}
-            <div className={combineThemeClasses(
-              themeClasses.text.muted,
+            <div className={cn(
+              "text-gray-600",
               'text-xs'
             )}>
               Enter a valid discount code to apply savings to your subscription.
@@ -332,12 +342,12 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
       {/* Loading State */}
       {isLoading && (
         <div className="flex items-center justify-center py-4">
-          <LoaderIcon className={combineThemeClasses(
-            themeClasses.text.muted,
+          <LoaderIcon className={cn(
+            "text-gray-600",
             'w-5 h-5 animate-spin'
           )} />
-          <span className={combineThemeClasses(
-            themeClasses.text.secondary,
+          <span className={cn(
+            "text-gray-600",
             'ml-2 text-sm'
           )}>
             Loading discounts...
@@ -347,19 +357,19 @@ export const DiscountManager: React.FC<DiscountManagerProps> = ({
 
       {/* Total Savings Summary */}
       {currentDiscounts.length > 0 && (
-        <div className={combineThemeClasses(
+        <div className={cn(
           themeClasses.background.elevated,
           'rounded-lg p-3 border-l-4 border-green-500'
         )}>
           <div className="flex items-center justify-between">
-            <span className={combineThemeClasses(
-              themeClasses.text.primary,
+            <span className={cn(
+              "text-gray-600",
               'font-medium text-sm'
             )}>
               Total Savings
             </span>
-            <span className={combineThemeClasses(
-              themeClasses.text.success,
+            <span className={cn(
+              "text-gray-600",
               'font-bold text-sm'
             )}>
               {formatCurrency(

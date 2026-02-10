@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRightIcon } from 'lucide-react';
+import { Text } from '@/components/ui/Text/Text';
 
 
 
@@ -15,12 +16,10 @@ const Breadcrumbs = ({ items }) => {
             )}
             {item.link ? (
               <Link to={item.link} className="text-copy-lighter hover:text-primary">
-                {item.label}
+                <Text as="span">{item.label}</Text>
               </Link>
             ) : (
-              <span className="text-main">
-                {item.label}
-              </span>
+              <Text as="span" className="text-main">{item.label}</Text>
             )}
           </li>
         ))}

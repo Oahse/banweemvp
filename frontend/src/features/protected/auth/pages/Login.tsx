@@ -4,8 +4,7 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { Input } from '../../../../components/generic/Input';
-import { Checkbox } from '../../../../components/generic/Checkbox';
+import { Input, Checkbox } from '@/components/ui/Form';
 import SocialAuth from '../components/SocialAuth';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
@@ -221,47 +220,39 @@ export const Login = ({ isInitialLoading = false }) => {
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
             required
+            prefix={<Eye size={18} />}
           />
-          {/* Password Input and Forgot Password Link */}
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <Label htmlFor="password" className="block text-sm font-medium text-main">
-                Password
-              </Label>
+          {/* Password Input */}
+          <Input
+            label="Password"
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            required
+            suffix={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="cursor-pointer hover:text-primary transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
+            helperText={
               <Link to="/forgot-password" className="text-xs text-primary hover:underline">
                 Forgot password?
               </Link>
-            </div>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-                className="pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </Button>
-            </div>
-          </div>
+            }
+          />
           {/* Remember Me Checkbox */}
           <Checkbox
             label="Remember me"
             id="remember"
             checked={rememberMe}
-            onChange={() => setRememberMe(!rememberMe)}
-            error={null}
-            className=""
+            onChange={(e) => setRememberMe(e.target.checked)}
           />
           {/* Submit Button */}
           <Button

@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
-import { Input } from '@/components/generic/Input';
+import { Input } from '@/components/ui/Form';
 import { toast } from 'react-hot-toast';
 import { extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Body } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -93,56 +93,42 @@ export const ResetPassword = () => {
           Enter your new password below.
         </Body>
         <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
-          <div>
-            <Label htmlFor="password" className="block text-xs font-medium text-main mb-1">
-              New Password
-            </Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                required
-                className="pr-10"
-              />
-              <Button
+          <Input
+            label="New Password"
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            suffix={
+              <button
                 type="button"
-                variant="ghost"
-                size="icon"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="p-1 hover:bg-surface-elevated rounded transition-colors"
               >
-                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-              </Button>
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="confirmPassword" className="block text-xs font-medium text-main mb-1">
-              Confirm New Password
-            </Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
-                required
-                className="pr-10"
-              />
-              <Button
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            }
+          />
+          <Input
+            label="Confirm New Password"
+            id="confirmPassword"
+            type={showConfirmPassword ? 'text' : 'password'}
+            placeholder="••••••••"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            suffix={
+              <button
                 type="button"
-                variant="ghost"
-                size="icon"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="p-1 hover:bg-surface-elevated rounded transition-colors"
               >
-                {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-              </Button>
-            </div>
-          </div>
+                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            }
+          />
           <Button
             type="submit"
             variant="primary"

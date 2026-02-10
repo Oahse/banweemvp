@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { MessageCircle, X, Mail, HelpCircle, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { Text, Heading, Body, Caption } from '@/components/ui/Text/Text';
+import { Text, Heading, Caption } from '@/components/ui/Text/Text';
 
 const SupportFloat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +23,7 @@ const SupportFloat: React.FC = () => {
         onClick={toggleWidget}
         variant="primary"
         size="sm"
-        className="fixed bottom-16 right-6 z-50 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 px-4 py-3 group font-sans"
+        className="fixed bottom-24 right-6 z-50 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 px-4 py-3 group font-sans"
         aria-label="Open support widget"
       >
         {isOpen ? (
@@ -38,7 +38,7 @@ const SupportFloat: React.FC = () => {
 
       {/* Support Widget */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 bg-surface rounded-lg shadow-2xl border border-border overflow-hidden animate-slideUp font-sans">
+        <div className="fixed bottom-36 right-6 z-50 w-80 bg-surface rounded-lg shadow-2xl border border-border overflow-hidden animate-slideUp font-sans">
           {/* Header */}
           <div className="bg-primary text-white p-3">
             <Heading level={3} className="text-sm font-bold flex items-center gap-2">

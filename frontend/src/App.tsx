@@ -24,7 +24,7 @@ import {
   AdminDashboardSkeleton, 
   AdminTableSkeleton 
 } from '@/components/ui/SkeletonLoader';
-import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import SupportFloat from '@/components/layout/SupportFloat';
 import './animations.css';
 
@@ -132,7 +132,7 @@ export const App: React.FC = () => {
                     <WishlistProvider>
                       <Elements stripe={stripePromise}>
                         <SupportFloat />
-                        <Suspense fallback={<LoadingSpinner size="lg" text="Loading page..." fullScreen />}> 
+                        <Suspense fallback={<AnimatedLoader size="lg" variant="spinner" color="primary" text="Loading page..." className="fixed inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 z-50" />}> 
                           <Routes>
                         <Route path="/" element={<Layout><Home /></Layout>} />
                         <Route path="/products" element={<Layout><Suspense fallback={<ProductListSkeleton />}><Products /></Suspense></Layout>} />

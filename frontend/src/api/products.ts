@@ -79,7 +79,7 @@ export class ProductsAPI {
    * Get all home page data in one request
    * ACCESS: Public - No authentication required
    */
-  static async getHomeData() {
+  static async getHomeData(): Promise<{ data: HomeDataResponse }> {
     return await apiClient.get('/products/home');
   }
 
@@ -282,6 +282,14 @@ export class ProductsAPI {
     const url = `/suppliers/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await apiClient.get(url);
   }
+}
+
+// Define the type for the home data response
+export interface HomeDataResponse {
+  categories: Array<{ id: string; name: string; image_url?: string }>;
+  featured: Array<{ id: string; name: string; price: number }>;
+  popular: Array<{ id: string; name: string; price: number }>;
+  deals: Array<{ id: string; name: string; price: number }>;
 }
 
 export default ProductsAPI;

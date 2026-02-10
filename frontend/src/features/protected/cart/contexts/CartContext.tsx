@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useCallback, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { TokenManager } from '../../../../api/client';
-import { CartAPI } from '../../../../api/cart';
-import { Cart, AddToCartRequest } from '../../../../types';
+import { TokenManager } from '@/api/client';
+import { CartAPI } from '@/api/cart';
+import { Cart, AddToCartRequest } from '@/types';
 import { toast } from 'react-hot-toast';
-import { handleCartSyncError, validateCartItem } from '../../../../utils/cartSync';
+import { handleCartSyncError, validateCartItem } from '@/utils/cartSync';
 
 interface CartContextType {
   cart: Cart | null;

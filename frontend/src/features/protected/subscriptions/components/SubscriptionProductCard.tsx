@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MinusIcon, PlusIcon, PackageIcon } from 'lucide-react';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
-import { formatPriceWithFallback, getBestPrice } from '../../utils/price-utils';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
+import { formatPriceWithFallback } from '../../utils/price-utils';
 import { Button } from '@/components/ui/Button';
-import { Text, Heading } from '@/components/ui/Text';
+import { Text, Heading } from '@/components/ui/Text/Text';
+import { Card } from '@/components/ui/Card';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 
 interface SubscriptionProductCardProps {
@@ -79,17 +80,13 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
 
   if (viewMode === 'list') {
     return (
-      <div className={combineThemeClasses(
-        themeClasses.card.base,
-        'p-4 flex items-center space-x-4 hover:shadow-md transition-shadow duration-200'
-      )}>
-        {/* Product Image */}
-        <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 relative">
+      <Card hoverable orientation="horizontal">
+        <Card.Media placement="left" aspectRatio="square" className="w-16 h-16 sm:w-20 sm:h-20">
           {imageUrl ? (
-            <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-100">
+            <>
               {!imageLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className={combineThemeClasses(themeClasses.loading.spinner, 'w-6 h-6')}></div>
+                  <AnimatedLoader size="sm" variant="spinner" />
                 </div>
               )}
               <img
@@ -102,58 +99,48 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                 onLoad={handleImageLoad}
                 loading="lazy"
               />
-            </div>
+            </>
           ) : (
-            <div className={combineThemeClasses(
-              themeClasses.background.elevated,
-              'w-full h-full rounded-lg flex items-center justify-center border-2 border-dashed',
-              themeClasses.border.light
-            )}>
-              <PackageIcon className={combineThemeClasses(themeClasses.text.muted, 'w-6 h-6')} />
+            <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border-light dark:border-border-dark">
+              <PackageIcon className="w-6 h-6 text-copy-light dark:text-copy-light-dark" />
             </div>
           )}
-        </div>
+        </Card.Media>
 
-        {/* Product Info */}
-        <div className="flex-1 min-w-0">
+        <Card.Body>
           <Link
             to={`/products/${productId}`}
-            className={combineThemeClasses(
-              themeClasses.text.heading,
-              'font-medium hover:text-primary transition-colors duration-200 block truncate'
-            )}
+            className="text-copy dark:text-copy-dark font-medium hover:text-primary dark:hover:text-primary-dark transition-colors duration-200 block truncate"
           >
             <Heading level={3} className="truncate">{productName}</Heading>
           </Link>
           {product.variant_name && (
-            <Text as="p" className={combineThemeClasses(themeClasses.text.secondary, 'text-sm mt-1')}>
+            <Text variant="body-sm" tone="secondary" className="mt-1">
               Variant: {product.variant_name}
             </Text>
           )}
           {product.sku && (
-            <Text as="p" className={combineThemeClasses(themeClasses.text.muted, 'text-xs mt-1')}>
+            <Text variant="caption" tone="secondary" className="mt-1">
               SKU: {product.sku}
             </Text>
           )}
           <div className="flex items-center mt-2 space-x-4">
-            <Text as="span" className={combineThemeClasses(themeClasses.text.heading, 'font-semibold')}>
+            <Text variant="body-md" weight="semibold">
               {formatPriceWithFallback(product, product.currency, formatCurrency, 'Price not set')}
             </Text>
             {product.stock !== undefined && (
-              <Text as="span" className={combineThemeClasses(
-                themeClasses.text.muted,
-                'text-xs',
-                product.stock < 10 ? 'text-orange-600' : ''
-              )}>
+              <Text 
+                variant="caption" 
+                className={product.stock < 10 ? 'text-warning dark:text-warning-dark' : ''}
+              >
                 Stock: {product.stock}
               </Text>
             )}
           </div>
-        </div>
+        </Card.Body>
 
-        {/* Quantity & Actions */}
         {showActions && (
-          <div className="flex items-center space-x-3">
+          <Card.Actions>
             {onQuantityChange && (
               <div className="flex items-center space-x-2">
                 <Button
@@ -161,29 +148,16 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                   disabled={quantity <= 1}
                   variant="outline"
                   size="sm"
-                  className={combineThemeClasses(
-                    'p-1 rounded-md border transition-colors duration-200',
-                    themeClasses.border.light,
-                    themeClasses.text.muted,
-                    'hover:bg-gray-100 dark:hover:bg-gray-800',
-                    'disabled:opacity-50 disabled:cursor-not-allowed'
-                  )}
                 >
                   <MinusIcon className="w-3 h-3" />
                 </Button>
-                <Text as="span" className={combineThemeClasses(themeClasses.text.primary, 'min-w-[2rem] text-center')}>
+                <Text variant="body-sm" className="min-w-[2rem] text-center">
                   {quantity}
                 </Text>
                 <Button
                   onClick={() => handleQuantityChange(quantity + 1)}
                   variant="outline"
                   size="sm"
-                  className={combineThemeClasses(
-                    'p-1 rounded-md border transition-colors duration-200',
-                    themeClasses.border.light,
-                    themeClasses.text.muted,
-                    'hover:bg-gray-100 dark:hover:bg-gray-800'
-                  )}
                 >
                   <PlusIcon className="w-3 h-3" />
                 </Button>
@@ -196,34 +170,25 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                 disabled={isRemoving}
                 variant="danger"
                 size="sm"
-                className={combineThemeClasses(
-                  getButtonClasses('outline'),
-                  'text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300',
-                  'disabled:opacity-50 disabled:cursor-not-allowed text-sm px-3 py-1'
-                )}
               >
                 {isRemoving ? 'Removing...' : 'Remove'}
               </Button>
             )}
-          </div>
+          </Card.Actions>
         )}
-      </div>
+      </Card>
     );
   }
 
   // Grid view
   return (
-    <div className={combineThemeClasses(
-      themeClasses.card.base,
-      'group relative overflow-hidden hover:shadow-lg transition-all duration-300'
-    )}>
-      {/* Product Image */}
-      <div className="relative aspect-square overflow-hidden bg-gray-100">
+    <Card hoverable as="article">
+      <Card.Media aspectRatio="square">
         {imageUrl ? (
           <>
             {!imageLoaded && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className={combineThemeClasses(themeClasses.loading.spinner, 'w-8 h-8')}></div>
+                <AnimatedLoader size="md" variant="spinner" />
               </div>
             )}
             <img
@@ -238,10 +203,10 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
             />
           </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-300">
+          <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-border-light dark:border-border-dark">
             <div className="text-center">
-              <PackageIcon className={combineThemeClasses(themeClasses.text.muted, 'w-12 h-12 mx-auto mb-2')} />
-              <p className={combineThemeClasses(themeClasses.text.muted, 'text-sm')}>No Image</p>
+              <PackageIcon className="w-12 h-12 mx-auto mb-2 text-copy-light dark:text-copy-light-dark" />
+              <Text variant="body-sm" tone="secondary">No Image</Text>
             </div>
           </div>
         )}
@@ -253,11 +218,7 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
             disabled={isRemoving}
             variant="danger"
             size="sm"
-            className={combineThemeClasses(
-              'absolute top-2 right-2 p-1.5 rounded-full transition-colors duration-200',
-              'bg-red-600 text-white hover:bg-red-700',
-              'disabled:opacity-50 disabled:cursor-not-allowed'
-            )}
+            className="absolute top-2 right-2 p-1.5 rounded-full"
           >
             <MinusIcon className="w-3 h-3" />
           </Button>
@@ -265,40 +226,36 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
 
         {/* Stock Badge */}
         {product.stock !== undefined && product.stock < 10 && (
-          <div className="absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+          <div className="absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark">
             {product.stock === 0 ? 'Out of Stock' : `${product.stock} left`}
           </div>
         )}
-      </div>
+      </Card.Media>
 
-      {/* Product Info */}
-      <div className="p-4">
+      <Card.Body>
         <Link
           to={`/products/${productId}`}
-          className={combineThemeClasses(
-            themeClasses.text.heading,
-            'font-medium hover:text-primary transition-colors duration-200 block mb-2 line-clamp-2'
-          )}
+          className="text-copy dark:text-copy-dark font-medium hover:text-primary dark:hover:text-primary-dark transition-colors duration-200 block mb-2 line-clamp-2"
         >
-          {productName}
+          <Heading level={3} className="line-clamp-2 mb-2">{productName}</Heading>
         </Link>
 
         {product.variant_name && (
-          <p className={combineThemeClasses(themeClasses.text.secondary, 'text-sm mb-2')}>
+          <Text variant="body-sm" tone="secondary" className="mb-2">
             {product.variant_name}
-          </p>
+          </Text>
         )}
 
         {product.sku && (
-          <p className={combineThemeClasses(themeClasses.text.muted, 'text-xs mb-3')}>
+          <Text variant="caption" tone="secondary" className="mb-3">
             SKU: {product.sku}
-          </p>
+          </Text>
         )}
 
         <div className="flex items-center justify-between">
-          <span className={combineThemeClasses(themeClasses.text.heading, 'font-bold text-lg')}>
+          <Text variant="body-lg" weight="bold">
             {formatPriceWithFallback(product, product.currency, formatCurrency, 'Price not set')}
-          </span>
+          </Text>
           
           {showActions && onQuantityChange && (
             <div className="flex items-center space-x-2">
@@ -307,29 +264,16 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                 disabled={quantity <= 1}
                 variant="outline"
                 size="sm"
-                className={combineThemeClasses(
-                  'p-1 rounded-md border transition-colors duration-200',
-                  themeClasses.border.light,
-                  themeClasses.text.muted,
-                  'hover:bg-gray-100 dark:hover:bg-gray-800',
-                  'disabled:opacity-50 disabled:cursor-not-allowed'
-                )}
               >
                 <MinusIcon className="w-3 h-3" />
               </Button>
-              <span className={combineThemeClasses(themeClasses.text.primary, 'min-w-[1.5rem] text-center text-sm')}>
+              <Text variant="body-sm" className="min-w-[1.5rem] text-center">
                 {quantity}
-              </span>
+              </Text>
               <Button
                 onClick={() => handleQuantityChange(quantity + 1)}
                 variant="outline"
                 size="sm"
-                className={combineThemeClasses(
-                  'p-1 rounded-md border transition-colors duration-200',
-                  themeClasses.border.light,
-                  themeClasses.text.muted,
-                  'hover:bg-gray-100 dark:hover:bg-gray-800'
-                )}
               >
                 <PlusIcon className="w-3 h-3" />
               </Button>
@@ -338,11 +282,11 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
         </div>
 
         {product.quantity && product.quantity > 1 && (
-          <p className={combineThemeClasses(themeClasses.text.muted, 'text-xs mt-2')}>
+          <Text variant="caption" tone="secondary" className="mt-2">
             Quantity: {product.quantity}
-          </p>
+          </Text>
         )}
-      </div>
-    </div>
+      </Card.Body>
+    </Card>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import AdminLayout from '../components/AdminLayout';
+import AdminLayout from '../../../../components/layout/AdminLayout';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { InventoryAdjustmentsSkeleton } from '../components/skeletons/InventorySkeleton';
 import { Loader, AlertCircle, Plus, Filter, ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
@@ -8,6 +8,8 @@ import Dropdown from '@/components/ui/Dropdown';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { Button } from '@/components/ui/Button';
+import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { Card } from '@/components/ui/Card';
 
 const LIMIT = 20;
 
@@ -58,39 +60,92 @@ export const AdminInventoryAdjustments = () => {
     total: 0, 
     pages: 0 
   });
-  const [filters, setFilters] = useState({
+  const [localFilters, setLocalFilters] = useState({
     adjustment_type: '',
     date_from: '',
     date_to: '',
     search: ''
   });
 
-  useEffect(() => {
-    const fetchAdjustments = async () => {
-      try {
-        setLoading(true);
-        if (page === 1 && !filters.adjustment_type && !filters.search) {
-          setInitialLoading(true);
-        }
-        setError(null);
-        const response = await AdminAPI.getAllStockAdjustments();
-        const data = response?.data || response;
-        setAdjustments(Array.isArray(data) ? data : []);
-      } catch (err: any) {
-        const message = err?.response?.data?.message || 'Failed to load inventory adjustments';
-        setError(message);
-        toast.error(message);
-      } finally {
-        setLoading(false);
-        setInitialLoading(false);
+  const fetchData = async (params: any) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await AdminAPI.getAllStockAdjustments();
+      const allAdjustments = response?.data || [];
+      let filteredAdjustments = allAdjustments;
+      
+      if (params.search) {
+        filteredAdjustments = filteredAdjustments.filter((adjustment: any) =>
+          adjustment.reason?.toLowerCase().includes(params.search.toLowerCase()) ||
+          adjustment.product_variant?.name?.toLowerCase().includes(params.search.toLowerCase()) ||
+          adjustment.product_variant?.sku?.toLowerCase().includes(params.search.toLowerCase()) ||
+          adjustment.warehouse_location?.name?.toLowerCase().includes(params.search.toLowerCase())
+        );
       }
-    };
-
-    fetchAdjustments();
-  }, [page, filters]);
+      
+      if (params.filters?.adjustment_type) {
+        filteredAdjustments = filteredAdjustments.filter((adjustment: any) => adjustment.adjustment_type === params.filters.adjustment_type);
+      }
+      
+      if (params.filters?.date_from) {
+        filteredAdjustments = filteredAdjustments.filter((adjustment: any) => {
+          const adjDate = new Date(adjustment.created_at || 0);
+          const fromDate = new Date(params.filters.date_from);
+          return adjDate >= fromDate;
+        });
+      }
+      
+      if (params.filters?.date_to) {
+        filteredAdjustments = filteredAdjustments.filter((adjustment: any) => {
+          const adjDate = new Date(adjustment.created_at || 0);
+          const toDate = new Date(params.filters.date_to);
+          return adjDate <= toDate;
+        });
+      }
+      
+      if (params.sort_by === 'created_at') {
+        filteredAdjustments.sort((a: any, b: any) => {
+          const aDate = new Date(a.created_at || 0);
+          const bDate = new Date(b.created_at || 0);
+          return params.sort_order === 'asc' 
+            ? aDate.getTime() - bDate.getTime()
+            : bDate.getTime() - aDate.getTime();
+        });
+      } else if (params.sort_by === 'quantity') {
+        filteredAdjustments.sort((a: any, b: any) => {
+          return params.sort_order === 'asc' 
+            ? a.quantity - b.quantity
+            : b.quantity - a.quantity;
+        });
+      }
+      
+      const total = filteredAdjustments.length;
+      const pages = Math.max(1, Math.ceil(total / params.limit));
+      const startIndex = (params.page - 1) * params.limit;
+      const endIndex = startIndex + params.limit;
+      const paginatedAdjustments = filteredAdjustments.slice(startIndex, endIndex);
+      
+      setAdjustments(paginatedAdjustments);
+      setPagination({
+        page: params.page,
+        limit: params.limit,
+        total: total,
+        pages: pages
+      });
+    } catch (err: any) {
+      const message = err?.response?.data?.message || 'Failed to load inventory adjustments';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+      setInitialLoading(false);
+    }
+  };
 
   const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setLocalFilters(prev => ({ ...prev, [key]: value }));
     setPage(1); // Reset to first page when filters change
   };
 
@@ -126,6 +181,90 @@ export const AdminInventoryAdjustments = () => {
     );
   };
 
+  // Define columns for AdminDataTable
+  const columns: AdminColumn<any>[] = [
+    {
+      key: 'created_at',
+      label: 'Date',
+      sortable: true,
+      render: (value: string) => (
+        <span className="text-sm text-gray-900 dark:text-white">
+          {new Date(value).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      key: 'product_variant',
+      label: 'Product',
+      render: (value: any, row: any) => (
+        <div>
+          <span className="text-sm text-gray-900 dark:text-white">{value?.name || 'N/A'}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{value?.sku || 'N/A'}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'adjustment_type',
+      label: 'Type',
+      render: (value: string) => adjustmentTypeBadge(value),
+    },
+    {
+      key: 'quantity',
+      label: 'Quantity',
+      sortable: true,
+      render: (value: number, row: any) => quantityBadge(row.adjustment_type, value),
+    },
+    {
+      key: 'reason',
+      label: 'Reason',
+      render: (value: string) => (
+        <span className="text-sm text-gray-900 dark:text-white truncate">{value || 'N/A'}</span>
+      ),
+    },
+    {
+      key: 'warehouse_location',
+      label: 'Location',
+      render: (value: any) => (
+        <span className="text-sm text-gray-900 dark:text-white truncate">{value?.name || 'N/A'}</span>
+      ),
+    },
+    {
+      key: 'adjusted_by_user',
+      label: 'Adjusted By',
+      render: (value: any, row: any) => (
+        <div>
+          <span className="text-sm text-gray-900 dark:text-white truncate">{value?.name || row.adjusted_by || 'N/A'}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{value?.email || 'N/A'}</span>
+        </div>
+      ),
+    },
+  ];
+
+  const tableFilters: FilterConfig[] = [
+    {
+      key: 'adjustment_type',
+      label: 'Adjustment Type',
+      type: 'select',
+      options: [
+        { value: '', label: 'All Types' },
+        { value: 'increase', label: 'Increase' },
+        { value: 'decrease', label: 'Decrease' },
+        { value: 'transfer', label: 'Transfer' }
+      ],
+      placeholder: 'All Types',
+    },
+  ];
+
+  useEffect(() => {
+    fetchData({
+      page: 1,
+      limit: LIMIT,
+      search: '',
+      sort_by: 'created_at',
+      sort_order: 'desc'
+    });
+  }, []);
+
   if (initialLoading) {
     return <AdminLayoutSkeleton />;
   }
@@ -138,204 +277,37 @@ export const AdminInventoryAdjustments = () => {
             <h1 className="text-xl lg:text-2xl font-semibold">Inventory Adjustments</h1>
             <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Track all inventory changes and adjustments</p>
           </div>
-          <Button
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
-            leftIcon={<Plus className="w-4 h-4" />}
-          >
-            New Adjustment
-          </Button>
-        </div>
-
-        {/* Filters */}
-        <div className={`rounded-lg border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className={`w-4 h-4 ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-            <h2 className="text-base font-semibold">Filters</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label className={`block text-xs font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Adjustment Type</label>
-              <Dropdown
-                options={[
-                  { value: '', label: 'All Types' },
-                  { value: 'increase', label: 'Increase' },
-                  { value: 'decrease', label: 'Decrease' },
-                  { value: 'transfer', label: 'Transfer' }
-                ]}
-                value={filters.adjustment_type}
-                onChange={(value) => handleFilterChange('adjustment_type', value)}
-                placeholder="All Types"
-                className="w-full"
-              />
-            </div>
-            <div>
-              <label className={`block text-xs font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Date From</label>
-              <input
-                type="date"
-                value={filters.date_from}
-                onChange={(e) => handleFilterChange('date_from', e.target.value)}
-                className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors ${
-                  currentTheme === 'dark' 
-                    ? 'bg-gray-700 border-gray-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-              />
-            </div>
-            <div>
-              <label className={`block text-xs font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Date To</label>
-              <input
-                type="date"
-                value={filters.date_to}
-                onChange={(e) => handleFilterChange('date_to', e.target.value)}
-                className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors ${
-                  currentTheme === 'dark' 
-                    ? 'bg-gray-700 border-gray-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-              />
-            </div>
-            <div>
-              <label className={`block text-xs font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Search</label>
-              <input
-                type="text"
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                placeholder="Search adjustments..."
-                className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors ${
-                  currentTheme === 'dark' 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }`}
-              />
-            </div>
+          <div className="flex gap-2 w-full lg:w-auto">
+            <Button
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+              leftIcon={<Plus className="w-4 h-4" />}
+            >
+              New Adjustment
+            </Button>
           </div>
         </div>
 
-        {error && (
-          <div className={`p-4 rounded-lg border flex items-start gap-3 ${
-            currentTheme === 'dark' 
-              ? 'bg-error/10 border-error/30 text-error' 
-              : 'bg-error/10 border-error/30 text-error'
-          }`}>
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold">Error</p>
-              <p className="text-sm">{error}</p>
-            </div>
-          </div>
-        )}
-
-        <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          {loading && !initialLoading ? (
-            <div className="p-8">
-              <div className="flex items-center justify-center">
-                <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
-                <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading adjustments...</span>
-              </div>
-            </div>
-          ) : adjustments.length > 0 ? (
-            <>
-              {/* Desktop table */}
-              <div className="overflow-x-auto hidden md:block">
-                <table className="w-full">
-                  <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200 dark:border-gray-600`}>
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold">Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold">Product</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold">Type</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold">Quantity</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold">Reason</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold">Location</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold">Adjusted By</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {adjustments.map((adjustment) => (
-                      <tr key={adjustment.id} className={`border-b border-gray-200 dark:border-gray-700 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
-                        <td className="px-4 py-3 text-xs">
-                          {new Date(adjustment.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3 text-xs max-w-[150px]">
-                          <div className="truncate">{adjustment.product_variant?.name || 'N/A'}</div>
-                          <div className={`text-xs truncate ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {adjustment.product_variant?.sku || 'N/A'}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-xs">
-                          {adjustmentTypeBadge(adjustment.adjustment_type)}
-                        </td>
-                        <td className="px-4 py-3 text-xs">
-                          {quantityBadge(adjustment.adjustment_type, adjustment.quantity)}
-                        </td>
-                        <td className="px-4 py-3 text-xs max-w-[120px] truncate">
-                          {adjustment.reason}
-                        </td>
-                        <td className="px-4 py-3 text-xs max-w-[100px] truncate">
-                          {adjustment.warehouse_location?.name || 'N/A'}
-                        </td>
-                        <td className="px-4 py-3 text-xs max-w-[120px] truncate">
-                          {adjustment.adjusted_by_user?.name || adjustment.adjusted_by}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile cards */}
-              <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
-                {adjustments.map((adjustment) => (
-                  <div key={adjustment.id} className={`p-4 flex flex-col gap-2 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{adjustment.product_variant?.name || 'N/A'}</p>
-                        <p className={`text-xs truncate ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {adjustment.product_variant?.sku || 'N/A'}
-                        </p>
-                      </div>
-                      {adjustmentTypeBadge(adjustment.adjustment_type)}
-                    </div>
-                    <div className="space-y-1 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className={currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>Quantity:</span>
-                        <span>{quantityBadge(adjustment.adjustment_type, adjustment.quantity)}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className={currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>Reason:</span>
-                        <span className="truncate ml-2 flex-1 text-right">{adjustment.reason}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className={currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>Location:</span>
-                        <span className="truncate ml-2 flex-1 text-right">{adjustment.warehouse_location?.name || 'N/A'}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className={currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>Date:</span>
-                        <span>{new Date(adjustment.created_at).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className={currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>By:</span>
-                        <span className="truncate ml-2 flex-1 text-right">{adjustment.adjusted_by_user?.name || adjustment.adjusted_by}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Pagination */}
-                </div>
-              ))}
-                <TrendingUp className={`w-12 h-12 ${currentTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
-                <p className="text-sm">No inventory adjustments found</p>
-                <Button
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
-                  leftIcon={<Plus className="w-4 h-4" />}
-                >
-                  Create First Adjustment
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+        <AdminDataTable
+          data={adjustments}
+          loading={loading}
+          error={error}
+          pagination={pagination}
+          columns={columns}
+          fetchData={fetchData}
+          searchPlaceholder="Search adjustments..."
+          filters={tableFilters}
+          actions={
+            <Button
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+              leftIcon={<Plus className="w-4 h-4" />}
+            >
+              New Adjustment
+            </Button>
+          }
+          emptyMessage="No inventory adjustments found"
+          responsive="cards"
+          limit={LIMIT}
+        />
       </div>
     </AdminLayout>
   );

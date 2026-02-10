@@ -320,32 +320,32 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex space-x-2">
-        <Button
-          onClick={handleDownload}
-          disabled={isDownloading}
-          variant="primary"
-          size="sm"
-          className="flex-1 flex items-center justify-center space-x-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          leftIcon={<DownloadIcon size={16} />}
-          isLoading={isDownloading}
-        >
-          {isDownloading ? 'Downloading...' : 'Download'}
-        </Button>
-        <Button
-          onClick={handleShare}
-          disabled={isSharing}
-          variant="outline"
-          size="sm"
-          className="flex-1 flex items-center justify-center space-x-2 bg-surface-hover text-copy px-4 py-2 rounded-md hover:bg-surface-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          leftIcon={<ShareIcon size={16} />}
-          isLoading={isSharing}
-        >
-          {isSharing ? 'Sharing...' : 'Share'}
-        </Button>
-      </div>
+        <div className="flex space-x-2">
+          <Button
+            onClick={handleDownload}
+            disabled={isDownloading}
+            variant="primary"
+            size="sm"
+            className="flex-1 flex items-center justify-center space-x-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            leftIcon={<DownloadIcon size={16} />}
+            isLoading={isDownloading}
+          >
+            {isDownloading ? 'Downloading...' : 'Download'}
+          </Button>
+          <Button
+            onClick={handleShare}
+            disabled={isSharing}
+            variant="outline"
+            size="sm"
+            className="flex-1 flex items-center justify-center space-x-2 bg-surface-hover text-copy px-4 py-2 rounded-md hover:bg-surface-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            leftIcon={<ShareIcon size={16} />}
+            isLoading={isSharing}
+          >
+            {isSharing ? 'Sharing...' : 'Share'}
+          </Button>
+        </div>
+      </motion.div>
       <NotificationModal
         isOpen={showNotification}
         onClose={() => setShowNotification(false)}

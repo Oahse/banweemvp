@@ -8,9 +8,10 @@ import { ProductCard } from '@/components/generic/ProductCard';
 import { SkeletonProductCard } from '@/components/ui/SkeletonProductCard';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { themeClasses, combineThemeClasses, getInputClasses, getButtonClasses } from '../../../utils/themeClasses';
-import { cn } from '../../../utils/utils';
+import { cn } from '../../../utils/cn';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Pagination } from '@/components/ui/Pagination';
 
 // Animation variants
 const containerVariants = {
@@ -420,62 +421,14 @@ const Products = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              variant="outline"
-              size="sm"
-              className={cn(
-                'px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                currentPage === 1
-                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                  : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              )}
-            >
-              Previous
-            </Button>
-            
-            <div className="flex items-center gap-1 sm:gap-2">
-              {/* Show page numbers */}
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-                if (pageNum > totalPages) return null;
-                
-                return (
-                  <Button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    variant={currentPage === pageNum ? "primary" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      'px-3 py-2 rounded-lg text-sm font-medium transition-colors min-w-[40px]',
-                      currentPage === pageNum
-                        ? 'bg-primary text-white'
-                        : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                    )}
-                  >
-                    {pageNum}
-                  </Button>
-                );
-              })}
-            </div>
-            
-            <Button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              variant="outline"
-              size="sm"
-              className={cn(
-                'px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                currentPage === totalPages
-                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                  : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              )}
-            >
-              Next
-            </Button>
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={productsData?.pagination?.total || 0}
+            pageSize={productsData?.pagination?.limit || 12}
+            onPageChange={setCurrentPage}
+            loading={loading}
+            size="md"
+          />
         </motion.div>
       )}
 

@@ -1,6 +1,7 @@
 import asyncio
 import os
 import subprocess
+import logging
 from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -209,8 +210,13 @@ async def lifespan(app: FastAPI):
 
     # Initialize the database engine and session factory with optimization
     from core.config import settings
-    optimized_engine = DatabaseOptimizer.get_optimized_engine()
-    initialize_db(settings.SQLALCHEMY_DATABASE_URI, settings.ENVIRONMENT == "local", engine=optimized_engine)
+    try:
+        optimized_engine = DatabaseOptimizer.get_optimized_engine()
+        initialize_db(settings.SQLALCHEMY_DATABASE_URI, settings.ENVIRONMENT == "local", engine=optimized_engine)
+        logger.info("Database initialized successfully ✅")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+        raise RuntimeError(f"Database initialization required: {e}")
 
     # Initialize Redis if enabled
     if settings.ENABLE_REDIS:
@@ -239,22 +245,44 @@ async def lifespan(app: FastAPI):
             if settings.ENVIRONMENT != "local":
                 raise RuntimeError("ARQ connection required for background tasks")
 
+    # Run database maintenance and optimization first
+    try:
+        from core.db import db_manager
+        if getattr(db_manager, 'session_factory', None) is not None:
+            async with db_manager.session_factory() as db:
+                await DatabaseOptimizer.run_maintenance(db)
+        else:
+            logger.warning("Database session not available, skipping maintenance")
+    except Exception as e:
+        logger.warning(f"Database optimization warning: {e}")
+
     # Start background task managers
     global discount_task_manager, payment_retry_task_manager, subscription_task_manager
     discount_task_manager = DiscountExpirationTaskManager()
     payment_retry_task_manager = PaymentRetryTaskManager()
     subscription_task_manager = SubscriptionTaskManager()
 
-    asyncio.create_task(discount_task_manager.start_expiration_monitor())
-    asyncio.create_task(payment_retry_task_manager.start_retry_scheduler())
-    asyncio.create_task(subscription_task_manager.start_subscription_scheduler())
-
-    # Run database maintenance and optimization
-    try:
-        async with AsyncSessionDB() as db:
-            await DatabaseOptimizer.run_maintenance(db)
-    except Exception as e:
-        logger.warning(f"Database optimization warning: {e}")
+    # Start non-ARQ dependent tasks
+    from core.db import db_manager
+    if getattr(db_manager, 'session_factory', None) is not None:
+        asyncio.create_task(discount_task_manager.start_expiration_monitor())
+    else:
+        logger.warning("Database not available, skipping discount expiration monitor")
+    
+    # Only start ARQ-dependent tasks if ARQ is available
+    if settings.ENABLE_ARQ and getattr(db_manager, 'session_factory', None) is not None:
+        try:
+            asyncio.create_task(payment_retry_task_manager.start_retry_scheduler())
+            asyncio.create_task(subscription_task_manager.start_subscription_scheduler())
+            logger.info("ARQ-dependent schedulers started")
+        except Exception as e:
+            logger.error(f"Failed to start ARQ-dependent schedulers: {e}")
+            logger.warning("Continuing without ARQ background tasks")
+    else:
+        if not settings.ENABLE_ARQ:
+            logger.info("ARQ is disabled, skipping ARQ-dependent schedulers")
+        else:
+            logger.warning("Database not available, skipping ARQ-dependent schedulers")
 
     # Start notification cleanup task
     asyncio.create_task(run_notification_cleanup())

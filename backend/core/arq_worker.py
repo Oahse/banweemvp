@@ -16,15 +16,53 @@ logger = logging.getLogger(__name__)
 # ARQ Redis settings
 ARQ_REDIS_SETTINGS = RedisSettings.from_dsn(settings.ARQ_REDIS_URL)
 
+
+def _get_session_factory(ctx: Dict[str, Any]):
+    """Resolve the current DB session factory from context or core.db manager."""
+    factory = ctx.get('db_session')
+    if factory:
+        return factory
+
+    try:
+        import core.db as core_db
+        if getattr(core_db, 'AsyncSessionDB', None):
+            return core_db.AsyncSessionDB
+        if getattr(core_db, 'db_manager', None) and getattr(core_db.db_manager, 'session_factory', None):
+            return core_db.db_manager.session_factory
+    except Exception:
+        pass
+
+    return None
+
 async def startup(ctx: Dict[str, Any]) -> None:
     """Worker startup - initialize database connection"""
     logger.info("ARQ Worker starting up...")
-    # Store database session factory in context for tasks to use
-    ctx['db_session'] = AsyncSessionDB
+    # Dynamically import the DB session factory so we get the initialized value
+    try:
+        import core.db as core_db
+        ctx['db_session'] = core_db.AsyncSessionDB
+    except Exception:
+        ctx['db_session'] = None
+
+    # Create an ARQ pool for enqueueing from within tasks if not already provided
+    try:
+        pool = await create_pool(ARQ_REDIS_SETTINGS)
+        ctx['arq_pool'] = pool
+    except Exception as e:
+        logger.warning(f"Failed to create ARQ pool in worker startup: {e}")
+        ctx['arq_pool'] = None
 
 async def shutdown(ctx: Dict[str, Any]) -> None:
     """Worker shutdown - cleanup resources"""
     logger.info("ARQ Worker shutting down...")
+    # Close the pool if we created one
+    try:
+        pool = ctx.get('arq_pool')
+        if pool is not None:
+            await pool.close()
+            logger.info("ARQ pool closed")
+    except Exception as e:
+        logger.warning(f"Error closing ARQ pool during shutdown: {e}")
 
 # Background task functions
 async def send_email_task(ctx: Dict[str, Any], email_type: str, recipient: str, **kwargs) -> str:
@@ -32,7 +70,11 @@ async def send_email_task(ctx: Dict[str, Any], email_type: str, recipient: str, 
     try:
         from services.email import EmailService
         
-        async with ctx['db_session']() as db:
+        factory = _get_session_factory(ctx)
+        if not factory:
+            raise RuntimeError('Database session factory not available in ARQ context')
+
+        async with factory() as db:
             email_service = EmailService(db)
             
             if email_type == "welcome":
@@ -74,7 +116,11 @@ async def process_payment_task(ctx: Dict[str, Any], payment_id: str, action: str
     try:
         from services.payments import PaymentService
         
-        async with ctx['db_session']() as db:
+        factory = _get_session_factory(ctx)
+        if not factory:
+            raise RuntimeError('Database session factory not available in ARQ context')
+
+        async with factory() as db:
             payment_service = PaymentService(db)
             
             if action == "confirm":
@@ -104,7 +150,11 @@ async def update_inventory_task(ctx: Dict[str, Any], variant_id: str, action: st
         from services.inventory import InventoryService
         from uuid import UUID
         
-        async with ctx['db_session']() as db:
+        factory = _get_session_factory(ctx)
+        if not factory:
+            raise RuntimeError('Database session factory not available in ARQ context')
+
+        async with factory() as db:
             inventory_service = InventoryService(db)
             
             if action == "decrement":
@@ -163,7 +213,11 @@ async def process_subscription_renewal_task(ctx: Dict[str, Any], subscription_id
         from services.subscriptions.subscription_scheduler import SubscriptionSchedulerService
         from uuid import UUID
         
-        async with ctx['db_session']() as db:
+        factory = _get_session_factory(ctx)
+        if not factory:
+            raise RuntimeError('Database session factory not available in ARQ context')
+
+        async with factory() as db:
             scheduler = SubscriptionSchedulerService(db)
             result = await scheduler.process_specific_subscription(UUID(subscription_id))
             
@@ -200,7 +254,11 @@ async def retry_failed_payment_task(ctx: Dict[str, Any], payment_id: str, **kwar
         from services.payments import PaymentService
         from uuid import UUID
         
-        async with ctx['db_session']() as db:
+        factory = _get_session_factory(ctx)
+        if not factory:
+            raise RuntimeError('Database session factory not available in ARQ context')
+
+        async with factory() as db:
             payment_service = PaymentService(db)
             
             # Attempt to retry the payment
@@ -255,7 +313,11 @@ async def process_subscription_orders_task(ctx: Dict[str, Any]) -> str:
     try:
         from services.subscriptions.subscription_scheduler import SubscriptionSchedulerService
         
-        async with ctx['db_session']() as db:
+        factory = _get_session_factory(ctx)
+        if not factory:
+            raise RuntimeError('Database session factory not available in ARQ context')
+
+        async with factory() as db:
             scheduler = SubscriptionSchedulerService(db)
             result = await scheduler.process_due_subscriptions()
             

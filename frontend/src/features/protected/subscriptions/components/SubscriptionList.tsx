@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCwIcon, PlusIcon, LogInIcon } from 'lucide-react';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
 import { SubscriptionCard } from './SubscriptionCard';
 import { 
@@ -126,7 +127,7 @@ export const SubscriptionList: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex items-center gap-2">
-          <RefreshCwIcon className="w-5 h-5 animate-spin text-[#61b482]" />
+          <AnimatedLoader size="sm" variant="spinner" color="primary" />
           <span className={themeClasses.text.secondary}>
             {authLoading ? 'Checking authentication...' : 'Loading subscriptions...'}
           </span>

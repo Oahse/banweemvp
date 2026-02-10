@@ -1,13 +1,17 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Loader, AlertCircle, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon, X } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import { AlertCircle, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon, X } from 'lucide-react';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '../components/AdminLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import { RefundsListSkeleton } from '../components/skeletons/RefundsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
+import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { Card } from '@/components/ui/Card';
 
 const LIMIT = 10;
 
@@ -66,143 +70,96 @@ export const Refunds = () => {
     total: 0, 
     pages: 0 
   });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const detailsModal = useModal();
   const [viewingRefund, setViewingRefund] = useState<Refund | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [adminNotes, setAdminNotes] = useState('');
 
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300); // 300ms delay
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Reset to page 1 when filters change
-  const resetPage = useCallback(() => {
-    setPage(1);
-  }, []);
-
-  useEffect(() => {
-    resetPage();
-  }, [debouncedSearchQuery, statusFilter, sortBy, sortOrder, resetPage]);
-
-  useEffect(() => {
-    const fetchRefunds = async () => {
-      try {
-        if (page === 1 && !searchQuery && !statusFilter) {
-          setInitialLoading(true);
-        } else {
-          setLoading(true);
-        }
-        setError(null);
-        console.log('Fetching refunds with params:', {
-          page,
-          limit: LIMIT,
-          search: debouncedSearchQuery || undefined,
-          status: statusFilter || undefined,
-          sort_by: sortBy,
-          sort_order: sortOrder
-        });
-        
-        // For now, we'll use the existing API and handle pagination on frontend
-        const response = await AdminAPI.getRefunds({
-          page,
-          limit: LIMIT,
-          search: debouncedSearchQuery || undefined,
-          status: statusFilter || undefined,
-          sort_by: sortBy,
-          sort_order: sortOrder
-        });
-        
-        // Handle response format
-        const data = response?.data?.data || response?.data;
-        const allRefunds = Array.isArray(data) ? data : data?.items || [];
-        
-        // Apply client-side filtering and sorting if needed
-        let filteredRefunds = allRefunds;
-        
-        // Apply search filter
-        if (debouncedSearchQuery) {
-          filteredRefunds = filteredRefunds.filter((refund: any) =>
-            refund.id.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-            refund.order_id.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-            refund.customer_name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-            refund.reason?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-          );
-        }
-        
-        // Apply status filter
-        if (statusFilter) {
-          filteredRefunds = filteredRefunds.filter((refund: any) => refund.status === statusFilter);
-        }
-        
-        // Apply sorting
-        if (sortBy === 'created_at') {
-          filteredRefunds.sort((a: any, b: any) => {
-            const aDate = new Date(a.created_at || 0);
-            const bDate = new Date(b.created_at || 0);
-            return sortOrder === 'asc' 
-              ? aDate.getTime() - bDate.getTime()
-              : bDate.getTime() - aDate.getTime();
-          });
-        } else if (sortBy === 'amount') {
-          filteredRefunds.sort((a: any, b: any) => {
-            return sortOrder === 'asc' 
-              ? a.amount - b.amount
-              : b.amount - a.amount;
-          });
-        } else if (sortBy === 'customer_name') {
-          filteredRefunds.sort((a: any, b: any) => {
-            const aName = (a.customer_name || '').toLowerCase();
-            const bName = (b.customer_name || '').toLowerCase();
-            return sortOrder === 'asc' 
-              ? aName.localeCompare(bName)
-              : bName.localeCompare(aName);
-          });
-        } else if (sortBy === 'status') {
-          filteredRefunds.sort((a: any, b: any) => {
-            const aStatus = (a.status || '').toLowerCase();
-            const bStatus = (b.status || '').toLowerCase();
-            return sortOrder === 'asc'
-              ? aStatus.localeCompare(bStatus)
-              : bStatus.localeCompare(aStatus);
-          });
-        }
-        
-        const total = filteredRefunds.length;
-        const pages = Math.max(1, Math.ceil(total / LIMIT));
-        const startIndex = (page - 1) * LIMIT;
-        const endIndex = startIndex + LIMIT;
-        const paginatedRefunds = filteredRefunds.slice(startIndex, endIndex);
-        
-        setRefunds(paginatedRefunds);
-        setPagination({
-          page: page,
-          limit: LIMIT,
-          total: total,
-          pages: pages
-        });
-        
-      } catch (err: any) {
-        const message = err?.response?.data?.message || 'Failed to load refunds';
-        setError(message);
-        toast.error(message);
-      } finally {
-        setLoading(false);
-        setInitialLoading(false);
+  const fetchData = async (params: any) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await AdminAPI.getRefunds({
+        page: params.page,
+        limit: params.limit,
+        search: params.search || undefined,
+        status: params.filters?.status || undefined,
+        sort_by: params.sort_by,
+        sort_order: params.sort_order
+      });
+      
+      const data = response?.data?.data || response?.data;
+      const allRefunds = Array.isArray(data) ? data : data?.items || [];
+      let filteredRefunds = allRefunds;
+      
+      if (params.search) {
+        filteredRefunds = filteredRefunds.filter((refund: any) =>
+          refund.id.toLowerCase().includes(params.search.toLowerCase()) ||
+          refund.order_id.toLowerCase().includes(params.search.toLowerCase()) ||
+          refund.customer_name?.toLowerCase().includes(params.search.toLowerCase()) ||
+          refund.reason?.toLowerCase().includes(params.search.toLowerCase())
+        );
       }
-    };
-
-    fetchRefunds();
-  }, [page, debouncedSearchQuery, statusFilter, sortBy, sortOrder]);
+      
+      if (params.filters?.status) {
+        filteredRefunds = filteredRefunds.filter((refund: any) => refund.status === params.filters.status);
+      }
+      
+      if (params.sort_by === 'created_at') {
+        filteredRefunds.sort((a: any, b: any) => {
+          const aDate = new Date(a.created_at || 0);
+          const bDate = new Date(b.created_at || 0);
+          return params.sort_order === 'asc' 
+            ? aDate.getTime() - bDate.getTime()
+            : bDate.getTime() - aDate.getTime();
+        });
+      } else if (params.sort_by === 'amount') {
+        filteredRefunds.sort((a: any, b: any) => {
+          return params.sort_order === 'asc' 
+            ? a.amount - b.amount
+            : b.amount - a.amount;
+        });
+      } else if (params.sort_by === 'customer_name') {
+        filteredRefunds.sort((a: any, b: any) => {
+          const aName = (a.customer_name || '').toLowerCase();
+          const bName = (b.customer_name || '').toLowerCase();
+          return params.sort_order === 'asc' 
+            ? aName.localeCompare(bName)
+            : bName.localeCompare(aName);
+        });
+      } else if (params.sort_by === 'status') {
+        filteredRefunds.sort((a: any, b: any) => {
+          const aStatus = (a.status || '').toLowerCase();
+          const bStatus = (b.status || '').toLowerCase();
+          return params.sort_order === 'asc'
+            ? aStatus.localeCompare(bStatus)
+            : bStatus.localeCompare(aStatus);
+        });
+      }
+      
+      const total = filteredRefunds.length;
+      const pages = Math.max(1, Math.ceil(total / params.limit));
+      const startIndex = (params.page - 1) * params.limit;
+      const endIndex = startIndex + params.limit;
+      const paginatedRefunds = filteredRefunds.slice(startIndex, endIndex);
+      
+      setRefunds(paginatedRefunds);
+      setPagination({
+        page: params.page,
+        limit: params.limit,
+        total: total,
+        pages: pages
+      });
+    } catch (err: any) {
+      const message = err?.response?.data?.message || 'Failed to load refunds';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+      setInitialLoading(false);
+    }
+  };
 
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -231,6 +188,106 @@ export const Refunds = () => {
       </Text>
     );
   };
+
+  // Define columns for AdminDataTable
+  const columns: AdminColumn<any>[] = [
+    {
+      key: 'id',
+      label: 'Refund ID',
+      render: (value: string) => (
+        <Text className="text-sm text-gray-900 dark:text-white font-mono">
+          {String(value).slice(0, 8)}
+        </Text>
+      ),
+    },
+    {
+      key: 'order_id',
+      label: 'Order ID',
+      render: (value: string) => (
+        <Text className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+          {String(value).slice(0, 8)}
+        </Text>
+      ),
+    },
+    {
+      key: 'customer_name',
+      label: 'Customer',
+      render: (value: string) => (
+        <Text className="text-sm text-gray-900 dark:text-white">
+          {value || 'N/A'}
+        </Text>
+      ),
+    },
+    {
+      key: 'amount',
+      label: 'Amount',
+      sortable: true,
+      render: (value: number, row: any) => (
+        <Text className="text-sm text-gray-900 dark:text-white font-semibold">
+          {formatCurrency(value, row.currency)}
+        </Text>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (value: string) => statusBadge(value),
+    },
+    {
+      key: 'reason',
+      label: 'Reason',
+      render: (value: string) => (
+        <Text className="text-sm text-gray-500 dark:text-gray-400 truncate">
+          {value || 'No reason provided'}
+        </Text>
+      ),
+    },
+    {
+      key: 'created_at',
+      label: 'Date',
+      sortable: true,
+      render: (value: string) => (
+        <Text className="text-sm text-gray-500 dark:text-gray-400">
+          {new Date(value || '').toLocaleDateString()}
+        </Text>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (_: any, row: any) => (
+        <Button 
+          onClick={(e) => {
+            e.stopPropagation();
+            handleView(row);
+          }}
+          variant="primary"
+          size="sm"
+          leftIcon={<EyeIcon size={14} />}
+        />
+      ),
+    },
+  ];
+
+  const filters: FilterConfig[] = [
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'select',
+      options: [
+        { value: '', label: 'All Status' },
+        { value: 'requested', label: 'Requested' },
+        { value: 'pending_review', label: 'Pending Review' },
+        { value: 'approved', label: 'Approved' },
+        { value: 'rejected', label: 'Rejected' },
+        { value: 'processing', label: 'Processing' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'failed', label: 'Failed' },
+        { value: 'cancelled', label: 'Cancelled' }
+      ],
+      placeholder: 'All Status',
+    },
+  ];
 
   const handleDownloadCSV = () => {
     try {
@@ -279,7 +336,7 @@ export const Refunds = () => {
   const handleView = async (refund: Refund) => {
     setViewingRefund(refund);
     setAdminNotes(refund.admin_notes || '');
-    setShowDetailsModal(true);
+    detailsModal.open();
     setDetailsLoading(true);
     try {
       const response = await AdminAPI.getRefundDetails(refund.id);
@@ -318,347 +375,86 @@ export const Refunds = () => {
     }
   };
 
+  useEffect(() => {
+    fetchData({
+      page: 1,
+      limit: LIMIT,
+      search: '',
+      sort_by: 'created_at',
+      sort_order: 'desc'
+    });
+  }, []);
+
   if (initialLoading) {
     return (
       <AdminLayout>
-        <RefundsListSkeleton />
+        <div className="flex items-center justify-center py-20">
+          <AnimatedLoader size="md" variant="spinner" color="primary" text="Loading refunds..." />
+        </div>
       </AdminLayout>
     );
   }
 
   return (
     <AdminLayout>
-    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage refund requests and processing</Text>
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className={`p-4 rounded-lg border ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="flex flex-col gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                placeholder="Search refunds..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm ${
-                  currentTheme === 'dark' 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }`}
-              />
-              {searchQuery !== debouncedSearchQuery && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              )}
-            </div>
+      <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage refund requests and processing</Text>
           </div>
-          
-          <div className="flex flex-wrap gap-2">
-            <Dropdown
-              options={[
-                { value: '', label: 'All Status' },
-                { value: 'requested', label: 'Requested' },
-                { value: 'pending_review', label: 'Pending Review' },
-                { value: 'approved', label: 'Approved' },
-                { value: 'rejected', label: 'Rejected' },
-                { value: 'processing', label: 'Processing' },
-                { value: 'completed', label: 'Completed' },
-                { value: 'failed', label: 'Failed' },
-                { value: 'cancelled', label: 'Cancelled' }
-              ]}
-              value={statusFilter}
-              onChange={setStatusFilter}
-              placeholder="All Status"
-              className="min-w-[120px]"
-            />
-            
-            <Dropdown
-              options={[
-                { value: 'created_at', label: 'Created' },
-                { value: 'amount', label: 'Amount' },
-                { value: 'customer_name', label: 'Customer' },
-                { value: 'status', label: 'Status' }
-              ]}
-              value={sortBy}
-              onChange={setSortBy}
-              placeholder="Sort by"
-              className="min-w-[120px]"
-            />
-            
+          <div className="flex gap-2">
             <Button
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              onClick={handleDownloadCSV}
               variant="outline"
               size="sm"
-              className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
-                currentTheme === 'dark' 
-                  ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
-                  : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-              }`}
+              leftIcon={<DownloadIcon size={14} />}
             >
-              <ArrowUpDownIcon size={16} />
-              <Text variant="body-sm" className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</Text>
-              <Text variant="body-sm" className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</Text>
+              Export CSV
             </Button>
           </div>
-
-          {/* Active Filters */}
-          {(debouncedSearchQuery || statusFilter) && (
-            <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-              <Text variant="body-sm" tone="secondary">Active filters:</Text>
-              {debouncedSearchQuery && (
-                <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
-                  Search: "{debouncedSearchQuery}"
-                  <Button
-                    onClick={() => setSearchQuery('')}
-                    variant="ghost"
-                    size="sm"
-                    className="ml-1 hover:text-primary-dark"
-                    leftIcon={<X size={12} />}
-                  >
-                  </Button>
-                </Text>
-              )}
-              {statusFilter && (
-                <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
-                  Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
-                  <Button
-                    onClick={() => setStatusFilter('')}
-                    variant="ghost"
-                    size="sm"
-                    className="ml-1 hover:text-primary-dark"
-                    leftIcon={<X size={12} />}
-                  >
-                  </Button>
-                </Text>
-              )}
-              <Button
-                onClick={() => {
-                  setSearchQuery('');
-                  setStatusFilter('');
-                }}
-                variant="ghost"
-                size="sm"
-                className="text-xs text-primary hover:text-primary-dark underline"
-              >
-                Clear all
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {error && (
-        <div className={`p-4 rounded-lg border flex items-start gap-3 ${
-          currentTheme === 'dark' 
-            ? 'bg-red-900/20 border-red-800 text-red-200' 
-            : 'bg-red-50 border-red-200 text-red-800'
-        }`}>
-          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <div>
-            <Text weight="semibold">Error</Text>
-            <Text variant="body-sm">{error}</Text>
-          </div>
-        </div>
-      )}
-
-      <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className={`p-4 lg:p-6 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <Heading level={2} className="text-base lg:text-lg font-semibold">All Refunds</Heading>
         </div>
 
-        {refunds.length > 0 ? (
-          <>
-            {/* Desktop table */}
-            <div className="overflow-x-auto hidden md:block">
-              <table className="w-full">
-                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
-                  <tr>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Refund ID</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Order ID</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Customer</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Amount</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Status</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Reason</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Date</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Actions</Text></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {refunds.map((refund: any) => (
-                    <tr
-                      key={refund.id}
-                      onClick={() => handleView(refund)}
-                      className={`border-b cursor-pointer ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}
-                    >
-                      <td className="px-4 py-3 max-w-[100px] truncate"><Text variant="caption" tone="primary" truncate="single">{String(refund.id).slice(0, 8)}</Text></td>
-                      <td className="px-4 py-3 max-w-[100px] truncate"><Text variant="caption" tone="secondary" truncate="single">{String(refund.order_id).slice(0, 8)}</Text></td>
-                      <td className="px-4 py-3 max-w-[150px] truncate"><Text variant="caption" weight="medium" truncate="single">{refund.customer_name || 'N/A'}</Text></td>
-                      <td className="px-4 py-3"><Text variant="caption" weight="semibold">{formatCurrency(refund.amount, refund.currency)}</Text></td>
-                      <td className="px-4 py-3">{statusBadge(refund.status)}</td>
-                      <td className="px-4 py-3 max-w-[200px] truncate"><Text variant="caption" tone="secondary" truncate="single">{refund.reason || 'No reason provided'}</Text></td>
-                      <td className="px-4 py-3"><Text variant="caption" tone="secondary">{new Date(refund.created_at || '').toLocaleDateString()}</Text></td>
-                      <td className="px-4 py-3 text-xs">
-                        <div className="flex gap-1">
-                          <Button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleView(refund);
-                            }}
-                            variant="primary"
-                            size="sm"
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-xs"
-                          >
-                            <EyeIcon size={14} />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <AdminDataTable
+          data={refunds}
+          loading={loading}
+          error={error}
+          pagination={pagination}
+          columns={columns}
+          fetchData={fetchData}
+          searchPlaceholder="Search refunds..."
+          filters={filters}
+          actions={
+            <Button
+              onClick={handleDownloadCSV}
+              variant="outline"
+              size="sm"
+              leftIcon={<DownloadIcon size={14} />}
+            >
+              Export CSV
+            </Button>
+          }
+          emptyMessage="No refunds found"
+          responsive="cards"
+          limit={LIMIT}
+          onRowClick={handleView}
+        />
+
+        <Modal isOpen={detailsModal.isOpen} onClose={detailsModal.close} size="xl">
+          <ModalHeader>
+            <div>
+              <Heading level={3} className="text-lg font-semibold">Refund Details</Heading>
+              <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                {viewingRefund?.refund_number || viewingRefund?.id}
+              </Body>
             </div>
+          </ModalHeader>
 
-            {/* Mobile cards */}
-            <div className={`md:hidden divide-y ${currentTheme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
-              {refunds.map((refund: any) => (
-                <div
-                  key={refund.id}
-                  onClick={() => handleView(refund)}
-                  className={`p-4 flex flex-col gap-2 cursor-pointer ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <Text variant="caption" tone="primary" truncate="single">{String(refund.id).slice(0, 8)}</Text>
-                    {statusBadge(refund.status)}
-                  </div>
-                  <Text variant="body-sm" weight="medium" truncate="single">{refund.customer_name || 'N/A'}</Text>
-                  <div className="flex items-center justify-between gap-2">
-                    <Text variant="caption" tone="secondary">Order:</Text>
-                    <Text variant="caption" tone="secondary" truncate="single">{String(refund.order_id).slice(0, 8)}</Text>
-                  </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <Text variant="caption" tone="secondary">Amount:</Text>
-                    <Text variant="caption" weight="semibold" tone="secondary">{formatCurrency(refund.amount, refund.currency)}</Text>
-                  </div>
-                  <Text variant="caption" tone="secondary" truncate="single">{refund.reason || 'No reason provided'}</Text>
-                  <Text variant="caption" tone="secondary">{new Date(refund.created_at || '').toLocaleDateString()}</Text>
-                  <Button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleView(refund);
-                    }}
-                    variant="primary"
-                    className="w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors text-sm mt-2"
-                  >
-                    <EyeIcon size={14} />
-                    View Details
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className={`p-6 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No refunds found</div>
-        )}
-
-        {/* Pagination - Always visible */}
-        <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-          <Body className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-            {pagination.total > 0
-              ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
-              : `Total: ${pagination.total} items`
-            }
-            {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
-          </Body>
-          <div className="flex items-center gap-1">
-              <Button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                variant="outline"
-                size="sm"
-                className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                  currentTheme === 'dark' 
-              {/* Page numbers */}
-              <div className="flex items-center gap-1 mx-1 lg:mx-2">
-                {Array.from({ length: Math.min(5, Math.max(1, pagination.pages || 1)) }, (_, i) => {
-                  let pageNum: number;
-                  if (pagination.pages <= 5) {
-                    pageNum = i + 1;
-                  } else if (page <= 3) {
-                    pageNum = i + 1;
-                  } else if (page >= pagination.pages - 2) {
-                    pageNum = pagination.pages - 4 + i;
-                  } else {
-                    pageNum = page - 2 + i;
-                  }
-                  
-                  return (
-                    <Button
-                      key={pageNum}
-                      onClick={() => setPage(pageNum)}
-                      className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md text-xs lg:text-sm font-medium transition-colors ${
-                        pageNum === page
-                          ? 'bg-primary text-white'
-                          : currentTheme === 'dark'
-                            ? 'text-gray-300 hover:bg-gray-700 border border-gray-600'
-                            : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-                      }`}
-                    >
-                      {pageNum}
-                    </Button>
-                  );
-                })}
-              </div>
-              
-              <Button
-                onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
-                disabled={page >= (pagination.pages || 1)}
-                variant="outline"
-                size="sm"
-                className={`inline-flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg border text-xs lg:text-sm font-medium transition-colors ${
-                  currentTheme === 'dark' 
-                    ? 'border-gray-600 bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed' 
-                    : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                }`}
-              >
-                <Text className="hidden sm:inline">Next</Text>
-                <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
-              </Button>
-          </div>
-        </div>
-      </div>
-
-      {showDetailsModal && viewingRefund && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowDetailsModal(false)}>
-          <div className={`w-full max-w-4xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <Heading level={3} className="text-lg font-semibold">Refund Details</Heading>
-                <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {viewingRefund.refund_number || viewingRefund.id}
-                </Body>
-              </div>
-              <Button
-                onClick={() => setShowDetailsModal(false)}
-                variant="ghost"
-                size="sm"
-                className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
-              >
-                <Text className="text-xl">×</Text>
-              </Button>
-            </div>
-
+          <ModalBody>
             {detailsLoading ? (
               <div className="flex items-center justify-center py-10">
-                <Loader className="w-8 h-8 text-primary animate-spin" />
+                <AnimatedLoader size="sm" variant="spinner" color="primary" text="Loading details..." />
               </div>
-            ) : (
+            ) : viewingRefund && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
@@ -755,53 +551,47 @@ export const Refunds = () => {
                 </div>
               </div>
             )}
+          </ModalBody>
 
-            <div className="mt-6 flex flex-wrap justify-end gap-2">
-              <Button
-                onClick={() => handleStatusUpdate(viewingRefund.id, 'approved')}
-                variant="primary"
-                size="sm"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-              >
-                Approve
-              </Button>
-              <Button
-                onClick={() => handleStatusUpdate(viewingRefund.id, 'processing')}
-                variant="primary"
-                size="sm"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-              >
-                Mark Processing
-              </Button>
-              <Button
-                onClick={() => handleStatusUpdate(viewingRefund.id, 'completed')}
-                variant="success"
-                size="sm"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-success text-white rounded-lg hover:bg-success/90 transition-colors text-sm font-medium"
-              >
-                Mark Completed
-              </Button>
-              <Button
-                onClick={() => handleStatusUpdate(viewingRefund.id, 'rejected')}
-                variant="danger"
-                size="sm"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-error text-white rounded-lg hover:bg-error/90 transition-colors text-sm font-medium"
-              >
-                Reject
-              </Button>
-              <Button
-                onClick={() => setShowDetailsModal(false)}
-                variant="outline"
-                size="sm"
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${currentTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
-              >
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+          <ModalFooter>
+            <Button
+              onClick={() => viewingRefund && handleStatusUpdate(viewingRefund.id, 'approved')}
+              variant="primary"
+              size="sm"
+            >
+              Approve
+            </Button>
+            <Button
+              onClick={() => viewingRefund && handleStatusUpdate(viewingRefund.id, 'processing')}
+              variant="primary"
+              size="sm"
+            >
+              Mark Processing
+            </Button>
+            <Button
+              onClick={() => viewingRefund && handleStatusUpdate(viewingRefund.id, 'completed')}
+              variant="success"
+              size="sm"
+            >
+              Mark Completed
+            </Button>
+            <Button
+              onClick={() => viewingRefund && handleStatusUpdate(viewingRefund.id, 'rejected')}
+              variant="danger"
+              size="sm"
+            >
+              Reject
+            </Button>
+            <Button
+              onClick={detailsModal.close}
+              variant="outline"
+              size="sm"
+            >
+              Close
+            </Button>
+          </ModalFooter>
+        </Modal>
+      </div>
     </AdminLayout>
   );
 };

@@ -15,6 +15,7 @@ import { ProductVariantModal } from '@/components/ui/ProductVariantModal';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { Button } from '@/components/ui/Button';
 import { Text, Display, Heading, Body, Caption, Label, Code, Quote } from '@/components/ui/Text/Text';
+import { Textarea, Checkbox } from '@/components/ui/Form';
 import { Product, ProductVariant } from '@/types';
 interface WishlistDetail {
   id: string;
@@ -293,28 +294,22 @@ export const WishlistEdit = () => {
               </div>
               
               <div>
-                <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Description
-                </Label>
-                <textarea
+                <Textarea
+                  label="Description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
               <div>
-                <Label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_public}
-                    onChange={(e) => setFormData(prev => ({ ...prev, is_public: e.target.checked }))}
-                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
-                  />
-                  <Text as="span" className="ml-2 text-sm text-gray-700 dark:text-gray-300">Make wishlist public</Text>
-                </Label>
-                <Caption className="text-xs text-gray-500 dark:text-gray-400 mt-1">Anyone with the link can view this wishlist</Caption>
+                <Checkbox
+                  id="is_public"
+                  checked={formData.is_public}
+                  onChange={(e) => setFormData(prev => ({ ...prev, is_public: e.target.checked }))}
+                  label="Make wishlist public"
+                  description="Anyone with the link can view this wishlist"
+                />
               </div>
             </div>
 

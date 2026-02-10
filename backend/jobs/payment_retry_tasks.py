@@ -39,12 +39,12 @@ class PaymentRetryTaskManager:
         self.is_running = True
         logger.info("Starting payment retry scheduler with ARQ")
         
-        # Use ARQ for scheduled processing
-        from core.arq_worker import get_arq_pool
-        pool = await get_arq_pool()
-        
         while self.is_running:
             try:
+                # Use ARQ for scheduled processing
+                from core.arq_worker import get_arq_pool
+                pool = await get_arq_pool()
+                
                 # Schedule the next processing cycle
                 await pool.enqueue_job(
                     'process_payment_retries_task',
@@ -53,6 +53,11 @@ class PaymentRetryTaskManager:
                 await asyncio.sleep(self.retry_interval_minutes * 60)
             except Exception as e:
                 logger.error(f"Error in payment retry scheduler: {e}")
+                # If ARQ is not available, fall back to direct processing
+                try:
+                    await self._process_retry_queue()
+                except Exception as direct_error:
+                    logger.error(f"Error in direct retry processing: {direct_error}")
                 await asyncio.sleep(60)
     
     def stop_retry_scheduler(self):
@@ -116,6 +121,10 @@ class PaymentRetryTaskManager:
     
     async def _process_retry_queue(self):
         """Process payments that are due for retry"""
+        if not get_db:
+            logger.error("Database generator not available")
+            return
+        
         async for db in get_db():
             try:
                 # Find payments due for automatic retry

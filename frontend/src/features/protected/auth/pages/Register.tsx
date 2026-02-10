@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle, User, Mail } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { Input } from '../../../../components/generic/Input';
-import { Checkbox } from '../../../../components/generic/Checkbox';
+import { Input, Checkbox, RadioGroup } from '@/components/ui/Form';
 import SocialAuth from '../components/SocialAuth';
 import { validation } from '../../../../utils/validation';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -225,8 +224,8 @@ export const Register = () => {
             value={firstname}
             onChange={(e) => setFirstname(e.target.value)}
             required
+            prefix={<User size={16} />}
           />
-          {/* FIXED: Last Name Input */}
           <Input
             label="Last Name"
             id="lastname"
@@ -235,8 +234,8 @@ export const Register = () => {
             value={lastname}
             onChange={(e) => setLastname(e.target.value)}
             required
+            prefix={<User size={16} />}
           />
-          {/* Email Address Input */}
           <Input
             label="Email Address"
             id="email"
@@ -245,61 +244,47 @@ export const Register = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            prefix={<Mail size={16} />}
           />
           {/* Account Type Selection */}
-          <div>
-            <label htmlFor="userType" className="block text-xs font-medium text-main mb-1">
-              Account Type
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-              {userTypeOptions.map((option) => (
-                <div
-                  key={option.value}
-                  onClick={() => setUserType(option.value)}
-                  className={`border rounded-lg p-2 cursor-pointer transition-all ${
-                    userType === option.value
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/50'
-                  }`}>
-                  <div className="flex justify-between items-center mb-1">
-                    <Text className="text-sm font-medium text-main">{option.label}</Text>
-                    {userType === option.value && <CheckCircle size={14} className="text-primary" />}
-                  </div>
-                  <Body className="text-xs text-copy-light">{option.description}</Body>
-                </div>
-              ))}
-            </div>
-          </div>
+          <RadioGroup
+            label="Account Type"
+            name="userType"
+            value={userType}
+            onChange={(value) => setUserType(value)}
+            options={userTypeOptions.map(opt => ({
+              value: opt.value,
+              label: opt.label,
+              description: opt.description
+            }))}
+            required
+          />
           {/* Password Input */}
           <div>
-            <Label htmlFor="password" className="block text-xs font-medium text-main mb-1">
-              Password
-            </Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-              </Button>
-            </div>
-            {/* Password strength indicator (basic example) */}
+            <Input
+              label="Password"
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              suffix={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="p-1 hover:bg-surface-elevated rounded transition-colors"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              }
+              helperText="Password should be at least 8 characters"
+            />
+            {/* Password strength indicator */}
             <div className="mt-1">
               <div className="h-1 w-full bg-border rounded-full overflow-hidden">
                 <div
-                  className={`h-full ${
+                  className={`h-full transition-all ${
                     password.length === 0
                       ? 'w-0'
                       : password.length < 6
@@ -309,38 +294,30 @@ export const Register = () => {
                       : password.length < 10
                       ? 'w-3/4 bg-blue-500'
                       : 'w-full bg-green-500'
-                  }`}>
-                </div>
+                  }`}
+                />
               </div>
-              <Body className="text-xs text-copy-light mt-1">Password should be at least 8 characters</Body>
             </div>
           </div>
           {/* Confirm Password Input */}
-          <div>
-            <Label htmlFor="confirmPassword" className="block text-xs font-medium text-main mb-1">
-              Confirm Password
-            </Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="pr-10"
-              />
-              <Button
+          <Input
+            label="Confirm Password"
+            id="confirmPassword"
+            type={showConfirmPassword ? 'text' : 'password'}
+            placeholder="••••••••"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            suffix={
+              <button
                 type="button"
-                variant="ghost"
-                size="icon"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="p-1 hover:bg-surface-elevated rounded transition-colors"
               >
-                {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-              </Button>
-            </div>
-          </div>
+                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            }
+          />
           <Checkbox
             label={
               <>
@@ -350,10 +327,8 @@ export const Register = () => {
             }
             id="terms"
             checked={acceptTerms}
-            onChange={() => setAcceptTerms(!acceptTerms)}
-            required={true}
-            error=""
-            className=""
+            onChange={(e) => setAcceptTerms(e.target.checked)}
+            required
           />
           <Button
             type="submit"

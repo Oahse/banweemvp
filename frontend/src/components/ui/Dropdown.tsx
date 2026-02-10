@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDownIcon, CheckIcon, XIcon } from 'lucide-react';
-import { cn } from '../../utils/utils';
+import { cn } from '../../utils/cn';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text/Text';
 
 interface DropdownOption {
   value: string;
@@ -116,12 +117,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
             : 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer'
         } ${className}`}
       >
-        <span className={cn(
+        <Text as="span" className={cn(
           'truncate',
           selectedOption ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'
-        )}>
-          {displayText}
-        </span>
+        )}>{displayText}</Text>
         <ChevronDownIcon 
           className={`w-3 h-3 transition-transform flex-shrink-0 ml-1 ${isOpen ? 'rotate-180' : ''}`} 
         />
@@ -179,7 +178,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   disabled={option.disabled}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="truncate">{option.label}</span>
+                    <Text as="span" className="truncate">{option.label}</Text>
                     {value === option.value && (
                       <CheckIcon className="w-3 h-3 text-primary flex-shrink-0 ml-1" />
                     )}

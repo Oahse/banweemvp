@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Input } from '@/components/generic/Input';
+import { Mail } from 'lucide-react';
+import { Input } from '@/components/ui/Form';
 import { toast } from 'react-hot-toast';
 import { validation } from '@/utils/validation';
 import { AuthAPI } from '@/api';
 import { extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Body } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -83,10 +84,9 @@ export const ForgotPassword = () => {
             type="email"
             placeholder="your@email.com"
             value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
-            error=""
-            className=""
+            prefix={<Mail size={16} />}
           />
           <Button
             type="submit"

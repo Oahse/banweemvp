@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import DOMPurify from 'dompurify';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '../../../utils/cn';
+import { cn } from '../../../utils/utils';
 
 // Text component variants using class-variance-authority for type-safe styling
 const textVariants = cva(
@@ -114,10 +114,11 @@ const textVariants = cva(
 export type TextVariants = VariantProps<typeof textVariants>;
 
 // Semantic HTML element types
-type TextElement = 
+export type TextElement = 
   | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   | 'p' | 'span' | 'div'
   | 'label' | 'legend' | 'caption'
+  | 'small' | 'strong' | 'em'
   | 'blockquote' | 'code' | 'pre'
   | 'strong' | 'em' | 'u'
   | 'small' | 'time' | 'address'

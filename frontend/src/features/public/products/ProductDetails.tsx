@@ -207,7 +207,7 @@ export const ProductDetails = () => {
             </div>
           </div>
         </div>
-      </div>
+            </div>
     );
   }
 
@@ -370,7 +370,7 @@ export const ProductDetails = () => {
             <Text variant="body-sm">{product.name}</Text>
           </nav>
         </div>
-      </div>
+      </motion.div>
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
@@ -397,10 +397,9 @@ export const ProductDetails = () => {
                 
                 {/* Show SKU on mobile */}
                 <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 px-3 py-2 sm:hidden">
-                <Text variant="caption" tone="secondary">SKU: {selectedVariant.sku || product.sku}</Text>
+                  <Text variant="caption" tone="secondary">SKU: {selectedVariant?.sku || product.sku}</Text>
                 </div>
               </div>
-            )}
 
             {/* QR Code Modal */}
             <QRCodeModal
@@ -579,16 +578,16 @@ export const ProductDetails = () => {
                             </div>
                           </div>
                           
-                          {variant.attributes && Object.keys(variant.attributes).length > 0 && (
-                            <Text variant="caption" tone="secondary" truncate="single">
-                              {Object.entries(variant.attributes).map(([key, value], idx) => (
-                                <Text key={key} className={idx > 0 ? 'ml-2' : ''}>
-                                  <Text className="capitalize">{key.replace('_', ' ')}:</Text> {String(value)}
-                                </Text>
-                              ))}
-                            </Text>
-                          )}
-                        </button>
+                            {variant.attributes && Object.keys(variant.attributes).length > 0 && (
+                              <Text variant="caption" tone="secondary" truncate="single">
+                                {Object.entries(variant.attributes).map(([key, value], idx) => (
+                                  <Text key={key} className={idx > 0 ? 'ml-2' : ''}>
+                                    <Text className="capitalize">{key.replace('_', ' ')}:</Text> {String(value)}
+                                  </Text>
+                                ))}
+                              </Text>
+                            )}
+                          </Button>
                       );
                     })}
                   </div>
@@ -1314,7 +1313,6 @@ export const ProductDetails = () => {
           />
         )}
       </motion.div>
-    </motion.div>
   );
 };
 

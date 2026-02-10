@@ -7,16 +7,14 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCart } from '../../cart/contexts/CartContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
-import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useShipping } from '../../shipping/hooks/useShipping';
 import { OrdersAPI } from '@/api/orders';
 import { AuthAPI } from '@/api/auth';
-import { CartAPI } from '@/api/cart';
-import { TokenManager } from '@/api/client';
 import { Button } from '@/components/ui/Button';
 import { PaymentsAPI } from '@/api/payments';
 import { toast } from 'react-hot-toast';
-import { Input } from '@/components/ui/Input';
+import { RadioGroup, Textarea } from '@/components/ui/Form';
+import { Card } from '@/components/ui/Card';
 import { CheckCircle, AlertTriangle, CreditCard, Truck, MapPin } from 'lucide-react';
 import AddAddressForm from '@/components/generic/AddAddressForm';
 import { Text, Heading } from '@/components/ui/Text/Text';
@@ -70,10 +68,8 @@ interface CheckoutPricing {
 }
 
 export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess }) => {
-  const { user } = useAuth();
-  const { cart, clearCart, refreshCart } = useCart();
+  const { clearCart } = useCart();
   const { formatCurrency, currency, countryCode } = useLocale();
-  const { theme } = useTheme();
   const { 
     shippingMethods, 
     loading: shippingLoading, 
@@ -83,7 +79,6 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   } = useShipping({ autoLoad: true });
   
   // Form state
-  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     shipping_address_id: '',
     shipping_method_id: '',
@@ -98,7 +93,6 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   
   // UI state
   const [loading, setLoading] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<any>({});
   const [realTimeValidation, setRealTimeValidation] = useState<any>({});
   const [processingPayment, setProcessingPayment] = useState(false);
   const [showAddAddressForm, setShowAddAddressForm] = useState(false);
@@ -139,7 +133,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
 
   // Real-time validation with comprehensive pricing
   const debouncedValidation = useCallback(
-    debounce(async (data) => {
+    debounce(async (data: any) => {
       try {
         // Skip validation if required fields are missing
         if (!data.shipping_address_id || 
@@ -184,8 +178,8 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
           // Handle validation warnings
           if (response.data.warnings && response.data.warnings.length > 0) {
             const priceWarnings = response.data.warnings
-              .filter(w => w.type === 'price_mismatch')
-              .map(w => w.message);
+              .filter((w: any) => w.type === 'price_mismatch')
+              .map((w: any) => w.message);
             setPriceValidationErrors(priceWarnings);
           }
         } else {
@@ -226,7 +220,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       if (addressesRes.success) {
         setAddresses(addressesRes.data || []);
         // Auto-select default address
-        const defaultAddress = addressesRes.data?.find(addr => addr.is_default);
+        const defaultAddress = addressesRes.data?.find((addr: any) => addr.is_default);
         if (defaultAddress && !formData.shipping_address_id) {
           setFormData(prev => ({ ...prev, shipping_address_id: defaultAddress.id }));
         }
@@ -235,7 +229,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       if (paymentMethodsRes.success) {
         setPaymentMethods(paymentMethodsRes.data || []);
         // Auto-select default payment method
-        const defaultPayment = paymentMethodsRes.data?.find(pm => pm.is_default);
+        const defaultPayment = paymentMethodsRes.data?.find((pm: any) => pm.is_default);
         if (defaultPayment && !formData.payment_method_id) {
           setFormData(prev => ({ ...prev, payment_method_id: defaultPayment.id }));
         }
@@ -291,7 +285,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       // Handle specific error types
       if (error.response?.data?.errors) {
         const errors = error.response.data.errors;
-        const errorMessages = errors.map(err => err.message).join(', ');
+        const errorMessages = errors.map((err: any) => err.message).join(', ');
         toast.error(`Order failed: ${errorMessages}`);
       } else {
         toast.error(error.message || 'Failed to place order. Please try again.');
@@ -318,66 +312,75 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
         : 'Loading pricing information...';
       
       return (
-        <div className="bg-surface-elevated dark:bg-surface-elevated-dark border border-border-light dark:border-border-dark p-4 rounded-lg">
-          <Text variant="body-sm" tone="secondary">{message}</Text>
-        </div>
+        <Card variant="elevated">
+          <Card.Body>
+            <Text variant="body-sm" tone="secondary">{message}</Text>
+          </Card.Body>
+        </Card>
       );
     }
 
     return (
-      <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6 space-y-4 sm:space-y-6">
-        <Heading level={3} weight="medium">Order Summary</Heading>
-        
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Text variant="caption">Subtotal:</Text>
-              <Text variant="caption">{formatCurrency(pricingData.subtotal)}</Text>
-            </div>
-            
-            <div className="flex justify-between">
-              <Text variant="caption">Shipping ({pricingData.shipping.method_name}):</Text>
-              <Text variant="caption">{formatCurrency(pricingData.shipping.cost)}</Text>
-            </div>
-            
-            <div className="flex justify-between">
-              <Text variant="caption">Tax ({(pricingData.tax.rate * 100).toFixed(2)}%):</Text>
-              <Text variant="caption">{formatCurrency(pricingData.tax.amount)}</Text>
-            </div>
-            
-            {pricingData.discount && (
+      <>
+        <Card>
+          <Card.Header>
+            <Card.Title size="sm">Order Summary</Card.Title>
+          </Card.Header>
+          <Card.Body>
+            <div className="space-y-2">
               <div className="flex justify-between">
-                <Text variant="caption" className="text-success">Discount ({pricingData.discount.code}):</Text>
-                <Text variant="caption" className="text-success">-{formatCurrency(pricingData.discount.amount)}</Text>
+                <Text variant="caption">Subtotal:</Text>
+                <Text variant="caption">{formatCurrency(pricingData.subtotal)}</Text>
               </div>
-            )}
-          </div>
-          
-          <hr className="my-2 border-border-light dark:border-border-dark" />
-          
-          <div className="flex justify-between">
-            <Text variant="caption" weight="medium">Total:</Text>
-            <Text variant="caption" weight="medium">{formatCurrency(pricingData.total)}</Text>
-          </div>
-        </div>
+              
+              <div className="flex justify-between">
+                <Text variant="caption">Shipping ({pricingData.shipping.method_name}):</Text>
+                <Text variant="caption">{formatCurrency(pricingData.shipping.cost)}</Text>
+              </div>
+              
+              <div className="flex justify-between">
+                <Text variant="caption">Tax ({(pricingData.tax.rate * 100).toFixed(2)}%):</Text>
+                <Text variant="caption">{formatCurrency(pricingData.tax.amount)}</Text>
+              </div>
+              
+              {pricingData.discount && (
+                <div className="flex justify-between">
+                  <Text variant="caption" className="text-success">Discount ({pricingData.discount.code}):</Text>
+                  <Text variant="caption" className="text-success">-{formatCurrency(pricingData.discount.amount)}</Text>
+                </div>
+              )}
+            </div>
+            
+            <Card.Divider />
+            
+            <div className="flex justify-between">
+              <Text variant="caption" weight="medium">Total:</Text>
+              <Text variant="caption" weight="medium">{formatCurrency(pricingData.total)}</Text>
+            </div>
+          </Card.Body>
+        </Card>
         
         {priceValidationErrors.length > 0 && (
-          <div className="mt-3 p-3 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
-              <Text variant="caption" weight="medium" className="text-destructive">Price Verification</Text>
+          <Card variant="outlined" className="mt-3 border-destructive/30">
+            <Card.Body density="compact">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
+                <Text variant="caption" weight="medium" className="text-destructive">Price Verification</Text>
+              </div>
               {priceValidationErrors.map((error, index) => (
                 <Text key={index} variant="caption" className="text-destructive">{error}</Text>
               ))}
-          </div>
+            </Card.Body>
+          </Card>
         )}
-      </div>
+      </>
     );
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <AnimatedLoader size="md" variant="spinner" />
         <span className="ml-2">Loading checkout...</span>
       </div>
     );
@@ -392,174 +395,166 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Shipping Address Section */}
-            <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="h-4 w-4 text-primary dark:text-primary-dark" />
-                <Heading level={2} weight="medium">Shipping Address</Heading>
-              </div>
-              
-              {addresses.length > 0 ? (
-                <div className="space-y-3">
-                  {addresses.map((address) => (
-                    <label key={address.id} className="flex items-start gap-2 sm:gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-surface-elevated dark:hover:bg-surface-elevated-dark transition-colors">
-                      <input
-                        type="radio"
-                        name="shipping_address"
-                        value={address.id}
-                        checked={formData.shipping_address_id === address.id}
-                        onChange={(e) => updateFormData('shipping_address_id', e.target.value)}
-                        className="mt-1 accent-primary dark:accent-primary-dark"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <Text variant="body-sm" weight="medium">{address.street}</Text>
-                        <Text variant="caption" tone="secondary">
-                          {address.city}, {address.state} {address.post_code}
-                        </Text>
-                        <Text variant="caption" tone="secondary">{address.country}</Text>
-                      </div>
-                    </label>
-                  ))}
-                  <Link to="/account/addresses">
+            <Card>
+              <Card.Header>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-primary dark:text-primary-dark" />
+                  <Card.Title size="sm">Shipping Address</Card.Title>
+                </div>
+              </Card.Header>
+              <Card.Body>
+                {addresses.length > 0 ? (
+                  <div className="space-y-3">
+                    <RadioGroup
+                      name="shipping_address"
+                      value={formData.shipping_address_id}
+                      onChange={(value) => updateFormData('shipping_address_id', value)}
+                      options={addresses.map((address) => ({
+                        value: address.id,
+                        label: address.street,
+                        description: `${address.city}, ${address.state} ${address.post_code}, ${address.country}`
+                      }))}
+                    />
+                    <Link to="/account/addresses">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        fullWidth={true}
+                      >
+                        Manage Addresses
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <Text variant="body-sm" tone="secondary">No addresses found</Text>
                     <Button
                       type="button"
                       variant="outline"
-                      fullWidth={true}
+                      onClick={() => setShowAddAddressForm(true)}
                     >
-                      Manage Addresses
+                      Add New Address
                     </Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <Text variant="body-sm" tone="secondary">No addresses found</Text>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowAddAddressForm(true)}
-                  >
-                    Add New Address
-                  </Button>
-                </div>
-              )}
-            </div>
+                  </div>
+                )}
+              </Card.Body>
+            </Card>
 
             {/* Shipping Method Section */}
-            <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Truck className="h-4 w-4 text-primary dark:text-primary-dark" />
-                <Heading level={2} weight="medium">Shipping Method</Heading>
-              </div>
-              
-              {shippingError && (
-                <div className="mb-4 p-4 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
-                    <Text variant="body-sm" weight="medium" className="text-destructive">Error Loading Shipping Methods</Text>
-                    <Text variant="body-sm" className="text-destructive">{shippingError}</Text>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={loadShippingMethods}
-                  >
-                    Retry
-                  </Button>
+            <Card>
+              <Card.Header>
+                <div className="flex items-center gap-2">
+                  <Truck className="h-4 w-4 text-primary dark:text-primary-dark" />
+                  <Card.Title size="sm">Shipping Method</Card.Title>
                 </div>
-              )}
-              
-              {shippingLoading ? (
-                <div className="animate-pulse space-y-3">
-                  <div className="h-16 bg-surface-elevated dark:bg-surface-elevated-dark rounded"></div>
-                  <div className="h-16 bg-surface-elevated dark:bg-surface-elevated-dark rounded"></div>
-                </div>
-              ) : shippingMethods.length > 0 ? (
-                <div className="space-y-2 sm:space-y-3">
-                  {shippingMethods.map((method) => (
-                    <label key={method.id} className="flex items-center justify-between gap-2 sm:gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-surface-elevated dark:hover:bg-surface-elevated-dark transition-colors">
-                      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                        <input
-                          type="radio"
-                          name="shipping_method"
-                          value={method.id}
-                          checked={formData.shipping_method_id === method.id}
-                          onChange={(e) => {
-                            console.log('✅ Shipping method selected:', method.id, method.name, `$${method.price}`);
-                            updateFormData('shipping_method_id', e.target.value);
-                          }}
-                          className="accent-primary dark:accent-primary-dark flex-shrink-0"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <Text variant="body-sm" weight="medium">{method.name}</Text>
+              </Card.Header>
+              <Card.Body>
+                {shippingError && (
+                  <Card variant="outlined" className="mb-4 border-destructive/30">
+                    <Card.Body density="compact">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
+                        <Text variant="body-sm" weight="medium" className="text-destructive">Error Loading Shipping Methods</Text>
+                      </div>
+                      <Text variant="body-sm" className="text-destructive">{shippingError}</Text>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={loadShippingMethods}
+                        className="mt-2"
+                      >
+                        Retry
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                )}
+                
+                {shippingLoading ? (
+                  <div className="animate-pulse space-y-3">
+                    <div className="h-16 bg-surface-elevated dark:bg-surface-elevated-dark rounded"></div>
+                    <div className="h-16 bg-surface-elevated dark:bg-surface-elevated-dark rounded"></div>
+                  </div>
+                ) : shippingMethods.length > 0 ? (
+                  <RadioGroup
+                    name="shipping_method"
+                    value={formData.shipping_method_id}
+                    onChange={(value) => {
+                      const method = shippingMethods.find(m => m.id === value);
+                      console.log('✅ Shipping method selected:', value, method?.name, method?.price);
+                      updateFormData('shipping_method_id', value);
+                    }}
+                    options={shippingMethods.map((method) => ({
+                      value: method.id,
+                      label: method.name,
+                      description: (
+                        <div className="flex items-center justify-between gap-2 mt-1">
                           <Text variant="caption" tone="secondary">{method.description}</Text>
+                          <div className="text-right">
+                            <Text variant="body-sm" weight="medium">{formatCurrency(method.price)}</Text>
+                            <Text variant="caption" tone="secondary">{method.estimated_days}d</Text>
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <Text variant="body-sm" weight="medium">{formatCurrency(method.price)}</Text>
-                        <Text variant="caption" tone="secondary">{method.estimated_days}d</Text>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              ) : (
-                <Text variant="body-sm" tone="secondary">No shipping methods available</Text>
-              )}
-            </div>
+                      )
+                    }))}
+                  />
+                ) : (
+                  <Text variant="body-sm" tone="secondary">No shipping methods available</Text>
+                )}
+              </Card.Body>
+            </Card>
 
             {/* Payment Method Section */}
-            <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <CreditCard className="h-4 w-4 text-primary dark:text-primary-dark" />
-                <h2 className="text-base font-medium text-copy dark:text-copy-dark">Payment Method</h2>
-              </div>
-              
-              {paymentMethods.length > 0 ? (
-                <div className="space-y-3">
-                  {paymentMethods.map((method) => (
-                    <label key={method.id} className="flex items-center gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-surface-elevated dark:hover:bg-surface-elevated-dark transition-colors">
-                      <input
-                        type="radio"
-                        name="payment_method"
-                        value={method.id}
-                        checked={formData.payment_method_id === method.id}
-                        onChange={(e) => {
-                          console.log('✅ Payment method selected:', method.id, method.type);
-                          updateFormData('payment_method_id', e.target.value);
-                        }}
-                        className="accent-primary dark:accent-primary-dark flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-copy dark:text-copy-dark truncate">
-                          {method.type === 'credit_card' ? 'Credit Card' : method.type}
-                        </div>
-                        <div className="text-xs text-copy-light dark:text-copy-light-dark truncate">
-                          **** **** **** {method.last_four}
-                        </div>
-                      </div>
-                    </label>
-                  ))}
+            <Card>
+              <Card.Header>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-primary dark:text-primary-dark" />
+                  <Card.Title size="sm">Payment Method</Card.Title>
                 </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-copy-light dark:text-copy-light-dark mb-3">No payment methods available</p>
-                  <Link to="/account/payment-methods">
-                    <Button type="button" variant="outline" fullWidth={true}>
-                      Add Payment Method
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
+              </Card.Header>
+              <Card.Body>
+                {paymentMethods.length > 0 ? (
+                  <RadioGroup
+                    name="payment_method"
+                    value={formData.payment_method_id}
+                    onChange={(value) => {
+                      const method = paymentMethods.find(m => m.id === value);
+                      console.log('✅ Payment method selected:', value, method?.type);
+                      updateFormData('payment_method_id', value);
+                    }}
+                    options={paymentMethods.map((method) => ({
+                      value: method.id,
+                      label: method.type === 'credit_card' ? 'Credit Card' : method.type,
+                      description: `**** **** **** ${method.last_four}`
+                    }))}
+                  />
+                ) : (
+                  <div className="text-center py-4">
+                    <Text variant="body-sm" tone="secondary" className="mb-3">No payment methods available</Text>
+                    <Link to="/account/payment-methods">
+                      <Button type="button" variant="outline" fullWidth={true}>
+                        Add Payment Method
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </Card.Body>
+            </Card>
 
             {/* Order Notes */}
-            <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
-              <h2 className="text-base font-medium text-copy dark:text-copy-dark mb-4">Order Notes (Optional)</h2>
-              <textarea
-                className="w-full p-3 border border-border-light dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-copy dark:text-copy-dark resize-none focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark"
-                rows={3}
-                placeholder="Special instructions for your order..."
-                value={formData.notes}
-                onChange={(e) => updateFormData('notes', e.target.value)}
-              />
-            </div>
+            <Card>
+              <Card.Header>
+                <Card.Title size="sm">Order Notes (Optional)</Card.Title>
+              </Card.Header>
+              <Card.Body>
+                <Textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={(e) => updateFormData('notes', e.target.value)}
+                  placeholder="Special instructions for your order..."
+                  rows={3}
+                />
+              </Card.Body>
+            </Card>
 
             {/* Validation Errors */}
             {realTimeValidation.errors && realTimeValidation.errors.length > 0 && (
@@ -569,7 +564,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                   <span className="font-medium text-destructive dark:text-destructive-dark">Please fix the following issues:</span>
                 </div>
                 <ul className="list-disc list-inside text-sm text-destructive dark:text-destructive-dark space-y-1">
-                  {realTimeValidation.errors.map((error, index) => (
+                  {realTimeValidation.errors.map((error: any, index: number) => (
                     <li key={index}>{typeof error === 'string' ? error : error.message}</li>
                   ))}
                 </ul>

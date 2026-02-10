@@ -5,36 +5,62 @@
 
 import React, { useState, useEffect } from 'react';
 import { ContactMessagesAPI, ContactMessage } from '../../../../api/contact-messages';
-import { Mail, Clock, CheckCircle, AlertCircle, Search, Eye, Trash2, Filter, X } from 'lucide-react';
+import { Mail, Clock, CheckCircle, AlertCircle, Search, Eye, Trash2, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ContactMessagesSkeleton from '../components/skeletons/ContactMessagesSkeleton';
 import { useTheme } from '../../../../components/shared/contexts/ThemeContext';
 import Dropdown from '../../../../components/ui/Dropdown';
-import AdminLayout from '../components/AdminLayout';
+import AdminLayout from '../../../../components/layout/AdminLayout';
 import { ConfirmationModal } from '../../../../components/ui/ConfirmationModal';
+import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { Card } from '@/components/ui/Card';
+import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text/Text';
+
+const PAGE_SIZE = 20;
+
+interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: 'new' | 'in_progress' | 'resolved' | 'closed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  created_at: string;
+  updated_at?: string;
+}
 
 const ContactMessages: React.FC = () => {
   const { currentTheme } = useTheme();
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [stats, setStats] = useState({ total: 0, new: 0, in_progress: 0, resolved: 0 });
+  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
+  const [pagination, setPagination] = useState({ 
+    page: 1, 
+    limit: PAGE_SIZE, 
+    total: 0, 
+    pages: 0 
+  });
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [priorityFilter, setPriorityFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
-  const [showModal, setShowModal] = useState(false);
+  const viewModal = useModal();
   const [showFilters, setShowFilters] = useState(true);
+  const [stats, setStats] = useState({
+    total: 0,
+    new: 0,
+    in_progress: 0,
+    resolved: 0
+  });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const PAGE_SIZE = 20;
 
   // Debounce search
   useEffect(() => {
@@ -45,8 +71,14 @@ const ContactMessages: React.FC = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    fetchMessages();
-  }, [page, statusFilter, priorityFilter, debouncedSearchTerm]);
+    fetchData({
+      page: 1,
+      limit: PAGE_SIZE,
+      search: '',
+      sort_by: 'created_at',
+      sort_order: 'desc'
+    });
+  }, []);
 
   const fetchMessages = async () => {
     try {
@@ -77,40 +109,17 @@ const ContactMessages: React.FC = () => {
     }
   };
 
-  const calculateStats = async (currentMessages: ContactMessage[], totalCount: number) => {
-    console.log('Calculating stats - currentMessages:', currentMessages.length, 'totalCount:', totalCount);
+  const calculateStats = (currentMessages: ContactMessage[], totalCount: number) => {
+    const newCount = currentMessages.filter(m => m.status === 'new').length;
+    const inProgressCount = currentMessages.filter(m => m.status === 'in_progress').length;
+    const resolvedCount = currentMessages.filter(m => m.status === 'resolved').length;
     
-    // If filters are applied, we need to fetch all messages to calculate accurate stats
-    // Otherwise, use the current page data
-    if (statusFilter || priorityFilter || debouncedSearchTerm) {
-      // When filtered, calculate from current filtered results
-      const newCount = currentMessages.filter(m => m.status === 'new').length;
-      const inProgressCount = currentMessages.filter(m => m.status === 'in_progress').length;
-      const resolvedCount = currentMessages.filter(m => m.status === 'resolved').length;
-      
-      console.log('Filtered stats - new:', newCount, 'inProgress:', inProgressCount, 'resolved:', resolvedCount);
-      
-      setStats({
-        total: totalCount,
-        new: newCount,
-        in_progress: inProgressCount,
-        resolved: resolvedCount
-      });
-    } else {
-      // When not filtered, use the current messages since they represent all data
-      const newCount = currentMessages.filter(m => m.status === 'new').length;
-      const inProgressCount = currentMessages.filter(m => m.status === 'in_progress').length;
-      const resolvedCount = currentMessages.filter(m => m.status === 'resolved').length;
-      
-      console.log('Unfiltered stats - new:', newCount, 'inProgress:', inProgressCount, 'resolved:', resolvedCount);
-      
-      setStats({
-        total: currentMessages.length,
-        new: newCount,
-        in_progress: inProgressCount,
-        resolved: resolvedCount
-      });
-    }
+    setStats({
+      total: totalCount,
+      new: newCount,
+      in_progress: inProgressCount,
+      resolved: resolvedCount
+    });
   };
 
   
@@ -159,7 +168,7 @@ const ContactMessages: React.FC = () => {
 
   const viewMessage = (message: ContactMessage) => {
     setSelectedMessage(message);
-    setShowModal(true);
+    viewModal.open();
   };
 
   const getStatusColor = (status: string) => {
@@ -181,6 +190,162 @@ const ContactMessages: React.FC = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  const fetchData = async (params: any) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await ContactMessagesAPI.getAll({
+        page: params.page,
+        page_size: params.limit,
+        status: params.filters?.status || undefined,
+        priority: params.filters?.priority || undefined,
+        search: params.search,
+      });
+      
+      const allMessages = response?.messages || [];
+      let filteredMessages = allMessages;
+      
+      if (params.search) {
+        filteredMessages = filteredMessages.filter((message: any) =>
+          message.name?.toLowerCase().includes(params.search.toLowerCase()) ||
+          message.email?.toLowerCase().includes(params.search.toLowerCase()) ||
+          message.subject?.toLowerCase().includes(params.search.toLowerCase())
+        );
+      }
+      
+      if (params.filters?.status) {
+        filteredMessages = filteredMessages.filter((message: any) => message.status === params.filters.status);
+      }
+      
+      if (params.filters?.priority) {
+        filteredMessages = filteredMessages.filter((message: any) => message.priority === params.filters.priority);
+      }
+      
+      const total = filteredMessages.length;
+      const pages = Math.max(1, Math.ceil(total / params.limit));
+      const startIndex = (params.page - 1) * params.limit;
+      const endIndex = startIndex + params.limit;
+      const paginatedMessages = filteredMessages.slice(startIndex, endIndex);
+      
+      setMessages(paginatedMessages);
+      setPagination({
+        page: params.page,
+        limit: params.limit,
+        total: total,
+        pages: pages
+      });
+      
+      calculateStats(allMessages, total);
+    } catch (error: any) {
+      console.error('Error fetching messages:', error);
+      toast.error('Failed to load messages');
+    } finally {
+      setLoading(false);
+      setInitialLoading(false);
+    }
+  };
+
+  // Define columns for AdminDataTable
+  const columns: AdminColumn<ContactMessage>[] = [
+    {
+      key: 'name',
+      label: 'Name',
+      render: (value: string, row: ContactMessage) => (
+        <Text className="text-sm text-gray-900 dark:text-white">{row.name || 'N/A'}</Text>
+      ),
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      render: (value: string, row: ContactMessage) => (
+        <Text className="text-sm text-gray-900 dark:text-white">{row.email || 'N/A'}</Text>
+      ),
+    },
+    {
+      key: 'subject',
+      label: 'Subject',
+      render: (value: string) => (
+        <Text className="text-sm text-gray-900 dark:text-white">{value || 'N/A'}</Text>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (value: string) => statusBadge(value),
+    },
+    {
+      key: 'priority',
+      label: 'Priority',
+      render: (value: string) => priorityBadge(value),
+    },
+    {
+      key: 'created_at',
+      label: 'Date',
+      sortable: true,
+      render: (value: string) => (
+        <Text className="text-sm text-gray-900 dark:text-white">
+          {new Date(value).toLocaleDateString()}
+        </Text>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (_: any, row: ContactMessage) => (
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => viewMessage(row)}
+            variant="ghost"
+            size="sm"
+            leftIcon={<Eye size={14} />}
+            className="inline-flex items-center gap-1 px-2 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+          >
+            View
+          </Button>
+          <Button
+            onClick={() => handleDelete(row.id)}
+            variant="ghost"
+            size="sm"
+            leftIcon={<Trash2 size={14} />}
+            className="inline-flex items-center gap-1 px-2 py-1.5 bg-error/10 text-error rounded-lg hover:bg-error/20 transition-colors"
+          >
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const filters: FilterConfig[] = [
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'select',
+      options: [
+        { value: '', label: 'All Status' },
+        { value: 'new', label: 'New' },
+        { value: 'in_progress', label: 'In Progress' },
+        { value: 'resolved', label: 'Resolved' },
+        { value: 'closed', label: 'Closed' }
+      ],
+      placeholder: 'All Status',
+    },
+    {
+      key: 'priority',
+      label: 'Priority',
+      type: 'select',
+      options: [
+        { value: '', label: 'All Priorities' },
+        { value: 'urgent', label: 'Urgent' },
+        { value: 'high', label: 'High' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'low', label: 'Low' }
+      ],
+      placeholder: 'All Priorities',
+    },
+  ];
 
   const statusBadge = (status: string) => (
     <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(status)}`}>
@@ -356,241 +521,57 @@ const ContactMessages: React.FC = () => {
           )}
         </div>
 
-        {/* Messages Table/Cards */}
-        <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          {loading && !initialLoading ? (
-            <div className="p-8">
-              <div className="flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mr-3"></div>
-                <span className="text-sm text-copy-light">Updating messages...</span>
-              </div>
-            </div>
-          ) : (
-            messages.length > 0 ? (
-              <>
-                {/* Desktop Table */}
-                <div className="overflow-x-auto hidden md:block">
-                  <table className="w-full">
-                    <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Name</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Email</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Subject</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Priority</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-main">Date</th>
-                        <th className="px-4 py-3 text-center text-xs font-semibold text-main">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {messages.map((message) => (
-                        <tr key={message.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
-                          <td className="px-4 py-3 text-sm text-main">{message.name}</td>
-                          <td className="px-4 py-3 text-sm text-copy-light">{message.email}</td>
-                          <td className="px-4 py-3 text-sm text-main">{message.subject}</td>
-                          <td className="px-4 py-3">
-                            <div className="inline-block">
-                              <Dropdown
-                                options={[
-                                  { value: 'new', label: 'New' },
-                                  { value: 'in_progress', label: 'In Progress' },
-                                  { value: 'resolved', label: 'Resolved' },
-                                  { value: 'closed', label: 'Closed' }
-                                ]}
-                                value={message.status}
-                                onChange={(value) => handleStatusChange(message.id, value)}
-                                placeholder="Status"
-                                className="min-w-[120px]"
-                              />
-                            </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="inline-block">
-                              <Dropdown
-                                options={[
-                                  { value: 'low', label: 'Low' },
-                                  { value: 'medium', label: 'Medium' },
-                                  { value: 'high', label: 'High' },
-                                  { value: 'urgent', label: 'Urgent' }
-                                ]}
-                                value={message.priority}
-                                onChange={(value) => handlePriorityChange(message.id, value)}
-                                placeholder="Priority"
-                                className="min-w-[100px]"
-                              />
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-copy-light">
-                            {new Date(message.created_at).toLocaleDateString('en-US', { 
-                              year: 'numeric', 
-                              month: 'short', 
-                              day: 'numeric' 
-                            })}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <Button
-                                onClick={() => viewMessage(message)}
-                                variant="primary"
-                                size="sm"
-                                leftIcon={<Eye size={14} />}
-                                className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
-                              >
-                                View Details
-                              </Button>
-                              <Button
-                                onClick={() => handleDelete(message.id)}
-                                variant="danger"
-                                size="sm"
-                                className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                title="Delete"
-                              >
-                                <Trash2 size={14} />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Mobile Cards */}
-                <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`p-4 flex flex-col gap-3 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-main truncate">{message.name}</p>
-                          <p className="text-sm text-copy-light truncate">{message.email}</p>
-                        </div>
-                        {statusBadge(message.status)}
-                      </div>
-                      <p className="text-sm text-main font-medium">{message.subject}</p>
-                      <div className="flex items-center justify-between">
-                        {priorityBadge(message.priority)}
-                        <span className="text-xs text-copy-light">
-                          {new Date(message.created_at).toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })}
-                        </span>
-                      </div>
-                      <div className="flex gap-2 pt-2">
-                        <Button
-                          onClick={() => viewMessage(message)}
-                          variant="primary"
-                          size="sm"
-                          leftIcon={<Eye size={14} />}
-                          className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
-                        >
-                          View Details
-                        </Button>
-                        <Button
-                          onClick={() => handleDelete(message.id)}
-                          variant="danger"
-                          size="sm"
-                          className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="p-8 text-center">
-                <Mail className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-sm text-copy-light">No contact messages found</p>
-              </div>
-            )
-          )}
-        </div>
-
-        {/* Pagination */}
-        <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-          <p className="text-sm text-copy-light">
-            {messages.length > 0
-              ? `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, messages.length)} of ${messages.length} items`
-              : 'No contact messages found'}
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              variant="outline"
-              size="sm"
-              className={`px-4 py-2 text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                currentTheme === 'dark' 
-                  ? 'bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700' 
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              Previous
-            </Button>
-            <span className="text-sm text-copy-light">
-              Page {page} of {totalPages || 1}
-            </span>
-            <Button
-              onClick={() => setPage(p => Math.min(totalPages || 1, p + 1))}
-              disabled={page >= (totalPages || 1)}
-              variant="outline"
-              size="sm"
-              className={`px-4 py-2 text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                currentTheme === 'dark' 
-                  ? 'bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700' 
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        <AdminDataTable
+          data={messages}
+          loading={loading}
+          error={error}
+          pagination={pagination}
+          columns={columns}
+          fetchData={fetchData}
+          searchPlaceholder="Search messages..."
+          filters={filters}
+          emptyMessage="No contact messages found"
+          responsive="cards"
+          limit={PAGE_SIZE}
+          onRowClick={viewMessage}
+        />
       </div>
 
       {/* View Message Modal */}
-      {showModal && selectedMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className={`rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto ${currentTheme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
-            <div className={`p-4 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-              <h2 className="text-lg font-bold text-main">Message Details</h2>
-            </div>
-            <div className="p-4 space-y-4">
+      <Modal isOpen={viewModal.isOpen} onClose={viewModal.close} size="lg">
+        <ModalHeader>Message Details</ModalHeader>
+        <ModalBody>
+          {selectedMessage && (
+            <div className="space-y-4">
               <div>
-                <label className="text-sm font-semibold text-main">Name</label>
-                <p className="text-sm text-copy mt-1">{selectedMessage.name}</p>
+                <Text weight="semibold" className="text-sm">Name</Text>
+                <Text className="text-sm mt-1">{selectedMessage.name}</Text>
               </div>
               <div>
-                <label className="text-sm font-semibold text-main">Email</label>
-                <p className="text-sm text-copy mt-1">{selectedMessage.email}</p>
+                <Text weight="semibold" className="text-sm">Email</Text>
+                <Text className="text-sm mt-1">{selectedMessage.email}</Text>
               </div>
               <div>
-                <label className="text-sm font-semibold text-main">Subject</label>
-                <p className="text-sm text-copy mt-1">{selectedMessage.subject}</p>
+                <Text weight="semibold" className="text-sm">Subject</Text>
+                <Text className="text-sm mt-1">{selectedMessage.subject}</Text>
               </div>
               <div>
-                <label className="text-sm font-semibold text-main">Message</label>
-                <p className="text-sm text-copy mt-1 whitespace-pre-wrap">{selectedMessage.message}</p>
+                <Text weight="semibold" className="text-sm">Message</Text>
+                <Text className="text-sm mt-1 whitespace-pre-wrap">{selectedMessage.message}</Text>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-semibold text-main">Status</label>
+                  <Text weight="semibold" className="text-sm">Status</Text>
                   <div className="mt-1">{statusBadge(selectedMessage.status)}</div>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-main">Priority</label>
+                  <Text weight="semibold" className="text-sm">Priority</Text>
                   <div className="mt-1">{priorityBadge(selectedMessage.priority)}</div>
                 </div>
               </div>
               <div>
-                <label className="text-sm font-semibold text-main">Created At</label>
-                <p className="text-sm text-copy mt-1">
+                <Text weight="semibold" className="text-sm">Created At</Text>
+                <Text className="text-sm mt-1">
                   {new Date(selectedMessage.created_at).toLocaleString('en-US', { 
                     year: 'numeric', 
                     month: 'short', 
@@ -598,26 +579,17 @@ const ContactMessages: React.FC = () => {
                     hour: '2-digit',
                     minute: '2-digit'
                   })}
-                </p>
+                </Text>
               </div>
             </div>
-            <div className={`p-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex justify-end`}>
-              <Button
-                onClick={() => setShowModal(false)}
-                variant="ghost"
-                size="sm"
-                className={`px-4 py-2 text-sm rounded-lg transition-colors ${
-                  currentTheme === 'dark' 
-                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={viewModal.close} variant="secondary" size="sm">
+            Close
+          </Button>
+        </ModalFooter>
+      </Modal>
 
       {/* Delete Confirmation Modal */}
       <ConfirmationModal

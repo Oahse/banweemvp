@@ -157,7 +157,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                   ) : (
                     <div className={combineThemeClasses(
                       'w-full h-full rounded-md flex items-center justify-center border-2 border-dashed',
-                      themeClasses.border.light,
+                      themeClasses.border.default,
                       themeClasses.background.elevated
                     )}>
                       <ImageIcon className={combineThemeClasses(themeClasses.text.muted, 'w-6 h-6')} />
@@ -210,26 +210,17 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                         {formatCurrency(priceInfo.current, currency)}
                       </Text>
                     {priceInfo.original && (
-                      <span className={combineThemeClasses(
+                      <Text as="span" className={combineThemeClasses(
                         themeClasses.text.muted,
                         'line-through text-sm'
                       )}>
                         {formatCurrency(priceInfo.original, currency)}
-                      </span>
-                        <Text as="span" className={combineThemeClasses(
-                          themeClasses.text.muted,
-                          'line-through text-sm'
-                        )}>
-                          {formatCurrency(priceInfo.original, currency)}
-                        </Text>
+                      </Text>
                     )}
                     {priceInfo.discount && (
-                      <span className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full font-medium">
+                      <Text as="span" className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full font-medium">
                         -{priceInfo.discount}%
-                      </span>
-                        <Text as="span" className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full font-medium">
-                          -{priceInfo.discount}%
-                        </Text>
+                      </Text>
                     )}
                   </div>
                     <div className="flex items-center space-x-2">

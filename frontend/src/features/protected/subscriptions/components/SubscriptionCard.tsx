@@ -368,7 +368,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 <Button
                   onClick={handleCancel}
                   disabled={isCancelling}
-                  variant="error"
+                  variant="danger"
                   size="sm"
                 >
                   Cancel
@@ -379,7 +379,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 <Button
                   onClick={() => setShowDeleteModal(true)}
                   disabled={isDeleting}
-                  variant="error"
+                  variant="danger"
                   size="sm"
                 >
                   Delete
@@ -409,12 +409,11 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               <Button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                variant="error"
+                variant="danger"
                 size="sm"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
               </Button>
-              </button>
             </div>
           </div>
         </div>

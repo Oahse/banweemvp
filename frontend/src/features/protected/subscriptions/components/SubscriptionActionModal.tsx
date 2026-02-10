@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { X, TrashIcon, PauseIcon, PlayIcon, AlertTriangleIcon } from 'lucide-react';
-import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
+import { TrashIcon, PauseIcon, PlayIcon, AlertTriangleIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { useTheme } from '@/components/shared/contexts/ThemeContext';
 
 export type SubscriptionAction = 'cancel' | 'pause' | 'resume';
 
@@ -73,6 +74,7 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
   planName,
   loading = false
 }) => {
+  const { currentTheme } = useTheme();
   const [reason, setReason] = useState('');
   const [confirmText, setConfirmText] = useState('');
 
@@ -96,231 +98,146 @@ export const SubscriptionActionModal: React.FC<SubscriptionActionModalProps> = (
   const isConfirmValid = !config.requiresConfirmation || 
     confirmText.toLowerCase() === config.confirmationText?.toLowerCase();
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
-        onClick={handleClose}
-      />
-      
-      {/* Modal */}
-      <div className={combineThemeClasses(
-        'relative w-full max-w-md mx-auto rounded-lg shadow-xl',
-        themeClasses.background.surface,
-        'transform transition-all'
-      )}>
-        {/* Header */}
-        <div className={combineThemeClasses(
-          'flex items-center justify-between p-6 border-b',
-          themeClasses.border.light
-        )}>
-          <div className="flex items-center gap-3">
-            <div className={combineThemeClasses(
-              'p-2 rounded-full',
-              config.iconBg
-            )}>
-              <Icon className={combineThemeClasses(
-                'w-5 h-5',
-                config.iconColor
-              )} />
-            </div>
-            <div>
-              <Heading level={3} className={combineThemeClasses(
-                themeClasses.text.heading,
-                'text-lg font-semibold'
-              )}>
-                {config.title}
-              </Heading>
-              <Body className={combineThemeClasses(
-                themeClasses.text.muted,
-                'text-sm'
-              )}>
-                {planName} Plan
-              </Body>
-            </div>
+    <Modal isOpen={isOpen} onClose={handleClose} size="md">
+      <ModalHeader>
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-full ${config.iconBg}`}>
+            <Icon className={`w-5 h-5 ${config.iconColor}`} />
           </div>
-          
-          <Button
-            onClick={handleClose}
-            disabled={loading}
-            variant="ghost"
-            className={combineThemeClasses(
-              'p-1 rounded-md transition-colors',
-              themeClasses.text.muted,
-              themeClasses.interactive.hover,
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            )}
-          >
-            <X className="w-5 h-5" />
-          </Button>
+          <div>
+            <Heading level={3} className="text-lg font-semibold">
+              {config.title}
+            </Heading>
+            <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+              {planName} Plan
+            </Body>
+          </div>
         </div>
+      </ModalHeader>
 
-        {/* Content */}
-        <div className="p-6">
-          <div className="mb-4">
-            {/* Warning for destructive actions */}
-            {action === 'cancel' && (
-              <div className={combineThemeClasses(
-                'p-4 rounded-lg border-2 border-dashed mb-4',
-                'border-red-300 bg-red-50'
-              )}>
-                <div className="flex items-start gap-3">
-                  <AlertTriangleIcon className="w-5 h-5 mt-0.5 flex-shrink-0 text-red-500" />
-                  <div>
-                    <Heading level={4} className="font-semibold text-sm mb-1 text-red-800">
-                      {config.warning}
-                    </Heading>
-                    <Body className="text-sm text-red-700">
-                      {config.description}
-                    </Body>
-                  </div>
+      <ModalBody>
+        <div className="mb-4">
+          {/* Warning for destructive actions */}
+          {action === 'cancel' && (
+            <div className="p-4 rounded-lg border-2 border-dashed border-red-300 bg-red-50 mb-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangleIcon className="w-5 h-5 mt-0.5 flex-shrink-0 text-red-500" />
+                <div>
+                  <Heading level={4} className="font-semibold text-sm mb-1 text-red-800">
+                    {config.warning}
+                  </Heading>
+                  <Body className="text-sm text-red-700">
+                    {config.description}
+                  </Body>
                 </div>
               </div>
-            )}
-
-            {/* Info for non-destructive actions */}
-            {action !== 'cancel' && (
-              <>
-                <Body className={combineThemeClasses(
-                  themeClasses.text.secondary,
-                  'text-sm mb-3'
-                )}>
-                  {config.description}
-                </Body>
-                
-                {config.warning && (
-                  <div className={combineThemeClasses(
-                    'p-3 rounded-lg border mb-4',
-                    themeClasses.background.elevated,
-                    'border-yellow-300 border-opacity-30'
-                  )}>
-                    <Text className="text-sm font-medium text-yellow-700">
-                      Note: {config.warning}
-                    </Text>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Reason input */}
-            <div className="mb-4">
-              <Label 
-                htmlFor="action-reason"
-                className={combineThemeClasses(
-                  'block text-sm font-medium mb-2',
-                  themeClasses.text.primary
-                )}
-              >
-                {config.requiresConfirmation ? 'Please confirm by typing "CANCEL"' : 'Reason (optional)'}
-              </Label>
-              <textarea
-                id="action-reason"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                disabled={loading}
-                placeholder={config.reasonPlaceholder}
-                rows={3}
-                maxLength={500}
-                className={combineThemeClasses(
-                  'w-full px-3 py-2 border rounded-md resize-none transition-colors',
-                  themeClasses.background.surface,
-                  themeClasses.border.light,
-                  themeClasses.text.primary,
-                  'focus:outline-none focus:ring-2 focus:ring-[#61b482] focus:border-transparent',
-                  'placeholder:text-gray-400',
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
-                )}
-              />
-              <div className="flex justify-between items-center mt-1">
-                <p className={combineThemeClasses(
-                  themeClasses.text.muted,
-                  'text-xs'
-                )}>
-                  {config.reasonHelp}
-                </p>
-                <span className={combineThemeClasses(
-                  themeClasses.text.muted,
-                  'text-xs'
-                )}>
-                  {reason.length}/500
-                </span>
-              </div>
             </div>
+          )}
 
-            {/* Confirmation input for destructive actions */}
-            {config.requiresConfirmation && (
-              <div className="mb-4">
-                <label 
-                  htmlFor="confirm-action"
-                  className={combineThemeClasses(
-                    themeClasses.text.primary,
-                    'block text-sm font-medium mb-2'
-                  )}
-                >
-                  Type "{config.confirmationText}" to confirm {action}
-                </label>
-                <input
-                  id="confirm-action"
-                  type="text"
-                  value={confirmText}
-                  onChange={(e) => setConfirmText(e.target.value)}
-                  disabled={loading}
-                  placeholder={`Type ${config.confirmationText} here`}
-                  className={combineThemeClasses(
-                    'w-full px-3 py-2 border rounded-md transition-colors',
-                    themeClasses.background.surface,
-                    isConfirmValid ? 'border-green-300' : themeClasses.border.light,
-                    themeClasses.text.primary,
-                    'focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
-                    'placeholder:text-gray-400',
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                  )}
-                />
-              </div>
-            )}
+          {/* Info for non-destructive actions */}
+          {action !== 'cancel' && (
+            <>
+              <Body className={`text-sm mb-3 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {config.description}
+              </Body>
+              
+              {config.warning && (
+                <div className={`p-3 rounded-lg border mb-4 ${currentTheme === 'dark' ? 'bg-yellow-900/20 border-yellow-700/30' : 'bg-yellow-50 border-yellow-300/30'}`}>
+                  <Text className="text-sm font-medium text-yellow-700">
+                    Note: {config.warning}
+                  </Text>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Reason input */}
+          <div className="mb-4">
+            <Label 
+              htmlFor="action-reason"
+              className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
+            >
+              {config.reasonLabel}
+            </Label>
+            <textarea
+              id="action-reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              disabled={loading}
+              placeholder={config.reasonPlaceholder}
+              rows={3}
+              maxLength={500}
+              className={`w-full px-3 py-2 border rounded-md resize-none transition-colors ${
+                currentTheme === 'dark'
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+              } focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            />
+            <div className="flex justify-between items-center mt-1">
+              <p className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                {config.reasonHelp}
+              </p>
+              <span className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                {reason.length}/500
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className={combineThemeClasses(
-          'flex items-center justify-end gap-3 p-6 border-t',
-          themeClasses.border.light,
-          themeClasses.background.elevated
-        )}>
-          <Button
-            onClick={handleClose}
-            disabled={loading}
-            variant="ghost"
-            size="sm"
-            className={combineThemeClasses(
-              'p-1 rounded-lg transition-colors',
-              loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-            )}
-            leftIcon={<X size={20} />}
-          >
-            {action === 'cancel' ? 'Keep Subscription' : 'Cancel'}
-          </Button>
-          
-          <Button
-            onClick={handleConfirm}
-            disabled={loading || !isConfirmValid}
-            variant={action === 'cancel' ? 'destructive' : action === 'pause' ? 'warning' : 'success'}
-            size="sm"
-            className={combineThemeClasses(
-              getButtonClasses(action === 'cancel' ? 'danger' : action === 'pause' ? 'warning' : 'success', 'sm'),
-              'flex items-center gap-2',
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            )}
-            leftIcon={action === 'cancel' ? <TrashIcon size={16} /> : action === 'pause' ? <PauseIcon size={16} /> : <PlayIcon size={16} />}
-            isLoading={loading}
-          >
-            {loading ? getActionText(action) : getActionText(action)}
-          </Button>
+          {/* Confirmation input for destructive actions */}
+          {config.requiresConfirmation && (
+            <div className="mb-4">
+              <label 
+                htmlFor="confirm-action"
+                className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
+              >
+                Type "{config.confirmationText}" to confirm {action}
+              </label>
+              <input
+                id="confirm-action"
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                disabled={loading}
+                placeholder={`Type ${config.confirmationText} here`}
+                className={`w-full px-3 py-2 border rounded-md transition-colors ${
+                  currentTheme === 'dark'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                } ${
+                  isConfirmValid ? 'border-green-300' : ''
+                } focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              />
+            </div>
+          )}
         </div>
-      </div>
-    </div>
+      </ModalBody>
+
+      <ModalFooter>
+        <Button
+          onClick={handleClose}
+          disabled={loading}
+          variant="ghost"
+          size="sm"
+        >
+          {action === 'cancel' ? 'Keep Subscription' : 'Cancel'}
+        </Button>
+        
+        <Button
+          onClick={handleConfirm}
+          disabled={loading || !isConfirmValid}
+          variant={action === 'cancel' ? 'danger' : action === 'pause' ? 'warning' : 'success'}
+          size="sm"
+          leftIcon={loading ? undefined : <Icon size={16} />}
+          isLoading={loading}
+        >
+          {loading ? config.loadingText : config.buttonText}
+        </Button>
+      </ModalFooter>
+    </Modal>
   );
 };

@@ -230,18 +230,20 @@ export const SupplierDetail = () => {
                     )}
 
                     {supplier.specialties && supplier.specialties.length > 0 && (
-                              <Heading level={4} className="font-medium text-main mb-2">Specialties</Heading>
-                              <div className="flex flex-wrap gap-2">
-                                {supplier.specialties.map((specialty: any, index: number) => (
-                                  <Text
-                                    key={index}
-                                    as="span"
-                                    className="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full"
-                                  >
-                                    {specialty}
-                                  </Text>
-                                ))}
-                              </div>
+                      <div>
+                        <Heading level={4} className="font-medium text-main mb-2">Specialties</Heading>
+                        <div className="flex flex-wrap gap-2">
+                          {supplier.specialties.map((specialty: any, index: number) => (
+                            <Text
+                              key={index}
+                              as="span"
+                              className="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                            >
+                              {specialty}
+                            </Text>
+                          ))}
+                        </div>
+                      </div>
                     )}
 
                     {supplier.founded_year && (

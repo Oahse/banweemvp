@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../../SubscriptionContext';
+import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
 import { 
   PlusIcon, 
   PackageIcon,
@@ -15,7 +15,6 @@ import {
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Heading, Caption, Text, Body } from '@/components/ui/Text/Text';
-import { ProductVariantModal } from '@/components/ui/ProductVariantModal';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 interface Subscription {
   id: string;
@@ -49,7 +48,6 @@ interface Subscription {
 
 interface SubscriptionsProps {
   mode?: 'list' | 'manage';
-  // ...rest of the file (truncated for brevity)
 }
 
 export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) => {
@@ -166,7 +164,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <ConfirmationModal
-          open={showConfirmModal}
+          isOpen={showConfirmModal}
           onClose={() => setShowConfirmModal(false)}
           onConfirm={() => {
             if (!selectedId || !confirmAction) return;
@@ -177,7 +175,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
             setShowConfirmModal(false);
           }}
           title={confirmAction === 'pause' ? 'Pause Subscription' : confirmAction === 'resume' ? 'Resume Subscription' : confirmAction === 'cancel' ? 'Cancel Subscription' : 'Remove Subscription'}
-          description={`Are you sure you want to ${confirmAction} this subscription?`}
+          message={`Are you sure you want to ${confirmAction} this subscription?`}
         />
       )}
     </div>

@@ -13,6 +13,7 @@ import { toast } from 'react-hot-toast';
 import { cn } from '@/utils/utils';
 import { Button } from '@/components/ui/Button';
 import { Heading, Text } from '@/components/ui/Text';
+import { Card } from '@/components/ui/Card';
 
 /**
  * @typedef {object} ProductVariantImage
@@ -304,16 +305,24 @@ export const ProductCard = ({
       };
 
   return (
-    <motion.div
+    <Card
+      as="article"
+      hoverable
       className={cn(
-        'bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 group text-copy',
         'flex flex-col h-full',
-        viewMode === 'list' && 'flex-row items-center p-4',
-        'w-full'
+        viewMode === 'list' && 'flex-row items-center',
+        'w-full',
+        className
       )}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.2 }}>
-      <div className={cn('relative flex-shrink-0', viewMode === 'list' && 'w-48 h-48 mr-4')}>
+      orientation={viewMode === 'list' ? 'horizontal' : 'vertical'}
+      size="sm"
+      density="compact"
+    >
+      {/* Product Image with Badges and Quick Actions */}
+      <Card.Media
+        as="div"
+        className={cn('relative', viewMode === 'list' && 'w-48 h-48')}
+      >
         <Link to={`/products/${product.id}`}>
           {imageError ? (
             <div className={cn(
@@ -338,6 +347,7 @@ export const ProductCard = ({
             />
           )}
         </Link>
+        
         {/* Product badges */}
         {product.isNew && (
           <Text variant="caption" className="absolute top-2 left-2 bg-primary text-white font-medium px-2 py-1 rounded-full">
@@ -359,7 +369,8 @@ export const ProductCard = ({
             Out of Stock
           </Text>
         )}
-        {/* Quick action buttons - hidden on mobile for grid view */}
+        
+        {/* Quick action buttons */}
         <Button
           onClick={handleAddToWishlist}
           variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
@@ -379,8 +390,10 @@ export const ProductCard = ({
           aria-label="View product">
           <EyeIcon size={16} />
         </Link>
-      </div>
-      <div className={cn('flex flex-col flex-grow p-2 sm:p-3', viewMode === 'list' && 'p-0')}>
+      </Card.Media>
+
+      {/* Product Details */}
+      <Card.Body className={cn('flex flex-col flex-grow', viewMode === 'list' && 'p-0')}>
         <div className="space-y-1">
           <Text variant="caption" tone="secondary" className="line-clamp-1 uppercase tracking-wide">
             {(typeof product.category === 'object' && product.category.name) 
@@ -407,6 +420,7 @@ export const ProductCard = ({
             <Text variant="caption" tone="secondary">({Number(product.review_count || product.reviewCount) || 0})</Text>
           </div>
         </div>
+        
         <div className="mt-auto pt-1.5 sm:pt-2 space-y-1.5 sm:space-y-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
             <div className="space-y-0.5">
@@ -434,7 +448,8 @@ export const ProductCard = ({
               )}
             </div>
           </div>
-          {/* Mobile buttons - optimized for smaller cards */}
+          
+          {/* Mobile buttons */}
           <div className="flex flex-col gap-1 sm:hidden">
             <div className="grid grid-cols-2 gap-1">
               <Button
@@ -452,10 +467,8 @@ export const ProductCard = ({
                 )}
                 aria-label={isInCart ? "In cart" : "Add to cart"}
                 leftIcon={<ShoppingCartIcon size={10} />}
-              >
-              </Button>
+              />
               
-              {/* Mobile wishlist button */}
               <Button
                 onClick={handleAddToWishlist}
                 variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
@@ -468,12 +481,11 @@ export const ProductCard = ({
                 )}
                 aria-label={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}
                 leftIcon={<HeartIcon size={10} fill={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? 'currentColor' : 'none'} />}
-              >
-              </Button>
+              />
             </div>
           </div>
 
-          {/* Desktop buttons (hidden on mobile) */}
+          {/* Desktop buttons */}
           <div className={cn(
             'hidden items-center gap-2',
             'sm:flex',
@@ -494,10 +506,8 @@ export const ProductCard = ({
               )}
               aria-label={isInCart ? "In cart" : "Add to cart"}
               leftIcon={<ShoppingCartIcon size={12} />}
-            >
-            </Button>
+            />
             
-            {/* Desktop wishlist button */}
             <Button
               onClick={handleAddToWishlist}
               variant={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "danger" : "ghost"}
@@ -510,14 +520,14 @@ export const ProductCard = ({
               )}
               aria-label={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? "Remove from wishlist" : "Add to wishlist"}
               leftIcon={<HeartIcon size={12} fill={wishlistMode || isInWishlist(product.id, displayVariant?.id) ? 'currentColor' : 'none'} />}
-            >
-            </Button>
+            />
           </div>
         </div>
 
         {/* QR Code and Barcode Display */}
         {(showQRCode || showBarcode) && displayVariant && (
-          <div className="mt-4 pt-4 border-t border-border-light">
+          <>
+            <Card.Divider />
             <div className="flex items-center justify-center space-x-4">
               {showQRCode && displayVariant.qr_code && (
                 <div className="text-center">
@@ -556,9 +566,9 @@ export const ProductCard = ({
                 </div>
               )}
             </div>
-          </div>
+          </>
         )}
-      </div>
-    </motion.div>
+      </Card.Body>
+    </Card>
   );
 };

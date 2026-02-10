@@ -1,13 +1,16 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, ChevronLeft, ChevronRight, SearchIcon, DownloadIcon, ArrowUpDownIcon, PackageIcon, TruckIcon } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, SearchIcon, DownloadIcon, ArrowUpDownIcon, PackageIcon, TruckIcon } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '../components/AdminLayout';
+import AdminLayout from '../../../../components/layout/AdminLayout';
 import { ShippingListSkeleton } from '../components/skeletons/ShippingSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
+import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { Card } from '@/components/ui/Card';
 
 const LIMIT = 10;
 
@@ -51,8 +54,8 @@ export const AdminShipping = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [showModal, setShowModal] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const editModal = useModal();
+  const detailsModal = useModal();
   const [editingMethod, setEditingMethod] = useState<ShippingMethod | null>(null);
   const [viewingMethod, setViewingMethod] = useState<ShippingMethod | null>(null);
   const [formData, setFormData] = useState({
@@ -196,7 +199,7 @@ export const AdminShipping = () => {
       carrier: '',
       tracking_url_template: ''
     });
-    setShowModal(true);
+    editModal.open();
   };
 
   const openEditModal = (method: ShippingMethod) => {
@@ -210,12 +213,12 @@ export const AdminShipping = () => {
       carrier: method.carrier || '',
       tracking_url_template: method.tracking_url_template || ''
     });
-    setShowModal(true);
+    editModal.open();
   };
 
   const openDetailsModal = (method: ShippingMethod) => {
     setViewingMethod(method);
-    setShowDetailsModal(true);
+    detailsModal.open();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -265,7 +268,7 @@ export const AdminShipping = () => {
           }
         }
         toast.success('Shipping method updated successfully');
-        setShowModal(false);
+        editModal.close();
       } catch (error: any) {
         setAllMethods(previous);
         toast.error('Failed to update shipping method');
@@ -299,7 +302,7 @@ export const AdminShipping = () => {
         ));
       }
       toast.success('Shipping method created successfully');
-      setShowModal(false);
+      editModal.close();
     } catch (error: any) {
       setAllMethods(prev => prev.filter(method => method.id !== tempId));
       toast.error('Failed to create shipping method');
@@ -318,65 +321,166 @@ export const AdminShipping = () => {
     }
   };
 
-  const handleDownloadCSV = () => {
+  const fetchData = async (params: any) => {
     try {
-      // Apply same filters as the table to get all filtered results
+      setLoading(true);
+      setError(null);
+      
       let filteredMethods = [...allMethods];
       
-      if (debouncedSearchQuery) {
+      if (params.search) {
         filteredMethods = filteredMethods.filter((method: any) =>
-          method.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-          method.description?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+          method.name.toLowerCase().includes(params.search.toLowerCase()) ||
+          method.description?.toLowerCase().includes(params.search.toLowerCase())
         );
       }
       
-      if (statusFilter === 'active') {
+      if (params.filters?.status === 'active') {
         filteredMethods = filteredMethods.filter((method: any) => method.is_active);
-      } else if (statusFilter === 'inactive') {
+      } else if (params.filters?.status === 'inactive') {
         filteredMethods = filteredMethods.filter((method: any) => !method.is_active);
       }
       
-      // Export all filtered methods (not just current page)
-      const methodsToExport = filteredMethods.map((method: any) => ({
-        'Method Name': method.name || 'N/A',
-        'Description': method.description || 'No description',
-        'Cost': `$${(method.price || 0).toFixed(2)}`,
-        'Delivery Time': `${method.estimated_days || '-'} days`,
-        'Regions': method.regions?.join(', ') || 'All regions',
-        'Status': method.is_active ? 'Active' : 'Inactive',
-        'Created At': new Date(method.created_at || '').toLocaleDateString()
-      }));
-
-      // Create CSV content
-      const headers = Object.keys(methodsToExport[0] || {});
-      const csvContent = [
-        headers.join(','),
-        ...methodsToExport.map((item: any) => {
-          return headers.map(header => {
-            const value = item[header];
-            return typeof value === 'string' && value.includes(',') 
-              ? `"${value}"` 
-              : value;
-          }).join(',');
-        })
-      ].join('\n');
-
-      // Create and download CSV file
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `shipping-methods-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      if (params.sort_by === 'created_at') {
+        filteredMethods.sort((a: any, b: any) => {
+          const aDate = new Date(a.created_at || 0);
+          const bDate = new Date(b.created_at || 0);
+          return params.sort_order === 'asc' 
+            ? aDate.getTime() - bDate.getTime()
+            : bDate.getTime() - aDate.getTime();
+        });
+      } else if (params.sort_by === 'name') {
+        filteredMethods.sort((a: any, b: any) => {
+          const aName = a.name.toLowerCase();
+          const bName = b.name.toLowerCase();
+          return params.sort_order === 'asc' 
+            ? aName.localeCompare(bName)
+            : bName.localeCompare(aName);
+        });
+      } else if (params.sort_by === 'cost') {
+        filteredMethods.sort((a: any, b: any) => {
+          return params.sort_order === 'asc' 
+            ? a.price - b.price
+            : b.price - a.price;
+        });
+      } else if (params.sort_by === 'estimated_days') {
+        filteredMethods.sort((a: any, b: any) => {
+          return params.sort_order === 'asc' 
+            ? a.estimated_days - b.estimated_days
+            : b.estimated_days - a.estimated_days;
+        });
+      }
       
-      toast.success('Shipping methods downloaded successfully');
-    } catch (error: any) {
-      toast.error('Failed to download shipping methods');
+      const total = filteredMethods.length;
+      const pages = Math.max(1, Math.ceil(total / params.limit));
+      const startIndex = (params.page - 1) * params.limit;
+      const endIndex = startIndex + params.limit;
+      const paginatedMethods = filteredMethods.slice(startIndex, endIndex);
+      
+      setMethods(paginatedMethods);
+      setPagination({
+        page: params.page,
+        limit: params.limit,
+        total: total,
+        pages: pages
+      });
+      
+    } catch (err: any) {
+      const message = err?.response?.data?.message || 'Failed to load shipping methods';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Define columns for AdminDataTable
+  const columns: AdminColumn<ShippingMethod>[] = [
+    {
+      key: 'name',
+      label: 'Method Name',
+      sortable: true,
+      render: (value: string) => (
+        <Text variant="caption" weight="medium" truncate="single">{value || 'N/A'}</Text>
+      ),
+    },
+    {
+      key: 'description',
+      label: 'Description',
+      render: (value: string) => (
+        <Text variant="caption" tone="secondary" truncate="single">{value || 'No description'}</Text>
+      ),
+    },
+    {
+      key: 'price',
+      label: 'Cost',
+      sortable: true,
+      render: (value: number) => (
+        <Text variant="caption" weight="semibold">${(value || 0).toFixed(2)}</Text>
+      ),
+    },
+    {
+      key: 'estimated_days',
+      label: 'Delivery Time',
+      sortable: true,
+      render: (value: number) => (
+        <Text variant="caption" tone="secondary">{value || '-'} days</Text>
+      ),
+    },
+    {
+      key: 'regions',
+      label: 'Regions',
+      render: (value: string[]) => (
+        <Text variant="caption" tone="secondary" truncate="single">{value?.join(', ') || 'All regions'}</Text>
+      ),
+    },
+    {
+      key: 'is_active',
+      label: 'Status',
+      render: (value: boolean) => (
+        <Text className={`px-2 py-1 rounded-full font-semibold ${
+          value 
+            ? 'bg-success/20 text-success' 
+            : 'bg-error/20 text-error'
+        }`}>
+          {value ? 'Active' : 'Inactive'}
+        </Text>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (_: any, row: ShippingMethod) => (
+        <div className="flex gap-1">
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(row.id);
+            }}
+            variant="danger"
+            size="sm"
+            leftIcon={<TrashIcon size={14} />}
+          >
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const filters: FilterConfig[] = [
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'select',
+      options: [
+        { value: '', label: 'All Status' },
+        { value: 'active', label: 'Active Only' },
+        { value: 'inactive', label: 'Inactive Only' }
+      ],
+      placeholder: 'All Status',
+    },
+  ];
 
   if (initialLoading) {
     return (
@@ -405,311 +509,43 @@ export const AdminShipping = () => {
         </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className={`p-4 rounded-lg border ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="flex flex-col gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <SearchIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
-              <input
-                type="text"
-                placeholder="Search shipping methods..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm ${
-                  currentTheme === 'dark' 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }`}
-              />
-              {searchQuery !== debouncedSearchQuery && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className={`w-4 h-4 border-2 rounded-full animate-spin ${
-                    currentTheme === 'dark' 
-                      ? 'border-white border-t-transparent' 
-                      : 'border-gray-900 border-t-transparent'
-                  }`}></div>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            <Dropdown
-              options={[
-                { value: '', label: 'All Status' },
-                { value: 'active', label: 'Active Only' },
-                { value: 'inactive', label: 'Inactive Only' }
-              ]}
-              value={statusFilter}
-              onChange={setStatusFilter}
-              placeholder="All Status"
-              className="min-w-[120px]"
-            />
-            
-            <Dropdown
-              options={[
-                { value: 'created_at', label: 'Created' },
-                { value: 'name', label: 'Method Name' },
-                { value: 'cost', label: 'Cost' },
-                { value: 'estimated_days', label: 'Delivery Time' }
-              ]}
-              value={sortBy}
-              onChange={setSortBy}
-              placeholder="Sort by"
-              className="min-w-[120px]"
-            />
-            
-            <Button
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              variant="outline"
-              size="sm"
-              leftIcon={<ArrowUpDownIcon size={14} />}
-            >
-              Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
-            </Button>
-          </div>
+      <AdminDataTable
+        data={methods}
+        loading={loading}
+        error={error}
+        pagination={pagination}
+        columns={columns}
+        fetchData={fetchData}
+        searchPlaceholder="Search shipping methods..."
+        filters={filters}
+        actions={
+          <Button
+            onClick={openAddModal}
+            variant="primary"
+            size="sm"
+            leftIcon={<PlusIcon size={14} />}
+          >
+            Add Shipping Method
+          </Button>
+        }
+        exportable={true}
+        emptyMessage="No shipping methods found"
+        responsive="cards"
+        limit={LIMIT}
+        onRowClick={openDetailsModal}
+      />
 
-          {/* Active Filters */}
-          {(debouncedSearchQuery || statusFilter) && (
-            <div className={`flex items-center gap-2 pt-2 border-t ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
-              <Text variant="body-sm" tone="secondary">Active filters:</Text>
-              {debouncedSearchQuery && (
-                <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
-                  Search: "{debouncedSearchQuery}"
-                  <Button
-                    onClick={() => setSearchQuery('')}
-                    variant="ghost"
-                    size="sm"
-                    className="ml-1 hover:text-primary-dark"
-                    leftIcon={<TrashIcon size={12} />}
-                  >
-                  </Button>
-                </Text>
-              )}
-              {statusFilter && (
-                <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
-                  Status: {statusFilter === 'active' ? 'Active Only' : 'Inactive Only'}
-                  <Button
-                    onClick={() => setStatusFilter('')}
-                    variant="ghost"
-                    size="sm"
-                    className="ml-1 hover:text-primary-dark"
-                    leftIcon={<TrashIcon size={12} />}
-                  >
-                    Clear
-                  </Button>
-                </Text>
-              )}
-              <Button
-                onClick={() => {
-                  setSearchQuery('');
-                  setStatusFilter('');
-                }}
-                variant="secondary"
-                size="sm"
-              >
-                Clear all
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {error && (
-        <div className={`p-4 rounded-lg border flex items-start gap-3 ${
-          currentTheme === 'dark' 
-            ? 'bg-red-900/20 border-red-800 text-red-200' 
-            : 'bg-red-50 border-red-200 text-red-800'
-        }`}>
-          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <div>
-            <Text weight="semibold">Error</Text>
-            <Text variant="body-sm">{error}</Text>
-          </div>
-        </div>
-      )}
-
-      <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className={`p-4 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-            <Heading level={2} weight="medium">All Shipping Methods</Heading>
-        </div>
-
-        {methods.length > 0 ? (
+      <Modal isOpen={detailsModal.isOpen} onClose={detailsModal.close} size="lg">
+        {viewingMethod && (
           <>
-            {/* Desktop table */}
-            <div className="overflow-x-auto hidden md:block">
-              <table className="w-full">
-                <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
-                  <tr>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Method Name</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Description</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Cost</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Delivery Time</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Regions</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Status</Text></th>
-                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Actions</Text></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {methods.map((method: any) => (
-                    <tr
-                      key={method.id}
-                      onClick={() => openDetailsModal(method)}
-                      className={`border-b cursor-pointer ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}
-                    >
-                      <td className="px-4 py-3 max-w-[150px] truncate"><Text variant="caption" weight="medium" truncate="single">{method.name || 'N/A'}</Text></td>
-                      <td className="px-4 py-3 max-w-[200px] truncate"><Text variant="caption" tone="secondary" truncate="single">{method.description || 'No description'}</Text></td>
-                      <td className="px-4 py-3"><Text variant="caption" weight="semibold">${(method.price || 0).toFixed(2)}</Text></td>
-                      <td className="px-4 py-3"><Text variant="caption" tone="secondary">{method.estimated_days || '-'} days</Text></td>
-                      <td className="px-4 py-3 max-w-[150px] truncate"><Text variant="caption" tone="secondary" truncate="single">{method.regions?.join(', ') || 'All regions'}</Text></td>
-                      <td className="px-4 py-3">
-                        <Text className={`px-2 py-1 rounded-full font-semibold ${
-                          method.is_active 
-                            ? 'bg-success/20 text-success' 
-                            : 'bg-error/20 text-error'
-                        }`}>
-                          {method.is_active ? 'Active' : 'Inactive'}
-                        </Text>
-                      </td>
-                      <td className="px-4 py-3 text-xs">
-                        <div className="flex gap-1">
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(method.id);
-                            }}
-                            variant="danger"
-                            size="sm"
-                            leftIcon={<TrashIcon size={14} />}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile cards */}
-            <div className={`md:hidden divide-y ${currentTheme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
-              {methods.map((method: any) => (
-                <div
-                  key={method.id}
-                  onClick={() => openDetailsModal(method)}
-                  className={`p-4 flex flex-col gap-2 cursor-pointer ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <Text variant="body-sm" weight="medium" tone="primary" truncate="single">{method.name || 'N/A'}</Text>
-                    <Text className={`px-2 py-1 rounded-full font-semibold ${
-                      method.is_active 
-                        ? 'bg-success/20 text-success' 
-                        : 'bg-error/20 text-error'
-                    }`}>
-                      {method.is_active ? 'Active' : 'Inactive'}
-                    </Text>
-                  </div>
-                  <Text variant="caption" tone="secondary" truncate="single">{method.description || 'No description'}</Text>
-                  <div className="flex items-center justify-between">
-                    <Text variant="caption" tone="secondary">{method.estimated_days || '-'} days</Text>
-                    <Text variant="caption" weight="semibold">${(method.price || 0).toFixed(2)}</Text>
-                  </div>
-                  <Text variant="caption" tone="secondary" truncate="single">
-                    {method.regions?.join(', ') || 'All regions'}
-                  </Text>
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(method.id);
-                    }}
-                    variant="danger"
-                    size="sm"
-                    leftIcon={<TrashIcon size={14} />}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              ))}
-            </div>
-
-            {pagination.total > 0 && (
-              <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-                <Text variant="body-sm" tone="secondary">
-                  Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} methods
-                  {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
-                </Text>
-                <div className="flex items-center gap-1">
-                  <Button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Previous
-                  </Button>
-                  
-                  {/* Page numbers */}
-                  <div className="flex items-center gap-1 mx-1 lg:mx-2">
-                    {Array.from({ length: Math.min(5, Math.max(1, pagination.pages)) }, (_, i) => {
-                      let pageNum: number;
-                      if (pagination.pages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (page >= pagination.pages - 2) {
-                        pageNum = pagination.pages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-                      
-                      return (
-                        <Button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          variant={page === pageNum ? 'primary' : 'ghost'}
-                          size="sm"
-                        >
-                          {pageNum}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                  
-                  <Button
-                    onClick={() => setPage((p) => (pagination.pages > 0 ? Math.min(pagination.pages, p + 1) : p + 1))}
-                    disabled={page >= pagination.pages || pagination.pages <= 1}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className={`p-6 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>No shipping methods found</div>
-        )}
-      </div>
-
-      {showDetailsModal && viewingMethod && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowDetailsModal(false)}>
-          <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between mb-4">
+            <ModalHeader>
               <div>
                 <Heading level={3} className="text-lg font-semibold">{viewingMethod.name}</Heading>
                 <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Shipping method details</Body>
               </div>
-              <Button
-                onClick={() => setShowDetailsModal(false)}
-                variant="ghost"
-                size="sm"
-              >
-                Close
-              </Button>
-            </div>
+            </ModalHeader>
+
+            <ModalBody>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
@@ -734,14 +570,15 @@ export const AdminShipping = () => {
               </div>
               <div>
                 <Body className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tracking URL Template</Body>
-                <Body className="break-all">{viewingMethod.tracking_url_template || '—'}</Body>
+                <Body>{viewingMethod.tracking_url_template || '—'}</Body>
               </div>
             </div>
+            </ModalBody>
 
-            <div className="mt-6 flex justify-end gap-2">
+            <ModalFooter>
               <Button
                 onClick={() => {
-                  setShowDetailsModal(false);
+                  detailsModal.close();
                   openEditModal(viewingMethod);
                 }}
                 variant="primary"
@@ -750,29 +587,21 @@ export const AdminShipping = () => {
               >
                 Edit
               </Button>
-            </div>
+            </ModalFooter>
+          </>
+        )}
+      </Modal>
+
+      <Modal isOpen={editModal.isOpen} onClose={editModal.close} size="lg">
+        <ModalHeader>
+          <div>
+            <Heading level={3} className="text-lg font-semibold">{editingMethod ? 'Edit Shipping Method' : 'Add Shipping Method'}</Heading>
+            <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fill in the details below</Body>
           </div>
-        </div>
-      )}
+        </ModalHeader>
 
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowModal(false)}>
-          <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <Heading level={3} className="text-lg font-semibold">{editingMethod ? 'Edit Shipping Method' : 'Add Shipping Method'}</Heading>
-                <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fill in the details below</Body>
-              </div>
-              <Button
-                onClick={() => setShowModal(false)}
-                variant="ghost"
-                size="sm"
-              >
-                Close
-              </Button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <ModalBody>
+          <form onSubmit={handleSubmit} id="shipping-form" className="space-y-4">
               <div>
                 <Label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Name *
@@ -862,7 +691,7 @@ export const AdminShipping = () => {
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                     }`}
-                    placeholder="e.g., UPS"
+                    placeholder="e.g., UPS, FedEx"
                   />
                 </div>
                 <div>
@@ -878,48 +707,34 @@ export const AdminShipping = () => {
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                     }`}
-                    placeholder="https://carrier.com/track/{tracking_number}"
+                    placeholder="e.g., https://carrier.com/track/{tracking_number}"
                   />
                 </div>
               </div>
+          </form>
+        </ModalBody>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  role="switch"
-                  aria-checked={formData.is_active}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setFormData(prev => ({ ...prev, is_active: !prev.is_active }));
-                  }}
-                  variant="primary"
-                  size="sm"
-                >
-                  {formData.is_active ? 'Active' : 'Inactive'}
-                </Button>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <Button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  variant="secondary"
-                  size="sm"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="sm"
-                >
-                  {editingMethod ? 'Update' : 'Create'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+        <ModalFooter>
+          <Button
+            onClick={() => {
+              editModal.close();
+              setEditingMethod(null);
+            }}
+            variant="secondary"
+            size="sm"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            form="shipping-form"
+            variant="primary"
+            size="sm"
+          >
+            {editingMethod ? 'Update Shipping Method' : 'Add Shipping Method'}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
     </AdminLayout>
   );

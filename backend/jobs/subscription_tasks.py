@@ -42,6 +42,11 @@ class SubscriptionTaskManager:
                 await asyncio.sleep(self.check_interval_minutes * 60)
             except Exception as e:
                 logger.error(f"Error in subscription scheduler: {e}")
+                # If ARQ is not available, fall back to direct processing
+                try:
+                    await self._process_subscription_orders()
+                except Exception as direct_error:
+                    logger.error(f"Error in direct subscription processing: {direct_error}")
                 await asyncio.sleep(300)  # Wait 5 minutes before retrying
     
     def stop_subscription_scheduler(self):
@@ -119,6 +124,10 @@ class SubscriptionTaskManager:
     
     async def _process_subscription_orders(self):
         """Process subscriptions due for order placement"""
+        if not get_db:
+            logger.error("Database generator not available")
+            return
+        
         async for db in get_db():
             try:
                 scheduler = SubscriptionSchedulerService(db)

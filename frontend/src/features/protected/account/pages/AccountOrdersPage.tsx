@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { ChevronDownIcon, ChevronUpIcon, EyeIcon, DownloadIcon, ShoppingBagIcon, TruckIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { ChevronDownIcon, ChevronUpIcon, EyeIcon, DownloadIcon, ShoppingBagIcon, TruckIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SkeletonOrderTable } from '@/features/protected/account/components/SkeletonOrderTable';
+import { Table } from '@/components/ui/Table';
 import { usePaginatedApi } from '@/components/shared/hooks/useAsync';
 import OrdersAPI from '@/api/orders';
 import { toast } from 'react-hot-toast';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
+import { Pagination } from '@/components/ui/Pagination';
 import { Text, Heading } from '@/components/ui/Text/Text';
 
 
@@ -100,10 +101,23 @@ export const Orders = (props: OrdersProps) => {
       </div>
 
       {loading ? (
-        <SkeletonOrderTable />
+        <Table>
+          <Table.Head>
+            <Table.Row>
+              <Table.HeaderCell>Order ID</Table.HeaderCell>
+              <Table.HeaderCell>Date</Table.HeaderCell>
+              <Table.HeaderCell>Status</Table.HeaderCell>
+              <Table.HeaderCell>Total</Table.HeaderCell>
+              <Table.HeaderCell>Actions</Table.HeaderCell>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            <Table.Loading rows={5} columns={5} />
+          </Table.Body>
+        </Table>
       ) : error ? (
         <div className="text-center py-6">
-          <p className="text-xs text-red-600">Error loading orders</p>
+          <Text as="p" className="text-xs text-red-600">Error loading orders</Text>
         </div>
       ) : ordersArray.length === 0 ? (
         <div className="text-center py-6">
@@ -153,13 +167,13 @@ export const Orders = (props: OrdersProps) => {
                   </Button>
                   
                   <div className="flex space-x-2">
-                    <Link
-                      to={`/account/orders/${order.id}`}
-                      className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      <EyeIcon className="h-3 w-3 mr-1" />
-                      View
-                    </Link>
+                        <Link
+                          to={`/account/orders/${order.id}`}
+                          className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50"
+                        >
+                          <EyeIcon className="h-3 w-3 mr-1" />
+                          <Text as="span">View</Text>
+                        </Link>
                   </div>
                 </div>
 
@@ -211,27 +225,13 @@ export const Orders = (props: OrdersProps) => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  size="icon"
-                  leftIcon={<ChevronLeftIcon className="h-3 w-3" />}
-                />
-                <span className="text-xs text-gray-600">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  variant="outline"
-                  size="icon"
-                  leftIcon={<ChevronRightIcon className="h-3 w-3" />}
-                />
-              </div>
-            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalItems={totalOrders}
+              pageSize={10}
+              onPageChange={setCurrentPage}
+              size="sm"
+            />
           )}
         </div>
       )}

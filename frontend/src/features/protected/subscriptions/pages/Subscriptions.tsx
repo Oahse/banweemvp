@@ -122,7 +122,7 @@ export const Subscriptions = () => {
                         }`}
                       >
                         <span className="mr-3">{item.icon}</span>
-                        <span>{item.label}</span>
+                          <Text as="span">{item.label}</Text>
                       </Link>
                     </li>
                   ))}
@@ -135,7 +135,7 @@ export const Subscriptions = () => {
                       leftIcon={<LogOutIcon size={16} />}
                     >
                       <LogOutIcon size={20} className="mr-3" />
-                      <span>Logout</span>
+                        <Text as="span">Logout</Text>
                     </Button>
                   </li>
                 </ul>
@@ -195,7 +195,7 @@ export const Subscriptions = () => {
                       }`}
                     >
                       <span className="mr-3">{item.icon}</span>
-                      <span>{item.label}</span>
+                      <Text as="span">{item.label}</Text>
                     </Link>
                   </li>
                 ))}
@@ -208,7 +208,7 @@ export const Subscriptions = () => {
                     leftIcon={<LogOutIcon size={16} />}
                   >
                     <LogOutIcon size={20} className="mr-3" />
-                    <span>Logout</span>
+                    <Text as="span">Logout</Text>
                   </Button>
                 </li>
               </ul>

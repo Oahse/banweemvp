@@ -1,7 +1,8 @@
 import { useEffect, Suspense, lazy } from 'react';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/contexts/AuthContext';
-import AccountLayout from '../components/AccountLayout';
+import AccountLayout from '../../../../components/layout/AccountLayout';
 import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
 // Account Skeleton for loading states
 const AccountSkeleton = () => (
@@ -18,17 +19,15 @@ const AccountOrdersPage = lazy(() => import('./AccountOrdersPage').then(module =
 const AccountOrderDetailPage = lazy(() => import('./AccountOrderDetailPage').then(module => ({ default: module.OrderDetail })));
 const AccountTrackOrderPage = lazy(() => import('./AccountTrackOrderPage'));
 const AccountWishlistPage = lazy(() => import('./AccountWishlistPage').then(module => ({ default: module.Wishlist })));
-const AccountWishlistEditPage = lazy(() => import('./AccountWishlistEditPage'));
 const AccountAddressesPage = lazy(() => import('./AccountAddressesPage').then(module => ({ default: module.Addresses })));
 const AccountMySubscriptionsPage = lazy(() => import('./AccountMySubscriptionsPage').then(module => ({ default: module.MySubscriptions })));
 const AccountSubscriptionEditPage = lazy(() => import('./AccountSubscriptionEditPage'));
-const SubscriptionDetails = lazy(() => import('./SubscriptionDetails'));
-const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage').then(module => ({ default: module.AccountPaymentMethodsPage })));
+const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage'));
 
-// Loading Spinner
-const LoadingSpinner = () => (
+// Loading Spinner fallback
+const LoadingFallback = () => (
   <div className="flex items-center justify-center h-64">
-    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+    <AnimatedLoader size="lg" variant="spinner" color="primary" />
   </div>
 );
 
@@ -45,7 +44,7 @@ export const Account = () => {
   }, [user, navigate]);
 
   if (!user) {
-    return <LoadingSpinner />;
+    return <LoadingFallback />;
   }
 
   return (
@@ -60,11 +59,9 @@ export const Account = () => {
           <Route path="/tracking" element={<AccountTrackOrderPage />} />
           {/* <Route path="/tracking/:shipmentId" element={<ShipmentTracking />} /> */} // TODO: Implement shipping module
           <Route path="/wishlist" element={<AccountWishlistPage />} />
-          <Route path="/wishlist/:wishlistId/edit" element={<AccountWishlistEditPage />} />
           <Route path="/addresses" element={<AccountAddressesPage />} />
           <Route path="/payment-methods" element={<AccountPaymentMethodsPage />} />
           <Route path="/subscriptions" element={<AccountMySubscriptionsPage /> } />
-          <Route path="/subscriptions/:subscriptionId" element={<SubscriptionDetails />} />
           <Route path="/subscriptions/:subscriptionId/edit" element={<AccountSubscriptionEditPage />} />
           <Route path="/subscriptions/:subscriptionId/orders" element={<AccountOrdersPage />} />
           

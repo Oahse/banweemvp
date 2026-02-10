@@ -56,6 +56,15 @@ class DiscountExpirationTaskManager:
         Returns:
             Summary of expiration handling results
         """
+        if AsyncSessionDB is None:
+            logger.error("Database session not available")
+            return {
+                'expired_discounts_count': 0,
+                'affected_subscriptions': 0,
+                'notifications_sent': 0,
+                'error': 'Database session not available'
+            }
+        
         async with AsyncSessionDB() as db_session:
             try:
                 discount_engine = DiscountEngine(db_session)

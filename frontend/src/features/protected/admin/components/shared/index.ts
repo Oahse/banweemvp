@@ -1,18 +1,18 @@
 // Admin Shared Components
-export { default as DataTable } from './DataTable';
+export { default as DataTable } from './AdminDataTable'; // New enhanced version
 export { default as StatsCard } from './StatsCard';
 export { default as PageLayout } from './PageLayout';
 export { default as FilterBar } from './FilterBar';
 
 // Types
 export type { 
-  Column, 
+  AdminColumn as Column,
   FilterOption, 
   FilterConfig, 
   PaginationInfo, 
   AdminDataTableProps, 
   FetchParams 
-} from './DataTable';
+} from './AdminDataTable';
 
 export type { AdminStatsCardProps } from './StatsCard';
 export type { AdminPageLayoutProps } from './PageLayout';

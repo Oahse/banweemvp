@@ -13,12 +13,12 @@ import {
   PackageIcon,
   EditIcon,
   EyeIcon,
-  ShareIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon
+  ShareIcon
 } from 'lucide-react';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
+import { Pagination } from '@/components/ui/Pagination';
 import { Text, Heading, Body, Caption } from '@/components/ui/Text/Text';
+import { Card } from '@/components/ui/Card';
 import { ProductCard } from '@/components/generic/ProductCard';
 import { Product, ProductVariant } from '@/types';
 
@@ -83,62 +83,69 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 bg-white rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <Heading level={2} className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <HeartIcon size={20} /> My Wishlist
-      </Heading>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {paginatedItems.map((item: WishlistItem) => (
-          <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex flex-col">
-            <ProductCard product={item.product} variant={item.variant} />
-            <div className="mt-2 flex gap-2">
-              <Button
-                variant="primary"
-                size="sm"
-                leftIcon={<ShoppingCartIcon size={14} />}
-                onClick={() => addToCart(item.product, item.variant)}
-              >
-                Add to Cart
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                leftIcon={<TrashIcon size={14} />}
-                onClick={() => {
-                  setItemToRemove(item.id);
-                  setShowRemoveModal(true);
-                }}
-              >
-                Remove
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-6 gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-            leftIcon={<ChevronLeftIcon size={14} />}
-          >
-            Prev
-          </Button>
-          <Text as="span" className="text-xs">Page {currentPage} of {totalPages}</Text>
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-            rightIcon={<ChevronRightIcon size={14} />}
-          >
-            Next
-          </Button>
+    <Card>
+      <Card.Header>
+        <div className="flex items-center gap-2">
+          <HeartIcon size={20} />
+          <Card.Title size="md">My Wishlist</Card.Title>
         </div>
-      )}
+      </Card.Header>
+      <Card.Body>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {paginatedItems.map((item: WishlistItem) => (
+            <Card key={item.id} variant="outlined">
+              <Card.Body density="compact">
+                <ProductCard product={item.product} selectedVariant={item.variant} />
+              </Card.Body>
+              <Card.Footer>
+                <div className="flex gap-2">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    leftIcon={<ShoppingCartIcon size={14} />}
+                    onClick={() => addToCart(item.product, item.variant)}
+                  >
+                    Add to Cart
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    leftIcon={<TrashIcon size={14} />}
+                    onClick={() => {
+                      setItemToRemove(item.id);
+                      setShowRemoveModal(true);
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              </Card.Footer>
+            </Card>
+          ))}
+        </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-6 gap-2">
+            <Pagination
+              currentPage={currentPage}
+              totalItems={wishlistItems.length}
+              pageSize={itemsPerPage}
+              onPageChange={setCurrentPage}
+              size="sm"
+            />
+          </div>
+        )}
+        {/* Clear Wishlist Button */}
+        <Button
+          variant="danger"
+          size="sm"
+          leftIcon={<TrashIcon size={16} />}
+          onClick={() => setShowClearModal(true)}
+          className="mt-6"
+        >
+          Clear Wishlist
+        </Button>
+      </Card.Body>
       {/* Remove Modal */}
       {showRemoveModal && (
         <ConfirmationModal
@@ -165,16 +172,6 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
           description="Are you sure you want to clear your entire wishlist?"
         />
       )}
-      {/* Clear Wishlist Button */}
-      <Button
-        variant="danger"
-        size="sm"
-        leftIcon={<TrashIcon size={16} />}
-        onClick={() => setShowClearModal(true)}
-        className="mt-6"
-      >
-        Clear Wishlist
-      </Button>
-    </div>
+    </Card>
   );
 };

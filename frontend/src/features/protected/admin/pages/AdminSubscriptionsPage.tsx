@@ -1,14 +1,17 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, ChevronLeft, ChevronRight, Calendar, DollarSign, User, Package, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import { Loader, AlertCircle, PlusIcon, EditIcon, TrashIcon, Calendar, DollarSign, User, Package, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, CreditCardIcon } from 'lucide-react';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { DateTimeDropdown } from '@/components/ui/DateTimeDropdown';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import AdminLayout from '../components/AdminLayout';
+import AdminLayout from '../../../../components/layout/AdminLayout';
 import { SubscriptionsListSkeleton } from '../components/skeletons/SubscriptionsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Modal, ModalHeader, ModalBody, useModal } from '@/components/ui/Modal';
+import { AdminDataTable, AdminColumn, FilterConfig } from '../components/shared/AdminDataTable';
+import { Card } from '@/components/ui/Card';
 
 const LIMIT = 20;
 
@@ -87,14 +90,14 @@ export const AdminSubscriptions = () => {
   const [dateFromFilter, setDateFromFilter] = useState('');
   const [dateToFilter, setDateToFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const detailsModal = useModal();
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const handleViewSubscription = (subscription: Subscription) => {
     setSelectedSubscription(subscription);
-    setShowDetailsModal(true);
+    detailsModal.open();
   };
 
   const getCostBreakdown = (subscription: Subscription) => {
@@ -113,84 +116,199 @@ export const AdminSubscriptions = () => {
     };
   };
 
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300); // 300ms delay
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Reset to page 1 when filters change
-  const resetPage = useCallback(() => {
-    setPage(1);
-  }, []);
-
-  useEffect(() => {
-    resetPage();
-  }, [debouncedSearchQuery, statusFilter, dateFromFilter, dateToFilter, sortBy, sortOrder, resetPage]);
-
-  useEffect(() => {
-    const fetchSubscriptions = async () => {
-      try {
-        if (page === 1 && !searchQuery && !statusFilter) {
-          setInitialLoading(true);
-        } else {
-          setLoading(true);
-        }
-        setError(null);
+  const fetchData = async (params: any) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await AdminAPI.getSubscriptions({
+        page: params.page,
+        limit: params.limit,
+        search: params.search,
+        status: params.filters?.status || undefined,
+        date_from: params.filters?.date_from || undefined,
+        date_to: params.filters?.date_to || undefined,
+        sort_by: params.sort_by,
+        sort_order: params.sort_order
+      });
+      
+      if (response?.success && response?.data) {
+        const data = response.data;
+        const allSubscriptions = Array.isArray(data) ? data : data?.data || data?.items || [];
         
-        const response = await AdminAPI.getSubscriptions({
-          page,
-          limit: LIMIT,
-          status: statusFilter || undefined,
-          search: debouncedSearchQuery || undefined,
-          date_from: dateFromFilter || undefined,
-          date_to: dateToFilter || undefined,
-          sort_by: sortBy,
-          sort_order: sortOrder
+        let filteredSubscriptions = allSubscriptions;
+        
+        if (params.search) {
+          filteredSubscriptions = filteredSubscriptions.filter((sub: any) =>
+            sub.user?.email?.toLowerCase().includes(params.search.toLowerCase()) ||
+            sub.user?.name?.toLowerCase().includes(params.search.toLowerCase()) ||
+            sub.subscription_plan?.name?.toLowerCase().includes(params.search.toLowerCase())
+          );
+        }
+        
+        if (params.filters?.status) {
+          filteredSubscriptions = filteredSubscriptions.filter((sub: any) => sub.status === params.filters.status);
+        }
+        
+        if (params.filters?.date_from) {
+          filteredSubscriptions = filteredSubscriptions.filter((sub: any) => {
+            const subDate = new Date(sub.created_at || 0);
+            const fromDate = new Date(params.filters.date_from);
+            return subDate >= fromDate;
+          });
+        }
+        
+        if (params.filters?.date_to) {
+          filteredSubscriptions = filteredSubscriptions.filter((sub: any) => {
+            const subDate = new Date(sub.created_at || 0);
+            const toDate = new Date(params.filters.date_to);
+            return subDate <= toDate;
+          });
+        }
+        
+        if (params.sort_by === 'created_at') {
+          filteredSubscriptions.sort((a: any, b: any) => {
+            const aDate = new Date(a.created_at || 0);
+            const bDate = new Date(b.created_at || 0);
+            return params.sort_order === 'asc' 
+              ? aDate.getTime() - bDate.getTime()
+              : bDate.getTime() - aDate.getTime();
+          });
+        } else if (params.sort_by === 'user_email') {
+          filteredSubscriptions.sort((a: any, b: any) => {
+            const aEmail = (a.user?.email || '').toLowerCase();
+            const bEmail = (b.user?.email || '').toLowerCase();
+            return params.sort_order === 'asc' 
+              ? aEmail.localeCompare(bEmail)
+              : bEmail.localeCompare(aEmail);
+          });
+        } else if (params.sort_by === 'subscription_plan') {
+          filteredSubscriptions.sort((a: any, b: any) => {
+            const aPlan = (a.subscription_plan?.name || '').toLowerCase();
+            const bPlan = (b.subscription_plan?.name || '').toLowerCase();
+            return params.sort_order === 'asc' 
+              ? aPlan.localeCompare(bPlan)
+              : bPlan.localeCompare(aPlan);
+          });
+        } else if (params.sort_by === 'total_cost') {
+          filteredSubscriptions.sort((a: any, b: any) => {
+            return params.sort_order === 'asc' 
+              ? a.total_cost - b.total_cost
+              : b.total_cost - a.total_cost;
+          });
+        }
+        
+        const total = filteredSubscriptions.length;
+        const pages = Math.max(1, Math.ceil(total / params.limit));
+        const startIndex = (params.page - 1) * params.limit;
+        const endIndex = startIndex + params.limit;
+        const paginatedSubscriptions = filteredSubscriptions.slice(startIndex, endIndex);
+        
+        setSubscriptions(paginatedSubscriptions);
+        setPagination({
+          page: params.page,
+          limit: params.limit,
+          total: total,
+          pages: pages
         });
-        
-        if (response?.success && response?.data) {
-          const data = response.data;
-          setSubscriptions(data.data || []);
-          if (data.pagination) {
-            setPagination({
-              page: data.pagination.page || page,
-              limit: data.pagination.limit || LIMIT,
-              total: data.pagination.total || 0,
-              pages: data.pagination.pages || 0,
-            });
-          }
-        } else {
-          throw new Error(response?.message || 'Failed to load subscriptions');
-        }
-      } catch (err: any) {
-        const message = err?.response?.data?.message || err?.message || 'Failed to load subscriptions';
-        setError(message);
-        toast.error(message);
-      } finally {
-        setLoading(false);
-        setInitialLoading(false);
+      } else {
+        throw new Error(response?.message || 'Failed to load subscriptions');
       }
-    };
-
-    fetchSubscriptions();
-  }, [page, debouncedSearchQuery, statusFilter, dateFromFilter, dateToFilter, sortBy, sortOrder]);
-
-  const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-    }).format(amount ?? 0);
+    } catch (err: any) {
+      const message = err?.response?.data?.message || 'Failed to load subscriptions';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+      setInitialLoading(false);
+    }
   };
+
+  // Define columns for AdminDataTable
+  const columns: AdminColumn<Subscription>[] = [
+    {
+      key: 'user',
+      label: 'Customer',
+      sortable: true,
+      render: (value: string, row: Subscription) => (
+        <div>
+          <Text className="text-sm text-gray-900 dark:text-white">{row.user?.name || 'N/A'}</Text>
+          <Text className="text-xs text-gray-500 dark:text-gray-400">{row.user?.email || 'N/A'}</Text>
+        </div>
+      ),
+    },
+    {
+      key: 'subscription_plan',
+      label: 'Plan',
+      sortable: true,
+      render: (value: any, row: Subscription) => (
+        <Text className="text-sm text-gray-900 dark:text-white">{value?.name || 'N/A'}</Text>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (value: string) => statusBadge(value),
+    },
+    {
+      key: 'total_cost',
+      label: 'Total Cost',
+      sortable: true,
+      render: (value: number, row: Subscription) => (
+        <Text className="text-sm font-semibold text-gray-900 dark:text-white">
+          {formatCurrency(value, row.currency)}
+        </Text>
+      ),
+    },
+    {
+      key: 'next_billing_date',
+      label: 'Next Billing',
+      sortable: true,
+      render: (value: string) => (
+        <Text className="text-sm text-gray-900 dark:text-white">
+          {value ? new Date(value).toLocaleDateString() : 'N/A'}
+        </Text>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (_: any, row: Subscription) => (
+        <Button
+          onClick={() => handleViewSubscription(row)}
+          variant="ghost"
+          size="sm"
+          leftIcon={<EyeIcon size={14} />}
+          className="inline-flex items-center gap-1 px-2 py-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+        >
+          View
+        </Button>
+      ),
+    },
+  ];
+
+  const filters: FilterConfig[] = [
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'select',
+      options: [
+        { value: '', label: 'All Status' },
+        { value: 'active', label: 'Active Only' },
+        { value: 'paused', label: 'Paused Only' },
+        { value: 'cancelled', label: 'Cancelled Only' },
+        { value: 'expired', label: 'Expired Only' },
+        { value: 'pending', label: 'Pending Only' }
+      ],
+      placeholder: 'All Status',
+    },
+  ];
 
   const statusBadge = (status: string) => {
     const config = {
       active: { color: 'bg-success/20 text-success', label: 'Active' },
       paused: { color: 'bg-warning/20 text-warning', label: 'Paused' },
-      cancelled: { color: 'bg-destructive/20 text-destructive', label: 'Cancelled' },
+      cancelled: { color: 'bg-error/20 text-error', label: 'Cancelled' },
       expired: { color: 'bg-gray/20 text-gray', label: 'Expired' },
       pending: { color: 'bg-blue/20 text-blue', label: 'Pending' }
     };
@@ -204,6 +322,23 @@ export const AdminSubscriptions = () => {
     );
   };
 
+  const formatCurrency = (amount: number, currency: string = 'USD') => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(amount ?? 0);
+  };
+
+  useEffect(() => {
+    fetchData({
+      page: 1,
+      limit: LIMIT,
+      search: '',
+      sort_by: 'created_at',
+      sort_order: 'desc'
+    });
+  }, []);
+
   if (initialLoading) {
     return (
       <AdminLayout>
@@ -214,200 +349,116 @@ export const AdminSubscriptions = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-3">
+      <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex items-center justify-between">
           <div>
-                <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage all customer subscriptions</Text>
+            <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage all customer subscriptions</Text>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className={`rounded-lg border p-4 ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center justify-between mb-4">
-            <Heading level={2} className="text-base font-semibold">Filters</Heading>
-            <Button
-              type="button"
-              onClick={() => setShowFilters((prev) => !prev)}
-              className={`md:hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border text-xs font-medium transition ${
-                currentTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-white border-gray-300 text-gray-700'
-              }`}
-            >
-            <Text className={`text-xs font-medium transition ${
-                currentTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'
-              }`}>
-              {showFilters ? 'Hide Filters' : 'Show Filters'}
-            </Text>
-            </Button>
-          </div>
-          <div className={`${showFilters ? 'grid' : 'hidden'} md:grid grid-cols-1 md:grid-cols-4 gap-4`}>
-            <div>
-              <Label className={`block text-sm font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</Label>
-              {/* ... */}
-            </div>
-          </div>
-        </div>
+        <AdminDataTable
+          data={subscriptions}
+          loading={loading}
+          error={error}
+          pagination={pagination}
+          columns={columns}
+          fetchData={fetchData}
+          searchPlaceholder="Search subscriptions..."
+          filters={filters}
+          emptyMessage="No subscriptions found"
+          responsive="cards"
+          limit={LIMIT}
+          onRowClick={handleViewSubscription}
+        />
 
-        {/* ... */}
-
-        <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className={`p-4 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-            <Heading level={2} className="text-lg font-semibold">All Subscriptions ({subscriptions.length})</Heading>
-          </div>
-
-          {/* ... */}
-
-          <div className="hidden md:block overflow-hidden">
-            <table className="w-full table-fixed">
-              <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
-                <tr>
-                  {/* ... */}
-                </tr>
-              </thead>
-              <tbody>
-                {subscriptions.map((subscription) => (
-                  <tr key={subscription.id} className={`border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                    {/* ... */}
-                    <td className="px-4 py-3 text-sm">
-                      <Button
-                        onClick={() => handleViewSubscription(subscription)}
-                        variant="primary"
-                        size="sm"
-                        className="inline-flex items-center gap-1 px-2 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-xs whitespace-nowrap"
-                      >
-                        View
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* ... */}
-
-          <div className={`px-4 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-wrap items-center justify-between gap-4`}>
-              <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>
-                {/* ... */}
-              </Text>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                variant="outline"
-                size="sm"
-              >
-                Previous
-              </Button>
-              <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Page {pagination.page} of {pagination.pages || 1}</Text>
-              <Button
-                onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
-                disabled={page >= pagination.pages || pagination.pages <= 1}
-                variant="outline"
-                size="sm"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* ... */}
-
-        {showDetailsModal && selectedSubscription && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowDetailsModal(false)}>
-            <div className={`w-full max-w-3xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-start justify-between mb-4">
+        <Modal isOpen={detailsModal.isOpen} onClose={detailsModal.close} size="lg">
+          {selectedSubscription && (
+            <>
+              <ModalHeader>
                 <div>
                   <Heading level={3} className="text-lg font-semibold">Subscription Details</Heading>
                   <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {selectedSubscription.name || 'Subscription'}
+                    {selectedSubscription.subscription_plan?.name || 'Subscription'}
                   </Body>
                 </div>
-                <Button
-                  onClick={() => setShowDetailsModal(false)}
-                  variant="ghost"
-                  size="sm"
-                  className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
-                >
-                  Close
-                </Button>
-              </div>
+              </ModalHeader>
 
-              {/* ... */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Text variant="body-sm">{selectedSubscription.user?.name || 'Unknown User'}</Text>
-                  <Text variant="caption" tone="secondary">{selectedSubscription.user?.email}</Text>
-                </div>
-                <div>
-                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Status</Text>
-                  {statusBadge(selectedSubscription.status)}
-                </div>
-                <div>
-                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Billing</Text>
-                  <Text variant="body-sm">Next: {selectedSubscription.next_billing_date ? new Date(selectedSubscription.next_billing_date).toLocaleDateString() : 'N/A'}</Text>
-                  <Text variant="body-sm">Period End: {selectedSubscription.current_period_end ? new Date(selectedSubscription.current_period_end).toLocaleDateString() : 'N/A'}</Text>
-                </div>
-                <div>
-                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Costs</Text>
-                  <Text variant="body-sm">Subtotal: {formatCurrency(getCostBreakdown(selectedSubscription).subtotal, selectedSubscription.currency)}</Text>
-                  <Text variant="body-sm">Shipping: {formatCurrency(getCostBreakdown(selectedSubscription).shipping, selectedSubscription.currency)}</Text>
-                  <Text variant="body-sm">Tax: {formatCurrency(getCostBreakdown(selectedSubscription).tax, selectedSubscription.currency)}</Text>
-                <Text tone="success" variant="body-sm">Discount: -{formatCurrency(getCostBreakdown(selectedSubscription).discount, selectedSubscription.currency)}</Text>
-                  <Text variant="body-sm" weight="semibold">Total: {formatCurrency(getCostBreakdown(selectedSubscription).total, selectedSubscription.currency)}</Text>
-                </div>
-                <div className="md:col-span-2">
-                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Delivery Address</Text>
-                  {selectedSubscription.delivery_address ? (
-                    <Text variant="body-sm">
-                      {selectedSubscription.delivery_address.street}, {selectedSubscription.delivery_address.city}, {selectedSubscription.delivery_address.state} {selectedSubscription.delivery_address.postal_code}, {selectedSubscription.delivery_address.country}
-                    </Text>
-                  ) : (
-                    <Text variant="caption" tone="secondary">No delivery address</Text>
-                  )}
-                </div>
+              <ModalBody>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Text variant="body-sm">{selectedSubscription.user?.name || 'Unknown User'}</Text>
+                    <Text variant="caption" tone="secondary">{selectedSubscription.user?.email}</Text>
+                  </div>
+                  <div>
+                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Status</Text>
+                    {statusBadge(selectedSubscription.status)}
+                  </div>
+                  <div>
+                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Billing</Text>
+                    <Text variant="body-sm">Next: {selectedSubscription.next_billing_date ? new Date(selectedSubscription.next_billing_date).toLocaleDateString() : 'N/A'}</Text>
+                    <Text variant="body-sm">Period End: {selectedSubscription.current_period_end ? new Date(selectedSubscription.current_period_end).toLocaleDateString() : 'N/A'}</Text>
+                  </div>
+                  <div>
+                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Costs</Text>
+                    <Text variant="body-sm">Subtotal: {formatCurrency(getCostBreakdown(selectedSubscription).subtotal, selectedSubscription.currency)}</Text>
+                    <Text variant="body-sm">Shipping: {formatCurrency(getCostBreakdown(selectedSubscription).shipping, selectedSubscription.currency)}</Text>
+                    <Text variant="body-sm">Tax: {formatCurrency(getCostBreakdown(selectedSubscription).tax, selectedSubscription.currency)}</Text>
+                    <Text tone="success" variant="body-sm">Discount: -{formatCurrency(getCostBreakdown(selectedSubscription).discount, selectedSubscription.currency)}</Text>
+                    <Text variant="body-sm" weight="semibold">Total: {formatCurrency(getCostBreakdown(selectedSubscription).total, selectedSubscription.currency)}</Text>
+                  </div>
+                  <div className="md:col-span-2">
+                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Delivery Address</Text>
+                    {selectedSubscription.delivery_address ? (
+                      <Text variant="body-sm">
+                        {selectedSubscription.delivery_address.street}, {selectedSubscription.delivery_address.city}, {selectedSubscription.delivery_address.state} {selectedSubscription.delivery_address.postal_code}, {selectedSubscription.delivery_address.country}
+                      </Text>
+                    ) : (
+                      <Text variant="caption" tone="secondary">No delivery address</Text>
+                    )}
+                  </div>
 
-                <div className="md:col-span-2">
-                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Variants</Text>
-                  {selectedSubscription.variants && selectedSubscription.variants.length > 0 ? (
-                    <div className="mt-2 overflow-x-auto">
-                      <table className="w-full text-xs">
-                        <thead>
-                          <tr>
-                            <th className="text-left py-1"><Text variant="caption" weight="medium">Name</Text></th>
-                            <th className="text-left py-1"><Text variant="caption" weight="medium">SKU</Text></th>
-                            <th className="text-right py-1"><Text variant="caption" weight="medium">Price</Text></th>
-                            <th className="text-right py-1"><Text variant="caption" weight="medium">Qty</Text></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {selectedSubscription.variants.map((variant) => (
-                            <tr key={variant.id} className={`${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} border-t`}>
-                              <td className="py-2 pr-2">
-                                <Text variant="body-sm" truncate="single">{variant.name}</Text>
-                              </td>
-                              <td className={`py-2 pr-2`}>
-                                <Text variant="body-sm" tone="secondary">{variant.sku}</Text>
-                              </td>
-                              <td className="py-2 text-right">
-                                <Text variant="body-sm">{formatCurrency(variant.current_price ?? variant.base_price, selectedSubscription.currency)}</Text>
-                              </td>
-                              <td className="py-2 text-right">
-                                <Text variant="body-sm">{variant.qty}</Text>
-                              </td>
+                  <div className="md:col-span-2">
+                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Variants</Text>
+                    {selectedSubscription.variants && selectedSubscription.variants.length > 0 ? (
+                      <div className="mt-2 overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr>
+                              <th className="text-left py-1"><Text variant="caption" weight="medium">Name</Text></th>
+                              <th className="text-left py-1"><Text variant="caption" weight="medium">SKU</Text></th>
+                              <th className="text-right py-1"><Text variant="caption" weight="medium">Price</Text></th>
+                              <th className="text-right py-1"><Text variant="caption" weight="medium">Qty</Text></th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <Text variant="caption" tone="secondary">No variants found</Text>
-                  )}
+                          </thead>
+                          <tbody>
+                            {selectedSubscription.variants.map((variant) => (
+                              <tr key={variant.id} className={`${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} border-t`}>
+                                <td className="py-2 pr-2">
+                                  <Text variant="body-sm" truncate="single">{variant.name}</Text>
+                                </td>
+                                <td className={`py-2 pr-2`}>
+                                  <Text variant="body-sm" tone="secondary">{variant.sku}</Text>
+                                </td>
+                                <td className="py-2 text-right">
+                                  <Text variant="body-sm">{formatCurrency(variant.current_price ?? variant.base_price, selectedSubscription.currency)}</Text>
+                                </td>
+                                <td className="py-2 text-right">
+                                  <Text variant="body-sm">{variant.qty}</Text>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <Text variant="caption" tone="secondary">No variants found</Text>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
+              </ModalBody>
+            </>
+          )}
+        </Modal>
       </div>
     </AdminLayout>
   );

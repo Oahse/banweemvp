@@ -3,7 +3,7 @@ import { X, DollarSign, TrendingUp, TrendingDown, CheckCircle, XCircle, Clock } 
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Input } from '@/components/ui/Input/Input';
 import { apiClient } from '@/api/client';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 

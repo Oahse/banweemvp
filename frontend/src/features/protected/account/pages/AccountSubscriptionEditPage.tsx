@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../../SubscriptionContext';
+import { useSubscription } from '../../subscriptions/contexts/SubscriptionContext';
 import { toast } from 'react-hot-toast';
-import { CalendarIcon, DollarSignIcon } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading, Label } from '@/components/ui/Text/Text';
 
@@ -42,7 +42,8 @@ const AccountSubscriptionEditPage: React.FC = () => {
   }, [subscriptionId, getSubscription]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
     setForm(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,

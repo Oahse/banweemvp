@@ -7,32 +7,27 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../cart/contexts/CartContext';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import { AuthAPI } from '../api/auth';
+import { AuthAPI } from '@/api/auth';
 import { CartAPI } from '@/api/cart';
 import { toast } from 'react-hot-toast';
 import SmartCheckoutForm from '../components/SmartCheckoutForm';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading } from '@/components/ui/Text/Text';
+import { containerVariants, itemVariants } from '@/data/variants';
 
-// Animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
+// Type definitions
+interface StockIssue {
+  variant_id: string;
+  message: string;
+  current_stock: number;
+  requested_quantity: number;
+}
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5 }
-  }
-};
+interface StockValidation {
+  valid: boolean;
+  issues: StockIssue[];
+}
 
 export const Checkout = () => {
   const navigate = useNavigate();
@@ -42,7 +37,7 @@ export const Checkout = () => {
 
   // UI state
   const [loading, setLoading] = useState(false);
-  const [stockValidation, setStockValidation] = useState({ valid: true, issues: [] });
+  const [stockValidation, setStockValidation] = useState<StockValidation>({ valid: true, issues: [] });
 
   // Handle authentication check
   useEffect(() => {
@@ -135,7 +130,7 @@ export const Checkout = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-surface-dark">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
+          <AnimatedLoader size="xl" variant="spinner" />
           <Text variant="body-sm" tone="secondary">
             {authLoading ? 'Checking authentication...' : 'Loading checkout...'}
           </Text>
@@ -193,7 +188,7 @@ export const Checkout = () => {
                   <ul className="list-disc pl-4 space-y-0.5">
                     {stockValidation.issues.map((issue, index) => (
                       <li key={index} className="text-destructive/80">
-                        {issue.message}
+                        {issue?.message}
                       </li>
                     ))}
                   </ul>
@@ -201,7 +196,7 @@ export const Checkout = () => {
                 <div className="mt-2">
                   <Button
                     onClick={() => navigate('/cart')}
-                    variant="destructive"
+                    variant="danger"
                     size="sm"
                   >
                     Back to Cart

@@ -9,8 +9,6 @@ import TabHeader from '@/components/ui/TabHeader';
 import { 
   PlusIcon, 
   PackageIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   XIcon,
   SearchIcon,
   EyeIcon,
@@ -18,6 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { SubscriptionCard } from '../../subscriptions/components/SubscriptionCard';
+import { Pagination } from '@/components/ui/Pagination';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { AutoRenewToggle } from '../../subscriptions/components/AutoRenewToggle';
 import ProductsAPI from '@/api/products';
@@ -339,10 +338,9 @@ export const MySubscriptions = () => {
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                {error}
+              <div className="ml-3">
+                <Heading level={3} className="text-sm font-medium text-red-800">Error</Heading>
+                <Text as="div" className="mt-2 text-sm text-red-700">{error}</Text>
               </div>
               <div className="mt-4">
                 <Button
@@ -355,7 +353,6 @@ export const MySubscriptions = () => {
                 </Button>
               </div>
             </div>
-          </div>
         </div>
       )}
 
@@ -363,10 +360,8 @@ export const MySubscriptions = () => {
       {filteredSubscriptions.length === 0 && !loading ? (
         <div className="text-center py-12">
           <PackageIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No subscriptions</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchQuery ? 'No subscriptions match your search.' : 'Get started by creating a new subscription.'}
-          </p>
+          <Heading level={3} className="mt-2 text-sm font-medium text-gray-900">No subscriptions</Heading>
+          <Text as="p" className="mt-1 text-sm text-gray-500">{searchQuery ? 'No subscriptions match your search.' : 'Get started by creating a new subscription.'}</Text>
           <div className="mt-6">
             <Button
               onClick={() => setShowCreateModal(true)}
@@ -410,25 +405,13 @@ export const MySubscriptions = () => {
             {Math.min(currentPage * itemsPerPage, filteredSubscriptions.length)} of{' '}
             {filteredSubscriptions.length} results
           </div>
-          <div className="flex items-center justify-center space-x-2">
-            <Button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              variant="outline"
-              size="icon"
-              leftIcon={<ChevronLeftIcon className="w-4 h-4" />}
-            />
-            <span className="px-3 py-1 text-sm">
-              {currentPage} of {totalPages}
-            </span>
-            <Button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              variant="outline"
-              size="icon"
-              leftIcon={<ChevronRightIcon className="w-4 h-4" />}
-            />
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filteredSubscriptions.length}
+            pageSize={itemsPerPage}
+            onPageChange={setCurrentPage}
+            size="sm"
+          />
         </div>
       )}
 
@@ -569,9 +552,9 @@ export const MySubscriptions = () => {
                   availableProducts.map((product) => (
                     <div key={product.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 gap-3">
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100">{product.name}</h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{product.description}</p>
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatCurrencyLocale(product.price || 0)}</p>
+                        <Heading level={4} className="font-medium text-gray-900 dark:text-gray-100">{product.name}</Heading>
+                        <Text as="p" className="text-sm text-gray-500 dark:text-gray-400">{product.description}</Text>
+                        <Text as="p" className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatCurrencyLocale(product.price || 0)}</Text>
                       </div>
                       <Button
                         onClick={() => {

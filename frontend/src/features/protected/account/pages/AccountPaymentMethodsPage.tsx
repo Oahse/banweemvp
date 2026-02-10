@@ -141,7 +141,7 @@ const AccountPaymentMethodsPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <Heading level={1} className="text-lg md:text-xl font-bold text-gray-900 dark:text-white" />
+        <Heading level={1} className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Payment Methods</Heading>
         <Button
           onClick={() => setShowStripeForm(true)}
           variant="primary"
@@ -217,21 +217,24 @@ const AccountPaymentMethodsPage = () => {
                       <Caption className="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">Default</Caption>
                     )}
                   </div>
-                  <Body className="text-sm text-gray-600 dark:text-gray-400 mb-0">
-                    {method.type === 'card' && method.last_four ? (
-                      <>
-                        <Code className="font-mono">•••• {method.last_four}</Code>
-                        {method.expiry_month && method.expiry_year && (
-                          <Caption className="ml-3 text-xs">Valid thru {method.expiry_month}/{method.expiry_year.toString().slice(-2)}</Caption>
-                        )}
-                      </>
-                    ) : (
-                      <Text as="span">{method.provider || 'Payment Method'}</Text>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-0">
+                    {method.type === 'card' && method.last_four && (
+                      <div>
+                        <Heading level={4}>Card Details</Heading>
+                        <Text variant="body-sm" tone="secondary">•••• {method.last_four}</Text>
+                        <Text variant="caption" tone="secondary">Valid thru {method.expiry_month ?? 'MM'}/{method.expiry_year ? String(method.expiry_year).slice(-2) : 'YY'}</Text>
+                      </div>
                     )}
-                  </Body>
-                  <Caption className="text-xs text-gray-500 dark:text-gray-400 mt-1">Added on {method.created_at ? new Date(method.created_at).toLocaleDateString() : 'Unknown date'}</Caption>
+
+                    <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded mt-2">
+                      <Text variant="body-sm">
+                        <Text as="span">{method.provider || 'Payment Method'}</Text>
+                        {deleteConfirm?.lastFour && <Text as="span"> {` •••• ${deleteConfirm.lastFour}`}</Text>}
+                      </Text>
+                      <Text variant="caption" tone="secondary" className="mt-1">Added on {method.created_at ? new Date(method.created_at).toLocaleDateString() : 'Unknown date'}</Text>
+                    </div>
+                  </div>
                 </div>
-              </div>
               <div className="flex items-center gap-2">
                 {!method.is_default && (
                   <Button
@@ -255,6 +258,7 @@ const AccountPaymentMethodsPage = () => {
                 </Button>
               </div>
             </div>
+            </div>
           ))
         )}
       </div>
@@ -268,16 +272,16 @@ const AccountPaymentMethodsPage = () => {
                 <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Delete Payment Method</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">This action cannot be undone</p>
+                <Heading level={3}>Delete Payment Method</Heading>
+                <Text variant="body-sm" tone="secondary">This action cannot be undone</Text>
               </div>
             </div>
             
             <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded">
-              <p className="text-sm text-gray-700 dark:text-gray-300">
+              <Text variant="body-sm" tone="secondary">
                 {deleteConfirm.provider ? deleteConfirm.provider.charAt(0).toUpperCase() + deleteConfirm.provider.slice(1) : 'Card'} 
                 {deleteConfirm.lastFour && ` •••• ${deleteConfirm.lastFour}`}
-              </p>
+              </Text>
             </div>
             
             <div className="flex gap-3">
@@ -308,5 +312,4 @@ const AccountPaymentMethodsPage = () => {
   );
 };
 
-export { AccountPaymentMethodsPage };
 export default AccountPaymentMethodsPage;

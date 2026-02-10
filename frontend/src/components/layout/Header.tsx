@@ -8,8 +8,8 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading } from '@/components/ui/Text/Text';
 
-import { SkeletonHeader } from '../ui/SkeletonNavigation';
-import { getCountryByCode } from '../../data/countries';
+import { SkeletonHeader } from '@/components/ui/SkeletonNavigation';
+import { getCountryByCode } from '@/data/countries';
 
 const TopHeaderAds = [
   'Authentic African spices delivered to your door',
@@ -227,9 +227,11 @@ export const Header = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
+            >
               <Text variant="body-sm" className="text-center">
                 {TopHeaderAds[currentAdIndex]}
               </Text>
+            </motion.div>
         </div>
       </div>
 

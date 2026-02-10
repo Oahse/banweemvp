@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon, AlertCircle, CheckCircle, Loader2} from 'lucide-react';
+import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -13,6 +13,7 @@ import { CartAPI } from '@/api/cart';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading, Label } from '@/components/ui/Text/Text';
+import { Input } from '@/components/ui/Form';
 
 export const Cart = () => {
   const { 
@@ -296,9 +297,11 @@ export const Cart = () => {
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                    <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                    <Text className="w-10 h-10 text-gray-400">
+                      <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </Text>
                   </div>
                 );
               })()}
@@ -310,41 +313,38 @@ export const Cart = () => {
                 to={`/products/${item.product_id}`}
                 className="font-medium text-copy hover:text-primary block text-sm"
               >
-                {(item.variant?.product_name || (item.variant as any)?.product?.name) && (
-                  <Text variant="caption" weight="medium">{item.variant?.product_name || (item.variant as any)?.product?.name}</Text>
-                )}
-                <Text variant="caption" tone="secondary">{item.variant?.name || 'Product'}</Text>
+                <Text variant="body-sm">{item.variant?.product_name || 'Product'}</Text>
               </Link>
               {item.variant?.attributes && Object.keys(item.variant.attributes).length > 0 && (
-                <div className="mt-1">
+                <Text className="mt-1">
                   {Object.entries(item.variant.attributes).slice(0, 2).map(([key, value]) => (
-                    <Text variant="caption" className="inline-block bg-gray-100 text-gray-600 px-2 py-1 rounded mr-1 mb-1">
+                    <Text key={key} variant="caption" className="inline-block bg-gray-100 text-gray-600 px-2 py-1 rounded mr-1 mb-1">
                       {key}: {value}
                     </Text>
                   ))}
-                </div>
+                </Text>
               )}
               
               {/* Stock status indicator */}
               {item.variant?.stock !== undefined && (
-                <div className="mt-1">
+                <Text className="mt-1">
                   {item.variant.stock > 10 ? (
                     <Text variant="caption" className="text-green-600 flex items-center">
                       <CheckCircle size={12} className="mr-1" />
-                      In Stock
+                      In Stock ({item.variant.stock} available)
                     </Text>
                   ) : item.variant.stock > 0 ? (
-                    <Text variant="caption" className="text-orange-600 flex items-center">
+                    <Text variant="caption" className="text-warning flex items-center">
                       <AlertCircle size={12} className="mr-1" />
                       Only {item.variant.stock} left
                     </Text>
                   ) : (
-                    <Text variant="caption" className="text-red-600 flex items-center">
+                    <Text variant="caption" className="text-error flex items-center">
                       <AlertCircle size={12} className="mr-1" />
                       Out of Stock
                     </Text>
                   )}
-                </div>
+                </Text>
               )}
               
               <Button
@@ -371,9 +371,9 @@ export const Cart = () => {
               </Text>
               {/* Show discount if applicable */}
               {item.variant?.discount_percentage && item.variant.discount_percentage > 0 && (
-                <div className="text-xs text-gray-500 line-through">
-                  {formatCurrency(item.variant.base_price || 0)}
-                </div>
+                <Text className="text-xs text-gray-500 line-through">
+                  <Text variant="caption">{formatCurrency(item.variant.base_price || 0)}</Text>
+                </Text>
               )}
             </div>
           </div>
@@ -389,15 +389,17 @@ export const Cart = () => {
               >
                 <MinusIcon size={14} />
               </Button>
-              <input
+              <Input
                 type="number"
                 min="1"
                 max={item.variant?.stock || 999}
                 value={item.quantity}
-                onChange={(e) =>
-                  handleQuantityChange(item.id, parseInt(e.target.value) || 1)
-                }
-                className="w-10 text-center border-none focus:outline-none focus:ring-1 focus:ring-primary bg-transparent"
+                onChange={(e) => {
+                  const newQuantity = parseInt(e.target.value) || 1;
+                  handleQuantityChange(item.id, newQuantity);
+                }}
+                className="w-16 text-center text-sm"
+                disabled={item.variant?.stock !== undefined && item.quantity >= item.variant.stock}
                 aria-label={`Quantity for ${item.variant?.product_name || 'item'}`}
               />
               <Button
@@ -470,9 +472,9 @@ export const Cart = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-background flex items-center justify-center">
+          <Text className="w-12 h-12 mx-auto mb-3 rounded-full bg-background flex items-center justify-center">
             <ShoppingCartIcon size={24} className="text-copy-lighter" />
-          </div>
+          </Text>
           <Heading level={2} weight="medium">Your cart is empty</Heading>
           <Text variant="body-sm" tone="secondary">Looks like you haven't added any products to your cart yet.</Text>
           <Link
@@ -492,10 +494,10 @@ export const Cart = () => {
           <div className="lg:w-2/3">
             <div className="bg-surface rounded-lg shadow-sm overflow-hidden">
               <div className="hidden md:grid grid-cols-12 gap-4 p-3 bg-background text-copy font-medium text-xs">
-                <div className="col-span-6">Product</div>
-                <div className="col-span-2 text-center">Price</div>
-                <div className="col-span-2 text-center">Quantity</div>
-                <div className="col-span-2 text-center">Subtotal</div>
+                <Text variant="caption" className="col-span-6">Product</Text>
+                <Text variant="caption" className="col-span-2 text-center">Price</Text>
+                <Text variant="caption" className="col-span-2 text-center">Quantity</Text>
+                <Text variant="caption" className="col-span-2 text-center">Subtotal</Text>
               </div>
               <div className="divide-y divide-border-light">
                 <AnimatePresence mode="popLayout">
@@ -514,8 +516,8 @@ export const Cart = () => {
               
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
-                <Text variant="body-sm" tone="secondary">Total</Text>
-                <Text variant="body-sm" weight="medium">{formatCurrency(subtotal)}</Text>
+                  <Text variant="body-sm" tone="secondary">Total</Text>
+                  <Text variant="body-sm" weight="medium">{formatCurrency(subtotal)}</Text>
                 </div>
                 <Text variant="caption" tone="secondary">
                   Tax and shipping will be calculated at checkout
@@ -534,19 +536,18 @@ export const Cart = () => {
                     Clear Cart ({cartItems.length})
                   </Button>
                 </div>
-              <Text variant="body-sm">Continue Shopping</Text>
+                <Text variant="body-sm">Continue Shopping</Text>
               </div>
               <form onSubmit={handleApplyCoupon} className="mb-4">
                 <Label htmlFor="coupon-code" className="block text-xs font-medium mb-2 text-copy">Promo Code (Optional)</Label>
                 <div className="flex">
-                  <input
+                  <Input
                     id="coupon-code"
                     type="text"
                     placeholder="Enter coupon code"
-                    className="flex-grow px-3 py-2 border border-border rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary bg-transparent text-sm"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    aria-label="Coupon code"
+                    className="flex-1"
                   />
                   <Button
                     type="submit"

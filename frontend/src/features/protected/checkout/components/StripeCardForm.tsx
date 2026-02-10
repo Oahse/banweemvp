@@ -5,6 +5,8 @@ import { toast } from 'react-hot-toast';
 import { PaymentsAPI } from '@/api/payments';
 import { Button } from '@/components/ui/Button';
 import { AlertTriangle } from 'lucide-react';
+import { Text, Label } from '@/components/ui/Text/Text';
+import { Input } from '@/components/ui/Form';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
 
@@ -135,40 +137,40 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
         <label className="block text-xs font-medium text-copy dark:text-copy-dark mb-2">
           Cardholder Name
         </label>
-        <input
+        <Input
           type="text"
-          className="w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-copy dark:text-copy-dark text-xs focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark"
           placeholder="John Doe"
           value={cardholderName}
           onChange={(e) => setCardholderName(e.target.value)}
           disabled={loading}
+          className="w-full"
         />
       </div>
 
       {/* ZIP Code */}
       <div>
-        <label className="block text-xs font-medium text-copy dark:text-copy-dark mb-2">
+        <Label className="block text-xs font-medium text-copy dark:text-copy-dark mb-2">
           ZIP Code (Optional)
-        </label>
-        <input
+        </Label>
+        <Input
           type="text"
-          className="w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-copy dark:text-copy-dark text-xs focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark"
           placeholder="12345 (US only)"
           value={zipCode}
           onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
           disabled={loading}
           maxLength={5}
+          className="w-full"
         />
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <Text variant="caption" className="text-gray-500 dark:text-gray-400 mt-1">
           Required for US cards, optional for international cards
-        </p>
+        </Text>
       </div>
 
       {/* Card Details using Stripe Elements */}
       <div>
-        <label className="block text-xs font-medium text-copy dark:text-copy-dark mb-2">
+        <Label className="block text-xs font-medium text-copy dark:text-copy-dark mb-2">
           Card Details
-        </label>
+        </Label>
         <div className="p-3 border border-border-light dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark">
           <CardElement options={cardElementOptions} />
         </div>
@@ -176,10 +178,10 @@ const CardFormElement: React.FC<StripeCardFormProps> = ({ onSuccess, onCancel })
 
       {/* Error Message */}
       {error && (
-        <div className="flex items-start gap-2 p-3 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg">
-          <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-destructive dark:text-destructive-dark">{error}</p>
-        </div>
+        <Text className="flex items-start gap-2 p-3 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg text-xs text-destructive dark:text-destructive-dark">
+          <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+          {error}
+        </Text>
       )}
 
       {/* Buttons */}

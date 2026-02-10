@@ -1,5 +1,6 @@
 import React from 'react';
 import { RefreshCwIcon, XIcon } from 'lucide-react';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { themeClasses } from '../../../../utils/themeClasses';
 import { Button } from '@/components/ui/Button';
 
@@ -67,11 +68,7 @@ export const AutoRenewToggle: React.FC<AutoRenewToggleProps> = ({
           `}
         >
           {loading ? (
-            <RefreshCwIcon 
-              className={`w-3 h-3 text-gray-400 animate-spin ${
-                size === 'sm' ? 'w-2 h-2' : size === 'lg' ? 'w-4 h-4' : 'w-3 h-3'
-              }`}
-            />
+            <AnimatedLoader size={size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'} variant="spinner" color="secondary" />
           ) : isEnabled ? (
             <RefreshCwIcon 
               className={`text-primary ${

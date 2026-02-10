@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { HeartIcon, ShoppingCartIcon, TrashIcon } from 'lucide-react';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { useWishlist } from '../../../WishlistContext';
 import { useCart } from '../../../CartContext';
 import { toast } from 'react-hot-toast';
@@ -304,7 +305,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
             title="Remove from wishlist"
           >
             {isRemoving ? (
-              <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+              <AnimatedLoader size="sm" variant="spinner" color="error" />
             ) : (
               <TrashIcon size={16} />
             )}
