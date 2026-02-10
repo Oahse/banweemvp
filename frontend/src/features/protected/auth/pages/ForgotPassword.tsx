@@ -7,6 +7,7 @@ import { validation } from '@/utils/validation';
 import { AuthAPI } from '@/api';
 import { extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -71,12 +72,10 @@ export const ForgotPassword = () => {
         className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light"
         variants={itemVariants}
       >
-        <motion.h1 className="text-xl font-bold text-main mb-4 text-center" variants={itemVariants}>
-          Forgot Your Password?
-        </motion.h1>
-        <motion.p className="text-xs text-copy-light text-center mb-4" variants={itemVariants}>
+        <Heading level={1} className="text-xl font-bold text-main mb-4 text-center">Forgot Your Password?</Heading>
+        <Body className="text-xs text-copy-light text-center mb-4">
           Enter your email address below and we'll send you a link to reset your password.
-        </motion.p>
+        </Body>
         <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
           <Input
             label="Email Address"

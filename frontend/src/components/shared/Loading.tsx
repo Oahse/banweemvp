@@ -1,4 +1,5 @@
 import React from 'react';
+import { Text } from '@/components/ui/Text/Text';
 
 export const Loading = ({ size = 'md', text = 'Loading...' }: { size?: 'sm' | 'md' | 'lg', text?: string }) => {
   const sizes: Record<string, string> = {
@@ -10,7 +11,7 @@ export const Loading = ({ size = 'md', text = 'Loading...' }: { size?: 'sm' | 'm
   return (
     <div className="flex flex-col items-center justify-center p-8">
       <div className={`border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin ${sizes[size]}`}></div>
-      {text && <p className="body-text mt-4 text-gray-600">{text}</p>}
+      {text && <Text variant="body-sm" tone="secondary">{text}</Text>}
     </div>
   );
 };

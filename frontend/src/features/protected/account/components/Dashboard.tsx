@@ -9,6 +9,7 @@ import OrdersAPI from '../../api/orders';
 import SubscriptionAPI from '../../api/subscription';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 interface DashboardProps {
   animation?: 'shimmer' | 'pulse' | 'wave';
 }
@@ -142,8 +143,8 @@ export const Dashboard = ({
           <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h3 className="text-lg font-medium mb-2">Unable to Load Orders</h3>
-          <p className="text-gray-600">{getErrorMessage(error)}</p>
+          <Heading level={3} weight="medium">Unable to Load Orders</Heading>
+          <Text variant="body" tone="secondary">{getErrorMessage(error)}</Text>
         </div>
         <Button 
           onClick={() => window.location.reload()} 
@@ -151,7 +152,7 @@ export const Dashboard = ({
           size="sm"
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
         >
-          Try Again
+          <Text variant="body-sm">Try Again</Text>
         </Button>
       </div>
     );
@@ -160,12 +161,10 @@ export const Dashboard = ({
   return <div className="space-y-3">
       {/* Welcome Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3">
-        <h2 className="text-base font-medium text-main dark:text-white mb-1">
-          Welcome back, {user?.firstname}!
-        </h2>
-        <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
+        <Heading level={2} weight="medium">Welcome back, {user?.firstname}!</Heading>
+        <Text variant="caption" tone="secondary">
           Here's a summary of your account activities.
-        </p>
+        </Text>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
           <Link to="/account/orders" className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
             <div className="flex flex-col items-center text-center">
@@ -173,12 +172,10 @@ export const Dashboard = ({
                 <ShoppingBagIcon size={12} className="text-blue-600 dark:text-blue-300" />
               </div>
               <div>
-                <h3 className="text-xs font-medium text-main dark:text-white">
-                  Orders
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <Text variant="caption" weight="medium">Orders</Text>
+                <Text variant="caption" tone="secondary">
                   {recentOrders.length} recent
-                </p>
+                </Text>
               </div>
             </div>
           </Link>
@@ -188,12 +185,10 @@ export const Dashboard = ({
                 <PackageIcon size={12} className="text-green-600 dark:text-green-300" />
               </div>
               <div>
-                <h3 className="text-xs font-medium text-main dark:text-white">
-                  Subscriptions
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <Text variant="caption" weight="medium">Subscriptions</Text>
+                <Text variant="caption" tone="secondary">
                   {activeSubscriptions.length} active
-                </p>
+                </Text>
               </div>
             </div>
           </Link>
@@ -203,12 +198,10 @@ export const Dashboard = ({
                 <HeartIcon size={12} className="text-red-600 dark:text-red-300" />
               </div>
               <div>
-                <h3 className="text-xs font-medium text-main dark:text-white">
-                  Wishlist
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <Text variant="caption" weight="medium">Wishlist</Text>
+                <Text variant="caption" tone="secondary">
                   Saved items
-                </p>
+                </Text>
               </div>
             </div>
           </Link>
@@ -218,12 +211,10 @@ export const Dashboard = ({
                 <MapPinIcon size={12} className="text-green-600 dark:text-green-300" />
               </div>
               <div>
-                <h3 className="text-xs font-medium text-main dark:text-white">
-                  Addresses
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <Text variant="caption" weight="medium">Addresses</Text>
+                <Text variant="caption" tone="secondary">
                   Manage shipping
-                </p>
+                </Text>
               </div>
             </div>
           </Link>
@@ -233,12 +224,10 @@ export const Dashboard = ({
                 <CreditCardIcon size={12} className="text-purple-600 dark:text-purple-300" />
               </div>
               <div>
-                <h3 className="text-xs font-medium text-main dark:text-white">
-                  Payment Methods
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <Text variant="caption" weight="medium">Payment Methods</Text>
+                <Text variant="caption" tone="secondary">
                   Manage payment
-                </p>
+                </Text>
               </div>
             </div>
           </Link>
@@ -249,30 +238,24 @@ export const Dashboard = ({
       {activeSubscriptions.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3">
           <div className="flex justify-between items-center mb-3">
-            <h2 className="text-base font-medium text-main dark:text-white">
-              Active Subscriptions
-            </h2>
-            <Link to="/account/subscriptions" className="text-primary hover:underline text-sm">
-              View all
-            </Link>
+            <Heading level={2} weight="medium">Active Subscriptions</Heading>
+            <Text variant="body-sm" className="text-primary hover:underline">View all</Text>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {activeSubscriptions.slice(0, 2).map((subscription: any) => (
               <div key={subscription.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xs font-medium text-main dark:text-white">
-                    {subscription.name}
-                  </h3>
-                  <span className="px-2 py-1 text-xs rounded-full bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light">
+                  <Text variant="caption" weight="medium">{subscription.name}</Text>
+                  <Text variant="caption" className="px-2 py-1 rounded-full bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light">
                     Active
-                  </span>
+                  </Text>
                 </div>
-                <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+                <Text variant="caption" tone="secondary">
                   {subscription.products?.length || 0} products • {subscription.billing_cycle}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                </Text>
+                <Text variant="caption" tone="secondary">
                   Next billing: {subscription.next_billing_date ? new Date(subscription.next_billing_date).toLocaleDateString() : 'N/A'}
-                </p>
+                </Text>
               </div>
             ))}
           </div>
@@ -282,12 +265,8 @@ export const Dashboard = ({
       {/* Recent Orders Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3">
         <div className="flex justify-between items-center mb-3">
-          <h2 className="text-base font-medium text-main dark:text-white">
-            Recent Orders
-          </h2>
-          <Link to="/account/orders" className="text-primary hover:underline text-sm">
-            View all
-          </Link>
+          <Heading level={2} weight="medium">Recent Orders</Heading>
+          <Text variant="body-sm" className="text-primary hover:underline">View all</Text>
         </div>
         {recentOrders.length > 0 ? <div className="overflow-x-auto">
             <table className="w-full">

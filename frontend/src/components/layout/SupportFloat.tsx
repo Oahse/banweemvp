@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { MessageCircle, X, Mail, HelpCircle, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading, Body, Caption } from '@/components/ui/Text/Text';
 
 const SupportFloat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +31,7 @@ const SupportFloat: React.FC = () => {
         ) : (
           <>
             <MessageCircle className="w-5 h-5" />
-            <span className="text-sm font-medium hidden sm:inline">Need Help?</span>
+            <Text as="span" className="text-sm font-medium hidden sm:inline">Need Help?</Text>
           </>
         )}
       </Button>
@@ -40,13 +41,11 @@ const SupportFloat: React.FC = () => {
         <div className="fixed bottom-24 right-6 z-50 w-80 bg-surface rounded-lg shadow-2xl border border-border overflow-hidden animate-slideUp font-sans">
           {/* Header */}
           <div className="bg-primary text-white p-3">
-            <h3 className="text-sm font-bold flex items-center gap-2">
+            <Heading level={3} className="text-sm font-bold flex items-center gap-2">
               <MessageCircle className="w-4 h-4" />
               Customer Support
-            </h3>
-            <p className="text-xs mt-0.5 opacity-90">
-              How can we help you today?
-            </p>
+            </Heading>
+            <Caption className="text-xs mt-0.5 opacity-90">How can we help you today?</Caption>
           </div>
 
           {/* Quick Actions */}
@@ -62,8 +61,8 @@ const SupportFloat: React.FC = () => {
                 <MessageCircle className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1">
-                <div className="text-sm font-semibold text-copy">WhatsApp</div>
-                <div className="text-xs text-copy-light">Chat with us instantly</div>
+                <Heading level={4} className="text-sm font-semibold text-copy">WhatsApp</Heading>
+                <Caption className="text-xs text-copy-light">Chat with us instantly</Caption>
               </div>
               <ExternalLink className="w-3 h-3 text-copy-lighter" />
             </a>
@@ -77,8 +76,8 @@ const SupportFloat: React.FC = () => {
                 <Mail className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1">
-                <div className="text-sm font-semibold text-copy">Contact Us</div>
-                <div className="text-xs text-copy-light">Send us a message</div>
+                <Heading level={4} className="text-sm font-semibold text-copy">Contact Us</Heading>
+                <Caption className="text-xs text-copy-light">Send us a message</Caption>
               </div>
               <ExternalLink className="w-3 h-3 text-copy-lighter" />
             </Link>
@@ -92,8 +91,8 @@ const SupportFloat: React.FC = () => {
                 <HelpCircle className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1">
-                <div className="text-sm font-semibold text-copy">FAQs</div>
-                <div className="text-xs text-copy-light">Find quick answers</div>
+                <Heading level={4} className="text-sm font-semibold text-copy">FAQs</Heading>
+                <Caption className="text-xs text-copy-light">Find quick answers</Caption>
               </div>
               <ExternalLink className="w-3 h-3 text-copy-lighter" />
             </Link>
@@ -104,11 +103,11 @@ const SupportFloat: React.FC = () => {
             <div className="text-xs text-copy-light space-y-1">
               <div className="flex items-center gap-2">
                 <Mail className="w-3 h-3" />
-                <span>support@banwee.com</span>
+                <Text as="span">support@banwee.com</Text>
               </div>
               <div className="flex items-center gap-2">
                 <MessageCircle className="w-3 h-3" />
-                <span>1-800-BANWEE</span>
+                <Text as="span">1-800-BANWEE</Text>
               </div>
             </div>
           </div>

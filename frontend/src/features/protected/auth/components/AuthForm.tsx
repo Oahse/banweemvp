@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { SocialAuth } from './SocialAuth';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 
 
@@ -112,15 +113,15 @@ export const AuthForm = ({
     <div className="w-full max-w-md mx-auto">
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <Heading level={2} className="text-2xl font-bold text-gray-900 dark:text-white">
             {mode === 'login' ? 'Sign In' : 'Create Account'}
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          </Heading>
+          <Body className="text-gray-600 dark:text-gray-400 mt-2">
             {mode === 'login' 
               ? 'Welcome back! Please sign in to your account.' 
               : 'Join us today! Create your account to get started.'
             }
-          </p>
+          </Body>
         </div>
 
         {error && (
@@ -142,9 +143,9 @@ export const AuthForm = ({
                 <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
+                <Text className="px-2 bg-white dark:bg-gray-800 text-gray-500">
                   Or continue with {identifierType}
-                </span>
+                </Text>
               </div>
             </div>
           </div>
@@ -247,7 +248,7 @@ export const AuthForm = ({
                 onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
                 className="mt-1 mr-2"
               />
-              <label htmlFor="acceptTerms" className="text-sm text-gray-600 dark:text-gray-400">
+              <Label htmlFor="acceptTerms" className="text-sm text-gray-600 dark:text-gray-400">
                 I accept the{' '}
                 <a href="/terms" className="text-blue-600 hover:underline">
                   Terms and Conditions
@@ -256,9 +257,9 @@ export const AuthForm = ({
                 <a href="/privacy" className="text-blue-600 hover:underline">
                   Privacy Policy
                 </a>
-              </label>
+              </Label>
               {validationErrors.acceptTerms && (
-                <p className="text-red-500 text-xs mt-1">{validationErrors.acceptTerms}</p>
+                <Body className="text-red-500 text-xs mt-1">{validationErrors.acceptTerms}</Body>
               )}
             </div>
           )}
@@ -294,7 +295,7 @@ export const AuthForm = ({
           {/* Toggle Mode */}
           {onToggleMode && (
             <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <Body className="text-sm text-gray-600 dark:text-gray-400">
                 {mode === 'login' ? "Don't have an account?" : "Already have an account?"}{' '}
                 <Button
                   type="button"
@@ -302,11 +303,11 @@ export const AuthForm = ({
                   onClick={onToggleMode}
                 >
                   {mode === 'login' ? "Don't have an account?" : "Already have an account?"}{' '}
-                  <span className="text-blue-600 hover:underline font-medium">
+                  <Text className="text-blue-600 hover:underline font-medium">
                     {mode === 'login' ? 'Sign up' : 'Login'}
-                  </span>
+                  </Text>
                 </Button>
-              </p>
+              </Body>
             </div>
           )}
         </form>

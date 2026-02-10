@@ -3,6 +3,7 @@ import { MinusIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text/Text';
 
 interface CartItemProps {
   item: {
@@ -230,21 +231,15 @@ export const CartItem: React.FC<CartItemProps> = ({
 
       {/* Product Details */}
       <div className="flex-grow min-w-0">
-        <h3 className="product-title text-sm font-medium text-gray-900 truncate">
-          {item.variant.product_name || item.variant.name}
-        </h3>
-        <p className="body-text text-xs text-gray-500 mt-1">
-          {getVariantDescription()}
-        </p>
-        <p className="body-text text-xs text-gray-500">
-          SKU: {item.variant.sku}
-        </p>
+        <Text variant="body-sm" weight="medium">{item.variant.product_name || item.variant.name}</Text>
+        <Text variant="caption" tone="secondary">{getVariantDescription()}</Text>
+        <Text variant="caption" tone="secondary">SKU: {item.variant.sku}</Text>
         
         {/* Stock warning */}
         {item.variant.stock <= 5 && (
-          <p className="body-text text-xs text-orange-600 mt-1">
+          <Text variant="caption" className="text-orange-600">
             Only {item.variant.stock} left in stock
-          </p>
+          </Text>
         )}
       </div>
 
@@ -286,12 +281,8 @@ export const CartItem: React.FC<CartItemProps> = ({
 
       {/* Price */}
       <div className="text-right min-w-0">
-        <div className="price text-sm font-medium text-gray-900">
-          ${totalPrice.toFixed(2)}
-        </div>
-        <div className="body-text text-xs text-gray-500">
-          ${item.price_per_unit.toFixed(2)} each
-        </div>
+        <Text variant="body-sm" weight="medium">${totalPrice.toFixed(2)}</Text>
+        <Text variant="caption" tone="secondary">${item.price_per_unit.toFixed(2)} each</Text>
       </div>
 
       {/* Remove Button */}

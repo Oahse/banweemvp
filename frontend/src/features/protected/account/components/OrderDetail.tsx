@@ -4,6 +4,7 @@ import { ArrowLeftIcon, PackageIcon, DownloadIcon, MapPinIcon } from 'lucide-rea
 import { OrdersAPI } from '@/api/orders';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Caption, Text } from '@/components/ui/Text/Text';
 export const OrderDetail = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
@@ -96,20 +97,12 @@ export const OrderDetail = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Order Details
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Order ID: {order.id}
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Placed on: {new Date(order.created_at).toLocaleDateString()}
-            </p>
+            <Heading level={1} className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Order Details</Heading>
+            <Caption className="text-sm text-gray-500 dark:text-gray-400">Order ID: {order.id}</Caption>
+            <Caption className="text-sm text-gray-500 dark:text-gray-400">Placed on: {new Date(order.created_at).toLocaleDateString()}</Caption>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <span className={`px-3 py-1 text-sm rounded-full ${getStatusColor(order.status)}`}>
-              {order.status}
-            </span>
+            <Caption className={`px-3 py-1 text-sm rounded-full ${getStatusColor(order.status)}`}>{order.status}</Caption>
             <div className="flex flex-wrap gap-2 justify-end">
               <Link
                 to={`/track-order/${order.id}`}
@@ -134,9 +127,7 @@ export const OrderDetail = () => {
 
         {/* Order Items */}
         <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Order Items
-          </h2>
+          <Heading level={2} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Items</Heading>
           <div className="space-y-4">
             {order.items?.map((item: any) => {
               // Get primary image from variant images array (same logic as ProductCard)
@@ -166,21 +157,13 @@ export const OrderDetail = () => {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base">
-                      {item.variant?.product_name || item.variant?.name || 'Product'}
-                    </p>
+                    <Heading level={4} className="font-medium text-gray-900 dark:text-white text-sm sm:text-base">{item.variant?.product_name || item.variant?.name || 'Product'}</Heading>
                     {item.variant?.name && item.variant?.product_name && (
-                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                        Variant: {item.variant.name}
-                      </p>
+                      <Caption className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Variant: {item.variant.name}</Caption>
                     )}
-                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                      Quantity: {item.quantity} × ${(item.price_per_unit || 0).toFixed(2)}
-                    </p>
+                    <Caption className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Quantity: {item.quantity} × ${(item.price_per_unit || 0).toFixed(2)}</Caption>
                   </div>
-                  <p className="font-medium text-gray-900 dark:text-white whitespace-nowrap text-sm sm:text-base">
-                    ${item.total_price?.toFixed(2)}
-                  </p>
+                  <Body className="font-medium text-gray-900 dark:text-white whitespace-nowrap text-sm sm:text-base">${item.total_price?.toFixed(2)}</Body>
                 </div>
               );
             })}
@@ -212,35 +195,30 @@ export const OrderDetail = () => {
             return (
               <>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                  <span className="text-gray-900 dark:text-white">${subtotal.toFixed(2)}</span>
+                  <Caption className="text-gray-600 dark:text-gray-400">Subtotal</Caption>
+                  <Body className="text-gray-900 dark:text-white">${subtotal.toFixed(2)}</Body>
                 </div>
                 {hasDiscount && (
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-green-600 dark:text-green-400">Discount</span>
-                    <span className="text-green-600 dark:text-green-400">
-                      -${discount.toFixed(2)}
-                      {order.discount_type === 'percentage' && ` (${((discount / subtotal) * 100).toFixed(0)}%)`}
-                    </span>
-                  </div>
+                    <div className="flex justify-between items-center mb-2">
+                      <Caption className="text-green-600 dark:text-green-400">Discount</Caption>
+                      <Body className="text-green-600 dark:text-green-400">-${discount.toFixed(2)}{order.discount_type === 'percentage' && ` (${((discount / subtotal) * 100).toFixed(0)}%)`}</Body>
+                    </div>
                 )}
                 {hasShipping && (
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Shipping</span>
-                    <span className="text-gray-900 dark:text-white">${shipping.toFixed(2)}</span>
-                  </div>
+                    <div className="flex justify-between items-center mb-2">
+                      <Caption className="text-gray-600 dark:text-gray-400">Shipping</Caption>
+                      <Body className="text-gray-900 dark:text-white">${shipping.toFixed(2)}</Body>
+                    </div>
                 )}
                 {hasTax && (
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      Tax{order.tax_rate && ` (${(order.tax_rate * 100).toFixed(0)}%)`}
-                    </span>
-                    <span className="text-gray-900 dark:text-white">${tax.toFixed(2)}</span>
-                  </div>
+                    <div className="flex justify-between items-center mb-2">
+                      <Caption className="text-gray-600 dark:text-gray-400">Tax{order.tax_rate && ` (${(order.tax_rate * 100).toFixed(0)}%)`}</Caption>
+                      <Body className="text-gray-900 dark:text-white">${tax.toFixed(2)}</Body>
+                    </div>
                 )}
                 <div className="flex justify-between items-center text-lg font-semibold border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                  <span className="text-gray-900 dark:text-white">Total</span>
-                  <span className="text-gray-900 dark:text-white">${order.total_amount?.toFixed(2)}</span>
+                  <Body className="text-gray-900 dark:text-white">Total</Body>
+                  <Body className="text-gray-900 dark:text-white">${order.total_amount?.toFixed(2)}</Body>
                 </div>
               </>
             );
@@ -250,13 +228,11 @@ export const OrderDetail = () => {
         {/* Shipping Address */}
         {order.shipping_address && (
           <div className="border-t border-gray-200 dark:border-gray-700 mt-6 pt-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Shipping Address
-            </h2>
+            <Heading level={2} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Shipping Address</Heading>
             <div className="text-gray-600 dark:text-gray-400">
-              <p>{order.shipping_address.street}</p>
-              <p>{order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.post_code}</p>
-              <p>{order.shipping_address.country}</p>
+              <Body>{order.shipping_address.street}</Body>
+              <Body>{order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.post_code}</Body>
+              <Body>{order.shipping_address.country}</Body>
             </div>
           </div>
         )}
@@ -264,10 +240,8 @@ export const OrderDetail = () => {
         {/* Order Notes */}
         {order.notes && (
           <div className="border-t border-gray-200 dark:border-gray-700 mt-6 pt-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Order Notes
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">{order.notes}</p>
+            <Heading level={2} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Notes</Heading>
+            <Body className="text-gray-600 dark:text-gray-400">{order.notes}</Body>
           </div>
         )}
       </div>

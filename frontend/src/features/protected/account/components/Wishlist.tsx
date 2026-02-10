@@ -21,6 +21,7 @@ import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { ProductCard } from '@/components/generic/ProductCard';
 import { Product, ProductVariant } from '../../types';
 import { WishlistSkeleton } from './skeletons/WishlistSkeleton';
+import { Text, Heading } from '@/components/ui/Text/Text';
 interface WishlistItem {
   id: string;
   product_id: string;
@@ -162,16 +163,14 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
     return (
       <div className="text-center py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
         <HeartIcon size={32} className="mx-auto text-gray-400 mb-3" />
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-          Unable to load wishlist
-        </p>
+        <Text variant="caption" tone="secondary">Unable to load wishlist</Text>
         <Button
           onClick={() => window.location.reload()} 
           variant="link"
           size="sm"
           className="text-xs text-primary hover:underline"
         >
-          Try again
+          <Text variant="caption" className="text-primary hover:underline">Try again</Text>
         </Button>
       </div>
     );
@@ -188,9 +187,9 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-3">
           <div>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+            <Text variant="caption" tone="secondary">
               {items.length} {items.length === 1 ? 'item' : 'items'} saved
-            </p>
+            </Text>
           </div>
           <div className="flex gap-2">
             <Button
@@ -224,12 +223,10 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
             <div className="w-10 h-10 mx-auto mb-2 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
               <HeartIcon size={16} className="text-gray-500 dark:text-gray-400" />
             </div>
-            <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-              Your wishlist is empty
-            </h2>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
+            <Heading level={2} weight="medium">Your wishlist is empty</Heading>
+            <Text variant="caption" tone="secondary">
               Save items you like to your wishlist and they'll appear here.
-            </p>
+            </Text>
             <div className="flex gap-2 justify-center">
               <Button
                 onClick={() => navigate('/products')}
@@ -257,12 +254,10 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
                       <div className="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg mb-2 flex items-center justify-center">
                         <PackageIcon size={20} className="text-gray-400" />
                       </div>
-                      <h3 className="text-xs font-medium text-gray-900 dark:text-white mb-1 line-clamp-2">
-                        Loading product...
-                      </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <Heading level={3} weight="medium">Loading product...</Heading>
+                      <Text variant="caption" tone="secondary">
                         Product ID: {item.product_id}
-                      </p>
+                      </Text>
                       <div className="mt-2">
                         <Button
                           onClick={() => handleRemoveFromWishlist(item.id)}
@@ -288,7 +283,7 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
                 className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeftIcon size={14} className="mr-1" />
-                Previous
+                <Text variant="caption">Previous</Text>
               </Button>
               
               <div className="flex items-center space-x-1">
@@ -325,7 +320,7 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
                 disabled={currentPage === totalPages}
                 className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Next
+                <Text variant="caption">Next</Text>
                 <ChevronRightIcon size={14} className="ml-1" />
               </button>
             </div>
@@ -352,14 +347,14 @@ export const WishlistConsolidated: React.FC<WishlistProps> = ({ mode = 'list', w
   return (
     <div className="p-4 sm:p-6">
       <div className="text-center">
-        <p>Wishlist management view would be implemented here</p>
+        <Text variant="caption">Wishlist management view would be implemented here</Text>
         <Button
           onClick={() => navigate('/account/wishlist')}
           variant="link"
           size="sm"
           className="mt-4 text-primary hover:underline"
         >
-          Back to Wishlist
+          <Text variant="caption" className="text-primary hover:underline">Back to Wishlist</Text>
         </Button>
       </div>
     </div>

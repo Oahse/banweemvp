@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { cn } from '../../utils/utils';
 import { useTheme } from '../../../ThemeContext';
+import { Label, Text } from '@/components/ui/Text/Text';
 
 
 
@@ -19,13 +20,13 @@ export const Checkbox = forwardRef(({
             <input ref={ref} type="checkbox" className={cn('h-4 w-4 rounded border-border text-primary focus:ring-primary/50 bg-surface transition-colors', error && 'border-error', className)} {...props} />
           </div>
           {label && <div className="ml-2 text-sm">
-              <label htmlFor={props.id} className={cn('font-medium', error ? 'text-error' : 'text-copy')}>
+              <Label htmlFor={props.id} className={cn('font-medium', error ? 'text-error' : 'text-copy')}>
                 {label}
-              </label>
-              {helperText && <p className="text-copy-lighter">{helperText}</p>}
+              </Label>
+              {helperText && <Text className="text-copy-lighter">{helperText}</Text>}
             </div>}
         </div>
-        {error && <p className="mt-1 text-sm text-error">{error}</p>}
+        {error && <Text variant="body-sm" className="mt-1 text-error">{error}</Text>}
       </div>;
 });
 

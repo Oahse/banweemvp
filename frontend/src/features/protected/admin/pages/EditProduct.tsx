@@ -9,6 +9,7 @@ import { getCountryOptions } from '@/data/countries';
 import { DIETARY_TAGS } from '@/config/product';
 import { AdminLayout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 interface Category {
   id: string;
@@ -325,13 +326,13 @@ const EditProduct: React.FC = () => {
         className="inline-flex items-center gap-2 text-copy-light hover:text-copy transition-colors"
         leftIcon={<ArrowLeft size={16} />}
       >
-        Back to Products
+        <Text variant="body-sm">Back to Products</Text>
       </Button>
       
       <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
         <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
         <div>
-          <p className="font-semibold text-destructive">Error</p>
+          <Text weight="semibold" tone="danger">Error</Text>
           // ... (rest of the code remains the same)
 }
 
@@ -349,18 +350,18 @@ const EditProduct: React.FC = () => {
           className="inline-flex items-center gap-2 text-copy-light hover:text-copy transition-colors"
           leftIcon={<ArrowLeft size={16} />}
         >
-          Back to Product
+          <Text variant="body-sm">Back to Product</Text>
         </Button>
         <div>
-          <h1 className="text-lg font-semibold text-copy">Edit Product</h1>
-          <p className="text-xs text-copy-light">Update product and variant information</p>
+          <Heading level={1}>Edit Product</Heading>
+          <Text variant="caption" tone="secondary">Update product and variant information</Text>
         </div>
       </div>
     // ... (rest of the code remains the same)
 
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-medium text-copy">Featured Product</label>
+        <Label weight="medium">Featured Product</Label>
         <Button
           type="button"
           onClick={() => setFormData(prev => ({ ...prev, is_featured: !prev.is_featured }))}
@@ -370,15 +371,15 @@ const EditProduct: React.FC = () => {
             formData.is_featured ? 'bg-primary' : 'bg-gray-200'
           }`}
         >
-          <span
+          <Text
             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
               formData.is_featured ? 'translate-x-6' : 'translate-x-1'
             }`}
-          />
+          ></Text>
         </Button>
       </div>
       <div className="flex items-center justify-between">
-        <label className="text-xs font-medium text-copy">Bestseller</label>
+        <Label weight="medium">Bestseller</Label>
         <Button
           type="button"
           onClick={() => setFormData(prev => ({ ...prev, is_bestseller: !prev.is_bestseller }))}
@@ -388,11 +389,11 @@ const EditProduct: React.FC = () => {
             formData.is_bestseller ? 'bg-primary' : 'bg-gray-200'
           }`}
         >
-          <span
+          <Text
             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
               formData.is_bestseller ? 'translate-x-6' : 'translate-x-1'
             }`}
-          />
+          ></Text>
         </Button>
       </div>
               </>

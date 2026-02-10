@@ -8,6 +8,7 @@ import { Input } from '../../../../components/generic/Input';
 import { Checkbox } from '../../../../components/generic/Checkbox';
 import SocialAuth from '../components/SocialAuth';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -199,18 +200,16 @@ export const Login = ({ isInitialLoading = false }) => {
             className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-md"
             variants={itemVariants}
           >
-            <p className="text-sm text-copy">
+            <Body className="text-sm text-copy">
               {location.state?.from?.pathname 
                 ? 'Please log in to continue with your cart operation.'
                 : 'Please log in to continue to your requested page.'
               }
-            </p>
+            </Body>
           </motion.div>
         )}
         
-        <motion.h1 className="text-xl font-bold text-main mb-4 text-center" variants={itemVariants}>
-          Login to Your Account
-        </motion.h1>
+        <Heading level={1} className="text-xl font-bold text-main mb-4 text-center">Login to Your Account</Heading>
         <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
           {/* Email Address Input */}
           <Input
@@ -226,9 +225,9 @@ export const Login = ({ isInitialLoading = false }) => {
           {/* Password Input and Forgot Password Link */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label htmlFor="password" className="block text-sm font-medium text-main">
+              <Label htmlFor="password" className="block text-sm font-medium text-main">
                 Password
-              </label>
+              </Label>
               <Link to="/forgot-password" className="text-xs text-primary hover:underline">
                 Forgot password?
               </Link>
@@ -279,7 +278,7 @@ export const Login = ({ isInitialLoading = false }) => {
         <motion.div variants={itemVariants}>
           <div className="relative flex items-center justify-center my-4">
             <div className="border-t border-border-light w-full"></div>
-            <span className="bg-surface px-3 text-sm text-copy-light absolute">Or continue with</span>
+            <Text className="bg-surface px-3 text-sm text-copy-light absolute">Or continue with</Text>
           </div>
 
           <SocialAuth 

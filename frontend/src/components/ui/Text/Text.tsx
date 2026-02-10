@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import DOMPurify from 'dompurify';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../../utils/cn';
 
@@ -148,6 +149,16 @@ export interface TextProps extends
    * Children to render
    */
   children: React.ReactNode;
+  /**
+   * Raw HTML string to render. When provided, `children` are ignored.
+   * Use `sanitizeHtml` to control whether to sanitize the HTML before rendering.
+   */
+  html?: string;
+
+  /**
+   * Whether to sanitize the provided `html` string. Defaults to `true`.
+   */
+  sanitizeHtml?: boolean;
 }
 
 /**
@@ -174,6 +185,8 @@ export const Text = forwardRef<HTMLElement, TextProps>(
       selectable = true,
       className,
       children,
+      html,
+      sanitizeHtml = true,
       ...props
     },
     ref
@@ -197,8 +210,11 @@ export const Text = forwardRef<HTMLElement, TextProps>(
         ref={ref}
         className={classes}
         {...props}
+        {...(html
+          ? { dangerouslySetInnerHTML: { __html: sanitizeHtml ? DOMPurify.sanitize(html) : html } }
+          : {})}
       >
-        {children}
+        {!html && children}
       </Component>
     );
   }

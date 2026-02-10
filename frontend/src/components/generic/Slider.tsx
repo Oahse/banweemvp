@@ -1,5 +1,6 @@
 
 import { cn } from '../../utils/utils';
+import { Text } from '@/components/ui/Text/Text';
 
 
 
@@ -14,9 +15,7 @@ export const Slider = ({
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-main">
-          {label}
-        </label>
+        <Label weight="medium">{label}</Label>
       )}
       <input
         type={type}
@@ -27,7 +26,7 @@ export const Slider = ({
         )}
         {...props}
       />
-      {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+      {error && <Text variant="body-sm" className="text-red-500">{error}</Text>}
     </div>
   );
 };

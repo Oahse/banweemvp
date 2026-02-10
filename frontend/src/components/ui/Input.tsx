@@ -1,5 +1,6 @@
 import React, { forwardRef, useState } from 'react';
 import { cn } from '../../utils/utils';
+import { Label, Text } from '@/components/ui/Text/Text';
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string;
@@ -82,8 +83,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   return (
     <div className={cn('space-y-1', fullWidth && 'w-full')}>
       {label && (
-        <label 
-          htmlFor={props.id} 
+        <Label
+          htmlFor={props.id}
           className={cn(
             'block text-sm font-medium text-copy transition-colors',
             hasError && 'text-error',
@@ -93,7 +94,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
         >
           {label}
           {props.required && <span className="text-error ml-1">*</span>}
-        </label>
+        </Label>
       )}
       
       <div className="relative">
@@ -164,23 +165,23 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
       {(error || success || helperText) && (
         <div className="space-y-1">
           {error && (
-            <p className="text-sm text-error flex items-center gap-1">
+            <Text variant="body-sm" className="text-error flex items-center gap-1">
               <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               {error}
-            </p>
+            </Text>
           )}
           {success && !error && (
-            <p className="text-sm text-success flex items-center gap-1">
+            <Text variant="body-sm" className="text-success flex items-center gap-1">
               <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               {success}
-            </p>
+            </Text>
           )}
           {helperText && !error && !success && (
-            <p className="text-sm text-copy-light">{helperText}</p>
+            <Text variant="body-sm" className="text-copy-light">{helperText}</Text>
           )}
         </div>
       )}

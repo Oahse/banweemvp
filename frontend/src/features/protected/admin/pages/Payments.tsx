@@ -7,6 +7,7 @@ import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { PaymentsListSkeleton } from '../components/skeletons/PaymentsSkeleton';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface Payment {
   id: string;
@@ -207,9 +208,9 @@ export const Payments = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
     
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </span>
+      </Text>
     );
   };
 
@@ -275,7 +276,7 @@ export const Payments = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
-          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage payment transactions and processing</p>
+          <Body className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage payment transactions and processing</Body>
         </div>
       </div>
 
@@ -346,9 +347,9 @@ export const Payments = () => {
           {/* Active Filters */}
           {(debouncedSearchQuery || statusFilter) && (
             <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+              <Text className="text-sm text-gray-600 dark:text-gray-400">Active filters:</Text>
               {debouncedSearchQuery && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                <Text className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Search: "{debouncedSearchQuery}"
                   <Button
                     onClick={() => setSearchQuery('')}
@@ -357,10 +358,10 @@ export const Payments = () => {
                   >
                     ×
                   </Button>
-                </span>
+                </Text>
               )}
               {statusFilter && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                <Text className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                   Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
                   <Button
                     onClick={() => setStatusFilter('')}
@@ -370,7 +371,7 @@ export const Payments = () => {
                     leftIcon={<X size={12} />}
                   >
                   </Button>
-                </span>
+                </Text>
               )}
               <Button
                 onClick={() => {
@@ -395,8 +396,8 @@ export const Payments = () => {
         }`}>
           <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="font-semibold">Error Loading Payments</p>
-            <p className="text-sm mt-1">{error}</p>
+            <Body className="font-semibold">Error Loading Payments</Body>
+            <Body className="text-sm mt-1">{error}</Body>
             <Button
               onClick={() => window.location.reload()}
               variant="ghost"
@@ -413,7 +414,7 @@ export const Payments = () => {
           <div className="p-8">
             <div className="flex items-center justify-center">
               <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
-              <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating payments...</span>
+              <Text className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating payments...</Text>
             </div>
           </div>
         ) : payments.length > 0 ? (
@@ -468,25 +469,25 @@ export const Payments = () => {
                   className={`p-4 flex flex-col gap-2 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-mono text-primary truncate flex-1">{String(payment.id).slice(0, 8)}</span>
+                    <Text className="text-xs font-mono text-primary truncate flex-1">{String(payment.id).slice(0, 8)}</Text>
                     {statusBadge(payment.status)}
                   </div>
                   <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{payment.customer_name || 'N/A'}</div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-gray-600 dark:text-gray-300">Order:</span>
-                    <span className="text-xs font-mono text-gray-600 dark:text-gray-300">{String(payment.order_id).slice(0, 8)}</span>
+                    <Text className="text-xs text-gray-600 dark:text-gray-300">Order:</Text>
+                    <Text className="text-xs font-mono text-gray-600 dark:text-gray-300">{String(payment.order_id).slice(0, 8)}</Text>
                   </div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-gray-600 dark:text-gray-300">Amount:</span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(payment.amount, payment.currency)}</span>
+                    <Text className="text-xs text-gray-600 dark:text-gray-300">Amount:</Text>
+                    <Text className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(payment.amount, payment.currency)}</Text>
                   </div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-gray-600 dark:text-gray-300">Method:</span>
-                    <span className="text-xs text-gray-600 dark:text-gray-300 truncate max-w-[150px]">{payment.payment_method || 'N/A'}</span>
+                    <Text className="text-xs text-gray-600 dark:text-gray-300">Method:</Text>
+                    <Text className="text-xs text-gray-600 dark:text-gray-300 truncate max-w-[150px]">{payment.payment_method || 'N/A'}</Text>
                   </div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-gray-600 dark:text-gray-300">Date:</span>
-                    <span className="text-xs text-gray-600 dark:text-gray-300">{new Date(payment.created_at || '').toLocaleDateString()}</span>
+                    <Text className="text-xs text-gray-600 dark:text-gray-300">Date:</Text>
+                    <Text className="text-xs text-gray-600 dark:text-gray-300">{new Date(payment.created_at || '').toLocaleDateString()}</Text>
                   </div>
                   <Button
                     onClick={() => handleView(payment)}
@@ -502,13 +503,13 @@ export const Payments = () => {
             </div>
 
             <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-              <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+              <Body className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 {pagination.total > 0
                   ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
                   : `Total: ${pagination.total} items`
                 }
                 {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
-              </p>
+              </Body>
               <div className="flex items-center gap-1">
                 <Button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -566,9 +567,9 @@ export const Payments = () => {
             
             {/* Pagination even with no data */}
             <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-              <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+              <Body className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 Total: 0 items
-              </p>
+              </Body>
               <div className="flex items-center gap-1">
                 <Button
                   disabled
@@ -606,7 +607,7 @@ export const Payments = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className={`w-full max-w-lg rounded-lg p-6 ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Payment Details</h2>
+              <Heading level={2} className="text-lg font-semibold">Payment Details</Heading>
               <Button
                 onClick={() => setIsViewOpen(false)}
                 variant="ghost"

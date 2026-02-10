@@ -12,6 +12,7 @@ import { CartAPI } from '@/api/cart';
 import { toast } from 'react-hot-toast';
 import SmartCheckoutForm from '../components/SmartCheckoutForm';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -135,9 +136,9 @@ export const Checkout = () => {
       <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-surface-dark">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-copy-light dark:text-copy-light-dark">
+          <Text variant="body-sm" tone="secondary">
             {authLoading ? 'Checking authentication...' : 'Loading checkout...'}
-          </p>
+          </Text>
         </div>
       </div>
     );
@@ -162,10 +163,10 @@ export const Checkout = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div className="mb-4" variants={itemVariants}>
-          <h1 className="text-lg font-bold text-copy dark:text-copy-dark mb-1">Checkout</h1>
-          <p className="text-xs text-copy-light dark:text-copy-light-dark">
+          <Heading level={1} weight="bold">Checkout</Heading>
+          <Text variant="caption" tone="secondary">
             Complete your purchase quickly and securely
-          </p>
+          </Text>
         </motion.div>
 
         {/* Stock Validation Warning */}
@@ -185,18 +186,18 @@ export const Checkout = () => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-xs font-semibold text-destructive dark:text-destructive-dark">
+                <Text variant="caption" weight="semibold" className="text-destructive">
                   Stock Issues Detected
-                </h3>
-                <div className="mt-1 text-xs text-destructive dark:text-destructive-dark">
+                </Text>
+                <Text variant="caption" className="text-destructive">
                   <ul className="list-disc pl-4 space-y-0.5">
                     {stockValidation.issues.map((issue, index) => (
-                      <li key={index} className="text-destructive/80 dark:text-destructive-dark/80">
+                      <li key={index} className="text-destructive/80">
                         {issue.message}
                       </li>
                     ))}
                   </ul>
-                </div>
+                </Text>
                 <div className="mt-2">
                   <Button
                     onClick={() => navigate('/cart')}

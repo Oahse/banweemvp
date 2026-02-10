@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/protected/auth/contexts/AuthContext';
 import { useTheme } from './contexts/ThemeContext';
+import { Text } from '@/components/ui/Text/Text';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,7 +22,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
         <div className="text-center">
           <div className={`w-16 h-16 border-4 ${theme === 'dark' ? 'border-blue-500' : 'border-blue-600'} border-t-transparent rounded-full animate-spin`}></div>
-          <p className={`mt-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Loading...</p>
+          <Text variant="body-sm" tone="secondary">Loading...</Text>
         </div>
       </div>
     );

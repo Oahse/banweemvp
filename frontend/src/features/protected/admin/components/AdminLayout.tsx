@@ -28,6 +28,7 @@ import {
   Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 import { cn } from '@/utils/cn';
 import { containerFastVariants, itemFastVariants } from '@/utils/pageAnimations';
 
@@ -69,8 +70,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <User className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-sm font-medium text-gray-900 dark:text-white">Admin Panel</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">admin@banwee.com</p>
+              <Heading level={2} className="text-sm font-medium text-gray-900 dark:text-white">Admin Panel</Heading>
+              <Body className="text-xs text-gray-500 dark:text-gray-400">admin@banwee.com</Body>
             </div>
           </div>
           <Button
@@ -100,7 +101,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               )}
             >
               <item.icon className="h-5 w-5" />
-              <span>{item.name}</span>
+              <Text>{item.name}</Text>
               {location.pathname === item.href && (
                 <ChevronRight className="h-4 w-4 ml-auto" />
               )}
@@ -142,9 +143,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               >
               </Button>
               <div className="flex-1">
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <Heading level={1} className="text-xl font-semibold text-gray-900 dark:text-white">
                   {adminNavigationItems.find(item => location.pathname === item.href)?.name || 'Admin'}
-                </h1>
+                </Heading>
               </div>
             </div>
             <div className="flex items-center space-x-2">
@@ -155,7 +156,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 leftIcon={<Home className="w-4 h-4" />}
               >
-                <span className="hidden sm:inline">Home</span>
+                <Text className="hidden sm:inline">Home</Text>
               </Button>
               <Button
                 onClick={() => navigate('/products')}
@@ -164,7 +165,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors"
                 leftIcon={<Package className="w-4 h-4" />}
               >
-                <span className="hidden sm:inline">Products</span>
+                <Text className="hidden sm:inline">Products</Text>
               </Button>
             </div>
           </div>

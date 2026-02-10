@@ -4,6 +4,7 @@ import { cn } from '../../utils/utils';
 import { Input } from '../ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Select } from '../ui/Select';
+import { Text, Label } from '@/components/ui/Text/Text';
 
 export const ProductSearch = ({
   onSearch,
@@ -132,12 +133,12 @@ export const ProductSearch = ({
           >
             Filters
             {hasActiveFilters && (
-              <span className="ml-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <Text className="ml-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {[filters.category, ...filters.tags, filters.availability].filter(Boolean).length + 
                  (filters.minPrice !== priceRange.min ? 1 : 0) + 
                  (filters.maxPrice !== priceRange.max ? 1 : 0) + 
                  (filters.minRating > 0 ? 1 : 0)}
-              </span>
+              </Text>
             )}
           </Button>
         </div>
@@ -145,9 +146,9 @@ export const ProductSearch = ({
         <div className="flex items-center justify-between mt-4">
           <div className="text-sm text-gray-600">
             {resultCount !== undefined && (
-              <span>
+              <Text>
                 {loading ? 'Searching...' : `${resultCount} products found`}
-              </span>
+              </Text>
             )}
           </div>
 
@@ -196,9 +197,9 @@ export const ProductSearch = ({
         <div className="p-4 bg-gray-50 border-b border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Label className="block text-sm font-medium text-gray-700 mb-2">
                 Availability
-              </label>
+              </Label>
               <Select
                 value={filters.availability}
                 onChange={(e) => updateFilter('availability', e.target.value)}
@@ -207,9 +208,9 @@ export const ProductSearch = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Label className="block text-sm font-medium text-gray-700 mb-2">
                 Price Range
-              </label>
+              </Label>
               <div className="flex items-center space-x-2">
                 <Input
                   type="number"
@@ -220,7 +221,7 @@ export const ProductSearch = ({
                   max={filters.maxPrice}
                   className="text-sm"
                 />
-                <span className="text-gray-500">-</span>
+                <Text className="text-gray-500">-</Text>
                 <Input
                   type="number"
                   placeholder="Max"
@@ -234,9 +235,9 @@ export const ProductSearch = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Label className="block text-sm font-medium text-gray-700 mb-2">
                 Minimum Rating
-              </label>
+              </Label>
               <Select
                 value={filters.minRating.toString()}
                 onChange={(e) => updateFilter('minRating', Number(e.target.value))}
@@ -265,9 +266,9 @@ export const ProductSearch = ({
 
           {tags.length > 0 && (
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Label className="block text-sm font-medium text-gray-700 mb-2">
                 Tags
-              </label>
+              </Label>
               <div className="flex flex-wrap gap-2">
                 {tags.map(tag => (
                   <Button
@@ -295,10 +296,10 @@ export const ProductSearch = ({
         <div className="p-4 bg-blue-50 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium text-gray-700">Active filters:</span>
+              <Text className="text-sm font-medium text-gray-700">Active filters:</Text>
               
               {filters.query && (
-                <span className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded-md text-sm">
+                <Text className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded-md text-sm">
                   Search: "{filters.query}"
                   <Button
                     onClick={() => updateFilter('query', '')}
@@ -308,11 +309,11 @@ export const ProductSearch = ({
                   >
                     <XIcon size={14} />
                   </Button>
-                </span>
+                </Text>
               )}
 
               {filters.category && (
-                <span className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded-md text-sm">
+                <Text className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded-md text-sm">
                   Category: {categories.find(c => c.id === filters.category)?.name}
                   <Button
                     onClick={() => updateFilter('category', '')}
@@ -322,13 +323,13 @@ export const ProductSearch = ({
                   >
                     <XIcon size={14} />
                   </Button>
-                </span>
+                </Text>
               )}
 
               {filters.tags.map(tagId => {
                 const tag = tags.find(t => t.id === tagId);
                 return tag ? (
-                  <span key={tagId} className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded-md text-sm">
+                  <Text key={tagId} className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded-md text-sm">
                     Tag: {tag.name}
                     <Button
                       onClick={() => toggleTag(tagId)}
@@ -338,7 +339,7 @@ export const ProductSearch = ({
                     >
                       <XIcon size={14} />
                     </Button>
-                  </span>
+                  </Text>
                 ) : null;
               })}
             </div>

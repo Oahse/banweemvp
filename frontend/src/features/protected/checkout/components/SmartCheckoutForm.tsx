@@ -19,6 +19,7 @@ import { toast } from 'react-hot-toast';
 import { Input } from '@/components/ui/Input';
 import { CheckCircle, AlertTriangle, CreditCard, Truck, MapPin } from 'lucide-react';
 import AddAddressForm from '@/components/generic/AddAddressForm';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 // Debounce utility
 const debounce = (func: Function, wait: number) => {
@@ -318,43 +319,44 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
       
       return (
         <div className="bg-surface-elevated dark:bg-surface-elevated-dark border border-border-light dark:border-border-dark p-4 rounded-lg">
-          <p className="text-sm text-copy-light dark:text-copy-light-dark">{message}</p>
+          <Text variant="body-sm" tone="secondary">{message}</Text>
         </div>
       );
     }
 
     return (
       <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6 space-y-4 sm:space-y-6">
-        <h3 className="text-base font-medium text-copy dark:text-copy-dark">Order Summary</h3>
+        <Heading level={3} weight="medium">Order Summary</Heading>
         
-        <div className="space-y-2 text-xs">
-          <div className="flex justify-between text-copy dark:text-copy-dark">
-            <span>Subtotal:</span>
-            <span>{formatCurrency(pricingData.subtotal)}</span>
-          </div>
-          
-          <div className="flex justify-between text-copy dark:text-copy-dark">
-            <span>Shipping ({pricingData.shipping.method_name}):</span>
-            <span>{formatCurrency(pricingData.shipping.cost)}</span>
-          </div>
-          
-          <div className="flex justify-between text-copy dark:text-copy-dark">
-            <span>Tax ({(pricingData.tax.rate * 100).toFixed(2)}%):</span>
-            <span>{formatCurrency(pricingData.tax.amount)}</span>
-          </div>
-          
-          {pricingData.discount && (
-            <div className="flex justify-between text-success dark:text-success-dark">
-              <span>Discount ({pricingData.discount.code}):</span>
-              <span>-{formatCurrency(pricingData.discount.amount)}</span>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Text variant="caption">Subtotal:</Text>
+              <Text variant="caption">{formatCurrency(pricingData.subtotal)}</Text>
             </div>
-          )}
+            
+            <div className="flex justify-between">
+              <Text variant="caption">Shipping ({pricingData.shipping.method_name}):</Text>
+              <Text variant="caption">{formatCurrency(pricingData.shipping.cost)}</Text>
+            </div>
+            
+            <div className="flex justify-between">
+              <Text variant="caption">Tax ({(pricingData.tax.rate * 100).toFixed(2)}%):</Text>
+              <Text variant="caption">{formatCurrency(pricingData.tax.amount)}</Text>
+            </div>
+            
+            {pricingData.discount && (
+              <div className="flex justify-between">
+                <Text variant="caption" className="text-success">Discount ({pricingData.discount.code}):</Text>
+                <Text variant="caption" className="text-success">-{formatCurrency(pricingData.discount.amount)}</Text>
+              </div>
+            )}
+          </div>
           
           <hr className="my-2 border-border-light dark:border-border-dark" />
           
-          <div className="flex justify-between text-xs font-medium text-copy dark:text-copy-dark">
-            <span>Total:</span>
-            <span>{formatCurrency(pricingData.total)}</span>
+          <div className="flex justify-between">
+            <Text variant="caption" weight="medium">Total:</Text>
+            <Text variant="caption" weight="medium">{formatCurrency(pricingData.total)}</Text>
           </div>
         </div>
         
@@ -362,11 +364,10 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
           <div className="mt-3 p-3 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
-              <span className="text-xs font-medium text-destructive dark:text-destructive-dark">Price Verification</span>
-            </div>
-            {priceValidationErrors.map((error, index) => (
-              <p key={index} className="text-xs text-destructive dark:text-destructive-dark">{error}</p>
-            ))}
+              <Text variant="caption" weight="medium" className="text-destructive">Price Verification</Text>
+              {priceValidationErrors.map((error, index) => (
+                <Text key={index} variant="caption" className="text-destructive">{error}</Text>
+              ))}
           </div>
         )}
       </div>
@@ -385,7 +386,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
   return (
     <div className="min-h-screen bg-surface dark:bg-surface-dark">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        <h1 className="text-lg font-medium text-copy dark:text-copy-dark mb-6">Checkout</h1>
+        <Heading level={1} weight="medium">Checkout</Heading>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Form */}
           <div className="lg:col-span-2">
@@ -394,7 +395,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
               <div className="flex items-center gap-2 mb-3">
                 <MapPin className="h-4 w-4 text-primary dark:text-primary-dark" />
-                <h2 className="text-base font-medium text-copy dark:text-copy-dark">Shipping Address</h2>
+                <Heading level={2} weight="medium">Shipping Address</Heading>
               </div>
               
               {addresses.length > 0 ? (
@@ -410,11 +411,11 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                         className="mt-1 accent-primary dark:accent-primary-dark"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-copy dark:text-copy-dark truncate">{address.street}</div>
-                        <div className="text-xs sm:text-sm text-copy-light dark:text-copy-light-dark">
+                        <Text variant="body-sm" weight="medium">{address.street}</Text>
+                        <Text variant="caption" tone="secondary">
                           {address.city}, {address.state} {address.post_code}
-                        </div>
-                        <div className="text-xs sm:text-sm text-copy-light dark:text-copy-light-dark">{address.country}</div>
+                        </Text>
+                        <Text variant="caption" tone="secondary">{address.country}</Text>
                       </div>
                     </label>
                   ))}
@@ -430,7 +431,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <p className="text-copy-light dark:text-copy-light-dark mb-4">No addresses found</p>
+                  <Text variant="body-sm" tone="secondary">No addresses found</Text>
                   <Button
                     type="button"
                     variant="outline"
@@ -446,16 +447,15 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             <div className="bg-surface dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4 sm:p-6">
               <div className="flex items-center gap-2 mb-3">
                 <Truck className="h-4 w-4 text-primary dark:text-primary-dark" />
-                <h2 className="text-base font-medium text-copy dark:text-copy-dark">Shipping Method</h2>
+                <Heading level={2} weight="medium">Shipping Method</Heading>
               </div>
               
               {shippingError && (
                 <div className="mb-4 p-4 bg-destructive/10 dark:bg-destructive-dark/10 border border-destructive/30 dark:border-destructive-dark/30 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle className="h-4 w-4 text-destructive dark:text-destructive-dark" />
-                    <span className="font-medium text-destructive dark:text-destructive-dark">Error Loading Shipping Methods</span>
-                  </div>
-                  <p className="text-sm text-destructive dark:text-destructive-dark">{shippingError}</p>
+                    <Text variant="body-sm" weight="medium" className="text-destructive">Error Loading Shipping Methods</Text>
+                    <Text variant="body-sm" className="text-destructive">{shippingError}</Text>
                   <Button
                     type="button"
                     variant="outline"
@@ -488,19 +488,19 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                           className="accent-primary dark:accent-primary-dark flex-shrink-0"
                         />
                         <div className="min-w-0 flex-1">
-                          <div className="font-medium text-copy dark:text-copy-dark truncate">{method.name}</div>
-                          <div className="text-xs text-copy-light dark:text-copy-light-dark line-clamp-1">{method.description}</div>
+                          <Text variant="body-sm" weight="medium">{method.name}</Text>
+                          <Text variant="caption" tone="secondary">{method.description}</Text>
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <div className="font-medium text-copy dark:text-copy-dark whitespace-nowrap">{formatCurrency(method.price)}</div>
-                        <div className="text-xs text-copy-light dark:text-copy-light-dark whitespace-nowrap">{method.estimated_days}d</div>
+                        <Text variant="body-sm" weight="medium">{formatCurrency(method.price)}</Text>
+                        <Text variant="caption" tone="secondary">{method.estimated_days}d</Text>
                       </div>
                     </label>
                   ))}
                 </div>
               ) : (
-                <p className="text-copy-light dark:text-copy-light-dark">No shipping methods available</p>
+                <Text variant="body-sm" tone="secondary">No shipping methods available</Text>
               )}
             </div>
 

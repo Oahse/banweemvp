@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../utils/utils';
+import { Text } from '@/components/ui/Text/Text';
 
 
 
@@ -22,11 +23,9 @@ export const Radio = ({
         {...props}
       />
       {label && (
-        <label htmlFor={id} className="ml-2 block text-sm text-copy-light">
-          {label}
-        </label>
+        <Text variant="body-sm" tone="secondary">{label}</Text>
       )}
-      {error && <p className="text-sm text-error mt-1">{error}</p>}
+      {error && <Text variant="body-sm" className="text-error">{error}</Text>}
     </div>
   );
 };

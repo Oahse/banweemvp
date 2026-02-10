@@ -10,6 +10,7 @@ import Dropdown from '@/components/ui/Dropdown';
 import { getCountryOptions } from '@/data/countries';
 import { AdminLayout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 interface Category {
   id: string;
@@ -225,30 +226,22 @@ const CreateProduct: React.FC = () => {
             onClick={() => navigate('/admin/products')}
             variant="ghost"
             size="sm"
-            className={`flex items-center gap-2 mb-3 text-sm ${currentTheme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
+            className={`flex items-center gap-2 mb-3 ${currentTheme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
             leftIcon={<ArrowLeft size={16} />}
           >
-            Back to Products
+            <Text variant="body-sm">Back to Products</Text>
           </Button>
-          <h1 className={`text-2xl font-semibold ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Create New Product
-          </h1>
-          <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            Add a new product to your inventory
-          </p>
+          <Heading level={1}>Create New Product</Heading>
+          <Text variant="body-sm" tone="secondary">Add a new product to your inventory</Text>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Basic Information */}
           <div className={`${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow p-5`}>
-            <h2 className={`text-lg font-medium mb-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Basic Information
-            </h2>
+            <Heading level={2} weight="medium">Basic Information</Heading>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Product Name *
-                </label>
+                <Label weight="medium">Product Name *</Label>
                 <input
                   type="text"
                   value={formData.name}
@@ -264,9 +257,7 @@ const CreateProduct: React.FC = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Slug <span className="text-xs text-gray-500">(auto-generated)</span>
-                </label>
+                <Label weight="medium">Slug <Text variant="caption" tone="secondary">(auto-generated)</Text></Label>
                 <input
                   type="text"
                   value={formData.slug}
@@ -281,9 +272,7 @@ const CreateProduct: React.FC = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Category *
-                </label>
+                <Label weight="medium">Category *</Label>
                 <Dropdown
                   options={categories.map(cat => ({ value: cat.id, label: cat.name }))}
                   value={formData.category_id}
@@ -295,9 +284,7 @@ const CreateProduct: React.FC = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Origin
-                </label>
+                <Label weight="medium">Origin</Label>
                 <Dropdown
                   options={getCountryOptions()}
                   value={formData.origin}
@@ -310,9 +297,7 @@ const CreateProduct: React.FC = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Short Description
-                </label>
+                <Label weight="medium">Short Description</Label>
                 <input
                   type="text"
                   value={formData.short_description}
@@ -327,9 +312,7 @@ const CreateProduct: React.FC = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Description
-                </label>
+                <Label weight="medium">Description</Label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => updateField('description', e.target.value)}
@@ -345,14 +328,10 @@ const CreateProduct: React.FC = () => {
 
               {/* Marketing Flags */}
               <div className="md:col-span-2">
-                <label className={`block text-sm font-medium mb-3 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Marketing Options
-                </label>
+                <Label weight="medium">Marketing Options</Label>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Featured Product
-                    </label>
+                    <Label weight="medium">Featured Product</Label>
                     <Button
                       type="button"
                       onClick={() => updateField('is_featured', !formData.is_featured)}
@@ -362,7 +341,7 @@ const CreateProduct: React.FC = () => {
                         formData.is_featured ? 'bg-primary' : 'bg-gray-200'
                       }`}
                     >
-                      <span
+                      <Text
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                           formData.is_featured ? 'translate-x-6' : 'translate-x-1'
                         }`}
@@ -370,9 +349,7 @@ const CreateProduct: React.FC = () => {
                     </Button>
                   </div>
                   <div className="flex items-center justify-between">
-                    <label className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Bestseller
-                    </label>
+                    <Label weight="medium">Bestseller</Label>
                     <Button
                       type="button"
                       onClick={() => updateField('is_bestseller', !formData.is_bestseller)}
@@ -382,7 +359,7 @@ const CreateProduct: React.FC = () => {
                         formData.is_bestseller ? 'bg-primary' : 'bg-gray-200'
                       }`}
                     >
-                      <span
+                      <Text
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                           formData.is_bestseller ? 'translate-x-6' : 'translate-x-1'
                         }`}
@@ -397,18 +374,16 @@ const CreateProduct: React.FC = () => {
           {/* Variants */}
           <div className={`${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow p-5`}>
             <div className="flex items-center justify-between mb-3">
-              <h2 className={`text-lg font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Product Variants
-              </h2>
+              <Heading level={2} weight="medium">Product Variants</Heading>
               <Button
                 type="button"
                 onClick={addVariant}
                 variant="primary"
                 size="sm"
-                className="flex items-center gap-2 px-2 py-1 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
+                className="flex items-center gap-2 px-2 py-1 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                 leftIcon={<Plus size={14} />}
               >
-                Add Variant
+                <Text variant="body-sm">Add Variant</Text>
               </Button>
             </div>
 
@@ -423,9 +398,7 @@ const CreateProduct: React.FC = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Package className="w-4 h-4 text-primary" />
-                      <h3 className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Variant {index + 1}
-                      </h3>
+                      <Heading level={3} weight="medium">Variant {index + 1}</Heading>
                     </div>
                     {formData.variants.length > 1 && (
                       <Button
@@ -441,9 +414,7 @@ const CreateProduct: React.FC = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
-                      <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Variant Name *
-                      </label>
+                      <Label weight="medium">Variant Name *</Label>
                       <input
                         type="text"
                         value={variant.name}
@@ -459,9 +430,7 @@ const CreateProduct: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        SKU <span className="text-xs text-gray-500">(auto-generated)</span>
-                      </label>
+                      <Label weight="medium">SKU <Text variant="caption" tone="secondary">(auto-generated)</Text></Label>
                       <input
                         type="text"
                         value={variant.sku}
@@ -476,9 +445,7 @@ const CreateProduct: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Initial Stock
-                      </label>
+                      <Label weight="medium">Initial Stock</Label>
                       <input
                         type="number"
                         value={variant.stock}
@@ -494,9 +461,7 @@ const CreateProduct: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Base Price * ($)
-                      </label>
+                      <Label weight="medium">Base Price * ($)</Label>
                       <input
                         type="number"
                         step="0.01"
@@ -514,9 +479,7 @@ const CreateProduct: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Sale Price ($)
-                      </label>
+                      <Label weight="medium">Sale Price ($)</Label>
                       <input
                         type="number"
                         step="0.01"
@@ -533,9 +496,7 @@ const CreateProduct: React.FC = () => {
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <label className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Active
-                      </label>
+                      <Label weight="medium">Active</Label>
                       <Button
                         type="button"
                         onClick={() => updateVariant(index, 'is_active', !variant.is_active)}
@@ -545,7 +506,7 @@ const CreateProduct: React.FC = () => {
                           variant.is_active ? 'bg-primary' : 'bg-gray-200'
                         }`}
                       >
-                        <span
+                        <Text
                           className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                             variant.is_active ? 'translate-x-6' : 'translate-x-1'
                           }`}
@@ -556,9 +517,7 @@ const CreateProduct: React.FC = () => {
 
                   {/* Dietary Tags for this variant */}
                   <div className="mt-4">
-                    <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Dietary Tags (select multiple)
-                    </label>
+                    <Label weight="medium">Dietary Tags (select multiple)</Label>
                     <select
                       multiple
                       value={variant.dietary_tags}
@@ -578,15 +537,13 @@ const CreateProduct: React.FC = () => {
                         </option>
                       ))}
                     </select>
-                    <p className={`mt-1 text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      Hold Ctrl/Cmd to select multiple tags. Selected: {variant.dietary_tags.length}
-                    </p>
+                    <Text variant="caption" tone="secondary">Hold Ctrl/Cmd to select multiple tags. Selected: {variant.dietary_tags.length}</Text>
                     {variant.dietary_tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
                         {variant.dietary_tags.map(tag => (
                           <span
                             key={tag}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white text-xs rounded-full"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white rounded-full"
                           >
                             {tag}
                             <Button
@@ -605,9 +562,7 @@ const CreateProduct: React.FC = () => {
 
                   {/* Tags field */}
                   <div className="mt-3">
-                    <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Tags (comma-separated)
-                    </label>
+                    <Label weight="medium">Tags (comma-separated)</Label>
                     <input
                       type="text"
                       value={variant.tags || ''}
@@ -623,9 +578,7 @@ const CreateProduct: React.FC = () => {
 
                   {/* Images */}
                   <div className="mt-3">
-                    <label className={`block text-sm font-medium mb-1.5 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Product Images
-                    </label>
+                    <Label weight="medium">Product Images</Label>
                     <div className="flex gap-2 mb-2">
                       <input
                         type="url"
@@ -650,7 +603,7 @@ const CreateProduct: React.FC = () => {
                         className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                         leftIcon={<Plus size={14} />}
                       >
-                        Add Image
+                        <Text variant="body-sm">Add Image</Text>
                       </Button>
                     </div>
                     {variant.image_urls.length > 0 && (

@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../../../../features/protected/auth/hooks/useAuth';
 import { ReviewsAPI } from '../../../../api';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Label } from '@/components/ui/Text/Text';
 
 const ReviewForm = ({ productId, onReviewSubmitted }) => {
   const { isAuthenticated } = useAuth();
@@ -40,13 +41,13 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
 
   return (
     <div className="mt-8 p-6 bg-surface rounded-lg shadow-sm">
-      <h3 className="text-lg font-semibold text-main mb-4">Write a Review</h3>
+      <Heading level={3} className="text-lg font-semibold text-main mb-4">Write a Review</Heading>
       {!isAuthenticated ? (
-        <p className="text-copy-light">Please log in to submit a review.</p>
+        <Body className="text-copy-light">Please log in to submit a review.</Body>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-main mb-2">Your Rating</label>
+            <Label className="block text-xs font-medium text-main mb-2">Your Rating</Label>
             <div className="flex items-center">
               {[1, 2, 3, 4, 5].map((star) => (
                                   <Star
@@ -61,7 +62,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
             </div>
           </div>
           <div>
-            <label htmlFor="comment" className="block text-xs font-medium text-main mb-2">Your Comment</label>
+            <Label className="block text-xs font-medium text-main mb-2">Your Comment</Label>
             <textarea
               id="comment"
               rows={4}

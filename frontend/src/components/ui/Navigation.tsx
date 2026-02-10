@@ -5,9 +5,6 @@ import { ChevronDownIcon, MenuIcon, XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 
-
-
-
 export const Navigation = ({
   items,
   orientation = 'horizontal',

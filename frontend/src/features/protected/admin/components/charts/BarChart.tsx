@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { Heading, Body } from '@/components/ui/Text/Text';
 
 interface BarChartProps {
   data: any[];
@@ -30,14 +31,14 @@ export const CustomBarChart: React.FC<BarChartProps> = ({
   if (!data || data.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg">
-        <p className="text-gray-500 dark:text-gray-400">No data available</p>
+        <Body className="text-gray-500 dark:text-gray-400">No data available</Body>
       </div>
     );
   }
 
   return (
     <div className="w-full bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</h3>
+      <Heading level={3} className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</Heading>
       <ResponsiveContainer width="100%" height={height}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />

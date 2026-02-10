@@ -135,12 +135,12 @@ export const PaymentMethods = () => {
 
   // Display loading message while payment methods are being fetched
   if (loading) {
-    return <div className="p-6 text-center text-copy-light">Loading payment methods...</div>
+    return <div className="p-6 text-center"><Text variant="body" tone="secondary">Loading payment methods...</Text></div>
   }
 
   // Display error message if fetching payment methods failed
   if (error) {
-    return <div className="p-6 text-center text-error">Error: {error.message}</div>
+    return <div className="p-6 text-center"><Text variant="body" className="text-error">Error: {error.message}</Text></div>
   }
 
   return (
@@ -152,14 +152,14 @@ export const PaymentMethods = () => {
           <div className="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-primary font-medium">Complete Your Checkout</p>
-                <p className="text-sm text-copy-light">Add a payment method to finish placing your order.</p>
+                <Text variant="body-sm" weight="medium" className="text-primary">Complete Your Checkout</Text>
+                <Text variant="caption" tone="secondary">Add a payment method to finish placing your order.</Text>
               </div>
               <Link
                 to="/checkout"
                 className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors"
               >
-                Back to Checkout
+              <Text variant="body-sm">Back to Checkout</Text>
               </Link>
             </div>
           </div>
@@ -192,24 +192,24 @@ export const PaymentMethods = () => {
                   <div className="flex items-center">
                     <span className="mr-2">{getCardIcon(method.brand || method.provider)}</span>
                     <div>
-                      <p className="text-xs font-medium text-main dark:text-white">
+                      <Text variant="caption" weight="medium">
                         {method.brand?.charAt(0).toUpperCase() + method.brand?.slice(1) || method.provider?.charAt(0).toUpperCase() + method.provider?.slice(1)}{' '}
                         •••• {method.last_four}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-300">
+                      </Text>
+                      <Text variant="caption" tone="secondary">
                         Expires {method.expiry_month}/{method.expiry_year}
-                      </p>
+                      </Text>
                     </div>
                   </div>
                   <div className="flex items-center">
                     {/* Set as default button or default badge */}
                     {method.is_default ? (
-                      <span className="flex items-center text-xs bg-primary/10 text-primary px-2 py-1 rounded mr-2">
+                      <Text variant="caption" className="flex items-center bg-primary/10 text-primary px-2 py-1 rounded mr-2">
                         <CheckCircle size={12} className="mr-1" /> Default
-                      </span>
+                      </Text>
                     ) : (
                       <Button onClick={() => handleSetDefault(method.id)} className="text-xs text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary mr-2" variant="ghost" size="sm">
-                        Set as default
+                      <Text variant="caption">Set as default</Text>
                       </Button>
                     )}
                     {/* Delete button */}
@@ -231,12 +231,8 @@ export const PaymentMethods = () => {
         ) : (
           <div className="text-center py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
             <CreditCard size={36} className="mx-auto text-gray-400 mb-2" />
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
-              No payment methods saved yet
-            </p>
-            <Button onClick={() => setShowAddCardForm(true)} className="text-primary hover:underline text-xs" variant="link" size="sm">
-              Add your first payment method
-            </Button>
+            <Text variant="caption" tone="secondary">No payment methods saved yet</Text>
+            <Text variant="caption" className="text-primary hover:underline">Add your first payment method</Text>
           </div>
         )}
         {/* Add Card Form */}
@@ -254,17 +250,15 @@ export const PaymentMethods = () => {
       </div>
       {/* Payment Security Information */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-        <Heading level={2} className="text-lg font-medium text-main dark:text-white mb-4">
-          Payment Security
-        </Heading>
-        <Body className="text-gray-600 dark:text-gray-300 mb-3">
-          Your payment information is securely stored using industry-standard
-          encryption. We never store your full card details on our servers.
-        </Body>
-        <Body className="text-gray-600 dark:text-gray-300">
-          All transactions are processed through our secure payment gateway
-          partners and comply with PCI DSS standards.
-        </Body>
+            <Text variant="body-lg" weight="medium">Payment Security</Text>
+            <Text variant="body" tone="secondary">
+              Your payment information is securely stored using industry-standard
+              encryption. We never store your full card details on our servers.
+            </Text>
+            <Text variant="body" tone="secondary">
+              All transactions are processed through our secure payment gateway
+              partners and comply with PCI DSS standards.
+            </Text>
       </div>
     </div>
   );

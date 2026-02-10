@@ -4,7 +4,7 @@ import { QrCodeIcon, DownloadIcon, ShareIcon, XIcon } from 'lucide-react';
 import { NotificationModal } from '@/components/ui/NotificationModal';
 import QRCode from 'qrcode';
 import { Button } from '@/components/ui/Button';
-import { Heading } from '@/components/ui/Text/Text';
+import { Heading, Body } from '@/components/ui/Text/Text';
 
 export const QRCodeModal = ({
   data,
@@ -244,7 +244,7 @@ export const QRCodeModal = ({
         </div>
 
         {description && (
-          <p className="text-copy-light text-sm mb-4">{description}</p>
+          <Body className="text-copy-light text-sm mb-4">{description}</Body>
         )}
 
         <div className="flex justify-center mb-4">
@@ -258,8 +258,8 @@ export const QRCodeModal = ({
         </div>
 
         <div className="mb-4">
-          <p className="text-xs text-copy-lighter mb-1">Data:</p>
-          <p className="text-sm text-copy-light bg-surface-hover p-2 rounded break-all">
+          <Body className="text-xs text-copy-lighter mb-1">Data:</Body>
+          <Body className="text-sm text-copy-light bg-surface-hover p-2 rounded break-all">
 
       <div className="flex space-x-2">
         <Button

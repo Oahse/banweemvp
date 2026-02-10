@@ -4,6 +4,7 @@ import { useWishlist } from '../../../WishlistContext';
 import { useCart } from '../../../CartContext';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading, Body, Caption, Label } from '@/components/ui/Text/Text';
 
 interface WishlistItemProps {
   item: {
@@ -209,7 +210,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
         {/* Stock status overlay */}
         {!isInStock() && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="text-white font-medium">Out of Stock</span>
+            <Text as="span" className="text-white font-medium">Out of Stock</Text>
           </div>
         )}
 
@@ -233,26 +234,16 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
       </div>
 
       {/* Product Details */}
-      <div className="p-4">
+        <div className="p-4">
         <div className="mb-2">
-          <h3 className="product-title text-sm font-medium text-gray-900 line-clamp-2">
-            {item.product?.name || 'Unknown Product'}
-          </h3>
+          <Heading level={3} className="product-title text-sm font-medium text-gray-900 line-clamp-2">{item.product?.name || 'Unknown Product'}</Heading>
           
           {item.variant && (
-            <p className="body-text text-xs text-gray-500 mt-1">
-              {getVariantDescription()}
-            </p>
+            <Caption className="body-text text-xs text-gray-500 mt-1">{getVariantDescription()}</Caption>
           )}
           
           {item.product?.category && (
-            <p className="body-text text-xs text-gray-400 mt-1">
-              {(typeof item.product.category === 'object' && item.product.category.name) 
-                ? item.product.category.name 
-                : (typeof item.product.category === 'string' 
-                  ? item.product.category 
-                  : 'Uncategorized')}
-            </p>
+            <Caption className="body-text text-xs text-gray-400 mt-1">{(typeof item.product.category === 'object' && item.product.category.name) ? item.product.category.name : (typeof item.product.category === 'string' ? item.product.category : 'Uncategorized')}</Caption>
           )}
         </div>
 
@@ -260,26 +251,18 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
         {item.variant && (
           <div className="mb-3">
             <div className="flex items-center gap-2">
-              <span className="price text-lg font-semibold text-gray-900">
-                ${getCurrentPrice().toFixed(2)}
-              </span>
+              <Body className="price text-lg font-semibold text-gray-900">${getCurrentPrice().toFixed(2)}</Body>
               {isOnSale() && (
-                <span className="price text-sm text-gray-500 line-through">
-                  ${item.variant.base_price.toFixed(2)}
-                </span>
+                <Caption className="price text-sm text-gray-500 line-through">${item.variant.base_price.toFixed(2)}</Caption>
               )}
             </div>
             
             {/* Stock info */}
             <div className="mt-1">
               {isInStock() ? (
-                <span className="body-text text-xs text-green-600">
-                  {item.variant.stock} in stock
-                </span>
+                <Caption className="body-text text-xs text-green-600">{item.variant.stock} in stock</Caption>
               ) : (
-                <span className="body-text text-xs text-red-600">
-                  Out of stock
-                </span>
+                <Caption className="body-text text-xs text-red-600">Out of stock</Caption>
               )}
             </div>
           </div>
@@ -288,9 +271,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
         {/* Quantity selector (only if in stock) */}
         {isInStock() && item.variant && (
           <div className="mb-3">
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Quantity
-            </label>
+            <Label className="block text-xs font-medium text-gray-700 mb-1">Quantity</Label>
             <select
               value={quantity}
               onChange={(e) => handleQuantityChange(parseInt(e.target.value))}
@@ -313,7 +294,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ShoppingCartIcon size={14} className="mr-1" />
-            <span className="text-xs">{isAddingToCart ? 'Adding...' : 'Add to Cart'}</span>
+            <Text as="span" className="text-xs">{isAddingToCart ? 'Adding...' : 'Add to Cart'}</Text>
           </Button>
 
           <Button
@@ -332,9 +313,7 @@ export const WishlistItem: React.FC<WishlistItemProps> = ({
 
         {/* Added date */}
         <div className="mt-3 pt-3 border-t border-gray-100">
-          <p className="body-text text-xs text-gray-400">
-            Added {new Date(item.added_at).toLocaleDateString()}
-          </p>
+          <Caption className="body-text text-xs text-gray-400">Added {new Date(item.added_at).toLocaleDateString()}</Caption>
         </div>
       </div>
     </div>

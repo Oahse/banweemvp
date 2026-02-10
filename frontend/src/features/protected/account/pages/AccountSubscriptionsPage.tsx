@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
+import { Heading, Caption, Text, Body } from '@/components/ui/Text/Text';
 import { ProductVariantModal } from '@/components/ui/ProductVariantModal';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 interface Subscription {
@@ -67,7 +68,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <span className="text-gray-500 text-sm">Loading subscriptions...</span>
+        <Caption className="text-gray-500 text-sm">Loading subscriptions...</Caption>
       </div>
     );
   }
@@ -76,7 +77,7 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <PackageIcon size={28} className="text-gray-300 mb-2" />
-        <span className="text-sm text-gray-500 mb-2">You have no subscriptions.</span>
+        <Caption className="text-sm text-gray-500 mb-2">You have no subscriptions.</Caption>
         <Button
           variant="primary"
           size="sm"
@@ -90,35 +91,27 @@ export const Subscriptions: React.FC<SubscriptionsProps> = ({ mode = 'list' }) =
 
   return (
     <div className="max-w-3xl mx-auto p-4 bg-white rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <CalendarIcon size={20} /> My Subscriptions
-      </h2>
+      <Heading level={2} className="text-lg font-semibold mb-4 flex items-center gap-2"><CalendarIcon size={20} /> My Subscriptions</Heading>
       <div className="space-y-3">
         {subscriptions.map((sub: Subscription) => (
           <div key={sub.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <span className="text-sm font-medium">{sub.subscription_plan?.name || 'Plan'}</span>
-                <span className="ml-2 text-xs text-gray-500">{sub.subscription_plan?.billing_interval || 'Interval'}</span>
+                <Text as="span" className="text-sm font-medium">{sub.subscription_plan?.name || 'Plan'}</Text>
+                <Caption className="ml-2 text-xs text-gray-500">{sub.subscription_plan?.billing_interval || 'Interval'}</Caption>
               </div>
-              <span className={`px-2 py-1 text-xs rounded-full ${
+              <Caption className={`px-2 py-1 text-xs rounded-full ${
                 sub.status === 'active' ? 'bg-green-100 text-green-700' :
                 sub.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
                 sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                 'bg-gray-100 text-gray-500'
               }`}>{sub.status}</span>
             </div>
-            <div className="mb-2 text-sm text-gray-500">
-              Period: {new Date(sub.current_period_start).toLocaleDateString()} - {new Date(sub.current_period_end).toLocaleDateString()}
-            </div>
-            <div className="mb-2 text-sm text-gray-500">
-              Next Billing: {sub.next_billing_date ? new Date(sub.next_billing_date).toLocaleDateString() : 'N/A'}
-            </div>
-            <div className="mb-2 text-sm text-gray-700">
-              Total: <DollarSignIcon size={14} className="inline" /> {sub.total_cost?.toFixed(2)} {sub.currency}
-            </div>
+            <Caption className="mb-2 text-sm text-gray-500">Period: {new Date(sub.current_period_start).toLocaleDateString()} - {new Date(sub.current_period_end).toLocaleDateString()}</Caption>
+            <Caption className="mb-2 text-sm text-gray-500">Next Billing: {sub.next_billing_date ? new Date(sub.next_billing_date).toLocaleDateString() : 'N/A'}</Caption>
+            <Body className="mb-2 text-sm text-gray-700">Total: <DollarSignIcon size={14} className="inline" /> {sub.total_cost?.toFixed(2)} {sub.currency}</Body>
             <div className="mb-2">
-              <span className="text-sm font-medium">Products:</span>
+              <Text as="span" className="text-sm font-medium">Products:</Text>
               <ul className="ml-2">
                 {sub.product_variants?.map(variant => (
                   <li key={variant.id} className="flex items-center gap-2 text-sm">

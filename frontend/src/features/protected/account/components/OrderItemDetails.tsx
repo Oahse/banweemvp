@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { useApi } from '../../../shared/hooks/useAsync';
-import { apiClient, ProductsAPI } from '../../api';
-import { getBestPrice } from '../../utils/price-utils';
+import { useApi } from '@/components/shared/hooks/useAsync';
+import { apiClient, ProductsAPI } from '@/api';
+import { getBestPrice } from '@/utils/price-utils';
+import { Heading, Body, Caption } from '@/components/ui/Text/Text';
 
 /**
  * @typedef {object} OrderItemDetailsProps
@@ -47,31 +48,22 @@ export const OrderItemDetails = ({ productId, quantity, price }) => {
         <img src={image.url} alt={image.alt_text || product.name} className="w-16 h-16 object-cover rounded" />
       ) : (
         <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center">
-          <span className="text-xs text-gray-500">No Image</span>
+          <Caption className="text-xs text-gray-500">No Image</Caption>
         </div>
       )}
       <div className="flex-1">
-        <h3 className="font-medium text-main dark:text-white">
-          {product.name}
-        </h3>
+        <Heading level={3} className="font-medium text-main dark:text-white">{product.name}</Heading>
         {variant?.name && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Variant: {variant.name}
-          </p>
+          <Caption className="text-sm text-gray-500 dark:text-gray-400">Variant: {variant.name}</Caption>
         )}
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Quantity: {quantity} × ${(() => {
-            const unitPrice = price / quantity;
-            const variantPrice = getBestPrice(variant || {});
-            // Use the order item price if available, otherwise fall back to variant price
-            const displayPrice = unitPrice > 0 ? unitPrice : variantPrice;
-            return displayPrice.toFixed(2);
-          })()}
-        </p>
+        <Body className="text-sm text-gray-500 dark:text-gray-400">Quantity: {quantity} × ${(() => {
+          const unitPrice = price / quantity;
+          const variantPrice = getBestPrice(variant || {});
+          const displayPrice = unitPrice > 0 ? unitPrice : variantPrice;
+          return displayPrice.toFixed(2);
+        })()}</Body>
       </div>
-      <p className="font-medium text-main dark:text-white">
-        ${price.toFixed(2)}
-      </p>
+      <Body className="font-medium text-main dark:text-white">${price.toFixed(2)}</Body>
     </div>
   );
 };

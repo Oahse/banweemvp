@@ -10,6 +10,7 @@ import {
   ChevronRightIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Heading, Text } from '@/components/ui/Text/Text';
 
 
 
@@ -203,10 +204,10 @@ export const AdvancedTable = ({
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            {title && <h3 className="font-semibold text-gray-900">{title}</h3>}
-            <span className="text-sm text-gray-500">
-              {filteredAndSortedData.length} {filteredAndSortedData.length === 1 ? 'row' : 'rows'}
-            </span>
+              {title && <Heading level={3} className="font-semibold text-gray-900">{title}</Heading>}
+              <Text className="text-sm text-gray-500">
+                {filteredAndSortedData.length} {filteredAndSortedData.length === 1 ? 'row' : 'rows'}
+              </Text>
           </div>
           
           <div className="flex items-center gap-2">
@@ -264,7 +265,7 @@ export const AdvancedTable = ({
                       }}
                       className="mr-2"
                     />
-                    <span className="text-sm">{column.label}</span>
+                    <Text as="span" className="text-sm">{column.label}</Text>
                   </label>
                 ))}
               </div>
@@ -289,9 +290,9 @@ export const AdvancedTable = ({
           <div className="space-y-2">
             {filters.map(filter => (
               <div key={filter.column} className="flex items-center gap-2 text-sm">
-                <span className="font-medium">{columns.find(c => c.key === filter.column)?.label}</span>
-                <span className="text-gray-500">{filter.operator}</span>
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{filter.value}</span>
+                <Text as="span" className="font-medium">{columns.find(c => c.key === filter.column)?.label}</Text>
+                <Text as="span" className="text-gray-500">{filter.operator}</Text>
+                <Text as="span" className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{filter.value}</Text>
                 <Button
                   onClick={() => removeFilter(filter.column)}
                   variant="ghost"
@@ -331,7 +332,7 @@ export const AdvancedTable = ({
                   onClick={() => column.sortable && handleSort(column.key)}
                 >
                   <div className="flex items-center gap-2">
-                    <span>{column.label}</span>
+                    <Text as="span">{column.label}</Text>
                     {column.sortable && sortable && (
                       <div className="flex flex-col">
                         <ChevronUpIcon

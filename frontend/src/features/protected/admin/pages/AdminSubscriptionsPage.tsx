@@ -8,7 +8,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import AdminLayout from '../components/AdminLayout';
 import { SubscriptionsListSkeleton } from '../components/skeletons/SubscriptionsSkeleton';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text } from '@/components/ui/Text/Text';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 const LIMIT = 20;
 
@@ -198,9 +198,9 @@ export const AdminSubscriptions = () => {
     const { color, label } = config[status as keyof typeof config] || config.pending;
     
     return (
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}>
+      <Text className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}>
         {label}
-      </span>
+      </Text>
     );
   };
 
@@ -217,7 +217,7 @@ export const AdminSubscriptions = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <Body className={`text-sm mt-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage all customer subscriptions</Body>
+                <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage all customer subscriptions</Text>
           </div>
         </div>
 
@@ -232,12 +232,16 @@ export const AdminSubscriptions = () => {
                 currentTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-white border-gray-300 text-gray-700'
               }`}
             >
+            <Text className={`text-xs font-medium transition ${
+                currentTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'
+              }`}>
               {showFilters ? 'Hide Filters' : 'Show Filters'}
+            </Text>
             </Button>
           </div>
           <div className={`${showFilters ? 'grid' : 'hidden'} md:grid grid-cols-1 md:grid-cols-4 gap-4`}>
             <div>
-              <label className={`block text-sm font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</label>
+              <Label className={`block text-sm font-medium mb-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</Label>
               {/* ... */}
             </div>
           </div>
@@ -282,9 +286,9 @@ export const AdminSubscriptions = () => {
           {/* ... */}
 
           <div className={`px-4 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-wrap items-center justify-between gap-4`}>
-            <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-              {/* ... */}
-            </p>
+              <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>
+                {/* ... */}
+              </Text>
             <div className="flex items-center gap-2">
               <Button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -294,9 +298,7 @@ export const AdminSubscriptions = () => {
               >
                 Previous
               </Button>
-              <span className={`text-sm px-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                Page {pagination.page} of {pagination.pages || 1}
-              </span>
+              <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Page {pagination.page} of {pagination.pages || 1}</Text>
               <Button
                 onClick={() => setPage((p) => Math.min(pagination.pages || 1, p + 1))}
                 disabled={page >= pagination.pages || pagination.pages <= 1}
@@ -332,70 +334,74 @@ export const AdminSubscriptions = () => {
               </div>
 
               {/* ... */}
-                  <p>{selectedSubscription.user?.name || 'Unknown User'}</p>
-                  <p className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{selectedSubscription.user?.email}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Text variant="body-sm">{selectedSubscription.user?.name || 'Unknown User'}</Text>
+                  <Text variant="caption" tone="secondary">{selectedSubscription.user?.email}</Text>
                 </div>
                 <div>
-                  <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</p>
+                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Status</Text>
                   {statusBadge(selectedSubscription.status)}
                 </div>
                 <div>
-                  <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Billing</p>
-                  <p>Next: {selectedSubscription.next_billing_date ? new Date(selectedSubscription.next_billing_date).toLocaleDateString() : 'N/A'}</p>
-                  <p>Period End: {selectedSubscription.current_period_end ? new Date(selectedSubscription.current_period_end).toLocaleDateString() : 'N/A'}</p>
+                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Billing</Text>
+                  <Text variant="body-sm">Next: {selectedSubscription.next_billing_date ? new Date(selectedSubscription.next_billing_date).toLocaleDateString() : 'N/A'}</Text>
+                  <Text variant="body-sm">Period End: {selectedSubscription.current_period_end ? new Date(selectedSubscription.current_period_end).toLocaleDateString() : 'N/A'}</Text>
                 </div>
                 <div>
-                  <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Costs</p>
-                  <p>Subtotal: {formatCurrency(getCostBreakdown(selectedSubscription).subtotal, selectedSubscription.currency)}</p>
-                  <p>Shipping: {formatCurrency(getCostBreakdown(selectedSubscription).shipping, selectedSubscription.currency)}</p>
-                  <p>Tax: {formatCurrency(getCostBreakdown(selectedSubscription).tax, selectedSubscription.currency)}</p>
-                  <p className="text-green-600">Discount: -{formatCurrency(getCostBreakdown(selectedSubscription).discount, selectedSubscription.currency)}</p>
-                  <p className={`text-sm font-semibold ${currentTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-                    Total: {formatCurrency(getCostBreakdown(selectedSubscription).total, selectedSubscription.currency)}
-                  </p>
+                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Costs</Text>
+                  <Text variant="body-sm">Subtotal: {formatCurrency(getCostBreakdown(selectedSubscription).subtotal, selectedSubscription.currency)}</Text>
+                  <Text variant="body-sm">Shipping: {formatCurrency(getCostBreakdown(selectedSubscription).shipping, selectedSubscription.currency)}</Text>
+                  <Text variant="body-sm">Tax: {formatCurrency(getCostBreakdown(selectedSubscription).tax, selectedSubscription.currency)}</Text>
+                <Text tone="success" variant="body-sm">Discount: -{formatCurrency(getCostBreakdown(selectedSubscription).discount, selectedSubscription.currency)}</Text>
+                  <Text variant="body-sm" weight="semibold">Total: {formatCurrency(getCostBreakdown(selectedSubscription).total, selectedSubscription.currency)}</Text>
                 </div>
                 <div className="md:col-span-2">
-                  <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Delivery Address</p>
+                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Delivery Address</Text>
                   {selectedSubscription.delivery_address ? (
-                    <p className="text-sm">
+                    <Text variant="body-sm">
                       {selectedSubscription.delivery_address.street}, {selectedSubscription.delivery_address.city}, {selectedSubscription.delivery_address.state} {selectedSubscription.delivery_address.postal_code}, {selectedSubscription.delivery_address.country}
-                    </p>
+                    </Text>
                   ) : (
-                    <p className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>No delivery address</p>
+                    <Text variant="caption" tone="secondary">No delivery address</Text>
                   )}
                 </div>
 
                 <div className="md:col-span-2">
-                  <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Variants</p>
+                  <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Variants</Text>
                   {selectedSubscription.variants && selectedSubscription.variants.length > 0 ? (
                     <div className="mt-2 overflow-x-auto">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className={`${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                            <th className="text-left font-medium py-1">Name</th>
-                            <th className="text-left font-medium py-1">SKU</th>
-                            <th className="text-right font-medium py-1">Price</th>
-                            <th className="text-right font-medium py-1">Qty</th>
+                          <tr>
+                            <th className="text-left py-1"><Text variant="caption" weight="medium">Name</Text></th>
+                            <th className="text-left py-1"><Text variant="caption" weight="medium">SKU</Text></th>
+                            <th className="text-right py-1"><Text variant="caption" weight="medium">Price</Text></th>
+                            <th className="text-right py-1"><Text variant="caption" weight="medium">Qty</Text></th>
                           </tr>
                         </thead>
                         <tbody>
                           {selectedSubscription.variants.map((variant) => (
                             <tr key={variant.id} className={`${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} border-t`}>
                               <td className="py-2 pr-2">
-                                <span className="text-copy text-sm truncate block">{variant.name}</span>
+                                <Text variant="body-sm" truncate="single">{variant.name}</Text>
                               </td>
-                              <td className={`py-2 pr-2 ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{variant.sku}</td>
-                              <td className="py-2 text-right text-copy">
-                                {formatCurrency(variant.current_price ?? variant.base_price, selectedSubscription.currency)}
+                              <td className={`py-2 pr-2`}>
+                                <Text variant="body-sm" tone="secondary">{variant.sku}</Text>
                               </td>
-                              <td className="py-2 text-right text-copy">{variant.qty}</td>
+                              <td className="py-2 text-right">
+                                <Text variant="body-sm">{formatCurrency(variant.current_price ?? variant.base_price, selectedSubscription.currency)}</Text>
+                              </td>
+                              <td className="py-2 text-right">
+                                <Text variant="body-sm">{variant.qty}</Text>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
                   ) : (
-                    <p className={`text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>No variants found</p>
+                    <Text variant="caption" tone="secondary">No variants found</Text>
                   )}
                 </div>
               </div>

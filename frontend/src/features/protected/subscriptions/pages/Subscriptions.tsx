@@ -18,6 +18,7 @@ import {
 import { toast } from 'react-hot-toast';
 import { MySubscriptions } from '@/features/subscriptions/components/MySubscriptions';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 export const Subscriptions = () => {
   const { user, logout, isAdmin, isSupplier } = useAuth();
   const { subscriptions, loading, error, refreshSubscriptions } = useSubscription();
@@ -102,10 +103,10 @@ export const Subscriptions = () => {
                   {user?.firstname?.charAt(0) || user?.full_name?.charAt(0) || 'U'}
                 </div>
                 <div className="ml-3">
-                  <h3 className="font-medium text-main">
+                  <Heading level={3} weight="medium">
                     {user?.full_name || `${user?.firstname} ${user?.lastname}`}
-                  </h3>
-                  <p className="text-copy-light text-sm">{user?.email}</p>
+                  </Heading>
+                  <Text variant="body-sm" tone="secondary">{user?.email}</Text>
                 </div>
               </div>
               <nav>
@@ -145,8 +146,8 @@ export const Subscriptions = () => {
           <div className="flex-grow">
             <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
               <AlertCircleIcon size={48} className="mx-auto text-error mb-4" />
-              <h2 className="text-xl font-medium text-main mb-2">Unable to Load Subscriptions</h2>
-              <p className="text-copy-light mb-4">{error}</p>
+              <Heading level={2} weight="medium">Unable to Load Subscriptions</Heading>
+              <Text variant="body" tone="secondary">{error}</Text>
               <Button
                 onClick={refreshSubscriptions}
                 variant="primary"
@@ -175,10 +176,10 @@ export const Subscriptions = () => {
                 {user?.firstname?.charAt(0) || user?.full_name?.charAt(0) || 'U'}
               </div>
               <div className="ml-3">
-                <h3 className="font-medium text-main">
+                <Text variant="heading-md" weight="medium">
                   {user?.full_name || `${user?.firstname} ${user?.lastname}`}
-                </h3>
-                <p className="text-copy-light text-sm">{user?.email}</p>
+                </Text>
+                <Text variant="body-sm" tone="secondary">{user?.email}</Text>
               </div>
             </div>
             <nav>
@@ -218,7 +219,7 @@ export const Subscriptions = () => {
         {/* Main Content */}
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-main">My Subscriptions</h1>
+            <Heading level={1} weight="bold">My Subscriptions</Heading>
             <Button
               onClick={() => navigate('/account/subscriptions')}
               variant="primary"

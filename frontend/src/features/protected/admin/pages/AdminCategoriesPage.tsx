@@ -271,7 +271,7 @@ const AdminCategoriesPage = () => {
       <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
-          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product categories</p>
+          <Body className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product categories</Body>
         </div>
           <Button
             onClick={openAddModal}
@@ -340,8 +340,8 @@ const AdminCategoriesPage = () => {
           {/* Active Filters */}
           {debouncedSearchQuery && (
             <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+              <Text className="text-sm text-gray-600 dark:text-gray-400">Active filters:</Text>
+              <Text className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                 Search: "{debouncedSearchQuery}"
                 <Button
                   onClick={() => setSearchQuery('')}
@@ -351,7 +351,7 @@ const AdminCategoriesPage = () => {
                   leftIcon={<X size={14} />}
                 >
                 </Button>
-              </span>
+              </Text>
               <Button
                 onClick={() => setSearchQuery('')}
                 variant="link"
@@ -373,8 +373,8 @@ const AdminCategoriesPage = () => {
         }`}>
           <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="font-semibold">Error Loading Categories</p>
-            <p className="text-sm mt-1">{error}</p>
+            <Body className="font-semibold">Error Loading Categories</Body>
+            <Body className="text-sm mt-1">{error}</Body>
             <Button
               onClick={() => window.location.reload()}
               variant="link"
@@ -394,7 +394,7 @@ const AdminCategoriesPage = () => {
           <div className="p-8">
             <div className="flex items-center justify-center">
               <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
-              <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating categories...</span>
+              <Text className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating categories...</Text>
             </div>
           </div>
         ) : categories.length > 0 ? (
@@ -423,13 +423,13 @@ const AdminCategoriesPage = () => {
                         {category.description || '-'}
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        <Text className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           category.is_active 
                             ? 'bg-success/20 text-success'
                             : 'bg-gray-500/20 text-gray-500'
                         }`}>
                           {category.is_active ? 'Active' : 'Inactive'}
-                        </span>
+                        </Text>
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex items-center gap-2">
@@ -469,15 +469,15 @@ const AdminCategoriesPage = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <FolderIcon size={16} className="text-gray-400" />
-                      <span className="font-medium text-gray-900 dark:text-white">{category.name}</span>
+                      <Text className="font-medium text-gray-900 dark:text-white">{category.name}</Text>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    <Text className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       category.is_active 
                         ? 'bg-success/20 text-success'
                         : 'bg-gray-500/20 text-gray-500'
                     }`}>
                       {category.is_active ? 'Active' : 'Inactive'}
-                    </span>
+                    </Text>
                   </div>
                   {category.description && (
                     <div className="text-sm text-gray-600 dark:text-gray-300">{category.description}</div>
@@ -537,12 +537,12 @@ const AdminCategoriesPage = () => {
 
         {/* Pagination - bottom */}
         <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-          <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+          <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
             {pagination.total > 0 
               ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items${pagination.pages > 1 ? ` (Page ${pagination.page} of ${pagination.pages})` : ''}`
               : `Total: ${pagination.total} items`
             }
-          </p>
+          </Body>
           <div className="flex items-center gap-1">
             <Button
               onClick={() => setPage((p) => Math.max(1, p - 1))}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDownIcon } from 'lucide-react';
+import { Text } from '@/components/ui/Text/Text';
 
 interface SelectOption {
   value: string;
@@ -25,9 +26,7 @@ export const Select: React.FC<SelectProps> = ({
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-main">
-          {label}
-        </label>
+        <Label weight="medium">{label}</Label>
       )}
       <div className="relative">
         <select
@@ -45,7 +44,7 @@ export const Select: React.FC<SelectProps> = ({
           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-copy-lighter pointer-events-none"
         />
       </div>
-      {error && <p className="text-sm text-error mt-1">{error}</p>}
+      {error && <Text variant="body-sm" className="text-error">{error}</Text>}
     </div>
   );
 };

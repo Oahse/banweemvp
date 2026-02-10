@@ -18,6 +18,7 @@ import {
   ChevronRightIcon
 } from 'lucide-react';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
+import { Text, Heading, Body, Caption } from '@/components/ui/Text/Text';
 import { ProductCard } from '@/components/generic/ProductCard';
 import { Product, ProductVariant } from '@/types';
 
@@ -60,7 +61,7 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Text className="text-gray-500 text-sm">Loading wishlist...</Text>
+        <Body className="text-gray-500 text-sm">Loading wishlist...</Body>
       </div>
     );
   }
@@ -69,7 +70,7 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <HeartIcon size={28} className="text-gray-300 mb-2" />
-        <Text className="text-sm text-gray-500 mb-2">Your wishlist is empty.</Text>
+        <Body className="text-sm text-gray-500 mb-2">Your wishlist is empty.</Body>
         <Button
           variant="primary"
           size="sm"
@@ -83,9 +84,9 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
 
   return (
     <div className="max-w-3xl mx-auto p-4 bg-white rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+      <Heading level={2} className="text-lg font-semibold mb-4 flex items-center gap-2">
         <HeartIcon size={20} /> My Wishlist
-      </h2>
+      </Heading>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {paginatedItems.map((item: WishlistItem) => (
           <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex flex-col">

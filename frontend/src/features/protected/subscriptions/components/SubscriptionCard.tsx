@@ -214,9 +214,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           {isEditing ? (
             <div className="space-y-3">
               <div>
-                <label className={combineThemeClasses(themeClasses.text.primary, 'block text-sm font-medium mb-1')}>
-                  Subscription Name
-                </label>
+                <Text variant="body-sm" weight="medium">Subscription Name</Text>
                 <input
                   type="text"
                   value={editData.name}
@@ -226,9 +224,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 />
               </div>
               <div>
-                <label className={combineThemeClasses(themeClasses.text.primary, 'block text-sm font-medium mb-1')}>
-                  Billing Cycle
-                </label>
+                <Text variant="body-sm" weight="medium">Billing Cycle</Text>
                 <select
                   value={editData.billing_cycle}
                   onChange={(e) => setEditData({ ...editData, billing_cycle: e.target.value as any })}
@@ -246,12 +242,12 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 {subscription.name}
               </Heading>
               <div className="flex items-center gap-2 mt-1">
-                <Text className={combineThemeClasses(themeClasses.text.primary, 'font-medium text-xs')}>
+                <Text variant="caption" weight="medium">
                   {formatCurrency(subscription.price, subscription.currency)}
                 </Text>
-                <span className={themeClasses.text.secondary}>
+                <Text variant="caption">
                   / {subscription.billing_cycle}
-                </span>
+                </Text>
               </div>
             </>
           )}
@@ -276,23 +272,23 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       </div>
 
       {/* Description */}
-      <p className={combineThemeClasses(themeClasses.text.secondary, 'text-xs mb-1')}>
+      <Text variant="caption" tone="secondary">
         {subscription.products?.length || 0} products • {subscription.billing_cycle}
-      </p>
+      </Text>
 
       {/* Next billing */}
       {subscription.next_billing_date && (
-        <div className="flex items-center gap-1 text-xs">
+        <div className="flex items-center gap-1">
           <CalendarIcon className="w-3 h-3" />
-          <span className={themeClasses.text.secondary}>
+          <Text variant="caption">
             Next: {formatDate(subscription.next_billing_date)}
-          </span>
+          </Text>
         </div>
       )}
 
       {/* Auto-renew toggle */}
       <div className="flex items-center justify-between">
-        <span className="text-xs">Auto-renew</span>
+        <Text variant="caption">Auto-renew</Text>
         <Button
           onClick={handleAutoRenewToggle}
           disabled={isTogglingAutoRenew}

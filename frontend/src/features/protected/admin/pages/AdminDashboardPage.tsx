@@ -47,7 +47,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, color, 
             }`}>
               {isPositive ? <ArrowUpRight className="w-3 h-3 mr-0.5" /> : 
                isNegative ? <ArrowDownRight className="w-3 h-3 mr-0.5" /> : null}
-              <span>{Math.abs(change)}% vs last period</span>
+              <Text>{Math.abs(change)}% vs last period</Text>
             </div>
           )}
         </div>
@@ -176,7 +176,7 @@ const AdminDashboard: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">Welcome back! Here's what's happening.</p>
+            <Body className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">Welcome back! Here's what's happening.</Body>
           </div>
           <div className="flex items-center space-x-2">
             <Dropdown
@@ -357,9 +357,9 @@ const AdminDashboard: React.FC = () => {
             <Body className="text-xl font-bold text-gray-900 dark:text-white mb-1">
               {overview.active_subscriptions?.toLocaleString() || '0'}
             </Body>
-            <p className="text-xs text-gray-600 dark:text-gray-400">
+            <Body className="text-xs text-gray-600 dark:text-gray-400">
               of {overview.total_subscriptions?.toLocaleString() || '0'} total subscriptions
-            </p>
+            </Body>
           </div>
         </div>
 
@@ -490,11 +490,11 @@ const AdminDashboard: React.FC = () => {
                       </Body>
                     </div>
                   </div>
-                  <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${
+                  <Text className={`inline-block px-2 py-0.5 text-xs rounded-full ${
                     user.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                   }`}>
                     {user.is_active ? 'Active' : 'Inactive'}
-                  </span>
+                  </Text>
                 </div>
               ))}
             </div>

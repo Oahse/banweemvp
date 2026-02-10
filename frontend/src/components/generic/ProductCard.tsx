@@ -340,24 +340,24 @@ export const ProductCard = ({
         </Link>
         {/* Product badges */}
         {product.isNew && (
-          <span className="absolute top-2 left-2 bg-primary text-white text-xs font-medium px-2 py-1 rounded-full">
+          <Text variant="caption" className="absolute top-2 left-2 bg-primary text-white font-medium px-2 py-1 rounded-full">
             New
-          </span>
+          </Text>
         )}
         {salePrice && (
-          <span className="absolute top-2 right-2 bg-error text-white text-xs font-medium px-2 py-1 rounded-full">
+          <Text variant="caption" className="absolute top-2 right-2 bg-error text-white font-medium px-2 py-1 rounded-full">
             Sale
-          </span>
+          </Text>
         )}
         {displayVariant && displayVariant.inventory && displayVariant.inventory.quantity_available <= 5 && displayVariant.inventory.quantity_available > 0 && (
-          <span className="absolute bottom-2 left-2 bg-warning text-white text-xs font-medium px-2 py-1 rounded-full">
+          <Text variant="caption" className="absolute bottom-2 left-2 bg-warning text-white font-medium px-2 py-1 rounded-full">
             Only {displayVariant.inventory.quantity_available} left
-          </span>
+          </Text>
         )}
         {displayVariant && (!displayVariant.inventory || displayVariant.inventory.quantity_available === 0) && (
-          <span className="absolute bottom-2 left-2 bg-error text-white text-xs font-medium px-2 py-1 rounded-full">
+          <Text variant="caption" className="absolute bottom-2 left-2 bg-error text-white font-medium px-2 py-1 rounded-full">
             Out of Stock
-          </span>
+          </Text>
         )}
         {/* Quick action buttons - hidden on mobile for grid view */}
         <Button
@@ -382,7 +382,7 @@ export const ProductCard = ({
       </div>
       <div className={cn('flex flex-col flex-grow p-2 sm:p-3', viewMode === 'list' && 'p-0')}>
         <div className="space-y-1">
-          <Text className="text-xs text-copy-light dark:text-gray-400 line-clamp-1 uppercase tracking-wide">
+          <Text variant="caption" tone="secondary" className="line-clamp-1 uppercase tracking-wide">
             {(typeof product.category === 'object' && product.category.name) 
               ? product.category.name 
               : (typeof product.category === 'string' 
@@ -404,7 +404,7 @@ export const ProductCard = ({
                 />
               ))}
             </div>
-            <span className="text-xs text-copy-light dark:text-gray-400">({Number(product.review_count || product.reviewCount) || 0})</span>
+            <Text variant="caption" tone="secondary">({Number(product.review_count || product.reviewCount) || 0})</Text>
           </div>
         </div>
         <div className="mt-auto pt-1.5 sm:pt-2 space-y-1.5 sm:space-y-2">
@@ -412,25 +412,25 @@ export const ProductCard = ({
             <div className="space-y-0.5">
               {salePrice && discountPercentage > 0 ? (
                 <div className="flex items-center flex-wrap gap-1">
-                  <span className="font-bold text-sm sm:text-base text-primary">
+                  <Text variant="body-sm" weight="bold" tone="primary">
                     {formatCurrency(currentPrice)}
-                  </span>
-                  <span className="text-xs text-copy-light dark:text-gray-400 line-through">
+                  </Text>
+                  <Text variant="caption" tone="secondary" className="line-through">
                     {formatCurrency(basePrice)}
-                  </span>
-                  <span className="bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded-full">
+                  </Text>
+                  <Text variant="caption" className="bg-red-500 text-white font-bold px-1 py-0.5 rounded-full">
                     -{discountPercentage}%
-                  </span>
+                  </Text>
                 </div>
               ) : (
-                <span className="font-bold text-sm sm:text-base text-primary">
+                <Text variant="body-sm" weight="bold" tone="primary">
                   {formatCurrency(currentPrice)}
-                </span>
+                </Text>
               )}
               {displayVariant && (
-                <div className="text-xs text-copy-light dark:text-gray-400">
+                <Text variant="caption" tone="secondary">
                   {displayVariant.name || 'Default Variant'}
-                </div>
+                </Text>
               )}
             </div>
           </div>

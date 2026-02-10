@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { apiClient } from '@/api/client';
-import { Heading, Body, Text } from '@/components/ui/Text/Text';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 interface NegotiationRound {
   round: number;
@@ -271,9 +271,9 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
               <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-center">
                   <XCircle className="text-red-600 mr-2" size={20} />
-                  <span className="font-medium text-red-900">Error</span>
+                  <Text className="font-medium text-red-900">Error</Text>
                 </div>
-                <p className="text-sm text-red-700 mt-1">{error}</p>
+                <Body className="text-sm text-red-700 mt-1">{error}</Body>
               </div>
             )}
 
@@ -282,11 +282,11 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-center mb-2">
                     <DollarSign className="text-blue-600 mr-2" size={20} />
-                    <span className="font-medium text-blue-900">Current Price: ${product.price.toFixed(2)}</span>
+                    <Text className="font-medium text-blue-900">Current Price: ${product.price.toFixed(2)}</Text>
                   </div>
-                  <p className="text-sm text-blue-700">
+                  <Body className="text-sm text-blue-700">
                     Set your target and maximum prices to start negotiating with the seller.
-                  </p>
+                  </Body>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -315,9 +315,9 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <Label className="block text-sm font-medium text-gray-700 mb-3">
                     Negotiation Style
-                  </label>
+                  </Label>
                   <div className="grid grid-cols-1 gap-3">
                     {NEGOTIATION_STYLES.map((style) => (
                       <label
@@ -355,11 +355,11 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <div className="flex items-center mb-2">
                     <Clock className="text-yellow-600 mr-2" size={20} />
-                    <span className="font-medium text-yellow-900">Negotiation in Progress</span>
+                    <Text className="font-medium text-yellow-900">Negotiation in Progress</Text>
                   </div>
-                  <p className="text-sm text-yellow-700">
+                  <Body className="text-sm text-yellow-700">
                     The negotiation is running automatically. You can watch the rounds below.
-                  </p>
+                  </Body>
                 </div>
 
                 {rounds.length > 0 && (
@@ -374,12 +374,12 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
                           className="bg-gray-50 border border-gray-200 rounded-lg p-4"
                         >
                           <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-gray-900">Round {round.round}</span>
+                            <Text className="font-medium text-gray-900">Round {round.round}</Text>
                             {round.finished && (
                               <CheckCircle className="text-green-600" size={20} />
                             )}
                           </div>
-                          <p className="text-sm text-gray-700 mb-2">{round.message}</p>
+                          <Body className="text-sm text-gray-700 mb-2">{round.message}</Body>
                           {round.buyer_offer && round.seller_offer && (
                             <div className="flex items-center justify-between text-sm">
                               <div className="flex items-center text-blue-600">
@@ -454,12 +454,12 @@ export const NegotiationModal: React.FC<NegotiationModalProps> = ({
                           className="bg-gray-50 border border-gray-200 rounded-lg p-4"
                         >
                           <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-gray-900">Round {round.round}</span>
+                            <Text className="font-medium text-gray-900">Round {round.round}</Text>
                             {round.finished && (
                               <CheckCircle className="text-green-600" size={20} />
                             )}
                           </div>
-                          <p className="text-sm text-gray-700 mb-2">{round.message}</p>
+                          <Body className="text-sm text-gray-700 mb-2">{round.message}</Body>
                           {round.buyer_offer && round.seller_offer && (
                             <div className="flex items-center justify-between text-sm">
                               <div className="flex items-center text-blue-600">

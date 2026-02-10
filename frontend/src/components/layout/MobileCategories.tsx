@@ -6,6 +6,7 @@ import { useAuth } from '../../features/protected/auth/contexts/AuthContext';
 import { useCart } from '../../features/protected/cart/contexts/CartContext';
 import { useWishlist } from '../../features/protected/wishlist/contexts/WishlistContext';
 import { Button } from '@/components/ui/Button';
+import { Heading, Text } from '@/components/ui/Text/Text';
 
 /**
  * @typedef {object} MobileCategoriesProps
@@ -48,7 +49,7 @@ export const MobileCategories = ({
       <div className="bg-surface w-4/5 max-w-sm h-full overflow-y-auto text-copy">
         <div className="p-4 border-b border-border-light">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-main">Categories</h3>
+            <Heading level={3} className="text-lg font-semibold text-main">Categories</Heading>
             <Button onClick={onClose} variant="ghost" size="sm" className="p-1 hover:bg-background rounded-md">
               <XIcon size={24} />
             </Button>
@@ -63,10 +64,8 @@ export const MobileCategories = ({
                 <div className="flex items-center">
                   <UserIcon size={20} className="mr-2" />
                   <div>
-                    <div className="font-medium">
-                      Hello, {user?.firstname || user?.full_name?.split(' ')[0] || 'User'}
-                    </div>
-                    <div className="text-sm opacity-75">My Account</div>
+                    <Text as="div" weight="medium">Hello, {user?.firstname || user?.full_name?.split(' ')[0] || 'User'}</Text>
+                    <Text as="div" className="text-sm opacity-75">My Account</Text>
                   </div>
                 </div>
                 <ChevronRightIcon size={20} />
@@ -98,7 +97,7 @@ export const MobileCategories = ({
                 className="flex items-center justify-between py-2 px-3 bg-primary text-white rounded-md mb-2"
                 onClick={onClose}
               >
-                <span>Sign In / Register</span>
+                <Text as="span">Sign In / Register</Text>
                 <ChevronRightIcon size={20} />
               </Link>
               <div className="grid grid-cols-2 gap-2 mt-3">
@@ -115,18 +114,18 @@ export const MobileCategories = ({
 
         {/* Categories */}
         <div className="p-4 border-b border-border-light">
-          <h4 className="text-sm font-medium text-copy-light mb-2">Shop By Category</h4>
+          <Text as="h4" className="text-sm font-medium text-copy-light mb-2">Shop By Category</Text>
           <ul>
             {loading ? (
-              <li>Loading categories...</li>
+              <li><Text>Loading categories...</Text></li>
             ) : error ? (
-              <li>Error loading categories: {error}</li>
+              <li><Text>Error loading categories: {error}</Text></li>
             ) : (
               categories?.map((category, index) => (
                 <li key={index}>
                   <Link to={`/products?category=${category?.slug}`} className="flex items-center py-3 hover:text-primary" onClick={onClose}>
-                    <span className="mr-3 text-xl">{category?.image}</span>
-                    <span>{category?.name}</span>
+                    <Text as="span" className="mr-3 text-xl">{category?.image}</Text>
+                    <Text as="span">{category?.name}</Text>
                   </Link>
                 </li>
               ))
@@ -136,12 +135,12 @@ export const MobileCategories = ({
 
         {/* Main Navigation */}
         <div className="p-4">
-          <h4 className="text-sm font-medium text-copy-light mb-2">Menu</h4>
+          <Text as="h4" className="text-sm font-medium text-copy-light mb-2">Menu</Text>
           <ul>
             {mainNavigation.map((item, index) => (
               <li key={index}>
                 <Link to={item.path} className="flex items-center py-3 hover:text-primary border-b border-border-light last:border-0" onClick={onClose}>
-                  <span>{item.name}</span>
+                  <Text as="span">{item.name}</Text>
                 </Link>
               </li>
             ))}

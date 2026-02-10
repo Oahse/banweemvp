@@ -12,6 +12,7 @@ import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { CartAPI } from '@/api/cart';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 export const Cart = () => {
   const { 
@@ -310,21 +311,16 @@ export const Cart = () => {
                 className="font-medium text-copy hover:text-primary block text-sm"
               >
                 {(item.variant?.product_name || (item.variant as any)?.product?.name) && (
-                  <div className="text-xs font-medium">{item.variant?.product_name || (item.variant as any)?.product?.name}</div>
+                  <Text variant="caption" weight="medium">{item.variant?.product_name || (item.variant as any)?.product?.name}</Text>
                 )}
-                <div className="text-xs text-copy-light">{item.variant?.name || 'Product'}</div>
+                <Text variant="caption" tone="secondary">{item.variant?.name || 'Product'}</Text>
               </Link>
-              
-              {/* Show variant attributes if available */}
               {item.variant?.attributes && Object.keys(item.variant.attributes).length > 0 && (
                 <div className="mt-1">
                   {Object.entries(item.variant.attributes).slice(0, 2).map(([key, value]) => (
-                    <span 
-                      key={key}
-                      className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded mr-1 mb-1"
-                    >
+                    <Text variant="caption" className="inline-block bg-gray-100 text-gray-600 px-2 py-1 rounded mr-1 mb-1">
                       {key}: {value}
-                    </span>
+                    </Text>
                   ))}
                 </div>
               )}
@@ -333,20 +329,20 @@ export const Cart = () => {
               {item.variant?.stock !== undefined && (
                 <div className="mt-1">
                   {item.variant.stock > 10 ? (
-                    <span className="text-green-600 text-xs flex items-center">
+                    <Text variant="caption" className="text-green-600 flex items-center">
                       <CheckCircle size={12} className="mr-1" />
                       In Stock
-                    </span>
+                    </Text>
                   ) : item.variant.stock > 0 ? (
-                    <span className="text-orange-600 text-xs flex items-center">
+                    <Text variant="caption" className="text-orange-600 flex items-center">
                       <AlertCircle size={12} className="mr-1" />
                       Only {item.variant.stock} left
-                    </span>
+                    </Text>
                   ) : (
-                    <span className="text-red-600 text-xs flex items-center">
+                    <Text variant="caption" className="text-red-600 flex items-center">
                       <AlertCircle size={12} className="mr-1" />
                       Out of Stock
-                    </span>
+                    </Text>
                   )}
                 </div>
               )}
@@ -451,10 +447,11 @@ export const Cart = () => {
         transition={{ duration: 0.3 }}
       >
         <Link to="/" className="text-copy-lighter hover:text-primary">
-          Home
+          <Text variant="body-sm" tone="secondary">Home</Text>
         </Link>
+        
         <ChevronRightIcon size={14} className="mx-2" />
-        <span className="text-copy">Shopping Cart</span>
+        <Text variant="body-sm">Shopping Cart</Text>
       </motion.nav>
 
       <motion.h1 
@@ -463,7 +460,7 @@ export const Cart = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <span>Your Shopping Cart</span>
+        <Heading level={1} weight="bold">Shopping Cart</Heading>
       </motion.h1>
 
       {cartItems.length === 0 ? (
@@ -476,12 +473,12 @@ export const Cart = () => {
           <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-background flex items-center justify-center">
             <ShoppingCartIcon size={24} className="text-copy-lighter" />
           </div>
-          <h2 className="text-sm font-medium text-copy mb-2">Your cart is empty</h2>
-          <p className="text-xs text-copy-light mb-4">Looks like you haven't added any products to your cart yet.</p>
+          <Heading level={2} weight="medium">Your cart is empty</Heading>
+          <Text variant="body-sm" tone="secondary">Looks like you haven't added any products to your cart yet.</Text>
           <Link
             to="/products"
             className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
-            Continue Shopping
+            <Text variant="body-sm">Continue Shopping</Text>
           </Link>
         </motion.div>
       ) : (
@@ -513,16 +510,16 @@ export const Cart = () => {
           {/* Order Summary */}
           <div className="lg:w-1/3">
             <div className="bg-surface rounded-lg shadow-sm p-4">
-              <h2 className="text-sm font-semibold text-copy mb-3">Order Summary</h2>
+              <Heading level={2} weight="semibold">Order Summary</Heading>
               
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-copy-light">Total</span>
-                  <span className="font-medium text-copy">{formatCurrency(subtotal)}</span>
+                <Text variant="body-sm" tone="secondary">Total</Text>
+                <Text variant="body-sm" weight="medium">{formatCurrency(subtotal)}</Text>
                 </div>
-                <div className="text-xs text-copy-light mt-2">
+                <Text variant="caption" tone="secondary">
                   Tax and shipping will be calculated at checkout
-                </div>
+                </Text>
               </div>
               
               <div className="p-3 bg-background flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
@@ -537,9 +534,7 @@ export const Cart = () => {
                     Clear Cart ({cartItems.length})
                   </Button>
                 </div>
-                <Link to="/products" className="text-xs text-primary hover:underline flex items-center">
-                  Continue Shopping
-                </Link>
+              <Text variant="body-sm">Continue Shopping</Text>
               </div>
               <form onSubmit={handleApplyCoupon} className="mb-4">
                 <label htmlFor="coupon-code" className="block text-xs font-medium mb-2 text-copy">Promo Code (Optional)</label>

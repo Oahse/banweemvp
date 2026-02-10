@@ -250,6 +250,22 @@ const user: User = {
         </div>
       </section>
 
+      {/* Raw HTML Rendering */}
+      <section>
+        <Heading level={2} className="mb-4">
+          Raw HTML Rendering
+        </Heading>
+        <div className="space-y-4">
+          <Label>Sanitized HTML</Label>
+          <Text as="div" html={`<p>Hello <strong>world</strong> — <a href=\"#\">link</a></p><script>console.log('xss')</script>`} sanitizeHtml>
+          </Text>
+
+          <Label>Unsafe (no sanitize) — avoid in production</Label>
+          <Text as="div" html={`<p><em>Unsafe HTML</em> <img src=\"x\" onerror=\"alert('xss')\"/></p>`} sanitizeHtml={false}>
+          </Text>
+        </div>
+      </section>
+
       {/* Text Styling Options */}
       <section>
         <Heading level={2} className="mb-4">

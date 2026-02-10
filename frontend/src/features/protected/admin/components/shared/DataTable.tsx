@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
+import { Body, Text } from '@/components/ui/Text/Text';
 
 // Types
 export interface Column<T = any> {
@@ -337,7 +338,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                     className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
                     leftIcon={<DownloadIcon className="h-4 w-4" />}
                   >
-                    <span className="hidden sm:inline">Export</span>
+                    <Text className="hidden sm:inline">Export</Text>
                   </Button>
                 )}
               </div>
@@ -350,7 +351,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
       {loading && (
         <div className="flex items-center justify-center py-6">
           <Loader className="h-5 w-5 animate-spin text-green-600 dark:text-green-400 mr-2" />
-          <span className="text-xs text-gray-600 dark:text-gray-400">Loading...</span>
+          <Text className="text-xs text-gray-600 dark:text-gray-400">Loading...</Text>
         </div>
       )}
 
@@ -358,7 +359,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
       {error && (
         <div className="flex items-center justify-center py-6">
           <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 mr-2" />
-          <span className="text-xs text-red-600 dark:text-red-400">{error}</span>
+          <Text className="text-xs text-red-600 dark:text-red-400">{error}</Text>
         </div>
       )}
 
@@ -370,7 +371,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
               <div className="text-gray-400 dark:text-gray-500 mb-1">
                 <FilterIcon className="h-8 w-8 mx-auto" />
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{emptyMessage}</p>
+              <Body className="text-xs text-gray-500 dark:text-gray-400">{emptyMessage}</Body>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -449,14 +450,14 @@ export const AdminDataTable = <T extends Record<string, any>>({
             <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="text-xs text-gray-700 dark:text-gray-300">
-                  <span className="block sm:hidden">
+                  <Text className="block sm:hidden">
                     Page {pagination.page} of {pagination.pages || 1}
-                  </span>
-                  <span className="hidden sm:block">
+                  </Text>
+                  <Text className="hidden sm:block">
                     Showing {pagination.total === 0 ? 0 : ((pagination.page - 1) * pagination.limit) + 1} to{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                     {pagination.total} results
-                  </span>
+                  </Text>
                 </div>
                 <div className="flex items-center justify-center sm:justify-end gap-1">
                   <Button
@@ -469,9 +470,9 @@ export const AdminDataTable = <T extends Record<string, any>>({
                     <ChevronLeft className="h-3 w-3" />
                   </Button>
                   
-                  <span className="text-xs text-gray-700 dark:text-gray-300 hidden sm:block min-w-[80px] text-center">
+                  <Text className="text-xs text-gray-700 dark:text-gray-300 hidden sm:block min-w-[80px] text-center">
                     Page {pagination.page} of {pagination.pages || 1}
-                  </span>
+                  </Text>
                   
                   <Button
                     onClick={() => handlePageChange(pagination.page + 1)}

@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { useLocale } from '../../../shared/hooks/useLocale';
+import { Text } from '@/components/ui/Text/Text';
 
 interface PriceProps {
   amount: number;
@@ -27,8 +28,8 @@ export const Price: React.FC<PriceProps> = ({
   if (!showCurrency) {
     // Extract just the number part
     const numberOnly = formattedPrice.replace(/[^\d.,]/g, '');
-    return <span className={className}>{numberOnly}</span>;
+    return <Text variant="body-sm" className={className}>{numberOnly}</Text>;
   }
 
-  return <span className={className}>{formattedPrice}</span>;
+  return <Text variant="body-sm" className={className}>{formattedPrice}</Text>;
 };

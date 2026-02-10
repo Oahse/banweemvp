@@ -1,6 +1,7 @@
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
 import { useTheme } from '../../../../../components/shared/contexts/ThemeContext';
+import { Body, Text } from '@/components/ui/Text/Text';
 
 export interface AdminStatsCardProps {
   title: string;
@@ -84,7 +85,7 @@ export const AdminStatsCard: React.FC<AdminStatsCardProps> = ({
       <div className="flex flex-col space-y-2">
         {/* Icon and Title Row */}
         <div className="flex items-start justify-between">
-          <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
+          <Body className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{title}</Body>
           {Icon && (
             <div className={`p-2 sm:p-3 rounded-lg ${colorClasses[color]} shrink-0`}>
               <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
@@ -93,16 +94,16 @@ export const AdminStatsCard: React.FC<AdminStatsCardProps> = ({
         </div>
         
         {/* Value */}
-        <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+        <Body className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{value}</Body>
         
         {/* Change Indicator */}
         {change && (
           <div className="flex items-center">
-            <span className={`inline-flex items-center px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium ${changeColorClasses[change.type]}`}>
-              <span className="mr-1">{changeIcons[change.type]}</span>
+            <Text className={`inline-flex items-center px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium ${changeColorClasses[change.type]}`}>
+              <Text className="mr-1">{changeIcons[change.type]}</Text>
               {Math.abs(change.value)}%
-              {change.period && <span className="hidden sm:inline"> {change.period}</span>}
-            </span>
+              {change.period && <Text className="hidden sm:inline"> {change.period}</Text>}
+            </Text>
           </div>
         )}
       </div>

@@ -17,7 +17,7 @@ import {
   CalendarIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text } from '@/components/ui/Text/Text';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 import { ProductImageGallery } from './components/ProductImageGallery';
 import { VariantSelector } from './components/VariantSelector';
@@ -358,12 +358,16 @@ export const ProductDetails = () => {
       {/* Breadcrumb */}
       <motion.div className="bg-surface py-4" variants={itemVariants}>
         <div className="container mx-auto px-4">
-          <nav className="flex items-center space-x-2 text-sm text-copy-light">
-            <Link to="/" className="hover:text-primary">Home</Link>
+          <nav className="flex items-center space-x-2">
+            <Text variant="body-sm" tone="secondary">
+              <Link to="/" className="hover:text-primary">Home</Link>
+            </Text>
             <ChevronRightIcon size={16} />
-            <Link to="/products" className="hover:text-primary">Products</Link>
+            <Text variant="body-sm" tone="secondary">
+              <Link to="/products" className="hover:text-primary">Products</Link>
+            </Text>
             <ChevronRightIcon size={16} />
-            <span className="text-main">{product.name}</span>
+            <Text variant="body-sm">{product.name}</Text>
           </nav>
         </div>
       </div>
@@ -381,25 +385,19 @@ export const ProductDetails = () => {
               className=""
             />
             
-            {/* Debug: Show image count */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="text-xs text-gray-500 mt-2">
-                Total Images: {actualProductData.variants?.flatMap((variant: ProductVariant) => variant.images || [])?.length || 0} | 
-                Selected Variant: {selectedVariant?.name || 'None'} | 
-                Selected Variant Images: {selectedVariant?.images?.length || 0}
-              </div>
-            )}
+            
+            <Button
                     onClick={() => setShowBarcode(true)}
                     className="flex items-center justify-center space-x-2 text-sm text-primary hover:underline px-3 py-2 border border-primary/20 rounded-lg hover:bg-primary/5 transition-colors"
                   >
                     <ScanLineIcon size={16} />
-                    <span className="sm:inline">View Barcode</span>
-                  </button>
-                )}
+                    <Text variant="body-sm" className="sm:inline">View Barcode</Text>
+                  </Button>
+                
                 
                 {/* Show SKU on mobile */}
                 <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 px-3 py-2 sm:hidden">
-                  SKU: {selectedVariant.sku || product.sku}
+                <Text variant="caption" tone="secondary">SKU: {selectedVariant.sku || product.sku}</Text>
                 </div>
               </div>
             )}
@@ -461,46 +459,43 @@ export const ProductDetails = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-copy-light ml-2">
+                  <Text variant="caption" tone="secondary">
                     ({product.review_count || product.reviewCount || totalReviews} reviews)
-                  </span>
+                  </Text>
                 </div>
-                <span className="text-xs text-copy-light">SKU: {selectedVariant?.sku || 'N/A'}</span>
+                <Text variant="caption" tone="secondary">SKU: {selectedVariant?.sku || 'N/A'}</Text>
               </div>
 
               <div className="flex items-center space-x-4 mb-4">
                 {selectedVariant?.sale_price && selectedVariant.sale_price < selectedVariant.base_price ? (
                   <>
-                    <span className="text-xl font-bold text-primary">
+                    <Text variant="body-lg" weight="bold" tone="primary">
                       {formatCurrency(selectedVariant.sale_price)}
-                    </span>
-                    <span className="text-sm text-copy-light line-through">
+                    </Text>
+                    <Text variant="body-sm" tone="secondary" className="line-through">
                       {formatCurrency(selectedVariant.base_price)}
-                    </span>
-                    <span className="bg-error-100 text-error-600 px-2 py-1 rounded text-xs font-medium">
+                    </Text>
+                    <Text variant="caption" className="bg-error-100 text-error-600 px-2 py-1 rounded font-medium">
                       {Math.round(((selectedVariant.base_price - selectedVariant.sale_price) / selectedVariant.base_price) * 100)}% OFF
-                    </span>
+                    </Text>
                   </>
                 ) : (
-                  <span className="text-xl font-bold text-primary">
+                  <Text variant="body-lg" weight="bold" tone="primary">
                     {formatCurrency(
                       selectedVariant?.sale_price ||
                       selectedVariant?.base_price ||
-                      product.price_range?.min ||
-                      product.min_price ||
-                      product.price ||
-                      0
+                      product.base_price
                     )}
-                  </span>
+                  </Text>
                 )}
               </div>
 
-              <Body className="text-sm text-copy-light mb-6">{product.description}</Body>
+              <Text variant="body-sm" tone="secondary" className="mb-6">{product.description}</Text>
               
               {/* Variant Selection - Moved under description */}
               {actualProductData?.variants && actualProductData.variants.length > 0 && (
                 <div className="mb-6">
-                  <Heading level={3} className="text-sm font-medium text-main mb-2">Available Variants</Heading>
+                  <Heading level={3} weight="medium">Available Variants</Heading>
                   <div className="space-y-1">
                     {actualProductData.variants.map((variant: any, index: number) => {
                       const isSelected = selectedVariant?.id === variant.id;
@@ -555,43 +550,43 @@ export const ProductDetails = () => {
                                   <div className="w-1.5 h-1.5 rounded-full bg-white mx-auto mt-0.75"></div>
                                 )}
                               </div>
-                              <span className="font-medium text-main truncate">
+                              <Text variant="body-sm" weight="medium" truncate="single">
                                 {variant.name || `Variant ${index + 1}`}
-                              </span>
+                              </Text>
                               {variant.sku && (
-                                <span className="text-xs text-copy-light flex-shrink-0">SKU: {variant.sku}</span>
+                                <Text variant="caption" tone="secondary">SKU: {variant.sku}</Text>
                               )}
                             </div>
                             
                             <div className="flex items-center space-x-2 flex-shrink-0">
                               <div className="text-right">
-                                <div className="text-sm font-bold text-primary">
+                                <Text variant="body-sm" weight="bold" tone="primary">
                                   ${currentPrice.toFixed(2)}
-                                </div>
+                                </Text>
                                 {variant.sale_price && variant.sale_price < variant.base_price && (
-                                  <div className="text-xs text-copy-light line-through">
+                                  <Text variant="caption" tone="secondary" className="line-through">
                                     ${variant.base_price.toFixed(2)}
-                                  </div>
+                                  </Text>
                                 )}
                               </div>
-                              <div className={`text-xs px-1.5 py-0.5 rounded-full ${
+                              <Text variant="caption" className={`px-1.5 py-0.5 rounded-full ${
                                 isAvailable
                                   ? 'bg-success-100 text-success-800'
                                   : 'bg-error-100 text-error-800'
                               }`}>
-                                {isAvailable ? `${variant.stock}` : 'Out'}
-                              </div>
+                                {isAvailable ? 'In Stock' : 'Out of Stock'}
+                              </Text>
                             </div>
                           </div>
                           
                           {variant.attributes && Object.keys(variant.attributes).length > 0 && (
-                            <div className="mt-1 text-xs text-copy-light truncate">
+                            <Text variant="caption" tone="secondary" truncate="single">
                               {Object.entries(variant.attributes).map(([key, value], idx) => (
-                                <span key={key} className={idx > 0 ? 'ml-2' : ''}>
-                                  <span className="capitalize">{key.replace('_', ' ')}:</span> {String(value)}
-                                </span>
+                                <Text key={key} className={idx > 0 ? 'ml-2' : ''}>
+                                  <Text className="capitalize">{key.replace('_', ' ')}:</Text> {String(value)}
+                                </Text>
                               ))}
-                            </div>
+                            </Text>
                           )}
                         </button>
                       );
@@ -605,13 +600,13 @@ export const ProductDetails = () => {
             {selectedVariant && (
               <div className="mb-4">
                 {(selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 ? (
-                  <span className="text-xs text-success-600 font-medium">
+                  <Text variant="caption" tone="success" weight="medium">
                     ✓ In Stock ({selectedVariant.inventory?.quantity_available ?? selectedVariant.stock} available)
-                  </span>
+                  </Text>
                 ) : (
-                  <span className="text-xs text-error-600 font-medium">
+                  <Text variant="caption" tone="error" weight="medium">
                     ✗ Out of Stock
-                  </span>
+                  </Text>
                 )}
               </div>
             )}
@@ -619,7 +614,7 @@ export const ProductDetails = () => {
             {/* Quantity Selection */}
             {selectedVariant && (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 && (
               <div>
-                <Heading level={3} className="text-xs font-medium text-main mb-3">Quantity:</Heading>
+                <Heading level={3} weight="medium">Quantity:</Heading>
                 <div className="flex items-center space-x-2">
                   <Button
                     onClick={() => handleQuantityChange(quantity - 1)}
@@ -630,7 +625,7 @@ export const ProductDetails = () => {
                   >
                     <MinusIcon size={12} />
                   </Button>
-                  <span className="w-12 text-center font-medium text-sm">{quantity}</span>
+                  <Text variant="body-sm" weight="medium" className="w-12 text-center">{quantity}</Text>
                   <Button
                     onClick={() => handleQuantityChange(quantity + 1)}
                     disabled={selectedVariant && quantity >= (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock)}
@@ -779,7 +774,7 @@ export const ProductDetails = () => {
                   className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-xs"
                   leftIcon={<CalendarIcon size={14} className="mr-1 sm:mr-2 flex-shrink-0" />}
                 >
-                  <span className="truncate">Add to Subscription</span>
+                  <Text className="truncate">Add to Subscription</Text>
                 </Button>
               )}
             </div>
@@ -788,19 +783,19 @@ export const ProductDetails = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
                 <TruckIcon size={16} className="text-primary" />
-                <span className="text-xs">Standard Shipping Available</span>
+                <Text className="text-xs">Standard Shipping Available</Text>
               </div>
               <div className="flex items-center space-x-2">
                 <ShieldCheckIcon size={16} className="text-primary" />
-                <span className="text-xs">Secure Payment</span>
+                <Text className="text-xs">Secure Payment</Text>
               </div>
               <div className="flex items-center space-x-2">
                 <RefreshCwIcon size={16} className="text-primary" />
-                <span className="text-xs">Easy Returns</span>
+                <Text className="text-xs">Easy Returns</Text>
               </div>
               <div className="flex items-center space-x-2">
                 <ShareIcon size={16} className="text-primary" />
-                <span className="text-xs">Share Product</span>
+                <Text className="text-xs">Share Product</Text>
               </div>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { Input } from '@/components/generic/Input';
 import { toast } from 'react-hot-toast';
 import { extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -87,17 +88,15 @@ export const ResetPassword = () => {
         className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light"
         variants={itemVariants}
       >
-        <motion.h1 className="text-xl font-bold text-main mb-4 text-center" variants={itemVariants}>
-          Reset Password
-        </motion.h1>
-        <motion.p className="text-xs text-copy-light text-center mb-4" variants={itemVariants}>
+        <Heading level={1} className="text-xl font-bold text-main mb-4 text-center">Reset Password</Heading>
+        <Body className="text-xs text-copy-light text-center mb-4">
           Enter your new password below.
-        </motion.p>
+        </Body>
         <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
           <div>
-            <label htmlFor="password" className="block text-xs font-medium text-main mb-1">
+            <Label htmlFor="password" className="block text-xs font-medium text-main mb-1">
               New Password
-            </label>
+            </Label>
             <div className="relative">
               <Input
                 id="password"
@@ -120,9 +119,9 @@ export const ResetPassword = () => {
             </div>
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="block text-xs font-medium text-main mb-1">
+            <Label htmlFor="confirmPassword" className="block text-xs font-medium text-main mb-1">
               Confirm New Password
-            </label>
+            </Label>
             <div className="relative">
               <Input
                 id="confirmPassword"

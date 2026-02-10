@@ -512,8 +512,8 @@ export const FinancialDashboard = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Financial Dashboard</h1>
-          <p className="text-gray-600">Monitor revenue, expenses, and financial performance</p>
+          <Heading level={1} className="text-2xl font-bold text-gray-900">Financial Dashboard</Heading>
+          <Text className="text-gray-600">Monitor revenue, expenses, and financial performance</Text>
         </div>
         
         <CustomizableDashboard

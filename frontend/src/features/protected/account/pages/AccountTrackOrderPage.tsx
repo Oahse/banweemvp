@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchIcon, PackageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Label, Caption } from '@/components/ui/Text/Text';
 
 const TrackOrder = () => {
   const [orderNumber, setOrderNumber] = useState('');
@@ -23,17 +24,13 @@ const TrackOrder = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
             <PackageIcon size={32} className="text-primary" />
           </div>
-          <h1 className="text-base font-bold text-gray-900 dark:text-white mb-2">Track Your Order</h1>
-          <p className="text-xs text-gray-600 dark:text-gray-400">
-            Enter your order number to view tracking details and order status
-          </p>
+          <Heading level={1} className="text-base font-bold text-gray-900 dark:text-white mb-2">Track Your Order</Heading>
+          <Body className="text-xs text-gray-600 dark:text-gray-400">Enter your order number to view tracking details and order status</Body>
         </div>
 
         <form onSubmit={handleTrackOrder} className="space-y-6">
           <div>
-            <label htmlFor="orderNumber" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Order Number
-            </label>
+            <Label htmlFor="orderNumber" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Order Number</Label>
             <input
               id="orderNumber"
               type="text"
@@ -43,9 +40,7 @@ const TrackOrder = () => {
               required
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs"
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              You can find your order number in your order confirmation email
-            </p>
+            <Caption className="text-xs text-gray-500 dark:text-gray-400 mt-1">You can find your order number in your order confirmation email</Caption>
           </div>
 
           <Button

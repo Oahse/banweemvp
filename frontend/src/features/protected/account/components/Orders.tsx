@@ -8,7 +8,7 @@ import OrdersAPI from '../../api/orders';
 import { toast } from 'react-hot-toast';
 import { useLocale } from '../../../LocaleContext';
 import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
-import { Heading, Body } from '@/components/ui/Text/Text';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 import { Button } from '@/components/ui/Button';
 interface Order {
   id: string;
@@ -214,11 +214,11 @@ export const Orders = ({
             }}
             className="mt-3 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
-            Try Again
+            <Text variant="body-sm">Try Again</Text>
           </Button>
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-3 text-xs text-gray-600">
-              <p>Debug info:</p>
+            <Text variant="caption" className="text-gray-600">Debug info:</Text>
               <pre className="text-left bg-gray-100 p-2 rounded mt-2 max-h-40 overflow-auto">
                 {JSON.stringify(error, null, 2)}
               </pre>
@@ -233,9 +233,9 @@ export const Orders = ({
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
         
         {orders.length > 0 && (
-          <p className="text-xs text-gray-600 dark:text-gray-300">
+          <Text variant="caption" tone="secondary">
             {totalOrders} order{totalOrders !== 1 ? 's' : ''}
-          </p>
+          </Text>
         )}
       </div>
       
@@ -243,33 +243,33 @@ export const Orders = ({
           {orders.map((order: Order) => <div key={order.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 cursor-pointer gap-2" onClick={() => toggleOrderExpand(order.id)}>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+                  <Text variant="caption" tone="secondary">
                     Order placed
-                  </p>
-                  <p className="text-xs font-medium text-gray-900 dark:text-white">
+                  </Text>
+                  <Text variant="caption" weight="medium">
                     {new Date(order.created_at).toLocaleDateString()}
-                  </p>
+                  </Text>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+                  <Text variant="caption" tone="secondary">
                     Order ID
-                  </p>
-                  <p className="text-xs font-medium text-gray-900 dark:text-white break-all">
+                  </Text>
+                  <Text variant="caption" weight="medium">
                     {order.id}
-                  </p>
+                  </Text>
                 </div>
                 <div className="flex-1 min-w-0 text-right">
-                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+                  <Text variant="caption" tone="secondary">
                     Total
-                  </p>
-                  <p className="text-xs font-medium text-gray-900 dark:text-white">
+                  </Text>
+                  <Text variant="caption" weight="medium">
                     {formatCurrency(order.total_amount)}
-                  </p>
+                  </Text>
                 </div>
                 <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-                  <span className={`px-2 py-1 text-xs text-gray-900 dark:text-white rounded-full ${getStatusColor(order.status)}`}>
+                  <Text variant="caption" className={`px-2 py-1 rounded-full ${getStatusColor(order.status)}`}>
                     {order.status}
-                  </span>
+                  </Text>
                   {expandedOrderId === order.id ? <ChevronUpIcon size={16} className="text-gray-500" /> : <ChevronDownIcon size={16} className="text-gray-500" />}
                 </div>
               </div>
@@ -292,35 +292,35 @@ export const Orders = ({
                           return (
                             <>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
-                                <span className="text-gray-900 dark:text-white">{formatCurrency(pricing.subtotal)}</span>
+                                <Text variant="caption" tone="secondary">Subtotal</Text>
+                                <Text variant="caption">{formatCurrency(pricing.subtotal)}</Text>
                               </div>
                               {pricing.hasDiscount && (
                                 <div className="flex justify-between items-center">
-                                  <span className="text-green-600 dark:text-green-400">Discount</span>
-                                  <span className="text-green-600 dark:text-green-400">
+                                  <Text variant="caption" className="text-green-600 dark:text-green-400">Discount</Text>
+                                  <Text variant="caption" className="text-green-600 dark:text-green-400">
                                     -{formatCurrency(pricing.discount)}
                                     {order.discount_type === 'percentage' && ` (${((pricing.discount / pricing.subtotal) * 100).toFixed(0)}%)`}
-                                  </span>
+                                  </Text>
                                 </div>
                               )}
                               {pricing.hasShipping && (
                                 <div className="flex justify-between items-center">
-                                  <span className="text-gray-500 dark:text-gray-400">Shipping</span>
-                                  <span className="text-gray-900 dark:text-white">{formatCurrency(pricing.shipping)}</span>
+                                  <Text variant="caption" tone="secondary">Shipping</Text>
+                                  <Text variant="caption">{formatCurrency(pricing.shipping)}</Text>
                                 </div>
                               )}
                               {pricing.hasTax && (
                                 <div className="flex justify-between items-center">
-                                  <span className="text-gray-500 dark:text-gray-400">
+                                  <Text variant="caption" tone="secondary">
                                     Tax{order.tax_rate && ` (${(order.tax_rate * 100).toFixed(0)}%)`}
-                                  </span>
-                                  <span className="text-gray-900 dark:text-white">{formatCurrency(pricing.tax)}</span>
+                                  </Text>
+                                  <Text variant="caption">{formatCurrency(pricing.tax)}</Text>
                                 </div>
                               )}
                               <div className="flex justify-between items-center pt-2 mt-2 border-t border-gray-200 dark:border-gray-700">
-                                <span className="font-medium text-gray-900 dark:text-white">Total</span>
-                                <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(order.total_amount)}</span>
+                                <Text variant="caption" weight="medium">Total</Text>
+                                <Text variant="caption" weight="medium">{formatCurrency(order.total_amount)}</Text>
                               </div>
                             </>
                           );
@@ -329,11 +329,11 @@ export const Orders = ({
                       <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-start sm:justify-end">
                         <Link to={`/track-order/${order.id}`} className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-w-[80px] justify-center">
                           <TruckIcon size={12} className="mr-1 flex-shrink-0" />
-                          <span>Track</span>
+                          <Text variant="caption">Track</Text>
                         </Link>
                         <Link to={`/account/orders/${order.id}`} className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-w-[80px] justify-center">
                           <EyeIcon size={12} className="mr-1 flex-shrink-0" />
-                          <span>Details</span>
+                          <Text variant="caption">Details</Text>
                         </Link>
                         <Button 
                           onClick={async () => {
@@ -349,7 +349,7 @@ export const Orders = ({
                           className="flex items-center px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-w-[80px] justify-center"
                         >
                           <DownloadIcon size={12} className="mr-1 flex-shrink-0" />
-                          <span>Invoice</span>
+                          <Text variant="caption">Invoice</Text>
                         </Button>
                       </div>
                     </div>

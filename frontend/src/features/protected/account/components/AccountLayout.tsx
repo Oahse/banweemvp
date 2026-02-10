@@ -19,6 +19,7 @@ import { useAuth } from '../../auth/contexts/AuthContext';
 import { cn } from '@/utils/cn';
 import { containerFastVariants } from '@/utils/pageAnimations';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 interface AccountLayoutProps {
   children?: React.ReactNode;
@@ -104,8 +105,8 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
               <User className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-sm font-medium text-gray-900 dark:text-white">My Account</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
+              <Heading level={2} weight="medium">My Account</Heading>
+              <Text variant="caption" tone="secondary">{user?.email}</Text>
             </div>
           </div>
           <Button
@@ -136,7 +137,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
               )}
             >
               <item.icon className="h-5 w-5" />
-              <span>{item.name}</span>
+              <Text variant="body-sm">{item.name}</Text>
               {item.current && (
                 <ChevronRight className="h-4 w-4 ml-auto" />
               )}
@@ -152,7 +153,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
             className="flex items-center space-x-3 w-full px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <LogOut className="h-5 w-5" />
-            <span>Logout</span>
+            <Text variant="body-sm">Logout</Text>
           </Button>
         </div>
       </div>
@@ -180,9 +181,9 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ children }) => {
                 <Menu className="h-6 w-6" />
               </Button>
               <div className="flex-1">
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <Heading level={1} weight="semibold">
                   {navigationItems.find(item => item.current)?.name || 'Account'}
-                </h1>
+                </Heading>
               </div>
             </div>
           </div>

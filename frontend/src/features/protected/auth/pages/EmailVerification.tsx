@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
 import { extractErrorMessage } from '../../../../utils/api-response';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -71,9 +72,7 @@ export const EmailVerification = () => {
         className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light text-center"
         variants={itemVariants}
       >
-        <motion.h1 className="text-xl font-bold text-main mb-4" variants={itemVariants}>
-          Email Verification
-        </motion.h1>
+        <Heading level={1} className="text-xl font-bold text-main mb-4">Email Verification</Heading>
         
         <AnimatePresence mode="wait">
           {verificationStatus === 'pending' && (
@@ -85,7 +84,7 @@ export const EmailVerification = () => {
               exit={{ opacity: 0 }}
             >
             <Loader size={48} className="mx-auto text-primary animate-spin" />
-            <p className="text-sm text-copy-light">Verifying your email...</p>
+            <Body className="text-sm text-copy-light">Verifying your email...</Body>
           </motion.div>
         )}
         
@@ -98,7 +97,7 @@ export const EmailVerification = () => {
             exit={{ opacity: 0 }}
           >
             <CheckCircle size={48} className="mx-auto text-green-500" />
-            <p className="text-sm text-copy">{message}</p>
+            <Body className="text-sm text-copy">{message}</Body>
             <Link 
               to="/login" 
               className="inline-block w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md transition-colors text-sm mt-3"
@@ -117,7 +116,7 @@ export const EmailVerification = () => {
             exit={{ opacity: 0 }}
           >
             <XCircle size={48} className="mx-auto text-red-500" />
-            <p className="text-sm text-red-600">{message}</p>
+            <Body className="text-sm text-red-600">{message}</Body>
             <Link 
               to="/login" 
               className="inline-block text-primary hover:underline text-xs mt-2"

@@ -194,12 +194,10 @@ const Products = () => {
     >
       {/* Header */}
       <motion.div className="mb-4 sm:mb-6" variants={itemVariants}>
-        <Heading level={1} className="text-xl font-semibold text-main dark:text-white mb-2">
-          Products
-        </Heading>
-        <Body className="text-sm text-copy-light dark:text-gray-400">
+        <Heading level={1} weight="semibold">Products</Heading>
+        <Text variant="body-sm" tone="secondary">
           {loading && !productsData ? 'Loading products...' : `${totalProducts} products available`}
-        </Body>
+        </Text>
       </motion.div>
 
       {/* Search and Filters */}
@@ -228,7 +226,7 @@ const Products = () => {
             size="sm"
             className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded text-sm font-medium transition-colors"
           >
-            Search
+            <Text variant="body-sm">Search</Text>
           </Button>
         </form>
 
@@ -274,9 +272,7 @@ const Products = () => {
             {/* Categories */}
             {categories && categories.length > 0 && (
               <div>
-                <Heading level={3} className="text-sm font-medium text-main dark:text-white mb-2">
-                  Categories
-                </Heading>
+                <Heading level={3} weight="medium">Categories</Heading>
                 <div className="flex flex-wrap gap-1">
                   {categories.map((category) => (
                     <Button
@@ -300,14 +296,10 @@ const Products = () => {
 
             {/* Price Range */}
             <div>
-              <Heading level={3} className="text-sm font-medium text-main dark:text-white mb-2">
-                Price Range
-              </Heading>
+              <Heading level={3} weight="medium">Price Range</Heading>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  <Label className="block text-xs text-copy-light dark:text-gray-400 mb-1">
-                    Min Price
-                  </Label>
+                  <Label weight="medium">Min Price</Label>
                   <input
                     type="number"
                     placeholder="0"
@@ -320,11 +312,9 @@ const Products = () => {
                     )}
                   />
                 </div>
-                <span className="text-copy-light dark:text-gray-400 mt-3">—</span>
+                <Text variant="body-sm" tone="secondary">—</Text>
                 <div className="flex-1">
-                  <label className="block text-xs text-copy-light dark:text-gray-400 mb-1">
-                    Max Price
-                  </label>
+                  <Label weight="medium">Max Price</Label>
                   <input
                     type="number"
                     placeholder="1000"
@@ -362,7 +352,7 @@ const Products = () => {
                 size="sm"
                 className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                Done
+                <Text variant="body-sm">Done</Text>
               </Button>
             </div>
           </motion.div>
@@ -402,12 +392,10 @@ const Products = () => {
               )}>
                 <SearchIcon size={24} className={themeClasses.text.muted} />
               </div>
-              <Heading level={3} className={combineThemeClasses(themeClasses.text.heading, 'text-lg mb-2')}>
-                No products found
-              </Heading>
-              <Body className={combineThemeClasses(themeClasses.text.secondary, 'mb-4')}>
-                Try adjusting your search or filter criteria
-              </Body>
+              <Heading level={3} className="text-lg mb-2">No products found</Heading>
+              <Text variant="body-sm" tone="secondary" className="mb-4">
+                Try adjusting your search or filters to find what you're looking for.
+              </Text>
               <Button
                 onClick={clearFilters}
                 variant="primary"
@@ -502,7 +490,7 @@ const Products = () => {
           >
           <div className="flex items-center gap-2">
             <div className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"></div>
-            <span className="text-sm font-medium">Loading...</span>
+            <Text variant="body-sm" weight="medium">Loading...</Text>
           </div>
         </motion.div>
       )}

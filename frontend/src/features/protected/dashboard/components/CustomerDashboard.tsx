@@ -14,6 +14,7 @@ import {
   TableIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 /**
  * @typedef {object} CustomerDashboardProps
@@ -39,8 +40,8 @@ const CustomerMetricWidget = ({
         </div>
       )}
     </div>
-    <div className="text-2xl font-bold text-gray-900 mb-1">{value}</div>
-    <div className="text-sm text-gray-500 mb-3">{label}</div>
+    <Text variant="body-lg" weight="bold">{value}</Text>
+    <Text variant="body-sm" tone="secondary">{label}</Text>
     {actionText && onAction && (
       <Button
         onClick={onAction}
@@ -48,7 +49,7 @@ const CustomerMetricWidget = ({
         size="sm"
         className={`text-xs px-3 py-1 rounded-full bg-${color}-100 text-${color}-700 hover:bg-${color}-200 transition-colors`}
       >
-        {actionText}
+        <Text variant="body-sm">{actionText}</Text>
       </Button>
     )}
   </div>
@@ -110,7 +111,7 @@ const OrderHistoryWidget = () => {
       label: 'Order ID',
       sortable: true,
       render: (value) => (
-        <span className="font-mono text-sm text-blue-600">{value}</span>
+        <Text variant="body-sm" className="font-mono" tone="primary">{value}</Text>
       )
     },
     {
@@ -125,7 +126,7 @@ const OrderHistoryWidget = () => {
       sortable: true,
       align: 'center',
       render: (value) => (
-        <span className="px-2 py-1 bg-gray-100 rounded-full text-sm">{value}</span>
+        <Text variant="body-sm" className="px-2 py-1 bg-gray-100 rounded-full">{value}</Text>
       )
     },
     {
@@ -141,14 +142,12 @@ const OrderHistoryWidget = () => {
       sortable: true,
       align: 'center',
       render: (value) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        <Text variant="caption" className={`px-2 py-1 rounded-full font-medium ${
           value === 'Delivered' ? 'bg-green-100 text-green-800' :
           value === 'Shipped' ? 'bg-blue-100 text-blue-800' :
           value === 'Processing' ? 'bg-yellow-100 text-yellow-800' :
           'bg-gray-100 text-gray-800'
-        }`}>
-          {value}
-        </span>
+        }`}>{value}</Text>
       )
     },
     {
@@ -156,11 +155,9 @@ const OrderHistoryWidget = () => {
       label: 'Tracking',
       render: (value) => (
         value ? (
-          <Button className="text-blue-600 hover:text-blue-800 text-sm underline" variant="link" size="sm">
-            Track
-          </Button>
+          <Text variant="body-sm" className="text-blue-600 hover:text-blue-800 underline">Track</Text>
         ) : (
-          <span className="text-gray-400 text-sm">-</span>
+          <Text variant="body-sm" className="text-gray-400">-</Text>
         )
       )
     }
@@ -355,8 +352,8 @@ const LoyaltyPointsWidget = () => {
   return (
     <div className="text-center">
       <div className="mb-4">
-        <div className="text-3xl font-bold text-purple-600 mb-1">{currentPoints}</div>
-        <div className="text-sm text-gray-500">Loyalty Points</div>
+        <Text variant="display" weight="bold" className="text-purple-600">{currentPoints}</Text>
+        <Text variant="body-sm" tone="secondary">Loyalty Points</Text>
       </div>
       
       <div className="mb-4">
@@ -366,14 +363,12 @@ const LoyaltyPointsWidget = () => {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="text-xs text-gray-500 mt-1">
+        <Text variant="caption" className="text-gray-500">
           {nextRewardAt - currentPoints} points to next reward
-        </div>
+        </Text>
       </div>
       
-      <Button className="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200" variant="outline" size="sm">
-        View Rewards
-      </Button>
+      <Text variant="caption" className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200">View Rewards</Text>
     </div>
   );
 };
@@ -550,8 +545,8 @@ export const CustomerDashboard = ({
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">My Dashboard</h1>
-          <p className="text-gray-600">Here&apos;s your personalized shopping overview</p>
+          <Heading level={1} weight="bold">My Dashboard</Heading>
+          <Text variant="body" tone="secondary">Here's your personalized shopping overview</Text>
         </div>
         
         <CustomizableDashboard

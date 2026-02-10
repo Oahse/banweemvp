@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { cn } from '../../utils/utils';
 import { ChevronDownIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getInputClasses } from '../../utils/themeClasses';
+import { Label, Text } from '@/components/ui/Text/Text';
 
 interface SelectOption {
   value: string;
@@ -51,9 +52,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(({
   return (
     <div className={combineThemeClasses('relative', fullWidth && 'w-full', !label && 'mb-0')}>
       {label && (
-        <label htmlFor={props.id} className={combineThemeClasses(themeClasses.text.primary, 'block text-sm font-medium mb-2')}>
+        <Label htmlFor={props.id} className={combineThemeClasses(themeClasses.text.primary, 'block text-sm font-medium mb-2')}>
           {label}
-        </label>
+        </Label>
       )}
       <div className="relative">
         <select 
@@ -82,12 +83,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(({
         />
       </div>
       {(helperText || error) && (
-        <p className={combineThemeClasses(
-          'mt-2 text-xs',
+        <Text variant="body-sm" className={combineThemeClasses(
+          'mt-2',
           error ? themeClasses.text.error : themeClasses.text.muted
         )}>
           {error || helperText}
-        </p>
+        </Text>
       )}
     </div>
   );

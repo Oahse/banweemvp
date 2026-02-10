@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Checkbox } from '../ui/Checkbox';
-import { Input } from '../ui/Input';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Skeleton } from '../ui/Skeleton';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { FilterIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
-import { cn } from '../../utils/utils';
+import { cn } from '@/utils/utils';
+import { Heading, Text, Label } from '@/components/ui/Text/Text';
 
 /**
  * @typedef {object} FilterOption
@@ -117,7 +118,7 @@ export const ProductFilter = ({
     children
   }) => <div className="mb-6">
       <div className="flex items-center justify-between cursor-pointer mb-2" onClick={onToggle}>
-        <h3 className="text-lg font-semibold text-main">{title}</h3>
+        <Heading level={3} className="text-lg font-semibold text-main">{title}</Heading>
         {expanded ? <ChevronUpIcon size={20} className="text-gray-500" /> : <ChevronDownIcon size={20} className="text-gray-500" />}
       </div>
       {expanded && <div className="space-y-2">{children}</div>}
@@ -159,7 +160,7 @@ export const ProductFilter = ({
         </div>}
       <div className={cn('p-6', isMobile && !isOpen && 'hidden')}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-main">Filters</h2>
+          <Heading level={2} className="text-xl font-semibold text-main">Filters</Heading>
           {(selectedCategories.length > 0 || selectedBrands.length > 0 || selectedRatings.length > 0 || minPrice !== priceRange.min || maxPrice !== priceRange.max) && <Button variant="ghost" size="sm" onClick={clearAllFilters} className="text-gray-500">
               Clear all
             </Button>}
@@ -168,48 +169,48 @@ export const ProductFilter = ({
             <FilterSection title="Categories" expanded={expandedSections.categories} onToggle={() => toggleSection('categories')}>
               {categories.options.map(option => <div key={option.id} className="flex items-center">
                   <Checkbox id={`category-${option.id}`} checked={selectedCategories.includes(option.id)} onChange={e => handleCategoryChange(option.id, e.target.checked)} />
-                  <label htmlFor={`category-${option.id}`} className="ml-2 text-gray-700 flex-grow">
+                  <Text className="ml-2 text-gray-700 flex-grow">
                     {option.label}
-                  </label>
-                  <span className="text-xs text-gray-500">
+                  </Text>
+                  <Text className="text-xs text-gray-500">
                     ({option.count})
-                  </span>
+                  </Text>
                 </div>)}
             </FilterSection>
             <FilterSection title="Brands" expanded={expandedSections.brands} onToggle={() => toggleSection('brands')}>
               {brands.options.map(option => <div key={option.id} className="flex items-center">
                   <Checkbox id={`brand-${option.id}`} checked={selectedBrands.includes(option.id)} onChange={e => handleBrandChange(option.id, e.target.checked)} />
-                  <label htmlFor={`brand-${option.id}`} className="ml-2 text-gray-700 flex-grow">
+                  <Text className="ml-2 text-gray-700 flex-grow">
                     {option.label}
-                  </label>
-                  <span className="text-xs text-gray-500">
+                  </Text>
+                  <Text className="text-xs text-gray-500">
                     ({option.count})
-                  </span>
+                  </Text>
                 </div>)}
             </FilterSection>
             <FilterSection title="Rating" expanded={expandedSections.ratings} onToggle={() => toggleSection('ratings')}>
               {ratings.options.map(option => <div key={option.id} className="flex items-center">
                   <Checkbox id={`rating-${option.id}`} checked={selectedRatings.includes(option.id)} onChange={e => handleRatingChange(option.id, e.target.checked)} />
-                  <label htmlFor={`rating-${option.id}`} className="ml-2 text-gray-700 flex items-center">
+                  <Text className="ml-2 text-gray-700 flex items-center">
                     <div className="flex text-yellow-400 mr-1">
                       {'★'.repeat(parseInt(option.id))}
                       {'☆'.repeat(5 - parseInt(option.id))}
                     </div>
-                    & Up
-                  </label>
+                    & up
+                  </Text>
                 </div>)}
             </FilterSection>
             <FilterSection title="Price Range" expanded={expandedSections.price} onToggle={() => toggleSection('price')}>
               <div className="space-y-4">
                 <div className="flex items-center space-x-4">
                   <Input type="number" value={minPrice} onChange={e => setMinPrice(Number(e.target.value))} placeholder="Min" className="w-full" min={priceRange.min} max={maxPrice} />
-                  <span className="text-gray-500">to</span>
+                  <Text className="text-gray-500">to</Text>
                   <Input type="number" value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} placeholder="Max" className="w-full" min={minPrice} max={priceRange.max} />
                 </div>
                 <input type="range" min={priceRange.min} max={priceRange.max} value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
                 <div className="flex items-center justify-between text-sm text-gray-600">
-                  <span>${priceRange.min}</span>
-                  <span>${priceRange.max}</span>
+                  <Text>${priceRange.min}</Text>
+                  <Text>${priceRange.max}</Text>
                 </div>
               </div>
             </FilterSection>

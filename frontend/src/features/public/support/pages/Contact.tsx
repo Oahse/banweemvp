@@ -8,6 +8,7 @@ import { Select } from '../../../../components/generic/Select';
 import { ContactMessagesAPI } from '../../../../api/contact-messages';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -127,21 +128,21 @@ export const Contact = () => {
           Home
         </Link>
         <ChevronRightIcon size={12} className="mx-1" />
-        <span className="text-copy">Contact Us</span>
+        <Text className="text-copy">Contact Us</Text>
       </motion.nav>
 
       <motion.div className="max-w-5xl mx-auto" variants={itemVariants}>
         <div className="text-center mb-6">
-          <h1 className="text-base md:text-lg font-semibold text-copy mb-2">Get In Touch</h1>
-          <p className="text-xs text-copy-light max-w-2xl mx-auto">
+          <Heading level={1} className="text-base md:text-lg font-semibold text-copy mb-2">Get In Touch</Heading>
+          <Body className="text-xs text-copy-light max-w-2xl mx-auto">
             Have questions about our products, shipping, or anything else? We're here to help. Fill out the form
             below or contact us directly.
-          </p>
+          </Body>
         </div>
 
         {/* Contact Methods */}
         <motion.div className="mb-6" variants={itemVariants}>
-          <h2 className="text-sm font-semibold text-copy mb-3">Contact Methods</h2>
+          <Heading level={2} className="text-sm font-semibold text-copy mb-3">Contact Methods</Heading>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* WhatsApp */}
             <a
@@ -155,12 +156,12 @@ export const Contact = () => {
                   <MessageCircle className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-copy mb-0.5">
+                  <Heading level={4} className="text-sm font-semibold text-copy mb-0.5">
                     WhatsApp Support
-                  </h4>
-                  <p className="text-xs text-copy-light mb-1">
+                  </Heading>
+                  <Body className="text-xs text-copy-light mb-1">
                     Get instant help via WhatsApp
-                  </p>
+                  </Body>
                   <div className="text-xs text-copy-lighter space-y-0.5">
                     <div>24/7</div>
                     <div className="font-medium text-primary">
@@ -181,12 +182,12 @@ export const Contact = () => {
                   <PhoneIcon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-copy mb-0.5">
+                  <Heading level={4} className="text-sm font-semibold text-copy mb-0.5">
                     Phone Support
-                  </h4>
-                  <p className="text-xs text-copy-light mb-1">
+                  </Heading>
+                  <Body className="text-xs text-copy-light mb-1">
                     Speak directly with our team
-                  </p>
+                  </Body>
                   <div className="text-xs text-copy-lighter space-y-0.5">
                     <div>9 AM - 9 PM EST</div>
                     <div className="font-medium text-primary">
@@ -207,12 +208,12 @@ export const Contact = () => {
                   <MailIcon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-copy mb-0.5">
+                  <Heading level={4} className="text-sm font-semibold text-copy mb-0.5">
                     Email Support
-                  </h4>
-                  <p className="text-xs text-copy-light mb-1">
+                  </Heading>
+                  <Body className="text-xs text-copy-light mb-1">
                     Send us a detailed message
-                  </p>
+                  </Body>
                   <div className="text-xs text-copy-lighter space-y-0.5">
                     <div>24/7</div>
                     <div className="font-medium text-primary">
@@ -229,14 +230,14 @@ export const Contact = () => {
           {/* Contact Form */}
           <div className="lg:w-2/3">
             <div className="bg-surface rounded-lg shadow-sm p-3">
-              <h2 className="text-sm font-semibold text-copy mb-3">Send Us a Message</h2>
+              <Heading level={2} className="text-sm font-semibold text-copy mb-3">Send Us a Message</Heading>
               {formSubmitted ? (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
                   <CheckCircleIcon size={24} className="text-green-500 mx-auto mb-2" />
-                  <h3 className="text-sm font-bold text-green-800 mb-1">Message Sent!</h3>
-                  <p className="text-xs text-green-700">
+                  <Heading level={3} className="text-sm font-bold text-green-800 mb-1">Message Sent!</Heading>
+                  <Body className="text-xs text-green-700">
                     Thank you for reaching out. We'll get back to you as soon as possible.
-                  </p>
+                  </Body>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
@@ -301,25 +302,8 @@ export const Contact = () => {
           {/* Contact Info */}
           <div className="lg:w-1/3">
             <div className="bg-surface rounded-lg shadow-sm p-3 mb-4">
-              <h2 className="text-sm font-semibold text-copy mb-3">Contact Information</h2>
+              <Heading level={2} className="text-sm font-semibold text-copy mb-3">Contact Information</Heading>
               <div className="space-y-3">
-                <div className="flex">
-                  <div className="mr-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <MapPinIcon size={14} className="text-primary" />
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-copy mb-0.5">Our Location</h3>
-                    <p className="text-xs text-copy-light">
-                      1234 Fashion Street, Suite 567
-                      <br />
-                      New York, NY 10001
-                      <br />
-                      United States
-                    </p>
-                  </div>
-                </div>
                 <div className="flex">
                   <div className="mr-2">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
@@ -327,60 +311,37 @@ export const Contact = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-copy mb-0.5">Phone Number</h3>
-                    <p className="text-xs text-copy-light">
+                    <Heading level={3} className="text-sm font-bold text-copy mb-0.5">Phone Number</Heading>
+                    <Body className="text-xs text-copy-light">
                       Customer Service: (212) 555-1234
                       <br />
                       Wholesale Inquiries: (212) 555-5678
-                    </p>
+                    </Body>
                   </div>
                 </div>
                 <div className="flex">
                   <div className="mr-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <MailIcon size={14} className="text-primary" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-copy mb-0.5">Email Address</h3>
-                    <p className="text-xs text-copy-light">
-                      Customer Support:{' '}
-                      <a href="mailto:support@banwee.com" className="text-primary hover:underline">
-                        support@banwee.com
-                      </a>
-                      <br />
-                      Business Inquiries:{' '}
-                      <a href="mailto:info@banwee.com" className="text-primary hover:underline">
-                        info@banwee.com
-                      </a>
-                    </p>
-                  </div>
-                </div>
-                <div className="flex">
-                  <div className="mr-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <ClockIcon size={14} className="text-primary" />
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-copy mb-0.5">Working Hours</h3>
-                    <p className="text-xs text-copy-light">
+                    <Heading level={3} className="text-sm font-bold text-copy mb-0.5">Working Hours</Heading>
+                    <Body className="text-xs text-copy-light">
                       Monday - Friday: 9:00 AM - 6:00 PM EST
                       <br />
                       Saturday: 10:00 AM - 4:00 PM EST
                       <br />
                       Sunday: Closed
-                    </p>
+                    </Body>
                   </div>
                 </div>
               </div>
             </div>
             {/* FAQ Link */}
             <div className="bg-primary/10 rounded-lg p-3">
-              <h3 className="text-sm font-bold text-copy mb-1">Have a Question?</h3>
-              <p className="text-xs text-copy-light mb-2">
+              <Heading level={3} className="text-sm font-bold text-copy mb-1">Have a Question?</h3>
+              <Body className="text-xs text-copy-light mb-2">
                 Check our frequently asked questions for quick answers to common inquiries.
-              </p>
+              </Body>
               <Link to="/faq" className="inline-block text-xs text-primary hover:underline font-medium">
                 View FAQs
               </Link>
@@ -391,7 +352,7 @@ export const Contact = () => {
         {/* Map */}
         <motion.div className="mt-6" variants={itemVariants}>
           <div className="bg-surface rounded-lg shadow-sm p-3">
-            <h2 className="text-sm font-semibold text-copy mb-3">Find Us</h2>
+            <Heading level={2} className="text-sm font-semibold text-copy mb-3">Find Us</Heading>
             <div className="h-64 bg-border rounded-lg overflow-hidden">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.9663095343008!2d-74.00425872418978!3d40.74076097138946!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1685290225594!5m2!1sen!2sus"

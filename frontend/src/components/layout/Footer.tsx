@@ -55,15 +55,15 @@ export const Footer = () => {
           <div className="bg-background rounded-lg p-6 md:p-10 mb-12">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div className="mb-6 md:mb-0 md:mr-8">
-                <Heading level={3} className="text-lg font-semibold text-main mb-2">Manage Your Subscriptions</Heading>
-                <Body className="text-copy-light text-sm">Explore, set up, and manage your recurring orders and subscriptions.</Body>
+                <Heading level={3} weight="semibold">Manage Your Subscriptions</Heading>
+                <Text variant="body-sm" tone="secondary">Explore, set up, and manage your recurring orders and subscriptions.</Text>
               </div>
               <div className="flex-shrink-0 w-full md:w-auto">
                 <Link
                   to="/account/subscriptions"
                   className="bg-primary text-copy-inverse px-4 py-2 text-sm rounded-md hover:bg-primary-dark transition-colors flex items-center justify-center whitespace-nowrap"
                 >
-                  Go to Subscriptions
+                  <Text variant="body-sm">Go to Subscriptions</Text>
                   <ArrowRightIcon size={14} className="ml-2" />
                 </Link>
               </div>
@@ -80,31 +80,35 @@ export const Footer = () => {
                 <img src="/banwee_logo_text_green.png" alt="Banwee" className="h-6" />
               </div>
             </Link>
-            <p className="text-copy-light text-sm mb-6 max-w-md">
+            <Text variant="body-sm" tone="secondary" className="mb-6 max-w-md">
               Banwee brings you the finest organic products from Africa, ethically sourced and sustainably
               produced.
-            </p>
+            </Text>
             <div className="space-y-4">
               <div className="flex items-start">
                 <MapPinIcon size={20} className="text-primary flex-shrink-0 mr-3 mt-1" />
-                <p className="text-copy-light text-sm">
+                <Text variant="body-sm" tone="secondary">
                   1234 Fashion Street, Suite 567, New York, NY 10001
-                </p>
+                </Text>
               </div>
               <div className="flex items-center">
                 <MailIcon size={20} className="text-primary flex-shrink-0 mr-3" />
                 <a href="mailto:info@banwee.com" className="text-copy-light text-sm hover:text-primary">
+                <Text variant="body-sm" tone="secondary">
                   info@banwee.com
+                </Text>
                 </a>
               </div>
               <div className="flex items-center">
                 <PhoneIcon size={20} className="text-primary flex-shrink-0 mr-3" />
                 <a href="tel:+12125551234" className="text-copy-light text-sm hover:text-primary">
+                <Text variant="body-sm" tone="secondary">
                   (212) 555-1234
+                </Text>
                 </a>
               </div>
               <Link to="/contact" className="inline-flex items-center text-primary text-sm hover:underline">
-                Get direction
+                <Text variant="body-sm" tone="primary">Get direction</Text>
                 <ArrowRightIcon size={16} className="ml-2" />
               </Link>
             </div>
@@ -112,12 +116,12 @@ export const Footer = () => {
 
           {/* Categories */}
           <div>
-            <Heading level={5} className="text-sm font-semibold text-main mb-3">Shop Categories</Heading>
+            <Heading level={5} weight="semibold">Shop Categories</Heading>
             <ul className="space-y-3">
               {categories.map((category, index) => (
                 <li key={index}>
                   <Link to={category.path} className="text-copy-light text-sm hover:text-primary">
-                    {category.name}
+                  <Text variant="body-sm" tone="secondary">{category.name}</Text>
                   </Link>
                 </li>
               ))}
@@ -126,12 +130,12 @@ export const Footer = () => {
 
           {/* Help */}
           <div>
-            <Heading level={5} className="text-sm font-semibold text-main mb-3">Help</Heading>
+            <Heading level={5} weight="semibold">Help</Heading>
             <ul className="space-y-3">
               {helpLinks.map((link, index) => (
                 <li key={index}>
                   <Link to={link.path} className="text-copy-light text-sm hover:text-primary">
-                    {link.name}
+                    <Text variant="body-sm" tone="secondary">{link.name}</Text>
                   </Link>
                 </li>
               ))}
@@ -140,12 +144,12 @@ export const Footer = () => {
 
           {/* Account */}
           <div>
-            <Heading level={5} className="text-sm font-semibold text-main mb-3">My Account</Heading>
+            <Heading level={5} weight="semibold">My Account</Heading>
             <ul className="space-y-3">
               {accountLinks.map((link, index) => (
                 <li key={index}>
                   <Link to={link.path} className="text-copy-light text-sm hover:text-primary">
-                    {link.name}
+                    <Text variant="body-sm" tone="secondary">{link.name}</Text>
                   </Link>
                 </li>
               ))}
@@ -154,7 +158,7 @@ export const Footer = () => {
 
           {/* Mobile App */}
           <div>
-            <Heading level={5} className="text-sm font-semibold text-main mb-3">Follow Us</Heading>
+            <Heading level={5} weight="semibold">Follow Us</Heading>
             <div className="space-y-3">
               <a
                 href="#"
@@ -221,7 +225,7 @@ export const Footer = () => {
         <div className="mt-12 pt-6 border-t border-border-light">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <div className="mb-4 md:mb-0">
-              <p className="text-copy-light">© 2025 Banwee Store. All Rights Reserved.</p>
+              <Text variant="body-sm" tone="secondary">© 2025 Banwee Store. All Rights Reserved.</Text>
             </div>
             <nav className="flex space-x-6" aria-label="Social media links">
               <a 

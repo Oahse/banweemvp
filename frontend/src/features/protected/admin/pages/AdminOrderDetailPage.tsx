@@ -10,6 +10,7 @@ import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import AdminLayoutSkeleton from '../components/skeletons/AdminLayoutSkeleton';
 import { OrderDetailSkeleton } from '../components/skeletons/OrdersSkeleton';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface OrderDetail {
   id: string;
@@ -265,15 +266,15 @@ export const AdminOrderDetail = () => {
               className="flex items-center gap-2 text-primary hover:text-primary/80"
             >
               <ArrowLeft className="w-5 h-5" />
-              Back to Orders
+              <Text>Back to Orders</Text>
             </Button>
           </div>
 
           <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-destructive">Error</p>
-              <p className="text-destructive/80 text-sm">{error || 'Order not found'}</p>
+              <Body className="font-semibold text-destructive">Error</Body>
+              <Body className="text-destructive/80 text-sm">{error || 'Order not found'}</Body>
             </div>
           </div>
         </div>
@@ -298,8 +299,8 @@ export const AdminOrderDetail = () => {
               Back to Orders
             </Button>
             <div>
-              <h1 className="text-xl font-bold text-copy">Order #{order.order_number}</h1>
-              <p className="text-xs text-copy-light">{order.id}</p>
+              <Heading level={1} className="text-xl font-bold text-copy">Order #{order.order_number}</Heading>
+              <Body className="text-xs text-copy-light">{order.id}</Body>
             </div>
           </div>
           <Button
@@ -317,14 +318,14 @@ export const AdminOrderDetail = () => {
         <div>
           {previewLoading && (
             <div className="mb-4">
-              <p className="text-sm text-copy-light">Loading invoice preview...</p>
+              <Body className="text-sm text-copy-light">Loading invoice preview...</Body>
             </div>
           )}
 
           {invoicePreviewHtml && (
             <div className="mb-6 bg-surface rounded-lg border border-border-light p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="font-semibold">Invoice Preview</p>
+                <Body className="font-semibold">Invoice Preview</Body>
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => window.print()}
@@ -345,7 +346,7 @@ export const AdminOrderDetail = () => {
                 </div>
               </div>
               <div className="overflow-auto max-h-[60vh] border border-border-light">
-                <div className="p-4" dangerouslySetInnerHTML={{ __html: invoicePreviewHtml }} />
+                <Text as="div" className="p-4" html={invoicePreviewHtml || ''} />
               </div>
             </div>
           )}
@@ -356,43 +357,43 @@ export const AdminOrderDetail = () => {
           {/* Order Status */}
           <div className="bg-surface rounded-lg border border-border-light p-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-copy-light">Order Status</p>
+              <Body className="text-sm text-copy-light">Order Status</Body>
               <Package className="w-4 h-4 text-primary" />
             </div>
-            <p className={`px-3 py-1 rounded-full text-xs font-bold w-fit ${getStatusColor(order.order_status)}`}>
+            <Text className={`px-3 py-1 rounded-full text-xs font-bold w-fit ${getStatusColor(order.order_status)}`}>
               {formatStatus(order.order_status)}
-            </p>
+            </Text>
           </div>
 
           {/* Payment Status */}
           <div className="bg-surface rounded-lg border border-border-light p-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-copy-light">Payment Status</p>
+              <Body className="text-sm text-copy-light">Payment Status</Body>
               <DollarSign className="w-4 h-4 text-success" />
             </div>
-            <p className={`px-3 py-1 rounded-full text-xs font-bold w-fit ${getPaymentStatusColor(order.payment_status)}`}>
+            <Text className={`px-3 py-1 rounded-full text-xs font-bold w-fit ${getPaymentStatusColor(order.payment_status)}`}>
               {formatStatus(order.payment_status)}
-            </p>
+            </Text>
           </div>
 
           {/* Fulfillment Status */}
           <div className="bg-surface rounded-lg border border-border-light p-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-copy-light">Fulfillment</p>
+              <Body className="text-sm text-copy-light">Fulfillment</Body>
               <CheckCircle className="w-4 h-4 text-success" />
             </div>
-            <p className={`px-3 py-1 rounded-full text-xs font-small w-fit ${getFulfillmentStatusColor(order.fulfillment_status)}`}>
+            <Text className={`px-3 py-1 rounded-full text-xs font-small w-fit ${getFulfillmentStatusColor(order.fulfillment_status)}`}>
               {formatStatus(order.fulfillment_status)}
-            </p>
+            </Text>
           </div>
 
           {/* Order Total */}
           <div className="bg-surface rounded-lg border border-border-light p-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-copy-light">Total Amount</p>
+              <Body className="text-sm text-copy-light">Total Amount</Body>
               <DollarSign className="w-4 h-4 text-success" />
             </div>
-            <p className="text-base font-semibold text-copy">{formatCurrency(order.total_amount)}</p>
+            <Body className="text-base font-semibold text-copy">{formatCurrency(order.total_amount)}</Body>
           </div>
         </div>
 
@@ -422,51 +423,51 @@ export const AdminOrderDetail = () => {
             <div className="lg:col-span-2 space-y-6">
               {/* General Information */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <h3 className="text-base font-semibold text-copy mb-4">General Information</h3>
+                <Heading level={3} className="text-base font-semibold text-copy mb-4">General Information</Heading>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-copy-light">Order Date</p>
-                    <p className="text-copy font-semibold">
+                    <Text className="text-sm text-copy-light">Order Date</Text>
+                    <Text className="text-copy font-semibold">
                       {new Date(order.created_at).toLocaleDateString()} {new Date(order.created_at).toLocaleTimeString()}
-                    </p>
+                    </Text>
                   </div>
                   <div>
-                    <p className="text-sm text-copy-light">Last Updated</p>
-                    <p className="text-copy font-semibold">
+                    <Text className="text-sm text-copy-light">Last Updated</Text>
+                    <Text className="text-copy font-semibold">
                       {new Date(order.updated_at).toLocaleDateString()} {new Date(order.updated_at).toLocaleTimeString()}
-                    </p>
+                    </Text>
                   </div>
                   <div>
-                    <p className="text-sm text-copy-light">Order Source</p>
-                    <p className="text-copy font-semibold capitalize">{order.source || 'WEB'}</p>
+                    <Text className="text-sm text-copy-light">Order Source</Text>
+                    <Text className="text-copy font-semibold capitalize">{order.source || 'WEB'}</Text>
                   </div>
                   <div>
-                    <p className="text-sm text-copy-light">Currency</p>
-                    <p className="text-copy font-semibold">{order.currency}</p>
+                    <Text className="text-sm text-copy-light">Currency</Text>
+                    <Text className="text-copy font-semibold">{order.currency}</Text>
                   </div>
                 </div>
               </div>
 
               {/* Customer Information */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <h3 className="text-base font-semibold text-copy mb-4">Customer Information</h3>
+                <Heading level={3} className="text-base font-semibold text-copy mb-4">Customer Information</Heading>
                 <div className="space-y-3">
                   {order.user?.firstname && (
                     <div>
-                      <p className="text-sm text-copy-light">Name</p>
-                      <p className="text-copy font-semibold">
+                      <Text className="text-sm text-copy-light">Name</Text>
+                      <Text className="text-copy font-semibold">
                         {order.user.firstname} {order.user.lastname || ''}
-                      </p>
+                      </Text>
                     </div>
                   )}
                   <div>
-                    <p className="text-sm text-copy-light">Email</p>
-                    <p className="text-copy font-semibold">{order.user_email || order.user?.email}</p>
+                    <Text className="text-sm text-copy-light">Email</Text>
+                    <Text className="text-copy font-semibold">{order.user_email || order.user?.email}</Text>
                   </div>
                   {order.user?.phone && (
                     <div>
-                      <p className="text-sm text-copy-light">Phone</p>
-                      <p className="text-copy font-semibold">{order.user.phone}</p>
+                      <Text className="text-sm text-copy-light">Phone</Text>
+                      <Text className="text-copy font-semibold">{order.user.phone}</Text>
                     </div>
                   )}
                 </div>
@@ -474,17 +475,17 @@ export const AdminOrderDetail = () => {
 
               {/* Timeline */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <h3 className="text-base font-semibold text-copy mb-4">Order Timeline</h3>
+                <Heading level={3} className="text-base font-semibold text-copy mb-4">Order Timeline</Heading>
                 <div className="space-y-3">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center mt-1">
                       <Clock className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold text-copy">Order Placed</p>
-                      <p className="text-sm text-copy-light">
+                      <Text className="font-semibold text-copy">Order Placed</Text>
+                      <Text className="text-sm text-copy-light">
                         {new Date(order.created_at).toLocaleDateString()} {new Date(order.created_at).toLocaleTimeString()}
-                      </p>
+                      </Text>
                     </div>
                   </div>
 
@@ -494,10 +495,10 @@ export const AdminOrderDetail = () => {
                         <CheckCircle className="w-5 h-5 text-success" />
                       </div>
                       <div>
-                        <p className="font-semibold text-copy">Order Confirmed</p>
-                        <p className="text-sm text-copy-light">
+                        <Text className="font-semibold text-copy">Order Confirmed</Text>
+                        <Text className="text-sm text-copy-light">
                           {new Date(order.confirmed_at).toLocaleDateString()} {new Date(order.confirmed_at).toLocaleTimeString()}
-                        </p>
+                        </Text>
                       </div>
                     </div>
                   )}
@@ -508,10 +509,10 @@ export const AdminOrderDetail = () => {
                         <Truck className="w-5 h-5 text-primary" />
                       </div>
                       <div>
-                        <p className="font-semibold text-copy">Shipped</p>
-                        <p className="text-sm text-copy-light">
+                        <Text className="font-semibold text-copy">Shipped</Text>
+                        <Text className="text-sm text-copy-light">
                           {new Date(order.shipped_at).toLocaleDateString()} {new Date(order.shipped_at).toLocaleTimeString()}
-                        </p>
+                        </Text>
                       </div>
                     </div>
                   )}
@@ -522,10 +523,10 @@ export const AdminOrderDetail = () => {
                         <CheckCircle className="w-5 h-5 text-success" />
                       </div>
                       <div>
-                        <p className="font-semibold text-copy">Delivered</p>
-                        <p className="text-sm text-copy-light">
+                        <Text className="font-semibold text-copy">Delivered</Text>
+                        <Text className="text-sm text-copy-light">
                           {new Date(order.delivered_at).toLocaleDateString()} {new Date(order.delivered_at).toLocaleTimeString()}
-                        </p>
+                        </Text>
                       </div>
                     </div>
                   )}
@@ -537,7 +538,7 @@ export const AdminOrderDetail = () => {
             <div className="space-y-6">
               {/* Status Management */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <h3 className="text-base font-semibold text-copy mb-4">Update Status</h3>
+                <Heading level={3} className="text-base font-semibold text-copy mb-4">Update Status</Heading>
                 <div className="space-y-4">
                   <Dropdown
                     options={statusOptions.map(status => ({ value: status, label: status }))}
@@ -561,30 +562,30 @@ export const AdminOrderDetail = () => {
 
               {/* Pricing Breakdown */}
               <div className="bg-surface rounded-lg border border-border-light p-6">
-                <h3 className="text-base font-semibold text-copy mb-4">Pricing Details</h3>
+                <Heading level={3} className="text-base font-semibold text-copy mb-4">Pricing Details</Heading>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-copy-light">Subtotal</span>
-                    <span className="text-copy font-semibold">
+                    <Text className="text-copy-light">Subtotal</Text>
+                    <Text className="text-copy font-semibold">
                       {formatCurrency(order.subtotal || order.sub_total || 0)}
-                    </span>
+                    </Text>
                   </div>
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-copy-light">Shipping Cost</span>
-                    <span className="text-copy font-semibold">{formatCurrency(order.shipping_cost)}</span>
+                    <Text className="text-copy-light">Shipping Cost</Text>
+                    <Text className="text-copy font-semibold">{formatCurrency(order.shipping_cost)}</Text>
                   </div>
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-copy-light">
+                    <Text className="text-copy-light">
                       Tax ({((order.tax_rate ?? 0) * 100).toFixed(1)}%)
-                    </span>
-                    <span className="text-copy font-semibold">{formatCurrency(order.tax_amount)}</span>
+                    </Text>
+                    <Text className="text-copy font-semibold">{formatCurrency(order.tax_amount)}</Text>
                   </div>
 
                   <div className="border-t border-border-light pt-3 flex justify-between">
-                    <span className="text-sm text-copy font-semibold">Total</span>
-                    <span className="text-base font-semibold text-primary">{formatCurrency(order.total_amount)}</span>
+                    <Text className="text-sm text-copy font-semibold">Total</Text>
+                    <Text className="text-base font-semibold text-primary">{formatCurrency(order.total_amount)}</Text>
                   </div>
                 </div>
               </div>
@@ -592,22 +593,22 @@ export const AdminOrderDetail = () => {
               {/* Tracking Information */}
               {order.tracking_number && (
                 <div className="bg-surface rounded-lg border border-border-light p-6">
-                <h3 className="text-base font-semibold text-copy mb-4">Tracking Information</h3>
+                <Heading level={3} className="text-base font-semibold text-copy mb-4">Tracking Information</Heading>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-copy-light">Tracking Number</p>
-                      <p className="text-copy font-mono font-semibold">{order.tracking_number}</p>
+                      <Text className="text-sm text-copy-light">Tracking Number</Text>
+                      <Text className="text-copy font-mono font-semibold">{order.tracking_number}</Text>
                     </div>
                     {order.carrier && (
                       <div>
-                        <p className="text-sm text-copy-light">Carrier</p>
-                        <p className="text-copy font-semibold">{order.carrier}</p>
+                        <Text className="text-sm text-copy-light">Carrier</Text>
+                        <Text className="text-copy font-semibold">{order.carrier}</Text>
                       </div>
                     )}
                     {order.shipping_method && (
                       <div>
-                        <p className="text-sm text-copy-light">Shipping Method</p>
-                        <p className="text-copy font-semibold">{order.shipping_method}</p>
+                        <Text className="text-sm text-copy-light">Shipping Method</Text>
+                        <Text className="text-copy font-semibold">{order.shipping_method}</Text>
                       </div>
                     )}
                   </div>
@@ -621,7 +622,7 @@ export const AdminOrderDetail = () => {
         {activeTab === 'items' && (
           <div className="bg-surface rounded-lg border border-border-light overflow-hidden">
             <div className="p-6 border-b border-border-light">
-              <h3 className="text-base font-semibold text-copy">Order Items ({order.items?.length || 0})</h3>
+              <Heading level={3} className="text-base font-semibold text-copy">Order Items ({order.items?.length || 0})</Heading>
             </div>
 
             {order.items && order.items.length > 0 ? (
@@ -658,19 +659,27 @@ export const AdminOrderDetail = () => {
                             )}
                           </td>
                           <td className="px-6 py-4">
-                            <div className="text-sm font-semibold text-copy">
+                            <Text className="text-sm font-semibold text-copy">
                               {item.product_name ?? item.product?.name ?? 'N/A'}
-                            </div>
-                            <div className="text-xs text-copy-light mt-1">
+                            </Text>
+                            <Text className="text-xs text-copy-light mt-1">
                               ID: {item.product_id ?? 'N/A'}
-                            </div>
+                            </Text>
                           </td>
-                          <td className="px-6 py-4 text-sm text-copy-light">
-                            {item.variant_name ?? item.sku ?? item.variant?.sku ?? 'N/A'}
+                          <td className="px-6 py-4">
+                            <Text className="text-sm text-copy-light">
+                              {item.variant_name ?? item.sku ?? item.variant?.sku ?? 'N/A'}
+                            </Text>
                           </td>
-                          <td className="px-6 py-4 text-sm font-medium text-copy">{qty}</td>
-                          <td className="px-6 py-4 text-sm text-copy">{formatCurrency(unitPrice)}</td>
-                          <td className="px-6 py-4 text-sm font-bold text-copy">{formatCurrency(total)}</td>
+                          <td className="px-6 py-4">
+                            <Text className="text-sm font-medium text-copy">{qty}</Text>
+                          </td>
+                          <td className="px-6 py-4">
+                            <Text className="text-sm text-copy">{formatCurrency(unitPrice)}</Text>
+                          </td>
+                          <td className="px-6 py-4">
+                            <Text className="text-sm font-bold text-copy">{formatCurrency(total)}</Text>
+                          </td>
                         </tr>
                       );
                     })}
@@ -679,7 +688,7 @@ export const AdminOrderDetail = () => {
               </div>
             ) : (
               <div className="p-12 text-center">
-                <p className="text-copy-light text-base">No items in this order</p>
+                <Body className="text-copy-light text-base">No items in this order</Body>
               </div>
             )}
 
@@ -688,23 +697,23 @@ export const AdminOrderDetail = () => {
               <div className="px-6 py-4 bg-surface-light border-t border-border-light">
                 <div className="grid grid-cols-3 gap-4 text-right">
                   <div>
-                    <p className="text-xs text-copy-light mb-1">Total Items</p>
-                    <p className="text-base font-semibold text-copy">{order.items.reduce((sum, item) => sum + (item.quantity || 0), 0)}</p>
+                    <Text className="text-xs text-copy-light mb-1">Total Items</Text>
+                    <Text className="text-base font-semibold text-copy">{order.items.reduce((sum, item) => sum + (item.quantity || 0), 0)}</Text>
                   </div>
                   <div>
-                    <p className="text-xs text-copy-light mb-1">Total Cost</p>
-                    <p className="text-base font-semibold text-copy">
+                    <Text className="text-xs text-copy-light mb-1">Total Cost</Text>
+                    <Text className="text-base font-semibold text-copy">
                       {formatCurrency(order.items.reduce((sum, item) => sum + (Number(item.total_price) || 0), 0))}
-                    </p>
+                    </Text>
                   </div>
                   <div>
-                    <p className="text-xs text-copy-light mb-1">Average Price</p>
-                    <p className="text-base font-semibold text-copy">
+                    <Text className="text-xs text-copy-light mb-1">Average Price</Text>
+                    <Text className="text-base font-semibold text-copy">
                       {formatCurrency(
                         (order.items.reduce((sum, item) => sum + (Number(item.total_price) || 0), 0)) /
                         (order.items.length || 1)
                       )}
-                    </p>
+                    </Text>
                   </div>
                 </div>
               </div>
@@ -719,21 +728,21 @@ export const AdminOrderDetail = () => {
             <div className="bg-surface rounded-lg border border-border-light p-6">
               <div className="flex items-center gap-2 mb-4">
                 <MapPin className="w-5 h-5 text-primary" />
-                <h3 className="text-base font-semibold text-copy">Billing Address</h3>
+                <Heading level={3} className="text-base font-semibold text-copy">Billing Address</Heading>
               </div>
               {order.billing_address ? (
                 <div className="space-y-2 text-sm text-copy">
-                  <p className="font-semibold">{order.billing_address.full_name}</p>
-                  <p>{order.billing_address.street_address}</p>
-                  {order.billing_address.apartment && <p>{order.billing_address.apartment}</p>}
-                  <p>
+                  <Text className="font-semibold">{order.billing_address.full_name}</Text>
+                  <Text>{order.billing_address.street_address}</Text>
+                  {order.billing_address.apartment && <Text>{order.billing_address.apartment}</Text>}
+                  <Text>
                     {order.billing_address.city}, {order.billing_address.province} {order.billing_address.postal_code}
-                  </p>
-                  <p>{order.billing_address.country}</p>
-                  {order.billing_address.phone && <p className="mt-3 font-semibold">{order.billing_address.phone}</p>}
+                  </Text>
+                  <Text>{order.billing_address.country}</Text>
+                  {order.billing_address.phone && <Text className="mt-3 font-semibold">{order.billing_address.phone}</Text>}
                 </div>
               ) : (
-                <p className="text-copy-light">No billing address</p>
+                <Text className="text-copy-light">No billing address</Text>
               )}
             </div>
 
@@ -741,43 +750,43 @@ export const AdminOrderDetail = () => {
             <div className="bg-surface rounded-lg border border-border-light p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Truck className="w-5 h-5 text-primary" />
-                <h3 className="text-base font-semibold text-copy">Shipping Address</h3>
+                <Heading level={3} className="text-base font-semibold text-copy">Shipping Address</Heading>
               </div>
               {order.shipping_address ? (
                 <div className="space-y-2 text-sm text-copy">
-                  <p className="font-semibold">{order.shipping_address.full_name}</p>
-                  <p>{order.shipping_address.street_address}</p>
-                  {order.shipping_address.apartment && <p>{order.shipping_address.apartment}</p>}
-                  <p>
+                  <Text className="font-semibold">{order.shipping_address.full_name}</Text>
+                  <Text>{order.shipping_address.street_address}</Text>
+                  {order.shipping_address.apartment && <Text>{order.shipping_address.apartment}</Text>}
+                  <Text>
                     {order.shipping_address.city}, {order.shipping_address.province} {order.shipping_address.postal_code}
-                  </p>
-                  <p>{order.shipping_address.country}</p>
-                  {order.shipping_address.phone && <p className="mt-3 font-semibold">{order.shipping_address.phone}</p>}
+                  </Text>
+                  <Text>{order.shipping_address.country}</Text>
+                  {order.shipping_address.phone && <Text className="mt-3 font-semibold">{order.shipping_address.phone}</Text>}
                 </div>
               ) : (
-                <p className="text-copy-light">No shipping address</p>
+                <Text className="text-copy-light">No shipping address</Text>
               )}
             </div>
 
             {/* Shipping Details */}
             <div className="lg:col-span-2 bg-surface rounded-lg border border-border-light p-6">
-              <h3 className="text-base font-semibold text-copy mb-4">Shipping Details</h3>
+              <Heading level={3} className="text-base font-semibold text-copy mb-4">Shipping Details</Heading>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-sm text-copy-light">Method</p>
-                  <p className="text-copy font-semibold">{order.shipping_method || 'N/A'}</p>
+                  <Text className="text-sm text-copy-light">Method</Text>
+                  <Text className="text-copy font-semibold">{order.shipping_method || 'N/A'}</Text>
                 </div>
                 <div>
-                  <p className="text-sm text-copy-light">Cost</p>
-                  <p className="text-copy font-semibold">{formatCurrency(order.shipping_cost)}</p>
+                  <Text className="text-sm text-copy-light">Cost</Text>
+                  <Text className="text-copy font-semibold">{formatCurrency(order.shipping_cost)}</Text>
                 </div>
                 <div>
-                  <p className="text-sm text-copy-light">Tracking Number</p>
-                  <p className="text-copy font-mono">{order.tracking_number || 'N/A'}</p>
+                  <Text className="text-sm text-copy-light">Tracking Number</Text>
+                  <Text className="text-copy font-mono">{order.tracking_number || 'N/A'}</Text>
                 </div>
                 <div>
-                  <p className="text-sm text-copy-light">Carrier</p>
-                  <p className="text-copy font-semibold">{order.carrier || 'N/A'}</p>
+                  <Text className="text-sm text-copy-light">Carrier</Text>
+                  <Text className="text-copy font-semibold">{order.carrier || 'N/A'}</Text>
                 </div>
               </div>
             </div>
@@ -789,18 +798,18 @@ export const AdminOrderDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Customer Notes */}
             <div className="bg-surface rounded-lg border border-border-light p-6">
-              <h3 className="text-base font-semibold text-copy mb-4">Customer Notes</h3>
-              <p className="text-copy whitespace-pre-wrap">
+              <Heading level={3} className="text-base font-semibold text-copy mb-4">Customer Notes</Heading>
+              <Body className="text-copy whitespace-pre-wrap">
                 {order.customer_notes || '(No customer notes)'}
-              </p>
+              </Body>
             </div>
 
             {/* Internal Notes */}
             <div className="bg-surface rounded-lg border border-border-light p-6">
-              <h3 className="text-base font-semibold text-copy mb-4">Internal Notes</h3>
-              <p className="text-copy whitespace-pre-wrap">
+              <Heading level={3} className="text-base font-semibold text-copy mb-4">Internal Notes</Heading>
+              <Body className="text-copy whitespace-pre-wrap">
                 {order.internal_notes || '(No internal notes)'}
-              </p>
+              </Body>
             </div>
           </div>
         )}

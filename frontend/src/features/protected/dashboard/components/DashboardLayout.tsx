@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../AuthContext';
 import { Button } from '@/components/ui/Button';
+import { Heading, Text, Body } from '@/components/ui/Text/Text';
 
 import { 
   BarChart3Icon, 
@@ -14,7 +15,7 @@ import {
   DownloadIcon,
   FilterIcon
 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+ 
 
 /**
  * @typedef {object} DashboardWidget
@@ -100,12 +101,12 @@ export const DashboardLayout = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <Heading level={1} className="text-2xl font-bold text-gray-900 dark:text-white">
                 {title}
-              </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              </Heading>
+              <Text className="text-sm text-gray-500 dark:text-gray-400">
                 Last updated: {lastUpdated.toLocaleTimeString()}
-              </p>
+              </Text>
             </div>
             
             <div className="flex items-center gap-3">
@@ -221,13 +222,13 @@ const DashboardWidgetComponent = ({
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${getColSpan(widget.type)}`}>
       {/* Widget Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-3">
-          <span className="text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-3">
+          <Text as="span" className="text-gray-500 dark:text-gray-400">
             {getWidgetIcon(widget.type)}
-          </span>
-          <h3 className="font-semibold text-gray-900 dark:text-white">
+          </Text>
+          <Heading level={3} className="font-semibold text-gray-900 dark:text-white">
             {widget.title}
-          </h3>
+          </Heading>
         </div>
         
         <div className="flex items-center gap-2">
@@ -299,12 +300,12 @@ const WidgetContentComponent = ({ widget }) => {
     case 'metric':
       return (
         <div className="text-center">
-          <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <Heading level={3} className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             {widget.data.value}
-          </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          </Heading>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">
             {widget.data.label}
-          </div>
+          </Text>
           {widget.data.change && (
             <div className={`text-sm mt-2 ${
               widget.data.change > 0 ? 'text-green-600' : 'text-red-600'

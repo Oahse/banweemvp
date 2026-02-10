@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 interface SupportTicket {
   id: string;
@@ -50,13 +51,13 @@ const CustomerSupport: React.FC<CustomerSupportProps> = ({ className = '' }) => 
   return (
     <div className={`max-w-2xl mx-auto p-6 ${className}`}>
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Support</h2>
+        <Heading level={2} className="text-2xl font-bold text-gray-900 mb-6">Customer Support</Heading>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+            <Text className="block text-sm font-medium text-gray-700 mb-2">
               Subject
-            </label>
+            </Text>
             <input
               type="text"
               id="subject"
@@ -70,9 +71,9 @@ const CustomerSupport: React.FC<CustomerSupportProps> = ({ className = '' }) => 
           </div>
 
           <div>
-            <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">
+            <Text className="block text-sm font-medium text-gray-700 mb-2">
               Priority
-            </label>
+            </Text>
             <select
               id="priority"
               name="priority"
@@ -88,9 +89,9 @@ const CustomerSupport: React.FC<CustomerSupportProps> = ({ className = '' }) => 
           </div>
 
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+            <Text className="block text-sm font-medium text-gray-700 mb-2">
               Message
-            </label>
+            </Text>
             <textarea
               id="message"
               name="message"
@@ -118,18 +119,18 @@ const CustomerSupport: React.FC<CustomerSupportProps> = ({ className = '' }) => 
         </form>
 
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Other Ways to Get Help</h3>
-          <div className="space-y-3 text-sm text-gray-600">
-            <p>
-              <strong>Email:</strong> support@banwee.com
-            </p>
-            <p>
-              <strong>Phone:</strong> 1-800-BANWEE-1 (1-800-226-9331)
-            </p>
-            <p>
-              <strong>Hours:</strong> Monday - Friday, 9 AM - 6 PM EST
-            </p>
-          </div>
+          <Heading level={3} className="text-lg font-semibold text-gray-900 mb-4">Other Ways to Get Help</Heading>
+          <Body className="space-y-3 text-sm text-gray-600">
+            <Body>
+              <Text className="font-semibold">Email:</Text> support@banwee.com
+            </Body>
+            <Body>
+              <Text className="font-semibold">Phone:</Text> 1-800-BANWEE-1 (1-800-226-9331)
+            </Body>
+            <Body>
+              <Text className="font-semibold">Hours:</Text> Monday - Friday, 9 AM - 6 PM EST
+            </Body>
+          </Body>
         </div>
       </div>
     </div>

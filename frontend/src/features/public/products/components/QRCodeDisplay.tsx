@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { QrCodeIcon, DownloadIcon, PrinterIcon, CopyIcon, CheckIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 /**
  * @typedef {object} QRCodeDisplayProps
@@ -118,7 +119,7 @@ export const QRCodeDisplay = ({
       <div className={`flex items-center justify-center bg-surface-hover rounded-lg border-2 border-dashed border-border ${sizeClasses[size]} ${className || ''}`}>
         <div className="text-center">
           <QrCodeIcon size={24} className="text-copy-lighter mx-auto mb-2" />
-          <span className="text-xs text-copy-light">No QR Code</span>
+          <Text className="text-xs text-copy-light">No QR Code</Text>
         </div>
       </div>
     );

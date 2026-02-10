@@ -9,6 +9,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 const LIMIT = 10;
 
@@ -172,9 +173,9 @@ const AdminOrdersPage: React.FC = () => {
     };
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </span>
+      </Text>
     );
   };
 
@@ -188,9 +189,9 @@ const AdminOrdersPage: React.FC = () => {
     };
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </span>
+      </Text>
     );
   };
 
@@ -212,7 +213,7 @@ const AdminOrdersPage: React.FC = () => {
       <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
           <div>
-            <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage customer orders and fulfillment</p>
+            <Body className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage customer orders and fulfillment</Body>
           </div>
         </div>
         {/* Search and Filters */}
@@ -279,9 +280,9 @@ const AdminOrdersPage: React.FC = () => {
             {/* Active Filters */}
             {(debouncedSearchQuery || statusFilter || paymentStatusFilter) && (
               <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+                <Text className="text-sm text-gray-600 dark:text-gray-400">Active filters:</Text>
                 {debouncedSearchQuery && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                  <Text className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                     Search: "{debouncedSearchQuery}"
                     <Button
                       onClick={() => setSearchQuery('')}
@@ -290,10 +291,10 @@ const AdminOrdersPage: React.FC = () => {
                     >
                       ×
                     </Button>
-                  </span>
+                  </Text>
                 )}
                 {statusFilter && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                  <Text className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                     Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
                     <Button
                       onClick={() => setStatusFilter('')}
@@ -302,10 +303,10 @@ const AdminOrdersPage: React.FC = () => {
                     >
                       ×
                     </Button>
-                  </span>
+                  </Text>
                 )}
                 {paymentStatusFilter && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                  <Text className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                     Payment: {paymentStatusFilter.replace('_', ' ').charAt(0).toUpperCase() + paymentStatusFilter.slice(1).replace('_', ' ')}
                     <Button
                       onClick={() => setPaymentStatusFilter('')}
@@ -314,7 +315,7 @@ const AdminOrdersPage: React.FC = () => {
                     >
                       ×
                     </Button>
-                  </span>
+                  </Text>
                 )}
                 <Button
                   onClick={() => {
@@ -340,8 +341,8 @@ const AdminOrdersPage: React.FC = () => {
             }`}>
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <p className="font-semibold">Error Loading Orders</p>
-                <p className="text-sm mt-1">{error}</p>
+                <Body className="font-semibold">Error Loading Orders</Body>
+                <Body className="text-sm mt-1">{error}</Body>
                 <Button
                   onClick={() => window.location.reload()}
                   variant="ghost"

@@ -63,12 +63,10 @@ class ErrorBoundary extends Component<Props, State> {
             </Body>
             {this.state.error && (
               <details className="mb-3 text-left">
-                <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:text-main dark:hover:text-white">
-                  Error details
-                </summary>
-                <pre className="mt-2 text-xs bg-gray-50 dark:bg-gray-700 p-3 rounded overflow-auto max-h-40">
+                <Text variant="caption" className="cursor-pointer" tone="secondary">Error details</Text>
+                <Text variant="caption" className="mt-2 bg-gray-50 dark:bg-gray-700 p-3 rounded overflow-auto max-h-40">
                   {this.state.error.toString()}
-                </pre>
+                </Text>
               </details>
             )}
             <Button
@@ -77,7 +75,7 @@ class ErrorBoundary extends Component<Props, State> {
               size="sm"
               className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition-colors text-xs"
             >
-              Reload Page
+              <Text variant="body-sm">Reload Page</Text>
             </Button>
           </div>
         </div>

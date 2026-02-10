@@ -3,6 +3,7 @@ import { ChevronLeftIcon, ChevronRightIcon, ZoomInIcon, XIcon, PackageIcon } fro
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../../../utils/utils';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text/Text';
 
 export const ProductImageGallery = ({
   images,
@@ -63,10 +64,10 @@ export const ProductImageGallery = ({
       <div className={cn('bg-surface rounded-lg flex flex-col items-center justify-center h-96', className)}>
         <div className="text-center">
           <div className="w-24 h-24 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
-            <span className="text-gray-400 text-4xl">📷</span>
+            <Text className="text-gray-400 text-4xl">📷</Text>
           </div>
-          <span className="text-gray-500 font-medium">No images available</span>
-          <span className="text-gray-400 text-sm mt-1">This product doesn't have any images yet</span>
+          <Text className="text-gray-500 font-medium">No images available</Text>
+          <Text className="text-gray-400 text-sm mt-1">This product doesn't have any images yet</Text>
         </div>
       </div>
     );

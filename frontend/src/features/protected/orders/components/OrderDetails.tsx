@@ -4,6 +4,7 @@ import TrackingTimeline from './TrackingTimeline';
 import TrackingMap from './TrackingMap';
 import OrderNotes from './OrderNotes';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 
 
@@ -60,21 +61,19 @@ const OrderDetails = ({
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              Order #{order.id.slice(-8)}
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <Heading level={2} weight="semibold">Order #{order.id.slice(-8)}</Heading>
+            <Text variant="body-sm" tone="secondary">
               Placed on {format(new Date(order.created_at), 'MMM dd, yyyy')}
-            </p>
+            </Text>
           </div>
           <div className="flex items-center space-x-3">
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+            <Text variant="body-sm" className={`px-3 py-1 rounded-full font-medium ${getStatusColor(order.status)}`}>
               {order.status}
-            </span>
+            </Text>
             {order.tracking_number && (
-              <div className="text-sm text-gray-600">
+              <Text variant="body-sm" tone="secondary">
                 Tracking: {order.tracking_number}
-              </div>
+              </Text>
             )}
           </div>
         </div>
@@ -82,7 +81,7 @@ const OrderDetails = ({
         {/* Status update for suppliers/admins */}
         {editable && (
           <div className="mt-4 flex items-center space-x-3">
-            <label className="text-sm font-medium text-gray-700">Update Status:</label>
+            <Text variant="body-sm" weight="medium">Update Status:</Text>
             <select
               className="border border-gray-300 rounded-md px-3 py-1 text-sm"
               value={order.status}
@@ -97,7 +96,7 @@ const OrderDetails = ({
               <option value="Returned">Returned</option>
             </select>
             {isUpdatingStatus && (
-              <div className="text-sm text-gray-500">Updating...</div>
+              <Text variant="body-sm" tone="secondary">Updating...</Text>
             )}
           </div>
         )}
@@ -153,32 +152,32 @@ const OrderDetails = ({
           <div className="space-y-6">
             {/* Order Summary */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Order Summary</h3>
+              <Heading level={3} weight="medium">Order Summary</Heading>
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">Subtotal</span>
-                  <span className="text-sm font-medium">{order.currency}{order.total_amount}</span>
+                  <Text variant="body-sm" tone="secondary">Subtotal</Text>
+                  <Text variant="body-sm" weight="medium">{order.currency}{order.total_amount}</Text>
                 </div>
                 <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                  <span className="text-base font-medium text-gray-900">Total</span>
-                  <span className="text-base font-medium text-gray-900">{order.currency}{order.total_amount}</span>
+                  <Text variant="body" weight="medium">Total</Text>
+                  <Text variant="body" weight="medium">{order.currency}{order.total_amount}</Text>
                 </div>
               </div>
             </div>
 
             {/* Order Items */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Items ({order.items.length})</h3>
+              <Heading level={3} weight="medium">Items ({order.items.length})</Heading>
               <div className="space-y-4">
                 {order.items.map((item) => (
                   <div key={item.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">Product ID: {item.product_id}</p>
-                      <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
-                      <p className="text-sm text-gray-600">Price per unit: {order.currency}{item.price_per_unit}</p>
+                      <Text variant="body-sm" weight="medium">Product ID: {item.product_id}</Text>
+                      <Text variant="caption" tone="secondary">Quantity: {item.quantity}</Text>
+                      <Text variant="caption" tone="secondary">Price per unit: {order.currency}{item.price_per_unit}</Text>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-gray-900">{order.currency}{item.total_price}</p>
+                      <Text variant="body-sm" weight="medium">{order.currency}{item.total_price}</Text>
                     </div>
                   </div>
                 ))}

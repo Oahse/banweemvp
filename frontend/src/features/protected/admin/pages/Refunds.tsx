@@ -226,9 +226,9 @@ export const Refunds = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.requested;
     
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <Text className={`px-2 py-1 rounded-full font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </span>
+      </Text>
     );
   };
 
@@ -331,7 +331,7 @@ export const Refunds = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage refund requests and processing</p>
+          <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage refund requests and processing</Text>
         </div>
       </div>
 
@@ -403,17 +403,17 @@ export const Refunds = () => {
               }`}
             >
               <ArrowUpDownIcon size={16} />
-              <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
-              <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
+              <Text variant="body-sm" className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</Text>
+              <Text variant="body-sm" className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</Text>
             </Button>
           </div>
 
           {/* Active Filters */}
           {(debouncedSearchQuery || statusFilter) && (
             <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+              <Text variant="body-sm" tone="secondary">Active filters:</Text>
               {debouncedSearchQuery && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
                   Search: "{debouncedSearchQuery}"
                   <Button
                     onClick={() => setSearchQuery('')}
@@ -423,10 +423,10 @@ export const Refunds = () => {
                     leftIcon={<X size={12} />}
                   >
                   </Button>
-                </span>
+                </Text>
               )}
               {statusFilter && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
                   Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
                   <Button
                     onClick={() => setStatusFilter('')}
@@ -436,7 +436,7 @@ export const Refunds = () => {
                     leftIcon={<X size={12} />}
                   >
                   </Button>
-                </span>
+                </Text>
               )}
               <Button
                 onClick={() => {
@@ -462,8 +462,8 @@ export const Refunds = () => {
         }`}>
           <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold">Error</p>
-            <p className="text-sm">{error}</p>
+            <Text weight="semibold">Error</Text>
+            <Text variant="body-sm">{error}</Text>
           </div>
         </div>
       )}
@@ -480,14 +480,14 @@ export const Refunds = () => {
               <table className="w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Refund ID</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Order ID</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Customer</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Amount</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Reason</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Date</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Actions</th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Refund ID</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Order ID</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Customer</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Amount</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Status</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Reason</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Date</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Actions</Text></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -497,13 +497,13 @@ export const Refunds = () => {
                       onClick={() => handleView(refund)}
                       className={`border-b cursor-pointer ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}
                     >
-                      <td className={`px-4 py-3 text-xs font-mono text-primary max-w-[100px] truncate`}>{String(refund.id).slice(0, 8)}</td>
-                      <td className={`px-4 py-3 text-xs font-mono ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-[100px] truncate`}>{String(refund.order_id).slice(0, 8)}</td>
-                      <td className={`px-4 py-3 text-xs font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'} max-w-[150px] truncate`}>{refund.customer_name || 'N/A'}</td>
-                      <td className={`px-4 py-3 text-xs font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(refund.amount, refund.currency)}</td>
-                      <td className="px-4 py-3 text-xs">{statusBadge(refund.status)}</td>
-                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-[200px] truncate`}>{refund.reason || 'No reason provided'}</td>
-                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(refund.created_at || '').toLocaleDateString()}</td>
+                      <td className="px-4 py-3 max-w-[100px] truncate"><Text variant="caption" tone="primary" truncate="single">{String(refund.id).slice(0, 8)}</Text></td>
+                      <td className="px-4 py-3 max-w-[100px] truncate"><Text variant="caption" tone="secondary" truncate="single">{String(refund.order_id).slice(0, 8)}</Text></td>
+                      <td className="px-4 py-3 max-w-[150px] truncate"><Text variant="caption" weight="medium" truncate="single">{refund.customer_name || 'N/A'}</Text></td>
+                      <td className="px-4 py-3"><Text variant="caption" weight="semibold">{formatCurrency(refund.amount, refund.currency)}</Text></td>
+                      <td className="px-4 py-3">{statusBadge(refund.status)}</td>
+                      <td className="px-4 py-3 max-w-[200px] truncate"><Text variant="caption" tone="secondary" truncate="single">{refund.reason || 'No reason provided'}</Text></td>
+                      <td className="px-4 py-3"><Text variant="caption" tone="secondary">{new Date(refund.created_at || '').toLocaleDateString()}</Text></td>
                       <td className="px-4 py-3 text-xs">
                         <div className="flex gap-1">
                           <Button 
@@ -534,20 +534,20 @@ export const Refunds = () => {
                   className={`p-4 flex flex-col gap-2 cursor-pointer ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-mono text-primary truncate">{String(refund.id).slice(0, 8)}</span>
+                    <Text variant="caption" tone="primary" truncate="single">{String(refund.id).slice(0, 8)}</Text>
                     {statusBadge(refund.status)}
                   </div>
-                  <div className={`text-sm font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'} truncate`}>{refund.customer_name || 'N/A'}</div>
+                  <Text variant="body-sm" weight="medium" truncate="single">{refund.customer_name || 'N/A'}</Text>
                   <div className="flex items-center justify-between gap-2">
-                    <span className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Order:</span>
-                    <span className={`text-xs font-mono ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>{String(refund.order_id).slice(0, 8)}</span>
+                    <Text variant="caption" tone="secondary">Order:</Text>
+                    <Text variant="caption" tone="secondary" truncate="single">{String(refund.order_id).slice(0, 8)}</Text>
                   </div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Amount:</span>
-                    <span className={`text-xs font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{formatCurrency(refund.amount, refund.currency)}</span>
+                    <Text variant="caption" tone="secondary">Amount:</Text>
+                    <Text variant="caption" weight="semibold" tone="secondary">{formatCurrency(refund.amount, refund.currency)}</Text>
                   </div>
-                  <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>{refund.reason || 'No reason provided'}</div>
-                  <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{new Date(refund.created_at || '').toLocaleDateString()}</div>
+                  <Text variant="caption" tone="secondary" truncate="single">{refund.reason || 'No reason provided'}</Text>
+                  <Text variant="caption" tone="secondary">{new Date(refund.created_at || '').toLocaleDateString()}</Text>
                   <Button 
                     onClick={(e) => {
                       e.stopPropagation();
@@ -569,13 +569,13 @@ export const Refunds = () => {
 
         {/* Pagination - Always visible */}
         <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-          <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+          <Body className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
             {pagination.total > 0
               ? `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} items`
               : `Total: ${pagination.total} items`
             }
             {pagination.total > 0 && pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages || 1})`}
-          </p>
+          </Body>
           <div className="flex items-center gap-1">
               <Button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -627,7 +627,7 @@ export const Refunds = () => {
                     : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
                 }`}
               >
-                <span className="hidden sm:inline">Next</span>
+                <Text className="hidden sm:inline">Next</Text>
                 <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4" />
               </Button>
           </div>
@@ -650,7 +650,7 @@ export const Refunds = () => {
                 size="sm"
                 className={`p-1 rounded-lg transition-colors ${currentTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
               >
-                <span className="text-xl">×</span>
+                <Text className="text-xl">×</Text>
               </Button>
             </div>
 
@@ -722,9 +722,9 @@ export const Refunds = () => {
                       {viewingRefund.refund_items.map((item) => (
                         <div key={item.id} className={`px-4 py-2 text-sm ${currentTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
                           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                            <span className="font-mono">{item.order_item_id}</span>
-                            <span>Qty: {item.quantity_to_refund}</span>
-                            <span className="font-mono">${item.total_refund_amount.toFixed(2)}</span>
+                            <Text className="font-mono">{item.order_item_id}</Text>
+                            <Text>Qty: {item.quantity_to_refund}</Text>
+                            <Text className="font-mono">${item.total_refund_amount.toFixed(2)}</Text>
                           </div>
                           {item.condition_notes && (
                             <Body className={`mt-1 text-xs ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>

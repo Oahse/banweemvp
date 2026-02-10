@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../utils/utils';
 import { CheckIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Heading, Text } from '@/components/ui/Text/Text';
+import { Heading, Text, Label } from '@/components/ui/Text/Text';
 
 /**
  * @typedef {object} ProductVariantAttribute
@@ -179,26 +179,26 @@ export const VariantSelector = ({
                     <div className="flex items-center justify-between mt-1">
                       {showPrice && (
                         <div className="flex items-center space-x-2">
-                          <span className="font-semibold text-primary">
+                          <Text className="font-semibold text-primary">
                             ${getVariantPrice(variant).toFixed(2)}
-                          </span>
+                          </Text>
                           {variant.sale_price && (
-                            <span className="text-sm text-gray-500 line-through">
+                            <Text className="text-sm text-gray-500 line-through">
                               ${variant.base_price.toFixed(2)}
-                            </span>
+                            </Text>
                           )}
                         </div>
                       )}
                       
                       {showStock && (
-                        <span className={cn(
+                        <Text className={cn(
                           'text-xs px-2 py-1 rounded-full',
                           isAvailable
                             ? 'bg-success-100 text-success-800'
                             : 'bg-error-100 text-error-800'
                         )}>
                           {isAvailable ? `${variant.stock} in stock` : 'Out of stock'}
-                        </span>
+                        </Text>
                       )}
                     </div>
                   </div>
@@ -265,8 +265,8 @@ export const VariantSelector = ({
       <div className="p-3 bg-surface rounded-lg">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-sm font-medium text-copy">Selected:</span>
-            <span className="ml-2 text-sm text-copy">{selectedVariant?.name || 'Default'}</span>
+            <Text className="text-sm font-medium text-copy">Selected:</Text>
+            <Text className="ml-2 text-sm text-copy">{selectedVariant?.name || 'Default'}</Text>
           </div>
           {showPrice && selectedVariant && (
             <div className="text-right">

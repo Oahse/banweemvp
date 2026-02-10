@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, CreditCard, Banknote, Smartphone, CheckCircle } from 'lucide-react';
+import { Text, Heading, Body, Caption, Code } from '@/components/ui/Text/Text';
 import PaymentsAPI from '@/api/payments';
 import StripeCardForm from '../../checkout/components/StripeCardForm';
 import { toast } from 'react-hot-toast';
@@ -140,7 +141,7 @@ const AccountPaymentMethodsPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white"></h1>
+        <Heading level={1} className="text-lg md:text-xl font-bold text-gray-900 dark:text-white" />
         <Button
           onClick={() => setShowStripeForm(true)}
           variant="primary"
@@ -154,7 +155,7 @@ const AccountPaymentMethodsPage = () => {
       {showStripeForm && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-base font-semibold">Add Payment Method</h3>
+            <Heading level={3} className="text-base font-semibold">Add Payment Method</Heading>
             <Button
               onClick={() => setShowStripeForm(false)}
               variant="ghost"
@@ -175,8 +176,8 @@ const AccountPaymentMethodsPage = () => {
         {paymentMethods.length === 0 ? (
           <div className="text-center py-6 bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
               <CreditCard className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1">No payment methods</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Add a payment method to make checkout faster</p>
+              <Heading level={3} className="text-sm font-medium text-gray-900 dark:text-white mb-1">No payment methods</Heading>
+              <Caption className="text-xs text-gray-500 dark:text-gray-400 mb-2">Add a payment method to make checkout faster</Caption>
               <Button
                 onClick={() => setShowStripeForm(true)}
                 variant="primary"
@@ -205,36 +206,30 @@ const AccountPaymentMethodsPage = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-0">
-                    <h3 className="font-medium text-sm md:text-base text-gray-900 dark:text-white">
+                    <Heading level={3} className="font-medium text-sm md:text-base text-gray-900 dark:text-white">
                       {method.type === 'card' ? (
                         method.provider ? method.provider.charAt(0).toUpperCase() + method.provider.slice(1) : 'Card'
                       ) : (
                         method.provider || 'Payment Method'
                       )}
-                    </h3>
+                    </Heading>
                     {method.is_default && (
-                      <span className="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">
-                        Default
-                      </span>
+                      <Caption className="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">Default</Caption>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-0">
+                  <Body className="text-sm text-gray-600 dark:text-gray-400 mb-0">
                     {method.type === 'card' && method.last_four ? (
                       <>
-                        <span className="font-mono">•••• {method.last_four}</span>
+                        <Code className="font-mono">•••• {method.last_four}</Code>
                         {method.expiry_month && method.expiry_year && (
-                          <span className="ml-3 text-xs">
-                            Valid thru {method.expiry_month}/{method.expiry_year.toString().slice(-2)}
-                          </span>
+                          <Caption className="ml-3 text-xs">Valid thru {method.expiry_month}/{method.expiry_year.toString().slice(-2)}</Caption>
                         )}
                       </>
                     ) : (
-                      <span>{method.provider || 'Payment Method'}</span>
+                      <Text as="span">{method.provider || 'Payment Method'}</Text>
                     )}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Added on {method.created_at ? new Date(method.created_at).toLocaleDateString() : 'Unknown date'}
-                  </p>
+                  </Body>
+                  <Caption className="text-xs text-gray-500 dark:text-gray-400 mt-1">Added on {method.created_at ? new Date(method.created_at).toLocaleDateString() : 'Unknown date'}</Caption>
                 </div>
               </div>
               <div className="flex items-center gap-2">

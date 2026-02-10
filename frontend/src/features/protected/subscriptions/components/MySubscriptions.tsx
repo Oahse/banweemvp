@@ -144,9 +144,7 @@ export const MySubscriptions = () => {
     return (
       <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
         <PackageIcon size={48} className="text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-        <p className="text-gray-600 dark:text-gray-400 mb-3">
-          Unable to load subscriptions
-        </p>
+        <Text variant="body" tone="secondary">Unable to load subscriptions</Text>
         <Button
           onClick={() => refreshSubscriptions()} 
           variant="ghost"
@@ -163,9 +161,9 @@ export const MySubscriptions = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <p className="text-xs text-gray-600 dark:text-gray-300">
+          <Text variant="caption" tone="secondary">
             Manage your active and past subscriptions
-          </p>
+          </Text>
         </div>
         <div className="flex gap-2">
           <Button
@@ -205,12 +203,12 @@ export const MySubscriptions = () => {
       {subscriptions.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm text-center py-8">
           <PackageIcon size={32} className="text-gray-400 mx-auto mb-3" />
-          <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+          <Text variant="caption" tone="secondary">
             {activeTab === 'all' 
               ? "You don't have any subscriptions yet." 
               : `No ${activeTab} subscriptions found.`
             }
-          </p>
+          </Text>
           <Button
             onClick={() => setShowCreateModal(true)}
             variant="primary"
@@ -341,9 +339,7 @@ export const MySubscriptions = () => {
                 {/* Subscription Settings */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Subscription Name
-                    </label>
+                    <Text variant="caption" weight="medium">Subscription Name</Text>
                     <input
                       type="text"
                       value={newSubscriptionData.name}
@@ -352,15 +348,13 @@ export const MySubscriptions = () => {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs"
                       maxLength={255}
                     />
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    <Text variant="caption" tone="secondary">
                       Give your subscription a descriptive name (max 255 characters)
-                    </p>
+                    </Text>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Billing Cycle
-                    </label>
+                    <Text variant="caption" weight="medium">Billing Cycle</Text>
                     <select
                       value={newSubscriptionData.billing_cycle}
                       onChange={(e) => setNewSubscriptionData({...newSubscriptionData, billing_cycle: e.target.value})}
@@ -373,9 +367,7 @@ export const MySubscriptions = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Delivery Type
-                    </label>
+                    <Text variant="caption" weight="medium">Delivery Type</Text>
                     <select
                       value={newSubscriptionData.delivery_type}
                       onChange={(e) => setNewSubscriptionData({...newSubscriptionData, delivery_type: e.target.value})}
@@ -400,9 +392,9 @@ export const MySubscriptions = () => {
                 {/* Product Selection */}
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
+                    <Text variant="caption" weight="medium">
                       Select Product Variants ({selectedProducts.size} selected)
-                    </label>
+                    </Text>
                     <div className="relative">
                       <SearchIcon size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
@@ -422,7 +414,7 @@ export const MySubscriptions = () => {
                     {availableProducts.length === 0 ? (
                       <div className="text-center py-8">
                         <PackageIcon size={32} className="text-gray-400 mx-auto mb-2" />
-                        <p className="text-xs text-gray-500">No products found</p>
+                        <Text variant="caption" tone="secondary">No products found</Text>
                       </div>
                     ) : (
                       <div className="divide-y divide-gray-200 dark:divide-gray-600">

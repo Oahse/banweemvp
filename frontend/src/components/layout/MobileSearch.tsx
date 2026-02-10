@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { SearchIcon, XIcon } from 'lucide-react';
 import { useCategories } from '../shared/contexts/CategoryContext';
 import { Button } from '@/components/ui/Button';
+import { Heading, Text } from '@/components/ui/Text/Text';
 
 /**
  * @typedef {object} MobileSearchProps
@@ -49,7 +50,7 @@ export const MobileSearch = ({
       <div className="bg-surface w-full text-copy">
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-main">Search Products</h3>
+            <Heading level={3} className="text-lg font-semibold text-main">Search Products</Heading>
             <Button onClick={onClose} variant="ghost" size="sm" className="p-1 hover:bg-background rounded-md">
               <XIcon size={24} />
             </Button>
@@ -76,7 +77,7 @@ export const MobileSearch = ({
 
           {/* Popular Searches */}
           <div className="mb-6">
-            <h4 className="text-sm font-medium text-copy-light mb-2">Popular Searches</h4>
+            <Text as="h4" className="text-sm font-medium text-copy-light mb-2">Popular Searches</Text>
             <div className="flex flex-wrap gap-2">
               {popularSearches.map((term, index) => (
                 <Button
@@ -97,12 +98,12 @@ export const MobileSearch = ({
 
           {/* Popular Categories */}
           <div>
-            <h4 className="text-sm font-medium text-copy-light mb-2">Popular Categories</h4>
+            <Text as="h4" className="text-sm font-medium text-copy-light mb-2">Popular Categories</Text>
             <div className="grid grid-cols-2 gap-2">
               {loading ? (
-                <p>Loading categories...</p>
+                <Text>Loading categories...</Text>
               ) : error ? (
-                <p>Error loading categories: {error}</p>
+                <Text>Error loading categories: {error}</Text>
               ) : (
                 popularCategories?.map((category, index) => (
                   <Button

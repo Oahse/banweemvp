@@ -3,6 +3,7 @@ import { SearchIcon, FilterIcon, XIcon, CalendarIcon } from 'lucide-react';
 import Dropdown from '../../ui/Dropdown';
 import { useTheme } from '../../../store/ThemeContext';
 import { Button } from '@/components/ui/Button';
+import { Label, Text } from '@/components/ui/Text/Text';
 
 export interface FilterOption {
   value: string;
@@ -62,9 +63,9 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'select':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
-            </label>
+            </Label>
             <Dropdown
               options={filter.options || [{ value: '', label: filter.placeholder || `Select ${filter.label}` }]}
               value={value}
@@ -78,9 +79,9 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'text':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
-            </label>
+            </Label>
             <input
               type="text"
               placeholder={filter.placeholder || `Filter by ${filter.label}`}
@@ -94,9 +95,9 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'date':
         return (
           <div key={filter.key} className="min-w-[150px]">
-            <label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
-            </label>
+            </Label>
             <input
               type="date"
               value={value}
@@ -109,9 +110,9 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
       case 'daterange':
         return (
           <div key={filter.key} className="min-w-[200px]">
-            <label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
+            <Label className={`block text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'} mb-1`}>
               {filter.label}
-            </label>
+            </Label>
             <div className="flex items-center space-x-2">
               <input
                 type="date"
@@ -202,10 +203,10 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
         {/* Active Filters Display */}
         {(hasActiveFilters || hasActiveSearch) && (
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+            <Text className="text-sm text-gray-600 dark:text-gray-400">Active filters:</Text>
             
             {hasActiveSearch && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">
+              <Text className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">
                 Search: {searchValue}
                 <Button
                   onClick={() => onSearchChange('')}
@@ -215,12 +216,12 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                   leftIcon={<XIcon size={14} />}
                 >
                 </Button>
-              </span>
+              </Text>
             )}
             
             {Object.entries(values).map(([key, value]) => (
               value && (
-                <span
+                <Text
                   key={key}
                   className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                 >
@@ -233,7 +234,7 @@ export const AdminFilterBar: React.FC<AdminFilterBarProps> = ({
                     leftIcon={<XIcon size={14} />}
                   >
                   </Button>
-                </span>
+                </Text>
               )
             ))}
           </div>

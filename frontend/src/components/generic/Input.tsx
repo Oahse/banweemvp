@@ -1,4 +1,5 @@
 import React from 'react';
+import { Text } from '@/components/ui/Text/Text';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -20,9 +21,7 @@ export const Input: React.FC<InputProps> = ({
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-copy">
-          {label}
-        </label>
+        <Text variant="body-sm" weight="medium">{label}</Text>
       )}
       <input
         type={type}
@@ -30,8 +29,8 @@ export const Input: React.FC<InputProps> = ({
         className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 bg-surface text-copy transition-colors ${error ? 'border-error focus:ring-error/50' : 'border-border focus:ring-primary/50 hover:border-border-strong'} ${className || ''}`}
         {...props}
       />
-      {error && <p className="text-sm text-error mt-1">{error}</p>}
-      {helperText && !error && <p className="text-sm text-copy-lighter mt-1">{helperText}</p>}
+      {error && <Text variant="body-sm" className="text-error">{error}</Text>}
+      {helperText && !error && <Text variant="body-sm" tone="secondary">{helperText}</Text>}
     </div>
   );
 };

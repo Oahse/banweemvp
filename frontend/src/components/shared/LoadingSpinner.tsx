@@ -1,4 +1,5 @@
 import React from 'react';
+import { Text } from '@/components/ui/Text/Text';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -36,9 +37,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
         aria-label="Loading"
       />
       {text && (
-        <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm">
-          {text}
-        </p>
+        <Text variant="body-sm" tone="secondary">{text}</Text>
       )}
     </div>
   );

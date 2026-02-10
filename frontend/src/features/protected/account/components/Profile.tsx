@@ -3,10 +3,10 @@ import { UserIcon, MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, GlobeIcon, Sav
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../../AuthContext';
 import { AuthAPI } from '@/api';
-import { unwrapResponse, extractErrorMessage } from '../../utils/api-response';
+import { unwrapResponse, extractErrorMessage } from '@/utils/utils/api-response';
 import { SkeletonProfile } from '../ui/SkeletonProfile';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Body, Text, Label, Caption } from '@/components/ui/Text/Text';
 /**
  * Profile component allows users to view and edit their personal information.
  */
@@ -133,16 +133,16 @@ export const Profile = () => {
               </Heading>
               <Body className="text-xs text-gray-600 dark:text-gray-300">{user.email}</Body>
               <div className="flex items-center mt-1">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                <Text variant="caption" className={`inline-flex items-center px-2 py-0.5 rounded-full font-medium ${
                   user.verified 
                     ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
                     : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
                 }`}>
                   {user.verified ? '✓ Verified' : '⚠ Unverified'}
-                </span>
-                <span className="ml-2 text-xs text-gray-600 dark:text-gray-300 capitalize">
+                </Text>
+                <Text variant="caption" className="ml-2 capitalize">
                   {user.role}
-                </span>
+                </Text>
               </div>
             </div>
           </div>
@@ -153,7 +153,7 @@ export const Profile = () => {
               size="sm"
               className="px-3 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors text-sm"
             >
-              Edit Profile
+              <Text variant="body-sm">Edit Profile</Text>
             </Button>
           )}
         </div>
@@ -170,9 +170,7 @@ export const Profile = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {/* First Name */}
               <div>
-                <Label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  First Name *
-                </Label>
+                <Label>First Name *</Label>
                 <input
                   type="text"
                   name="firstname"
@@ -185,9 +183,7 @@ export const Profile = () => {
 
               {/* Last Name */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Last Name *
-                </label>
+                <Label>Last Name *</Label>
                 <input
                   type="text"
                   name="lastname"
@@ -200,9 +196,7 @@ export const Profile = () => {
 
               {/* Email */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Email *
-                </label>
+                <Label>Email *</Label>
                 <input
                   type="email"
                   name="email"
@@ -215,9 +209,7 @@ export const Profile = () => {
 
               {/* Phone */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Phone
-                </label>
+                <Label>Phone</Label>
                 <input
                   type="tel"
                   name="phone"
@@ -230,9 +222,7 @@ export const Profile = () => {
 
               {/* Age */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Age
-                </label>
+                <Label>Age</Label>
                 <input
                   type="number"
                   name="age"
@@ -246,9 +236,7 @@ export const Profile = () => {
 
               {/* Gender */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Gender
-                </label>
+                <Label>Gender</Label>
                 <select
                   name="gender"
                   value={formData.gender}
@@ -264,9 +252,7 @@ export const Profile = () => {
 
               {/* Country */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Country
-                </label>
+                <Label>Country</Label>
                 <input
                   type="text"
                   name="country"
@@ -279,9 +265,7 @@ export const Profile = () => {
 
               {/* Language */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Language
-                </label>
+                <Label>Language</Label>
                 <select
                   name="language"
                   value={formData.language}
@@ -299,9 +283,7 @@ export const Profile = () => {
 
               {/* Timezone */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Timezone
-                </label>
+                <Label>Timezone</Label>
                 <select
                   name="timezone"
                   value={formData.timezone}
@@ -364,18 +346,16 @@ export const Profile = () => {
               <div className="flex items-start">
                 <UserIcon size={16} className="text-gray-400 mr-3 mt-1" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Full Name</p>
-                  <p className="text-sm text-gray-900 dark:text-white font-medium">
-                    {user.firstname} {user.lastname}
-                  </p>
+                  <Caption className="text-xs text-gray-500 dark:text-gray-400">Full Name</Caption>
+                  <Body className="text-sm text-gray-900 dark:text-white font-medium">{user.firstname} {user.lastname}</Body>
                 </div>
               </div>
 
               <div className="flex items-start">
                 <MailIcon size={16} className="text-gray-400 mr-3 mt-1" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                  <p className="text-sm text-gray-900 dark:text-white font-medium">{user.email}</p>
+                  <Caption className="text-xs text-gray-500 dark:text-gray-400">Email</Caption>
+                  <Body className="text-sm text-gray-900 dark:text-white font-medium">{user.email}</Body>
                 </div>
               </div>
 
@@ -383,8 +363,8 @@ export const Profile = () => {
                 <div className="flex items-start">
                   <PhoneIcon size={16} className="text-gray-400 mr-3 mt-1" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
-                    <p className="text-sm text-gray-900 dark:text-white font-medium">{user.phone}</p>
+                    <Caption className="text-xs text-gray-500 dark:text-gray-400">Phone</Caption>
+                    <Body className="text-sm text-gray-900 dark:text-white font-medium">{user.phone}</Body>
                   </div>
                 </div>
               )}
@@ -394,8 +374,8 @@ export const Profile = () => {
                 <div className="flex items-start">
                   <CalendarIcon size={16} className="text-gray-400 mr-3 mt-1" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Age</p>
-                    <p className="text-sm text-gray-900 dark:text-white font-medium">{(user as any).age} years</p>
+                    <Caption className="text-xs text-gray-500 dark:text-gray-400">Age</Caption>
+                    <Body className="text-sm text-gray-900 dark:text-white font-medium">{(user as any).age} years</Body>
                   </div>
                 </div>
               )}
@@ -404,8 +384,8 @@ export const Profile = () => {
                 <div className="flex items-start">
                   <UserIcon size={16} className="text-gray-400 mr-3 mt-1" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Gender</p>
-                    <p className="text-sm text-gray-900 dark:text-white font-medium capitalize">{(user as any).gender}</p>
+                    <Caption className="text-xs text-gray-500 dark:text-gray-400">Gender</Caption>
+                    <Body className="text-sm text-gray-900 dark:text-white font-medium capitalize">{(user as any).gender}</Body>
                   </div>
                 </div>
               )}
@@ -415,8 +395,8 @@ export const Profile = () => {
                 <div className="flex items-start">
                   <MapPinIcon size={16} className="text-gray-400 mr-3 mt-1" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Country</p>
-                    <p className="text-sm text-gray-900 dark:text-white font-medium">{(user as any).country}</p>
+                    <Caption className="text-xs text-gray-500 dark:text-gray-400">Country</Caption>
+                    <Body className="text-sm text-gray-900 dark:text-white font-medium">{(user as any).country}</Body>
                   </div>
                 </div>
               )}
@@ -425,8 +405,8 @@ export const Profile = () => {
                 <div className="flex items-start">
                   <GlobeIcon size={16} className="text-gray-400 mr-3 mt-1" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Language</p>
-                    <p className="text-sm text-gray-900 dark:text-white font-medium capitalize">{(user as any).language}</p>
+                    <Caption className="text-xs text-gray-500 dark:text-gray-400">Language</Caption>
+                    <Body className="text-sm text-gray-900 dark:text-white font-medium capitalize">{(user as any).language}</Body>
                   </div>
                 </div>
               )}
@@ -435,8 +415,8 @@ export const Profile = () => {
                 <div className="flex items-start">
                   <GlobeIcon size={16} className="text-gray-400 mr-3 mt-1" />
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Timezone</p>
-                    <p className="text-sm text-gray-900 dark:text-white font-medium">{(user as any).timezone}</p>
+                    <Caption className="text-xs text-gray-500 dark:text-gray-400">Timezone</Caption>
+                    <Body className="text-sm text-gray-900 dark:text-white font-medium">{(user as any).timezone}</Body>
                   </div>
                 </div>
               )}
@@ -445,20 +425,16 @@ export const Profile = () => {
               <div className="flex items-start">
                 <UserIcon size={16} className="text-gray-400 mr-3 mt-1" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Account Status</p>
-                  <p className="text-sm text-gray-900 dark:text-white font-medium capitalize">
-                    {(user as any).account_status || (user.is_active ? 'Active' : 'Inactive')}
-                  </p>
+                  <Caption className="text-xs text-gray-500 dark:text-gray-400">Account Status</Caption>
+                  <Body className="text-sm text-gray-900 dark:text-white font-medium capitalize">{(user as any).account_status || (user.is_active ? 'Active' : 'Inactive')}</Body>
                 </div>
               </div>
 
               <div className="flex items-start">
                 <MailIcon size={16} className="text-gray-400 mr-3 mt-1" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Email Verification</p>
-                  <p className="text-sm text-gray-900 dark:text-white font-medium capitalize">
-                    {(user as any).verification_status || (user.verified ? 'Verified' : 'Not Verified')}
-                  </p>
+                  <Caption className="text-xs text-gray-500 dark:text-gray-400">Email Verification</Caption>
+                  <Body className="text-sm text-gray-900 dark:text-white font-medium capitalize">{(user as any).verification_status || (user.verified ? 'Verified' : 'Not Verified')}</Body>
                 </div>
               </div>
             </div>
@@ -468,28 +444,20 @@ export const Profile = () => {
 
       {/* Account Information */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-        <Heading level={3} className="text-base font-medium text-gray-900 dark:text-white mb-3">
-          Account Details
-        </Heading>
+        <Heading level={3} className="text-base font-medium text-gray-900 dark:text-white mb-3">Account Details</Heading>
         <div className="space-y-2">
           <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
-            <Text className="text-sm text-gray-500 dark:text-gray-400">Member Since</Text>
-            <Text className="text-sm text-gray-900 dark:text-white font-medium">
-              {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
-            </Text>
+            <Caption className="text-sm text-gray-500 dark:text-gray-400">Member Since</Caption>
+            <Body className="text-sm text-gray-900 dark:text-white font-medium">{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</Body>
           </div>
           <div className="flex justify-between items-center py-2">
-            <Text className="text-sm text-gray-500 dark:text-gray-400">Last Updated</Text>
-            <Text className="text-sm text-gray-900 dark:text-white font-medium">
-              {user.updated_at ? new Date(user.updated_at).toLocaleDateString() : 'N/A'}
-            </Text>
+            <Caption className="text-sm text-gray-500 dark:text-gray-400">Last Updated</Caption>
+            <Body className="text-sm text-gray-900 dark:text-white font-medium">{user.updated_at ? new Date(user.updated_at).toLocaleDateString() : 'N/A'}</Body>
           </div>
           {(user as any).last_login && (
             <div className="flex justify-between items-center py-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Last Login</span>
-              <span className="text-sm text-gray-900 dark:text-white font-medium">
-                {new Date((user as any).last_login).toLocaleDateString()}
-              </span>
+              <Caption className="text-sm text-gray-500 dark:text-gray-400">Last Login</Caption>
+              <Body className="text-sm text-gray-900 dark:text-white font-medium">{new Date((user as any).last_login).toLocaleDateString()}</Body>
             </div>
           )}
         </div>

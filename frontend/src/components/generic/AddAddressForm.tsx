@@ -3,6 +3,7 @@ import { toast } from 'react-hot-toast';
 import { AuthAPI } from '../../api/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '../ui/Input';
+import { Text } from '@/components/ui/Text/Text';
 import { X } from 'lucide-react';
 
 interface AddAddressFormProps {
@@ -96,7 +97,7 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {isModal && (
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-copy">Add New Address</h2>
+          <Text variant="body-lg" weight="semibold">Add New Address</Text>
           <Button
             type="button"
             onClick={onCancel}
@@ -110,9 +111,7 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
       )}
 
       <div>
-        <label htmlFor="street" className="block text-sm font-medium text-copy mb-1">
-          Street Address *
-        </label>
+        <Text variant="body-sm" weight="medium">Street Address *</Text>
         <Input
           id="street"
           name="street"
@@ -127,9 +126,7 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="city" className="block text-sm font-medium text-copy mb-1">
-            City *
-          </label>
+          <Text variant="body-sm" weight="medium">City *</Text>
           <Input
             id="city"
             name="city"
@@ -143,9 +140,7 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
         </div>
 
         <div>
-          <label htmlFor="state" className="block text-sm font-medium text-copy mb-1">
-            State/Province *
-          </label>
+          <Text variant="body-sm" weight="medium">State/Province *</Text>
           <Input
             id="state"
             name="state"
@@ -161,9 +156,7 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="post_code" className="block text-sm font-medium text-copy mb-1">
-            Postal Code *
-          </label>
+          <Text variant="body-sm" weight="medium">Postal Code *</Text>
           <Input
             id="post_code"
             name="post_code"
@@ -177,9 +170,7 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
         </div>
 
         <div>
-          <label htmlFor="country" className="block text-sm font-medium text-copy mb-1">
-            Country *
-          </label>
+          <Text variant="body-sm" weight="medium">Country *</Text>
           <select
             id="country"
             name="country"
@@ -200,15 +191,13 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
             <option value="KR">South Korea</option>
           </select>
           {errors.country && (
-            <p className="mt-1 text-sm text-error">{errors.country}</p>
+            <Text variant="body-sm" tone="error">{errors.country}</Text>
           )}
         </div>
       </div>
 
       <div>
-        <label htmlFor="kind" className="block text-sm font-medium text-copy mb-1">
-          Address Type
-        </label>
+        <Text variant="body-sm" weight="medium">Address Type</Text>
         <select
           id="kind"
           name="kind"
@@ -230,9 +219,7 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
           onChange={handleChange}
           className="h-4 w-4 text-primary focus:ring-primary border-border rounded"
         />
-        <label htmlFor="is_default" className="ml-2 block text-sm text-copy">
-          Set as default address
-        </label>
+        <Text variant="body-sm">Set as default address</Text>
       </div>
 
       <div className="flex items-center justify-end space-x-3 pt-4">
@@ -269,7 +256,7 @@ export const AddAddressForm: React.FC<AddAddressFormProps> = ({
 
   return (
     <div className="bg-surface rounded-lg shadow-sm border border-border p-6">
-      <h2 className="text-xl font-semibold text-copy mb-6">Add New Address</h2>
+      <Text variant="body-lg" weight="semibold">Add New Address</Text>
       {formContent}
     </div>
   );

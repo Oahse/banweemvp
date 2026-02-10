@@ -1,4 +1,5 @@
 import React from 'react';
+import { Text } from '@/components/ui/Text/Text';
 
 export const Checkbox = ({
   label,
@@ -16,11 +17,9 @@ export const Checkbox = ({
         {...props}
       />
       {label && (
-        <label htmlFor={id} className="ml-2 block text-sm text-copy-light">
-          {label}
-        </label>
+        <Text variant="body-sm" tone="secondary">{label}</Text>
       )}
-      {error && <p className="text-sm text-error mt-1">{error}</p>}
+      {error && <Text variant="body-sm" tone="error">{error}</Text>}
     </div>
   );
 };

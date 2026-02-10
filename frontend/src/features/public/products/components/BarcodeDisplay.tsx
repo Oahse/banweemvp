@@ -3,6 +3,7 @@ import { QrCodeIcon, ScanLineIcon } from 'lucide-react';
 import { ProductVariant, BarcodeData } from '../../../../types';
 import { ProductsAPI } from '../../../../api/products';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface BarcodeDisplayProps {
   variant: ProductVariant;
@@ -66,9 +67,9 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-main">
+        <Heading level={3} className="text-lg font-semibold text-main">
           {variant.name} - Codes
-        </h3>
+        </Heading>
         {canGenerate && (
           <Button
             onClick={handleGenerateCodes}
@@ -88,10 +89,10 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
         {(showBoth || !codes.qr_code) && (
           <div className="border border-border-light rounded-lg p-4 bg-surface">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
-              <h4 className="font-medium text-main flex items-center">
+              <Heading level={4} className="font-medium text-main flex items-center">
                 <ScanLineIcon size={16} className="mr-2 text-primary" />
                 Barcode
-              </h4>
+              </Heading>
               {codes.barcode && (
                 <Button
                   onClick={() => downloadCode(codes.barcode!, `barcode-${variant.sku}.png`)}
@@ -115,11 +116,11 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
               <div className={`${sizeClasses[size]} border-2 border-dashed border-border flex items-center justify-center text-copy-light bg-surface-hover rounded min-h-[4rem]`}>
                 <div className="text-center">
                   <ScanLineIcon size={24} className="mx-auto mb-2 text-copy-light" />
-                  <p className="text-sm">No barcode available</p>
+                  <Body className="text-sm">No barcode available</Body>
                 </div>
               </div>
             )}
-            <p className="text-xs text-copy-light mt-2 text-center font-mono break-all">SKU: {variant.sku}</p>
+            <Body className="text-xs text-copy-light mt-2 text-center font-mono break-all">SKU: {variant.sku}</Body>
           </div>
         )}
 
@@ -127,10 +128,10 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
         {(showBoth || !codes.barcode) && (
           <div className="border border-border-light rounded-lg p-4 bg-surface">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
-              <h4 className="font-medium text-main flex items-center">
+              <Heading level={4} className="font-medium text-main flex items-center">
                 <QrCodeIcon size={16} className="mr-2 text-primary" />
                 QR Code
-              </h4>
+              </Heading>
               {codes.qr_code && (
                 <Button
                   onClick={() => downloadCode(codes.qr_code!, `qrcode-${variant.sku}.png`)}
@@ -154,11 +155,11 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
               <div className={`${sizeClasses[size]} border-2 border-dashed border-border flex items-center justify-center text-copy-light bg-surface-hover rounded min-h-[4rem]`}>
                 <div className="text-center">
                   <QrCodeIcon size={24} className="mx-auto mb-2 text-copy-light" />
-                  <p className="text-sm">No QR code available</p>
+                  <Body className="text-sm">No QR code available</Body>
                 </div>
               </div>
             )}
-            <p className="text-xs text-copy-light mt-2 text-center break-words">{variant.name}</p>
+            <Body className="text-xs text-copy-light mt-2 text-center break-words">{variant.name}</Body>
           </div>
         )}
       </div>
@@ -167,22 +168,22 @@ export const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
       <div className="bg-surface-hover rounded-lg p-4 text-sm text-copy space-y-2">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <span className="font-medium text-main">Product:</span>
-            <p className="text-copy-light break-words">{variant.product_name || 'N/A'}</p>
+            <Text className="font-medium text-main">Product:</Text>
+            <Body className="text-copy-light break-words">{variant.product_name || 'N/A'}</Body>
           </div>
           <div>
-            <span className="font-medium text-main">Variant:</span>
-            <p className="text-copy-light break-words">{variant.name}</p>
+            <Text className="font-medium text-main">Variant:</Text>
+            <Body className="text-copy-light break-words">{variant.name}</Body>
           </div>
           <div>
-            <span className="font-medium text-main">Price:</span>
-            <p className="text-copy-light">${variant.sale_price || variant.base_price}</p>
+            <Text className="font-medium text-main">Price:</Text>
+            <Body className="text-copy-light">${variant.sale_price || variant.base_price}</Body>
           </div>
           <div>
-            <span className="font-medium text-main">Stock:</span>
-            <p className={`${(variant.stock || 0) > 10 ? 'text-success' : (variant.stock || 0) > 0 ? 'text-warning' : 'text-error'}`}>
+            <Text className="font-medium text-main">Stock:</Text>
+            <Body className={`${(variant.stock || 0) > 10 ? 'text-success' : (variant.stock || 0) > 0 ? 'text-warning' : 'text-error'}`}>
               {variant.stock || 0} units
-            </p>
+            </Body>
           </div>
         </div>
       </div>

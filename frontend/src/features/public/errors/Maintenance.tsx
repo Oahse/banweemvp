@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Wrench, Clock, Mail, Twitter, Facebook, Instagram, RefreshCw } from 'lucide-react';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface MaintenanceProps {
   estimatedTime?: string;
@@ -92,9 +93,9 @@ const Maintenance: React.FC<MaintenanceProps> = ({
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-3">
             <Wrench className="w-8 h-8 text-primary animate-pulse" />
           </div>
-          <h1 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">
+          <Heading level={1} className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">
             Under Maintenance
-          </h1>
+          </Heading>
         </motion.div>
 
         {/* Main Card */}
@@ -110,12 +111,12 @@ const Maintenance: React.FC<MaintenanceProps> = ({
           <div className="p-6">
             {/* Message */}
             <motion.div className="text-center mb-6" variants={itemVariants}>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+              <Body className="text-sm text-gray-700 dark:text-gray-300 mb-4">
                 {message}
-              </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              </Body>
+              <Body className="text-xs text-gray-600 dark:text-gray-400">
                 We'll be back online shortly. Thank you for your patience!
-              </p>
+              </Body>
             </motion.div>
 
             {/* Time Estimate */}
@@ -125,9 +126,9 @@ const Maintenance: React.FC<MaintenanceProps> = ({
             >
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Clock className="w-4 h-4 text-primary" />
-                <h3 className="text-xs font-semibold text-gray-900 dark:text-white">
-                  Estimated Downtime
-                </h3>
+                <Heading level={3} className="text-xs font-semibold text-gray-900 dark:text-white">
+                  Estimated Time
+                </Heading>
               </div>
               {showCountdown && timeRemaining ? (
                 <div className="text-center">
@@ -149,9 +150,9 @@ const Maintenance: React.FC<MaintenanceProps> = ({
 
             {/* What's Happening */}
             <motion.div className="mb-4" variants={itemVariants}>
-              <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-2">
+              <Heading level={3} className="text-xs font-semibold text-gray-900 dark:text-white mb-2">
                 What we're working on:
-              </h3>
+              </Heading>
               <ul className="space-y-1.5">
                 {[
                   'System performance improvements',
@@ -165,7 +166,7 @@ const Maintenance: React.FC<MaintenanceProps> = ({
                     variants={itemVariants}
                   >
                     <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 flex-shrink-0 animate-pulse"></div>
-                    <span>{item}</span>
+                    <Text>{item}</Text>
                   </motion.li>
                 ))}
               </ul>
@@ -187,7 +188,7 @@ const Maintenance: React.FC<MaintenanceProps> = ({
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600 dark:text-gray-400">Follow us:</span>
+                  <Text className="text-xs text-gray-600 dark:text-gray-400">Follow us:</Text>
                   {socialLinks.map((social) => (
                     <motion.a
                       key={social.name}

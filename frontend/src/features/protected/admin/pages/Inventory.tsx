@@ -7,6 +7,7 @@ import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { InventoryListSkeleton } from '../components/skeletons/InventorySkeleton';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 const LIMIT = 10;
 
@@ -340,7 +341,7 @@ export const AdminInventory = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
-          <p className={`mt-1 text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage stock levels and locations</p>
+          <Text variant="body-sm" tone="secondary">Manage stock levels and locations</Text>
         </div>
       </div>
 
@@ -433,37 +434,39 @@ export const AdminInventory = () => {
             leftIcon={<ArrowUpDownIcon size={14} />}
             className="inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium"
           >
-            Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+            <Text variant="body-sm">Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</Text>
           </Button>
         </div>
 
         {/* Active Filters */}
         {(debouncedSearchQuery || statusFilter) && (
           <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+            <Text variant="body-sm" tone="secondary">Active filters:</Text>
             {debouncedSearchQuery && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+              <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
                 Search: "{debouncedSearchQuery}"
                 <Button
                   onClick={() => setSearchQuery('')}
                   variant="ghost"
                   size="sm"
+                  className="ml-1 hover:text-primary-dark"
+                  leftIcon={<X size={12} />}
                 >
-                  Clear
                 </Button>
-              </span>
+              </Text>
             )}
             {statusFilter && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+              <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
                 Filter: {statusFilter === 'low_stock' ? 'Low Stock Only' : 'All Items'}
                 <Button
                   onClick={() => setStatusFilter('')}
                   variant="ghost"
                   size="sm"
+                  className="ml-1 hover:text-primary-dark"
+                  leftIcon={<X size={12} />}
                 >
-                  Clear
                 </Button>
-              </span>
+              </Text>
             )}
             <Button
               onClick={() => {
@@ -488,8 +491,8 @@ export const AdminInventory = () => {
       }`}>
         <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="font-semibold">Error Loading Inventory</p>
-          <p className="text-sm mt-1">{error}</p>
+          <Text weight="semibold">Error Loading Inventory</Text>
+          <Text variant="body-sm">{error}</Text>
           <Button
             onClick={() => window.location.reload()}
             variant="ghost"
@@ -507,7 +510,7 @@ export const AdminInventory = () => {
         <div className="p-8">
           <div className="flex items-center justify-center">
             <Loader className="w-8 h-8 text-primary animate-spin mr-3" />
-            <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Updating inventory...</span>
+            <Text variant="body-sm" tone="secondary">Updating inventory...</Text>
           </div>
         </div>
       ) : inventory.length > 0 ? (
@@ -517,12 +520,12 @@ export const AdminInventory = () => {
             <table className="w-full">
               <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b border-gray-200`}>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Variant</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">SKU</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Location</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Stock Level</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-white">Actions</th>
+                  <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Variant</Text></th>
+                  <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">SKU</Text></th>
+                  <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Location</Text></th>
+                  <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Stock Level</Text></th>
+                  <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Status</Text></th>
+                  <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Actions</Text></th>
                 </tr>
               </thead>
               <tbody>
@@ -531,14 +534,14 @@ export const AdminInventory = () => {
                   const d = getItemDisplay(item);
                   return (
                     <tr key={item.id} className={`border-b border-gray-200 transition-colors ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
-                      <td className="px-4 py-3 text-xs text-gray-900 dark:text-white max-w-[150px] truncate">{d.productName}</td>
-                      <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[100px] truncate">{d.variantSku}</td>
-                      <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 max-w-[120px] truncate">{d.locationName}</td>
-                      <td className="px-4 py-3 text-xs font-semibold text-gray-900 dark:text-white">{d.stockLevel}</td>
-                      <td className="px-4 py-3 text-xs">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.cls}`}>
+                      <td className="px-4 py-3 max-w-[150px] truncate"><Text variant="caption" truncate="single">{d.productName}</Text></td>
+                      <td className="px-4 py-3 max-w-[100px] truncate"><Text variant="caption" tone="secondary" truncate="single">{d.variantSku}</Text></td>
+                      <td className="px-4 py-3 max-w-[120px] truncate"><Text variant="caption" tone="secondary" truncate="single">{d.locationName}</Text></td>
+                      <td className="px-4 py-3"><Text variant="caption" weight="semibold">{d.stockLevel}</Text></td>
+                      <td className="px-4 py-3">
+                        <Text className={`px-3 py-1 rounded-full font-semibold ${status.cls}`}>
                           {status.label}
-                        </span>
+                        </Text>
                       </td>
                       <td className="px-4 py-3 text-xs">
                         <Button
@@ -551,7 +554,7 @@ export const AdminInventory = () => {
                           leftIcon={<EditIcon size={14} />}
                           className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                         >
-                          Edit
+                          <Text variant="body-sm">Edit</Text>
                         </Button>
                       </td>
                     </tr>
@@ -573,20 +576,20 @@ export const AdminInventory = () => {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <span className="font-medium text-sm text-gray-900 dark:text-white block truncate">{d.productName}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 truncate block">SKU: {d.variantSku}</span>
+                      <Text variant="body-sm" weight="medium" truncate="single">{d.productName}</Text>
+                      <Text variant="caption" tone="secondary" truncate="single">SKU: {d.variantSku}</Text>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${status.cls}`}>
+                    <Text className={`px-3 py-1 rounded-full font-semibold whitespace-nowrap ${status.cls}`}>
                       {status.label}
-                    </span>
+                    </Text>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-500 dark:text-gray-400">Location:</span>
-                    <span className="text-gray-900 dark:text-white truncate ml-2 flex-1 text-right">{d.locationName}</span>
+                    <Text variant="caption" tone="secondary">Location:</Text>
+                    <Text variant="caption" truncate="single">{d.locationName}</Text>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-500 dark:text-gray-400">Stock:</span>
-                    <span className="font-semibold text-gray-900 dark:text-white">{d.stockLevel}</span>
+                    <Text variant="caption" tone="secondary">Stock:</Text>
+                    <Text variant="caption" weight="semibold">{d.stockLevel}</Text>
                   </div>
                   <Button
                     onClick={(e) => {
@@ -598,7 +601,7 @@ export const AdminInventory = () => {
                     leftIcon={<EditIcon size={14} />}
                     className="mt-2 w-full inline-flex items-center justify-center gap-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm"
                   >
-                    Edit Stock
+                    <Text variant="body-sm">Edit Stock</Text>
                   </Button>
                 </div>
               );
@@ -606,10 +609,10 @@ export const AdminInventory = () => {
           </div>
 
           <div className={`px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-              <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+              <Text variant="body-sm" tone="secondary">
                 Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} items
                 {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
-              </p>
+              </Text>
               <div className="flex items-center gap-1">
                 <Button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -663,23 +666,6 @@ export const AdminInventory = () => {
           </>
         ) : (
           <div className={`p-8 text-center ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            <div className="mb-4">
-              <div className={`w-16 h-16 mx-auto rounded-full ${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} flex items-center justify-center`}>
-                <PackageIcon className={`w-8 h-8 ${currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
-              </div>
-            </div>
-            <h3 className="text-lg font-medium mb-2">No inventory items found</h3>
-            <p className="text-sm mb-4">
-              {searchQuery || statusFilter 
-                ? 'Try adjusting your search or filters to find what you\'re looking for.'
-                : 'Get started by adding inventory items to your store.'
-              }
-            </p>
-            {(searchQuery || statusFilter) && (
-              <Button
-                onClick={() => {
-                  setSearchQuery('');
-                  setStatusFilter('');
                 }}
                 variant="ghost"
                 size="sm"
@@ -696,8 +682,8 @@ export const AdminInventory = () => {
           <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold">{editingItem ? 'Edit Inventory' : 'Add Inventory Item'}</h3>
-                <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{editingItem ? 'Update stock levels and location' : 'Fill in the details below'}</p>
+                <Heading level={3} className="text-lg font-semibold">{editingItem ? 'Edit Inventory' : 'Add Inventory Item'}</Heading>
+                <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{editingItem ? 'Update stock levels and location' : 'Fill in the details below'}</Body>
               </div>
               <Button
                 onClick={() => {
@@ -714,9 +700,9 @@ export const AdminInventory = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {editingItem && (
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <Label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     Product
-                  </label>
+                  </Label>
                   <div className={`w-full px-3 py-2 text-sm border rounded-lg ${currentTheme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-400' : 'bg-gray-100 border-gray-300 text-gray-600'}`}>
                     {formData.product_name}
                   </div>

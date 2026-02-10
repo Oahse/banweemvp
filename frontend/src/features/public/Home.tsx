@@ -249,27 +249,25 @@ export const Home = () => {
               />
               <div className="relative z-20 container mx-auto px-4 h-full flex items-center">
                 <div className="max-w-xl text-white">
-                  <motion.span
-                    className="inline-block px-4 py-1 bg-primary text-white rounded-full mb-4 text-sm font-medium"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}>
-                    {heroSlides[currentSlide]?.subtitle}
-                  </motion.span>
-                  <motion.h1
-                    className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
+                  <Text variant="body-sm" className="inline-block px-4 py-1 bg-primary text-white rounded-full mb-4 font-medium">
+                    {heroSlides[currentSlide]?.badge}
+                  </Text>
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.4 }}>
-                    {heroSlides[currentSlide]?.title}
-                  </motion.h1>
-                  <motion.p
-                    className="text-lg mb-6"
+                    <Heading level={1} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+                      {heroSlides[currentSlide]?.title}
+                    </Heading>
+                  </motion.div>
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.6 }}>
-                    {heroSlides[currentSlide]?.description}
-                  </motion.p>
+                    <Text variant="body-lg" className="mb-6">
+                      {heroSlides[currentSlide]?.description}
+                    </Text>
+                  </motion.div>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -331,29 +329,29 @@ export const Home = () => {
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <TruckIcon size={24} className="text-primary" />
               </div>
-              <Heading level={3} className="font-medium text-main">Free Delivery</Heading>
-              <Body className="text-sm text-copy-light">From $49.99</Body>
+              <Heading level={3} weight="medium">Free Delivery</Heading>
+              <Text variant="body-sm" tone="secondary">From $49.99</Text>
             </div>
             <div className="flex flex-col items-center text-center p-4">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <BadgeCheckIcon size={24} className="text-primary" />
               </div>
-              <Heading level={3} className="font-medium text-main">Certified Organic</Heading>
-              <Body className="text-sm text-copy-light">100% Guarantee</Body>
+              <Heading level={3} weight="medium">Certified Organic</Heading>
+              <Text variant="body-sm" tone="secondary">100% Guarantee</Text>
             </div>
             <div className="flex flex-col items-center text-center p-4">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <ShieldIcon size={24} className="text-primary" />
               </div>
-              <Heading level={3} className="font-medium text-main">Secure Payments</Heading>
-              <Body className="text-sm text-copy-light">100% Protected</Body>
+              <Heading level={3} weight="medium">Secure Payments</Heading>
+              <Text variant="body-sm" tone="secondary">100% Protected</Text>
             </div>
             <div className="flex flex-col items-center text-center p-4">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <HeadphonesIcon size={24} className="text-primary" />
               </div>
-              <Heading level={3} className="font-medium text-main">24/7 Support</Heading>
-              <Body className="text-sm text-copy-light">Dedicated Support</Body>
+              <Heading level={3} weight="medium">24/7 Support</Heading>
+              <Text variant="body-sm" tone="secondary">Dedicated Support</Text>
             </div>
           </div>
         </div>
@@ -364,8 +362,8 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <Text className="text-primary font-medium">Explore our product range</Text>
-              <Heading level={2} className="text-2xl md:text-3xl font-bold text-main mt-1">Shop Categories</Heading>
+              <Text variant="body-sm" weight="medium" tone="primary">Explore our product range</Text>
+              <Heading level={2} className="text-2xl md:text-3xl font-bold mt-1">Shop Categories</Heading>
             </div>
             <div className="flex items-center space-x-2 mt-4 md:mt-0">
               <Button 
@@ -413,8 +411,8 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <Text className="text-primary font-medium text-sm">Featured Products</Text>
-              <Heading level={2} className="text-lg md:text-xl font-semibold text-main mt-1">Featured Products</Heading>
+              <Text variant="body-sm" weight="medium" tone="primary">Featured Products</Text>
+              <Heading level={2} className="text-lg md:text-xl font-semibold mt-1">Featured Products</Heading>
             </div>
             <Link
               to="/products?featured=true"
@@ -457,7 +455,7 @@ export const Home = () => {
               })
             ) : (
               <div className="col-span-full text-center py-8 text-copy-light">
-                No featured products available
+              <Text variant="body-sm" tone="secondary">No featured products available</Text>
               </div>
             )}
           </div>
@@ -469,8 +467,8 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <Text className="text-primary font-medium text-sm">Best Sellers</Text>
-              <Heading level={2} className="text-lg md:text-xl font-semibold text-main mt-1">Popular Products</Heading>
+              <Text variant="body-sm" weight="medium" tone="primary">Best Sellers</Text>
+              <Heading level={2} className="text-lg md:text-xl font-semibold mt-1">Popular Products</Heading>
             </div>
             <Link to="/products?popular=true" className="inline-flex items-center text-primary hover:underline mt-4 md:mt-0">
               All Popular
@@ -627,12 +625,12 @@ export const Home = () => {
                     </div>
                     <div className="flex-1 p-6">
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
+                        <Text className="bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
                           -{discountPercent}%
-                        </span>
-                        <span className="text-red-500 text-sm font-medium">
+                        </Text>
+                        <Text className="text-red-500 text-sm font-medium">
                           Ends in {product.endsIn || '2d 15h 22m'}
-                        </span>
+                        </Text>
                       </div>
                       <Heading level={3} className="text-lg font-semibold text-main mb-2">{product.name}</Heading>
                       <Body className="text-sm text-copy-light mb-4">
@@ -645,29 +643,29 @@ export const Home = () => {
                       <div className="flex items-center gap-2 mb-4">
                         <div className="flex items-center">
                           {Array.from({ length: 5 }).map((_, i) => (
-                            <span
+                            <Text
                               key={i}
                               className={`text-sm ${i < Math.floor(product.rating_average || product.rating || 0) ? 'text-yellow-400' : 'text-gray-300'
                                 }`}>
                               ★
-                            </span>
+                            </Text>
                           ))}
                         </div>
-                        <span className="text-sm text-copy-light">({product.review_count || product.reviewCount || 0})</span>
+                        <Text className="text-sm text-copy-light">({product.review_count || product.reviewCount || 0})</Text>
                       </div>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="text-xl font-bold text-primary">
+                        <Text className="text-xl font-bold text-primary">
                           {formatCurrency(
                             displayVariant?.sale_price || 
                             displayVariant?.base_price || 
                             product.min_price || 
                             0
                           )}
-                        </span>
+                        </Text>
                         {displayVariant?.sale_price && displayVariant.sale_price < displayVariant.base_price && (
-                          <span className="text-sm text-copy-light line-through">
+                          <Text className="text-sm text-copy-light line-through">
                             {formatCurrency(displayVariant.base_price)}
-                          </span>
+                          </Text>
                         )}
                       </div>
                       <Link

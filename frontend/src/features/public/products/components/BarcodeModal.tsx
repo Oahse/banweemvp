@@ -4,7 +4,7 @@ import { ScanLineIcon, DownloadIcon, ShareIcon, XIcon } from 'lucide-react';
 import { NotificationModal } from '@/components/ui/NotificationModal';
 import JsBarcode from 'jsbarcode';
 import { Button } from '@/components/ui/Button';
-import { Heading } from '@/components/ui/Text/Text';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 interface BarcodeModalProps {
   variant: {
@@ -289,9 +289,9 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
           </Button>
         </div>
 
-        <p className="text-copy-light text-sm mb-4">
+        <Body className="text-copy-light text-sm mb-4">
           Barcode for {variant.name}
-        </p>
+        </Body>
 
         <div className="flex justify-center mb-4">
           <div className="p-4 bg-surface border-2 border-border rounded-lg">
@@ -303,21 +303,21 @@ export const BarcodeModal: React.FC<BarcodeModalProps> = ({
         </div>
 
         <div className="mb-4">
-          <p className="text-xs text-copy-lighter mb-1">Barcode Data:</p>
+          <Body className="text-xs text-copy-lighter mb-1">Barcode Data:</Body>
           <div className="text-sm text-copy-light bg-surface-hover p-2 rounded">
             <div className="space-y-1">
-              <div><span className="font-medium">URL:</span> {barcodeData.url}</div>
-              <div><span className="font-medium">Product ID:</span> {barcodeData.productId}</div>
-              <div><span className="font-medium">SKU:</span> {barcodeData.sku}</div>
-              <div><span className="font-medium">Variant ID:</span> {barcodeData.variantId}</div>
-              <div><span className="font-medium">Variant:</span> {barcodeData.variantName}</div>
-              <div><span className="font-medium">Supplier:</span> {barcodeData.supplier}</div>
-              <div><span className="font-medium">Price:</span> ${barcodeData.price}</div>
-              <div><span className="font-medium">Stock:</span> {barcodeData.stock}</div>
+              <div><Text className="font-medium">URL:</Text> {barcodeData.url}</div>
+              <div><Text className="font-medium">Product ID:</Text> {barcodeData.productId}</div>
+              <div><Text className="font-medium">SKU:</Text> {barcodeData.sku}</div>
+              <div><Text className="font-medium">Variant ID:</Text> {barcodeData.variantId}</div>
+              <div><Text className="font-medium">Variant:</Text> {barcodeData.variantName}</div>
+              <div><Text className="font-medium">Supplier:</Text> {barcodeData.supplier}</div>
+              <div><Text className="font-medium">Price:</Text> ${barcodeData.price}</div>
+              <div><Text className="font-medium">Stock:</Text> {barcodeData.stock}</div>
               {Object.keys(barcodeData.attributes).length > 0 && (
-                <div><span className="font-medium">Attributes:</span> {JSON.stringify(barcodeData.attributes)}</div>
+                <div><Text className="font-medium">Attributes:</Text> {JSON.stringify(barcodeData.attributes)}</div>
               )}
-            )}
+            </div>
           </div>
         </div>
       </div>

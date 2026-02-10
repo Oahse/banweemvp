@@ -6,6 +6,7 @@ import { useWishlist } from '../../features/protected/wishlist/contexts/Wishlist
 import { ChevronDownIcon, SearchIcon, UserIcon, HeartIcon, ShoppingCartIcon, MenuIcon, PhoneIcon, ShieldIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 import { SkeletonHeader } from '../ui/SkeletonNavigation';
 import { getCountryByCode } from '../../data/countries';
@@ -206,13 +207,11 @@ export const Header = ({
               )}
 
               {/* Language Code */}
-              <span className="text-sm font-medium">
-                {selectedLanguage.toUpperCase()}
-              </span>
+              <Text variant="body-sm" weight="medium">{selectedLanguage.toUpperCase()}</Text>
 
               <div className="flex items-center">
                 <PhoneIcon size={16} className="mr-1" />
-                <span>Need Help: +18001090</span>
+                <Text variant="body-sm">Need Help: +18001090</Text>
               </div>
             </div>
           </div>
@@ -228,9 +227,9 @@ export const Header = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
-            className="text-center">
-            {TopHeaderAds[currentAdIndex]}
-          </motion.div>
+              <Text variant="body-sm" className="text-center">
+                {TopHeaderAds[currentAdIndex]}
+              </Text>
         </div>
       </div>
 
@@ -288,10 +287,10 @@ export const Header = ({
                 className="hidden md:flex items-center hover:text-primary">
                 <UserIcon size={24} className="mr-1" />
                 <div className="flex flex-col text-xs">
-                  <span>{isAuthenticated ? `Hello, ${user?.firstname || user?.full_name?.split(' ')[0] || 'User'}` : 'Login'}</span>
-                  <span className="font-semibold">
+                <Text variant="body-sm">{isAuthenticated ? `Hello, ${user?.firstname || user?.full_name?.split(' ')[0] || 'User'}` : 'Login'}</Text>
+                  <Text variant="body-sm" weight="semibold">
                     {isAuthenticated ? 'Account' : 'My Account'}
-                  </span>
+                  </Text>
                 </div>
               </Link>
 
@@ -300,14 +299,14 @@ export const Header = ({
                 <div className="relative">
                   <HeartIcon size={24} />
                   {defaultWishlist && defaultWishlist.items && defaultWishlist.items.length > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    <Text variant="caption" className="absolute -top-2 -right-2 bg-primary text-white rounded-full h-5 w-5 flex items-center justify-center">
                       {defaultWishlist.items.length}
-                    </span>
+                    </Text>
                   )}
                 </div>
                 <div className="flex flex-col ml-1 text-xs">
-                  <span>Favorite</span>
-                  <span className="font-semibold">Wishlist</span>
+                  <Text variant="body-sm">Favorite</Text>
+                  <Text variant="body-sm" weight="semibold">Wishlist</Text>
                 </div>
               </Link>
 
@@ -316,13 +315,13 @@ export const Header = ({
                 <div className="relative">
                   <ShoppingCartIcon size={24} />
                   {totalItems > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    <Text variant="caption" className="absolute -top-2 -right-2 bg-primary text-white rounded-full h-5 w-5 flex items-center justify-center">
                       {totalItems}
-                    </span>
+                    </Text>
                   )}
                 </div>
                 <div className="hidden md:flex flex-col ml-1 text-xs">
-                  <span>Your Cart</span>
+                  <Text variant="body-sm">Your Cart</Text>
                 </div>
               </Link>
 
@@ -362,7 +361,7 @@ export const Header = ({
                 leftIcon={<MenuIcon size={20} />}
                 rightIcon={<ChevronDownIcon size={20} />}
               >
-                <span className="font-semibold">Browse Categories</span>
+                <Text as="span" weight="semibold">Browse Categories</Text>
               </Button>
               <div className="absolute left-0 top-full hidden group-hover:block bg-surface shadow-lg rounded-b-md py-2 w-64 z-50">
                 {categories.map((category, index) => (
@@ -370,7 +369,7 @@ export const Header = ({
                     key={index}
                     to={category.path}
                     className="block px-4 py-2 hover:bg-background hover:text-primary transition-colors">
-                    {category.name}
+                  <Text variant="body-sm" weight="medium">{category.name}</Text>
                   </Link>
                 ))}
               </div>
@@ -381,22 +380,22 @@ export const Header = ({
               <ul className="flex space-x-10">
                 <li className="ml-8">
                   <Link to="/" className="block py-3 font-medium hover:text-primary transition-colors">
-                    Home
+                  <Text variant="body-sm" weight="medium">Home</Text>
                   </Link>
                 </li>
                 <li>
                   <Link to="/about" className="block py-3 font-medium hover:text-primary transition-colors">
-                    About
+                  <Text variant="body-sm" weight="medium">About</Text>
                   </Link>
                 </li>
                 <li>
                   <Link to="/contact" className="block py-3 font-medium hover:text-primary transition-colors">
-                    Contact
+                  <Text variant="body-sm" weight="medium">Contact</Text>
                   </Link>
                 </li>
                 <li>
                   <Link to="/faq" className="block py-3 font-medium hover:text-primary transition-colors">
-                    FAQ
+                  <Text variant="body-sm" weight="medium">FAQ</Text>
                   </Link>
                 </li>
               </ul>
@@ -406,8 +405,8 @@ export const Header = ({
             <div className="flex items-center">
               <PhoneIcon size={20} className="mr-2 text-primary" />
               <div>
-                <span className="block text-sm font-medium">1900100888</span>
-                <span className="block text-xs text-copy-light">Support Center</span>
+                <Text variant="body-sm" weight="medium">1900100888</Text>
+                <Text variant="caption" tone="secondary">Support Center</Text>
               </div>
             </div>
           </div>

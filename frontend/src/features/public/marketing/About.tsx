@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRightIcon, CheckIcon } from 'lucide-react';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -70,12 +71,14 @@ export const About = () => {
       variants={containerVariants}
     >
       {/* Breadcrumb */}
-      <motion.nav className="flex mb-4 text-xs" variants={itemVariants}>
-        <Link to="/" className="text-copy-lighter hover:text-primary">
-          Home
-        </Link>
+      <motion.nav className="flex mb-4" variants={itemVariants}>
+        <Text variant="caption" tone="secondary">
+          <Link to="/" className="hover:text-primary">
+            Home
+          </Link>
+        </Text>
         <ChevronRightIcon size={12} className="mx-1" />
-        <span className="text-copy">About Us</span>
+        <Text variant="caption">About Us</Text>
       </motion.nav>
 
       {/* Hero Section */}
@@ -89,10 +92,10 @@ export const About = () => {
           />
           <div className="relative z-20 container mx-auto px-4 h-full flex items-center">
             <div className="max-w-2xl text-white">
-              <h1 className="text-base md:text-lg font-semibold mb-2">Our Story</h1>
-              <p className="text-xs">
+              <Heading level={1} weight="semibold">Our Story</Heading>
+              <Text variant="body-sm">
                 Connecting African producers with global markets through ethical, sustainable, and transparent trade.
-              </p>
+              </Text>
             </div>
           </div>
         </div>
@@ -101,31 +104,31 @@ export const About = () => {
       {/* Mission & Vision */}
       <motion.div className="max-w-4xl mx-auto mb-8" variants={itemVariants}>
         <div className="text-center mb-6">
-          <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Mission & Vision</h2>
+          <Heading level={2} weight="semibold">Our Mission & Vision</Heading>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-surface p-3 rounded-lg shadow-sm">
-            <h3 className="text-sm font-semibold text-copy mb-2">Our Mission</h3>
-            <p className="text-xs text-copy-light mb-2">
+            <Heading level={3} weight="semibold">Our Mission</Heading>
+            <Text variant="body-sm" tone="secondary" className="mb-2">
               Banwee exists to create sustainable economic opportunities for African producers by connecting them with
               global markets through ethical trade practices.
-            </p>
-            <p className="text-xs text-copy-light">
-              We are committed to ensuring that our producers receive fair compensation, work in safe conditions, and
-              can invest in their communities and futures.
-            </p>
+            </Text>
+            <Text variant="body-sm" tone="secondary">
+              We provide fair pricing, transparent transactions, and direct access to international buyers, ensuring that
+              producers receive the true value of their products.
+            </Text>
           </div>
           <div className="bg-surface p-3 rounded-lg shadow-sm">
-            <h3 className="text-sm font-semibold text-copy mb-2">Our Vision</h3>
-            <p className="text-xs text-copy-light mb-2">
+            <Heading level={3} weight="semibold">Our Vision</Heading>
+            <Text variant="body-sm" tone="secondary" className="mb-2">
               We envision a world where African products are recognized globally for their exceptional quality and where
               the people who create them prosper through fair and direct trade relationships.
-            </p>
-            <p className="text-xs text-copy-light">
+            </Text>
+            <Text variant="body-sm" tone="secondary">
               We believe in a future where sustainability and profitability go hand in hand, creating lasting positive
               impact for all stakeholders.
-            </p>
+            </Text>
           </div>
         </div>
       </motion.div>
@@ -133,45 +136,43 @@ export const About = () => {
       {/* Our Story */}
       <motion.div className="max-w-4xl mx-auto mb-8" variants={itemVariants}>
         <div className="text-center mb-6">
-          <h2 className="text-sm md:text-base font-semibold text-copy mb-2">The Banwee Journey</h2>
+          <Heading level={2} weight="semibold">The Banwee Journey</Heading>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
         </div>
         <div className="bg-surface p-4 rounded-lg shadow-sm">
           <div className="mb-4">
-            <h3 className="text-sm font-semibold text-copy mb-2">The Beginning</h3>
-            <p className="text-xs text-copy-light mb-2">
+            <Heading level={3} weight="semibold">The Beginning</Heading>
+            <Text variant="body-sm" tone="secondary" className="mb-2">
               Banwee began in 2019 when our founder, Amara Okafor, returned to her ancestral home in Ghana and
               witnessed the incredible quality of local products that struggled to reach international markets.
-            </p>
-            <p className="text-xs text-copy-light">
-              Recognizing both the exceptional craftsmanship and the economic challenges faced by producers, Amara set
-              out to create a bridge between these skilled artisans and global consumers seeking authentic,
-              sustainable products.
-            </p>
+            </Text>
+            <Text variant="body-sm" tone="secondary">
+              Determined to make a difference, she started building connections between local producers and
+              international buyers, focusing on transparency and fair trade.
+            </Text>
           </div>
           <div className="mb-4">
-            <h3 className="text-sm font-semibold text-copy mb-2">Growth & Impact</h3>
-            <p className="text-xs text-copy-light mb-2">
+            <Heading level={3} weight="semibold">Growth & Impact</Heading>
+            <Text variant="body-sm" tone="secondary" className="mb-2">
               What started with a single cooperative of women producing shea butter has grown into partnerships with
               over 25 producer groups across 8 African countries. Today, Banwee offers a diverse range of products,
               from gourmet foods to skincare to home goods.
-            </p>
-            <p className="text-xs text-copy-light">
+            </Text>
+            <Text variant="body-sm" tone="secondary">
               Along the way, we've remained committed to our core values of fair trade, sustainability, and
-              transparency. Every product tells a story, and we ensure that the story includes fair compensation,
-              sustainable practices, and community investment.
-            </p>
+              transparency, ensuring that every product tells a story of empowerment and quality.
+            </Text>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-copy mb-2">Looking Forward</h3>
-            <p className="text-xs text-copy-light mb-2">
+            <Heading level={3} weight="semibold">Looking Forward</Heading>
+            <Text variant="body-sm" tone="secondary" className="mb-2">
               As we continue to grow, we're expanding our impact through educational initiatives, infrastructure
               development, and increased market access for our producer partners.
-            </p>
-            <p className="text-xs text-copy-light">
+            </Text>
+            <Text variant="body-sm" tone="secondary">
               We're also innovating in sustainable packaging, carbon-neutral shipping, and digital traceability to
               ensure that our environmental footprint remains as positive as our social impact.
-            </p>
+            </Text>
           </div>
         </div>
       </motion.div>
@@ -179,7 +180,7 @@ export const About = () => {
       {/* Our Values */}
       <motion.div className="max-w-4xl mx-auto mb-8" variants={itemVariants}>
         <div className="text-center mb-6">
-          <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Values</h2>
+          <Heading level={2} weight="semibold">Our Values</Heading>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -191,8 +192,8 @@ export const About = () => {
                 </div>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-copy mb-1">{value.title}</h3>
-                <p className="text-xs text-copy-light">{value.description}</p>
+                <Text variant="body-sm" weight="bold">{value.title}</Text>
+                <Text variant="body-sm" tone="secondary">{value.description}</Text>
               </div>
             </div>
           ))}
@@ -202,12 +203,12 @@ export const About = () => {
       {/* Our Team */}
       <motion.div className="max-w-4xl mx-auto mb-8" variants={itemVariants}>
         <div className="text-center mb-6">
-          <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Meet Our Team</h2>
+          <Heading level={2} weight="semibold">Meet Our Team</Heading>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
-          <p className="text-xs text-copy-light max-w-2xl mx-auto">
+          <Text variant="body-sm" tone="secondary" className="max-w-2xl mx-auto">
             Our diverse team brings together expertise in sustainable development, international trade, product
             curation, and community building.
-          </p>
+          </Text>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {teamMembers.map((member, index) => (
@@ -217,9 +218,9 @@ export const About = () => {
                   <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="p-3 sm:w-2/3">
-                  <h3 className="text-sm font-bold text-copy mb-0.5">{member.name}</h3>
-                  <p className="text-xs text-primary font-medium mb-2">{member.position}</p>
-                  <p className="text-xs text-copy-light">{member.bio}</p>
+                  <Text variant="body-sm" weight="bold">{member.name}</Text>
+                  <Text variant="caption" tone="primary" weight="medium">{member.position}</Text>
+                  <Text variant="body-sm" tone="secondary">{member.bio}</Text>
                 </div>
               </div>
             </div>
@@ -231,43 +232,27 @@ export const About = () => {
       <motion.div className="bg-primary/10 py-6 mb-8" variants={itemVariants}>
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-6">
-            <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Our Impact</h2>
+            <Heading level={2} weight="semibold">Our Impact</Heading>
             <div className="w-12 h-0.5 bg-primary mx-auto mb-3"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
             <div>
-              <div className="text-lg font-semibold text-primary mb-1">1,000+</div>
-              <p className="text-xs text-copy-light font-medium">Producers Supported</p>
+              <Text variant="body-lg" weight="semibold" tone="primary">1,000+</Text>
+              <Text variant="caption" weight="medium">Producers Supported</Text>
             </div>
             <div>
-              <div className="text-lg font-semibold text-primary mb-1">8</div>
-              <p className="text-xs text-copy-light font-medium">African Countries</p>
+              <Text variant="body-lg" weight="semibold" tone="primary">8</Text>
+              <Text variant="caption" weight="medium">African Countries</Text>
             </div>
             <div>
-              <div className="text-lg font-semibold text-primary mb-1">12</div>
-              <p className="text-xs text-copy-light font-medium">Community Projects</p>
+              <Text variant="body-lg" weight="semibold" tone="primary">12</Text>
+              <Text variant="caption" weight="medium">Community Projects</Text>
             </div>
           </div>
-        </div>
-      </motion.div>
-
-      {/* Join Us CTA */}
-      <motion.div className="max-w-4xl mx-auto text-center" variants={itemVariants}>
-        <h2 className="text-sm md:text-base font-semibold text-copy mb-2">Join Our Journey</h2>
-        <p className="text-xs text-copy-light mb-4 max-w-2xl mx-auto">
-          Be part of our mission to support sustainable development in Africa while enjoying exceptional products with
-          authentic stories.
-        </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-3">
-          <Link
-            to="/products"
-            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
-            Shop Our Products
-          </Link>
           <Link
             to="/account/subscriptions"
             className="bg-surface border border-primary text-primary hover:bg-primary/5 px-4 py-2 rounded-md transition-colors text-sm">
-            Manage Subscriptions
+            <Text variant="body-sm">Manage Subscriptions</Text>
           </Link>
         </div>
       </motion.div>

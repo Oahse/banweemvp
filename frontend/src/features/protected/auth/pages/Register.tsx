@@ -9,6 +9,7 @@ import { Checkbox } from '../../../../components/generic/Checkbox';
 import SocialAuth from '../components/SocialAuth';
 import { validation } from '../../../../utils/validation';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -205,20 +206,17 @@ export const Register = () => {
             className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-md"
             variants={itemVariants}
           >
-            <p className="text-sm text-copy">
+            <Body className="text-sm text-copy">
               {location.state?.from?.pathname 
                 ? 'Please create an account or log in to continue.'
                 : 'Please create an account to continue to your requested page.'
               }
-            </p>
+            </Body>
           </motion.div>
         )}
         
-        <motion.h1 className="text-xl font-bold text-main mb-4 text-center" variants={itemVariants}>
-          Create an Account
-        </motion.h1>
+        <Heading level={1} className="text-xl font-bold text-main mb-4 text-center">Create an Account</Heading>
         <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
-          {/* FIXED: First Name Input */}
           <Input
             label="First Name"
             id="firstname"
@@ -264,19 +262,19 @@ export const Register = () => {
                       : 'border-border hover:border-primary/50'
                   }`}>
                   <div className="flex justify-between items-center mb-1">
-                    <h3 className="text-sm font-medium text-main">{option.label}</h3>
+                    <Text className="text-sm font-medium text-main">{option.label}</Text>
                     {userType === option.value && <CheckCircle size={14} className="text-primary" />}
                   </div>
-                  <p className="text-xs text-copy-light">{option.description}</p>
+                  <Body className="text-xs text-copy-light">{option.description}</Body>
                 </div>
               ))}
             </div>
           </div>
           {/* Password Input */}
           <div>
-            <label htmlFor="password" className="block text-xs font-medium text-main mb-1">
+            <Label htmlFor="password" className="block text-xs font-medium text-main mb-1">
               Password
-            </label>
+            </Label>
             <div className="relative">
               <Input
                 id="password"
@@ -314,14 +312,14 @@ export const Register = () => {
                   }`}>
                 </div>
               </div>
-              <p className="text-xs text-copy-light mt-1">Password should be at least 8 characters</p>
+              <Body className="text-xs text-copy-light mt-1">Password should be at least 8 characters</Body>
             </div>
           </div>
           {/* Confirm Password Input */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-xs font-medium text-main mb-1">
+            <Label htmlFor="confirmPassword" className="block text-xs font-medium text-main mb-1">
               Confirm Password
-            </label>
+            </Label>
             <div className="relative">
               <Input
                 id="confirmPassword"
@@ -370,12 +368,12 @@ export const Register = () => {
         <motion.div variants={itemVariants}>
           <div className="relative flex items-center justify-center my-4">
           <div className="border-t border-border-light w-full"></div>
-          <span className="bg-surface px-3 text-xs text-copy-light absolute">Or continue with</span>
+          <Text className="bg-surface px-3 text-xs text-copy-light absolute">Or continue with</Text>
         </div>
         <SocialAuth mode="register" />
-        <motion.p className="text-center mt-4 text-xs text-copy-light" variants={itemVariants}>
+        <Body className="text-center mt-4 text-xs text-copy-light">
           Already have an account? <Link to="/login" className="text-primary hover:underline">Login</Link>
-        </motion.p>
+        </Body>
         </motion.div>
       </motion.div>
     </motion.div>

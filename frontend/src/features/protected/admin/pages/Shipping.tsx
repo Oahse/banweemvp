@@ -7,6 +7,7 @@ import Dropdown from '@/components/ui/Dropdown';
 import AdminLayout from '../components/AdminLayout';
 import { ShippingListSkeleton } from '../components/skeletons/ShippingSkeleton';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
 const LIMIT = 10;
 
@@ -390,7 +391,7 @@ export const AdminShipping = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <p className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage shipping methods and rates</p>
+          <Text variant="body-sm" tone="secondary">Manage shipping methods and rates</Text>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
           <Button
@@ -472,30 +473,33 @@ export const AdminShipping = () => {
           {/* Active Filters */}
           {(debouncedSearchQuery || statusFilter) && (
             <div className={`flex items-center gap-2 pt-2 border-t ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
-              <span className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Active filters:</span>
+              <Text variant="body-sm" tone="secondary">Active filters:</Text>
               {debouncedSearchQuery && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
                   Search: "{debouncedSearchQuery}"
                   <Button
                     onClick={() => setSearchQuery('')}
                     variant="ghost"
                     size="sm"
+                    className="ml-1 hover:text-primary-dark"
+                    leftIcon={<TrashIcon size={12} />}
                   >
-                    Clear
                   </Button>
-                </span>
+                </Text>
               )}
               {statusFilter && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                <Text variant="caption" className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
                   Status: {statusFilter === 'active' ? 'Active Only' : 'Inactive Only'}
                   <Button
                     onClick={() => setStatusFilter('')}
                     variant="ghost"
                     size="sm"
+                    className="ml-1 hover:text-primary-dark"
+                    leftIcon={<TrashIcon size={12} />}
                   >
                     Clear
                   </Button>
-                </span>
+                </Text>
               )}
               <Button
                 onClick={() => {
@@ -520,15 +524,15 @@ export const AdminShipping = () => {
         }`}>
           <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold">Error</p>
-            <p className="text-sm">{error}</p>
+            <Text weight="semibold">Error</Text>
+            <Text variant="body-sm">{error}</Text>
           </div>
         </div>
       )}
 
       <div className={`rounded-lg border overflow-hidden ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className={`p-4 border-b ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-            <h2 className="text-lg font-semibold">All Shipping Methods</h2>
+            <Heading level={2} weight="medium">All Shipping Methods</Heading>
         </div>
 
         {methods.length > 0 ? (
@@ -538,13 +542,13 @@ export const AdminShipping = () => {
               <table className="w-full">
                 <thead className={`${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} border-b ${currentTheme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Method Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Description</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Cost</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Delivery Time</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Regions</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Actions</th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Method Name</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Description</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Cost</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Delivery Time</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Regions</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Status</Text></th>
+                    <th className="px-4 py-3 text-left"><Text variant="caption" weight="semibold">Actions</Text></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -554,21 +558,19 @@ export const AdminShipping = () => {
                       onClick={() => openDetailsModal(method)}
                       className={`border-b cursor-pointer ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:${currentTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}
                     >
-                      <td className={`px-4 py-3 text-xs font-medium ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'} max-w-[150px] truncate`}>{method.name || 'N/A'}</td>
-                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-[200px] truncate`}>{method.description || 'No description'}</td>
-                      <td className={`px-4 py-3 text-xs font-mono font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>${(method.price || 0).toFixed(2)}</td>
-                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{method.estimated_days || '-'} days</td>
-                      <td className={`px-4 py-3 text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-[150px] truncate`}>
-                        {method.regions?.join(', ') || 'All regions'}
-                      </td>
-                      <td className="px-4 py-3 text-xs">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      <td className="px-4 py-3 max-w-[150px] truncate"><Text variant="caption" weight="medium" truncate="single">{method.name || 'N/A'}</Text></td>
+                      <td className="px-4 py-3 max-w-[200px] truncate"><Text variant="caption" tone="secondary" truncate="single">{method.description || 'No description'}</Text></td>
+                      <td className="px-4 py-3"><Text variant="caption" weight="semibold">${(method.price || 0).toFixed(2)}</Text></td>
+                      <td className="px-4 py-3"><Text variant="caption" tone="secondary">{method.estimated_days || '-'} days</Text></td>
+                      <td className="px-4 py-3 max-w-[150px] truncate"><Text variant="caption" tone="secondary" truncate="single">{method.regions?.join(', ') || 'All regions'}</Text></td>
+                      <td className="px-4 py-3">
+                        <Text className={`px-2 py-1 rounded-full font-semibold ${
                           method.is_active 
                             ? 'bg-success/20 text-success' 
                             : 'bg-error/20 text-error'
                         }`}>
                           {method.is_active ? 'Active' : 'Inactive'}
-                        </span>
+                        </Text>
                       </td>
                       <td className="px-4 py-3 text-xs">
                         <div className="flex gap-1">
@@ -600,23 +602,23 @@ export const AdminShipping = () => {
                   className={`p-4 flex flex-col gap-2 cursor-pointer ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${currentTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-primary truncate">{method.name || 'N/A'}</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    <Text variant="body-sm" weight="medium" tone="primary" truncate="single">{method.name || 'N/A'}</Text>
+                    <Text className={`px-2 py-1 rounded-full font-semibold ${
                       method.is_active 
                         ? 'bg-success/20 text-success' 
                         : 'bg-error/20 text-error'
                     }`}>
                       {method.is_active ? 'Active' : 'Inactive'}
-                    </span>
+                    </Text>
                   </div>
-                  <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>{method.description || 'No description'}</div>
-                  <div className={`flex items-center justify-between text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    <span>{method.estimated_days || '-'} days</span>
-                    <span className="font-mono font-semibold">${(method.price || 0).toFixed(2)}</span>
+                  <Text variant="caption" tone="secondary" truncate="single">{method.description || 'No description'}</Text>
+                  <div className="flex items-center justify-between">
+                    <Text variant="caption" tone="secondary">{method.estimated_days || '-'} days</Text>
+                    <Text variant="caption" weight="semibold">${(method.price || 0).toFixed(2)}</Text>
                   </div>
-                  <div className={`text-xs ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'} truncate`}>
+                  <Text variant="caption" tone="secondary" truncate="single">
                     {method.regions?.join(', ') || 'All regions'}
-                  </div>
+                  </Text>
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -634,10 +636,10 @@ export const AdminShipping = () => {
 
             {pagination.total > 0 && (
               <div className={`px-4 lg:px-6 py-4 border-t ${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-                <p className={`text-xs lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} items
+                <Text variant="body-sm" tone="secondary">
+                  Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} methods
                   {pagination.pages > 1 && ` (Page ${pagination.page} of ${pagination.pages})`}
-                </p>
+                </Text>
                 <div className="flex items-center gap-1">
                   <Button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -697,8 +699,8 @@ export const AdminShipping = () => {
           <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold">{viewingMethod.name}</h3>
-                <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Shipping method details</p>
+                <Heading level={3} className="text-lg font-semibold">{viewingMethod.name}</Heading>
+                <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Shipping method details</Body>
               </div>
               <Button
                 onClick={() => setShowDetailsModal(false)}
@@ -711,28 +713,28 @@ export const AdminShipping = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Description</p>
-                <p className={`${currentTheme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{viewingMethod.description || 'No description'}</p>
+                <Body className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Description</Body>
+                <Body className={`${currentTheme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{viewingMethod.description || 'No description'}</Body>
               </div>
               <div>
-                <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Price</p>
-                <p className="font-mono">${(viewingMethod.price || 0).toFixed(2)}</p>
+                <Body className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Price</Body>
+                <Body className="font-mono">${(viewingMethod.price || 0).toFixed(2)}</Body>
               </div>
               <div>
-                <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Estimated Days</p>
-                <p>{viewingMethod.estimated_days} days</p>
+                <Body className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Estimated Days</Body>
+                <Body>{viewingMethod.estimated_days} days</Body>
               </div>
               <div>
-                <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</p>
-                <p>{viewingMethod.is_active ? 'Active' : 'Inactive'}</p>
+                <Body className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</Body>
+                <Body>{viewingMethod.is_active ? 'Active' : 'Inactive'}</Body>
               </div>
               <div>
-                <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Carrier</p>
-                <p>{viewingMethod.carrier || '—'}</p>
+                <Body className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Carrier</Body>
+                <Body>{viewingMethod.carrier || '—'}</Body>
               </div>
               <div>
-                <p className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tracking URL Template</p>
-                <p className="break-all">{viewingMethod.tracking_url_template || '—'}</p>
+                <Body className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tracking URL Template</Body>
+                <Body className="break-all">{viewingMethod.tracking_url_template || '—'}</Body>
               </div>
             </div>
 
@@ -758,8 +760,8 @@ export const AdminShipping = () => {
           <div className={`w-full max-w-2xl rounded-xl p-6 shadow-xl ${currentTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold">{editingMethod ? 'Edit Shipping Method' : 'Add Shipping Method'}</h3>
-                <p className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fill in the details below</p>
+                <Heading level={3} className="text-lg font-semibold">{editingMethod ? 'Edit Shipping Method' : 'Add Shipping Method'}</Heading>
+                <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fill in the details below</Body>
               </div>
               <Button
                 onClick={() => setShowModal(false)}
@@ -772,9 +774,9 @@ export const AdminShipping = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                <Label className={`block text-sm font-medium mb-2 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Name *
-                </label>
+                </Label>
                 <input
                   type="text"
                   value={formData.name}

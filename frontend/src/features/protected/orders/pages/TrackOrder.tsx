@@ -15,6 +15,7 @@ import { toast } from 'react-hot-toast';
 import { unwrapResponse, extractErrorMessage } from '../utils/api-response';
 import { containerVariants, itemVariants } from '../../../utils/pageAnimations';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text/Text';
 
 interface TrackingEvent {
   id: string;
@@ -117,20 +118,18 @@ export const TrackOrder = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
         <div className="max-w-4xl mx-auto text-center">
           <PackageIcon size={48} className="mx-auto text-gray-400 mb-3" />
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
-            Order Not Found
-          </h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          <Heading level={2} weight="semibold">Order Not Found</Heading>
+          <Text variant="caption" tone="secondary">
             We couldn't find tracking information for this order.
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+          </Text>
+          <Text variant="caption" tone="secondary">
             Please check your order number and try again.
-          </p>
+          </Text>
           <Link 
             to="/account/track-order" 
             className="inline-block px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs"
           >
-            Search Another Order
+            <Text variant="caption">Search Another Order</Text>
           </Link>
         </div>
       </div>
@@ -170,12 +169,10 @@ export const TrackOrder = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <h1 className="text-sm font-bold text-gray-900 dark:text-white mb-1">
-                Track Your Order
-              </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <Heading level={1} weight="bold">Track Your Order</Heading>
+              <Text variant="caption" tone="secondary">
                 Order ID: {tracking.order_id}
-              </p>
+              </Text>
             </div>
             <Button
               onClick={handleDownloadInvoice}
@@ -183,20 +180,20 @@ export const TrackOrder = () => {
               className="flex items-center gap-1.5 px-2 py-1.5 text-xs"
             >
               <PrinterIcon size={14} />
-              Download Invoice
+              <Text variant="caption">Download Invoice</Text>
             </Button>
           </div>
 
           {tracking.tracking_number && (
             <div className="flex items-center gap-1.5 mb-3">
-              <span className="text-xs text-gray-600 dark:text-gray-400">Tracking Number:</span>
-              <span className="text-xs font-medium text-gray-900 dark:text-white">
+              <Text variant="caption" tone="secondary">Tracking Number:</Text>
+              <Text variant="caption" weight="medium">
                 {tracking.tracking_number}
-              </span>
+              </Text>
               {tracking.carrier_name && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <Text variant="caption" tone="secondary">
                   ({tracking.carrier_name})
-                </span>
+                </Text>
               )}
             </div>
           )}
@@ -204,9 +201,9 @@ export const TrackOrder = () => {
           {tracking.estimated_delivery && (
             <div className="flex items-center gap-1.5 mb-4">
               <ClockIcon size={12} className="text-gray-400" />
-              <span className="text-xs text-gray-600 dark:text-gray-400">
+              <Text variant="caption" tone="secondary">
                 Estimated Delivery: {new Date(tracking.estimated_delivery).toLocaleDateString()}
-              </span>
+              </Text>
             </div>
           )}
 
@@ -259,16 +256,14 @@ export const TrackOrder = () => {
 
           {/* Current Status */}
           <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
-            <h2 className="text-xs font-semibold text-gray-900 dark:text-white mb-1">
-              Current Status
-            </h2>
-            <p className={`text-xs font-bold ${getStatusColor(tracking.status)}`}>
+            <Heading level={2} weight="semibold">Current Status</Heading>
+            <Text variant="caption" weight="bold" className={getStatusColor(tracking.status)}>
               {tracking.status.charAt(0).toUpperCase() + tracking.status.slice(1).replace(/_/g, ' ')}
-            </p>
+            </Text>
             {tracking.status === 'cancelled' && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              <Text variant="caption" tone="secondary">
                 This order has been cancelled
-              </p>
+              </Text>
             )}
           </div>
         </div>
@@ -276,9 +271,7 @@ export const TrackOrder = () => {
         {/* Tracking Events Timeline */}
         {tracking.tracking_events && tracking.tracking_events.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-            <h2 className="text-xs font-semibold text-gray-900 dark:text-white mb-3">
-              Tracking History
-            </h2>
+            <Heading level={2} weight="semibold">Tracking History</Heading>
             <div className="space-y-3">
               {tracking.tracking_events
                 .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
@@ -292,20 +285,20 @@ export const TrackOrder = () => {
                     </div>
                     <div className="flex-1 pb-4">
                       <div className="flex items-start justify-between mb-0.5">
-                        <p className="text-xs font-medium text-gray-900 dark:text-white">
+                        <Text variant="caption" weight="medium">
                           {event.status.charAt(0).toUpperCase() + event.status.slice(1).replace('_', ' ')}
-                        </p>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        </Text>
+                        <Text variant="caption" tone="secondary">
                           {new Date(event.timestamp).toLocaleString()}
-                        </span>
+                        </Text>
                       </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-0.5">
+                      <Text variant="caption" tone="secondary">
                         {event.description}
-                      </p>
+                      </Text>
                       {event.location && (
-                        <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-1">
                           <MapPinIcon size={12} />
-                          <span>{event.location}</span>
+                          <Text variant="caption" tone="secondary">{event.location}</Text>
                         </div>
                       )}
                     </div>

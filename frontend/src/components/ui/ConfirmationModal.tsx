@@ -1,6 +1,7 @@
 import React from 'react';
 import { XIcon, AlertTriangleIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text/Text';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -64,7 +65,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               <div className={`flex-shrink-0 w-10 h-10 rounded-full ${styles.iconBg} flex items-center justify-center mr-3`}>
                 <AlertTriangleIcon size={20} className={styles.icon} />
               </div>
-              <h3 className="text-lg font-semibold text-main">{title}</h3>
+              <Text variant="body-lg" weight="semibold">{title}</Text>
             </div>
             <Button
               onClick={onClose}
@@ -79,7 +80,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
           {/* Content */}
           <div className="p-4">
-            <p className="text-copy text-sm leading-relaxed">{message}</p>
+            <Text variant="body-sm" tone="secondary">{message}</Text>
           </div>
 
           {/* Actions */}
@@ -91,7 +92,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               size="sm"
               className="px-4 py-2 text-sm font-medium text-copy border border-border rounded-md hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {cancelText}
+              <Text variant="body-sm">{cancelText}</Text>
             </Button>
             <Button
               onClick={onConfirm}
@@ -104,10 +105,10 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Processing...
+                  <Text variant="body-sm">Processing...</Text>
                 </>
               ) : (
-                confirmText
+                <Text variant="body-sm">{confirmText}</Text>
               )}
             </Button>
           </div>

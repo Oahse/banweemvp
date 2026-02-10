@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRightIcon, PlusIcon, MinusIcon, SearchIcon } from 'lucide-react';
 import { categories, faqItems } from '../../../data/faq';
 import { Button } from '@/components/ui/Button';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -61,16 +62,16 @@ export const FAQ = () => {
           Home
         </Link>
         <ChevronRightIcon size={12} className="mx-1" />
-        <span className="text-copy">Frequently Asked Questions</span>
+        <Text className="text-copy">Frequently Asked Questions</Text>
       </motion.nav>
 
       <motion.div className="max-w-4xl mx-auto" variants={itemVariants}>
         <div className="text-center mb-6">
-          <h1 className="text-base md:text-lg font-semibold text-copy mb-2">Frequently Asked Questions</h1>
-          <p className="text-xs text-copy-light max-w-2xl mx-auto">
+          <Heading level={1} className="text-base md:text-lg font-semibold text-copy mb-2">Frequently Asked Questions</Heading>
+          <Body className="text-xs text-copy-light max-w-2xl mx-auto">
             Find answers to common questions about our products, shipping, returns, and more. Can't find what you're
             looking for? Contact our support team.
-          </p>
+          </Body>
         </div>
 
         {/* Search bar */}
@@ -122,7 +123,7 @@ export const FAQ = () => {
                   variant="ghost"
                   size="sm"
                 >
-                  <h3 className="text-sm font-medium text-copy">{item.question}</h3>
+                  <Text className="text-sm font-medium text-copy">{item.question}</Text>
                   {openQuestions.includes(item.id) ? (
                     <MinusIcon size={14} className="text-primary flex-shrink-0" />
                   ) : (
@@ -139,7 +140,7 @@ export const FAQ = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="pt-2 border-t border-border-light">
-                        <p className="text-xs text-copy-light mt-2">{item.answer}</p>
+                        <Body className="text-xs text-copy-light mt-2">{item.answer}</Body>
                       </div>
                     </motion.div>
                   )}
@@ -151,20 +152,20 @@ export const FAQ = () => {
               <div className="mx-auto w-12 h-12 bg-background rounded-full flex items-center justify-center mb-3">
                 <SearchIcon size={16} className="text-copy-lighter" />
               </div>
-              <h3 className="text-sm font-medium text-copy mb-1">No results found</h3>
-              <p className="text-xs text-copy-light">
+              <Text className="text-sm font-medium text-copy mb-1">No results found</Text>
+              <Body className="text-xs text-copy-light">
                 Try adjusting your search or filter to find what you're looking for
-              </p>
+              </Body>
             </div>
           )}
         </motion.div>
 
         {/* Contact section */}
         <motion.div className="mt-8 bg-primary/10 rounded-lg p-4 text-center" variants={itemVariants}>
-          <h2 className="text-sm font-semibold text-copy mb-2">Still have questions?</h2>
-          <p className="text-xs text-copy-light mb-3 max-w-md mx-auto">
+          <Heading level={2} className="text-sm font-semibold text-copy mb-2">Still have questions?</Heading>
+          <Body className="text-xs text-copy-light mb-3 max-w-md mx-auto">
             If you couldn't find the answer you were looking for, our support team is here to help.
-          </p>
+          </Body>
           <Link
             to="/contact"
             className="inline-block bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">

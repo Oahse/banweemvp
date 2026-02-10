@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/Button';
 import { ChevronDownIcon } from 'lucide-react';
+import { Text } from '@/components/ui/Text/Text';
 
 
 const OrderList = ({
@@ -106,7 +107,7 @@ const OrderList = ({
       <div className="p-4 border-b border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <Text variant="body-sm" weight="medium">Status</Text>
             <select
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               value={filters.status || ''}
@@ -123,7 +124,7 @@ const OrderList = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <Text variant="body-sm" weight="medium">Start Date</Text>
             <input
               type="date"
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
@@ -133,7 +134,7 @@ const OrderList = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <Text variant="body-sm" weight="medium">End Date</Text>
             <input
               type="date"
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
@@ -143,7 +144,7 @@ const OrderList = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Min Amount</label>
+            <Text variant="body-sm" weight="medium">Min Amount</Text>
             <input
               type="number"
               placeholder="0.00"
@@ -154,7 +155,7 @@ const OrderList = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Max Amount</label>
+            <Text variant="body-sm" weight="medium">Max Amount</Text>
             <input
               type="number"
               placeholder="1000.00"
@@ -173,9 +174,9 @@ const OrderList = ({
           >
             Clear Filters
           </Button>
-          <div className="text-sm text-gray-500">
+          <Text variant="body-sm" tone="secondary">
             Showing {paginatedOrders.length} of {orders.length} orders
-          </div>
+          </Text>
         </div>
       </div>
 
@@ -234,36 +235,26 @@ const OrderList = ({
             {paginatedOrders.map((order) => (
               <tr key={order.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    #{order.id.slice(-8)}
-                  </div>
+                  <Text variant="body-sm" weight="medium">#{order.id.slice(-8)}</Text>
                   {order.tracking_number && (
-                    <div className="text-xs text-gray-500">
+                    <Text variant="caption" tone="secondary">
                       Tracking: {order.tracking_number}
-                    </div>
+                    </Text>
                   )}
                 </td>
                 {userRole === 'admin' && (
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      User {order.user_id.slice(-8)}
-                    </div>
+                    <Text variant="body-sm">User {order.user_id.slice(-8)}</Text>
                   </td>
                 )}
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                  <Text variant="caption" className={`px-2 py-1 font-medium rounded-full ${getStatusColor(order.status)}`}>
                     {order.status}
-                  </span>
+                  </Text>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {order.currency}{order.total_amount.toFixed(2)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {order.items.length} items
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {format(new Date(order.created_at), 'MMM dd, yyyy')}
-                </td>
+                  <Text variant="body-sm">{order.currency}{order.total_amount.toFixed(2)}</Text>
+                  <Text variant="body-sm" tone="secondary">{order.items.length} items</Text>
+                  <Text variant="body-sm" tone="secondary">{format(new Date(order.created_at), 'MMM dd, yyyy')}</Text>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                   <Button
                     onClick={() => onOrderSelect?.(order)}
@@ -296,23 +287,22 @@ const OrderList = ({
       {/* Empty State */}
       {paginatedOrders.length === 0 && (
         <div className="text-center py-12">
-          <div className="text-4xl mb-4">📦</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No orders found</h3>
-          <p className="text-gray-500">
+          <Text variant="display" className="text-4xl mb-4">📦</Text>
+          <Text variant="body-lg" weight="medium">No orders found</Text>
+          <Text variant="body" tone="secondary">
             {orders.length === 0 
               ? "No orders have been placed yet." 
-              : "No orders match your current filters."
-            }
-          </p>
+              : "No orders match your current filters."}
+          </Text>
         </div>
       )}
 
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-          <div className="text-sm text-gray-500">
+          <Text variant="body-sm" tone="secondary">
             Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, orders.length)} of {orders.length} results
-          </div>
+          </Text>
           <div className="flex items-center space-x-2">
             <Button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}

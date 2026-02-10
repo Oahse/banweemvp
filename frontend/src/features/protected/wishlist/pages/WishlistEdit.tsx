@@ -14,7 +14,7 @@ import { toast } from 'react-hot-toast';
 import { ProductVariantModal } from '@/components/ui/ProductVariantModal';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Label } from '@/components/ui/Text/Text';
+import { Text, Display, Heading, Body, Caption, Label, Code, Quote } from '@/components/ui/Text/Text';
 import { Product, ProductVariant } from '@/types';
 interface WishlistDetail {
   id: string;
@@ -209,7 +209,7 @@ export const WishlistEdit = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="ml-4 text-gray-600 dark:text-gray-400">Loading wishlist...</p>
+        <Body className="ml-4 text-gray-600 dark:text-gray-400">Loading wishlist...</Body>
       </div>
     );
   }
@@ -217,7 +217,7 @@ export const WishlistEdit = () => {
   if (error || !wishlist) {
     return (
       <div className="text-center p-6">
-        <p className="text-red-600 dark:text-red-400">Error: {error || 'Wishlist not found'}</p>
+        <Body className="text-red-600 dark:text-red-400">Error: {error || 'Wishlist not found'}</Body>
         <Button
           onClick={() => navigate('/account/wishlist')}
           variant="secondary"
@@ -305,20 +305,16 @@ export const WishlistEdit = () => {
               </div>
               
               <div>
-                <label className="flex items-center">
+                <Label className="flex items-center">
                   <input
                     type="checkbox"
                     checked={formData.is_public}
                     onChange={(e) => setFormData(prev => ({ ...prev, is_public: e.target.checked }))}
                     className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
                   />
-                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                    Make wishlist public
-                  </span>
-                </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Anyone with the link can view this wishlist
-                </p>
+                  <Text as="span" className="ml-2 text-sm text-gray-700 dark:text-gray-300">Make wishlist public</Text>
+                </Label>
+                <Caption className="text-xs text-gray-500 dark:text-gray-400 mt-1">Anyone with the link can view this wishlist</Caption>
               </div>
             </div>
 
@@ -393,21 +389,15 @@ export const WishlistEdit = () => {
 
                         {/* Product Info */}
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900 dark:text-white">
+                          <Heading level={4} className="font-medium text-gray-900 dark:text-white">
                             {product?.name || 'Unknown Product'}
-                          </h4>
+                          </Heading>
                           {variant && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {variant.name} • SKU: {variant.sku}
-                            </p>
+                            <Caption className="text-sm text-gray-600 dark:text-gray-400">{variant.name} • SKU: {variant.sku}</Caption>
                           )}
                           <div className="flex items-center gap-4 mt-2">
-                            <span className="font-medium text-gray-900 dark:text-white">
-                              {variant ? getVariantPrice(variant) : getProductPrice(product || {} as Product)}
-                            </span>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              Qty: {item.quantity}
-                            </span>
+                            <Body className="font-medium text-gray-900 dark:text-white">{variant ? getVariantPrice(variant) : getProductPrice(product || {} as Product)}</Body>
+                            <Caption className="text-sm text-gray-600 dark:text-gray-400">Qty: {item.quantity}</Caption>
                           </div>
                         </div>
 

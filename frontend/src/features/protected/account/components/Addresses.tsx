@@ -167,16 +167,14 @@ export const Addresses = () => {
     return (
       <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
         <MapPinIcon size={48} className="mx-auto text-gray-400 mb-3" />
-        <p className="text-gray-500 dark:text-gray-400 mb-3">
-          Unable to load addresses
-        </p>
+        <Text variant="body" tone="secondary">Unable to load addresses</Text>
         <Button 
           onClick={() => fetchAddresses(AuthAPI.getAddresses)} 
           variant="link"
           size="sm"
           className="text-primary hover:underline"
         >
-          Try again
+          <Text variant="body-sm" className="text-primary hover:underline">Try again</Text>
         </Button>
       </div>
     );
@@ -192,7 +190,7 @@ export const Addresses = () => {
           {/* Button to toggle the add/edit address form */}
           <Button onClick={() => setShowAddressForm(!showAddressForm)} className="flex items-center text-primary hover:text-primary-dark">
             <PlusCircleIcon size={18} className="mr-1" />
-            <span>Add New Address</span>
+            <Text variant="body-sm">Add New Address</Text>
           </Button>
         </div>
         {/* Display existing addresses or a message if none are saved */}
@@ -205,29 +203,29 @@ export const Addresses = () => {
                     <Text className="mr-1">
                       {getAddressTypeIcon(address.kind)}
                     </Text>
-                      <Text className="text-sm font-medium text-main dark:text-white capitalize">
+                      <Text variant="body-sm" weight="medium" className="capitalize">
                       {address.kind}
                     </Text>
                   </div>
                 </div>
-                  <Text className="text-gray-600 dark:text-gray-300 text-sm">
+                  <Text variant="body-sm" tone="secondary">
                   {address.street}
                 </Text>
-                  <Text className="text-gray-600 dark:text-gray-300 text-sm">
+                  <Text variant="body-sm" tone="secondary">
                   {address.city}, {address.state} {address.post_code}
                 </Text>
-                  <Text className="text-gray-600 dark:text-gray-300 text-sm">
+                  <Text variant="body-sm" tone="secondary">
                   {getCountryByCode(address.country)?.name || address.country}
                 </Text>
                 <div className="flex mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                   {/* Edit and Delete buttons for each address */}
                     <Button onClick={() => handleEditAddress(address)} variant="ghost" size="sm" className="flex items-center text-sm text-gray-600 hover:text-primary dark:text-gray-300 mr-3">
                       <PencilIcon size={14} className="mr-1" />
-                      Edit
+                      <Text variant="body-sm">Edit</Text>
                     </Button>
                     <Button onClick={() => handleDeleteAddress(address.id)} variant="ghost" size="sm" className="flex items-center text-sm text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 mr-3">
                       <TrashIcon size={14} className="mr-1" />
-                      Delete
+                      <Text variant="body-sm">Delete</Text>
                     </Button>
                 </div>
               </div>
@@ -236,12 +234,8 @@ export const Addresses = () => {
         ) : (
           <div className="text-center py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
             <MapPinIcon size={36} className="mx-auto text-gray-400 mb-2" />
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
-              No addresses saved yet
-            </p>
-            <Button onClick={() => setShowAddressForm(true)} variant="link" size="sm" className="text-primary hover:underline text-xs">
-              Add your first address
-            </Button>
+            <Text variant="caption" tone="secondary">No addresses saved yet</Text>
+            <Text variant="caption" className="text-primary hover:underline">Add your first address</Text>
           </div>
         )}
         {/* Add/Edit Address Form */}
@@ -254,16 +248,12 @@ export const Addresses = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Street Address Input */}
                 <div className="md:col-span-2">
-                  <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Street Address
-                  </Label>
+                  <Label>Street Address</Label>
                   <input type="text" name="street" value={formData.street} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white" required />
                 </div>
                 {/* City Input */}
                 <div>
-                  <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    City
-                  </Label>
+                  <Label>City</Label>
                   {getCitiesByProvince(formData.country, formData.state).length > 0 ? (
                     <Dropdown
                       options={getCityOptions(formData.country, formData.state)}
@@ -280,9 +270,7 @@ export const Addresses = () => {
                 </div>
                 {/* State/Province Input */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    State / Province
-                  </label>
+                  <Label>State / Province</Label>
                   {getProvincesByCountry(formData.country).length > 0 ? (
                     <Dropdown
                       options={getProvinceOptions(formData.country)}
@@ -306,16 +294,12 @@ export const Addresses = () => {
                 </div>
                 {/* Postal/Zip Code Input */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Postal / Zip Code
-                  </label>
+                  <Label>Postal / Zip Code</Label>
                   <input type="text" name="post_code" value={formData.post_code} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-primary dark:bg-gray-700 dark:text-white" required />
                 </div>
                 {/* Country Dropdown */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Country
-                  </label>
+                  <Label>Country</Label>
                   <Dropdown
                     options={getCountryOptions()}
                     value={formData.country}
@@ -328,9 +312,7 @@ export const Addresses = () => {
                 </div>
                  {/* Address Type Dropdown */}
                  <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Address Type
-                  </label>
+                  <Label>Address Type</Label>
                   <Dropdown
                     options={[
                       { value: 'Shipping', label: 'Shipping Address' },
@@ -348,7 +330,7 @@ export const Addresses = () => {
               {/* Form Action Buttons */}
               <div className="mt-6 flex justify-end space-x-3">
                 <Button type="button" onClick={resetForm} variant="outline" size="sm" className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  Cancel
+                  <Text variant="body-sm">Cancel</Text>
                 </Button>
                 <Button type="submit" variant="primary" size="sm" className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md">
                   {editingAddressId ? 'Update Address' : 'Add Address'}
