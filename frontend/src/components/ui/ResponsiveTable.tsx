@@ -1,4 +1,5 @@
 import React from 'react';
+import { Text } from '@/components/ui/Text/Text';
 
 interface Column<T> {
   key: string;
@@ -90,7 +91,7 @@ export function ResponsiveTable<T>({
               <tr>
                 {columns.map((col, idx) => (
                   <th key={idx} className="py-3 px-4 text-left font-medium text-main text-sm whitespace-nowrap">
-                    {col.label}
+                    <Text as="span">{col.label}</Text>
                   </th>
                 ))}
               </tr>
@@ -131,12 +132,12 @@ export function ResponsiveTable<T>({
                 .filter((col) => !col.hideOnMobile)
                 .map((col, idx) => (
                   <div key={idx} className="flex justify-between items-start">
-                    <span className="text-sm font-medium text-copy-light mr-2 flex-shrink-0">
+                    <Text as="span" className="text-sm font-medium text-copy-light mr-2 flex-shrink-0">
                       {col.mobileLabel || col.label}:
-                    </span>
-                    <span className="text-sm text-main text-right flex-1 min-w-0">
+                    </Text>
+                    <Text as="span" className="text-sm text-main text-right flex-1 min-w-0">
                       {col.render(item)}
-                    </span>
+                    </Text>
                   </div>
                 ))}
             </div>

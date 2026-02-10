@@ -9,6 +9,7 @@ import {
 } from '../../utils/countries';
 import { ChevronDownIcon, SearchIcon, XIcon, GlobeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text';
 
 export const CountrySelector = ({
   value,
@@ -190,7 +191,7 @@ export const CountrySelector = ({
                   {selectedCountry.flag}
                 </span>
               )}
-              <span className="truncate">{selectedCountry.name}</span>
+              <Text as="span" className="truncate">{selectedCountry.name}</Text>
               {showPhoneCode && (
                 <span className="ml-2 text-copy-light text-sm">
                   {selectedCountry.phoneCode}
@@ -203,10 +204,10 @@ export const CountrySelector = ({
               )}
             </>
           ) : (
-            <span className="text-copy-light flex items-center">
+            <Text as="span" className="text-copy-light flex items-center">
               <GlobeIcon size={16} className="mr-2" />
               {placeholder}
-            </span>
+            </Text>
           )}
         </div>
         
@@ -265,9 +266,9 @@ export const CountrySelector = ({
             {Object.entries(groupedCountries).map(([groupName, groupCountries]) => (
               <div key={groupName}>
                 {groupByContinent && (
-                  <div className="px-3 py-2 text-xs font-semibold text-copy-light bg-surface-hover border-b border-border-light">
+                  <Text as="div" className="px-3 py-2 text-xs font-semibold text-copy-light bg-surface-hover border-b border-border-light">
                     {groupName}
-                  </div>
+                  </Text>
                 )}
                 {groupCountries.map((country) => {
                   const globalIndex = allOptions.filter(option => 'code' in option).findIndex(c => c.code === country.code);
@@ -295,13 +296,13 @@ export const CountrySelector = ({
                         </span>
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="truncate">{country.name}</div>
+                        <Text as="div" className="truncate">{country.name}</Text>
                         {(showPhoneCode || showCurrency) && (
-                          <div className="text-xs text-copy-light mt-0.5">
+                          <Text as="div" className="text-xs text-copy-light mt-0.5">
                             {showPhoneCode && country.phoneCode}
                             {showPhoneCode && showCurrency && ' • '}
                             {showCurrency && `${getCurrencySymbol(country.currency)} ${country.currency}`}
-                          </div>
+                          </Text>
                         )}
                       </div>
                     </Button>
@@ -313,9 +314,9 @@ export const CountrySelector = ({
             {filteredCountries.length === 0 && (
               <div className="px-3 py-8 text-center text-copy-light">
                 <GlobeIcon size={24} className="mx-auto mb-2 text-copy-muted" />
-                <p>No countries found</p>
+                <Text as="p">No countries found</Text>
                 {searchQuery && (
-                  <p className="text-sm mt-1">Try a different search term</p>
+                  <Text as="p" className="text-sm mt-1">Try a different search term</Text>
                 )}
               </div>
             )}

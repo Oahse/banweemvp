@@ -5,6 +5,7 @@ import { useAuth } from '../../../AuthContext';
 import { Loading } from '../Loading';
 import { Error } from '../Error';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading, Label } from '@/components/ui/Text';
 
 interface UserData {
   id: string;
@@ -147,7 +148,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
   }
 
   if (!user) {
-    return <div className="text-center py-8">No user data available</div>;
+    return <div className="text-center py-8"><Text as="p">No user data available</Text></div>;
   }
 
   return (
@@ -155,7 +156,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h2 className="heading text-xl">Profile Information</h2>
+          <Heading level={2} className="heading text-xl">Profile Information</Heading>
           {!isEditing ? (
             <Button
               onClick={() => setIsEditing(true)}
@@ -201,7 +202,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
             />
             {isEditing && (
               <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity">
-                <span className="text-white text-xs">Change</span>
+                <Text as="span" className="text-white text-xs">Change</Text>
                 <input
                   type="file"
                   accept="image/*"
@@ -215,16 +216,16 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
             )}
           </div>
           <div>
-            <h3 className="heading text-lg">{user.firstname} {user.lastname}</h3>
-            <p className="body-text text-gray-600">{user.email}</p>
+            <Heading level={3} className="heading text-lg">{user.firstname} {user.lastname}</Heading>
+            <Text as="p" className="body-text text-gray-600">{user.email}</Text>
             {user.is_verified ? (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+              <Text as="span" className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
                 ✓ Verified
-              </span>
+              </Text>
             ) : (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+              <Text as="span" className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
                 Unverified
-              </span>
+              </Text>
             )}
           </div>
         </div>
@@ -235,9 +236,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* First Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              First Name
-            </label>
+            <Label className="block text-sm font-medium text-gray-700 mb-1">First Name</Label>
             {isEditing ? (
               <input
                 type="text"
@@ -246,15 +245,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             ) : (
-              <p className="body-text py-2">{user.firstname}</p>
+              <Text as="p" className="body-text py-2">{user.firstname}</Text>
             )}
           </div>
 
           {/* Last Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
-            </label>
+            <Label className="block text-sm font-medium text-gray-700 mb-1">Last Name</Label>
             {isEditing ? (
               <input
                 type="text"
@@ -263,24 +260,20 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             ) : (
-              <p className="body-text py-2">{user.lastname}</p>
+              <Text as="p" className="body-text py-2">{user.lastname}</Text>
             )}
           </div>
         </div>
 
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address
-          </label>
-          <p className="body-text py-2 text-gray-500">{user.email} (cannot be changed)</p>
+          <Label className="block text-sm font-medium text-gray-700 mb-1">Email Address</Label>
+          <Text as="p" className="body-text py-2 text-gray-500">{user.email} (cannot be changed)</Text>
         </div>
 
         {/* Phone */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Phone Number
-          </label>
+          <Label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</Label>
           {isEditing ? (
             <input
               type="tel"
@@ -290,15 +283,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
               placeholder="Enter phone number"
             />
           ) : (
-            <p className="body-text py-2">{user.phone || 'Not provided'}</p>
+            <Text as="p" className="body-text py-2">{user.phone || 'Not provided'}</Text>
           )}
         </div>
 
         {/* Date of Birth */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Date of Birth
-          </label>
+          <Label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</Label>
           {isEditing ? (
             <input
               type="date"
@@ -306,19 +297,19 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId, onUserUpdate }
               onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             />
-          ) : (
-            <p className="body-text py-2">
+            ) : (
+            <Text as="p" className="body-text py-2">
               {user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString() : 'Not provided'}
-            </p>
-          )}
+            </Text>
+            )}
         </div>
       </div>
 
       {/* Footer */}
       <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
         <div className="flex justify-between text-sm text-gray-500">
-          <span>Member since: {new Date(user.created_at).toLocaleDateString()}</span>
-          <span>Last updated: {new Date(user.updated_at).toLocaleDateString()}</span>
+          <Text as="span">Member since: {new Date(user.created_at).toLocaleDateString()}</Text>
+          <Text as="span">Last updated: {new Date(user.updated_at).toLocaleDateString()}</Text>
         </div>
       </div>
     </div>

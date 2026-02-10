@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../../utils/utils';
 import { ChevronDownIcon, MenuIcon, XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text/Text';
 
 
 export const Navigation = ({
@@ -76,13 +77,13 @@ export const Navigation = ({
       )}>
         <div className="flex items-center space-x-2">
           {item.icon && (
-            <span className="flex-shrink-0">{item.icon}</span>
+            <Text as="span" className="flex-shrink-0">{item.icon}</Text>
           )}
-          <span>{item.label}</span>
+          <Text as="span">{item.label}</Text>
           {item.badge && (
-            <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full">
+            <Text as="span" className="bg-primary text-white text-xs px-2 py-0.5 rounded-full">
               {item.badge}
-            </span>
+            </Text>
           )}
         </div>
         {hasChildren && (
@@ -193,11 +194,11 @@ export const Breadcrumb = ({
         {items.map((item, index) => (
           <li key={index} className="flex items-center space-x-2">
             {index > 0 && (
-              <span className="text-copy-muted" aria-hidden="true">
+              <Text as="span" className="text-copy-muted" aria-hidden="true">
                 {separator}
-              </span>
+              </Text>
             )}
-            {item.href ? (
+              {item.href ? (
               <Link
                 to={item.href}
                 className="text-copy-light hover:text-primary transition-colors"
@@ -205,9 +206,9 @@ export const Breadcrumb = ({
                 {item.label}
               </Link>
             ) : (
-              <span className="text-copy font-medium" aria-current="page">
+              <Text as="span" className="text-copy font-medium" aria-current="page">
                 {item.label}
-              </span>
+              </Text>
             )}
           </li>
         ))}

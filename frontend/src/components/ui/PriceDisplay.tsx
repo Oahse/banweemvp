@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocale } from '../../../LocaleContext';
+import { Text } from '@/components/ui/Text/Text';
 
 interface PriceDisplayProps {
   /** The price amount to display */
@@ -58,31 +59,31 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
 
   if (symbolOnly) {
     return (
-      <span className={`font-bold text-primary ${sizeClasses[size]} ${className}`}>
+      <Text as="span" className={`font-bold text-primary ${sizeClasses[size]} ${className}`}>
         {formatCurrency(displayPrice)}
-      </span>
+      </Text>
     );
   }
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       {/* Current/Sale Price */}
-      <span className={`font-bold text-primary ${sizeClasses[size]}`}>
+      <Text as="span" className={`font-bold text-primary ${sizeClasses[size]}`}>
         {formatCurrency(displayPrice)}
-      </span>
+      </Text>
 
       {/* Original Price (if on sale) */}
       {hasDiscount && (
-        <span className={`text-copy-light line-through ${saleSizeClasses[size]}`}>
+        <Text as="span" className={`text-copy-light line-through ${saleSizeClasses[size]}`}>
           {formatCurrency(amount)}
-        </span>
+        </Text>
       )}
 
       {/* Discount Badge */}
       {hasDiscount && showDiscount && discountPercentage > 0 && (
-        <span className="bg-error text-white text-xs font-medium px-2 py-1 rounded-full">
+        <Text as="span" className="bg-error text-white text-xs font-medium px-2 py-1 rounded-full">
           -{discountPercentage}%
-        </span>
+        </Text>
       )}
     </div>
   );
@@ -106,8 +107,8 @@ export const SimplePriceDisplay: React.FC<{
   };
 
   return (
-    <span className={`${sizeClasses[size]} ${className}`}>
+    <Text as="span" className={`${sizeClasses[size]} ${className}`}>
       {formatCurrency(amount)}
-    </span>
+    </Text>
   );
 };

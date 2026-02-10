@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../utils/utils';
+import { Text } from '@/components/ui/Text/Text';
 import LoadingSpinner from '../shared/LoadingSpinner';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -90,7 +91,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       disabled={disabled || isLoading}
       {...props}
     >
-      <span className={cn(
+      <Text as="span" className={cn(
         'flex items-center justify-center gap-2',
         isLoading && 'opacity-0'
       )}>
@@ -99,18 +100,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
             {leftIcon}
           </span>
         )}
-        {children && <span className="truncate">{children}</span>}
+        {children && <Text as="span" className="truncate">{children}</Text>}
         {rightIcon && (
           <span className="flex-shrink-0" aria-hidden="true">
             {rightIcon}
           </span>
         )}
-      </span>
+      </Text>
       
       {isLoading && (
         <span className="absolute inset-0 flex items-center justify-center">
           <LoadingSpinner size="sm" />
-          <span className="sr-only">Loading...</span>
+          <Text as="span" className="sr-only">Loading...</Text>
         </span>
       )}
     </button>

@@ -12,7 +12,7 @@ import { BarcodeDisplay } from '@/features/public/products/components/BarcodeDis
 import { toast } from 'react-hot-toast';
 import { cn } from '@/utils/utils';
 import { Button } from '@/components/ui/Button';
-import { Heading, Text } from '@/components/ui/Text/Text';
+import { Heading, Text } from '@/components/ui/Text';
 
 /**
  * @typedef {object} ProductVariantImage

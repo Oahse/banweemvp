@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import { Text, Heading } from '@/components/ui/Text';
 import { cn } from '../../utils/utils';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -115,13 +116,14 @@ export const CardTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTM
   children,
   ...props
 }, ref) => (
-  <h3
-    ref={ref}
+  <Heading
+    ref={ref as any}
+    level={3}
     className={cn('text-lg font-semibold leading-none tracking-tight text-copy', className)}
     {...props}
   >
     {children}
-  </h3>
+  </Heading>
 ));
 
 CardTitle.displayName = 'CardTitle';
@@ -131,13 +133,14 @@ export const CardDescription = forwardRef<HTMLParagraphElement, React.HTMLAttrib
   children,
   ...props
 }, ref) => (
-  <p
-    ref={ref}
+  <Text
+    ref={ref as any}
+    as="p"
     className={cn('text-sm text-copy-light', className)}
     {...props}
   >
     {children}
-  </p>
+  </Text>
 ));
 
 CardDescription.displayName = 'CardDescription';

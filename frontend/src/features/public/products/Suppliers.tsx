@@ -184,12 +184,12 @@ export const Suppliers = () => {
                   <div className="space-y-3 mb-4">
                     {supplier.email && (
                       <a
-                        href={`mailto:${supplier.email}`}
-                        className="flex items-center text-sm text-copy-light hover:text-primary transition-colors"
-                      >
-                        <MailIcon className="w-4 h-4 mr-2" />
-                        {supplier.email}
-                      </a>
+                          href={`mailto:${supplier.email}`}
+                          className="flex items-center text-sm text-copy-light hover:text-primary transition-colors"
+                        >
+                          <MailIcon className="w-4 h-4 mr-2" />
+                          <Text as="span">{supplier.email}</Text>
+                        </a>
                     )}
                     
                     {supplier.phone && (
@@ -198,7 +198,7 @@ export const Suppliers = () => {
                         className="flex items-center text-sm text-copy-light hover:text-primary transition-colors"
                       >
                         <PhoneIcon className="w-4 h-4 mr-2" />
-                        {supplier.phone}
+                        <Text as="span">{supplier.phone}</Text>
                       </a>
                     )}
                     
@@ -212,25 +212,23 @@ export const Suppliers = () => {
 
                   {/* Stats */}
                   <div className="flex items-center justify-between text-sm mb-4">
-                    <div className="text-center">
+                      <div className="text-center">
                       <div className="font-semibold text-main">{supplier.product_count || 0}</div>
-                      <div className="text-copy-light text-xs">Products</div>
+                      <Text as="span" className="text-copy-light text-xs">Products</Text>
                     </div>
                     <div className="text-center">
                       <div className="font-semibold text-main">{supplier.rating_average?.toFixed(1) || '0.0'}</div>
-                      <div className="text-copy-light text-xs">Rating</div>
+                      <Text as="span" className="text-copy-light text-xs">Rating</Text>
                     </div>
                     <div className="text-center">
                       <div className="font-semibold text-main">{supplier.review_count || 0}</div>
-                      <div className="text-copy-light text-xs">Reviews</div>
+                      <Text as="span" className="text-copy-light text-xs">Reviews</Text>
                     </div>
                   </div>
 
                   {/* Bio */}
                   {supplier.bio && (
-                    <p className="text-sm text-copy-light mb-4 line-clamp-3">
-                      {supplier.bio}
-                    </p>
+                    <Text as="p" className="text-sm text-copy-light mb-4 line-clamp-3">{supplier.bio}</Text>
                   )}
 
                   {/* Specialties */}
@@ -238,17 +236,18 @@ export const Suppliers = () => {
                     <div className="mb-4">
                       <div className="flex flex-wrap gap-1">
                         {supplier.specialties.slice(0, 3).map((specialty, idx) => (
-                          <span
+                          <Text
                             key={idx}
+                            as="span"
                             className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
                           >
                             {specialty}
-                          </span>
+                          </Text>
                         ))}
                         {supplier.specialties.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                          <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
                             +{supplier.specialties.length - 3} more
-                          </span>
+                          </Text>
                         )}
                       </div>
                     </div>

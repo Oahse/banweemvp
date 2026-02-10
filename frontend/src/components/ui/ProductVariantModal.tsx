@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, SearchIcon, PackageIcon, PlusIcon, CheckIcon } from 'lucide-react';
 import { useLocale } from '../../../LocaleContext';
+import { Text, Heading, Caption } from '@/components/ui/Text/Text';
 import ProductsAPI from '../../api/products';
 import { toast } from 'react-hot-toast';
 import { Product } from '../../types';
@@ -112,7 +113,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
         {/* Header */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
+            <Heading level={2} className="text-xl font-bold text-gray-900 dark:text-white">{title}</Heading>
             <Button
               onClick={onClose}
               variant="ghost"
@@ -140,12 +141,12 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
             <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                    {selected.size}
-                  </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {selected.size} variant{selected.size !== 1 ? 's' : ''} selected
-                  </span>
+                      <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                        {selected.size}
+                      </div>
+                      <Text as="span" className="text-sm font-medium text-gray-900 dark:text-white">
+                        {selected.size} variant{selected.size !== 1 ? 's' : ''} selected
+                      </Text>
                 </div>
                 <Button
                   onClick={() => {
@@ -166,16 +167,16 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center justify-center py-12">
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <span className="ml-3 text-gray-600 dark:text-gray-400">Loading products...</span>
+              <Text as="span" className="ml-3 text-gray-600 dark:text-gray-400">Loading products...</Text>
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-12">
               <PackageIcon size={48} className="text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400 mb-2">
+              <Caption className="text-gray-600 dark:text-gray-400 mb-2">
                 {searchQuery ? 'No products found matching your search.' : 'No products available.'}
-              </p>
+              </Caption>
               {searchQuery && (
                 <Button
                   onClick={() => setSearchQuery('')}
@@ -209,30 +210,30 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                        <Heading level={3} className="font-semibold text-gray-900 dark:text-white truncate">
                           {product.name}
-                        </h3>
+                        </Heading>
                         {product.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 truncate mt-1">
+                          <Caption className="text-sm text-gray-600 dark:text-gray-400 truncate mt-1">
                             {product.description}
-                          </p>
+                          </Caption>
                         )}
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          <Text as="span" className="text-sm font-medium text-gray-900 dark:text-white">
                             {formatCurrencyLocale(product.price || product.min_price || 0, currency)}
-                          </span>
+                          </Text>
                           {product.min_price !== product.max_price && product.max_price && (
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <Text as="span" className="text-sm text-gray-500 dark:text-gray-400">
                               - {formatCurrencyLocale(product.max_price, currency)}
-                            </span>
+                            </Text>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {product.variants && product.variants.length > 0 && (
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                          <Text as="span" className="text-sm text-gray-500 dark:text-gray-400">
                             {product.variants.length} variant{product.variants.length !== 1 ? 's' : ''}
-                          </span>
+                          </Text>
                         )}
                         <div className={`transform transition-transform ${expandedProducts.has(product.id) ? 'rotate-180' : ''}`}>
                           <PlusIcon size={20} className="text-gray-400" />
@@ -244,9 +245,9 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                   {/* Variants */}
                   {expandedProducts.has(product.id) && product.variants && product.variants.length > 0 && (
                     <div className="p-4 space-y-2">
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                          <Text as="p" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                         Available Variants:
-                      </p>
+                      </Text>
                       {product.variants.map((variant: any) => {
                         const isSelected = selected.has(variant.id);
                         const isAvailable = getVariantAvailability(variant);
@@ -284,30 +285,30 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                             {/* Variant Info */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900 dark:text-white text-sm">
+                                <Text as="span" className="font-medium text-gray-900 dark:text-white text-sm">
                                   {variant.name || "Default Variant"}
-                                </span>
+                                </Text>
                                 {variant.sku && (
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  <Caption className="text-xs text-gray-500 dark:text-gray-400">
                                     SKU: {variant.sku}
-                                  </span>
+                                  </Caption>
                                 )}
                               </div>
                               {showOnlyAvailable && variant.inventory && (
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <Caption className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                   Stock: {variant.inventory.quantity_available || 0}
-                                </div>
+                                </Caption>
                               )}
                             </div>
 
                             {/* Price and Selection */}
                             <div className="flex items-center gap-3">
-                              <span className="font-medium text-gray-900 dark:text-white text-sm">
+                              <Text as="span" className="font-medium text-gray-900 dark:text-white text-sm">
                                 {formatCurrencyLocale(
                                   variant.current_price || variant.base_price || variant.price || 0,
                                   currency
                                 )}
-                              </span>
+                              </Text>
                               {isSelected && (
                                 <div className="w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center">
                                   <CheckIcon size={12} />
@@ -330,14 +331,14 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                           onChange={() => handleVariantToggle(product.id)}
                           className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
                         />
-                        <div className="flex-1">
-                          <span className="font-medium text-gray-900 dark:text-white text-sm">
+                          <div className="flex-1">
+                          <Text as="span" className="font-medium text-gray-900 dark:text-white text-sm">
                             Default Variant
-                          </span>
+                          </Text>
                         </div>
-                        <span className="font-medium text-gray-900 dark:text-white text-sm">
+                        <Text as="span" className="font-medium text-gray-900 dark:text-white text-sm">
                           {formatCurrencyLocale(product.price || 0, currency)}
-                        </span>
+                        </Text>
                         {selected.has(product.id) && (
                           <div className="w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center">
                             <CheckIcon size={12} />

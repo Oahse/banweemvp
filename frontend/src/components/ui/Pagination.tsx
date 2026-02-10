@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/Text/Text';
 
 interface PaginationProps {
   currentPage: number;
@@ -53,9 +54,9 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className={`flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 ${className}`}>
       <div className="text-sm text-copy-light text-center sm:text-left">
-        Showing <span className="font-medium">{showingStart}</span> to{' '}
-        <span className="font-medium">{showingEnd}</span> of{' '}
-        <span className="font-medium">{totalItems}</span> {itemName}
+        Showing <Text as="span" className="font-medium">{showingStart}</Text> to{' '}
+        <Text as="span" className="font-medium">{showingEnd}</Text> of{' '}
+        <Text as="span" className="font-medium">{totalItems}</Text> {itemName}
       </div>
       
       <div className="flex items-center justify-center space-x-1 sm:space-x-2">
@@ -68,7 +69,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
         >
           <ChevronLeftIcon className="w-4 h-4" />
-          <span className="hidden sm:inline ml-1">Previous</span>
+          <Text as="span" className="hidden sm:inline ml-1">Previous</Text>
         </Button>
         
         {/* Page numbers */}
@@ -99,7 +100,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           size="sm"
           className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
         >
-          <span className="hidden sm:inline mr-1">Next</span>
+          <Text as="span" className="hidden sm:inline mr-1">Next</Text>
           <ChevronRightIcon className="w-4 h-4" />
         </Button>
       </div>

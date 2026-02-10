@@ -13,6 +13,7 @@ import {
 import { useAsync } from '../../../shared/hooks/useAsync';
 import { stockMonitor } from '../../utils/stock-monitor';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text';
 
 interface OrderItem {
   id: string;
@@ -345,10 +346,10 @@ export const OrderManager: React.FC = () => {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="heading text-2xl mb-2">Order Management</h1>
-            <p className="body-text text-gray-600">
+            <Heading level={1} className="heading text-2xl mb-2">Order Management</Heading>
+            <Text as="p" className="body-text text-gray-600">
               Track and manage customer orders, update statuses, and monitor fulfillment
-            </p>
+            </Text>
           </div>
         </div>
       </div>
@@ -359,44 +360,44 @@ export const OrderManager: React.FC = () => {
           <div className="flex items-center gap-3">
             <ShoppingBagIcon className="text-blue-500" size={24} />
             <div>
-              <p className="body-text text-sm text-gray-600">Total Orders</p>
-              <p className="heading text-xl">{orders.length}</p>
+              <Text as="p" className="body-text text-sm text-gray-600">Total Orders</Text>
+              <Heading level={3} className="heading text-xl">{orders.length}</Heading>
             </div>
           </div>
         </div>
         
         <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
             <ClockIcon className="text-yellow-500" size={24} />
             <div>
-              <p className="body-text text-sm text-gray-600">Pending</p>
-              <p className="heading text-xl">
+              <Text as="p" className="body-text text-sm text-gray-600">Pending</Text>
+              <Heading level={3} className="heading text-xl">
                 {orders.filter(o => o.status === 'pending').length}
-              </p>
+              </Heading>
             </div>
           </div>
         </div>
         
         <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
             <TruckIcon className="text-purple-500" size={24} />
             <div>
-              <p className="body-text text-sm text-gray-600">Processing</p>
-              <p className="heading text-xl">
+              <Text as="p" className="body-text text-sm text-gray-600">Processing</Text>
+              <Heading level={3} className="heading text-xl">
                 {orders.filter(o => o.status === 'processing' || o.status === 'shipped').length}
-              </p>
+              </Heading>
             </div>
           </div>
         </div>
         
         <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
             <CheckCircleIcon className="text-green-500" size={24} />
             <div>
-              <p className="body-text text-sm text-gray-600">Delivered</p>
-              <p className="heading text-xl">
+              <Text as="p" className="body-text text-sm text-gray-600">Delivered</Text>
+              <Heading level={3} className="heading text-xl">
                 {orders.filter(o => o.status === 'delivered').length}
-              </p>
+              </Heading>
             </div>
           </div>
         </div>
@@ -510,22 +511,22 @@ export const OrderManager: React.FC = () => {
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="heading text-sm font-medium text-gray-900">
+                      <Heading level={4} className="heading text-sm font-medium text-gray-900">
                         {order.order_number}
-                      </div>
-                      <div className="body-text text-sm text-gray-500">
+                      </Heading>
+                      <Text as="div" className="body-text text-sm text-gray-500">
                         {new Date(order.created_at).toLocaleDateString()}
-                      </div>
+                      </Text>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="body-text text-sm font-medium text-gray-900">
+                      <Text as="div" className="body-text text-sm font-medium text-gray-900">
                         {order.customer_name}
-                      </div>
-                      <div className="body-text text-sm text-gray-500">
+                      </Text>
+                      <Text as="div" className="body-text text-sm text-gray-500">
                         {order.customer_email}
-                      </div>
+                      </Text>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -554,9 +555,9 @@ export const OrderManager: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="price text-sm font-medium text-gray-900">
+                    <Text as="span" className="price text-sm font-medium text-gray-900">
                       ${order.total_amount.toFixed(2)}
-                    </span>
+                    </Text>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
@@ -574,9 +575,9 @@ export const OrderManager: React.FC = () => {
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPaymentStatusStyle(order.payment_status)}`}>
+                    <Text as="span" className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPaymentStatusStyle(order.payment_status)}`}>
                       {order.payment_status}
-                    </span>
+                    </Text>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">
@@ -623,10 +624,10 @@ export const OrderManager: React.FC = () => {
       {filteredOrders.length === 0 && (
         <div className="text-center py-12">
           <ShoppingBagIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="heading text-lg text-gray-900 mt-2">No orders found</h3>
-          <p className="body-text text-gray-500 mt-1">
+          <Heading level={3} className="heading text-lg text-gray-900 mt-2">No orders found</Heading>
+          <Text as="p" className="body-text text-gray-500 mt-1">
             Try adjusting your search or filter criteria.
-          </p>
+          </Text>
         </div>
       )}
     </div>

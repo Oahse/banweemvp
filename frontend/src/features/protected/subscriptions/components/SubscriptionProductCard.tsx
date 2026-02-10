@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MinusIcon, PlusIcon, PackageIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses, getButtonClasses } from '../../../../utils/themeClasses';
-import { formatCurrency } from '../../../../utils/orderCalculations';
 import { formatPriceWithFallback, getBestPrice } from '../../utils/price-utils';
 import { Button } from '@/components/ui/Button';
+import { Text, Heading } from '@/components/ui/Text';
+import { useLocale } from '@/components/shared/contexts/LocaleContext';
 
 interface SubscriptionProductCardProps {
   product: {
@@ -122,30 +123,30 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
               'font-medium hover:text-primary transition-colors duration-200 block truncate'
             )}
           >
-            {productName}
+            <Heading level={3} className="truncate">{productName}</Heading>
           </Link>
           {product.variant_name && (
-            <p className={combineThemeClasses(themeClasses.text.secondary, 'text-sm mt-1')}>
+            <Text as="p" className={combineThemeClasses(themeClasses.text.secondary, 'text-sm mt-1')}>
               Variant: {product.variant_name}
-            </p>
+            </Text>
           )}
           {product.sku && (
-            <p className={combineThemeClasses(themeClasses.text.muted, 'text-xs mt-1')}>
+            <Text as="p" className={combineThemeClasses(themeClasses.text.muted, 'text-xs mt-1')}>
               SKU: {product.sku}
-            </p>
+            </Text>
           )}
           <div className="flex items-center mt-2 space-x-4">
-            <span className={combineThemeClasses(themeClasses.text.heading, 'font-semibold')}>
+            <Text as="span" className={combineThemeClasses(themeClasses.text.heading, 'font-semibold')}>
               {formatPriceWithFallback(product, product.currency, formatCurrency, 'Price not set')}
-            </span>
+            </Text>
             {product.stock !== undefined && (
-              <span className={combineThemeClasses(
+              <Text as="span" className={combineThemeClasses(
                 themeClasses.text.muted,
                 'text-xs',
                 product.stock < 10 ? 'text-orange-600' : ''
               )}>
                 Stock: {product.stock}
-              </span>
+              </Text>
             )}
           </div>
         </div>
@@ -170,9 +171,9 @@ export const SubscriptionProductCard: React.FC<SubscriptionProductCardProps> = (
                 >
                   <MinusIcon className="w-3 h-3" />
                 </Button>
-                <span className={combineThemeClasses(themeClasses.text.primary, 'min-w-[2rem] text-center')}>
+                <Text as="span" className={combineThemeClasses(themeClasses.text.primary, 'min-w-[2rem] text-center')}>
                   {quantity}
-                </span>
+                </Text>
                 <Button
                   onClick={() => handleQuantityChange(quantity + 1)}
                   variant="outline"

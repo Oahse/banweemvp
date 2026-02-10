@@ -123,15 +123,13 @@ export const SupplierDetail = () => {
                 )}
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center">
-                    {getSupplierRating(supplier.rating_average)}
-                    <span className="ml-2 text-sm text-copy-light">
-                      ({supplier.review_count || 0} reviews)
-                    </span>
-                  </div>
+                      {getSupplierRating(supplier.rating_average)}
+                      <Text as="span" className="ml-2 text-sm text-copy-light">({supplier.review_count || 0} reviews)</Text>
+                    </div>
                   <div className="flex items-center text-sm text-success">
-                    <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
-                    Verified Supplier
-                  </div>
+                      <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
+                      <Text as="span">Verified Supplier</Text>
+                    </div>
                 </div>
               </div>
             </div>
@@ -143,7 +141,7 @@ export const SupplierDetail = () => {
                   className="flex items-center text-copy-light hover:text-primary transition-colors"
                 >
                   <MailIcon className="w-4 h-4 mr-2" />
-                  {supplier.email}
+                  <Text as="span">{supplier.email}</Text>
                 </a>
               )}
               {supplier.phone && (
@@ -152,7 +150,7 @@ export const SupplierDetail = () => {
                   className="flex items-center text-copy-light hover:text-primary transition-colors"
                 >
                   <PhoneIcon className="w-4 h-4 mr-2" />
-                  {supplier.phone}
+                  <Text as="span">{supplier.phone}</Text>
                 </a>
               )}
               {supplier.location && (
@@ -232,19 +230,18 @@ export const SupplierDetail = () => {
                     )}
 
                     {supplier.specialties && supplier.specialties.length > 0 && (
-                      <div>
-                        <Heading level={4} className="font-medium text-main mb-2">Specialties</Heading>
-                        <div className="flex flex-wrap gap-2">
-                          {supplier.specialties.map((specialty: any, index: number) => (
-                            <span
-                              key={index}
-                              className="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full"
-                            >
-                              {specialty}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+                              <Heading level={4} className="font-medium text-main mb-2">Specialties</Heading>
+                              <div className="flex flex-wrap gap-2">
+                                {supplier.specialties.map((specialty: any, index: number) => (
+                                  <Text
+                                    key={index}
+                                    as="span"
+                                    className="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                                  >
+                                    {specialty}
+                                  </Text>
+                                ))}
+                              </div>
                     )}
 
                     {supplier.founded_year && (

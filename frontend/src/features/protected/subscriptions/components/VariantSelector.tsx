@@ -3,6 +3,7 @@ import { CheckIcon, ImageIcon } from 'lucide-react';
 import { themeClasses, combineThemeClasses } from '../../../../utils/themeClasses';
 import { formatCurrency } from '../../../../utils/locale-config';
 import { Button } from '@/components/ui/Button';
+import { Text, Display, Heading, Body, Caption, Label, Code, Quote } from '@/components/ui/Text/Text';
 
 interface Variant {
   id: string;
@@ -180,13 +181,13 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
               {/* Variant Info */}
               <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className={combineThemeClasses(
-                    themeClasses.text.heading,
-                    'font-medium truncate',
-                    currentSize.text
-                  )}>
-                    {variant.name}
-                  </h4>
+                    <Heading level={4} className={combineThemeClasses(
+                      themeClasses.text.heading,
+                      'font-medium truncate',
+                      currentSize.text
+                    )}>
+                      {variant.name}
+                    </Heading>
                   {isSelected && (
                     <CheckIcon className="w-5 h-5 text-primary flex-shrink-0" />
                   )}
@@ -201,6 +202,13 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                     )}>
                       {formatCurrency(priceInfo.current, currency)}
                     </span>
+                      <Text as="span" className={combineThemeClasses(
+                        themeClasses.text.heading,
+                        'font-semibold',
+                        currentSize.price
+                      )}>
+                        {formatCurrency(priceInfo.current, currency)}
+                      </Text>
                     {priceInfo.original && (
                       <span className={combineThemeClasses(
                         themeClasses.text.muted,
@@ -208,13 +216,44 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                       )}>
                         {formatCurrency(priceInfo.original, currency)}
                       </span>
+                        <Text as="span" className={combineThemeClasses(
+                          themeClasses.text.muted,
+                          'line-through text-sm'
+                        )}>
+                          {formatCurrency(priceInfo.original, currency)}
+                        </Text>
                     )}
                     {priceInfo.discount && (
                       <span className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full font-medium">
                         -{priceInfo.discount}%
                       </span>
+                        <Text as="span" className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full font-medium">
+                          -{priceInfo.discount}%
+                        </Text>
                     )}
                   </div>
+                    <div className="flex items-center space-x-2">
+                      <Text as="span" className={combineThemeClasses(
+                        themeClasses.text.heading,
+                        'font-semibold',
+                        currentSize.price
+                      )}>
+                        {formatCurrency(priceInfo.current, currency)}
+                      </Text>
+                      {priceInfo.original && (
+                        <Text as="span" className={combineThemeClasses(
+                          themeClasses.text.muted,
+                          'line-through text-xs'
+                        )}>
+                          {formatCurrency(priceInfo.original, currency)}
+                        </Text>
+                      )}
+                      {priceInfo.discount && (
+                        <Text as="span" className="px-1.5 py-0.5 bg-red-100 text-red-800 text-xs rounded-full font-medium">
+                          -{priceInfo.discount}%
+                        </Text>
+                      )}
+                    </div>
 
                   {showStock && !outOfStock && (
                     <span className={combineThemeClasses(
@@ -228,26 +267,27 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                 </div>
 
                 {showSku && variant.sku && (
-                  <p className={combineThemeClasses(themeClasses.text.muted, 'text-xs mt-1')}>
-                    SKU: {variant.sku}
-                  </p>
-                )}
+                    <Text as="p" className={combineThemeClasses(themeClasses.text.muted, 'text-xs mt-1')}>
+                      SKU: {variant.sku}
+                    </Text>
+                  )}
 
                 {/* Variant Attributes */}
                 {variant.attributes && Object.keys(variant.attributes).length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {Object.entries(variant.attributes).map(([key, value]) => (
-                      <span
-                        key={key}
-                        className={combineThemeClasses(
-                          'px-2 py-0.5 rounded-full text-xs',
-                          themeClasses.background.elevated,
-                          themeClasses.text.secondary
-                        )}
-                      >
-                        {key}: {value}
-                      </span>
-                    ))}
+                        <Text
+                          key={key}
+                          as="span"
+                          className={combineThemeClasses(
+                            'px-2 py-0.5 rounded-full text-xs',
+                            themeClasses.background.elevated,
+                            themeClasses.text.secondary
+                          )}
+                        >
+                          {key}: {value}
+                        </Text>
+                      ))}
                   </div>
                 )}
               </div>

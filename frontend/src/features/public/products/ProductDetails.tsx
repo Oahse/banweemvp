@@ -654,10 +654,10 @@ export const ProductDetails = () => {
                         isLoading={isCartUpdating}
                         className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1.5 rounded-md transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                         leftIcon={<MinusIcon size={12} />}
-                      >
-                      <span className="bg-primary text-white px-3 py-2 rounded-md font-medium min-w-[100px] text-center text-xs">
+                      ></Button>
+                      <Text as="span" className="bg-primary text-white px-3 py-2 rounded-md font-medium min-w-[100px] text-center text-xs">
                         In Cart ({cartQuantity})
-                      </span>
+                      </Text>
                       <Button
                         onClick={() => handleCartOperation('increment')}
                         disabled={isCartUpdating || (selectedVariant ? cartQuantity >= (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) : true)}
@@ -666,7 +666,7 @@ export const ProductDetails = () => {
                         isLoading={isCartUpdating}
                         className="bg-primary hover:bg-primary-dark text-white p-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                         leftIcon={<PlusIcon size={12} />}
-                      >
+                      ></Button>
                     </div>
                   ) : (
                     <Button
@@ -846,13 +846,14 @@ export const ProductDetails = () => {
                     <Heading level={4} className="text-sm font-medium text-main mb-2">Tags:</Heading>
                     <div className="flex flex-wrap gap-2">
                       {(Array.isArray(selectedVariant?.tags) && selectedVariant?.tags.length > 0 ? selectedVariant?.tags : product.tags).map((tag: any, index: number) => (
-                        <span
+                        <Text
+                          as="span"
                           key={`${typeof tag === 'string' ? tag : tag?.name || 'tag'}-${index}`}
                           className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
                           style={{ backgroundColor: typeof tag === 'object' && tag?.color ? `${tag.color}20` : undefined }}
                         >
                           {typeof tag === 'string' ? tag : tag?.name || 'Tag'}
-                        </span>
+                        </Text>
                       ))}
                     </div>
                   </div>
@@ -928,121 +929,121 @@ export const ProductDetails = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Basic Product Info */}
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm font-medium text-main">Product ID:</span>
-                    <span className="text-sm text-copy-light">{product.id}</span>
+                    <Text as="span" className="text-sm font-medium text-main">Product ID:</Text>
+                    <Text as="span" className="text-sm text-copy-light">{product.id}</Text>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm font-medium text-main">SKU:</span>
-                    <span className="text-sm text-copy-light">{selectedVariant?.sku || product.sku || 'N/A'}</span>
+                    <Text as="span" className="text-sm font-medium text-main">SKU:</Text>
+                    <Text as="span" className="text-sm text-copy-light">{selectedVariant?.sku || product.sku || 'N/A'}</Text>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm font-medium text-main">Category:</span>
-                    <span className="text-sm text-copy-light">
+                    <Text as="span" className="text-sm font-medium text-main">Category:</Text>
+                    <Text as="span" className="text-sm text-copy-light">
                       {typeof product.category === 'object' && product.category.name 
                         ? product.category.name 
                         : (typeof product.category === 'string' 
                           ? product.category 
                           : 'Uncategorized')}
-                    </span>
+                    </Text>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm font-medium text-main">Stock:</span>
-                    <span className="text-sm text-copy-light">{selectedVariant?.inventory?.quantity_available ?? selectedVariant?.stock ?? 0} units</span>
+                    <Text as="span" className="text-sm font-medium text-main">Stock:</Text>
+                    <Text as="span" className="text-sm text-copy-light">{selectedVariant?.inventory?.quantity_available ?? selectedVariant?.stock ?? 0} units</Text>
                   </div>
                   
                   {/* Product Status */}
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm font-medium text-main">Status:</span>
-                    <span className="text-sm text-copy-light">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
+                    <Text as="span" className="text-sm font-medium text-main">Status:</Text>
+                    <Text as="span" className="text-sm text-copy-light">
+                      <Text as="span" className={`px-2 py-1 rounded-full text-xs ${
                         product.is_active ? 'bg-success-100 text-success-800' : 'bg-error-100 text-error-800'
                       }`}>
                         {product.is_active ? 'Active' : 'Inactive'}
-                      </span>
-                    </span>
+                      </Text>
+                    </Text>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm font-medium text-main">Featured:</span>
-                    <span className="text-sm text-copy-light">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
+                    <Text as="span" className="text-sm font-medium text-main">Featured:</Text>
+                    <Text as="span" className="text-sm text-copy-light">
+                      <Text as="span" className={`px-2 py-1 rounded-full text-xs ${
                         (product.is_featured || product.featured) ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 text-gray-800'
                       }`}>
                         {(product.is_featured || product.featured) ? 'Featured' : 'Regular'}
-                      </span>
-                    </span>
+                      </Text>
+                    </Text>
                   </div>
                   
                   {/* Dietary Information */}
                   <div className="md:col-span-2 py-2 border-b border-gray-100">
-                    <span className="text-sm font-medium text-main block mb-2">Dietary Information:</span>
+                    <Text as="span" className="text-sm font-medium text-main block mb-2">Dietary Information:</Text>
                     <div className="flex flex-wrap gap-2">
-                      {Array.isArray(selectedVariant?.dietary_tags) && selectedVariant.dietary_tags.length > 0 &&
+                          {Array.isArray(selectedVariant?.dietary_tags) && selectedVariant.dietary_tags.length > 0 &&
                         selectedVariant.dietary_tags.map((tag: string, index: number) => (
-                          <span key={`${tag}-${index}`} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                          <Text key={`${tag}-${index}`} as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
                             {tag}
-                          </span>
+                          </Text>
                         ))}
                       {/* Common dietary tags based on product category */}
                       {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('organic') || 
                         typeof product.category === 'string' && product.category.toLowerCase().includes('organic')) && (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Organic</span>
+                        <Text as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Organic</Text>
                       )}
                       
                       {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('gluten') || 
                         typeof product.category === 'string' && product.category.toLowerCase().includes('gluten')) && (
-                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Gluten-Free</span>
+                        <Text as="span" className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Gluten-Free</Text>
                       )}
                       
                       {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('vegan') || 
                         typeof product.category === 'string' && product.category.toLowerCase().includes('vegan')) && (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Vegan</span>
+                        <Text as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Vegan</Text>
                       )}
                       
                       {(typeof product.category === 'object' && product.category.name?.toLowerCase().includes('vegetarian') || 
                         typeof product.category === 'string' && product.category.toLowerCase().includes('vegetarian')) && (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Vegetarian</span>
+                        <Text as="span" className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Vegetarian</Text>
                       )}
                       
                       {/* Default dietary tags for agricultural products */}
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Natural</span>
-                      <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">Non-GMO</span>
-                      <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">Sustainably Sourced</span>
+                      <Text as="span" className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Natural</Text>
+                      <Text as="span" className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">Non-GMO</Text>
+                      <Text as="span" className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">Sustainably Sourced</Text>
                       
                       {/* Variant-specific dietary info */}
                       {selectedVariant?.attributes?.dietary && (
-                        <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+                        <Text as="span" className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
                           {selectedVariant.attributes.dietary}
-                        </span>
+                        </Text>
                       )}
                       
                       {selectedVariant?.attributes?.allergens && (
-                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
                           Contains: {selectedVariant.attributes.allergens}
-                        </span>
+                        </Text>
                       )}
                     </div>
                   </div>
                   
                   {/* Allergy Information */}
                   <div className="md:col-span-2 py-2 border-b border-gray-100">
-                    <span className="text-sm font-medium text-main block mb-2">Allergy Information:</span>
+                    <Text as="span" className="text-sm font-medium text-main block mb-2">Allergy Information:</Text>
                     <div className="flex flex-wrap gap-2">
                       {/* Common allergens - show as safe unless specified */}
-                      <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Dairy-Free</span>
-                      <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Nut-Free</span>
-                      <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Soy-Free</span>
+                      <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Dairy-Free</Text>
+                      <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Nut-Free</Text>
+                      <Text as="span" className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Soy-Free</Text>
                       
                       {/* If product contains allergens, show them prominently */}
                       {selectedVariant?.attributes?.contains_nuts && (
-                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Nuts</span>
+                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Nuts</Text>
                       )}
                       
                       {selectedVariant?.attributes?.contains_dairy && (
-                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Dairy</span>
+                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Dairy</Text>
                       )}
                       
                       {selectedVariant?.attributes?.contains_soy && (
-                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Soy</span>
+                        <Text as="span" className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Contains Soy</Text>
                       )}
                     </div>
                   </div>
@@ -1052,24 +1053,24 @@ export const ProductDetails = () => {
                     .filter(([key]) => !['dietary', 'allergens', 'contains_nuts', 'contains_dairy', 'contains_soy', 'weight', 'dimensions'].includes(key))
                     .map(([key, value]) => (
                       <div key={key} className="flex justify-between py-2 border-b border-gray-100">
-                        <span className="text-sm font-medium text-main capitalize">{key.replace('_', ' ')}:</span>
-                        <span className="text-sm text-copy-light">{String(value)}</span>
+                        <Text as="span" className="text-sm font-medium text-main capitalize">{key.replace('_', ' ')}:</Text>
+                        <Text as="span" className="text-sm text-copy-light">{String(value)}</Text>
                       </div>
                   ))}
 
                   {/* Variant Specifications */}
                   {selectedVariant?.specifications && Object.entries(selectedVariant.specifications).map(([key, value]) => (
                     <div key={`spec-${key}`} className="flex justify-between py-2 border-b border-gray-100">
-                      <span className="text-sm font-medium text-main capitalize">{key.replace('_', ' ')}:</span>
-                      <span className="text-sm text-copy-light">{String(value)}</span>
+                      <Text as="span" className="text-sm font-medium text-main capitalize">{key.replace('_', ' ')}:</Text>
+                      <Text as="span" className="text-sm text-copy-light">{String(value)}</Text>
                     </div>
                   ))}
                   
                   {/* Additional Info */}
                   {product.tags && product.tags.length > 0 && (
                     <div className="flex justify-between py-2 border-b border-gray-100">
-                      <span className="text-sm font-medium text-main">Tags:</span>
-                      <span className="text-sm text-copy-light">{product.tags.map((tag: any) => tag.name).join(', ')}</span>
+                      <Text as="span" className="text-sm font-medium text-main">Tags:</Text>
+                      <Text as="span" className="text-sm text-copy-light">{product.tags.map((tag: any) => tag.name).join(', ')}</Text>
                     </div>
                   )}
                 </div>
@@ -1090,7 +1091,7 @@ export const ProductDetails = () => {
                 <div className="flex items-center space-x-4 mb-6 mt-8">
                   {/* Min Rating Filter */}
                   <div>
-                    <label htmlFor="minRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Min Rating</label>
+                    <Label htmlFor="minRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Min Rating</Label>
                     <Dropdown
                       options={[
                         { value: '', label: 'Any' },
@@ -1109,7 +1110,7 @@ export const ProductDetails = () => {
 
                   {/* Max Rating Filter */}
                   <div>
-                    <label htmlFor="maxRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Max Rating</label>
+                    <Label htmlFor="maxRating" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Max Rating</Label>
                     <Dropdown
                       options={[
                         { value: '', label: 'Any' },
@@ -1128,7 +1129,7 @@ export const ProductDetails = () => {
 
                   {/* Sort By */}
                   <div>
-                    <label htmlFor="sortBy" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Sort By</label>
+                    <Label htmlFor="sortBy" className="block text-xs font-medium text-gray-700 dark:text-gray-300">Sort By</Label>
                     <Dropdown
                       options={[
                         { value: '', label: 'Newest' },
@@ -1165,9 +1166,9 @@ export const ProductDetails = () => {
                       <div key={review.id} className="border-b border-gray-100 pb-6">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-main">
+                            <Text as="span" className="text-sm font-medium text-main">
                               {review.user?.firstname || 'Anonymous'} {review.user?.lastname || ''}
-                            </span>
+                            </Text>
                             <div className="flex text-yellow-400">
                               {Array.from({ length: 5 }, (_, i) => (
                                 <StarIcon
@@ -1178,11 +1179,11 @@ export const ProductDetails = () => {
                               ))}
                             </div>
                           </div>
-                          <span className="text-xs text-copy-light">
+                          <Text as="span" className="text-xs text-copy-light">
                             {review.created_at ? new Date(review.created_at).toLocaleDateString() : ''}
-                          </span>
+                          </Text>
                         </div>
-                        <p className="text-sm text-copy-light">{review.comment || ''}</p>
+                        <Text as="p" className="text-sm text-copy-light">{review.comment || ''}</Text>
                       </div>
                     ))}
 
@@ -1222,7 +1223,7 @@ export const ProductDetails = () => {
                               </Button>
                             );
                           } else if (page === reviewsPage - 2 || page === reviewsPage + 2) {
-                            return <span key={page} className="px-2">...</span>;
+                            return <Text key={page} as="span" className="px-2">...</Text>;
                           }
                           return null;
                         })}

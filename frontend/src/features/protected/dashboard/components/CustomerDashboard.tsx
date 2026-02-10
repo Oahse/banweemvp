@@ -14,7 +14,7 @@ import {
   TableIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Text, Heading } from '@/components/ui/Text/Text';
+import { Text, Heading } from '@/components/ui/Text';
 
 /**
  * @typedef {object} CustomerDashboardProps
@@ -220,19 +220,13 @@ const WishlistWidget = () => {
             className="w-12 h-12 rounded-md object-cover"
           />
           <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-gray-900 truncate">{item.name}</h4>
+            <Heading level={4} className="font-medium text-gray-900 truncate">{item.name}</Heading>
             <div className="flex items-center gap-2 mt-1">
-              <span className="font-semibold text-gray-900">
-                ${item.price}
-              </span>
+              <Text as="span" className="font-semibold text-gray-900">${item.price}</Text>
               {item.discount > 0 && (
                 <>
-                  <span className="text-sm text-gray-500 line-through">
-                    ${item.originalPrice}
-                  </span>
-                  <span className="text-xs bg-red-100 text-red-800 px-1 rounded">
-                    -{item.discount}%
-                  </span>
+                  <Text as="span" className="text-sm text-gray-500 line-through">${item.originalPrice}</Text>
+                  <Text as="span" className="text-xs bg-red-100 text-red-800 px-1 rounded">-{item.discount}%</Text>
                 </>
               )}
             </div>
@@ -324,15 +318,15 @@ const RecommendationsWidget = () => {
             className="w-12 h-12 rounded-md object-cover"
           />
           <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-gray-900 truncate">{item.name}</h4>
+            <Heading level={4} className="font-medium text-gray-900 truncate">{item.name}</Heading>
             <div className="flex items-center gap-2 mt-1">
-              <span className="font-semibold text-gray-900">${item.price}</span>
+              <Text as="span" className="font-semibold text-gray-900">${item.price}</Text>
               <div className="flex items-center gap-1">
                 <StarIcon size={12} className="text-yellow-400 fill-current" />
-                <span className="text-sm text-gray-600">{item.rating}</span>
+                <Text as="span" className="text-sm text-gray-600">{item.rating}</Text>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-1">{item.reason}</p>
+            <Text as="p" className="text-xs text-gray-500 mt-1">{item.reason}</Text>
           </div>
           <Button className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700" variant="primary" size="sm">
             View
