@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Loader, AlertCircle, ArrowLeft, Package, DollarSign, Tag, User, Image as ImageIcon, Warehouse, RefreshCw, Edit, FileText, Salad } from 'lucide-react';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import AdminLayout from '@/components/layout/AdminLayout';
 import AdminLayoutSkeleton from '@/features/protected/admin/components/skeletons/AdminLayoutSkeleton';
 import { ProductDetailSkeleton } from '@/features/protected/admin/components/skeletons/ProductsSkeleton';
 import { Button } from '@/components/ui/Button';
@@ -47,14 +46,13 @@ export const AdminProductDetail = () => {
   }, [productId]);
 
   if (loading) {
-    return <AdminLayoutSkeleton />;
+    return <ProductDetailSkeleton />;
   }
 
   if (error || !product) {
     return (
-      <AdminLayout>
-        <div className="space-y-6">
-          <Button
+      <div className="space-y-6">
+        <Button
             onClick={() => navigate('/admin/products')}
             variant="ghost"
             size="sm"
@@ -82,13 +80,12 @@ export const AdminProductDetail = () => {
             </div>
           )}
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-4">
+    <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -415,7 +412,7 @@ export const AdminProductDetail = () => {
           </div>
         </div>
       </div>
-    </AdminLayout>
+    </div>
   );
 };
 

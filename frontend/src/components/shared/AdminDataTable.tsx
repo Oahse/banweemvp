@@ -17,7 +17,7 @@ import { DataTable } from '@/components/ui/Table';
 import { TableColumn, SortDirection } from '@/components/ui/Table/types';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import { Body, Text } from '@/components/ui/Text/Text';
+import { Body, Text as TextComponent } from '@/components/ui/Text/Text';
 
 // Types
 export interface AdminColumn<T = any> {
@@ -255,7 +255,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
                       size="sm"
                       leftIcon={<DownloadIcon className="h-4 w-4" />}
                     >
-                      <Text className="hidden sm:inline">Export</Text>
+                      <TextComponent className="hidden sm:inline">Export</TextComponent>
                     </Button>
                   )}
                 </div>
@@ -269,7 +269,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
       {loading && (
         <div className="flex items-center justify-center py-12">
           <AnimatedLoader size="sm" variant="spinner" className="mr-2" />
-          <Text variant="body-sm" className="text-copy-light dark:text-copy-light-dark">Loading...</Text>
+          <TextComponent variant="body-sm" className="text-copy-light dark:text-copy-light-dark">Loading...</TextComponent>
         </div>
       )}
 
@@ -277,7 +277,7 @@ export const AdminDataTable = <T extends Record<string, any>>({
       {error && !loading && (
         <div className="flex items-center justify-center py-12">
           <AlertCircle className="h-6 w-6 text-error dark:text-error-dark mr-2" />
-          <Text variant="body-sm" className="text-error dark:text-error-dark">{error}</Text>
+          <TextComponent variant="body-sm" className="text-error dark:text-error-dark">{error}</TextComponent>
         </div>
       )}
 

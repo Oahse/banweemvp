@@ -3,12 +3,9 @@ import { AlertCircle, SearchIcon, DownloadIcon, ArrowUpDownIcon, EyeIcon, Credit
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
-import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { RefundsListSkeleton } from '@/features/protected/admin/components/skeletons/RefundsSkeleton';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Body, Text as TextComponent, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
@@ -183,9 +180,9 @@ export const Refunds = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.requested;
     
     return (
-      <Text className={`px-2 py-1 rounded-full font-semibold ${config.bg} ${config.text}`}>
+      <TextComponent className={`px-2 py-1 rounded-full font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </Text>
+      </TextComponent>
     );
   };
 
@@ -195,27 +192,27 @@ export const Refunds = () => {
       key: 'id',
       label: 'Refund ID',
       render: (value: string) => (
-        <Text className="text-sm text-gray-900 dark:text-white font-mono">
+        <TextComponent className="text-sm text-gray-900 dark:text-white font-mono">
           {String(value).slice(0, 8)}
-        </Text>
+        </TextComponent>
       ),
     },
     {
       key: 'order_id',
       label: 'Order ID',
       render: (value: string) => (
-        <Text className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+        <TextComponent className="text-sm text-gray-500 dark:text-gray-400 font-mono">
           {String(value).slice(0, 8)}
-        </Text>
+        </TextComponent>
       ),
     },
     {
       key: 'customer_name',
       label: 'Customer',
       render: (value: string) => (
-        <Text className="text-sm text-gray-900 dark:text-white">
+        <TextComponent className="text-sm text-gray-900 dark:text-white">
           {value || 'N/A'}
-        </Text>
+        </TextComponent>
       ),
     },
     {
@@ -223,9 +220,9 @@ export const Refunds = () => {
       label: 'Amount',
       sortable: true,
       render: (value: number, row: any) => (
-        <Text className="text-sm text-gray-900 dark:text-white font-semibold">
+        <TextComponent className="text-sm text-gray-900 dark:text-white font-semibold">
           {formatCurrency(value, row.currency)}
-        </Text>
+        </TextComponent>
       ),
     },
     {
@@ -237,9 +234,9 @@ export const Refunds = () => {
       key: 'reason',
       label: 'Reason',
       render: (value: string) => (
-        <Text className="text-sm text-gray-500 dark:text-gray-400 truncate">
+        <TextComponent className="text-sm text-gray-500 dark:text-gray-400 truncate">
           {value || 'No reason provided'}
-        </Text>
+        </TextComponent>
       ),
     },
     {
@@ -247,9 +244,9 @@ export const Refunds = () => {
       label: 'Date',
       sortable: true,
       render: (value: string) => (
-        <Text className="text-sm text-gray-500 dark:text-gray-400">
+        <TextComponent className="text-sm text-gray-500 dark:text-gray-400">
           {new Date(value || '').toLocaleDateString()}
-        </Text>
+        </TextComponent>
       ),
     },
     {
@@ -386,21 +383,14 @@ export const Refunds = () => {
   }, []);
 
   if (initialLoading) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center py-20">
-          <AnimatedLoader size="md" variant="petals" color="primary" text="Loading refunds..." />
-        </div>
-      </AdminLayout>
-    );
+    return <RefundsListSkeleton />;
   }
 
   return (
-    <AdminLayout>
       <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage refund requests and processing</Text>
+            <TextComponent variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage refund requests and processing</TextComponent>
           </div>
           <div className="flex gap-2">
             <Button
@@ -458,69 +448,69 @@ export const Refunds = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer</Text>
-                    <Text>{viewingRefund.customer_name || 'N/A'}</Text>
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer</TextComponent>
+                    <TextComponent>{viewingRefund.customer_name || 'N/A'}</TextComponent>
                   </div>
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</Text>
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status</TextComponent>
                     {statusBadge(viewingRefund.status)}
                   </div>
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Order ID</Text>
-                    <Text className="font-mono break-all">{viewingRefund.order_id}</Text>
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Order ID</TextComponent>
+                    <TextComponent className="font-mono break-all">{viewingRefund.order_id}</TextComponent>
                   </div>
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Reason</Text>
-                    <Text>{viewingRefund.reason || 'N/A'}</Text>
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Reason</TextComponent>
+                    <TextComponent>{viewingRefund.reason || 'N/A'}</TextComponent>
                   </div>
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Refund Type</Text>
-                    <Text>{viewingRefund.refund_type || 'N/A'}</Text>
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Refund Type</TextComponent>
+                    <TextComponent>{viewingRefund.refund_type || 'N/A'}</TextComponent>
                   </div>
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Requested Amount</Text>
-                    <Text className="font-mono">
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Requested Amount</TextComponent>
+                    <TextComponent className="font-mono">
                       {formatCurrency(viewingRefund.requested_amount ?? viewingRefund.amount, viewingRefund.currency)}
-                    </Text>
+                    </TextComponent>
                   </div>
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Approved Amount</Text>
-                    <Text className="font-mono">
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Approved Amount</TextComponent>
+                    <TextComponent className="font-mono">
                       {viewingRefund.approved_amount != null
                         ? formatCurrency(viewingRefund.approved_amount, viewingRefund.currency)
                         : '—'}
-                    </Text>
+                    </TextComponent>
                   </div>
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Processed Amount</Text>
-                    <Text className="font-mono">
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Processed Amount</TextComponent>
+                    <TextComponent className="font-mono">
                       {viewingRefund.processed_amount != null
                         ? formatCurrency(viewingRefund.processed_amount, viewingRefund.currency)
                         : '—'}
-                    </Text>
+                    </TextComponent>
                   </div>
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Reason</Text>
-                    <Text>{viewingRefund.customer_reason || '—'}</Text>
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Reason</TextComponent>
+                    <TextComponent>{viewingRefund.customer_reason || '—'}</TextComponent>
                   </div>
                   <div>
-                    <Text className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Notes</Text>
-                    <Text>{viewingRefund.customer_notes || '—'}</Text>
+                    <TextComponent className={`font-medium ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Customer Notes</TextComponent>
+                    <TextComponent>{viewingRefund.customer_notes || '—'}</TextComponent>
                   </div>
                 </div>
 
                 {viewingRefund.refund_items && viewingRefund.refund_items.length > 0 && (
                   <div className="border rounded-lg overflow-hidden">
-                    <Text className={`px-4 py-2 text-sm font-semibold ${currentTheme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
+                    <TextComponent className={`px-4 py-2 text-sm font-semibold ${currentTheme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
                       Refunded Items
-                    </Text>
+                    </TextComponent>
                     <div className="divide-y">
                       {viewingRefund.refund_items.map((item) => (
                         <div key={item.id} className={`px-4 py-2 text-sm ${currentTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
                           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                            <Text className="font-mono">{item.order_item_id}</Text>
-                            <Text>Qty: {item.quantity_to_refund}</Text>
-                            <Text className="font-mono">${item.total_refund_amount.toFixed(2)}</Text>
+                            <TextComponent className="font-mono">{item.order_item_id}</TextComponent>
+                            <TextComponent>Qty: {item.quantity_to_refund}</TextComponent>
+                            <TextComponent className="font-mono">${item.total_refund_amount.toFixed(2)}</TextComponent>
                           </div>
                           {item.condition_notes && (
                             <Body className={`mt-1 text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -592,7 +582,6 @@ export const Refunds = () => {
           </ModalFooter>
         </Modal>
       </div>
-    </AdminLayout>
   );
 };
 

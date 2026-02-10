@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { SubscriptionsListSkeleton } from '@/features/protected/admin/components/skeletons/SubscriptionsSkeleton';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Body, Text as TextComponent, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, useModal } from '@/components/ui/Modal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
@@ -231,8 +231,8 @@ export const AdminSubscriptions = () => {
       sortable: true,
       render: (value: string, row: Subscription) => (
         <div>
-          <Text className="text-sm text-gray-900 dark:text-white">{row.user?.name || 'N/A'}</Text>
-          <Text className="text-sm text-gray-500 dark:text-gray-400">{row.user?.email || 'N/A'}</Text>
+          <TextComponent className="text-sm text-gray-900 dark:text-white">{row.user?.name || 'N/A'}</TextComponent>
+          <TextComponent className="text-sm text-gray-500 dark:text-gray-400">{row.user?.email || 'N/A'}</TextComponent>
         </div>
       ),
     },
@@ -241,7 +241,7 @@ export const AdminSubscriptions = () => {
       label: 'Plan',
       sortable: true,
       render: (value: any, row: Subscription) => (
-        <Text className="text-sm text-gray-900 dark:text-white">{value?.name || 'N/A'}</Text>
+        <TextComponent className="text-sm text-gray-900 dark:text-white">{value?.name || 'N/A'}</TextComponent>
       ),
     },
     {
@@ -254,9 +254,9 @@ export const AdminSubscriptions = () => {
       label: 'Total Cost',
       sortable: true,
       render: (value: number, row: Subscription) => (
-        <Text className="text-sm font-semibold text-gray-900 dark:text-white">
+        <TextComponent className="text-sm font-semibold text-gray-900 dark:text-white">
           {formatCurrency(value, row.currency)}
-        </Text>
+        </TextComponent>
       ),
     },
     {
@@ -264,9 +264,9 @@ export const AdminSubscriptions = () => {
       label: 'Next Billing',
       sortable: true,
       render: (value: string) => (
-        <Text className="text-sm text-gray-900 dark:text-white">
+        <TextComponent className="text-sm text-gray-900 dark:text-white">
           {value ? new Date(value).toLocaleDateString() : 'N/A'}
-        </Text>
+        </TextComponent>
       ),
     },
     {
@@ -315,9 +315,9 @@ export const AdminSubscriptions = () => {
     const { color, label } = config[status as keyof typeof config] || config.pending;
     
     return (
-      <Text className={`px-3 py-1 rounded-full text-sm font-semibold ${color}`}>
+      <TextComponent className={`px-3 py-1 rounded-full text-sm font-semibold ${color}`}>
         {label}
-      </Text>
+      </TextComponent>
     );
   };
 
@@ -346,7 +346,7 @@ export const AdminSubscriptions = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex items-center justify-between">
           <div>
-            <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage all customer subscriptions</Text>
+            <TextComponent variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage all customer subscriptions</TextComponent>
           </div>
         </div>
 
@@ -380,64 +380,64 @@ export const AdminSubscriptions = () => {
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Text variant="body-sm">{selectedSubscription.user?.name || 'Unknown User'}</Text>
-                    <Text variant="caption" tone="secondary">{selectedSubscription.user?.email}</Text>
+                    <TextComponent variant="body-sm">{selectedSubscription.user?.name || 'Unknown User'}</TextComponent>
+                    <TextComponent variant="caption" tone="secondary">{selectedSubscription.user?.email}</TextComponent>
                   </div>
                   <div>
-                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Status</Text>
+                    <TextComponent weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Status</TextComponent>
                     {statusBadge(selectedSubscription.status)}
                   </div>
                   <div>
-                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Billing</Text>
-                    <Text variant="body-sm">Next: {selectedSubscription.next_billing_date ? new Date(selectedSubscription.next_billing_date).toLocaleDateString() : 'N/A'}</Text>
-                    <Text variant="body-sm">Period End: {selectedSubscription.current_period_end ? new Date(selectedSubscription.current_period_end).toLocaleDateString() : 'N/A'}</Text>
+                    <TextComponent weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Billing</TextComponent>
+                    <TextComponent variant="body-sm">Next: {selectedSubscription.next_billing_date ? new Date(selectedSubscription.next_billing_date).toLocaleDateString() : 'N/A'}</TextComponent>
+                    <TextComponent variant="body-sm">Period End: {selectedSubscription.current_period_end ? new Date(selectedSubscription.current_period_end).toLocaleDateString() : 'N/A'}</TextComponent>
                   </div>
                   <div>
-                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Costs</Text>
-                    <Text variant="body-sm">Subtotal: {formatCurrency(getCostBreakdown(selectedSubscription).subtotal, selectedSubscription.currency)}</Text>
-                    <Text variant="body-sm">Shipping: {formatCurrency(getCostBreakdown(selectedSubscription).shipping, selectedSubscription.currency)}</Text>
-                    <Text variant="body-sm">Tax: {formatCurrency(getCostBreakdown(selectedSubscription).tax, selectedSubscription.currency)}</Text>
-                    <Text tone="success" variant="body-sm">Discount: -{formatCurrency(getCostBreakdown(selectedSubscription).discount, selectedSubscription.currency)}</Text>
-                    <Text variant="body-sm" weight="semibold">Total: {formatCurrency(getCostBreakdown(selectedSubscription).total, selectedSubscription.currency)}</Text>
+                    <TextComponent weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Costs</TextComponent>
+                    <TextComponent variant="body-sm">Subtotal: {formatCurrency(getCostBreakdown(selectedSubscription).subtotal, selectedSubscription.currency)}</TextComponent>
+                    <TextComponent variant="body-sm">Shipping: {formatCurrency(getCostBreakdown(selectedSubscription).shipping, selectedSubscription.currency)}</TextComponent>
+                    <TextComponent variant="body-sm">Tax: {formatCurrency(getCostBreakdown(selectedSubscription).tax, selectedSubscription.currency)}</TextComponent>
+                    <TextComponent tone="success" variant="body-sm">Discount: -{formatCurrency(getCostBreakdown(selectedSubscription).discount, selectedSubscription.currency)}</TextComponent>
+                    <TextComponent variant="body-sm" weight="semibold">Total: {formatCurrency(getCostBreakdown(selectedSubscription).total, selectedSubscription.currency)}</TextComponent>
                   </div>
                   <div className="md:col-span-2">
-                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Delivery Address</Text>
+                    <TextComponent weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Delivery Address</TextComponent>
                     {selectedSubscription.delivery_address ? (
-                      <Text variant="body-sm">
+                      <TextComponent variant="body-sm">
                         {selectedSubscription.delivery_address.street}, {selectedSubscription.delivery_address.city}, {selectedSubscription.delivery_address.state} {selectedSubscription.delivery_address.postal_code}, {selectedSubscription.delivery_address.country}
-                      </Text>
+                      </TextComponent>
                     ) : (
-                      <Text variant="caption" tone="secondary">No delivery address</Text>
+                      <TextComponent variant="caption" tone="secondary">No delivery address</TextComponent>
                     )}
                   </div>
 
                   <div className="md:col-span-2">
-                    <Text weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Variants</Text>
+                    <TextComponent weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Variants</TextComponent>
                     {selectedSubscription.variants && selectedSubscription.variants.length > 0 ? (
                       <div className="mt-2 overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
                             <tr>
-                              <th className="text-left py-1"><Text variant="caption" weight="medium">Name</Text></th>
-                              <th className="text-left py-1"><Text variant="caption" weight="medium">SKU</Text></th>
-                              <th className="text-right py-1"><Text variant="caption" weight="medium">Price</Text></th>
-                              <th className="text-right py-1"><Text variant="caption" weight="medium">Qty</Text></th>
+                              <th className="text-left py-1"><TextComponent variant="caption" weight="medium">Name</TextComponent></th>
+                              <th className="text-left py-1"><TextComponent variant="caption" weight="medium">SKU</TextComponent></th>
+                              <th className="text-right py-1"><TextComponent variant="caption" weight="medium">Price</TextComponent></th>
+                              <th className="text-right py-1"><TextComponent variant="caption" weight="medium">Qty</TextComponent></th>
                             </tr>
                           </thead>
                           <tbody>
                             {selectedSubscription.variants.map((variant) => (
                               <tr key={variant.id} className={`${currentTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'} border-t`}>
                                 <td className="py-2 pr-2">
-                                  <Text variant="body-sm" truncate="single">{variant.name}</Text>
+                                  <TextComponent variant="body-sm" truncate="single">{variant.name}</TextComponent>
                                 </td>
                                 <td className={`py-2 pr-2`}>
-                                  <Text variant="body-sm" tone="secondary">{variant.sku}</Text>
+                                  <TextComponent variant="body-sm" tone="secondary">{variant.sku}</TextComponent>
                                 </td>
                                 <td className="py-2 text-right">
-                                  <Text variant="body-sm">{formatCurrency(variant.current_price ?? variant.base_price, selectedSubscription.currency)}</Text>
+                                  <TextComponent variant="body-sm">{formatCurrency(variant.current_price ?? variant.base_price, selectedSubscription.currency)}</TextComponent>
                                 </td>
                                 <td className="py-2 text-right">
-                                  <Text variant="body-sm">{variant.qty}</Text>
+                                  <TextComponent variant="body-sm">{variant.qty}</TextComponent>
                                 </td>
                               </tr>
                             ))}
@@ -445,7 +445,7 @@ export const AdminSubscriptions = () => {
                         </table>
                       </div>
                     ) : (
-                      <Text variant="caption" tone="secondary">No variants found</Text>
+                      <TextComponent variant="caption" tone="secondary">No variants found</TextComponent>
                     )}
                   </div>
                 </div>
@@ -453,7 +453,6 @@ export const AdminSubscriptions = () => {
             </>
           )}
         </Modal>
-      </div>
     </div>
   );
 };

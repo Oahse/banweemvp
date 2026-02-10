@@ -251,7 +251,7 @@ export const AdminOrderDetail = () => {
   };
 
   if (loading) {
-    return <AdminLayoutSkeleton />;
+    return <OrderDetailSkeleton />;
   }
 
   if (error || !order) {

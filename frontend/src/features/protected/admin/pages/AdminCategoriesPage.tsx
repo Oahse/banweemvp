@@ -4,7 +4,6 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { CategoriesListSkeleton } from '@/features/protected/admin/components/skeletons/CategoriesSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
@@ -337,15 +336,12 @@ const AdminCategoriesPage = () => {
 
   if (initialLoading) {
     return (
-      <AdminLayout>
-        <CategoriesListSkeleton />
-      </AdminLayout>
+      <CategoriesListSkeleton />
     );
   }
 
   return (
-    <AdminLayout>
-      <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
           <Body className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product categories</Body>
@@ -370,16 +366,7 @@ const AdminCategoriesPage = () => {
         fetchData={fetchData}
         searchPlaceholder="Search categories..."
         filters={filters}
-        actions={
-          <Button
-            onClick={openAddModal}
-            variant="primary"
-            size="sm"
-            leftIcon={<Plus size={14} />}
-          >
-            Add Category
-          </Button>
-        }
+        
         emptyMessage="No categories found"
         responsive="cards"
         limit={LIMIT}
@@ -515,7 +502,6 @@ const AdminCategoriesPage = () => {
         </form>
       </Modal>
     </div>
-    </AdminLayout>
   );
 };
 

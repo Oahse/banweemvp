@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import Dropdown from '@/components/ui/Dropdown';
+import { Heading, Body, Text as TextComponent, Label } from '@/components/ui/Text/Text';
+import { Input } from '@/components/ui/Form/Input';
 import { ProductsListSkeleton } from '@/features/protected/admin/components/skeletons/ProductsSkeleton';
 import { ConfirmModal, useModal } from '@/components/ui/Modal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
@@ -179,7 +181,7 @@ const AdminProductsPage = () => {
       label: 'Name',
       sortable: true,
       render: (value: string) => (
-        <Text className="text-sm text-gray-900 dark:text-white">{value || 'N/A'}</Text>
+        <TextComponent className="text-sm text-gray-900 dark:text-white">{value || 'N/A'}</TextComponent>
       ),
     },
     {
@@ -187,7 +189,7 @@ const AdminProductsPage = () => {
       label: 'Category',
       sortable: true,
       render: (value: string) => (
-        <Text className="text-sm text-gray-600 dark:text-gray-300">{value || 'N/A'}</Text>
+        <TextComponent className="text-sm text-gray-600 dark:text-gray-300">{value || 'N/A'}</TextComponent>
       ),
     },
     {
@@ -195,7 +197,7 @@ const AdminProductsPage = () => {
       label: 'Price',
       sortable: true,
       render: (value: number) => (
-        <Text className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(value)}</Text>
+        <TextComponent className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(value)}</TextComponent>
       ),
     },
     {
@@ -278,19 +280,19 @@ const AdminProductsPage = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.active;
     
     return (
-      <span className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
+      <TextComponent className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </span>
+      </TextComponent>
     );
   };
 
   const stockBadge = (stock: number) => {
     if (stock === 0) {
-      return <span className="px-2 py-1 rounded-full text-sm font-semibold bg-error/20 text-error">Out of Stock</span>;
+      return <TextComponent className="px-2 py-1 rounded-full text-sm font-semibold bg-error/20 text-error">Out of Stock</TextComponent>;
     } else if (stock <= 10) {
-      return <span className="px-2 py-1 rounded-full text-sm font-semibold bg-warning/20 text-warning">Low Stock ({stock})</span>;
+      return <TextComponent className="px-2 py-1 rounded-full text-sm font-semibold bg-warning/20 text-warning">Low Stock ({stock})</TextComponent>;
     } else {
-      return <span className="px-2 py-1 rounded-full text-sm font-semibold bg-success/20 text-success">{stock} in Stock</span>;
+      return <TextComponent className="px-2 py-1 rounded-full text-sm font-semibold bg-success/20 text-success">{stock} in Stock</TextComponent>;
     }
   };
 
@@ -341,15 +343,16 @@ const AdminProductsPage = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
           <div>
-            <p className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product catalog and inventory</p>
+            <Body className={`mt-1 text-sm lg:text-sm ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Manage product catalog and inventory</Body>
           </div>
           <div className="flex gap-2 w-full lg:w-auto">
-            <button
+            <Button
               onClick={() => navigate('/admin/products/new')}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+              variant="primary"
+              size="sm"
             >
               Add Product
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -357,25 +360,20 @@ const AdminProductsPage = () => {
         <div className={`p-4 rounded-lg border ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <div className="flex flex-col gap-4">
             <div className="flex-1">
-              <div className="relative">
-                <SearchIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm ${
-                    currentTheme === 'dark' 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                />
-                {searchQuery !== debouncedSearchQuery && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <Input
+                type="search"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                prefix={<SearchIcon size={18} />}
+                suffix={
+                  searchQuery !== debouncedSearchQuery ? (
                     <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
-              </div>
+                  ) : undefined
+                }
+                size="md"
+                fullWidth
+              />
             </div>
             
             <div className="flex flex-wrap gap-2">
@@ -422,67 +420,73 @@ const AdminProductsPage = () => {
                 className="min-w-[120px]"
               />
               
-              <button
+              <Button
                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                className={`inline-flex items-center gap-1 px-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-sm font-medium ${
-                  currentTheme === 'dark' 
-                    ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-700' 
-                    : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
-                }`}
+                variant="outline"
+                size="sm"
+                leftIcon={<ArrowUpDownIcon size={16} />}
+                className="inline-flex items-center gap-1"
               >
-                <ArrowUpDownIcon size={16} />
-                <span className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</span>
-                <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
-              </button>
+                <TextComponent className="hidden sm:inline">{sortOrder === 'asc' ? 'A-Z' : 'Z-A'}</TextComponent>
+                <TextComponent className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</TextComponent>
+              </Button>
             </div>
 
             {/* Active Filters */}
             {(debouncedSearchQuery || statusFilter || categoryFilter) && (
               <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+                <TextComponent className="text-sm text-gray-600 dark:text-gray-400">Active filters:</TextComponent>
                 {debouncedSearchQuery && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
-                    Search: "{debouncedSearchQuery}"
-                    <button
+                  <TextComponent className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                    Search: &quot;{debouncedSearchQuery}&quot;
+                    <Button
                       onClick={() => setSearchQuery('')}
-                      className="ml-1 hover:text-primary-dark"
+                      variant="ghost"
+                      size="sm"
+                      className="ml-1 hover:text-primary-dark p-0 h-auto"
                     >
                       ×
-                    </button>
-                  </span>
+                    </Button>
+                  </TextComponent>
                 )}
                 {statusFilter && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                  <TextComponent className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
                     Status: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
-                    <button
+                    <Button
                       onClick={() => setStatusFilter('')}
-                      className="ml-1 hover:text-primary-dark"
+                      variant="ghost"
+                      size="sm"
+                      className="ml-1 hover:text-primary-dark p-0 h-auto"
                     >
                       ×
-                    </button>
-                  </span>
+                    </Button>
+                  </TextComponent>
                 )}
                 {categoryFilter && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                  <TextComponent className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
                     Category: {categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
-                    <button
+                    <Button
                       onClick={() => setCategoryFilter('')}
-                      className="ml-1 hover:text-primary-dark"
+                      variant="ghost"
+                      size="sm"
+                      className="ml-1 hover:text-primary-dark p-0 h-auto"
                     >
                       ×
-                    </button>
-                  </span>
+                    </Button>
+                  </TextComponent>
                 )}
-                <button
+                <Button
                   onClick={() => {
                     setSearchQuery('');
                     setStatusFilter('');
                     setCategoryFilter('');
                   }}
-                  className="text-sm text-primary hover:text-primary-dark underline"
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm text-primary hover:text-primary-dark underline p-0 h-auto"
                 >
                   Clear all
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -498,12 +502,13 @@ const AdminProductsPage = () => {
           searchPlaceholder="Search products..."
           filters={filters}
           actions={
-            <button
+            <Button
               onClick={() => navigate('/admin/products/new')}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+              variant="primary"
+              size="sm"
             >
               Add Product
-            </button>
+            </Button>
           }
           emptyMessage="No products found"
           responsive="cards"
@@ -520,7 +525,6 @@ const AdminProductsPage = () => {
           cancelText="Cancel"
           variant="danger"
           onConfirm={confirmDelete}
-          disabled={isDeleting}
         />
       </div>
   );

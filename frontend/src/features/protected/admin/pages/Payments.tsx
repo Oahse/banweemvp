@@ -4,10 +4,9 @@ import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { PaymentsListSkeleton } from '@/features/protected/admin/components/skeletons/PaymentsSkeleton';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text } from '@/components/ui/Text/Text';
+import { Heading, Body, Text as TextComponent } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
@@ -102,9 +101,9 @@ export const Payments = () => {
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
     
     return (
-      <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
+      <TextComponent className={`px-2 py-1 rounded-full text-sm font-semibold ${config.bg} ${config.text}`}>
         {config.label}
-      </Text>
+      </TextComponent>
     );
   };
 
@@ -132,7 +131,6 @@ export const Payments = () => {
       if (params.search) {
         filteredPayments = filteredPayments.filter((payment: any) =>
           payment.id.toLowerCase().includes(params.search.toLowerCase()) ||
-          payment.order_id.toLowerCase().includes(params.search.toLowerCase()) ||
           payment.customer_name?.toLowerCase().includes(params.search.toLowerCase()) ||
           payment.payment_method?.toLowerCase().includes(params.search.toLowerCase())
         );
@@ -211,14 +209,7 @@ export const Payments = () => {
       key: 'id',
       label: 'Payment ID',
       render: (value: string) => (
-        <Text className="font-mono text-primary">{String(value).slice(0, 8)}</Text>
-      ),
-    },
-    {
-      key: 'order_id',
-      label: 'Order ID',
-      render: (value: string) => (
-        <Text className="font-mono">{String(value).slice(0, 8)}</Text>
+        <TextComponent className="font-mono text-primary">{String(value).slice(0, 8)}</TextComponent>
       ),
     },
     {
@@ -226,7 +217,7 @@ export const Payments = () => {
       label: 'Customer',
       sortable: true,
       render: (value: string) => (
-        <Text weight="medium">{value || 'N/A'}</Text>
+        <TextComponent weight="medium">{value || 'N/A'}</TextComponent>
       ),
     },
     {
@@ -234,14 +225,14 @@ export const Payments = () => {
       label: 'Amount',
       sortable: true,
       render: (value: number, row: Payment) => (
-        <Text weight="semibold">{formatCurrency(value, row.currency)}</Text>
+        <TextComponent weight="semibold">{formatCurrency(value, row.currency)}</TextComponent>
       ),
     },
     {
       key: 'payment_method',
       label: 'Payment Method',
       render: (value: string) => (
-        <Text variant="body-sm">{value || 'N/A'}</Text>
+        <TextComponent variant="body-sm">{value || 'N/A'}</TextComponent>
       ),
     },
     {
@@ -254,7 +245,7 @@ export const Payments = () => {
       label: 'Date',
       sortable: true,
       render: (value: string) => (
-        <Text variant="body-sm">{new Date(value || '').toLocaleDateString()}</Text>
+        <TextComponent variant="body-sm">{new Date(value || '').toLocaleDateString()}</TextComponent>
       ),
     },
     {
@@ -297,7 +288,6 @@ export const Payments = () => {
       // Get all payments without pagination for CSV
       const allPayments = payments.map((payment: any) => ({
         'Payment ID': payment.id || 'N/A',
-        'Order ID': payment.order_id || 'N/A',
         'Customer': payment.customer_name || 'N/A',
         'Amount': formatCurrency(payment.amount, payment.currency),
         'Payment Method': payment.payment_method || 'N/A',
@@ -343,14 +333,11 @@ export const Payments = () => {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <PaymentsListSkeleton />
-      </AdminLayout>
+      <PaymentsListSkeleton />
     );
   }
 
   return (
-    <AdminLayout>
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
         <div>
@@ -358,20 +345,22 @@ export const Payments = () => {
         </div>
       </div>
 
-      <AdminDataTable
-        data={payments}
-        loading={loading}
-        error={error}
-        pagination={pagination}
-        columns={columns}
-        fetchData={fetchData}
-        searchPlaceholder="Search payments..."
-        filters={filters}
-        exportable={true}
-        emptyMessage="No payments found"
-        responsive="cards"
-        limit={LIMIT}
-      />
+      <div className="overflow-x-auto">
+        <AdminDataTable
+          data={payments}
+          loading={loading}
+          error={error}
+          pagination={pagination}
+          columns={columns}
+          fetchData={fetchData}
+          searchPlaceholder="Search payments..."
+          filters={filters}
+          exportable={true}
+          emptyMessage="No payments found"
+          responsive="cards"
+          limit={LIMIT}
+        />
+      </div>
 
       <Modal isOpen={detailsModal.isOpen} onClose={detailsModal.close} size="md">
         <ModalHeader>Payment Details</ModalHeader>
@@ -379,7 +368,6 @@ export const Payments = () => {
           {selectedPayment && (
             <div className="space-y-2 text-sm">
               <div><strong>ID:</strong> {selectedPayment.id}</div>
-              <div><strong>Order ID:</strong> {selectedPayment.order_id || 'N/A'}</div>
               <div><strong>Customer:</strong> {selectedPayment.customer_name || 'N/A'}</div>
               <div><strong>Amount:</strong> {formatCurrency(selectedPayment.amount, selectedPayment.currency)}</div>
               <div><strong>Method:</strong> {selectedPayment.payment_method || 'N/A'}</div>
@@ -395,7 +383,6 @@ export const Payments = () => {
         </ModalFooter>
       </Modal>
     </div>
-    </AdminLayout>
   );
 };
 

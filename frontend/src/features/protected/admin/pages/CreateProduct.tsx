@@ -8,7 +8,6 @@ import toast from 'react-hot-toast';
 import { DIETARY_TAGS } from '@/config/product';
 import Dropdown from '@/components/ui/Dropdown';
 import { getCountryOptions } from '@/data/countries';
-import { AdminLayout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
 
@@ -216,7 +215,6 @@ const CreateProduct: React.FC = () => {
   };
 
   return (
-    <AdminLayout>
     <div className={`min-h-screen ${currentTheme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
@@ -664,7 +662,6 @@ const CreateProduct: React.FC = () => {
         </form>
       </div>
     </div>
-    </AdminLayout>
   );
 };
 

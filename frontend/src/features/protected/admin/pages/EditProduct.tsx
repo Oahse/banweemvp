@@ -8,9 +8,9 @@ import toast from 'react-hot-toast';
 import Dropdown from '@/components/ui/Dropdown';
 import { Input } from '@/components/ui/Form/Input';
 import { Textarea } from '@/components/ui/Form/Textarea';
-import { AdminLayout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/Button';
 import { Heading, Text, Label } from '@/components/ui/Text/Text';
+import { EditProductSkeleton } from '@/features/protected/admin/components/skeletons/EditProductSkeleton';
 
 interface Variant {
   id?: string;
@@ -153,17 +153,12 @@ export const EditProduct: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <AnimatedLoader size="lg" variant="spinner" color="primary" text="Loading product..." />
-      </div>
-    );
+    return <EditProductSkeleton />;
   }
 
   if (error) {
     return (
-      <AdminLayout>
-        <div className="p-6">
+      <div className="p-6">
           <div className="bg-destructive/10 border border-destructive rounded-lg p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
             <div>
@@ -172,13 +167,11 @@ export const EditProduct: React.FC = () => {
             </div>
           </div>
         </div>
-      </AdminLayout>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="p-6 space-y-6 max-w-7xl">
+    <div className="p-6 space-y-6 max-w-7xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button
@@ -269,7 +262,6 @@ export const EditProduct: React.FC = () => {
           </div>
         </form>
       </div>
-    </AdminLayout>
   );
 };
 

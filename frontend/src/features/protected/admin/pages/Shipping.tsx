@@ -6,7 +6,7 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { ShippingListSkeleton } from '@/features/protected/admin/components/skeletons/ShippingSkeleton';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Body, Text as TextComponent, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
@@ -400,14 +400,14 @@ export const AdminShipping = () => {
       label: 'Method Name',
       sortable: true,
       render: (value: string) => (
-        <Text variant="caption" weight="medium" truncate="single">{value || 'N/A'}</Text>
+        <TextComponent variant="caption" weight="medium" truncate="single">{value || 'N/A'}</TextComponent>
       ),
     },
     {
       key: 'description',
       label: 'Description',
       render: (value: string) => (
-        <Text variant="caption" tone="secondary" truncate="single">{value || 'No description'}</Text>
+        <TextComponent variant="caption" tone="secondary" truncate="single">{value || 'No description'}</TextComponent>
       ),
     },
     {
@@ -415,7 +415,7 @@ export const AdminShipping = () => {
       label: 'Cost',
       sortable: true,
       render: (value: number) => (
-        <Text variant="caption" weight="semibold">${(value || 0).toFixed(2)}</Text>
+        <TextComponent variant="caption" weight="semibold">${(value || 0).toFixed(2)}</TextComponent>
       ),
     },
     {
@@ -423,27 +423,27 @@ export const AdminShipping = () => {
       label: 'Delivery Time',
       sortable: true,
       render: (value: number) => (
-        <Text variant="caption" tone="secondary">{value || '-'} days</Text>
+        <TextComponent variant="caption" tone="secondary">{value || '-'} days</TextComponent>
       ),
     },
     {
       key: 'regions',
       label: 'Regions',
       render: (value: string[]) => (
-        <Text variant="caption" tone="secondary" truncate="single">{value?.join(', ') || 'All regions'}</Text>
+        <TextComponent variant="caption" tone="secondary" truncate="single">{value?.join(', ') || 'All regions'}</TextComponent>
       ),
     },
     {
       key: 'is_active',
       label: 'Status',
       render: (value: boolean) => (
-        <Text className={`px-2 py-1 rounded-full font-semibold ${
+        <TextComponent className={`px-2 py-1 rounded-full font-semibold ${
           value 
             ? 'bg-success/20 text-success' 
             : 'bg-error/20 text-error'
         }`}>
           {value ? 'Active' : 'Inactive'}
-        </Text>
+        </TextComponent>
       ),
     },
     {
@@ -491,7 +491,7 @@ export const AdminShipping = () => {
     <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <Text variant="body-sm" tone="secondary">Manage shipping methods and rates</Text>
+          <TextComponent variant="body-sm" tone="secondary">Manage shipping methods and rates</TextComponent>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
           <Button

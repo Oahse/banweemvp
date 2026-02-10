@@ -3,11 +3,9 @@ import { Loader, AlertCircle, SearchIcon, DownloadIcon, EditIcon, ArrowUpDownIco
 import AdminAPI from '@/api/admin';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import Dropdown from '@/components/ui/Dropdown';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { InventoryListSkeleton } from '@/features/protected/admin/components/skeletons/InventorySkeleton';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Body, Text as TextComponent, Label } from '@/components/ui/Text/Text';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
 import { Card } from '@/components/ui/Card';
@@ -166,21 +164,21 @@ export const AdminInventory = () => {
       label: 'Product Name',
       sortable: true,
       render: (value: string, row: any) => (
-        <Text className="text-sm text-gray-900 dark:text-white">{value || 'N/A'}</Text>
+        <TextComponent className="text-sm text-gray-900 dark:text-white">{value || 'N/A'}</TextComponent>
       ),
     },
     {
       key: 'sku',
       label: 'SKU',
       render: (value: string, row: any) => (
-        <Text className="text-sm text-gray-900 dark:text-white font-mono">{value || 'N/A'}</Text>
+        <TextComponent className="text-sm text-gray-900 dark:text-white font-mono">{value || 'N/A'}</TextComponent>
       ),
     },
     {
       key: 'location_name',
       label: 'Location',
       render: (value: string, row: any) => (
-        <Text className="text-sm text-gray-900 dark:text-white">{value || 'N/A'}</Text>
+        <TextComponent className="text-sm text-gray-900 dark:text-white">{value || 'N/A'}</TextComponent>
       ),
     },
     {
@@ -190,9 +188,9 @@ export const AdminInventory = () => {
       render: (value: number, row: any) => {
         const level = getItemDisplay(row).stockLevel;
         return (
-          <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${level.cls}`}>
+          <TextComponent className={`px-2 py-1 rounded-full text-sm font-semibold ${level.cls}`}>
             {level.label}
-          </Text>
+          </TextComponent>
         );
       },
     },
@@ -200,13 +198,13 @@ export const AdminInventory = () => {
       key: 'status',
       label: 'Status',
       render: (value: string) => (
-        <Text className={`px-2 py-1 rounded-full text-sm font-semibold ${
+        <TextComponent className={`px-2 py-1 rounded-full text-sm font-semibold ${
           value === 'active' 
             ? 'bg-success/20 text-success' 
             : 'bg-gray-500/20 text-gray-500'
         }`}>
           {value === 'active' ? 'Active' : 'Inactive'}
-        </Text>
+        </TextComponent>
       ),
     },
     {
@@ -372,18 +370,15 @@ export const AdminInventory = () => {
 
   if (initialLoading) {
     return (
-      <AdminLayout>
-        <InventoryListSkeleton />
-      </AdminLayout>
+      <InventoryListSkeleton />
     );
   }
 
   return (
-    <AdminLayout>
       <div className={`space-y-3 ${currentTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
           <div>
-            <Text variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage inventory levels and locations</Text>
+            <TextComponent variant="body-sm" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Manage inventory levels and locations</TextComponent>
           </div>
           <div className="flex gap-2 w-full lg:w-auto">
             <Button
@@ -580,7 +575,6 @@ export const AdminInventory = () => {
           </ModalBody>
         </Modal>
       </div>
-    </AdminLayout>
   );
 };
 
