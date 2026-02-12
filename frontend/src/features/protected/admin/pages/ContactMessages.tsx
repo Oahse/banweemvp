@@ -534,7 +534,6 @@ const ContactMessages: React.FC = () => {
           limit={PAGE_SIZE}
           onRowClick={viewMessage}
         />
-      </div>
 
       {/* View Message Modal */}
       <Modal isOpen={viewModal.isOpen} onClose={viewModal.close} size="lg">
