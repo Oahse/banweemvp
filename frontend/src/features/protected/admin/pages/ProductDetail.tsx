@@ -394,7 +394,7 @@ export const AdminProductDetail = () => {
                       className="px-2 py-0.5 bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light rounded text-sm font-medium inline-flex items-center gap-1"
                     >
                       <span className="w-1 h-1 rounded-full bg-primary"></span>
-                      {tag.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      {tag.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                     </span>
                   ))}
                 </div>
