@@ -148,7 +148,22 @@ export const ProductDetails = () => {
   };
 
   if (!id || id === 'search') {
-    return <div>Product not found</div>;
+    return (
+      <div className="py-8">
+        <Container>
+          <div className="text-center">
+            <Heading level={5} className="mb-4">Product not found</Heading>
+            <Button
+              onClick={() => navigate('/products')}
+              variant="primary"
+              size="xs"
+            >
+              Browse Products
+            </Button>
+          </div>
+        </Container>
+      </div>
+    );
   }
 
   if (productLoading) {
@@ -322,17 +337,31 @@ export const ProductDetails = () => {
       {/* Breadcrumb */}
       <motion.div className="bg-surface py-4" variants={itemVariants}>
         <Container>
-          <nav className="flex items-center space-x-2">
-            <Text variant="body-sm" tone="secondary">
-              <Link to="/" className="hover:text-primary">Home</Link>
-            </Text>
-            <ChevronRightIcon size={16} />
-            <Text variant="body-sm" tone="secondary">
-              <Link to="/products" className="hover:text-primary">Products</Link>
-            </Text>
-            <ChevronRightIcon size={16} />
-            <Text variant="body-sm">{product.name}</Text>
-          </nav>
+          <div className="flex items-center justify-between">
+            <nav className="flex items-center space-x-2">
+              <Text variant="body-sm" tone="secondary">
+                <Link to="/" className="hover:text-primary">Home</Link>
+              </Text>
+              <ChevronRightIcon size={16} />
+              <Text variant="body-sm" tone="secondary">
+                <Link to="/products" className="hover:text-primary">Products</Link>
+              </Text>
+              <ChevronRightIcon size={16} />
+              <Text variant="body-sm">{product.name}</Text>
+            </nav>
+            
+            {/* Back button using location state */}
+            {location.state?.from && (
+              <Button
+                onClick={() => navigate(-1)}
+                variant="ghost"
+                size="xs"
+                className="text-sm"
+              >
+                ← Back
+              </Button>
+            )}
+          </div>
         </Container>
       </motion.div>
 
@@ -373,7 +402,7 @@ export const ProductDetails = () => {
 
             {/* QR Code Modal */}
             <QRCodeModal
-              data={`${window.location.origin}/products/${id}`}
+              data={`${window.location.origin}${location.pathname}`}
               title={`${product.name} - QR Code`}
               description={`Scan to view ${product.name} product page`}
               isOpen={showQR}
@@ -393,7 +422,7 @@ export const ProductDetails = () => {
                   stock: selectedVariant.stock,
                   product_name: product.name,
                   barcode: JSON.stringify({
-                    url: `${window.location.origin}/products/${id}`,
+                    url: `${window.location.origin}${location.pathname}`,
                     productId: actualProductData.id,
                     sku: selectedVariant.sku,
                     variantId: selectedVariant.id,
@@ -1268,6 +1297,9 @@ export const ProductDetails = () => {
             quantity={quantity}
             onSuccess={() => {
               setShowSubscriptionSelector(false);
+              toast.success('Added to subscription successfully!');
+              // Optionally navigate to subscriptions page
+              // navigate('/account/subscriptions');
             }}
           />
         )}
