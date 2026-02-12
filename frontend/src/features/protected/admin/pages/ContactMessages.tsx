@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { ContactMessagesAPI, ContactMessage } from '@/api/contact-messages';
+import { ContactMessagesAPI, ContactMessage} from '@/api/contact-messages';
 import { Mail, Clock, CheckCircle, AlertCircle, Search, Eye, Trash2, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ContactMessagesSkeleton from '@/features/protected/admin/components/skeletons/ContactMessagesSkeleton';
@@ -13,24 +13,12 @@ import { useTheme } from '@/components/shared/contexts/ThemeContext';
 import Dropdown from '@/components/ui/Dropdown';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { AdminDataTable, AdminColumn, FilterConfig } from '@/components/shared/AdminDataTable';
-import { Card } from '@/components/ui/Card';
 import { Modal, ModalHeader, ModalBody, ModalFooter, useModal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text/Text';
 
 const PAGE_SIZE = 20;
 
-interface ContactMessage {
-  id: string;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  status: 'new' | 'in_progress' | 'resolved' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  created_at: string;
-  updated_at?: string;
-}
 
 const ContactMessages: React.FC = () => {
   const { currentTheme } = useTheme();
@@ -95,8 +83,12 @@ const ContactMessages: React.FC = () => {
         search: debouncedSearchTerm || undefined,
       });
       setMessages(response.messages);
-      setTotalPages(response.total_pages);
-      setTotal(response.total);
+      setPagination({
+        page: response.page,
+        limit: response.page_size,
+        total: response.total,
+        pages: response.total_pages
+      });
       
       // Calculate stats from the response
       calculateStats(response.messages, response.total);
