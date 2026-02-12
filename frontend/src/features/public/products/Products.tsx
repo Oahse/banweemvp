@@ -225,14 +225,13 @@ const Products = () => {
             variant="outline"
             size="xs"
             className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600',
+              'flex items-center  gap-2 px-2 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600',
               'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300',
               'hover:border-primary hover:bg-gray-50 dark:hover:bg-gray-700',
               showFilters && 'bg-primary text-white border-primary'
             )}
           >
-            <FilterIcon size={14} />
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
+            <span className="whitespace-nowrap">{showFilters ? 'Hide Filters' : 'Show Filters'}</span>
           </Button>
 
           {/* Custom Sort Dropdown */}

@@ -41,25 +41,12 @@ import ErrorMessage from '@/components/shared/Error';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/features/protected/auth/hooks/useAuth';
 
-// Local interfaces for component state
-interface SelectedVariant extends ProductVariant {
-  tags?: string[];
-  dietary_tags?: string[];
-  specifications?: Record<string, any>;
-  inventory?: {
-    id: string;
-    quantity_available: number;
-    low_stock_threshold: number;
-    inventory_status: string;
-  };
-}
-
 // Product Details Component - using backend data directly
 export const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedVariant, setSelectedVariant] = useState<SelectedVariant | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<string>('description');
@@ -205,7 +192,7 @@ export const ProductDetails = () => {
   const totalReviews = actualReviewsData.total || 0;
 
   // Use backend data directly without transformation
-  const product = actualProductData;
+  const product: Product = actualProductData;
   
   // If product data is not available, show error
   if (!product) {
@@ -355,10 +342,10 @@ export const ProductDetails = () => {
           {/* Product Images */}
           <div className="space-y-4">
             <ProductImageGallery
-              images={[
+              images={([
                 ...(product.images || []),
                 ...(selectedVariant?.images || [])
-              ].filter((img, index, self) => 
+              ] as ProductImage[]).filter((img, index, self) => 
                 index === self.findIndex((i) => i.id === img.id)
               )}
               selectedImageIndex={selectedImage}

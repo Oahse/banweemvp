@@ -48,6 +48,9 @@ export interface User {
   date_of_birth?: string;
   language_preference?: string;
   currency_preference?: string;
+  // Supplier fields
+  company?: string;
+  logo?: string;
 }
 
 // Product Types
@@ -100,6 +103,16 @@ export interface ProductVariant {
   inventory_quantity_available?: number;
   inventory_reorder_level?: number;
   inventory_last_updated?: string;
+  // Additional variant fields from backend
+  tags?: string[];
+  dietary_tags?: string[];
+  specifications?: Record<string, any>;
+  inventory?: {
+    id: string;
+    quantity_available: number;
+    low_stock_threshold: number;
+    inventory_status: string;
+  };
 }
 
 export interface Category {
@@ -148,16 +161,21 @@ export interface Product {
   category?: Category;
   supplier?: User;
   created_at: string;
+  // Additional fields from backend
+  sku?: string;
+  base_price?: number;
+  rating?: number;
+  reviewCount?: number;
+  featured?: boolean;
+  is_active?: boolean;
+  features?: string[];
   updated_at?: string;
   // Legacy fields for backward compatibility
   brand_id?: string;
   brand?: Brand;
-  is_active?: boolean;
   average_rating?: number;
   price?: number;
   discountPrice?: number | null;
-  featured?: boolean;
-  rating?: number;
 }
 
 export interface Brand {
