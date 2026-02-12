@@ -490,90 +490,25 @@ export const ProductDetails = () => {
 
               <Text variant="body-sm" tone="secondary" className="mb-6">{product.description}</Text>
               
-              {/* Variant Selection - Moved under description */}
-              {actualProductData?.variants && actualProductData.variants.length > 0 && (
+              {/* Variant Selection - Using VariantSelector component */}
+              {actualProductData?.variants && actualProductData.variants.length > 1 && selectedVariant && (
                 <div className="mb-6">
-                  <Heading level={5} weight="medium">Available Variants</Heading>
-                  <div className="space-y-1">
-                    {actualProductData.variants.map((variant: any, index: number) => {
-                      const isSelected = selectedVariant?.id === variant.id;
-                      const isAvailable = variant.stock > 0;
-                      const currentPrice = variant.sale_price || variant.base_price;
-                      
-                      return (
-                        <Button
-                          key={variant.id}
-                          onClick={() => {
-                            if (isAvailable) {
-                              setSelectedVariant({
-                                ...variant,
-                                inventory: variant.inventory,
-                              });
-                              setSelectedImage(0);
-                            }
-                          }}
-                          disabled={!isAvailable}
-                          variant={isSelected ? "primary" : "ghost"}
-                          size="xs"
-                          className={`w-full p-2 border rounded text-left transition-all text-sm ${
-                            isSelected
-                              ? 'border-primary bg-primary/5'
-                              : 'border-border hover:border-border-strong'
-                          } ${
-                            !isAvailable ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2 flex-1 min-w-0">
-                              <div className={`w-3 h-3 rounded-full border flex-shrink-0 ${
-                                isSelected ? 'border-primary bg-primary' : 'border-gray-300'
-                              }`}>
-                                {isSelected && (
-                                  <div className="w-1.5 h-1.5 rounded-full bg-white mx-auto mt-0.75"></div>
-                                )}
-                              </div>
-                              <Text variant="body-sm" weight="medium" truncate="single">
-                                {variant.name || `Variant ${index + 1}`}
-                              </Text>
-                              {variant.sku && (
-                                <Text variant="caption" tone="secondary">SKU: {variant.sku}</Text>
-                              )}
-                            </div>
-                            
-                            <div className="flex items-center space-x-2 flex-shrink-0">
-                              <div className="text-right">
-                                <Text variant="body-sm" weight="bold" tone="primary">
-                                  ${currentPrice.toFixed(2)}
-                                </Text>
-                                {variant.sale_price && variant.sale_price < variant.base_price && (
-                                  <Text variant="caption" tone="secondary" className="line-through">
-                                    ${variant.base_price.toFixed(2)}
-                                  </Text>
-                                )}
-                              </div>
-                              <Text variant="caption" className={`px-1.5 py-0.5 rounded-full ${
-                                isAvailable
-                                  ? 'bg-success-100 text-success-800'
-                                  : 'bg-error-100 text-error-800'
-                              }`}>
-                                {isAvailable ? 'In Stock' : 'Out of Stock'}
-                              </Text>
-                            </div>
-                          </div>
-                          
-                            {variant.attributes && Object.keys(variant.attributes).length > 0 && (
-                              <Text variant="caption" tone="secondary" truncate="single">
-                                {Object.entries(variant.attributes).map(([key, value], idx) => (
-                                  <Text key={key} className={idx > 0 ? 'ml-2' : ''}>
-                                    <Text className="capitalize">{key.replace('_', ' ')}:</Text> {String(value)}
-                                  </Text>
-                                ))}
-                              </Text>
-                            )}
-                          </Button>
-                      );
-                    })}
-                  </div>
+                  <VariantSelector
+                    variants={actualProductData.variants}
+                    selectedVariant={selectedVariant}
+                    onVariantChange={(variant: ProductVariant) => {
+                      setSelectedVariant({
+                        ...variant,
+                        inventory: variant.inventory,
+                      });
+                      setSelectedImage(0);
+                    }}
+                    showImages={false}
+                    showPrice={true}
+                    showStock={true}
+                    layout="list"
+                    className=""
+                  />
                 </div>
               )}
             </div>
