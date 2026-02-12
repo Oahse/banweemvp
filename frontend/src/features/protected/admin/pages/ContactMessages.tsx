@@ -26,7 +26,6 @@ const ContactMessages: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ 
     page: 1, 
     limit: PAGE_SIZE, 
@@ -68,39 +67,6 @@ const ContactMessages: React.FC = () => {
     });
   }, []);
 
-  const fetchMessages = async () => {
-    try {
-      if (page === 1 && !searchTerm && !statusFilter && !priorityFilter) {
-        setInitialLoading(true);
-      } else {
-        setLoading(true);
-      }
-      const response = await ContactMessagesAPI.getAll({
-        page,
-        page_size: PAGE_SIZE,
-        status: statusFilter || undefined,
-        priority: priorityFilter || undefined,
-        search: debouncedSearchTerm || undefined,
-      });
-      setMessages(response.messages);
-      setPagination({
-        page: response.page,
-        limit: response.page_size,
-        total: response.total,
-        pages: response.total_pages
-      });
-      
-      // Calculate stats from the response
-      calculateStats(response.messages, response.total);
-    } catch (error: any) {
-      console.error('Error fetching messages:', error);
-      toast.error('Failed to load messages');
-    } finally {
-      setLoading(false);
-      setInitialLoading(false);
-    }
-  };
-
   const calculateStats = (currentMessages: ContactMessage[], totalCount: number) => {
     const newCount = currentMessages.filter(m => m.status === 'new').length;
     const inProgressCount = currentMessages.filter(m => m.status === 'in_progress').length;
@@ -112,28 +78,6 @@ const ContactMessages: React.FC = () => {
       in_progress: inProgressCount,
       resolved: resolvedCount
     });
-  };
-
-  
-
-  const handleStatusChange = async (messageId: string, newStatus: string) => {
-    try {
-      await ContactMessagesAPI.update(messageId, { status: newStatus as any });
-      toast.success('Status updated successfully');
-      fetchMessages();
-    } catch (error) {
-      toast.error('Failed to update status');
-    }
-  };
-
-  const handlePriorityChange = async (messageId: string, newPriority: string) => {
-    try {
-      await ContactMessagesAPI.update(messageId, { priority: newPriority as any });
-      toast.success('Priority updated successfully');
-      fetchMessages();
-    } catch (error) {
-      toast.error('Failed to update priority');
-    }
   };
 
   const handleDelete = async (messageId: string) => {
@@ -150,7 +94,13 @@ const ContactMessages: React.FC = () => {
       toast.success('Message deleted successfully');
       setShowDeleteConfirm(false);
       setMessageToDelete(null);
-      fetchMessages(); // This will recalculate stats
+      fetchData({
+        page: pagination.page,
+        limit: pagination.limit,
+        search: debouncedSearchTerm,
+        sort_by: 'created_at',
+        sort_order: 'desc'
+      }); // Refresh data after delete
     } catch (error) {
       toast.error('Failed to delete message');
     } finally {
