@@ -42,24 +42,10 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '@/features/protected/auth/hooks/useAuth';
 
 // Local interfaces for component state
-interface SelectedVariant {
-  id: string;
-  name: string;
-  base_price: number;
-  sale_price: number | null;
-  current_price: number;
-  discount_percentage: number;
-  stock: number;
-  sku: string;
-  attributes: Record<string, any>;
-  barcode: string;
-  qr_code: string;
+interface SelectedVariant extends ProductVariant {
   tags?: string[];
   dietary_tags?: string[];
   specifications?: Record<string, any>;
-  availability_status?: string;
-  is_active?: boolean;
-  images?: any[]; // Add images property
   inventory?: {
     id: string;
     quantity_available: number;
@@ -154,23 +140,7 @@ export const ProductDetails = () => {
     if (actualProductData && actualProductData.variants && actualProductData.variants.length > 0) {
       const variant = actualProductData.variants[0];
       setSelectedVariant({
-        id: variant.id,
-        name: variant.name,
-        base_price: variant.base_price,
-        sale_price: variant.sale_price,
-        current_price: variant.current_price,
-        discount_percentage: variant.discount_percentage,
-        stock: variant.stock,
-        sku: variant.sku,
-        attributes: variant.attributes,
-        barcode: variant.barcode,
-        qr_code: variant.qr_code,
-        tags: variant.tags,
-        dietary_tags: variant.dietary_tags,
-        specifications: variant.specifications,
-        availability_status: variant.availability_status,
-        is_active: variant.is_active,
-        images: variant.images, // Add images
+        ...variant,
         inventory: variant.inventory,
       });
       // Reset image selection when product changes
@@ -385,7 +355,12 @@ export const ProductDetails = () => {
           {/* Product Images */}
           <div className="space-y-4">
             <ProductImageGallery
-              images={selectedVariant?.images || []}
+              images={[
+                ...(product.images || []),
+                ...(selectedVariant?.images || [])
+              ].filter((img, index, self) => 
+                index === self.findIndex((i) => i.id === img.id)
+              )}
               selectedImageIndex={selectedImage}
               onImageSelect={setSelectedImage}
               showThumbnails={true}
@@ -515,23 +490,7 @@ export const ProductDetails = () => {
                           onClick={() => {
                             if (isAvailable) {
                               setSelectedVariant({
-                                id: variant.id,
-                                name: variant.name,
-                                base_price: variant.base_price,
-                                sale_price: variant.sale_price,
-                                current_price: variant.current_price,
-                                discount_percentage: variant.discount_percentage,
-                                stock: variant.stock,
-                                sku: variant.sku,
-                                attributes: variant.attributes,
-                                barcode: variant.barcode,
-                                qr_code: variant.qr_code,
-                                tags: variant.tags,
-                                dietary_tags: variant.dietary_tags,
-                                specifications: variant.specifications,
-                                availability_status: variant.availability_status,
-                                is_active: variant.is_active,
-                                images: variant.images,
+                                ...variant,
                                 inventory: variant.inventory,
                               });
                               setSelectedImage(0);
