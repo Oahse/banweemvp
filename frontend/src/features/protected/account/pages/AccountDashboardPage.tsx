@@ -51,7 +51,7 @@ interface User {
   [key: string]: any;
 }
 
-export const Dashboard = ({
+const Dashboard = ({
   animation = 'shimmer' 
 }: DashboardProps) => {
   const { user } = useAuth() as { user: User | null };
@@ -148,3 +148,5 @@ export const Dashboard = ({
     </motion.div>
   );
 };
+
+export default Dashboard;

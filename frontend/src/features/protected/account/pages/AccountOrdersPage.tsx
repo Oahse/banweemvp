@@ -9,7 +9,7 @@ import { useLocale } from '@/components/shared/contexts/LocaleContext';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
-import { Text, Heading } from '@/components/ui/Text/Text';
+import { Text, Heading, Caption } from '@/components/ui/Text/Text';
 
 
 interface Order {
@@ -37,7 +37,7 @@ interface OrdersProps {
   animation?: 'shimmer' | 'pulse' | 'wave';
 }
 
-export const Orders = (props: OrdersProps) => {
+const Orders = (props: OrdersProps) => {
   const { animation = 'shimmer' } = props;
   const { formatCurrency } = useLocale();
   const { data, loading, error, execute } = usePaginatedApi();
@@ -45,7 +45,7 @@ export const Orders = (props: OrdersProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
-  const ordersPerPage = 10;
+  const ordersPerPage = 5;
 
   // Helper function to calculate and format pricing breakdown
   const calculatePricingBreakdown = (order: Order) => {
@@ -107,20 +107,28 @@ export const Orders = (props: OrdersProps) => {
       </div>
 
       {loading ? (
-        <Table>
-          <Table.Head>
-            <Table.Row>
-              <Table.HeaderCell>Order ID</Table.HeaderCell>
-              <Table.HeaderCell>Date</Table.HeaderCell>
-              <Table.HeaderCell>Status</Table.HeaderCell>
-              <Table.HeaderCell>Total</Table.HeaderCell>
-              <Table.HeaderCell>Actions</Table.HeaderCell>
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            <Table.Loading rows={5} columns={5} />
-          </Table.Body>
-        </Table>
+        <div className="space-y-3">
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="bg-surface dark:bg-surface-dark shadow rounded-lg border border-border dark:border-border-dark">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse mb-2"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
+                  </div>
+                  <div className="text-right">
+                    <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse mb-2"></div>
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-24 animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-28 animate-pulse"></div>
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : error ? (
         <div className="text-center py-6">
           <Text as="p" className="text-sm text-red-600">Error loading orders</Text>
@@ -146,7 +154,7 @@ export const Orders = (props: OrdersProps) => {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <Heading level={5} weight="medium">Order #{order.id.slice(0, 8)}</Heading>
+                    <Caption weight="medium">Order #{order.id.slice(0, 8)}</Caption><br/>
                     <Text variant="caption" tone="secondary">{new Date(order.created_at).toLocaleDateString()}</Text>
                   </div>
                   <div className="text-right">
@@ -228,13 +236,18 @@ export const Orders = (props: OrdersProps) => {
           {/* Pagination */}
           <Pagination
             currentPage={currentPage}
+            totalPages={totalPages}
             totalItems={totalOrders}
-            pageSize={ordersPerPage}
+            itemsPerPage={ordersPerPage}
             onPageChange={setCurrentPage}
-            size="xs"
+            showingStart={(currentPage - 1) * ordersPerPage + 1}
+            showingEnd={Math.min(currentPage * ordersPerPage, totalOrders)}
+            itemName="orders"
           />
         </div>
       )}
     </div>
   );
 };
+
+export default Orders;

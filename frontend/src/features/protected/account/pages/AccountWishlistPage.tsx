@@ -37,7 +37,7 @@ interface WishlistProps {
   wishlistId?: string;
 }
 
-export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId }) => {
+const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId }) => {
   const navigate = useNavigate();
   const { defaultWishlist, removeItem, clearWishlist, addItem } = useWishlist();
   const { addItem: addToCart } = useCart();
@@ -157,3 +157,5 @@ export const Wishlist: React.FC<WishlistProps> = ({ mode = 'list', wishlistId })
     </Card>
   );
 };
+
+export default Wishlist;

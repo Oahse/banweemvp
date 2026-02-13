@@ -12,15 +12,15 @@ const AccountSkeleton = () => (
 );
 
 // Lazy load account pages (feature-based)
-const AccountDashboardPage = lazy(() => import('./AccountDashboardPage').then(module => ({ default: module.Dashboard })));
-const AccountProfilePage = lazy(() => import('./AccountProfilePage').then(module => ({ default: module.Profile })));
-const AccountOrdersPage = lazy(() => import('./AccountOrdersPage').then(module => ({ default: module.Orders })));
-const AccountOrderDetailPage = lazy(() => import('./AccountOrderDetailPage').then(module => ({ default: module.OrderDetail })));
+const AccountDashboardPage = lazy(() => import('./AccountDashboardPage'));
+const AccountProfilePage = lazy(() => import('./AccountProfilePage'));
+const AccountOrdersPage = lazy(() => import('./AccountOrdersPage'));
+const AccountOrderDetailPage = lazy(() => import('./AccountOrderDetailPage'));
 const AccountTrackOrderPage = lazy(() => import('./AccountTrackOrderPage'));
-const AccountWishlistPage = lazy(() => import('./AccountWishlistPage').then(module => ({ default: module.Wishlist })));
-const AccountAddressesPage = lazy(() => import('./AccountAddressesPage').then(module => ({ default: module.Addresses })));
-const AccountMySubscriptionsPage = lazy(() => import('./AccountMySubscriptionsPage').then(module => ({ default: module.MySubscriptions })));
-const AccountMySubscriptionDetailPage = lazy(() => import('./AccountMySubscriptionDetailPage').then(module => ({ default: module.MySubscriptionDetail })));
+const AccountWishlistPage = lazy(() => import('./AccountWishlistPage'));
+const AccountAddressesPage = lazy(() => import('./AccountAddressesPage'));
+const AccountMySubscriptionsPage = lazy(() => import('./AccountMySubscriptionsPage'));
+const AccountMySubscriptionDetailPage = lazy(() => import('./AccountMySubscriptionDetailPage'));
 const AccountSubscriptionEditPage = lazy(() => import('./AccountMySubscriptionEditPage'));
 const AccountPaymentMethodsPage = lazy(() => import('./AccountPaymentMethodsPage'));
 
@@ -56,7 +56,6 @@ export const Account = () => {
           <Route path="/orders" element={<AccountOrdersPage />} />
           <Route path="/orders/:orderId" element={<AccountOrderDetailPage />} />
           <Route path="/tracking" element={<AccountTrackOrderPage />} />
-          {/* <Route path="/tracking/:shipmentId" element={<ShipmentTracking />} /> */} // TODO: Implement shipping module
           <Route path="/wishlist" element={<AccountWishlistPage />} />
           <Route path="/addresses" element={<AccountAddressesPage />} />
           <Route path="/payment-methods" element={<AccountPaymentMethodsPage />} />

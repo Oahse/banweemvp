@@ -54,7 +54,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className={`flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 ${className}`}>
       <div className="text-sm text-copy-light text-center sm:text-left">
-        Showing <Text as="span" className="font-medium">{showingStart}</Text> to{' '}
+        Showing <Text as="span" className="font-medium">{showingStart}</Text> to {' '}
         <Text as="span" className="font-medium">{showingEnd}</Text> of{' '}
         <Text as="span" className="font-medium">{totalItems}</Text> {itemName}
       </div>
@@ -66,11 +66,13 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === 1}
           variant="outline"
           size="xs"
-          className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
+          leftIcon={<ChevronLeftIcon className="w-4 h-4 flex-shrink-0" />}
+          className="flex items-center justify-center h-8 px-3 py-1 sm:px-4 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
         >
-          <ChevronLeftIcon className="w-4 h-4" />
-          <Text as="span" className="hidden sm:inline ml-1">Previous</Text>
+          
+          <Text  as="span" className="hidden sm:inline ml-2">Previous</Text>
         </Button>
+        
         
         {/* Page numbers */}
         <div className="flex items-center space-x-1">
@@ -80,7 +82,7 @@ export const Pagination: React.FC<PaginationProps> = ({
               onClick={() => onPageChange(pageNum)}
               variant={currentPage === pageNum ? 'primary' : 'ghost'}
               size="xs"
-              className={`px-2 py-1 sm:px-3 sm:py-1 text-sm rounded-md min-w-[32px] transition-colors ${
+              className={`flex items-center justify-center h-8 w-8 px-2 py-1 text-sm rounded-md transition-colors ${
                 currentPage === pageNum
                   ? 'bg-primary text-white border-primary'
                   : 'text-copy hover:bg-surface-hover border-border'
@@ -98,10 +100,10 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === totalPages}
           variant="outline"
           size="xs"
-          className="flex items-center px-2 py-1 sm:px-3 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
+          rightIcon={<ChevronRightIcon className="w-4 h-4" />}
+          className="flex items-center justify-center h-8 px-3 py-1 sm:px-4 sm:py-1 border border-border rounded-md text-sm text-copy-light bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-hover transition-colors"
         >
-          <Text as="span" className="hidden sm:inline mr-1">Next</Text>
-          <ChevronRightIcon className="w-4 h-4" />
+          <Text as="span" className="hidden sm:inline mr-2 whitespace-nowrap">Next</Text>
         </Button>
       </div>
     </div>

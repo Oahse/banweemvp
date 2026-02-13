@@ -208,10 +208,10 @@ export const Pagination: React.FC<PaginationProps> = ({
       )}
       
       {/* Pagination controls */}
-      <div className="flex items-center order-1 sm:order-2">
+      <div className="flex items-center justify-center order-1 sm:order-2">
         <ul className={cn('flex items-center', sizes.gap)} role="list">
           {pageItems.map((item, index) => (
-            <li key={index}>
+            <li key={index} className="flex items-center">
               {renderPageItem(item, index)}
             </li>
           ))}

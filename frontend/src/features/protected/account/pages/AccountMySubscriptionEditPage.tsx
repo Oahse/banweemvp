@@ -14,7 +14,7 @@ import {
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { toast } from 'react-hot-toast';
 
-export const AccountMySubscriptionEditPage = () => {
+const AccountMySubscriptionEditPage = () => {
   const { subscriptionId } = useParams<{ subscriptionId: string }>();
   const navigate = useNavigate();
   const { 

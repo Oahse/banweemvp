@@ -13,7 +13,7 @@ import { Text, Label } from '@/components/ui/Text/Text';
 /**
  * Profile component allows users to view and edit their personal information.
  */
-export const Profile = () => {
+const Profile = () => {
   const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -259,4 +259,6 @@ export const Profile = () => {
       </div>
     </div>
   );
-}
+};
+
+export default Profile;

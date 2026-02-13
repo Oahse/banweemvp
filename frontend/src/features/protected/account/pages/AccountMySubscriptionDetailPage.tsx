@@ -16,7 +16,7 @@ import {
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 
-export const MySubscriptionDetail = () => {
+const MySubscriptionDetail = () => {
   const { subscriptionId } = useParams<{ subscriptionId: string }>();
   const navigate = useNavigate();
   const { 

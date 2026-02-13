@@ -22,7 +22,7 @@ import { AutoRenewToggle } from '@/features/protected/subscriptions/components/A
 import ProductsAPI from '@/api/products';
 import { Product } from '@/types';
 
-export const MySubscriptions = () => {
+const MySubscriptions = () => {
   const navigate = useNavigate();
   const { 
     subscriptions, 
@@ -405,10 +405,13 @@ export const MySubscriptions = () => {
           </div>
           <Pagination
             currentPage={currentPage}
+            totalPages={totalPages}
             totalItems={filteredSubscriptions.length}
-            pageSize={itemsPerPage}
+            itemsPerPage={itemsPerPage}
             onPageChange={setCurrentPage}
-            size="xs"
+            showingStart={(currentPage - 1) * itemsPerPage + 1}
+            showingEnd={Math.min(currentPage * itemsPerPage, filteredSubscriptions.length)}
+            itemName="subscriptions"
           />
         </div>
       )}
@@ -647,3 +650,5 @@ export const MySubscriptions = () => {
     </div>
   );
 };
+
+export default MySubscriptions;
