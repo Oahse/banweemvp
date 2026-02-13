@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 from uuid import UUID
+from core.utils.uuid_utils import uuid7
 import logging
 
 from models.subscriptions import Subscription
@@ -51,9 +52,19 @@ class SubscriptionSchedulerService:
                 order = await self.create_subscription_order(subscription)
                 if order:
                     processed_count += 1
+                    
+                    # Get user email for notification
+                    user_result = await self.db.execute(
+                        select(User).where(User.id == subscription.user_id)
+                    )
+                    user = user_result.scalar_one_or_none()
+                    
                     results.append({
                         "subscription_id": str(subscription.id),
                         "order_id": str(order.id),
+                        "order_number": order.order_number,
+                        "user_email": user.email if user else None,
+                        "user_id": str(subscription.user_id),
                         "status": "success"
                     })
                     logger.info(f"Created order {order.order_number} for subscription {subscription.id}")
@@ -61,6 +72,7 @@ class SubscriptionSchedulerService:
                     failed_count += 1
                     results.append({
                         "subscription_id": str(subscription.id),
+                        "user_id": str(subscription.user_id),
                         "status": "failed",
                         "reason": "Order creation failed"
                     })
@@ -68,6 +80,7 @@ class SubscriptionSchedulerService:
                 failed_count += 1
                 results.append({
                     "subscription_id": str(subscription.id),
+                    "user_id": str(subscription.user_id),
                     "status": "failed",
                     "reason": str(e)
                 })
@@ -80,8 +93,57 @@ class SubscriptionSchedulerService:
             "results": results
         }
     
+    async def process_specific_subscription(self, subscription_id: UUID) -> Dict[str, Any]:
+        """Process a specific subscription (for manual renewal or retry)"""
+        try:
+            result = await self.db.execute(
+                select(Subscription).where(Subscription.id == subscription_id)
+                .options(selectinload(Subscription.products))
+            )
+            subscription = result.scalar_one_or_none()
+            
+            if not subscription:
+                return {
+                    "success": False,
+                    "error": "Subscription not found"
+                }
+            
+            if subscription.status not in ["active", "payment_failed"]:
+                return {
+                    "success": False,
+                    "error": f"Subscription status is {subscription.status}, cannot process"
+                }
+            
+            order = await self.create_subscription_order(subscription)
+            
+            if order:
+                # Get user email
+                user_result = await self.db.execute(
+                    select(User).where(User.id == subscription.user_id)
+                )
+                user = user_result.scalar_one_or_none()
+                
+                return {
+                    "success": True,
+                    "order_id": str(order.id),
+                    "order_number": order.order_number,
+                    "user_email": user.email if user else None
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": "Order creation failed"
+                }
+                
+        except Exception as e:
+            logger.error(f"Failed to process specific subscription {subscription_id}: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
     async def create_subscription_order(self, subscription: Subscription) -> Optional[Order]:
-        """Create an order from a subscription with proper VAT calculation"""
+        """Create an order from a subscription with payment processing and inventory updates"""
         try:
             # Get user
             user_result = await self.db.execute(
@@ -98,7 +160,7 @@ class SubscriptionSchedulerService:
             variant_result = await self.db.execute(
                 select(ProductVariant).where(
                     ProductVariant.id.in_([UUID(vid) for vid in subscription.variant_ids])
-                )
+                ).options(selectinload(ProductVariant.product))
             )
             variants = variant_result.scalars().all()
             
@@ -108,12 +170,64 @@ class SubscriptionSchedulerService:
             # Recalculate pricing with current product prices and VAT
             updated_cost = await self._recalculate_subscription_pricing(subscription, variants)
             
-            # Create order with updated pricing
-            order = Order(
+            # ========================================
+            # STEP 1: PROCESS PAYMENT FIRST
+            # ========================================
+            from services.payments import PaymentService
+            from models.payments import PaymentMethod
+            
+            # Get user's default payment method
+            payment_method_result = await self.db.execute(
+                select(PaymentMethod).where(
+                    and_(
+                        PaymentMethod.user_id == subscription.user_id,
+                        PaymentMethod.is_default == True
+                    )
+                )
+            )
+            payment_method = payment_method_result.scalar_one_or_none()
+            
+            if not payment_method:
+                raise Exception(f"No default payment method found for user {subscription.user_id}")
+            
+            # Generate order number and temp ID for payment
+            order_number = await self._generate_order_number()
+            temp_order_id = uuid7()
+            
+            payment_service = PaymentService(self.db)
+            payment_result = await payment_service.process_payment_idempotent(
                 user_id=subscription.user_id,
-                order_number=await self._generate_order_number(),
-                order_status=OrderStatus.PENDING,
-                payment_status=PaymentStatus.PENDING,
+                order_id=temp_order_id,
+                amount=updated_cost["total_amount"],
+                payment_method_id=payment_method.id,
+                idempotency_key=f"subscription_{subscription.id}_{temp_order_id}",
+                request_id=str(temp_order_id)
+            )
+            
+            # Check payment status - MUST succeed before creating order
+            if payment_result.get("status") != "succeeded":
+                error_message = payment_result.get("error", "Payment processing failed")
+                
+                # Update subscription status
+                subscription.status = "payment_failed"
+                subscription.last_payment_error = error_message
+                
+                await self.db.commit()
+                
+                logger.error(f"Payment failed for subscription {subscription.id}: {error_message}")
+                raise Exception(f"Payment failed: {error_message}")
+            
+            logger.info(f"✅ Payment succeeded for subscription {subscription.id}, creating order...")
+            
+            # ========================================
+            # STEP 2: CREATE ORDER (only after successful payment)
+            # ========================================
+            order = Order(
+                id=temp_order_id,  # Use same ID as payment
+                user_id=subscription.user_id,
+                order_number=order_number,
+                order_status=OrderStatus.CONFIRMED,  # Already paid
+                payment_status=PaymentStatus.PAID,   # Payment succeeded
                 fulfillment_status=FulfillmentStatus.UNFULFILLED,
                 source=OrderSource.API,
                 subtotal=updated_cost["subtotal"],
@@ -123,53 +237,65 @@ class SubscriptionSchedulerService:
                 total_amount=updated_cost["total_amount"],
                 currency=subscription.currency or "USD",
                 shipping_method=subscription.delivery_type or "standard",
-                # Copy delivery info from subscription
                 shipping_address=await self._get_delivery_address(subscription),
-                billing_address=await self._get_delivery_address(subscription),  # Use same for billing
-                subscription_id=subscription.id,
-                order_metadata={
-                    "subscription_order": True,
-                    "subscription_id": str(subscription.id),
-                    "billing_cycle": subscription.billing_cycle,
-                    "delivery_type": subscription.delivery_type,
-                    "cost_breakdown": updated_cost,
-                    "order_created_at": datetime.utcnow().isoformat()
-                }
+                billing_address=await self._get_delivery_address(subscription),
+                subscription_id=subscription.id
             )
             
             self.db.add(order)
             await self.db.flush()  # Get order ID
             
-            # Create order items with current prices
+            # ========================================
+            # STEP 3: CREATE ORDER ITEMS
+            # ========================================
+            order_items = []
             for product_detail in updated_cost.get("product_details", []):
                 variant_id = UUID(product_detail["variant_id"])
                 variant = next((v for v in variants if v.id == variant_id), None)
                 
                 if variant:
-                    # Get quantity from subscription metadata or default to 1
                     quantity = self._get_variant_quantity(subscription, variant_id)
                     unit_price = product_detail["price"]
                     line_total = unit_price * quantity
                     
                     order_item = OrderItem(
                         order_id=order.id,
-                        product_variant_id=variant.id,
+                        variant_id=variant.id,
                         quantity=quantity,
-                        unit_price=unit_price,
-                        total_price=line_total,
-                        product_name=getattr(variant, 'product_name', product_detail["name"]),
-                        variant_name=getattr(variant, 'name', ''),
-                        sku=getattr(variant, 'sku', ''),
-                        item_metadata={
-                            "subscription_item": True,
-                            "original_price": unit_price,
-                            "price_at_order": unit_price
-                        }
+                        price_per_unit=unit_price,
+                        total_price=line_total
                     )
                     
                     self.db.add(order_item)
+                    order_items.append(order_item)
             
-            # Update subscription with new pricing (in case product prices changed)
+            await self.db.flush()  # Ensure order items have IDs
+            
+            # ========================================
+            # STEP 4: UPDATE INVENTORY
+            # ========================================
+            from services.inventory import InventoryService
+            from schemas.inventory import StockAdjustmentCreate
+            
+            inventory_service = InventoryService(self.db, None)
+            
+            for order_item in order_items:
+                adjustment = StockAdjustmentCreate(
+                    variant_id=order_item.variant_id,
+                    quantity_change=-order_item.quantity,
+                    reason=f"Subscription order: {order.order_number}",
+                    notes=f"Auto-adjusted inventory for subscription {subscription.id}"
+                )
+                
+                await inventory_service.adjust_stock(
+                    adjustment,
+                    adjusted_by_user_id=subscription.user_id,
+                    commit=False
+                )
+            
+            # ========================================
+            # STEP 5: UPDATE SUBSCRIPTION
+            # ========================================
             subscription.price = updated_cost["total_amount"]
             subscription.cost_breakdown = updated_cost
             subscription.tax_rate_applied = updated_cost.get("tax_rate")
@@ -178,11 +304,15 @@ class SubscriptionSchedulerService:
             subscription.discount_amount = updated_cost.get("discount_amount")
             subscription.subtotal = updated_cost.get("subtotal")
             subscription.total = updated_cost.get("total_amount")
+            subscription.status = "active"  # Reset to active after successful payment
+            subscription.last_payment_error = None
             
             # Update subscription billing dates
             await self._update_subscription_billing_dates(subscription)
             
             await self.db.commit()
+            
+            logger.info(f"✅ Successfully created and processed subscription order {order.order_number} for subscription {subscription.id}")
             
             return order
             

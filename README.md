@@ -154,12 +154,19 @@ A comprehensive full-stack e-commerce platform built with FastAPI (Python) backe
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
-8. **Start ARQ worker (in another terminal)**
+8. **Start ARQ worker (REQUIRED - in another terminal)**
    ```bash
    cd backend
-   source venv/bin/activate
-   python start_arq_worker.py
+   ./start_arq_worker.sh
    ```
+   
+   **Important:** The ARQ worker MUST be running for:
+   - Automatic subscription renewals (daily at 2 AM)
+   - Background email sending
+   - Inventory synchronization
+   - Cart cleanup
+   
+   See [ARQ_WORKER_SETUP.md](backend/ARQ_WORKER_SETUP.md) for production setup.
 
 #### Frontend Setup
 

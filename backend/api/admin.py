@@ -563,9 +563,9 @@ async def update_order_status(
 ):
     """Update order status with tracking information (admin only)."""
     try:
-        from services.orders import OrderService as EnhancedOrderService
+        from services.orders import OrderService
         
-        order_service = EnhancedOrderService(db)
+        order_service = OrderService(db)
         order = await order_service.update_order_status(
             order_id=UUID(order_id),
             status=request.status,
@@ -598,12 +598,12 @@ async def get_order_invoice_admin(
 ):
     """Get order invoice (admin only)."""
     from fastapi.responses import StreamingResponse, FileResponse
-    from services.orders import OrderService as EnhancedOrderService
+    from services.orders import OrderService as OrderService
     import os
     import io
     
     try:
-        order_service = EnhancedOrderService(db)
+        order_service = OrderService(db)
         order_query = await db.execute(
             select(Order).where(Order.id == order_id)
         )

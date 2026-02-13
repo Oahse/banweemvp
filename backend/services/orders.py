@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 from fastapi import HTTPException, BackgroundTasks
 from models.orders import Order, OrderItem, TrackingEvent, PaymentStatus, OrderStatus
 from models.user import User
-from jobs.email_tasks import send_order_confirmation_email
+from services.email import send_order_confirmation_email
 from models.cart import Cart, CartItem
 from models.user import User, Address
 from models.product import ProductVariant
@@ -429,17 +429,47 @@ class OrderService:
         shipping_method = shipping_method_result.scalar_one()
         
         try:
-            # Step 3: Create order
-            # Generate order number
+            # Step 3: PROCESS PAYMENT FIRST (before creating order)
+            # Generate order number for payment reference
             order_number = f"ORD-{datetime.utcnow().strftime('%Y%m%d')}-{uuid7().hex[:8].upper()}"
+            temp_order_id = uuid7()  # Temporary ID for payment processing
             
-            # Create order
+            # Process payment with Stripe using backend-calculated total
+            payment_service = PaymentService(self.db)
+            payment_idempotency_key = (
+                f"payment_{temp_order_id}_{idempotency_key}" if idempotency_key else f"payment_{temp_order_id}"
+            )
+
+            logger.info(f"Processing payment for order {order_number}, amount: {pricing['total']}")
+            
+            payment_result = await payment_service.process_payment_idempotent(
+                user_id=user_id,
+                order_id=temp_order_id,  # Use temp ID since order doesn't exist yet
+                amount=pricing['total'],
+                payment_method_id=request.payment_method_id,
+                idempotency_key=payment_idempotency_key,
+                request_id=str(uuid7()),
+                frontend_calculated_amount=getattr(request, "frontend_calculated_total", None)
+            )
+
+            # Check payment status - MUST be successful before creating order
+            if payment_result.get("status") != "succeeded":
+                error_message = payment_result.get("error", "Payment processing failed")
+                logger.error(f"Payment failed for order {order_number}: {error_message}")
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Payment failed: {error_message}"
+                )
+            
+            logger.info(f"Payment successful for order {order_number}, creating order...")
+            
+            # Step 4: Create order (ONLY after successful payment)
             order = Order(
-                id=uuid7(),
+                id=temp_order_id,  # Use the same ID we used for payment
                 order_number=order_number,
                 user_id=user_id,
-                order_status="pending",
-                payment_status="pending",
+                order_status="confirmed",  # Start as confirmed since payment succeeded
+                payment_status="paid",  # Payment already succeeded
                 fulfillment_status="unfulfilled",
                 subtotal=pricing['subtotal'],
                 shipping_cost=pricing['shipping']['cost'],
@@ -467,7 +497,7 @@ class OrderService:
             self.db.add(order)
             await self.db.flush()
             
-            # Create order items and update inventory
+            # Step 5: Create order items and update inventory
             order_items_list = []
             for cart_item in cart.items:
                 variant_price = cart_item.variant.sale_price or cart_item.variant.base_price
@@ -495,34 +525,6 @@ class OrderService:
                     adjusted_by_user_id=user_id,
                     commit=False
                 )
-
-            # Process payment with Stripe using backend-calculated total
-            payment_service = PaymentService(self.db)
-            payment_idempotency_key = (
-                f"payment_{order.id}_{idempotency_key}" if idempotency_key else f"payment_{order.id}"
-            )
-
-            payment_result = await payment_service.process_payment_idempotent(
-                user_id=user_id,
-                order_id=order.id,
-                amount=order.total_amount,
-                payment_method_id=request.payment_method_id,
-                idempotency_key=payment_idempotency_key,
-                request_id=str(uuid7()),
-                frontend_calculated_amount=getattr(request, "frontend_calculated_total", None)
-            )
-
-            if payment_result.get("status") != "succeeded":
-                order.payment_status = PaymentStatus.FAILED
-                order.order_status = OrderStatus.PENDING
-                order.failure_reason = payment_result.get("error", "Payment processing failed")
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Payment failed: {order.failure_reason}"
-                )
-
-            order.payment_status = PaymentStatus.PAID
-            order.order_status = OrderStatus.CONFIRMED
 
             # Send invoice/confirmation email in background
             try:
@@ -1379,7 +1381,7 @@ class OrderService:
         
         # Send shipping update email for shipped/delivered orders
         if status in ['shipped', 'delivered'] and background_tasks:
-            from jobs.email_tasks import send_shipping_update_email
+            from services.email import send_shipping_update_email, send_order_delivered_email
             
             # Get user details for email
             user_result = await self.db.execute(
@@ -1388,24 +1390,38 @@ class OrderService:
             user = user_result.scalar_one_or_none()
             
             if user and user.email:
-                # Get tracking info if available
-                tracking_result = await self.db.execute(
-                    select(TrackingEvent).where(
-                        TrackingEvent.order_id == order.id
-                    ).order_by(desc(TrackingEvent.created_at)).limit(1)
-                )
-                tracking = tracking_result.scalar_one_or_none()
-                
-                send_shipping_update_email(
-                    background_tasks=background_tasks,
-                    to_email=user.email,
-                    customer_name=user.firstname or "Customer",
-                    order_number=str(order.id)[:8],
-                    tracking_number=tracking.tracking_number if tracking else "N/A",
-                    carrier=tracking.carrier if tracking else "N/A",
-                    estimated_delivery=tracking.estimated_delivery if tracking else datetime.utcnow() + timedelta(days=3),
-                    tracking_url=tracking.tracking_url if tracking else None
-                )
+                if status == 'shipped':
+                    # Send shipping update email
+                    send_shipping_update_email(
+                        background_tasks=background_tasks,
+                        to_email=user.email,
+                        customer_name=user.firstname or "Customer",
+                        order_number=order.order_number or str(order.id)[:8],
+                        tracking_number=order.tracking_number or "N/A",
+                        carrier=order.carrier_name or order.carrier or "N/A",
+                        estimated_delivery=order.delivered_at or datetime.utcnow() + timedelta(days=3),
+                        tracking_url=None
+                    )
+                elif status == 'delivered':
+                    # Send order delivered email
+                    # Format shipping address
+                    shipping_addr = order.shipping_address or {}
+                    if isinstance(shipping_addr, dict):
+                        address_str = f"{shipping_addr.get('street', '')}, {shipping_addr.get('city', '')}, {shipping_addr.get('state', '')} {shipping_addr.get('post_code', '')}"
+                    else:
+                        address_str = "Your delivery address"
+                    
+                    send_order_delivered_email(
+                        background_tasks=background_tasks,
+                        to_email=user.email,
+                        customer_name=user.firstname or "Customer",
+                        order_id=str(order.id),
+                        order_number=order.order_number or str(order.id)[:8],
+                        tracking_number=order.tracking_number or "N/A",
+                        delivery_date=order.delivered_at or datetime.utcnow(),
+                        delivery_address=address_str,
+                        delivery_notes=None
+                    )
         
         return order
 

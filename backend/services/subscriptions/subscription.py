@@ -30,37 +30,55 @@ class SubscriptionService:
         from decimal import Decimal
         from models.shipping import ShippingMethod
         
-        # Map delivery types to shipping method names
-        delivery_type_mapping = {
-            "standard": "Standard Shipping",
-            "express": "Express Shipping", 
-            "overnight": "Priority Shipping"
-        }
-        
-        method_name = delivery_type_mapping.get(delivery_type, "Standard Shipping")
-        
-        # Get shipping method from database
+        # Try to find shipping method by delivery type (stored in metadata or name)
+        # First, try exact match on name (case-insensitive)
         result = await self.db.execute(
             select(ShippingMethod).where(
                 and_(
-                    ShippingMethod.name == method_name,
                     ShippingMethod.is_active == True
                 )
             )
         )
-        shipping_method = result.scalar_one_or_none()
+        shipping_methods = result.scalars().all()
         
-        if shipping_method:
-            return Decimal(str(shipping_method.price))
+        # Find matching method by delivery type
+        matching_method = None
+        delivery_type_lower = delivery_type.lower()
         
-        # Fallback to default costs if method not found
+        for method in shipping_methods:
+            method_name_lower = method.name.lower()
+            # Check if delivery type is in the method name
+            if delivery_type_lower in method_name_lower:
+                matching_method = method
+                break
+            # Also check common variations
+            if delivery_type_lower == "standard" and "standard" in method_name_lower:
+                matching_method = method
+                break
+            elif delivery_type_lower == "express" and "express" in method_name_lower:
+                matching_method = method
+                break
+            elif delivery_type_lower == "overnight" and ("overnight" in method_name_lower or "priority" in method_name_lower):
+                matching_method = method
+                break
+        
+        if matching_method:
+            logger.info(f"Found shipping method '{matching_method.name}' for delivery type '{delivery_type}'")
+            return Decimal(str(matching_method.price))
+        
+        # If no match found, use the cheapest active method as fallback
+        if shipping_methods:
+            cheapest = min(shipping_methods, key=lambda m: m.price)
+            logger.warning(f"No exact match for delivery type '{delivery_type}', using cheapest method: {cheapest.name}")
+            return Decimal(str(cheapest.price))
+        
+        # Final fallback if no shipping methods exist in database
+        logger.error(f"No shipping methods found in database for delivery type '{delivery_type}'")
         fallback_costs = {
             "standard": Decimal('8.99'),
             "express": Decimal('15.99'), 
             "overnight": Decimal('29.99')
         }
-        
-        logger.warning(f"Shipping method '{method_name}' not found in database, using fallback cost")
         return fallback_costs.get(delivery_type, Decimal('8.99'))
 
     async def create_subscription(
@@ -118,29 +136,25 @@ class SubscriptionService:
         from datetime import timezone
         now = datetime.now(timezone.utc)
         period_end = now + timedelta(days=30)
-        # Create subscription with simplified fields
+        
+        # Create subscription - DO NOT store prices (calculated dynamically)
         subscription = Subscription(
             user_id=user_id,
             name=name,
             status="active",
-            price=cost_breakdown["total_amount"],
             currency=currency,
-            variant_ids=[str(vid) for vid in product_variant_ids],
-            cost_breakdown=cost_breakdown,
             current_period_start=now,
             current_period_end=period_end,
             next_billing_date=period_end,
-            # Simplified pricing fields
-            subtotal=cost_breakdown.get("subtotal", 0.0),
-            shipping_cost=cost_breakdown.get("shipping_cost", 0.0),
-            tax_amount=cost_breakdown.get("tax_amount", 0.0),
-            tax_rate=cost_breakdown.get("tax_rate", 0.0),
-            discount_amount=cost_breakdown.get("discount_amount", 0.0),
-            total=cost_breakdown.get("total_amount", 0.0),
-            # Store quantities
-            variant_quantities={
-                str(vid): max(1, int((variant_quantities or {}).get(str(vid), 1)))
-                for vid in product_variant_ids
+            delivery_type=delivery_type,
+            delivery_address_id=delivery_address_id,
+            # Store only variant IDs and quantities (prices calculated dynamically)
+            variant_ids=[str(vid) for vid in product_variant_ids],
+            subscription_metadata={
+                "variant_quantities": {
+                    str(vid): max(1, int((variant_quantities or {}).get(str(vid), 1)))
+                    for vid in product_variant_ids
+                }
             }
         )
         
