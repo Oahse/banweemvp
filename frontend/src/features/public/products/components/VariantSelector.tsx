@@ -1,54 +1,48 @@
 import React from 'react';
 import { cn } from '@/utils/utils';
 import { CheckIcon } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Heading, Text, Label } from '@/components/ui/Text/Text';
+import { Heading } from '@/components/ui/Text/Text';
 
-/**
- * @typedef {object} ProductVariantAttribute
- * @property {string} id
- * @property {string} name
- * @property {string} value
- */
+interface ProductVariantAttribute {
+  name: string;
+  value: string;
+}
 
-/**
- * @typedef {object} ProductVariantImage
- * @property {string} id
- * @property {string} variant_id
- * @property {string} url
- * @property {string} [alt_text]
- * @property {number} sort_order
- * @property {boolean} is_primary
- */
+interface ProductVariantImage {
+  id: string;
+  variant_id: string;
+  url: string;
+  alt_text?: string;
+  sort_order: number;
+  is_primary: boolean;
+}
 
-/**
- * @typedef {object} ProductVariant
- * @property {string} id
- * @property {string} product_id
- * @property {string} sku
- * @property {string} name
- * @property {number} base_price
- * @property {number} [sale_price]
- * @property {number} stock
- * @property {string} [barcode]
- * @property {string} [qr_code]
- * @property {ProductVariantAttribute[]} attributes
- * @property {ProductVariantImage[]} images
- */
+interface ProductVariant {
+  id: string;
+  product_id: string;
+  sku: string;
+  name: string;
+  base_price: number;
+  sale_price?: number | null;
+  stock?: number;
+  barcode?: string;
+  qr_code?: string;
+  attributes: ProductVariantAttribute[];
+  images: ProductVariantImage[];
+}
 
-/**
- * @typedef {object} VariantSelectorProps
- * @property {ProductVariant[]} variants
- * @property {ProductVariant} selectedVariant
- * @property {(variant: ProductVariant) => void} onVariantChange
- * @property {boolean} [showImages=false]
- * @property {boolean} [showPrice=true]
- * @property {boolean} [showStock=true]
- * @property {string} [className]
- * @property {'grid' | 'list' | 'dropdown'} [layout='grid']
- */
+interface VariantSelectorProps {
+  variants: ProductVariant[];
+  selectedVariant: ProductVariant;
+  onVariantChange: (variant: ProductVariant) => void;
+  showImages?: boolean;
+  showPrice?: boolean;
+  showStock?: boolean;
+  className?: string;
+  layout?: 'grid' | 'list' | 'dropdown';
+}
 
-export const VariantSelector = ({
+export const VariantSelector: React.FC<VariantSelectorProps> = ({
   variants,
   selectedVariant,
   onVariantChange,
@@ -59,8 +53,8 @@ export const VariantSelector = ({
   layout = 'grid'
 }) => {
   // Group variants by attribute types for better organization
-  const getAttributeGroups = () => {
-    const groups = {};
+  const getAttributeGroups = (): Record<string, Set<string>> => {
+    const groups: Record<string, Set<string>> = {};
     
     variants.forEach(variant => {
       if (Array.isArray(variant.attributes)) {
@@ -78,21 +72,21 @@ export const VariantSelector = ({
 
   const attributeGroups = getAttributeGroups();
 
-  const getPrimaryImage = (variant) => {
+  const getPrimaryImage = (variant: ProductVariant): ProductVariantImage | undefined => {
     const primaryImage = variant.images.find(img => img.is_primary);
     return primaryImage || variant.images[0];
   };
 
-  const isVariantAvailable = (variant) => {
-    return variant.stock > 0;
+  const isVariantAvailable = (variant: ProductVariant): boolean => {
+    return (variant.stock ?? 0) > 0;
   };
 
-  const getVariantPrice = (variant) => {
+  const getVariantPrice = (variant: ProductVariant): number => {
     if (!variant) return 0;
     return variant.sale_price || variant.base_price;
   };
 
-  const formatAttributes = (variant) => {
+  const formatAttributes = (variant: ProductVariant): string => {
     if (!Array.isArray(variant.attributes)) return '';
     return variant.attributes
       .map(attr => `${attr.name}: ${attr.value}`)
@@ -102,7 +96,7 @@ export const VariantSelector = ({
   if (layout === 'dropdown') {
     return (
       <div className={cn('space-y-2', className)}>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Select Variant
         </label>
         <select
@@ -111,7 +105,7 @@ export const VariantSelector = ({
             const variant = variants.find(v => v.id === e.target.value);
             if (variant) onVariantChange(variant);
           }}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         >
           {variants.map(variant => (
             <option 
@@ -131,7 +125,7 @@ export const VariantSelector = ({
   if (layout === 'list') {
     return (
       <div className={cn('space-y-3', className)}>
-        <Heading level={5} className="text-sm font-medium text-gray-700">Select Variant</Heading>
+        <Heading level={5} className="text-sm font-medium text-gray-900 dark:text-gray-100">Select Variant</Heading>
         <div className="space-y-2">
           {variants.map(variant => {
             const isSelected = selectedVariant.id === variant.id;
@@ -139,71 +133,72 @@ export const VariantSelector = ({
             const primaryImage = getPrimaryImage(variant);
 
             return (
-              <Button
+              <button
                 key={variant.id}
                 onClick={() => isAvailable && onVariantChange(variant)}
                 disabled={!isAvailable}
-                variant={isSelected ? "primary" : "ghost"}
-                size="xs"
                 className={cn(
-                  'w-full p-3 border rounded-lg text-left transition-all',
+                  'w-full p-2.5 sm:p-3 border rounded-lg text-left transition-all',
+                  'bg-white dark:bg-gray-800',
                   isSelected
-                    ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
-                    : 'border-border hover:border-border-strong',
+                    ? 'border-primary bg-primary/5 dark:bg-primary/10 ring-2 ring-primary/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600',
                   !isAvailable && 'opacity-50 cursor-not-allowed'
                 )}
               >
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   {showImages && primaryImage && (
                     <img
                       src={primaryImage.url}
                       alt={primaryImage.alt_text || variant.name}
-                      className="w-12 h-12 object-cover rounded-md"
+                      className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-md flex-shrink-0"
                     />
                   )}
                   
-                  <div className="flex-grow">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-900">
+                  <div className="flex-grow min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">
                         {variant.name}
                       </span>
                       {isSelected && (
-                        <CheckIcon size={16} className="text-primary" />
+                        <CheckIcon size={16} className="text-primary flex-shrink-0" />
                       )}
                     </div>
                     
-                    <div className="text-sm text-gray-500">
-                      {formatAttributes(variant)}
-                    </div>
+                    {formatAttributes(variant) && (
+                      <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
+                        {formatAttributes(variant)}
+                      </div>
+                    )}
                     
-                    <div className="flex items-center justify-between mt-1">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
                       {showPrice && (
-                        <div className="flex items-center space-x-2">
-                          <Text className="font-semibold text-primary">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <span className="font-semibold text-sm sm:text-base text-primary">
                             ${getVariantPrice(variant).toFixed(2)}
-                          </Text>
-                          {variant.sale_price && (
-                            <Text className="text-sm text-gray-500 line-through">
+                          </span>
+                          {variant.sale_price && variant.sale_price < variant.base_price && (
+                            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-through">
                               ${variant.base_price.toFixed(2)}
-                            </Text>
+                            </span>
                           )}
                         </div>
                       )}
                       
                       {showStock && (
-                        <Text className={cn(
-                          'text-sm px-2 py-1 rounded-full',
+                        <span className={cn(
+                          'text-xs px-2 py-0.5 rounded-full font-medium',
                           isAvailable
-                            ? 'bg-success-100 text-success-800'
-                            : 'bg-error-100 text-error-800'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                            : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                         )}>
                           {isAvailable ? `${variant.stock} in stock` : 'Out of stock'}
-                        </Text>
+                        </span>
                       )}
                     </div>
                   </div>
                 </div>
-              </Button>
+              </button>
             );
           })}
         </div>
@@ -218,8 +213,8 @@ export const VariantSelector = ({
       <div className="space-y-3">
         {Object.entries(attributeGroups).map(([attributeName, values]) => (
           <div key={attributeName} className="space-y-2">
-            <Heading level={5} className="text-sm font-medium text-copy capitalize">
-              {attributeName === 'variant_index' ? 'Option' : attributeName}
+            <Heading level={5} className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
+              {attributeName === 'variant_index' ? 'Option' : attributeName.replace('_', ' ')}
             </Heading>
             <div className="flex flex-wrap gap-2">
               {Array.from(values).map(value => {
@@ -238,22 +233,20 @@ export const VariantSelector = ({
                 const isAvailable = isVariantAvailable(variantWithValue);
 
                 return (
-                  <Button
+                  <button
                     key={value}
                     onClick={() => isAvailable && onVariantChange(variantWithValue)}
                     disabled={!isAvailable}
-                    variant={isSelected ? "primary" : "outline"}
-                    size="xs"
                     className={cn(
-                      'px-4 py-2 border rounded-md text-sm font-medium transition-all',
+                      'px-3 sm:px-4 py-1.5 sm:py-2 border rounded-md text-xs sm:text-sm font-medium transition-all',
                       isSelected
-                        ? 'border-primary bg-primary text-white'
-                        : 'border-border text-copy hover:border-border-strong',
+                        ? 'border-primary bg-primary text-white shadow-sm'
+                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10',
                       !isAvailable && 'opacity-50 cursor-not-allowed line-through'
                     )}
                   >
                     {value}
-                  </Button>
+                  </button>
                 );
               })}
             </div>
@@ -262,19 +255,21 @@ export const VariantSelector = ({
       </div>
 
       {/* Selected variant info at the bottom */}
-      <div className="p-3 bg-surface rounded-lg">
-        <div className="flex items-center justify-between">
-          <div>
-            <Text className="text-sm font-medium text-copy">Selected:</Text>
-            <Text className="ml-2 text-sm text-copy">{selectedVariant?.name || 'Default'}</Text>
+      <div className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+        <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+          <div className="min-w-0">
+            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Selected:</span>
+            <p className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
+              {selectedVariant?.name || 'Default'}
+            </p>
           </div>
           {showPrice && selectedVariant && (
-            <div className="text-right">
-              <div className="text-lg font-bold text-primary">
+            <div className="text-right flex-shrink-0">
+              <div className="text-lg sm:text-xl font-bold text-primary">
                 ${getVariantPrice(selectedVariant).toFixed(2)}
               </div>
-              {selectedVariant.sale_price && (
-                <div className="text-sm text-copy-light line-through">
+              {selectedVariant.sale_price && selectedVariant.sale_price < selectedVariant.base_price && (
+                <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-through">
                   ${selectedVariant.base_price.toFixed(2)}
                 </div>
               )}
@@ -283,12 +278,12 @@ export const VariantSelector = ({
         </div>
         
         {showStock && selectedVariant && (
-          <div className="mt-2 text-sm">
+          <div className="mt-2 sm:mt-3">
             <span className={cn(
-              'px-2 py-1 rounded-full text-sm',
+              'inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium',
               isVariantAvailable(selectedVariant)
-                ? 'bg-success-100 text-success-800'
-                : 'bg-error-100 text-error-800'
+                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
             )}>
               {isVariantAvailable(selectedVariant) 
                 ? `${selectedVariant.stock} in stock` 
