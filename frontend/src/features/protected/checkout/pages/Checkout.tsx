@@ -6,11 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/features/protected/cart/contexts/CartContext';
 import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
-import { useTheme } from '@/components/shared/contexts/ThemeContext';
-import { AuthAPI } from '@/api/auth';
-import { CartAPI } from '@/api/cart';
 import { toast } from 'react-hot-toast';
-import SmartCheckoutForm from '@/components/SmartCheckoutForm';
+import { CartAPI } from '@/api/cart';
+import SmartCheckoutForm from '@/features/protected/checkout/components/SmartCheckoutForm';
 import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import { Button } from '@/components/ui/Button';
 import { Text, Heading } from '@/components/ui/Text/Text';
@@ -31,17 +29,14 @@ interface StockValidation {
 
 export const Checkout = () => {
   const navigate = useNavigate();
-  const { cart, loading: cartLoading, clearCart, refreshCart } = useCart();
+  const { cart, loading: cartLoading, clearCart } = useCart();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { theme } = useTheme();
 
   // UI state
-  const [loading, setLoading] = useState(false);
   const [stockValidation, setStockValidation] = useState<StockValidation>({ valid: true, issues: [] });
 
   // Handle authentication check
   useEffect(() => {
-    // If not authenticated, redirect to login
     if (!authLoading && !isAuthenticated) {
       toast.error('Please login to checkout');
       navigate('/login');
@@ -65,22 +60,19 @@ export const Checkout = () => {
       }
 
       try {
-        // Use bulk stock check for better performance
         const stockCheckRes = await CartAPI.checkBulkStock(cart.items.map(item => ({
           variant_id: item.variant_id || item.variant?.id,
           quantity: item.quantity
         })));
 
-        // FIXED: Handle wrapped response structure
-        // Response might be: { success: true, data: { items: [...], all_available: boolean } }
         const stockCheckData = stockCheckRes.data || stockCheckRes;
         const stockCheck = stockCheckData?.data || stockCheckData;
         
-        const stockIssues = stockCheck?.items?.filter((item: any) => !item.available) || [];
+        const stockIssues = stockCheck?.items?.filter((item: { available: boolean }) => !item.available) || [];
 
         setStockValidation({
           valid: stockCheck?.all_available || (stockIssues.length === 0),
-          issues: stockIssues.map((issue: any) => ({
+          issues: stockIssues.map((issue: { variant_id: string; message: string; current_stock: number; quantity_requested: number }) => ({
             variant_id: issue.variant_id,
             message: issue.message || 'Out of stock',
             current_stock: issue.current_stock || 0,
@@ -88,7 +80,6 @@ export const Checkout = () => {
           }))
         });
 
-        // Show toast for stock issues
         if (stockIssues.length > 0) {
           const itemCount = stockIssues.length;
           toast.error(`${itemCount} item${itemCount > 1 ? 's' : ''} in your cart ${itemCount > 1 ? 'are' : 'is'} no longer available`);
@@ -99,7 +90,6 @@ export const Checkout = () => {
       }
     };
 
-    // Only validate stock if authenticated and cart is loaded
     if (!authLoading && isAuthenticated && cart?.items) {
       validateStock();
       const interval = setInterval(validateStock, 300000); // 5 minutes
@@ -108,7 +98,6 @@ export const Checkout = () => {
   }, [cart?.items, authLoading, isAuthenticated]);
 
   // Checkout handler
-  // FIXED: SmartCheckoutForm success handler - properly clear cart and navigate
   const handleSmartCheckoutSuccess = (orderId: string) => {
     clearCart().then(() => {
       navigate(`/account/orders/${orderId}`, {
@@ -117,7 +106,6 @@ export const Checkout = () => {
       });
     }).catch((error) => {
       console.error('Failed to clear cart:', error);
-      // Still navigate even if cart clearing fails
       navigate(`/account/orders/${orderId}`, {
         replace: true,
         state: { fromCheckout: true }
@@ -125,7 +113,6 @@ export const Checkout = () => {
     });
   };
 
-  // Show loading state while checking authentication or loading cart
   if (authLoading || (isAuthenticated && cartLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-surface-dark">
@@ -139,12 +126,10 @@ export const Checkout = () => {
     );
   }
 
-  // Don't render anything if not authenticated (will redirect)
   if (!isAuthenticated && !authLoading) {
     return null;
   }
 
-  // Don't render if cart is empty (redirect will happen)
   if (!cart || !cart.items || cart.items.length === 0) {
     return null;
   }
@@ -164,7 +149,6 @@ export const Checkout = () => {
           </Text>
         </motion.div>
 
-        {/* Stock Validation Warning */}
         <AnimatePresence>
           {!stockValidation.valid && stockValidation.issues.length > 0 && (
             <motion.div 
@@ -208,7 +192,6 @@ export const Checkout = () => {
         )}
         </AnimatePresence>
 
-        {/* Checkout */}
         {stockValidation.valid && (
           <motion.div variants={itemVariants}>
             <SmartCheckoutForm

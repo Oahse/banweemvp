@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { AuthAPI } from '@/api/auth';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/ui/Input/Input';
+import { Input } from '@/components/ui/Form';
 import { Text } from '@/components/ui/Text/Text';
 import { X } from 'lucide-react';
 

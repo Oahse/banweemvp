@@ -17,7 +17,8 @@ import { RadioGroup, Textarea } from '@/components/ui/Form';
 import { Card } from '@/components/ui/Card';
 import { CheckCircle, AlertTriangle, CreditCard, Truck, MapPin } from 'lucide-react';
 import AddAddressForm from '@/components/generic/AddAddressForm';
-import { Text, Heading } from '@/components/ui/Text/Text';
+import { Text, Heading, Caption } from '@/components/ui/Text/Text';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 
 // Debounce utility
 const debounce = (func: Function, wait: number) => {
@@ -398,7 +399,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
               <Card.Header>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-primary dark:text-primary-dark" />
-                  <Card.Title size="xs">Shipping Address</Card.Title>
+                  <Heading level={5} weight="medium">Shipping Address</Heading>
                 </div>
               </Card.Header>
               <Card.Body>
@@ -444,7 +445,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
               <Card.Header>
                 <div className="flex items-center gap-2">
                   <Truck className="h-4 w-4 text-primary dark:text-primary-dark" />
-                  <Card.Title size="xs">Shipping Method</Card.Title>
+                  <Heading level={5} weight="medium">Shipping Method</Heading>
                 </div>
               </Card.Header>
               <Card.Body>
@@ -488,7 +489,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
                       description: (
                         <div className="flex items-center justify-between gap-2 mt-1">
                           <Text variant="caption" tone="secondary">{method.description}</Text>
-                          <div className="text-right">
+                          <div className="flex flex-col items-end">
                             <Text variant="body-sm" weight="medium">{formatCurrency(method.price)}</Text>
                             <Text variant="caption" tone="secondary">{method.estimated_days}d</Text>
                           </div>
@@ -507,7 +508,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
               <Card.Header>
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-primary dark:text-primary-dark" />
-                  <Card.Title size="xs">Payment Method</Card.Title>
+                  <Heading level={5} weight="medium">Payment Method</Heading>
                 </div>
               </Card.Header>
               <Card.Body>
@@ -542,7 +543,7 @@ export const SmartCheckoutForm: React.FC<SmartCheckoutFormProps> = ({ onSuccess 
             {/* Order Notes */}
             <Card>
               <Card.Header>
-                <Card.Title size="xs">Order Notes (Optional)</Card.Title>
+                <Heading level={5} weight="medium">Order Notes (Optional)</Heading>
               </Card.Header>
               <Card.Body>
                 <Textarea

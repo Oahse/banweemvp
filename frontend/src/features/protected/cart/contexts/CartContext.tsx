@@ -83,8 +83,17 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       
       // CartAPI now automatically uses interceptor for token
       const response = await CartAPI.getCart(country, validProvince);
+      
+      // Debug: Log the response
+      console.log('Cart API response:', response);
+      
       // Unwrap response data if it comes wrapped in { success, data }
       const cartData = response?.data || response;
+      
+      // Debug: Log the unwrapped data
+      console.log('Unwrapped cart data:', cartData);
+      console.log('Cart items:', cartData?.items);
+      
       // Ensure new object reference for React to detect changes
       setCart(cartData ? { ...cartData } : null);
       return cartData;

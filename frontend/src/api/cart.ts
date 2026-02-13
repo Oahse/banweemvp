@@ -2,14 +2,13 @@
  * Shopping Cart API endpoints
  * 
  * ACCESS LEVELS:
- * - Guest Users: Can use cart without login (uses cookie-based cart ID)
- * - Authenticated Users: Cart is linked to user account
- * - Cart Merge: Guest cart automatically merges with user cart on login
+ * - All cart operations require authentication
+ * - Cart is linked to user account
  * 
- * CART FLOW (Amazon-style):
- * 1. Guest adds items → Backend creates guest_cart_id cookie
- * 2. User logs in → Call mergeCart() to merge guest cart with user cart
- * 3. Cookie is cleared, cart is now linked to user account
+ * CART FLOW:
+ * 1. User must be logged in to use cart
+ * 2. All cart operations require valid authentication token
+ * 3. Cart is automatically created for authenticated users
  */
 
 import { apiClient } from './client';
@@ -19,8 +18,8 @@ import { apiClient } from './client';
 
 export class CartAPI {
   /**
-   * Get user's cart (works for both guest and authenticated users)
-   * ACCESS: Public - Works without authentication (uses cookie for guests)
+   * Get user's cart
+   * ACCESS: Authenticated - Requires user login
    */
   static async getCart(country?: string, province?: string) {
     const params = new URLSearchParams();
@@ -37,8 +36,8 @@ export class CartAPI {
   }
 
   /**
-   * Add item to cart (works for both guest and authenticated users)
-   * ACCESS: Public - Works without authentication (uses cookie for guests)
+   * Add item to cart
+   * ACCESS: Authenticated - Requires user login
    */
   static async addToCart(item: any, country?: string, province?: string) {
     const _country = country || localStorage.getItem('detected_country') || 'US';

@@ -41,9 +41,6 @@ export const Orders = (props: OrdersProps) => {
   const { animation = 'shimmer' } = props;
   const { formatCurrency } = useLocale();
   const { data, loading, error, execute } = usePaginatedApi();
-  const paginatedData = (data && typeof data === 'object' && 'data' in data)
-    ? (data as OrderPageResponse)
-    : undefined;
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -80,10 +77,17 @@ export const Orders = (props: OrdersProps) => {
           limit: ordersPerPage
         }));
         
-        const orders = unwrapResponse(response);
-        setTotalOrders(orders.total || 0);
-        setTotalPages(Math.ceil((orders.total || 0) / ordersPerPage));
+        console.log('Orders API full response:', response);
+        
+        // Response is wrapped: { success: true, data: { orders: [...], pagination: {...} } }
+        const ordersData = response?.data || response;
+        
+        if (ordersData && ordersData.pagination) {
+          setTotalOrders(ordersData.pagination.total || 0);
+          setTotalPages(ordersData.pagination.pages || 1);
+        }
       } catch (error) {
+        console.error('Error fetching orders:', error);
         toast.error(extractErrorMessage(error));
       }
     };
@@ -91,8 +95,10 @@ export const Orders = (props: OrdersProps) => {
     fetchOrders();
   }, [currentPage, execute]);
 
-  // Defensive: ensure ordersArray is always an array
-  const ordersArray = Array.isArray(paginatedData?.data) ? paginatedData.data : [];
+  // Extract orders array - response is { success, data: { orders: [...], pagination: {...} } }
+  const ordersArray = data?.data?.orders || data?.orders || [];
+  
+  console.log('Final ordersArray:', ordersArray, 'length:', ordersArray.length);
 
   return (
     <div className="space-y-4">
@@ -136,20 +142,20 @@ export const Orders = (props: OrdersProps) => {
       ) : (
         <div className="space-y-3">
           {ordersArray.map((order: Order) => (
-            <div key={order.id} className="bg-white shadow rounded-lg">
+            <div key={order.id} className="bg-surface dark:bg-surface-dark shadow rounded-lg border border-border dark:border-border-dark">
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <Heading level={5} weight="medium">Order #{order.id}</Heading>
+                    <Heading level={5} weight="medium">Order #{order.id.slice(0, 8)}</Heading>
                     <Text variant="caption" tone="secondary">{new Date(order.created_at).toLocaleDateString()}</Text>
                   </div>
                   <div className="text-right">
                     <Text variant="body-sm" className="font-semibold">{formatCurrency(order.total_amount)}</Text>
                     <Text as="span" variant="caption" className={`inline-flex px-2 py-0.5 text-sm font-semibold rounded-full ${
-                      order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                      order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                      order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
+                      order.status === 'delivered' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                      order.status === 'shipped' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                      order.status === 'processing' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                      'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
                     }`}>{order.status}</Text>
                   </div>
                 </div>
@@ -169,7 +175,7 @@ export const Orders = (props: OrdersProps) => {
                   <div className="flex space-x-2">
                         <Link
                           to={`/account/orders/${order.id}`}
-                          className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                          className="inline-flex items-center px-2 py-1 border border-border dark:border-border-dark rounded-md text-sm font-medium bg-surface dark:bg-surface-dark hover:bg-surface-elevated dark:hover:bg-surface-elevated-dark"
                         >
                           <EyeIcon className="h-3 w-3 mr-1" />
                           <Text as="span">View</Text>
@@ -178,31 +184,27 @@ export const Orders = (props: OrdersProps) => {
                 </div>
 
                 {expandedOrderId === order.id && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
+                  <div className="mt-3 pt-3 border-t border-border-light dark:border-border-light-dark">
                     <div className="space-y-1.5">
                       {order.items?.map((item: any, index: number) => (
                         <div key={index} className="flex items-center justify-between py-1.5">
                           <div className="flex-1">
-                            <Text variant="caption" weight="medium">{item.product_name}</Text>
+                            <Text variant="caption" weight="medium">{item.variant?.product_name || 'Product'}</Text>
                             <Text variant="caption" tone="secondary">Qty: {item.quantity}</Text>
                           </div>
-                          <Text variant="caption" weight="medium">{(() => {
-                            const formatted = formatCurrency(item.total_price || 0);
-                            console.log('formatCurrency output:', formatted, 'type:', typeof formatted);
-                            return formatted;
-                          })()}</Text>
+                          <Text variant="caption" weight="medium">{formatCurrency(item.total_price || 0)}</Text>
                         </div>
                       ))}
                     </div>
                     
-                    <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="mt-3 pt-3 border-t border-border-light dark:border-border-light-dark">
                       <div className="space-y-0.5 text-sm">
                         <div className="flex justify-between">
                           <Text variant="caption">Subtotal:</Text>
                           <Text variant="caption">{formatCurrency(calculatePricingBreakdown(order).subtotal)}</Text>
                         </div>
                         {calculatePricingBreakdown(order).discount > 0 && (
-                          <div className="flex justify-between text-green-600">
+                          <div className="flex justify-between text-green-600 dark:text-green-400">
                             <Text variant="caption">Discount:</Text>
                             <Text variant="caption">-{formatCurrency(calculatePricingBreakdown(order).discount)}</Text>
                           </div>
@@ -224,15 +226,13 @@ export const Orders = (props: OrdersProps) => {
           ))}
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalItems={totalOrders}
-              pageSize={10}
-              onPageChange={setCurrentPage}
-              size="xs"
-            />
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalOrders}
+            pageSize={ordersPerPage}
+            onPageChange={setCurrentPage}
+            size="xs"
+          />
         </div>
       )}
     </div>

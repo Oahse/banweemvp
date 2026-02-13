@@ -65,6 +65,8 @@ class OrderResponse(BaseModel):
     currency: str
     tracking_number: Optional[str]
     estimated_delivery: Optional[str]
+    shipping_address: Optional[dict] = None
+    billing_address: Optional[dict] = None
     items: List[OrderItemResponse]
     created_at: str = Field(..., description="ISO format datetime string")
 

@@ -430,7 +430,6 @@ class APIClient {
       '/products/categories',
       '/auth/profile',
       '/users/profile',
-      '/cart',  // Cart endpoints are optional (work without auth)
       '/orders/track/'  // Public order tracking
     ];
 

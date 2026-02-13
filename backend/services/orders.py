@@ -1468,6 +1468,8 @@ class OrderService:
             currency=order.currency,  # Use order's currency
             tracking_number=order.tracking_number,
             estimated_delivery=estimated_delivery,
+            shipping_address=order.shipping_address,
+            billing_address=order.billing_address,
             items=items,
             created_at=order.created_at.isoformat() if order.created_at else ""
         )

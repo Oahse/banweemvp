@@ -1,16 +1,12 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Request, Response as FastAPIResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import APIRouter, Depends, status, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from core.db import get_db
 from core.errors import APIException
 from core.logging import get_logger
-from core.cache import RedisKeyManager
 from services.cart import CartService
-from services.auth import AuthService
 from models.user import User
 from core.utils.response import Response
-from core.utils.uuid_utils import uuid7
 from schemas.cart import AddToCartRequest, ApplyPromocodeRequest, UpdateCartItemRequest
 from core.dependencies import get_current_auth_user
 from typing import Optional
@@ -19,64 +15,18 @@ logger = get_logger(__name__)
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
 
-# Optional bearer token for cart endpoints
-security = HTTPBearer(auto_error=False)
-
-# Cookie settings for guest cart
-CART_COOKIE_NAME = "guest_cart_id"
-CART_COOKIE_MAX_AGE = 30 * 24 * 60 * 60  # 30 days
-
-
-async def get_optional_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    db: AsyncSession = Depends(get_db)
-) -> Optional[User]:
-    """Get current user if authenticated, None otherwise"""
-    if not credentials:
-        return None
-    try:
-        auth_service = AuthService(db)
-        user = await auth_service.get_current_user(credentials.credentials)
-        return user
-    except Exception as e:
-        logger.debug(f"Failed to authenticate user: {e}")
-        return None
-
-
-def get_or_create_guest_cart_id(request: Request, response: FastAPIResponse) -> str:
-    """Get existing guest cart ID from cookie or create new one"""
-    # Try to get from cookie
-    guest_cart_id = request.cookies.get(CART_COOKIE_NAME)
-    
-    if not guest_cart_id:
-        # Create new guest cart ID
-        guest_cart_id = str(uuid7())
-        # Set cookie (will be set in response)
-        response.set_cookie(
-            key=CART_COOKIE_NAME,
-            value=guest_cart_id,
-            max_age=CART_COOKIE_MAX_AGE,
-            httponly=True,
-            samesite="lax",
-            secure=False  # Set to True in production with HTTPS
-        )
-        logger.info(f"Created new guest cart ID: {guest_cart_id}")
-    
-    return guest_cart_id
-
 
 @router.get("/")
 async def get_cart(
     request: Request,
-    response: FastAPIResponse,
     country: Optional[str] = None,
     province: Optional[str] = None,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Get cart for authenticated user or guest.
-    For guests, uses cookie-based cart ID (Amazon-style).
+    Get cart for authenticated user only.
+    Requires authentication.
     """
     try:
         country_code = country or request.headers.get('X-Country-Code', 'US')
@@ -84,23 +34,13 @@ async def get_cart(
         
         cart_service = CartService(db)
         
-        if current_user:
-            # Authenticated user - use user_id
-            cart = await cart_service.get_cart(
-                user_id=current_user.id,
-                session_id=None,
-                country_code=country_code,
-                province_code=province_code
-            )
-        else:
-            # Guest user - use cookie-based cart ID
-            guest_cart_id = get_or_create_guest_cart_id(request, response)
-            cart = await cart_service.get_cart(
-                user_id=None,
-                session_id=guest_cart_id,
-                country_code=country_code,
-                province_code=province_code
-            )
+        # Authenticated user - use user_id
+        cart = await cart_service.get_cart(
+            user_id=current_user.id,
+            session_id=None,
+            country_code=country_code,
+            province_code=province_code
+        )
         
         return Response(success=True, data=cart)
     except Exception as e:
@@ -115,36 +55,25 @@ async def get_cart(
 async def add_to_cart(
     request: AddToCartRequest,
     req: Request,
-    response: FastAPIResponse,
     country: Optional[str] = None,
     province: Optional[str] = None,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Add item to cart for authenticated user or guest.
-    For guests, uses cookie-based cart ID.
+    Add item to cart for authenticated user only.
+    Requires authentication.
     """
     try:
         cart_service = CartService(db)
         
-        if current_user:
-            # Authenticated user
-            cart = await cart_service.add_to_cart(
-                user_id=current_user.id,
-                variant_id=request.variant_id,
-                quantity=request.quantity,
-                session_id=None
-            )
-        else:
-            # Guest user - use cookie
-            guest_cart_id = get_or_create_guest_cart_id(req, response)
-            cart = await cart_service.add_to_cart(
-                user_id=None,
-                variant_id=request.variant_id,
-                quantity=request.quantity,
-                session_id=guest_cart_id
-            )
+        # Authenticated user
+        cart = await cart_service.add_to_cart(
+            user_id=current_user.id,
+            variant_id=request.variant_id,
+            quantity=request.quantity,
+            session_id=None
+        )
         
         return Response(success=True, data=cart, message="Item added to cart")
     except HTTPException as e:

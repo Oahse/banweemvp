@@ -81,7 +81,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
           {/* Content */}
           <div className="p-4">
-            <Text variant="body-sm" tone="secondary">{message}</Text>
+            <Text variant="body-sm" tone="default">{message}</Text>
           </div>
 
           {/* Actions */}
@@ -91,7 +91,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               disabled={loading}
               variant="outline"
               size="xs"
-              className="px-4 py-2 text-sm font-medium text-copy border border-border rounded-md hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-sm font-medium text-copy border border-border rounded-md hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Text variant="body-sm">{cancelText}</Text>
             </Button>
@@ -100,9 +100,10 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               disabled={loading}
               variant={variant === 'danger' ? 'primary' : variant === 'warning' ? 'warning' : 'primary'}
               size="xs"
-              className={`px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 ${styles.button}`}
+              className={`text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 ${styles.button}`}
               isLoading={loading}
             >
+              
               {confirmText}
             </Button>
           </div>

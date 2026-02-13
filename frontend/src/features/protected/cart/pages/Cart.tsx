@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { ChevronRightIcon, TrashIcon, MinusIcon, PlusIcon, ShoppingCartIcon, AlertCircle, CheckCircle } from 'lucide-react';
 import { useCart } from '@/features/protected/cart/contexts/CartContext';
 import { useAuth } from '@/features/protected/auth/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -12,7 +12,7 @@ import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { CartAPI } from '@/api/cart';
 import { unwrapResponse, extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
-import { Text, Heading, Label } from '@/components/ui/Text/Text';
+import { Text, Heading } from '@/components/ui/Text/Text';
 import { Input } from '@/components/ui/Form';
 
 export const Cart = () => {
@@ -34,12 +34,12 @@ export const Cart = () => {
   const [itemToRemove, setItemToRemove] = useState<{ id: string; name: string; message: string } | null>(null);
   
   // Use cart items directly from context - this ensures the component re-renders when cart object changes
-  var cartItems = cart?.items || [];
+  const cartItems = React.useMemo(() => cart?.items || [], [cart?.items]);
   
   // Authentication check - require user to be logged in to view cart
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      setIntendedDestination('/cart');
+      setIntendedDestination({ path: '/cart', action: 'view_cart' });
       navigate('/login', { state: { from: '/cart' } });
     }
   }, [isAuthenticated, authLoading, navigate, setIntendedDestination]);
@@ -94,10 +94,13 @@ export const Cart = () => {
     
     // Confirm removal for expensive items or multiple quantities
     if (item && (item.total_price > 100 || item.quantity > 1)) {
-      const confirmMessage = item.quantity > 1 
-        ? `Remove all ${item.quantity} units of "${itemName}" from your cart?`
-        : `Remove "${itemName}" from your cart?`;
-        
+      const confirmMessage =
+        item.quantity > 1 ? (
+          <>Remove all {item.quantity} units of <strong className='text-2xl'>{itemName}</strong> from your cart?</>
+        ) : (
+          <>Remove <strong className='text-2xl'>{itemName}</strong> from your cart?</>
+        );
+
       setItemToRemove({
         id,
         name: itemName,
@@ -213,11 +216,11 @@ export const Cart = () => {
     try {
       // Call actual backend API for coupon validation
       const response = await CartAPI.applyPromocode(couponCode.trim().toUpperCase());
-      const data = unwrapResponse(response);
+      const data = unwrapResponse(response) as { discount_amount?: number };
       
       toast.success(`Coupon applied! You saved ${formatCurrency(data.discount_amount || 0)}`);
       setCouponCode('');
-    } catch (error: any) {
+    } catch (error) {
       const errorMessage = extractErrorMessage(error);
       toast.error(errorMessage);
     }
@@ -249,7 +252,7 @@ export const Cart = () => {
   }
 
   // Enhanced cart item component with loading states
-  const CartItemRow = React.forwardRef<HTMLDivElement, { item: typeof cartItems[0] }>(({ item }, ref) => {
+  const CartItemRow = React.forwardRef<HTMLDivElement, { item: typeof cartItems[0] }>(function CartItemRow({ item }, ref) {
     
     return (
       <motion.div 
@@ -361,7 +364,7 @@ export const Cart = () => {
           </div>
           <div className="col-span-2 text-center text-sm">
             <Text as="span" className="md:hidden font-medium text-copy text-sm">Price: </Text>
-            <div>
+            <div className="flex flex-col items-center">
               <Text as="span" className="font-medium text-primary text-sm">
                 {formatCurrency(
                   !isNaN(item.price_per_unit) && item.price_per_unit > 0 
@@ -369,16 +372,20 @@ export const Cart = () => {
                     : item.variant?.current_price || item.variant?.sale_price || item.variant?.base_price || 0
                 )}
               </Text>
-              {/* Show discount if applicable */}
-              {item.variant?.discount_percentage && item.variant.discount_percentage > 0 && (
-                <Text className="text-sm text-gray-500 line-through">
-                  <Text variant="caption">{formatCurrency(item.variant.base_price || 0)}</Text>
+              {/* Show discount if applicable - only if discount > 0 and sale price < base price */}
+              {item.variant?.discount_percentage && 
+               item.variant.discount_percentage > 0 && 
+               item.variant.sale_price && 
+               (item.variant.base_price && item.variant.base_price > 0) &&
+               item.variant.sale_price < item.variant.base_price && (
+                <Text variant="caption" className="text-gray-500 line-through">
+                  {formatCurrency(item.variant.base_price)}
                 </Text>
               )}
             </div>
           </div>
           <div className="col-span-2 flex justify-center">
-            <div className="flex items-center border border-border rounded-md">
+            <div className="flex items-center border border-border rounded-md gap-1">
               <Button
                 onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                 variant="ghost"
@@ -456,14 +463,14 @@ export const Cart = () => {
         <Text variant="body-sm">Shopping Cart</Text>
       </motion.nav>
 
-      <motion.h1 
+      <motion.div 
         className="text-lg font-bold text-copy mb-4 flex items-center justify-between"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
         <Heading level={5} weight="bold">Shopping Cart</Heading>
-      </motion.h1>
+      </motion.div>
 
       {cartItems.length === 0 ? (
         <motion.div 
@@ -478,7 +485,7 @@ export const Cart = () => {
           </div>
           <Heading level={5} weight="semibold" className="mb-3 flex items-center justify-center">Your cart is empty</Heading>
           <Text variant="body" tone="secondary" className="mb-6 max-w-md mx-auto">
-            Looks like you haven't added any products to your cart yet.
+            Looks like you haven&apos;t added any products to your cart yet.
           </Text>
           <div className='mt-3'>
               <Link
@@ -512,6 +519,25 @@ export const Cart = () => {
                   ))}
                 </AnimatePresence>
               </div>
+              
+              {/* Action buttons under the cart items */}
+              <div className="p-4 bg-background border-t border-border-light flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                <Button
+                  onClick={handleClearCart}
+                  variant="danger"
+                  size="xs"
+                  disabled={clearingCart || cartItems.length === 0}
+                  leftIcon={<TrashIcon size={14} />}
+                >
+                  Clear Cart ({cartItems.length})
+                </Button>
+                <Link
+                  to="/products"
+                  className="inline-flex items-center justify-center text-primary hover:text-primary-dark font-medium text-sm transition-colors"
+                >
+                  Continue Shopping
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -529,24 +555,9 @@ export const Cart = () => {
                   Tax and shipping will be calculated at checkout
                 </Text>
               </div>
-              
-              <div className="p-3 bg-background flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                <div className="flex items-center">
-                  <Button
-                    onClick={handleClearCart}
-                    variant="danger"
-                    size="xs"
-                    disabled={clearingCart || cartItems.length === 0}
-                    leftIcon={<TrashIcon size={12} />}
-                  >
-                    Clear Cart ({cartItems.length})
-                  </Button>
-                </div>
-                <Text variant="body-sm">Continue Shopping</Text>
-              </div>
               <form onSubmit={handleApplyCoupon} className="mb-4">
-                <Label htmlFor="coupon-code" className="block text-sm font-medium mb-2 text-copy">Promo Code (Optional)</Label>
-                <div className="flex">
+                <label htmlFor="coupon-code" className="block text-sm font-medium mb-2 text-copy">Promo Code (Optional)</label>
+                <div className="flex gap-1">
                   <Input
                     id="coupon-code"
                     type="text"
@@ -571,7 +582,6 @@ export const Cart = () => {
                   variant="primary"
                   fullWidth={true}
                   size="xs"
-                  className="py-2.5"
                 >
                   {isAuthenticated ? 'Proceed to Checkout' : 'Login to Checkout'}
                 </Button>

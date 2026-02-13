@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SearchIcon, FilterIcon, XIcon, SortAscIcon, SortDescIcon, GridIcon, ListIcon } from 'lucide-react';
 import { cn } from '@/utils/utils';
-import { Input } from '@/ui/Input';
+import { Input } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
 import { Dropdown } from '@/ui/Dropdown';
 import { Text, Label } from '@/components/ui/Text/Text';
