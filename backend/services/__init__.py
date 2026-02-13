@@ -4,7 +4,6 @@
 from .auth import AuthService
 from .cart import CartService
 from .email import EmailService
-from .loyalty import LoyaltyService
 from .products import ProductService
 from .promocode import PromocodeService
 from .review import ReviewService

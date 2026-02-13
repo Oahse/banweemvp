@@ -60,7 +60,7 @@ def event_loop():
 async def setup_database():
     """Set up test database tables in a test schema."""
     # Import all models to ensure they're registered with Base
-    from models import user, product, cart, orders, payments, shipping, tax_rates, inventories, loyalty, analytics, admin, discounts, promocode, refunds, review, subscriptions, variant_tracking, wishlist, validation_rules
+    from models import user, product, cart, orders, payments, shipping, tax_rates, inventories, analytics, admin, discounts, promocode, refunds, review, subscriptions, variant_tracking, wishlist, validation_rules
     
     async with test_engine.begin() as conn:
         # Create test schema

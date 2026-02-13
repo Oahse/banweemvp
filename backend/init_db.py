@@ -56,8 +56,7 @@ def get_models():
     from models.promocode import Promocode
     from models.shipping import ShippingMethod
     from models.wishlist import Wishlist, WishlistItem
-    from models.loyalty import LoyaltyAccount, PointsTransaction
-    from models.analytics import UserSession, AnalyticsEvent
+        from models.analytics import UserSession, AnalyticsEvent
     from models.refunds import Refund, RefundItem
     from models.tax_rates import TaxRate
     from models.shipping_tracking import ShipmentTracking, ShippingCarrier
@@ -77,7 +76,6 @@ def get_models():
         'Promocode': Promocode,
         'ShippingMethod': ShippingMethod,
         'Wishlist': Wishlist, 'WishlistItem': WishlistItem,
-        'LoyaltyAccount': LoyaltyAccount, 'PointsTransaction': PointsTransaction,
         'UserSession': UserSession, 'AnalyticsEvent': AnalyticsEvent,
         'Refund': Refund, 'RefundItem': RefundItem,
         'TaxRate': TaxRate,
@@ -393,21 +391,6 @@ WISHLIST_ITEMS = [
     {"user_email": "distributor.mike@agrihub.com", "product_name": "Hemp Seeds", "quantity": 15},
     {"user_email": "retailer.jane@agrihub.com", "product_name": "Turmeric Powder", "quantity": 2},
     {"user_email": "retailer.jane@agrihub.com", "product_name": "Black Pepper", "quantity": 1},
-]
-
-LOYALTY_ACCOUNTS = [
-    {"user_email": "buyer.sarah@agrihub.com", "total_points": 150, "available_points": 120, "tier": "bronze", "tier_progress": 0.15, "points_earned_lifetime": 150, "points_redeemed_lifetime": 30, "referrals_made": 2, "successful_referrals": 1, "tier_benefits": {"discount_percentage": 2, "early_access": False}, "status": "active", "loyalty_metadata": {"join_date": "2024-01-15", "preferred_rewards": "discounts"}},
-    {"user_email": "distributor.mike@agrihub.com", "total_points": 450, "available_points": 380, "tier": "silver", "tier_progress": 0.45, "points_earned_lifetime": 450, "points_redeemed_lifetime": 70, "referrals_made": 5, "successful_referrals": 3, "tier_benefits": {"discount_percentage": 5, "early_access": True}, "status": "active", "loyalty_metadata": {"join_date": "2023-12-01", "preferred_rewards": "discounts"}},
-    {"user_email": "retailer.jane@agrihub.com", "total_points": 1200, "available_points": 950, "tier": "gold", "tier_progress": 0.20, "points_earned_lifetime": 1200, "points_redeemed_lifetime": 250, "referrals_made": 8, "successful_referrals": 6, "tier_benefits": {"discount_percentage": 10, "early_access": True, "free_shipping": True}, "status": "active", "loyalty_metadata": {"join_date": "2023-10-15", "preferred_rewards": "discounts"}},
-]
-
-POINTS_TRANSACTIONS = [
-    {"user_email": "buyer.sarah@agrihub.com", "points": 50, "transaction_type": "earned", "description": "Purchase bonus - Organic Wheat order", "reason_code": "purchase_bonus", "related_amount": 25.98, "currency": "USD", "status": "completed", "reference_id": "order_123", "expires_at": "2025-01-31", "transaction_metadata": {"source": "web", "campaign": "spring_sale"}},
-    {"user_email": "buyer.sarah@agrihub.com", "points": -20, "transaction_type": "redeemed", "description": "Discount applied on bulk order", "reason_code": "discount_redemption", "related_amount": 5.00, "currency": "USD", "status": "completed", "reference_id": "order_124", "expires_at": None, "transaction_metadata": {"source": "web", "discount_type": "points"}},
-    {"user_email": "distributor.mike@agrihub.com", "points": 100, "transaction_type": "earned", "description": "Bulk order bonus - Basmati Rice", "reason_code": "bulk_bonus", "related_amount": 45.99, "currency": "USD", "status": "completed", "reference_id": "order_125", "expires_at": "2025-02-28", "transaction_metadata": {"source": "web", "bulk_threshold": 100.0}},
-    {"user_email": "distributor.mike@agrihub.com", "points": 25, "transaction_type": "earned", "description": "Referral bonus - new customer", "reason_code": "referral_bonus", "related_amount": 0.00, "currency": "USD", "status": "completed", "reference_id": "ref_001", "expires_at": "2025-03-31", "transaction_metadata": {"source": "referral", "referred_customer": "new_user_123"}},
-    {"user_email": "retailer.jane@agrihub.com", "points": 200, "transaction_type": "earned", "description": "Loyalty bonus - Gold tier", "reason_code": "tier_bonus", "related_amount": 0.00, "currency": "USD", "status": "completed", "reference_id": "loyalty_001", "expires_at": "2025-06-30", "transaction_metadata": {"source": "loyalty", "tier": "gold"}},
-    {"user_email": "retailer.jane@agrihub.com", "points": -50, "transaction_type": "redeemed", "description": "Free shipping redemption", "reason_code": "shipping_redemption", "related_amount": 15.99, "currency": "USD", "status": "completed", "reference_id": "shipping_001", "expires_at": None, "transaction_metadata": {"source": "web", "shipping_method": "express"}},
 ]
 
 INVENTORY_ITEMS = [
@@ -1026,111 +1009,6 @@ async def seed_wishlist_items(session: AsyncSession):
         await session.rollback()
         raise
 
-async def seed_loyalty_accounts(session: AsyncSession):
-    """Seed loyalty accounts using models"""
-    models = get_models()
-    LoyaltyAccount = models['LoyaltyAccount']
-    User = models['User']
-    
-    try:
-        # Check if loyalty accounts already exist
-        result = await session.execute(select(LoyaltyAccount).limit(1))
-        existing = result.scalar_one_or_none()
-        
-        if existing:
-            print("✅ Loyalty accounts already exist. Skipping...")
-            return
-        
-        print(f"🏆 Seeding {len(LOYALTY_ACCOUNTS)} loyalty accounts...")
-        
-        # Get user mapping
-        users_result = await session.execute(select(User))
-        users = {user.email: user for user in users_result.scalars()}
-        
-        loyalty_accounts = []
-        for account_data in LOYALTY_ACCOUNTS:
-            user = users.get(account_data["user_email"])
-            if user:
-                account = LoyaltyAccount(
-                    user_id=user.id,
-                    total_points=account_data["total_points"],
-                    available_points=account_data["available_points"],
-                    tier=account_data["tier"],
-                    tier_progress=account_data["tier_progress"],
-                    points_earned_lifetime=account_data["points_earned_lifetime"],
-                    points_redeemed_lifetime=account_data["points_redeemed_lifetime"],
-                    referrals_made=account_data["referrals_made"],
-                    successful_referrals=account_data["successful_referrals"],
-                    tier_benefits=account_data["tier_benefits"],
-                    status=account_data["status"],
-                    loyalty_metadata=account_data["loyalty_metadata"]
-                )
-                loyalty_accounts.append(account)
-        
-        session.add_all(loyalty_accounts)
-        await session.commit()
-        print(f"✅ Successfully seeded {len(loyalty_accounts)} loyalty accounts")
-        
-    except Exception as e:
-        print(f"❌ Error seeding loyalty accounts: {e}")
-        await session.rollback()
-        raise
-
-async def seed_points_transactions(session: AsyncSession):
-    """Seed points transactions using models"""
-    models = get_models()
-    PointsTransaction = models['PointsTransaction']
-    LoyaltyAccount = models['LoyaltyAccount']
-    User = models['User']
-    
-    try:
-        # Check if points transactions already exist
-        result = await session.execute(select(PointsTransaction).limit(1))
-        existing = result.scalar_one_or_none()
-        
-        if existing:
-            print("✅ Points transactions already exist. Skipping...")
-            return
-        
-        print(f"🏆 Seeding {len(POINTS_TRANSACTIONS)} points transactions...")
-        
-        # Get mappings
-        users_result = await session.execute(select(User))
-        users = {user.email: user for user in users_result.scalars()}
-        
-        loyalty_accounts_result = await session.execute(select(LoyaltyAccount))
-        loyalty_accounts = {account.user_id: account for account in loyalty_accounts_result.scalars()}
-        
-        transactions = []
-        for transaction_data in POINTS_TRANSACTIONS:
-            user = users.get(transaction_data["user_email"])
-            loyalty_account = loyalty_accounts.get(user.id)
-            
-            if user and loyalty_account:
-                transaction = PointsTransaction(
-                    loyalty_account_id=loyalty_account.id,
-                    points_amount=transaction_data["points"],
-                    transaction_type=transaction_data["transaction_type"],
-                    description=transaction_data["description"],
-                    reason_code=transaction_data["reason_code"],
-                    related_amount=transaction_data.get("related_amount"),
-                    currency=transaction_data.get("currency", "USD"),
-                    expires_at=transaction_data.get("expires_at"),
-                    status=transaction_data.get("status", "completed"),
-                    transaction_metadata=transaction_data.get("transaction_metadata"),
-                    created_at=datetime.utcnow() - timedelta(days=random.randint(1, 30))
-                )
-                transactions.append(transaction)
-        
-        session.add_all(transactions)
-        await session.commit()
-        print(f"✅ Successfully seeded {len(transactions)} points transactions")
-        
-    except Exception as e:
-        print(f"❌ Error seeding points transactions: {e}")
-        await session.rollback()
-        raise
-
 async def seed_inventory(session: AsyncSession):
     """Seed inventory using models"""
     models = get_models()
@@ -1635,8 +1513,6 @@ async def main():
                 await seed_reviews(session)
                 await seed_wishlists(session)
                 await seed_wishlist_items(session)
-                await seed_loyalty_accounts(session)
-                await seed_points_transactions(session)
                 await seed_shipping_methods(session)
                 await seed_promo_codes(session)
                 await seed_warehouses(session)

@@ -1680,7 +1680,7 @@ class OrderService:
             raise HTTPException(status_code=500, detail=f"Failed to calculate order total: {str(e)}")
 
     async def _calculate_discount_amount(self, cart_items: List, subtotal: float) -> float:
-        """Calculate discount amount from applied promocodes and loyalty points"""
+        """Calculate discount amount from applied promocodes"""
         try:
             discount_amount = 0.0
             

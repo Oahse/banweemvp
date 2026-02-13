@@ -296,14 +296,8 @@ class SubscriptionSchedulerService:
             # ========================================
             # STEP 5: UPDATE SUBSCRIPTION
             # ========================================
-            subscription.price = updated_cost["total_amount"]
-            subscription.cost_breakdown = updated_cost
-            subscription.tax_rate_applied = updated_cost.get("tax_rate")
-            subscription.tax_amount = updated_cost.get("tax_amount")
-            subscription.shipping_cost = updated_cost.get("shipping_cost")
-            subscription.discount_amount = updated_cost.get("discount_amount")
-            subscription.subtotal = updated_cost.get("subtotal")
-            subscription.total = updated_cost.get("total_amount")
+            # DO NOT store prices - they are calculated dynamically
+            # Only update status and billing dates
             subscription.status = "active"  # Reset to active after successful payment
             subscription.last_payment_error = None
             

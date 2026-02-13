@@ -13,6 +13,7 @@ from uuid import UUID
 from datetime import datetime, timedelta, timezone
 from typing import Optional, List, Dict, Any
 from services.payments import PaymentService
+from services.promocode import Promocode
 import logging
 
 logger = logging.getLogger(__name__)
@@ -137,26 +138,70 @@ class SubscriptionService:
         now = datetime.now(timezone.utc)
         period_end = now + timedelta(days=30)
         
-        # Create subscription - DO NOT store prices (calculated dynamically)
+        from datetime import datetime
+
         subscription = Subscription(
+            # --- Basic subscription info ---
             user_id=user_id,
-            name=name,
+            name=name,  # e.g., "Monthly Coffee Subscription"
             status="active",
             currency=currency,
+            interval="monthly",  # billing interval: "weekly", "monthly", etc.
             current_period_start=now,
             current_period_end=period_end,
             next_billing_date=period_end,
-            delivery_type=delivery_type,
+
+            # --- Delivery info ---
+            delivery_type=delivery_type,  # e.g., "home delivery"
             delivery_address_id=delivery_address_id,
-            # Store only variant IDs and quantities (prices calculated dynamically)
-            variant_ids=[str(vid) for vid in product_variant_ids],
-            subscription_metadata={
-                "variant_quantities": {
-                    str(vid): max(1, int((variant_quantities or {}).get(str(vid), 1)))
-                    for vid in product_variant_ids
+
+            # --- Product Variants ---
+            variants=[
+                {"id": vid, "qty": max(1, int((variant_quantities or {}).get(str(vid), 1)))}
+                for vid in product_variant_ids
+            ],
+
+            # --- Prices at creation (fixed for historical accuracy) ---
+            variant_prices_at_creation=[
+                {
+                    "id": vid,
+                    "price": variant_prices.get(str(vid), 0),
+                    "qty": max(1, int((variant_quantities or {}).get(str(vid), 1)))
                 }
-            }
+                for vid in product_variant_ids
+            ],
+            shipping_amount_at_creation=shipping_amount,
+            tax_amount_at_creation=tax_amount,
+            tax_rate_at_creation=tax_rate,
+            total_charged_at_creation=cost_breakdown["total_amount"],
+
+            # --- Current / dynamic values (for display or reporting) ---
+            current_variant_prices=[
+                {
+                    "id": vid,
+                    "current_price": get_current_variant_price(vid),
+                    "qty": max(1, int((variant_quantities or {}).get(str(vid), 1)))
+                }
+                for vid in product_variant_ids
+            ],
+            current_shipping_amount=get_current_shipping_amount(delivery_type),
+            current_tax_amount=get_current_tax_amount(delivery_address_id),
+            current_tax_rate=get_current_tax_rate(delivery_address_id),
+            current_total_amount=lambda: sum(
+                [v["current_price"] * v["qty"] for v in get_current_variant_prices(product_variant_ids)]
+            ) + get_current_shipping_amount(delivery_type) + get_current_tax_amount(delivery_address_id),
+
+            # --- Discount info ---
+            discount_id=promocode.id if promocode else None,
+            discount_type=promocode.discount_type if promocode else None,
+            discount_value=promocode.value if promocode else 0,
+            discount_code=promocode.code if promocode else None,
+
+            # --- Payment info ---
+            payment_gateway="stripe",
+            payment_reference=stripe_subscription_id if stripe_subscription_id else None
         )
+
         
         # Add subscription to session first
         self.db.add(subscription)
@@ -1264,10 +1309,8 @@ class SubscriptionService:
             loyalty_discount = Decimal('0')
             if user_id:
                 try:
-                    from services.loyalty import LoyaltyService
-                    loyalty_service = LoyaltyService(self.db)
-                    discount_result = await loyalty_service.calculate_loyalty_discount(
-                        user_id=user_id,
+                    from services.promocode import PromocodeService
+                    promocode_service = PromocodeService(self.db)
                         subtotal=float(subtotal)
                     )
                     loyalty_discount = Decimal(str(discount_result.get("discount_amount", 0.0)))

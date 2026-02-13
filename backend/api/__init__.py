@@ -6,7 +6,6 @@ from .cart import router as cart_router
 from .categories import router as categories_router
 from .health import router as health_router
 from .inventory import router as inventory_router
-from .loyalty import router as loyalty_router
 from .oauth import router as oauth_router
 from .orders import router as orders_router
 from .payments import router as payments_router
