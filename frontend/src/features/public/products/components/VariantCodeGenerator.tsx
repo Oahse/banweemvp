@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { QrCodeIcon, ScanLineIcon, RefreshCwIcon } from 'lucide-react';
-import { ProductsAPI } from '@/api/products';
 import { toast } from 'react-hot-toast';
+import { ProductsAPI } from '@/api/products';
 import { Button } from '@/components/ui/Button';
 import { Heading, Body, Text } from '@/components/ui/Text/Text';
+
+// Client-side barcode generation
+import JsBarcode from 'jsbarcode';
+import QRCode from 'qrcode';
 
 interface VariantCodeGeneratorProps {
   variantId: string;
@@ -38,24 +42,51 @@ export const VariantCodeGenerator: React.FC<VariantCodeGeneratorProps> = ({
     }
   }, [autoGenerate, variantId, hasGenerated]);
 
+  const generateClientSideBarcode = async (data: string, type: string) => {
+    const canvas = document.createElement('canvas');
+    JsBarcode(canvas, data, {
+      format: type,
+      width: 2,
+      height: 100,
+      fontSize: 18,
+      font: 'Arial',
+      fontOptions: 'bold',
+      textMargin: 2,
+      text: data,
+      textPosition: 'bottom',
+    });
+    return canvas.toDataURL('image/png').split(',')[1];
+  };
+
+  const generateClientSideQRCode = async (data: string) => {
+    const canvas = document.createElement('canvas');
+    QRCode.toCanvas(canvas, data);
+    return canvas.toDataURL('image/png').split(',')[1];
+  };
+
   const generateCodes = async () => {
     if (!variantId) return;
     
     setIsGenerating(true);
     try {
-      const response = await ProductsAPI.generateVariantCodes(variantId);
-      if (response.success && response.data) {
-        const newCodes = {
-          barcode: response.data.barcode,
-          qr_code: response.data.qr_code
-        };
-        setCodes(newCodes);
-        setHasGenerated(true);
-        onCodesGenerated?.(newCodes);
-        
-        if (!autoGenerate) {
-          toast.success('Codes generated successfully!');
-        }
+      // Generate barcode client-side
+      const barcode = await generateClientSideBarcode(variantSku, 'code128');
+      
+      // Generate QR code client-side
+      const qrData = `https://banwee.com/products/variant/${variantId}`;
+      const qrCode = await generateClientSideQRCode(qrData);
+      
+      const newCodes = {
+        barcode: `data:image/png;base64,${barcode}`,
+        qr_code: `data:image/png;base64,${qrCode}`
+      };
+      
+      setCodes(newCodes);
+      setHasGenerated(true);
+      onCodesGenerated?.(newCodes);
+      
+      if (!autoGenerate) {
+        toast.success('Codes generated successfully!');
       }
     } catch (error) {
       console.error('Failed to generate codes:', error);
