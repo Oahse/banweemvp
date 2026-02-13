@@ -193,21 +193,6 @@ export const Login = ({ isInitialLoading = false }) => {
         className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light"
         variants={itemVariants}
       >
-        {/* Show message if redirected from another page */}
-        {(location.search.includes('redirect=') || location.state?.from?.pathname) && (
-          <motion.div 
-            className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-md"
-            variants={itemVariants}
-          >
-            <Body className="text-sm text-copy">
-              {location.state?.from?.pathname 
-                ? 'Please log in to continue with your cart operation.'
-                : 'Please log in to continue to your requested page.'
-              }
-            </Body>
-          </motion.div>
-        )}
-        
         <Heading level={5} className="text-xl font-bold text-main mb-4 text-center">Login to Your Account</Heading>
         <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
           {/* Email Address Input */}

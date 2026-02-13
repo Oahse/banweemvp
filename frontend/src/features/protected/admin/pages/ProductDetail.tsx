@@ -383,12 +383,12 @@ export const AdminProductDetail = () => {
                   Dietary Information
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {(typeof product.dietary_tags === 'object' 
+                  {((typeof product.dietary_tags === 'object' 
                     ? Object.keys(product.dietary_tags).filter(key => product.dietary_tags[key])
                     : Array.isArray(product.dietary_tags) 
                       ? product.dietary_tags 
                       : []
-                  ).map((tag: string, index: number) => (
+                  )).map((tag: string, index: number) => (
                     <span
                       key={index}
                       className="px-2 py-0.5 bg-primary-light text-primary-dark dark:bg-primary-dark dark:text-primary-light rounded text-sm font-medium inline-flex items-center gap-1"
@@ -411,7 +411,6 @@ export const AdminProductDetail = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

@@ -118,6 +118,11 @@ const Home: React.FC = () => {
 // Add type assertion for homeData
 const homeData = data as { data: HomeDataResponse } | null;
 
+// Fetch home data on mount
+useEffect(() => {
+  execute(() => ProductsAPI.getHomeData());
+}, [execute]);
+
 useEffect(() => {
   if (homeData?.data) {
     const payload = homeData.data;
@@ -132,6 +137,7 @@ useEffect(() => {
     });
 
     // Update state with parsed data
+    setFeaturedProducts(featured || []);
     setPopularProducts(popular || []);
     setDeals(dealsData || []);
 

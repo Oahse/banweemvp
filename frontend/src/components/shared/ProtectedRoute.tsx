@@ -18,18 +18,18 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const location = useLocation();
   const { theme } = useTheme();
 
-  if (isLoading) {
-    return (
-      <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-        <div className="text-center">
-          <AnimatedLoader size="xl" variant="spinner" color="primary" centered={false} />
-          <Text variant="body-sm" tone="secondary">Loading...</Text>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+  //       <div className="text-center">
+  //         <AnimatedLoader size="xl" variant="spinner" color="primary" centered={false} />
+  //         <Text variant="body-sm" tone="secondary">Loading...</Text>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || isLoading) {
     // Save the full location (pathname + search + hash) for redirect after login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

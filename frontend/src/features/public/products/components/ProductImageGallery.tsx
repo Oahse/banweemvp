@@ -1,11 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, ZoomInIcon, XIcon, PackageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/utils/utils';
-import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text/Text';
 
-export const ProductImageGallery = ({
+interface ProductImage {
+  id: string;
+  url: string;
+  alt_text?: string;
+  sort_order: number;
+  is_primary?: boolean;
+}
+
+interface ProductImageGalleryProps {
+  images: ProductImage[];
+  selectedImageIndex: number;
+  onImageSelect: (index: number) => void;
+  showThumbnails?: boolean;
+  zoomEnabled?: boolean;
+  className?: string;
+}
+
+export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
   images,
   selectedImageIndex,
   onImageSelect,
@@ -22,17 +38,17 @@ export const ProductImageGallery = ({
   
   const currentImage = sortedImages[selectedImageIndex];
 
-  const nextImage = () => {
+  const nextImage = useCallback(() => {
     const nextIndex = (selectedImageIndex + 1) % sortedImages.length;
     onImageSelect(nextIndex);
-  };
+  }, [selectedImageIndex, sortedImages.length, onImageSelect]);
 
-  const prevImage = () => {
+  const prevImage = useCallback(() => {
     const prevIndex = (selectedImageIndex - 1 + sortedImages.length) % sortedImages.length;
     onImageSelect(prevIndex);
-  };
+  }, [selectedImageIndex, sortedImages.length, onImageSelect]);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!zoomEnabled || !isZoomed) return;
     
     const rect = e.currentTarget.getBoundingClientRect();
@@ -42,7 +58,7 @@ export const ProductImageGallery = ({
     setZoomPosition({ x, y });
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (isFullscreen) {
       if (e.key === 'Escape') {
         setIsFullscreen(false);
@@ -52,12 +68,12 @@ export const ProductImageGallery = ({
         nextImage();
       }
     }
-  };
+  }, [isFullscreen, prevImage, nextImage]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen, prevImage, nextImage]);
+  }, [handleKeyDown]);
 
   if (!sortedImages.length) {
     return (
@@ -67,7 +83,7 @@ export const ProductImageGallery = ({
             <Text className="text-gray-400 text-4xl">📷</Text>
           </div>
           <Text className="text-gray-500 font-medium">No images available</Text>
-          <Text className="text-gray-400 text-sm mt-1">This product doesn't have any images yet</Text>
+          <Text className="text-gray-400 text-sm mt-1">This product doesn&apos;t have any images yet</Text>
         </div>
       </div>
     );
@@ -77,14 +93,14 @@ export const ProductImageGallery = ({
     <div className={cn('space-y-4', className)}>
       <div className="relative group">
         <div 
-          className="relative overflow-hidden rounded-lg bg-surface cursor-zoom-in"
+          className="relative overflow-hidden rounded-lg bg-white dark:bg-gray-900 cursor-zoom-in border border-gray-200 dark:border-gray-700"
           onMouseEnter={() => zoomEnabled && setIsZoomed(true)}
           onMouseLeave={() => setIsZoomed(false)}
           onMouseMove={handleMouseMove}
           onClick={() => setIsFullscreen(true)}
         >
           {imageError ? (
-            <div className="w-full h-96 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+            <div className="w-full h-96 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
               <PackageIcon size={64} className="text-gray-400 dark:text-gray-500" />
             </div>
           ) : (
@@ -93,7 +109,7 @@ export const ProductImageGallery = ({
               alt={currentImage.alt_text || `Product image ${selectedImageIndex + 1}`}
               onError={() => setImageError(true)}
               className={cn(
-                'w-full h-96 object-cover transition-transform duration-300 ',
+                'w-full h-96 object-cover transition-transform duration-300',
                 isZoomed && 'scale-150'
               )}
               style={
@@ -115,22 +131,18 @@ export const ProductImageGallery = ({
 
         {sortedImages.length > 1 && (
           <>
-            <Button
+            <button
               onClick={prevImage}
-              variant="ghost"
-              size="xs"
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
-              leftIcon={<ChevronLeftIcon size={20} />}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white dark:bg-gray-800/80 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
             >
-            </Button>
-            <Button
+              <ChevronLeftIcon size={20} />
+            </button>
+            <button
               onClick={nextImage}
-              variant="ghost"
-              size="xs"
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
-              rightIcon={<ChevronRightIcon size={20} />}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white dark:bg-gray-800/80 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors opacity-0 group-hover:opacity-100"
             >
-            </Button>
+              <ChevronRightIcon size={20} />
+            </button>
           </>
         )}
 
@@ -144,29 +156,27 @@ export const ProductImageGallery = ({
       {showThumbnails && sortedImages.length > 1 && (
         <div className="grid grid-cols-4 gap-2">
           {sortedImages.map((image, index) => (
-            <Button
+            <button
               key={image.id}
               onClick={() => onImageSelect(index)}
-              variant={index === selectedImageIndex ? "primary" : "ghost"}
-              size="xs"
               className={cn(
-                'relative overflow-hidden rounded-md border-2 transition-all h-20',
+                'relative overflow-hidden rounded-md border-2 transition-all h-20 bg-white dark:bg-gray-900',
                 selectedImageIndex === index
                   ? 'border-primary ring-2 ring-primary/20'
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
               )}
             >
               <img
                 src={image.url}
                 alt={image.alt_text || `Thumbnail ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover p-1"
               />
               {image.is_primary && (
-                <div className="absolute top-1 left-1 bg-primary text-white text-sm px-1 rounded">
+                <div className="absolute top-1 left-1 bg-primary text-white text-xs px-1.5 py-0.5 rounded">
                   Primary
                 </div>
               )}
-            </Button>
+            </button>
           ))}
         </div>
       )}
@@ -184,43 +194,37 @@ export const ProductImageGallery = ({
               <img
                 src={currentImage.url}
                 alt={currentImage.alt_text || `Product image ${selectedImageIndex + 1}`}
-                className="max-w-full max-h-full object-contain"
+                className="max-w-full max-h-full object-cover"
                 onClick={(e) => e.stopPropagation()}
               />
               
-              <Button
+              <button
                 onClick={() => setIsFullscreen(false)}
-                variant="ghost"
-                size="xs"
                 className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-                leftIcon={<XIcon size={16} />}
               >
-              </Button>
+                <XIcon size={16} />
+              </button>
 
               {sortedImages.length > 1 && (
                 <>
-                  <Button
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       prevImage();
                     }}
-                    variant="ghost"
-                    size="xs"
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white w-12 h-12 rounded-full flex items-center justify-center transition-colors"
-                    leftIcon={<ChevronLeftIcon size={24} />}
                   >
-                  </Button>
-                  <Button
+                    <ChevronLeftIcon size={24} />
+                  </button>
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       nextImage();
                     }}
-                    variant="ghost"
-                    size="xs"
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white w-12 h-12 rounded-full flex items-center justify-center transition-colors"
-                    rightIcon={<ChevronRightIcon size={24} />}
                   >
-                  </Button>
+                    <ChevronRightIcon size={24} />
+                  </button>
                 </>
               )}
 

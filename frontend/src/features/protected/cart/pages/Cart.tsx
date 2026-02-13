@@ -467,21 +467,27 @@ export const Cart = () => {
 
       {cartItems.length === 0 ? (
         <motion.div 
-          className="text-center py-8"
+          className="text-center py-16"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <Text className="w-12 h-12 mx-auto mb-3 rounded-full bg-background flex items-center justify-center">
-            <ShoppingCartIcon size={24} className="text-copy-lighter" />
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <ShoppingCartIcon size={40} className="text-gray-400 dark:text-gray-500" />
+            
+          </div>
+          <Heading level={5} weight="semibold" className="mb-3 flex items-center justify-center">Your cart is empty</Heading>
+          <Text variant="body" tone="secondary" className="mb-6 max-w-md mx-auto">
+            Looks like you haven't added any products to your cart yet.
           </Text>
-          <Heading level={5} weight="medium">Your cart is empty</Heading>
-          <Text variant="body-sm" tone="secondary">Looks like you haven't added any products to your cart yet.</Text>
-          <Link
-            to="/products"
-            className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors text-sm">
-            <Text variant="body-sm">Continue Shopping</Text>
-          </Link>
+          <div className='mt-3'>
+              <Link
+                to="/products"
+                className="inline-flex items-center bg-primary hover:bg-primary-dark text-white px-4 py-1 rounded-md transition-colors font-small"
+              >
+                Continue Shopping
+              </Link>
+          </div>
         </motion.div>
       ) : (
         <motion.div 

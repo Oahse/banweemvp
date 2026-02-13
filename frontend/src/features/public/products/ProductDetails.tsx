@@ -17,7 +17,7 @@ import {
   CalendarIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body, Text, Label } from '@/components/ui/Text/Text';
+import { Heading, Body, Text, Label, Caption } from '@/components/ui/Text/Text';
 import { Container } from '@/components/layout/Container';
 
 import { ProductImageGallery } from './components/ProductImageGallery';
@@ -364,361 +364,253 @@ export const ProductDetails = () => {
           </div>
         </Container>
       </motion.div>
-
+      
       <motion.div className="py-8">
-        <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Product Images */}
-          <div className="space-y-4">
-            <ProductImageGallery
-              images={([
-                ...(product.images || []),
-                ...(selectedVariant?.images || [])
-              ] as ProductImage[]).filter((img, index, self) => 
-                index === self.findIndex((i) => i.id === img.id)
-              )}
-              selectedImageIndex={selectedImage}
-              onImageSelect={setSelectedImage}
-              showThumbnails={true}
-              zoomEnabled={true}
-              className=""
+  <Container className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    {/* LEFT SIDE */}
+    <div className="space-y-4">
+      
+      {/* Product Images */}
+      <ProductImageGallery
+        images={([
+          ...(product.images || []),
+          ...(selectedVariant?.images || [])
+        ] as ProductImage[]).filter((img, index, self) =>
+          index === self.findIndex((i) => i.id === img.id)
+        )}
+        selectedImageIndex={selectedImage}
+        onImageSelect={setSelectedImage}
+        showThumbnails={true}
+        zoomEnabled={true}
+        className="w-full"
+      />
+
+      {/* Barcode Button */}
+      <button
+        onClick={() => setShowBarcode(true)}
+        className="w-full flex items-center justify-center gap-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 px-3 py-2 transition-colors"
+      >
+        <ScanLineIcon size={16} className="flex-shrink-0" />
+        <span className="whitespace-nowrap">View Barcode</span>
+      </button>
+
+      {/* SKU Mobile Only */}
+      <div className="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 sm:hidden">
+        <Text variant="caption" tone="secondary">
+          SKU: {selectedVariant?.sku || product.sku}
+        </Text>
+      </div>
+
+      {/* QR Code Modal */}
+      <QRCodeModal
+        data={`${window.location.origin}${location.pathname}`}
+        title={`${product.name} - QR Code`}
+        description={`Scan to view ${product.name} product page`}
+        isOpen={showQR}
+        onClose={() => setShowQR(false)}
+      />
+
+      {/* Barcode Modal */}
+      {selectedVariant && (
+        <BarcodeModal
+          variant={{
+            id: selectedVariant.id,
+            product_id: actualProductData.id,
+            sku: selectedVariant.sku,
+            name: selectedVariant.name,
+            base_price: selectedVariant.base_price,
+            sale_price: selectedVariant.sale_price,
+            stock: selectedVariant.stock,
+            product_name: product.name,
+            barcode: JSON.stringify({
+              url: `${window.location.origin}${location.pathname}`,
+              productId: actualProductData.id,
+              sku: selectedVariant.sku,
+              variantId: selectedVariant.id,
+              variantName: selectedVariant.name,
+              supplier: actualProductData.supplier
+                ? `${actualProductData.supplier.firstname || ''} ${actualProductData.supplier.lastname || ''}`.trim()
+                : 'Unknown',
+              price: selectedVariant.sale_price || selectedVariant.base_price,
+              stock: selectedVariant.stock,
+              attributes: selectedVariant.attributes
+            }),
+            qr_code: selectedVariant.qr_code
+          }}
+          title={`${product.name} - Barcode`}
+          isOpen={showBarcode}
+          onClose={() => setShowBarcode(false)}
+          canGenerate={false}
+        />
+      )}
+    </div>
+
+    {/* RIGHT SIDE - Product Info */}
+    <div className="space-y-6">
+      
+      <div>
+        <Heading level={5} className="text-xl font-bold text-main mb-2">
+          {product.name}
+        </Heading>
+
+        <div className="flex items-center space-x-4 mb-4">
+          <Text variant="caption" tone="secondary">
+            SKU: {selectedVariant?.sku || 'N/A'}
+          </Text>
+        </div>
+
+        <div className="mb-4">
+          <Text variant="body-lg" weight="bold" tone="primary">
+            {formatCurrency(
+              selectedVariant?.sale_price ||
+              selectedVariant?.base_price ||
+              product.base_price
+            )}
+          </Text>
+        </div>
+
+        <Text variant="body-sm" tone="secondary" className="mb-6">
+          {product.description}
+        </Text>
+
+        {/* Variant Selector */}
+        {actualProductData?.variants &&
+          actualProductData.variants.length > 1 &&
+          selectedVariant && (
+            <VariantSelector
+              variants={actualProductData.variants}
+              selectedVariant={selectedVariant}
+              onVariantChange={(variant: ProductVariant) => {
+                setSelectedVariant({
+                  ...variant,
+                  inventory: variant.inventory,
+                });
+                setSelectedImage(0);
+              }}
+              showImages={false}
+              showPrice={true}
+              showStock={true}
+              layout="list"
             />
-            
-            
-            <Button
-                    onClick={() => setShowBarcode(true)}
-                    className="flex items-center justify-center space-x-2 text-sm text-primary hover:underline px-3 py-2 border border-primary/20 rounded-lg hover:bg-primary/5 transition-colors"
-                  >
-                    <ScanLineIcon size={16} />
-                    <Text variant="body-sm" className="sm:inline">View Barcode</Text>
-                  </Button>
-                
-                
-                {/* Show SKU on mobile */}
-                <div className="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 px-3 py-2 sm:hidden">
-                  <Text variant="caption" tone="secondary">SKU: {selectedVariant?.sku || product.sku}</Text>
-                </div>
-              </div>
+          )}
+      </div>
 
-            {/* QR Code Modal */}
-            <QRCodeModal
-              data={`${window.location.origin}${location.pathname}`}
-              title={`${product.name} - QR Code`}
-              description={`Scan to view ${product.name} product page`}
-              isOpen={showQR}
-              onClose={() => setShowQR(false)}
-            />
+      {/* Stock */}
+      {selectedVariant && (
+        <Text
+          variant="caption"
+          tone={
+            (selectedVariant.inventory?.quantity_available ??
+              selectedVariant.stock) > 0
+              ? 'success'
+              : 'error'
+          }
+          weight="medium"
+        >
+          {(selectedVariant.inventory?.quantity_available ??
+            selectedVariant.stock) > 0
+            ? `✓ In Stock (${selectedVariant.inventory?.quantity_available ??
+                selectedVariant.stock} available)`
+            : '✗ Out of Stock'}
+        </Text>
+      )}
 
-            {/* Barcode Modal */}
-            {selectedVariant && (
-              <BarcodeModal
-                variant={{
-                  id: selectedVariant.id,
-                  product_id: actualProductData.id,
-                  sku: selectedVariant.sku,
-                  name: selectedVariant.name,
-                  base_price: selectedVariant.base_price,
-                  sale_price: selectedVariant.sale_price,
-                  stock: selectedVariant.stock,
-                  product_name: product.name,
-                  barcode: JSON.stringify({
-                    url: `${window.location.origin}${location.pathname}`,
-                    productId: actualProductData.id,
-                    sku: selectedVariant.sku,
-                    variantId: selectedVariant.id,
-                    variantName: selectedVariant.name,
-                    supplier: actualProductData.supplier ? `${actualProductData.supplier.firstname || ''} ${actualProductData.supplier.lastname || ''}`.trim() : 'Unknown',
-                    price: selectedVariant.sale_price || selectedVariant.base_price,
-                    stock: selectedVariant.stock,
-                    attributes: selectedVariant.attributes
-                  }),
-                  qr_code: selectedVariant.qr_code
-                }}
-                title={`${product.name} - Barcode`}
-                isOpen={showBarcode}
-                onClose={() => setShowBarcode(false)}
-                canGenerate={false} // Set to true if user has admin permissions
-              />
-            )}
-          </div>
+      {/* Action Buttons Row */}
+      <div className="flex space-x-3">
 
-          {/* Product Info */}
-          <div className="space-y-6">
-            <div>
-              <Heading level={5} className="text-xl font-bold text-main mb-2">{product.name}</Heading>
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="flex items-center">
-                  <div className="flex text-yellow-400">
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <StarIcon
-                        key={i}
-                        size={14}
-                        className={i < Math.floor(product.rating_average || product.rating || averageRating) ? 'fill-current' : ''}
-                      />
-                    ))}
-                  </div>
-                  <Text variant="caption" tone="secondary">
-                    ({product.review_count || product.reviewCount || totalReviews} reviews)
-                  </Text>
-                </div>
-                <Text variant="caption" tone="secondary">SKU: {selectedVariant?.sku || 'N/A'}</Text>
-              </div>
+        {/* Add to Cart */}
+        <div className="flex-1">
+          <Button
+            disabled={
+              !selectedVariant ||
+              (selectedVariant.inventory?.quantity_available ??
+                selectedVariant.stock) <= 0
+            }
+            className="w-full bg-primary hover:bg-primary-dark text-white px-3 py-2 rounded-md font-medium transition-colors"
+          >
+            Add to Cart
+          </Button>
+        </div>
 
-              <div className="flex items-center space-x-4 mb-4">
-                {selectedVariant?.sale_price && selectedVariant.sale_price < selectedVariant.base_price ? (
-                  <>
-                    <Text variant="body-lg" weight="bold" tone="primary">
-                      {formatCurrency(selectedVariant.sale_price)}
-                    </Text>
-                    <Text variant="body-sm" tone="secondary" className="line-through">
-                      {formatCurrency(selectedVariant.base_price)}
-                    </Text>
-                    <Text variant="caption" className="bg-error-100 text-error-600 px-2 py-1 rounded font-medium">
-                      {Math.round(((selectedVariant.base_price - selectedVariant.sale_price) / selectedVariant.base_price) * 100)}% OFF
-                    </Text>
-                  </>
-                ) : (
-                  <Text variant="body-lg" weight="bold" tone="primary">
-                    {formatCurrency(
-                      selectedVariant?.sale_price ||
-                      selectedVariant?.base_price ||
-                      product.base_price
-                    )}
-                  </Text>
-                )}
-              </div>
+        {/* Wishlist Button */}
+        <Button
+          onClick={async () => {
+            if (isWishlistUpdating) return;
 
-              <Text variant="body-sm" tone="secondary" className="mb-6">{product.description}</Text>
-              
-              {/* Variant Selection - Using VariantSelector component */}
-              {actualProductData?.variants && actualProductData.variants.length > 1 && selectedVariant && (
-                <div className="mb-6">
-                  <VariantSelector
-                    variants={actualProductData.variants}
-                    selectedVariant={selectedVariant}
-                    onVariantChange={(variant: ProductVariant) => {
-                      setSelectedVariant({
-                        ...variant,
-                        inventory: variant.inventory,
-                      });
-                      setSelectedImage(0);
-                    }}
-                    showImages={false}
-                    showPrice={true}
-                    showStock={true}
-                    layout="list"
-                    className=""
-                  />
-                </div>
-              )}
-            </div>
+            setIsWishlistUpdating(true);
 
-            {/* Stock Status */}
-            {selectedVariant && (
-              <div className="mb-4">
-                {(selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 ? (
-                  <Text variant="caption" tone="success" weight="medium">
-                    ✓ In Stock ({selectedVariant.inventory?.quantity_available ?? selectedVariant.stock} available)
-                  </Text>
-                ) : (
-                  <Text variant="caption" tone="error" weight="medium">
-                    ✗ Out of Stock
-                  </Text>
-                )}
-              </div>
-            )}
+            await executeWithAuth(async () => {
+              if (!defaultWishlist) return false;
 
-            {/* Quantity Selection */}
-            {selectedVariant && (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 && (
-              <div>
-                <Heading level={5} weight="medium">Quantity:</Heading>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    onClick={() => handleQuantityChange(quantity - 1)}
-                    disabled={quantity <= 1}
-                    variant="outline"
-                    size="xs"
-                    className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                  >
-                    <MinusIcon size={12} />
-                  </Button>
-                  <Text variant="body-sm" weight="medium" className="w-12 text-center">{quantity}</Text>
-                  <Button
-                    onClick={() => handleQuantityChange(quantity + 1)}
-                    disabled={selectedVariant && quantity >= (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock)}
-                    variant="outline"
-                    size="xs"
-                    className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                  >
-                    <PlusIcon size={12} />
-                  </Button>
-                </div>
-              </div>
-            )}
+              try {
+                if (isInWishlistState) {
+                  const wishlistItem = defaultWishlist.items?.find(
+                    item =>
+                      item?.product_id === product.id &&
+                      (selectedVariant
+                        ? item?.variant_id === selectedVariant.id
+                        : true)
+                  );
 
-            {/* Action Buttons */}
-            <div className="space-y-4 mb-6">
-              {/* Cart Button with Quantity */}
-              <div className="flex space-x-3">
-                <div className="flex-1">
-                  {cartQuantity > 0 ? (
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        onClick={() => handleCartOperation('decrement')}
-                        disabled={isCartUpdating}
-                        variant="ghost"
-                        size="xs"
-                        isLoading={isCartUpdating}
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1.5 rounded-md transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                        leftIcon={<MinusIcon size={12} />}
-                      ></Button>
-                      <Text as="span" className="bg-primary text-white px-3 py-2 rounded-md font-medium min-w-[100px] text-center text-sm">
-                        In Cart ({cartQuantity})
-                      </Text>
-                      <Button
-                        onClick={() => handleCartOperation('increment')}
-                        disabled={isCartUpdating || (selectedVariant ? cartQuantity >= (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) : true)}
-                        variant="primary"
-                        size="xs"
-                        isLoading={isCartUpdating}
-                        className="bg-primary hover:bg-primary-dark text-white p-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                        leftIcon={<PlusIcon size={12} />}
-                      ></Button>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={async () => {
-                        if (!selectedVariant) return;
-                        if (isCartUpdating) return;
-                        
-                        setIsCartUpdating(true);
-                        await executeWithAuth(async () => {
-                          try {
-                            await addToCart({ variant_id: String(selectedVariant.id), quantity: quantity });
-                            toast.success(`${quantity} item(s) added to cart`);
-                            await refreshCart();
-                            return true;
-                          } catch (error: any) {
-                            console.error('Failed to add to cart:', error);
-                            toast.error(error?.message || 'Failed to add item to cart');
-                            return false;
-                          }
-                        }, 'cart');
-                        setIsCartUpdating(false);
-                      }}
-                      disabled={!selectedVariant || (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) <= 0 || isCartUpdating}
-                      variant="primary"
-                      size="xs"
-                      className="w-full bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-sm"
-                      leftIcon={isCartUpdating ? null : <ShoppingCartIcon size={16} className="mr-2" />}
-                      isLoading={isCartUpdating}
-                    >
-                      {isCartUpdating ? 'Adding...' : selectedVariant && (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) <= 0 ? 'Out of Stock' : 'Add to Cart'}
-                    </Button>
-                  )}
-                </div>
+                  if (wishlistItem) {
+                    await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
+                  }
+                } else {
+                  await addToWishlist(product.id, selectedVariant?.id, quantity);
+                }
 
-                {/* Wishlist Button */}
-                <Button
-                    onClick={async () => {
-                      if (isWishlistUpdating) {
-                        toast.error('Please wait, updating wishlist...');
-                        return;
-                      }
+                return true;
+              } catch (error) {
+                return false;
+              }
+            }, 'wishlist');
 
-                      setIsWishlistUpdating(true);
-                      
-                      await executeWithAuth(async () => {
-                        if (!defaultWishlist) {
-                          toast.error("No default wishlist found.");
-                          return false;
-                        }
-                        
-                        try {
-                          if (isInWishlistState) {
-                            const wishlistItem = defaultWishlist.items?.find(
-                              item => item?.product_id === product.id && (selectedVariant ? item?.variant_id === selectedVariant.id : true)
-                            );
-                            if (wishlistItem) {
-                              await removeFromWishlist(defaultWishlist.id, wishlistItem.id);
-                              toast.success('Item removed from wishlist');
-                            }
-                          } else {
-                            await addToWishlist(product.id, selectedVariant?.id, quantity);
-                            toast.success('Item added to wishlist');
-                          }
-                          return true;
-                        } catch (error: any) {
-                          console.error('Wishlist operation failed:', error);
-                          toast.error(error?.message || 'Failed to update wishlist');
-                          return false;
-                        }
-                      }, 'wishlist');
-                      
-                      setIsWishlistUpdating(false);
-                    }}
-                    disabled={isWishlistUpdating}
-                    variant={isInWishlistState ? "outline" : "ghost"}
-                    size="xs"
-                    className={`px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center min-w-[50px] text-sm disabled:opacity-50 disabled:cursor-not-allowed ${isInWishlistState
-                    ? 'bg-error-100 text-error-600 hover:bg-error-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                    title={isInWishlistState ? 'Remove from Wishlist' : 'Add to Wishlist'}
-                    leftIcon={isWishlistUpdating ? null : <HeartIcon size={16} className={isInWishlistState ? 'fill-current' : ''} />}
-                    isLoading={isWishlistUpdating}
-                  >
-                  </Button>
-              </div>
+            setIsWishlistUpdating(false);
+          }}
+          disabled={isWishlistUpdating}
+          variant={isInWishlistState ? "outline" : "ghost"}
+          size="xs"
+          className={`px-3 py-2 rounded-md flex items-center justify-center min-w-[50px] text-sm ${
+            isInWishlistState
+              ? 'bg-error-100 text-error-600 hover:bg-error-200'
+              : 'bg-gray-600 text-primary-600 hover:bg-primary-200'
+          }`}
+          leftIcon={
+            isWishlistUpdating
+              ? null
+              : <HeartIcon size={16} className={isInWishlistState ? 'fill-current' : ''} />
+          }
+          isLoading={isWishlistUpdating}
+        />
+      </div>
 
-              {/* Subscription Button */}
-              {isAuthenticated && hasActiveSubscriptions && selectedVariant && (selectedVariant.inventory?.quantity_available ?? selectedVariant.stock) > 0 && (
-                <Button
-                  onClick={() => {
-                    if (!selectedVariant) {
-                      toast.error('Please select a variant first');
-                      return;
-                    }
-                    const availableInventory = selectedVariant.inventory?.quantity_available ?? selectedVariant.stock;
-                    if (availableInventory <= 0) {
-                      toast.error('This variant is out of stock');
-                      return;
-                    }
-                    setShowSubscriptionSelector(true);
-                  }}
-                  variant="success"
-                  size="xs"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md font-medium transition-colors flex items-center justify-center text-sm"
-                  leftIcon={<CalendarIcon size={14} className="mr-1 sm:mr-2 flex-shrink-0" />}
-                >
-                  <Text className="truncate">Add to Subscription</Text>
-                </Button>
-              )}
-            </div>
+      
 
-            {/* Product Features */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <TruckIcon size={16} className="text-primary" />
-                <Text className="text-sm">Standard Shipping Available</Text>
-              </div>
-              <div className="flex items-center space-x-2">
-                <ShieldCheckIcon size={16} className="text-primary" />
-                <Text className="text-sm">Secure Payment</Text>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RefreshCwIcon size={16} className="text-primary" />
-                <Text className="text-sm">Easy Returns</Text>
-              </div>
-              <div className="flex items-center space-x-2">
-                <ShareIcon size={16} className="text-primary" />
-                <Text className="text-sm">Share Product</Text>
-              </div>
-            </div>
-          </div>
-        
-        </Container>
-      </motion.div>
+      {/* Features */}
+      <div className="grid grid-cols-2 gap-4 pt-4">
+        <div className="flex items-center space-x-2">
+          <TruckIcon size={16} className="text-primary" />
+          <Text className="text-sm">Standard Shipping Available</Text>
+        </div>
+        <div className="flex items-center space-x-2">
+          <ShieldCheckIcon size={16} className="text-primary" />
+          <Text className="text-sm">Secure Payment</Text>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RefreshCwIcon size={16} className="text-primary" />
+          <Text className="text-sm">Easy Returns</Text>
+        </div>
+        <div className="flex items-center space-x-2">
+          <ShareIcon size={16} className="text-primary" />
+          <Text className="text-sm">Share Product</Text>
+        </div>
+      </div>
+    </div>
+
+  </Container>
+</motion.div>
+
 
       {/* Product Details Tabs */}
       <motion.div className="py-8">
@@ -827,9 +719,9 @@ export const ProductDetails = () => {
                           )}
                         </div>
                         <div>
-                          <Heading level={5} className="text-sm font-semibold text-main">
+                          <Caption className="">
                             {product.supplier.company || `${product.supplier.firstname} ${product.supplier.lastname}`}
-                          </Heading>
+                          </Caption>
                         </div>
                       </div>
                       
