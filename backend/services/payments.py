@@ -1410,27 +1410,12 @@ class PaymentService:
                 PaymentFailureReason.PROCESSING_ERROR
             ] else "warning"
             
-            from services.notifications import NotificationService
-            notification_service = NotificationService(self.db)
-            
-            await notification_service.create_notification(
-                user_id=payment_intent.user_id,
-                message=user_message,
-                type=notification_type,
-                related_id=str(payment_intent.id),
-                metadata={
-                    "payment_failure": {
-                        "reason": failure_reason.value,
-                        "order_id": str(payment_intent.order_id) if payment_intent.order_id else None,
-                        "subscription_id": str(payment_intent.subscription_id) if payment_intent.subscription_id else None,
-                        "amount": payment_intent.amount_breakdown.get("total", 0),
-                        "currency": payment_intent.currency
-                    }
-                }
-            )
+            # For payment failures, we could send an email notification instead
+            # For now, we'll just log the failure
+            logger.info(f"Payment failure notification would be sent to user {payment_intent.user_id}: {user_message}")
             
         except Exception as e:
-            logger.error(f"Error sending failure notification: {e}")
+            logger.error(f"Error handling payment failure notification: {e}")
 
     def _determine_retry_strategy(
         self,

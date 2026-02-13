@@ -1316,7 +1316,8 @@ class OrderService:
         tracking_number: Optional[str] = None,
         carrier_name: Optional[str] = None,
         location: Optional[str] = None,
-        description: Optional[str] = None
+        description: Optional[str] = None,
+        background_tasks = None
     ) -> Order:
         """Update order status (admin function)"""
         query = select(Order).where(Order.id == order_id)
@@ -1326,7 +1327,13 @@ class OrderService:
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
 
-        order.status = status
+        # Convert string status to OrderStatus enum (enum values are lowercase)
+        try:
+            status_enum = OrderStatus(status.lower())
+            order.order_status = status_enum
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid order status: {status}")
+        
         if tracking_number:
             order.tracking_number = tracking_number
         if carrier_name:
@@ -1370,15 +1377,35 @@ class OrderService:
         await self.db.commit()
         await self.db.refresh(order)
         
-        # Send notification to user about status change
-        from services.notifications import NotificationService
-        notification_service = NotificationService(self.db)
-        await notification_service.create_notification(
-            user_id=order.user_id,
-            message=f"Your order #{order_id} status has been updated to {status}",
-            type="info",
-            related_id=str(order_id)
-        )
+        # Send shipping update email for shipped/delivered orders
+        if status in ['shipped', 'delivered'] and background_tasks:
+            from jobs.email_tasks import send_shipping_update_email
+            
+            # Get user details for email
+            user_result = await self.db.execute(
+                select(User).where(User.id == order.user_id)
+            )
+            user = user_result.scalar_one_or_none()
+            
+            if user and user.email:
+                # Get tracking info if available
+                tracking_result = await self.db.execute(
+                    select(TrackingEvent).where(
+                        TrackingEvent.order_id == order.id
+                    ).order_by(desc(TrackingEvent.created_at)).limit(1)
+                )
+                tracking = tracking_result.scalar_one_or_none()
+                
+                send_shipping_update_email(
+                    background_tasks=background_tasks,
+                    to_email=user.email,
+                    customer_name=user.firstname or "Customer",
+                    order_number=str(order.id)[:8],
+                    tracking_number=tracking.tracking_number if tracking else "N/A",
+                    carrier=tracking.carrier if tracking else "N/A",
+                    estimated_delivery=tracking.estimated_delivery if tracking else datetime.utcnow() + timedelta(days=3),
+                    tracking_url=tracking.tracking_url if tracking else None
+                )
         
         return order
 

@@ -158,7 +158,7 @@ const Orders = (props: OrdersProps) => {
                     <Text variant="caption" tone="secondary">{new Date(order.created_at).toLocaleDateString()}</Text>
                   </div>
                   <div className="text-right">
-                    <Text variant="body-sm" className="font-semibold">{formatCurrency(order.total_amount)}</Text>
+                    <Text variant="body-sm" className="font-semibold">{formatCurrency(order.total_amount)}</Text><br/>
                     <Text as="span" variant="caption" className={`inline-flex px-2 py-0.5 text-sm font-semibold rounded-full ${
                       order.status === 'delivered' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                       order.status === 'shipped' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :

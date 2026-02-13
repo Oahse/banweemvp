@@ -412,7 +412,13 @@ export class AdminAPI {
    * Update order status
    */
   static async updateOrderStatus(orderId: string, status: string) {
-    return await apiClient.put(`/admin/orders/${orderId}/status`, { status }, {});
+    return await apiClient.put(`/admin/orders/${orderId}/status`, { 
+      status: status,
+      tracking_number: null,
+      carrier_name: null,
+      location: null,
+      description: null
+    });
   }
 
   /**

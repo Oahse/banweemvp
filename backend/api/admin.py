@@ -572,12 +572,13 @@ async def update_order_status(
             tracking_number=request.tracking_number,
             carrier_name=request.carrier_name,
             location=request.location,
-            description=request.description
+            description=request.description,
+            background_tasks=background_tasks
         )
         
         return Response.success(data={
             "id": str(order.id),
-            "status": order.status,
+            "order_status": order.order_status.value if hasattr(order.order_status, 'value') else str(order.order_status),
             "tracking_number": order.tracking_number,
             "carrier_name": order.carrier_name
         }, message=f"Order status updated to {request.status}")

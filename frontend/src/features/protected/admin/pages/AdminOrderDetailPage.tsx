@@ -75,33 +75,33 @@ export const AdminOrderDetail = () => {
   const [invoicePreviewHtml, setInvoicePreviewHtml] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        if (!orderId) {
-          setError('Order ID not provided');
-          return;
-        }
-
-        const response = await AdminAPI.getOrder(orderId);
-        // Response structure: { success: true, data: {...order data...} }
-        const data = response?.data || response;
-        console.log('Order data received:', data);
-        console.log('Order items:', data?.items);
-        setOrder(data);
-        setNewStatus((data?.order_status || data?.status || '').toString().toUpperCase());
-      } catch (err: any) {
-        const message = err?.response?.data?.message || 'Failed to load order details';
-        setError(message);
-        toast.error(message);
-      } finally {
-        setLoading(false);
+  const fetchOrder = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      if (!orderId) {
+        setError('Order ID not provided');
+        return;
       }
-    };
 
+      const response = await AdminAPI.getOrder(orderId);
+      // Response structure: { success: true, data: {...order data...} }
+      const data = response?.data || response;
+      console.log('Order data received:', data);
+      console.log('Order items:', data?.items);
+      setOrder(data);
+      setNewStatus((data?.order_status || data?.status || '').toString().toUpperCase());
+    } catch (err: any) {
+      const message = err?.response?.data?.message || 'Failed to load order details';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchOrder();
   }, [orderId]);
 
@@ -113,11 +113,18 @@ export const AdminOrderDetail = () => {
     try {
       setUpdating(true);
       // Backend expects lowercase status values; convert before sending
-      await AdminAPI.updateOrderStatus(orderId, newStatus.toLowerCase());
+      const response = await AdminAPI.updateOrderStatus(orderId, newStatus.toLowerCase());
       toast.success('Order status updated successfully');
-      if (order) {
-        setOrder({ ...order, order_status: newStatus.toLowerCase() });
-      }
+      
+      // Update the order state directly with the new status
+      setOrder(prevOrder => {
+        if (!prevOrder) return prevOrder;
+        return {
+          ...prevOrder,
+          status: newStatus.toLowerCase(),
+          order_status: newStatus.toUpperCase()
+        };
+      });
     } catch (err: any) {
       const message = err?.response?.data?.message || 'Failed to update order status';
       toast.error(message);
@@ -422,23 +429,23 @@ export const AdminOrderDetail = () => {
                 <Heading level={5} className="text-base font-semibold text-copy mb-4">General Information</Heading>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Text className="text-sm text-copy-light">Order Date</Text>
+                    <Text className="text-sm text-copy-light">Order Date</Text><br/>
                     <Text className="text-copy font-semibold">
                       {new Date(order.created_at).toLocaleDateString()} {new Date(order.created_at).toLocaleTimeString()}
                     </Text>
                   </div>
                   <div>
-                    <Text className="text-sm text-copy-light">Last Updated</Text>
+                    <Text className="text-sm text-copy-light">Last Updated</Text><br/>
                     <Text className="text-copy font-semibold">
                       {new Date(order.updated_at).toLocaleDateString()} {new Date(order.updated_at).toLocaleTimeString()}
                     </Text>
                   </div>
                   <div>
-                    <Text className="text-sm text-copy-light">Order Source</Text>
+                    <Text className="text-sm text-copy-light">Order Source</Text>{" "}
                     <Text className="text-copy font-semibold capitalize">{order.source || 'WEB'}</Text>
                   </div>
                   <div>
-                    <Text className="text-sm text-copy-light">Currency</Text>
+                    <Text className="text-sm text-copy-light">Currency</Text>{" "}
                     <Text className="text-copy font-semibold">{order.currency}</Text>
                   </div>
                 </div>
@@ -450,19 +457,19 @@ export const AdminOrderDetail = () => {
                 <div className="space-y-3">
                   {order.user?.firstname && (
                     <div>
-                      <Text className="text-sm text-copy-light">Name</Text>
+                      <Text className="text-sm text-copy-light">Name</Text>{" "}
                       <Text className="text-copy font-semibold">
                         {order.user.firstname} {order.user.lastname || ''}
                       </Text>
                     </div>
                   )}
                   <div>
-                    <Text className="text-sm text-copy-light">Email</Text>
+                    <Text className="text-sm text-copy-light">Email</Text>{" "}
                     <Text className="text-copy font-semibold">{order.user_email || order.user?.email}</Text>
                   </div>
                   {order.user?.phone && (
                     <div>
-                      <Text className="text-sm text-copy-light">Phone</Text>
+                      <Text className="text-sm text-copy-light">Phone</Text>{" "}
                       <Text className="text-copy font-semibold">{order.user.phone}</Text>
                     </div>
                   )}
@@ -478,7 +485,7 @@ export const AdminOrderDetail = () => {
                       <Clock className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <Text className="font-semibold text-copy">Order Placed</Text>
+                      <Text className="font-semibold text-copy">Order Placed</Text><br/>
                       <Text className="text-sm text-copy-light">
                         {new Date(order.created_at).toLocaleDateString()} {new Date(order.created_at).toLocaleTimeString()}
                       </Text>
@@ -549,7 +556,7 @@ export const AdminOrderDetail = () => {
                     disabled={updating || newStatus === order.order_status}
                     variant="primary"
                     size="xs"
-                    className="w-full px-4 py-2 bg-primary text-copy-inverse rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    className="w-full px-4 py-2 text-xs bg-primary text-copy-inverse rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
                   >
                     {updating ? 'Updating...' : `Update to ${newStatus}`}
                   </Button>
@@ -657,7 +664,7 @@ export const AdminOrderDetail = () => {
                           <td className="px-6 py-4">
                             <Text className="text-sm font-semibold text-copy">
                               {item.product_name ?? item.product?.name ?? 'N/A'}
-                            </Text>
+                            </Text><br/>
                             <Text className="text-sm text-copy-light mt-1">
                               ID: {item.product_id ?? 'N/A'}
                             </Text>
@@ -693,17 +700,17 @@ export const AdminOrderDetail = () => {
               <div className="px-6 py-4 bg-surface-light border-t border-border-light">
                 <div className="grid grid-cols-3 gap-4 text-right">
                   <div>
-                    <Text className="text-sm text-copy-light mb-1">Total Items</Text>
+                    <Text className="text-sm text-copy-light mb-1">Total Items</Text>{" "}
                     <Text className="text-base font-semibold text-copy">{order.items.reduce((sum, item) => sum + (item.quantity || 0), 0)}</Text>
                   </div>
                   <div>
-                    <Text className="text-sm text-copy-light mb-1">Total Cost</Text>
+                    <Text className="text-sm text-copy-light mb-1">Total Cost</Text>{" "}
                     <Text className="text-base font-semibold text-copy">
                       {formatCurrency(order.items.reduce((sum, item) => sum + (Number(item.total_price) || 0), 0))}
                     </Text>
                   </div>
                   <div>
-                    <Text className="text-sm text-copy-light mb-1">Average Price</Text>
+                    <Text className="text-sm text-copy-light mb-1">Average Price</Text>{" "}
                     <Text className="text-base font-semibold text-copy">
                       {formatCurrency(
                         (order.items.reduce((sum, item) => sum + (Number(item.total_price) || 0), 0)) /
@@ -724,7 +731,7 @@ export const AdminOrderDetail = () => {
             <div className="bg-surface rounded-lg border border-border-light p-6">
               <div className="flex items-center gap-2 mb-4">
                 <MapPin className="w-5 h-5 text-primary" />
-                <Heading level={5} className="text-base font-semibold text-copy">Billing Address</Heading>
+                <Heading level={5} weight={"light"}>Billing Address</Heading>
               </div>
               {order.billing_address ? (
                 <div className="space-y-2 text-sm text-copy">
@@ -746,7 +753,7 @@ export const AdminOrderDetail = () => {
             <div className="bg-surface rounded-lg border border-border-light p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Truck className="w-5 h-5 text-primary" />
-                <Heading level={5} className="text-base font-semibold text-copy">Shipping Address</Heading>
+                <Heading level={5} weight={'light'}>Shipping Address</Heading>
               </div>
               {order.shipping_address ? (
                 <div className="space-y-2 text-sm text-copy">
@@ -769,19 +776,19 @@ export const AdminOrderDetail = () => {
               <Heading level={5} className="text-base font-semibold text-copy mb-4">Shipping Details</Heading>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <Text className="text-sm text-copy-light">Method</Text>
+                  <Text className="text-sm text-copy-light">Method</Text><br/>
                   <Text className="text-copy font-semibold">{order.shipping_method || 'N/A'}</Text>
                 </div>
                 <div>
-                  <Text className="text-sm text-copy-light">Cost</Text>
+                  <Text className="text-sm text-copy-light">Cost</Text><br/>
                   <Text className="text-copy font-semibold">{formatCurrency(order.shipping_cost)}</Text>
                 </div>
                 <div>
-                  <Text className="text-sm text-copy-light">Tracking Number</Text>
+                  <Text className="text-sm text-copy-light">Tracking Number</Text><br/>
                   <Text className="text-copy font-mono">{order.tracking_number || 'N/A'}</Text>
                 </div>
                 <div>
-                  <Text className="text-sm text-copy-light">Carrier</Text>
+                  <Text className="text-sm text-copy-light">Carrier</Text><br/>
                   <Text className="text-copy font-semibold">{order.carrier || 'N/A'}</Text>
                 </div>
               </div>
@@ -794,16 +801,16 @@ export const AdminOrderDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Customer Notes */}
             <div className="bg-surface rounded-lg border border-border-light p-6">
-              <Heading level={5} className="text-base font-semibold text-copy mb-4">Customer Notes</Heading>
-              <Body className="text-copy whitespace-pre-wrap">
+              <Heading level={5} weight={"light"} className="mb-4">Customer Notes</Heading>
+              <Body className="text-xs text-copy whitespace-pre-wrap">
                 {order.customer_notes || '(No customer notes)'}
               </Body>
             </div>
 
             {/* Internal Notes */}
             <div className="bg-surface rounded-lg border border-border-light p-6">
-              <Heading level={5} className="text-base font-semibold text-copy mb-4">Internal Notes</Heading>
-              <Body className="text-copy whitespace-pre-wrap">
+              <Heading level={5} weight={"light"} className="mb-4">Internal Notes</Heading>
+              <Body className="text-xs text-copy whitespace-pre-wrap">
                 {order.internal_notes || '(No internal notes)'}
               </Body>
             </div>

@@ -167,26 +167,17 @@ async def update_cart_item(
 async def remove_from_cart(
     cart_item_id: UUID,
     req: Request,
-    response: FastAPIResponse,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Remove item from cart by cart_item_id"""
     try:
         cart_service = CartService(db)
         
-        if current_user:
-            cart = await cart_service.remove_from_cart_by_item_id(
-                user_id=current_user.id,
-                cart_item_id=cart_item_id
-            )
-        else:
-            guest_cart_id = get_or_create_guest_cart_id(req, response)
-            cart = await cart_service.remove_from_cart_by_item_id(
-                user_id=None,
-                cart_item_id=cart_item_id,
-                session_id=guest_cart_id
-            )
+        cart = await cart_service.remove_from_cart_by_item_id(
+            user_id=current_user.id,
+            cart_item_id=cart_item_id
+        )
         
         return Response(success=True, data=cart, message="Item removed from cart")
     except HTTPException as e:
@@ -202,16 +193,15 @@ async def remove_from_cart(
 async def apply_promocode(
     request: ApplyPromocodeRequest,
     req: Request,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(req) if not current_user else None
         result = await cart_service.apply_promocode(
-            user_id=current_user.id if current_user else None,
+            user_id=current_user.id,
             code=request.code,
-            session_id=session_id
+            session_id=None
         )
         return Response(success=True, data=result)
     except Exception as e:
@@ -222,15 +212,14 @@ async def apply_promocode(
 @router.delete("/promocode")
 async def remove_promocode(
     request: Request,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(request) if not current_user else None
         result = await cart_service.remove_promocode(
-            user_id=current_user.id if current_user else None,
-            session_id=session_id
+            user_id=current_user.id,
+            session_id=None
         )
         return Response(success=True, data=result)
     except Exception:
@@ -241,15 +230,14 @@ async def remove_promocode(
 @router.get("/count")
 async def get_cart_item_count(
     request: Request,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(request) if not current_user else None
         count = await cart_service.get_cart_item_count(
-            user_id=current_user.id if current_user else None,
-            session_id=session_id
+            user_id=current_user.id,
+            session_id=None
         )
         return Response(success=True, data=count)
     except Exception:
@@ -330,16 +318,15 @@ async def validate_cart(
 async def get_shipping_options(
     address: dict,
     request: Request,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(request) if not current_user else None
         result = await cart_service.get_shipping_options(
-            user_id=current_user.id if current_user else None,
+            user_id=current_user.id,
             address=address,
-            session_id=session_id
+            session_id=None
         )
         return Response(success=True, data=result)
     except Exception as e:
@@ -351,16 +338,15 @@ async def get_shipping_options(
 async def calculate_totals(
     data: dict,
     request: Request,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(request) if not current_user else None
         result = await cart_service.calculate_totals(
-            user_id=current_user.id if current_user else None,
+            user_id=current_user.id,
             data=data,
-            session_id=session_id
+            session_id=None
         )
         return Response(success=True, data=result)
     except Exception as e:
@@ -372,16 +358,15 @@ async def calculate_totals(
 @router.post("/clear")
 async def clear_cart(
     request: Request,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Clear all items from the cart"""
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(request) if not current_user else None
         result = await cart_service.clear_cart(
-            user_id=current_user.id if current_user else None,
-            session_id=session_id
+            user_id=current_user.id,
+            session_id=None
         )
         return Response(success=True, data=result, message="Cart cleared successfully")
     except Exception as e:
@@ -391,63 +376,17 @@ async def clear_cart(
         )
 
 
-@router.post("/merge")
-async def merge_cart(
-    request: Request,
-    response: FastAPIResponse,
-    current_user: User = Depends(get_current_auth_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    Merge guest cart with user cart when user logs in (Amazon-style).
-    This should be called immediately after login.
-    """
-    try:
-        cart_service = CartService(db)
-        
-        # Get guest cart ID from cookie
-        guest_cart_id = request.cookies.get(CART_COOKIE_NAME)
-        
-        if guest_cart_id:
-            # Merge guest cart into user cart
-            result = await cart_service.merge_carts(current_user.id, guest_cart_id)
-            
-            # Clear the guest cart cookie since it's now merged
-            response.delete_cookie(key=CART_COOKIE_NAME)
-            
-            return Response(
-                success=True, 
-                data=result, 
-                message="Guest cart merged successfully"
-            )
-        else:
-            # No guest cart to merge, just return user cart
-            result = await cart_service.get_cart(user_id=current_user.id)
-            return Response(
-                success=True, 
-                data=result, 
-                message="No guest cart to merge"
-            )
-    except Exception as e:
-        logger.exception("Failed to merge cart")
-        raise APIException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message=f"Failed to merge cart: {e}"
-        )
-
-
 @router.get("/checkout-summary")
 async def get_checkout_summary(
     request: Request,
-    current_user: Optional[User] = Depends(get_current_auth_user),
+    current_user: User = Depends(get_current_auth_user),
     db: AsyncSession = Depends(get_db)
 ):
     try:
         cart_service = CartService(db)
-        session_id = get_session_id(request) if not current_user else None
         result = await cart_service.get_checkout_summary(
-            user_id=current_user.id if current_user else None,
-            session_id=session_id
+            user_id=current_user.id,
+            session_id=None
         )
         return Response(success=True, data=result)
     except Exception:
