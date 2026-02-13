@@ -6,7 +6,7 @@ from core.db import get_db
 from core.utils.response import Response
 from core.errors import APIException
 from core.logging import get_logger
-from schemas.product import ProductCreate, ProductUpdate, BarcodeGenerateRequest, BarcodeResponse, BarcodeUpdateRequest
+from schemas.product import ProductCreate, ProductUpdate
 from services.products import ProductService
 from services.search import SearchService
 from models.user import User
@@ -374,30 +374,6 @@ async def get_variant(
 
 
 @router.get("/variants/{variant_id}/qrcode")
-async def get_variant_qr_code(
-    variant_id: UUID,
-    db: AsyncSession = Depends(get_db)
-):
-    """Get QR code for a product variant."""
-    try:
-        product_service = ProductService(db)
-        qr_code_url = await product_service.generate_qr_code(variant_id)
-        if not qr_code_url:
-            raise APIException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                message="Product variant not found"
-            )
-        return Response.success(data={"qr_code_url": qr_code_url})
-    except APIException:
-        raise
-    except Exception as e:
-        raise APIException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to generate QR code - {str(e)}"
-        )
-
-
-@router.get("/variants/{variant_id}/qrcode")
 async def get_variant_qrcode(
     variant_id: UUID,
     db: AsyncSession = Depends(get_db)
@@ -418,104 +394,6 @@ async def get_variant_qrcode(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to generate QR code - {str(e)}"
-        )
-
-@router.get("/variants/{variant_id}/barcode")
-async def get_variant_barcode(
-    variant_id: UUID,
-    db: AsyncSession = Depends(get_db)
-):
-    """Get barcode for a product variant."""
-    try:
-        product_service = ProductService(db)
-        barcode_url = await product_service.generate_barcode(variant_id)
-        if not barcode_url:
-            raise APIException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                message="Product variant not found"
-            )
-        return Response.success(data={"barcode_url": barcode_url})
-    except APIException:
-        raise
-    except Exception as e:
-        raise APIException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to generate barcode - {str(e)}"
-        )
-
-
-@router.post("/variants/{variant_id}/codes/generate")
-async def generate_variant_codes(
-    variant_id: UUID,
-    current_user: User = Depends(get_current_auth_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Generate both barcode and QR code for a product variant."""
-    try:
-        if current_user.role not in ["Supplier", "Admin"]:
-            raise APIException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message="Only suppliers and admins can generate codes"
-            )
-
-        product_service = ProductService(db)
-        codes = await product_service.generate_variant_codes(variant_id)
-        
-        return Response(
-            success=True, 
-            data={
-                "variant_id": variant_id,
-                "barcode": codes["barcode"],
-                "qr_code": codes["qr_code"]
-            },
-            message="Codes generated successfully"
-        )
-    except APIException:
-        raise
-    except Exception as e:
-        raise APIException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to generate codes - {str(e)}"
-        )
-
-
-@router.put("/variants/{variant_id}/codes")
-async def update_variant_codes(
-    variant_id: UUID,
-    codes_data: BarcodeUpdateRequest,
-    current_user: User = Depends(get_current_auth_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Update barcode and/or QR code for a product variant."""
-    try:
-        if current_user.role not in ["Supplier", "Admin"]:
-            raise APIException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message="Only suppliers and admins can update codes"
-            )
-
-        product_service = ProductService(db)
-        codes = await product_service.update_variant_codes(
-            variant_id, 
-            codes_data.barcode, 
-            codes_data.qr_code
-        )
-        
-        return Response(
-            success=True, 
-            data={
-                "variant_id": variant_id,
-                "barcode": codes["barcode"],
-                "qr_code": codes["qr_code"]
-            },
-            message="Codes updated successfully"
-        )
-    except APIException:
-        raise
-    except Exception as e:
-        raise APIException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to update codes - {str(e)}"
         )
 
 
