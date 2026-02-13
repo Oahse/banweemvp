@@ -184,14 +184,14 @@ async def process_subscription_renewal_task(ctx: Dict[str, Any], subscription_id
 async def process_subscription_orders_task(ctx: Dict[str, Any]) -> str:
     """Process all due subscription orders"""
     try:
-        from services.subscriptions.subscription_scheduler import SubscriptionSchedulerService
+        from services.subscriptions.scheduler import SubscriptionScheduler
         
         factory = _get_session_factory(ctx)
         if not factory:
             raise RuntimeError('Database session factory not available in ARQ context')
 
         async with factory() as db:
-            scheduler = SubscriptionSchedulerService(db)
+            scheduler = SubscriptionScheduler(db)
             result = await scheduler.process_due_subscriptions()
             
             # Send order confirmation emails for successful orders
