@@ -2,7 +2,7 @@
 .env
 backend/.env
 frontend/.env
-
+commingsoon/
 # Python
 __pycache__/
 *.py[cod]

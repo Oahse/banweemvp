@@ -3,11 +3,11 @@ from .service import (
 )
 
 from .scheduler import (
-    PromocodeScheduler
+    PromoCodeScheduler
 )
 
 __all__ = [
     # Core classes
     'PromocodeService',
-    'PromocodeScheduler'
+    'PromoCodeScheduler'
 ]

@@ -9,5 +9,5 @@ from .scheduler import (
 __all__ = [
     # Core classes
     'SubscriptionService',
-    'SubscriptionScheduler
+    'SubscriptionScheduler'
 ]

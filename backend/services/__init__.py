@@ -13,7 +13,6 @@ from .tax import TaxService
 from .user import UserService, AddressService
 from .tracking import VariantTrackingService
 from .wishlist import WishlistService
-from .barcode import BarcodeService
 
 # Consolidated services - single source of truth
 from .orders import OrderService
@@ -31,7 +30,7 @@ __all__ = [
     "AuthService",
     "CartService",
     "EmailService",
-    "LoyaltyService",
+    # "LoyaltyService",  # TODO: Implement loyalty service
     "ProductService",
     "PromocodeService",
     "ReviewService",
@@ -42,7 +41,7 @@ __all__ = [
     "AddressService",
     "VariantTrackingService",
     "WishlistService",
-    "BarcodeService",
+    # "BarcodeService",  # TODO: Implement barcode service
     
     # Consolidated services
     "OrderService",

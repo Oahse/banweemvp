@@ -204,11 +204,10 @@ async def send_email_mailjet_legacy(
         "activation": "📧 Verify Your Email Address - Banwee",
         "email_change": "📧 Email Change Confirmation",
         "password_reset": "🔐 Reset Your Password - Banwee",
-        "login_alert": "� Login Alert - Banwee",r
+        "login_alert": "🔔 Login Alert - Banwee",
         "profile_update": "✅ Profile Update Confirmation",
-        "unsubscribe_confirmation": "👋 Unsubscribe Confirmation",
-        "subscription_renewal": "� Subscription Renewal Confirmation",
-        "subscription_shipment": "� Subscription Shipment Update",o
+        "subscription_renewal": "🔄 Subscription Renewal Confirmation",
+        "subscription_shipment": "📦 Subscription Shipment Update",
 
         # Marketing
         "newsletter": "📰 Latest News & Offers from Banwee",

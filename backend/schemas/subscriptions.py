@@ -47,6 +47,43 @@ class UpdateSubscription(BaseModel):
     variant_quantities: Optional[Dict[str, int]] = None
 
 
+class SubscriptionCostCalculationRequest(BaseModel):
+    """Request to calculate subscription cost"""
+    variant_ids: List[str]
+    variant_quantities: Optional[Dict[str, int]] = {}
+    delivery_type: str = "standard"
+    delivery_address_id: Optional[UUID] = None
+    currency: str = "USD"
+
+
+class SubscriptionAddProducts(BaseModel):
+    """Add products to subscription"""
+    variant_ids: List[str]
+    variant_quantities: Optional[Dict[str, int]] = {}
+
+
+class SubscriptionRemoveProducts(BaseModel):
+    """Remove products from subscription"""
+    variant_ids: List[str]
+
+
+class SubscriptionUpdateQuantity(BaseModel):
+    """Update variant quantity in subscription"""
+    variant_id: str
+    quantity: int = Field(gt=0, description="New quantity (must be greater than 0)")
+
+
+class SubscriptionQuantityChange(BaseModel):
+    """Change variant quantity (increment/decrement)"""
+    variant_id: str
+    change: int = Field(description="Quantity change (positive to add, negative to subtract)")
+
+
+class DiscountApplicationRequest(BaseModel):
+    """Apply discount to subscription"""
+    discount_code: str
+
+
 class SubscriptionResponse(BaseModel):
     """Subscription response"""
     id: str
