@@ -35,6 +35,7 @@ __all__ = [
     "orders_router",
     "payments_router",
     "products_router",
+    "promocodes_router",
     "refunds_router",
     "review_router",
     "search_router",

@@ -34,6 +34,7 @@ from api import (
     orders_router,
     payments_router,
     products_router,
+    promocodes_router,
     refunds_router,
     review_router,
     search_router,
@@ -167,6 +168,7 @@ v1_router.include_router(oauth_router)
 v1_router.include_router(subscriptions_router)
 v1_router.include_router(review_router)
 v1_router.include_router(payments_router)
+v1_router.include_router(promocodes_router)
 v1_router.include_router(wishlist_router)
 v1_router.include_router(health_router)
 v1_router.include_router(search_router)

@@ -409,30 +409,16 @@ class ProductService:
         return [self._convert_product_to_response(product) for product in products]
 
     async def get_recommended_products(self, product_id: UUID, limit: int = 4) -> List[ProductResponse]:
-        """Get recommended products based on a product."""
-        # Get the product first
-        product_query = select(Product).where(Product.id == product_id)
-        product_result = await self.db.execute(product_query)
-        product = product_result.scalar_one_or_none()
-
-        if not product:
-            return []
-
-        # Get products from the same category
-        query = select(Product).options(
-            selectinload(Product.category),
-            selectinload(Product.supplier),
-            selectinload(Product.variants).selectinload(ProductVariant.images),
-            selectinload(Product.variants).selectinload(ProductVariant.inventory)
-        ).where(
-            and_(Product.category_id == product.category_id,
-                 Product.id != product_id)
-        ).limit(limit)
-
-        result = await self.db.execute(query)
-        products = result.scalars().all()
-
-        return [self._convert_product_to_response(product) for product in products]
+        """
+        Get smart product recommendations using multiple algorithms:
+        - Complementary (cross-sell): Products frequently bought together
+        - Similar (alternative): Same category, similar price range
+        - Behavioral (social proof): Popular based on orders and reviews
+        """
+        from services.products.recommendations import RecommendationService
+        
+        recommendation_service = RecommendationService(self.db)
+        return await recommendation_service.get_smart_recommendations(product_id, limit)
 
     async def get_categories(self) -> List[CategoryResponse]:
         """Get all categories with their product counts."""

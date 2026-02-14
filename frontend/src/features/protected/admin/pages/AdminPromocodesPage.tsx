@@ -310,6 +310,19 @@ const AdminPromocodesPage: React.FC = () => {
             </div>
           </div>
 
+          <div>
+            <Label htmlFor="maximum_discount_amount">Maximum Discount Amount ($)</Label>
+            <Input
+              id="maximum_discount_amount"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.maximum_discount_amount || ''}
+              onChange={(e) => setFormData({ ...formData, maximum_discount_amount: parseFloat(e.target.value) || undefined })}
+              placeholder="Optional cap on discount"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="minimum_order_amount">Minimum Order Amount ($)</Label>
@@ -320,6 +333,7 @@ const AdminPromocodesPage: React.FC = () => {
                 min="0"
                 value={formData.minimum_order_amount || ''}
                 onChange={(e) => setFormData({ ...formData, minimum_order_amount: parseFloat(e.target.value) || undefined })}
+                placeholder="Optional minimum"
               />
             </div>
 
@@ -331,6 +345,7 @@ const AdminPromocodesPage: React.FC = () => {
                 min="1"
                 value={formData.usage_limit || ''}
                 onChange={(e) => setFormData({ ...formData, usage_limit: parseInt(e.target.value) || undefined })}
+                placeholder="Optional limit"
               />
             </div>
           </div>

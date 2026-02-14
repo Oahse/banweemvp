@@ -254,9 +254,6 @@ async def get_products(
             message=f"Failed to fetch products {str(e)}"
         )
 
-
-
-
 @router.get("/categories")
 async def get_categories(
     q: Optional[str] = Query(None, description="Search query for category name"),
@@ -426,46 +423,6 @@ async def get_supplier_products(
         raise APIException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=f"Failed to fetch supplier products: {str(e)}"
-        )
-
-
-@router.get("/featured")
-async def get_featured_products(
-    limit: int = Query(10, ge=1, le=50, description="Maximum number of featured products"),
-    db: AsyncSession = Depends(get_db)
-):
-    """Get featured products"""
-    try:
-        products = await product_service.get_products(
-            page=1,
-            limit=limit,
-            filters={"featured": True}
-        )
-        return Response.success(data=products["data"])
-    except Exception as e:
-        raise APIException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to fetch featured products: {str(e)}"
-        )
-
-
-@router.get("/popular")
-async def get_popular_products(
-    limit: int = Query(10, ge=1, le=50, description="Maximum number of popular products"),
-    db: AsyncSession = Depends(get_db)
-):
-    """Get popular products"""
-    try:
-        products = await product_service.get_products(
-            page=1,
-            limit=limit,
-            filters={"popular": True}
-        )
-        return Response.success(data=products["data"])
-    except Exception as e:
-        raise APIException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message=f"Failed to fetch popular products: {str(e)}"
         )
 
 

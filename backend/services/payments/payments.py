@@ -21,27 +21,6 @@ import json
 import logging
 import time
 
-# Ensure compatibility with Stripe library code that expects a global `uuid7`
-# Some Stripe versions mistakenly call `uuid7()` without importing it. Provide
-# a safe shim and inject it into stripe._api_requestor so requests work.
-try:
-    # Prefer a real uuid7 if available (Python 3.11+ may provide uuid.uuid7)
-    from uuid import uuid7 as _native_uuid7  # type: ignore
-    def _uuid7():
-        return _native_uuid7()
-except Exception:
-    import uuid as _uuid
-    def _uuid7():
-        # Fallback: use uuid4 for uniqueness when uuid7 is not available
-        return _uuid.uuid4()
-
-try:
-    # Inject into stripe's api_requestor module namespace if present
-    import stripe._api_requestor as _stripe_api_requestor  # type: ignore
-    setattr(_stripe_api_requestor, "uuid7", _uuid7)
-except Exception:
-    # If injection fails, we'll still rely on explicit idempotency keys
-    pass
 # Configure Stripe
 stripe.api_key = getattr(settings, 'STRIPE_SECRET_KEY', '')
 
