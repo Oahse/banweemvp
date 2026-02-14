@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, CheckCircle, RefreshCw } from 'lucide-react';
@@ -41,18 +41,19 @@ export const VerifyEmailPending = () => {
   const handleResendEmail = async () => {
     setResending(true);
     try {
-      // TODO: Implement resend verification email endpoint
       const response = await fetch('/v1/auth/resend-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         setResent(true);
-        toast.success('Verification email resent successfully!');
+        toast.success(data.message || 'Verification email resent successfully!');
       } else {
-        toast.error('Failed to resend verification email. Please try again.');
+        toast.error(data.message || 'Failed to resend verification email. Please try again.');
       }
     } catch (error) {
       toast.error('An error occurred. Please try again later.');

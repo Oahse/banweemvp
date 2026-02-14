@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, status, BackgroundTasks, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from typing import List
 from core.db import get_db
 from core.utils.response import Response as APIResponse
 from core.errors import APIException
 from core.config import settings
 from core.logging import get_logger
-from schemas.auth import UserCreate, UserLogin, RefreshTokenRequest
+from schemas.auth import UserCreate, UserLogin, RefreshTokenRequest, ResendVerificationRequest, ForgotPasswordRequest, ResetPasswordRequest
 from schemas.user import AddressCreate, AddressUpdate, AddressResponse
 from services.auth import AuthService
 from services.user import UserService, AddressService
@@ -268,16 +269,87 @@ async def verify_email(
         )
 
 
+@router.post("/resend-verification")
+async def resend_verification_email(
+    request: ResendVerificationRequest,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Resend verification email to user.
+    
+    - Finds user by email
+    - Checks if already verified
+    - Generates new verification token
+    - Sends new verification email
+    
+    Returns success even if email doesn't exist (security)
+    """
+    try:
+        from datetime import datetime, timedelta
+        import secrets
+        
+        # Find user by email
+        result = await db.execute(
+            select(User).where(User.email == request.email.lower())
+        )
+        user = result.scalar_one_or_none()
+        
+        # Always return success for security (don't reveal if email exists)
+        if not user:
+            return APIResponse(
+                success=True,
+                message="If the email exists, a new verification link has been sent."
+            )
+        
+        # Check if user is already verified
+        if user.verified:
+            return APIResponse(
+                success=True,
+                message="This email is already verified. You can login now."
+            )
+        
+        # Generate new verification token
+        new_token = secrets.token_urlsafe(32)
+        new_expiration = datetime.now() + timedelta(hours=24)
+        
+        # Update user with new token
+        user.verification_token = new_token
+        user.token_expiration = new_expiration
+        await db.commit()
+        
+        # Send new verification email
+        user_service = UserService(db)
+        background_tasks.add_task(
+            user_service.send_verification_email,
+            user,
+            new_token
+        )
+        
+        return APIResponse(
+            success=True,
+            message="A new verification link has been sent to your email."
+        )
+        
+    except Exception as e:
+        # Log error but return generic success message for security
+        logger.error(f"Error resending verification email: {e}")
+        return APIResponse(
+            success=True,
+            message="If the email exists, a new verification link has been sent."
+        )
+
+
 @router.post("/forgot-password")
 async def forgot_password(
-    email: str,
+    request: ForgotPasswordRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
 ):
     """Send password reset email."""
     try:
         auth_service = AuthService(db)
-        await auth_service.send_password_reset(email, background_tasks)
+        await auth_service.send_password_reset(request.email, background_tasks)
         return APIResponse(success=True, message="Password reset email sent")
     except Exception as e:
         # Always return success for security
@@ -286,14 +358,13 @@ async def forgot_password(
 
 @router.post("/reset-password")
 async def reset_password(
-    token: str,
-    new_password: str,
+    request: ResetPasswordRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """Reset password with token."""
     try:
         auth_service = AuthService(db)
-        await auth_service.reset_password(token, new_password)
+        await auth_service.reset_password(request.token, request.new_password)
         return APIResponse(success=True, message="Password reset successfully")
     except Exception as e:
         raise APIException(

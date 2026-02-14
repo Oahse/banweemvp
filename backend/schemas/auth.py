@@ -45,3 +45,16 @@ class AuthResponse(BaseModel):
     refresh_token: Optional[str] = None
     expires_in: int
     user: UserResponse
+
+
+class ResendVerificationRequest(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str

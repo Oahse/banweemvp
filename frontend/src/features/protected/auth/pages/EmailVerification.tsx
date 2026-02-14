@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle } from 'lucide-react';
@@ -122,7 +122,26 @@ export const EmailVerification = () => {
             exit={{ opacity: 0 }}
           >
             <XCircle size={48} className="mx-auto text-red-500" />
+            <Heading level={6} className="text-lg font-semibold text-main">
+              Verification Failed
+            </Heading>
             <Body className="text-sm text-red-600">{message}</Body>
+            
+            {/* Show resend option if token is expired */}
+            {message.toLowerCase().includes('expired') && (
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <Text className="text-sm text-yellow-800 mb-2">
+                  Your verification link has expired. Request a new one to verify your account.
+                </Text>
+                <Link 
+                  to="/verify-email-pending" 
+                  className="inline-block w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md transition-colors text-sm mt-2"
+                >
+                  Request New Verification Link
+                </Link>
+              </div>
+            )}
+            
             <Link 
               to="/login" 
               className="inline-block text-primary hover:underline text-sm mt-2"
