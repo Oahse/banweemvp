@@ -29,7 +29,6 @@ from api import (
     categories_router,
     health_router,
     inventory_router,
-    loyalty_router,
     oauth_router,
     orders_router,
     payments_router,
@@ -173,7 +172,6 @@ v1_router.include_router(wishlist_router)
 v1_router.include_router(health_router)
 v1_router.include_router(search_router)
 v1_router.include_router(inventory_router)
-v1_router.include_router(loyalty_router)
 v1_router.include_router(analytics_router)
 v1_router.include_router(refunds_router)
 v1_router.include_router(shipping_router)

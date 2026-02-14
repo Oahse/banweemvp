@@ -30,7 +30,6 @@ __all__ = [
     "categories_router",
     "health_router",
     "inventory_router",
-    "loyalty_router",
     "oauth_router",
     "orders_router",
     "payments_router",
