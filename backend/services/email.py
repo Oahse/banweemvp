@@ -139,8 +139,8 @@ class EmailService:
         
         html_content = await self.render_email_with_template("account/password_reset.html", context)
         
-        from core.utils.messages.email import send_email_mailgun
-        await send_email_mailgun(
+        from core.utils.messages.email import send_email_mailjet
+        await send_email_mailjet(
             to_email=recipient_email,
             subject="Reset Your Password",
             html_content=html_content
@@ -178,8 +178,8 @@ class EmailService:
         
         html_content = await self.render_email_with_template("purchase/shipping_update.html", context)
         
-        from core.utils.messages.email import send_email_mailgun
-        await send_email_mailgun(
+        from core.utils.messages.email import send_email_mailjet
+        await send_email_mailjet(
             to_email=recipient_email,
             subject=f"Your Order {order_number} Has Shipped!",
             html_content=html_content
@@ -211,8 +211,8 @@ class EmailService:
         
         html_content = await self.render_email_with_template("system/low_stock_alert.html", context)
         
-        from core.utils.messages.email import send_email_mailgun
-        await send_email_mailgun(
+        from core.utils.messages.email import send_email_mailjet
+        await send_email_mailjet(
             to_email=recipient_email,
             subject=f"Low Stock Alert: {product_name}",
             html_content=html_content
@@ -257,8 +257,8 @@ class EmailService:
         
         html_content = await self.render_email_with_template("purchase/order_delivered.html", context)
         
-        from core.utils.messages.email import send_email_mailgun
-        await send_email_mailgun(
+        from core.utils.messages.email import send_email_mailjet
+        await send_email_mailjet(
             to_email=recipient_email,
             subject=f"Your Order {order_number} Has Been Delivered!",
             html_content=html_content
@@ -306,8 +306,8 @@ class EmailService:
         
         html_content = await self.render_email_with_template("system/subscription_payment_failed.html", context)
         
-        from core.utils.messages.email import send_email_mailgun
-        await send_email_mailgun(
+        from core.utils.messages.email import send_email_mailjet
+        await send_email_mailjet(
             to_email=user_email,
             subject=subject,
             html_content=html_content

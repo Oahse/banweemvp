@@ -97,7 +97,13 @@ export const EmailVerification = () => {
             exit={{ opacity: 0 }}
           >
             <CheckCircle size={48} className="mx-auto text-green-500" />
+            <Heading level={6} className="text-lg font-semibold text-main">
+              Email Verified Successfully!
+            </Heading>
             <Body className="text-sm text-copy">{message}</Body>
+            <Body className="text-sm text-copy-light">
+              Your account is now active. You can login to start shopping!
+            </Body>
             <Link 
               to="/login" 
               className="inline-block w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-md transition-colors text-sm mt-3"

@@ -54,60 +54,10 @@ export const Register = () => {
   const [loading, setLoading] = useState(false);
 
   // Auth context for registration and authentication status
-  const { register, isAuthenticated, isAdmin, isSupplier, intendedDestination, setIntendedDestination } = useAuth();
+  const { register, isLoading: authLoading } = useAuth();
   // React Router hooks for navigation and location
   const navigate = useNavigate();
   const location = useLocation();
-
-  /**
-   * Effect hook to redirect authenticated users.
-   * If a user is already logged in, they are redirected based on their role
-   * or a 'redirect' parameter in the URL.
-   */
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Determines the appropriate redirect path after successful login/registration
-      const getRedirectPath = () => {
-        // First priority: Check if user was redirected from another page
-        if (location.state?.from?.pathname && location.state.from.pathname !== '/register') {
-          console.log('Redirecting back to:', location.state.from.pathname);
-          return location.state.from.pathname + (location.state.from.search || '');
-        }
-        
-        // Second priority: intended destination (from protected route)
-        if (intendedDestination && (intendedDestination as any).path !== '/register') {
-          const destination = intendedDestination as any;
-          // Always redirect back to the original page where the user was
-          // This allows them to continue their shopping experience
-          return destination.path;
-        }
-        
-        // Third priority: redirect query parameter
-        const params = new URLSearchParams(location.search);
-        const redirect = params.get('redirect');
-        if (redirect) return redirect;
-        
-        // Third priority: role-based default
-        if (isAdmin) return '/admin';
-        if (isSupplier) return '/account/products';
-        return '/';
-      };
-      const redirectPath = getRedirectPath();
-      
-      // Show success message based on intended action
-      if (intendedDestination && (intendedDestination as any).action === 'cart') {
-        toast.success('Registration successful! You can now add items to your cart.');
-      } else if (intendedDestination && (intendedDestination as any).action === 'wishlist') {
-        toast.success('Registration successful! You can now add items to your wishlist.');
-      }
-      
-      navigate(redirectPath);
-      // Clear intended destination after navigation
-      if (intendedDestination) {
-        setIntendedDestination(null);
-      }
-    }
-  }, [isAuthenticated, navigate, location.search, isAdmin, isSupplier, intendedDestination, setIntendedDestination]);
 
   /**
    * Handles the form submission for user registration.
@@ -172,7 +122,14 @@ export const Register = () => {
         email.toLowerCase().trim(),
         password
       );
-      toast.success('Registration successful! Welcome to Banwee Organics.');
+      
+      // Redirect to verify email pending page
+      navigate('/verify-email-pending', { 
+        state: { email: email.toLowerCase().trim() },
+        replace: true 
+      });
+      
+      toast.success('Registration successful! Please check your email to verify your account.');
       // Navigation to dashboard/home is handled by the useEffect hook based on authentication status
     } catch (error: any) {
       // Display specific error message if available

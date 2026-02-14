@@ -138,18 +138,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = useCallback(async (firstname: string, lastname: string, email: string, password: string, phone?: string): Promise<void> => {
     setIsLoading(true);
     try {
-      // Set remember me to true by default for new registrations
-      TokenManager.setRememberMe(true);
-      
       const response = await AuthAPI.register({ firstname, lastname, email, password, phone });
 
-      // Save tokens if provided by backend (TokenManager expects tokens directly in response.data)
-      TokenManager.setTokens(response.data);
-
-      const transformedUser = transformUser(response.data.user);
-      setUser(transformedUser);
-      setIsAuthenticated(true);
-      toast.success('Registration successful!');
+      // Don't auto-login after registration - user needs to verify email first
+      // Just return success - the Register component will handle navigation
+      console.log('Registration successful:', response.data);
     } catch (error) {
       console.error('Registration error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Registration failed';

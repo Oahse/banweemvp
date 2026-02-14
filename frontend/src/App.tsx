@@ -46,6 +46,7 @@ const Contact = lazy(() => import('@/features/public/support/pages/Contact'));
 const TermsAndConditions = lazy(() => import('@/features/public/marketing/TermsAndConditions'));
 const PrivacyPolicy = lazy(() => import('@/features/public/marketing/PrivacyPolicy'));
 const EmailVerification = lazy(() => import('@/features/protected/auth/pages/EmailVerification'));
+const VerifyEmailPending = lazy(() => import('@/features/protected/auth/pages/VerifyEmailPending'));
 const ResetPassword = lazy(() => import('@/features/protected/auth/pages/ResetPassword'));
 const TrackOrder = lazy(() => import('@/features/protected/account/pages/AccountTrackOrderPage'));
 const FAQ = lazy(() => import('@/features/public/marketing/FAQ'));
@@ -141,6 +142,7 @@ export const App: React.FC = () => {
                         <Route path="/account/*" element={<ProtectedRoute><Layout><Suspense fallback={<AccountSkeleton />}><Account /></Suspense></Layout></ProtectedRoute>} />
                         <Route path="/login" element={<Layout><Login /></Layout>} />
                         <Route path="/register" element={<Layout><Register /></Layout>} />
+                        <Route path="/verify-email-pending" element={<Layout><VerifyEmailPending /></Layout>} />
                         <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
                         <Route path="/track-order" element={<Layout><TrackOrder /></Layout>} />
                         <Route path="/suppliers" element={<Layout><Suspense fallback={<ProductListSkeleton />}><Suppliers /></Suspense></Layout>} />

@@ -278,8 +278,8 @@ class UserService:
 
     async def send_verification_email(self, user: User, token: str):
         """Sends a verification email using the send_email service."""
-        if not settings.MAILGUN_API_KEY or not settings.MAILGUN_DOMAIN:
-            print("Mailgun API key or domain not configured. Skipping email sending.")
+        if not settings.MAILJET_API_KEY or not settings.MAILJET_API_SECRET:
+            print("Mailjet API key or secret not configured. Skipping email sending.")
             return
 
         verification_link = f"{settings.FRONTEND_URL}/verify-email?token={token}"
@@ -293,7 +293,8 @@ class UserService:
         }
 
         try:
-            await send_email(
+            from core.utils.messages.email import send_email_mailjet_legacy
+            await send_email_mailjet_legacy(
                 to_email=user.email,
                 mail_type='activation',
                 context=context
@@ -302,6 +303,34 @@ class UserService:
         except Exception as e:
             print(
                 f"Failed to send verification email to {user.email}. Error: {e}")
+
+    async def send_welcome_email(self, user: User):
+        """Sends a welcome email after email verification."""
+        if not settings.MAILJET_API_KEY or not settings.MAILJET_API_SECRET:
+            print("Mailjet API key or secret not configured. Skipping email sending.")
+            return
+
+        context = {
+            "customer_name": user.firstname,
+            "user_name": f"{user.firstname} {user.lastname}",
+            "email": user.email,
+            "store_url": settings.FRONTEND_URL,
+            "company_name": "Banwee",
+            "support_email": "support@banwee.com",
+            "current_year": datetime.now().year,
+        }
+
+        try:
+            from core.utils.messages.email import send_email_mailjet_legacy
+            await send_email_mailjet_legacy(
+                to_email=user.email,
+                mail_type='welcome',
+                context=context
+            )
+            print(f"Welcome email sent to {user.email} successfully.")
+        except Exception as e:
+            print(
+                f"Failed to send welcome email to {user.email}. Error: {e}")
 
     async def verify_email(self, token: str, background_tasks: BackgroundTasks):
         """Verify user email with token and send welcome email."""
