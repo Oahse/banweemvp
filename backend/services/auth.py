@@ -7,6 +7,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 import secrets
+import logging
 from core.utils.uuid_utils import uuid7
 from core.config import settings
 from models.user import User
@@ -15,6 +16,8 @@ from services.user import UserService
 from core.db import get_db
 from core.utils.messages.email import send_email
 from core.utils.encryption import PasswordManager
+
+logger = logging.getLogger(__name__)
 
 
 class AuthService:
@@ -347,28 +350,40 @@ class AuthService:
         user = await self.get_user_by_email(email)
         if not user:
             # Return silently for security (don't reveal if email exists)
-            print(f"Password reset requested for non-existent email: {email}")
+            logger.info(f"Password reset requested for non-existent email: {email}")
             return
         
         # Generate reset token (32 bytes = 43 characters in base64)
         reset_token = secrets.token_urlsafe(32)
         reset_link = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
         
-        # Store token in user record with expiration
+        # Store token in user record with expiration (1 hour)
         user.reset_token = reset_token
         user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
         await self.db.commit()
         
-        print(f"Password reset token generated for {email}")
+        logger.info(f"Password reset token generated for {email}")
         
-        # Queue password reset email via ARQ
-        from services.email import EmailQueue
-        EmailQueue.send_password_reset(
-            background_tasks,
-            user.email,
-            reset_token=reset_token,
-            reset_link=reset_link
-        )
+        # Send password reset email
+        context = {
+            "customer_name": user.firstname,
+            "reset_link": reset_link,
+            "expiry_time": "1 hour",
+            "company_name": "Banwee",
+            "current_year": datetime.now().year,
+        }
+        
+        try:
+            from core.utils.messages.email import send_email_mailjet_legacy
+            background_tasks.add_task(
+                send_email_mailjet_legacy,
+                to_email=user.email,
+                mail_type='password_reset',
+                context=context
+            )
+            logger.info(f"Password reset email queued for {user.email}")
+        except Exception as e:
+            logger.error(f"Failed to queue password reset email for {user.email}. Error: {e}")
 
     async def reset_password(self, token: str, new_password: str):
         """Reset password using reset token"""
@@ -379,6 +394,7 @@ class AuthService:
         user = result.scalar_one_or_none()
         
         if not user:
+            logger.warning(f"Password reset attempted with invalid token")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid or expired reset token"
@@ -386,9 +402,10 @@ class AuthService:
         
         # Check token expiration
         if not user.reset_token_expires or user.reset_token_expires < datetime.utcnow():
+            logger.warning(f"Password reset attempted with expired token for user {user.email}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Reset token has expired"
+                detail="Reset token has expired. Please request a new password reset link."
             )
         
         # Update password and clear reset token
@@ -397,4 +414,4 @@ class AuthService:
         user.reset_token_expires = None
         await self.db.commit()
         
-        print(f"Password reset successfully for user {user.email}")
+        logger.info(f"Password reset successfully for user {user.email}")

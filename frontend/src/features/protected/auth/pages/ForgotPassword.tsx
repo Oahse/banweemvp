@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail } from 'lucide-react';
+import { Mail, ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/Form';
 import { toast } from 'react-hot-toast';
 import { validation } from '@/utils/validation';
 import { AuthAPI } from '@/api';
 import { extractErrorMessage } from '@/utils/api-response';
 import { Button } from '@/components/ui/Button';
-import { Heading, Body } from '@/components/ui/Text/Text';
+import { Heading, Body, Text } from '@/components/ui/Text/Text';
 
 // Animation variants
 const containerVariants = {
@@ -35,6 +35,7 @@ const itemVariants = {
 export const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +53,8 @@ export const ForgotPassword = () => {
       // Call the forgot password API
       await AuthAPI.forgotPassword(email.toLowerCase().trim());
       
-      toast.success(`Password reset link sent! If an account with ${email} exists, you will receive a password reset link.`);
-      setEmail('');
+      // Navigate to confirmation page with email
+      navigate('/forgot-password-sent', { state: { email: email.toLowerCase().trim() } });
     } catch (error: any) {
       const errorMessage = extractErrorMessage(error);
       toast.error(errorMessage || 'Failed to send reset link. Please try again.');
@@ -70,14 +71,27 @@ export const ForgotPassword = () => {
       variants={containerVariants}
     >
       <motion.div 
-        className="max-w-md mx-auto bg-surface p-6 rounded-lg shadow-sm border border-border-light"
+        className="max-w-md mx-auto bg-surface p-8 rounded-lg shadow-sm border border-border-light"
         variants={itemVariants}
       >
-        <Heading level={5} className="text-xl font-bold text-main mb-4 text-center">Forgot Your Password?</Heading>
-        <Body className="text-sm text-copy-light text-center mb-4">
-          Enter your email address below and we'll send you a link to reset your password.
+        {/* Back to Login Link */}
+        <Link 
+          to="/login" 
+          className="inline-flex items-center text-sm text-copy-light hover:text-primary transition-colors mb-6"
+        >
+          <ArrowLeft size={16} className="mr-1" />
+          Back to Login
+        </Link>
+
+        <Heading level={5} className="text-2xl font-bold text-main mb-2 text-center">
+          Forgot Your Password?
+        </Heading>
+        
+        <Body className="text-sm text-copy-light text-center mb-6">
+          No worries! Enter your email address and we'll send you a link to reset your password.
         </Body>
-        <motion.form className="space-y-3" onSubmit={handleSubmit} variants={itemVariants}>
+
+        <motion.form className="space-y-4" onSubmit={handleSubmit} variants={itemVariants}>
           <Input
             label="Email Address"
             id="email"
@@ -88,6 +102,7 @@ export const ForgotPassword = () => {
             required
             prefix={<Mail size={16} />}
           />
+
           <Button
             type="submit"
             variant="primary"
@@ -98,9 +113,19 @@ export const ForgotPassword = () => {
             {loading ? 'Sending...' : 'Send Reset Link'}
           </Button>
         </motion.form>
-        <motion.p className="text-center mt-4 text-sm text-copy-light" variants={itemVariants}>
-          Remember your password? <Link to="/login" className="text-primary hover:underline">Login</Link>
-        </motion.p>
+
+        {/* Help Text */}
+        <motion.div 
+          className="mt-6 pt-6 border-t border-border-light text-center"
+          variants={itemVariants}
+        >
+          <Text className="text-xs text-copy-light">
+            Remember your password?{' '}
+            <Link to="/login" className="text-primary hover:underline font-medium">
+              Login here
+            </Link>
+          </Text>
+        </motion.div>
       </motion.div>
     </motion.div>
   );

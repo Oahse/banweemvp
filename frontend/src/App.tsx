@@ -40,6 +40,8 @@ const Checkout = lazy(() => import('@/features/protected/checkout/pages/Checkout
 const Account = lazy(() => import('@/features/protected/account/pages/Account'));
 const Login = lazy(() => import('@/features/protected/auth/pages/Login'));
 const ForgotPassword = lazy(() => import('@/features/protected/auth/pages/ForgotPassword'));
+const ForgotPasswordSent = lazy(() => import('@/features/protected/auth/pages/ForgotPasswordSent'));
+const ResetPassword = lazy(() => import('@/features/protected/auth/pages/ResetPassword'));
 const Register = lazy(() => import('@/features/protected/auth/pages/Register'));
 const About = lazy(() => import('@/features/public/marketing/About'));
 const Contact = lazy(() => import('@/features/public/support/pages/Contact'));
@@ -47,7 +49,6 @@ const TermsAndConditions = lazy(() => import('@/features/public/marketing/TermsA
 const PrivacyPolicy = lazy(() => import('@/features/public/marketing/PrivacyPolicy'));
 const EmailVerification = lazy(() => import('@/features/protected/auth/pages/EmailVerification'));
 const VerifyEmailPending = lazy(() => import('@/features/protected/auth/pages/VerifyEmailPending'));
-const ResetPassword = lazy(() => import('@/features/protected/auth/pages/ResetPassword'));
 const TrackOrder = lazy(() => import('@/features/protected/account/pages/AccountTrackOrderPage'));
 const FAQ = lazy(() => import('@/features/public/marketing/FAQ'));
 const AdminLayout = lazy(() => import('@/components/layout/AdminLayout'));
@@ -144,6 +145,8 @@ export const App: React.FC = () => {
                         <Route path="/register" element={<Layout><Register /></Layout>} />
                         <Route path="/verify-email-pending" element={<Layout><VerifyEmailPending /></Layout>} />
                         <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
+                        <Route path="/forgot-password-sent" element={<Layout><ForgotPasswordSent /></Layout>} />
+                        <Route path="/reset-password" element={<Layout><ResetPassword /></Layout>} />
                         <Route path="/track-order" element={<Layout><TrackOrder /></Layout>} />
                         <Route path="/suppliers" element={<Layout><Suspense fallback={<ProductListSkeleton />}><Suppliers /></Suspense></Layout>} />
                         <Route path="/suppliers/:id" element={<Layout><Suspense fallback={<PageSkeleton />}><SupplierDetail /></Suspense></Layout>} />
