@@ -1,5 +1,5 @@
 """
-Mailgun email service for sending emails
+Mailjet email service for sending emails
 """
 import aiohttp
 import asyncio
@@ -9,7 +9,8 @@ import os
 from pathlib import Path
 
 # Initialize Jinja environment directly to avoid circular imports
-template_dir = Path("templates")
+# Use absolute path from the backend directory
+template_dir = Path(__file__).parent / "templates"
 template_dir.mkdir(parents=True, exist_ok=True)
 
 env = Environment(
@@ -62,62 +63,91 @@ async def render_email(template_name: str, context: dict) -> str:
         raise RuntimeError(f"Template rendering error: {e}")
 
 
-async def send_email_mailgun(
+async def send_email_mailjet(
     to_email: str,
     subject: str = None,
     template_name: str = None,
-    context: dict = {}
+    context: dict = {},
+    html_content: str = None
 ):
     """
-    Send email using Mailgun API (async)
+    Send email using Mailjet API (async)
     
     Args:
         to_email: Recipient email address
         subject: Email subject line
-        template_name: Template file name (e.g., 'emails/welcome.html')
+        template_name: Template file name (e.g., 'account/welcome.html')
         context: Template context variables
+        html_content: Pre-rendered HTML content (alternative to template_name)
     """
     
-    if not template_name:
-        raise ValueError("template_name is required")
+    if not template_name and not html_content:
+        raise ValueError("Either template_name or html_content is required")
     
     if not subject:
         subject = "Notification from Banwee"
 
     try:
-        html_body = await render_email(template_name, context)
+        # Use pre-rendered HTML if provided, otherwise render template
+        if html_content:
+            html_body = html_content
+        else:
+            html_body = await render_email(template_name, context)
+        
         text_body = context.get("text_body", "This is a plain-text fallback.")
         
-        print(f'📤 Sending email via Mailgun to {to_email}...')
+        print(f'📤 Sending email via Mailjet to {to_email}...')
 
-        # Mailgun API endpoint
-        mailgun_url = f"https://api.mailgun.net/v3/{settings.MAILGUN_DOMAIN}/messages"
+        # Mailjet API endpoint (v3.1)
+        mailjet_url = "https://api.mailjet.com/v3.1/send"
         
-        # Prepare form data
-        data = {
-            "from": settings.MAILGUN_FROM_EMAIL,
-            "to": [to_email],
-            "subject": subject,
-            "html": html_body,
-            "text": text_body
+        # Parse from email
+        from_email = settings.MAILJET_FROM_EMAIL
+        if '<' in from_email and '>' in from_email:
+            # Format: "Name <email@domain.com>"
+            from_name = from_email.split('<')[0].strip()
+            from_address = from_email.split('<')[1].split('>')[0].strip()
+        else:
+            # Format: "email@domain.com"
+            from_name = "Banwee"
+            from_address = from_email
+        
+        # Prepare Mailjet payload (v3.1 format)
+        payload = {
+            "Messages": [
+                {
+                    "From": {
+                        "Email": from_address,
+                        "Name": from_name
+                    },
+                    "To": [
+                        {
+                            "Email": to_email
+                        }
+                    ],
+                    "Subject": subject,
+                    "TextPart": text_body,
+                    "HTMLPart": html_body
+                }
+            ]
         }
         
-        # Send async request to Mailgun
+        # Send async request to Mailjet
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                mailgun_url,
-                auth=aiohttp.BasicAuth("api", settings.MAILGUN_API_KEY),
-                data=data,
+                mailjet_url,
+                auth=aiohttp.BasicAuth(settings.MAILJET_API_KEY, settings.MAILJET_API_SECRET),
+                json=payload,
                 timeout=aiohttp.ClientTimeout(total=30)
             ) as response:
                 if response.status == 200:
                     result = await response.json()
-                    print(f"✅ Email sent successfully via Mailgun: {result}")
+                    print(f"✅ Email sent successfully via Mailjet: {result}")
                     return result
                 else:
                     error_text = await response.text()
-                    print(f"❌ Mailgun error ({response.status}): {error_text}")
-                    raise Exception(f"Mailgun API error: {error_text}")
+                    print(f"❌ Mailjet error ({response.status}): {error_text}")
+                    raise Exception(f"Mailjet API error: {error_text}")
 
     except asyncio.TimeoutError:
         print("❌ Request timed out.")
@@ -129,7 +159,7 @@ async def send_email_mailgun(
 
 
 # Legacy function for backward compatibility with old mail_type system
-async def send_email_mailgun_legacy(
+async def send_email_mailjet_legacy(
     to_email: str,
     mail_type: str,
     context: dict = {}
@@ -140,136 +170,146 @@ async def send_email_mailgun_legacy(
     
     subject_map = {
         # Pre-Purchase / Lead Nurturing
-        "store_launch": "Store Launch 🚀",
-        "waitlist_notification": "Back in Stock Alert!",
-        "product_launch": "New Product Launch 🚀",
-        "back_in_stock": "Your Favorite Item is Back!",
-        "cart_abandonment": "Forgot Something in Your Cart?",
-        "price_drop": "Price Drop Alert!",
-        "browse_abandonment": "Still Thinking About This?",
-        "wishlist_reminder": "A Wishlist Item is Waiting for You",
+        "store_launch": "🚀 Store Launch - Welcome to Banwee!",
+        "waitlist_notification": "✅ Back in Stock Alert!",
+        "product_launch": "🚀 New Product Launch - Check It Out!",
+        "back_in_stock": "🎉 Your Favorite Item is Back in Stock!",
+        "cart_abandonment": "🛒 Forgot Something in Your Cart?",
+        "price_drop": "💰 Price Drop Alert - Save Now!",
+        "browse_abandonment": "👀 Still Thinking About This?",
+        "wishlist_reminder": "❤️ A Wishlist Item is Waiting for You",
 
         # Purchase Related
-        "order_confirmation": "Order Confirmation",
-        "payment_receipt": "Payment Receipt",
-        "shipping_update": "Shipping Update",
-        "order_delivered": "Your Order Has Been Delivered",
-        "digital_delivery": "Your Digital Product is Ready",
-        "out_for_delivery": "Your Order is Out for Delivery",
-        "partial_shipment": "Partial Shipment Notification",
+        "order_confirmation": "✅ Order Confirmation - Thank You!",
+        "payment_receipt": "💳 Payment Receipt - Banwee",
+        "shipping_update": "📦 Shipping Update for Your Order",
+        "order_delivered": "🎉 Your Order Has Been Delivered!",
+        "digital_delivery": "📥 Your Digital Product is Ready",
+        "out_for_delivery": "🚚 Your Order is Out for Delivery",
+        "partial_shipment": "📦 Partial Shipment Notification",
 
         # Post-Purchase
-        "thank_you": "Thank You for Your Purchase!",
-        "review_request": "Tell Us What You Think",
-        "referral_request": "Refer a Friend & Get Rewards",
-        "product_tips": "How to Use Your Product",
-        "warranty_reminder": "Register Your Warranty",
-        "reorder_reminder": "Time to Reorder?",
-        "return_process": "Return Instructions",
+        "thank_you": "🙏 Thank You for Your Purchase!",
+        "review_request": "⭐ Tell Us What You Think",
+        "referral_request": "🎁 Refer a Friend & Get Rewards",
+        "product_tips": "💡 How to Use Your Product",
+        "warranty_reminder": "🛡️ Register Your Warranty",
+        "reorder_reminder": "🔄 Time to Reorder?",
+        "return_process": "↩️ Return Instructions",
+        "invoice_template": "📄 Your Invoice - Banwee",
 
         # Account & Engagement
-        "welcome": "Welcome to Banwee!",
-        "onboarding": "Let's Get You Started",
-        "activation": "Activate Your Account",
-        "email_change": 'Change Email',
-        "password_reset": "Reset Your Password",
-        "login_alert": "Login Alert",
-        "profile_update": "Profile Update Confirmation",
-        "unsubscribe_confirmation": "Unsubscribe Confirmation",
+        "welcome": "👋 Welcome to Banwee!",
+        "onboarding": "🚀 Let's Get You Started",
+        "activation": "📧 Verify Your Email Address - Banwee",
+        "email_change": "📧 Email Change Confirmation",
+        "password_reset": "🔐 Reset Your Password - Banwee",
+        "login_alert": "� Login Alert - Banwee",r
+        "profile_update": "✅ Profile Update Confirmation",
+        "unsubscribe_confirmation": "👋 Unsubscribe Confirmation",
+        "subscription_renewal": "� Subscription Renewal Confirmation",
+        "subscription_shipment": "� Subscription Shipment Update",o
 
         # Marketing
-        "newsletter": "Latest News & Offers",
+        "newsletter": "📰 Latest News & Offers from Banwee",
         "flash_sale": "⚡ Flash Sale - Don't Miss Out!",
-        "holiday_campaign": "Seasonal Special Just for You",
-        "loyalty_update": "Your Loyalty Perks",
-        "birthday_offer": "Happy Birthday 🎉",
-        "cross_sell": "You Might Also Like These",
-        "event_invite": "You're Invited!",
+        "holiday_campaign": "🎄 Seasonal Special Just for You",
+        "loyalty_update": "🎁 Your Loyalty Perks",
+        "birthday_offer": "🎉 Happy Birthday from Banwee!",
+        "cross_sell": "💡 You Might Also Like These",
+        "event_invite": "🎉 You're Invited!",
 
         # Transactional / System
-        "payment_failed": "Payment Failed",
-        "subscription_update": "Subscription Update",
-        "invoice": "Your Invoice",
-        "fraud_alert": "Suspicious Activity Detected",
-        "maintenance_notice": "Scheduled Maintenance",
+        "payment_failed": "⚠️ Payment Failed - Action Required",
+        "subscription_payment_failed": "⚠️ Subscription Payment Failed",
+        "subscription_update": "🔄 Subscription Update",
+        "invoice": "📄 Your Invoice - Banwee",
+        "fraud_alert": "🚨 Suspicious Activity Detected",
+        "low_stock_alert": "⚠️ Low Stock Alert",
+        "maintenance_notice": "🔧 Scheduled Maintenance",
         
         # New subscription-related emails
-        "subscription_cost_change": "Your Subscription Cost Has Changed",
-        "payment_confirmation": "Payment Confirmation - Thank You!",
-        "payment_failure": "Payment Issue - Action Required",
-        "payment_method_expiring": "Your Payment Method is Expiring Soon",
+        "subscription_cost_change": "💰 Your Subscription Cost Has Changed",
+        "payment_confirmation": "✅ Payment Confirmation - Thank You!",
+        "payment_failure": "⚠️ Payment Issue - Action Required",
+        "payment_method_expiring": "⚠️ Your Payment Method is Expiring Soon",
 
         # Legal / Compliance
-        "policy_update": "We've Updated Our Policies",
-        "gdpr_confirmation": "Your GDPR Request",
-        "cookie_settings": "Your Cookie Preferences",
+        "policy_update": "📋 We've Updated Our Policies",
+        "gdpr_confirmation": "✅ Your GDPR Request",
+        "cookie_settings": "🍪 Your Cookie Preferences",
     }
 
     template_map = {
         # Pre-Purchase
-        "store_launch": "emails/pre_purchase/store_launch.html",
-        "waitlist_notification": "emails/pre_purchase/waitlist_notification.html",
-        "product_launch": "emails/pre_purchase/product_launch.html",
-        "back_in_stock": "emails/pre_purchase/back_in_stock.html",
-        "cart_abandonment": "emails/pre_purchase/cart_abandonment.html",
-        "price_drop": "emails/pre_purchase/price_drop.html",
-        "browse_abandonment": "emails/pre_purchase/browse_abandonment.html",
-        "wishlist_reminder": "emails/pre_purchase/wishlist_reminder.html",
+        "store_launch": "pre_purchase/store_launch.html",
+        "waitlist_notification": "pre_purchase/waitlist_notification.html",
+        "product_launch": "pre_purchase/product_launch.html",
+        "back_in_stock": "pre_purchase/back_in_stock.html",
+        "cart_abandonment": "pre_purchase/cart_abandonment.html",
+        "price_drop": "pre_purchase/price_drop.html",
+        "browse_abandonment": "pre_purchase/browse_abandonment.html",
+        "wishlist_reminder": "pre_purchase/wishlist_reminder.html",
 
         # Purchase Related
-        "order_confirmation": "emails/purchase/order_confirmation.html",
-        "payment_receipt": "emails/purchase/payment_receipt.html",
-        "shipping_update": "emails/purchase/shipping_update.html",
-        "order_delivered": "emails/purchase/order_delivered.html",
-        "digital_delivery": "emails/purchase/digital_delivery.html",
-        "out_for_delivery": "emails/purchase/out_for_delivery.html",
-        "partial_shipment": "emails/purchase/partial_shipment.html",
+        "order_confirmation": "purchase/order_confirmation.html",
+        "payment_receipt": "purchase/payment_receipt.html",
+        "shipping_update": "purchase/shipping_update.html",
+        "order_delivered": "purchase/order_delivered.html",
+        "digital_delivery": "purchase/digital_delivery.html",
+        "out_for_delivery": "purchase/out_for_delivery.html",
+        "partial_shipment": "purchase/partial_shipment.html",
 
         # Post-Purchase
-        "thank_you": "emails/post_purchase/thank_you.html",
-        "review_request": "emails/post_purchase/review_request.html",
-        "referral_request": "emails/post_purchase/referral_request.html",
-        "product_tips": "emails/post_purchase/product_tips.html",
-        "warranty_reminder": "emails/post_purchase/warranty_reminder.html",
-        "reorder_reminder": "emails/post_purchase/reorder_reminder.html",
-        "return_process": "emails/post_purchase/return_process.html",
+        "thank_you": "post_purchase/thank_you.html",
+        "review_request": "post_purchase/review_request.html",
+        "referral_request": "post_purchase/referral_request.html",
+        "product_tips": "post_purchase/product_tips.html",
+        "warranty_reminder": "post_purchase/warranty_reminder.html",
+        "reorder_reminder": "post_purchase/reorder_reminder.html",
+        "return_process": "post_purchase/return_process.html",
+        "invoice_template": "post_purchase/invoice_template.html",
 
         # Account & Engagement
-        "welcome": "emails/account/welcome.html",
-        "onboarding": "emails/account/onboarding.html",
-        "activation": "emails/account/activation.html",
-        "email_change": "emails/account/email_change.html",
-        "password_reset": "emails/account/password_reset.html",
-        "login_alert": "emails/account/login_alert.html",
-        "profile_update": "emails/account/profile_update.html",
-        "unsubscribe_confirmation": "emails/account/unsubscribe_confirmation.html",
+        "welcome": "account/welcome.html",
+        "onboarding": "account/onboarding.html",
+        "activation": "account/activation.html",
+        "email_change": "account/email_change.html",
+        "password_reset": "account/password_reset.html",
+        "login_alert": "account/login_alert.html",
+        "profile_update": "account/profile_update.html",
+        "unsubscribe_confirmation": "account/unsubscribe_confirmation.html",
+        "subscription_renewal": "account/subscription_renewal.html",
+        "subscription_shipment": "account/subscription_shipment.html",
 
         # Marketing
-        "newsletter": "emails/marketing/newsletter.html",
-        "flash_sale": "emails/marketing/flash_sale.html",
-        "holiday_campaign": "emails/marketing/holiday_campaign.html",
-        "loyalty_update": "emails/marketing/loyalty_update.html",
-        "birthday_offer": "emails/marketing/birthday_offer.html",
-        "cross_sell": "emails/marketing/cross_sell.html",
-        "event_invite": "emails/marketing/event_invite.html",
+        "newsletter": "marketing/newsletter.html",
+        "flash_sale": "marketing/flash_sale.html",
+        "holiday_campaign": "marketing/holiday_campaign.html",
+        "loyalty_update": "marketing/loyalty_update.html",
+        "birthday_offer": "marketing/birthday_offer.html",
+        "cross_sell": "marketing/cross_sell.html",
+        "event_invite": "marketing/event_invite.html",
 
         # Transactional / System
-        "payment_failed": "emails/payment_failure.html",
-        "subscription_update": "emails/system/subscription_update.html",
-        "invoice": "emails/system/invoice.html",
-        "fraud_alert": "emails/system/fraud_alert.html",
-        "maintenance_notice": "emails/system/maintenance_notice.html",
+        "payment_failed": "system/payment_failed.html",
+        "subscription_payment_failed": "system/subscription_payment_failed.html",
+        "subscription_update": "system/subscription_update.html",
+        "invoice": "system/invoice.html",
+        "fraud_alert": "system/fraud_alert.html",
+        "low_stock_alert": "system/low_stock_alert.html",
+        "maintenance_notice": "system/maintenance_notice.html",
         
         # New subscription-related emails
-        "subscription_cost_change": "emails/subscription_cost_change.html",
-        "payment_confirmation": "emails/payment_confirmation.html",
-        "payment_failure": "emails/payment_failure.html",
-        "payment_method_expiring": "emails/payment_method_expiring.html",
+        "subscription_cost_change": "system/subscription_update.html",
+        "payment_confirmation": "purchase/payment_receipt.html",
+        "payment_failure": "system/payment_failed.html",
+        "payment_method_expiring": "system/payment_failed.html",
 
         # Legal / Compliance
-        "policy_update": "emails/legal/policy_update.html",
-        "gdpr_confirmation": "emails/legal/gdpr_confirmation.html",
-        "cookie_settings": "emails/legal/cookie_settings.html",
+        "policy_update": "legal/policy_update.html",
+        "gdpr_confirmation": "legal/gdpr_confirmation.html",
+        "cookie_settings": "legal/cookie_settings.html",
     }
 
     subject = subject_map.get(mail_type, "Notification")
@@ -279,7 +319,7 @@ async def send_email_mailgun_legacy(
         print(f"No template found for mail_type: {mail_type}")
         return
 
-    return await send_email_mailgun(
+    return await send_email_mailjet(
         to_email=to_email,
         subject=subject,
         template_name=template_name,
@@ -288,19 +328,19 @@ async def send_email_mailgun_legacy(
 
 
 # Synchronous wrapper for backward compatibility
-def send_email_mailgun_sync(to_email: str, mail_type: str, context: dict = {}):
+def send_email_mailjet_sync(to_email: str, mail_type: str, context: dict = {}):
     """
-    Synchronous wrapper for send_email_mailgun_legacy
+    Synchronous wrapper for send_email_mailjet_legacy
     """
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
         return loop.run_until_complete(
-            send_email_mailgun_legacy(to_email, mail_type, context)
+            send_email_mailjet_legacy(to_email, mail_type, context)
         )
     finally:
         loop.close()
 
 
 # Alias for backward compatibility
-send_email = send_email_mailgun_sync
+send_email = send_email_mailjet_sync

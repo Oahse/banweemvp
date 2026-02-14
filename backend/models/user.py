@@ -71,6 +71,10 @@ class User(BaseModel):
     verification_token = Column(String(255), nullable=True)
     token_expiration = Column(DateTime(timezone=True), nullable=True)
     
+    # Password reset fields
+    reset_token = Column(String(255), nullable=True)
+    reset_token_expires = Column(DateTime(timezone=True), nullable=True)
+    
     # Legacy profile fields (consider moving to preferences JSONB)
     age = Column(String(10), nullable=True)
     gender = Column(String(50), nullable=True)

@@ -88,8 +88,8 @@ class EmailService:
         
         html_content = await self.render_email_with_template("purchase/order_confirmation.html", context)
         
-        from core.utils.messages.email import send_email_mailgun
-        await send_email_mailgun(
+        from core.utils.messages.email import send_email_mailjet
+        await send_email_mailjet(
             to_email=recipient_email,
             subject=f"Order Confirmation - {order_number}",
             html_content=html_content
@@ -113,8 +113,8 @@ class EmailService:
         
         html_content = await self.render_email_with_template("account/welcome.html", context)
         
-        from core.utils.messages.email import send_email_mailgun
-        await send_email_mailgun(
+        from core.utils.messages.email import send_email_mailjet
+        await send_email_mailjet(
             to_email=recipient_email,
             subject="Welcome to Banwee!",
             html_content=html_content

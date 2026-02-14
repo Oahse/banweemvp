@@ -341,3 +341,60 @@ class AuthService:
         return user
 
 
+
+    async def send_password_reset(self, email: str, background_tasks: BackgroundTasks):
+        """Send password reset email"""
+        user = await self.get_user_by_email(email)
+        if not user:
+            # Return silently for security (don't reveal if email exists)
+            print(f"Password reset requested for non-existent email: {email}")
+            return
+        
+        # Generate reset token (32 bytes = 43 characters in base64)
+        reset_token = secrets.token_urlsafe(32)
+        reset_link = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
+        
+        # Store token in user record with expiration
+        user.reset_token = reset_token
+        user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+        await self.db.commit()
+        
+        print(f"Password reset token generated for {email}")
+        
+        # Queue password reset email via ARQ
+        from services.email import EmailQueue
+        EmailQueue.send_password_reset(
+            background_tasks,
+            user.email,
+            reset_token=reset_token,
+            reset_link=reset_link
+        )
+
+    async def reset_password(self, token: str, new_password: str):
+        """Reset password using reset token"""
+        # Find user by reset token
+        result = await self.db.execute(
+            select(User).where(User.reset_token == token)
+        )
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired reset token"
+            )
+        
+        # Check token expiration
+        if not user.reset_token_expires or user.reset_token_expires < datetime.utcnow():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Reset token has expired"
+            )
+        
+        # Update password and clear reset token
+        user.hashed_password = self.get_password_hash(new_password)
+        user.reset_token = None
+        user.reset_token_expires = None
+        await self.db.commit()
+        
+        print(f"Password reset successfully for user {user.email}")

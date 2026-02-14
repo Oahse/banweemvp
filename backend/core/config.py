@@ -227,9 +227,9 @@ class ApplicationConfig(BaseSettings):
     )
     
     # Email Configuration (optional in development)
-    MAILGUN_API_KEY: Optional[str] = Field(None, description="Mailgun API key")
-    MAILGUN_DOMAIN: Optional[str] = Field(None, description="Mailgun domain")
-    MAILGUN_FROM_EMAIL: str = Field(
+    MAILJET_API_KEY: Optional[str] = Field(None, description="Mailjet API key")
+    MAILJET_API_SECRET: Optional[str] = Field(None, description="Mailjet API secret")
+    MAILJET_FROM_EMAIL: str = Field(
         default="Banwee <noreply@banwee.com>",
         description="From email address"
     )
@@ -244,7 +244,7 @@ class ApplicationConfig(BaseSettings):
             raise ValueError('URLs must start with http:// or https://')
         return v
     
-    @field_validator('MAILGUN_API_KEY', 'MAILGUN_DOMAIN')
+    @field_validator('MAILJET_API_KEY', 'MAILJET_API_SECRET')
     @classmethod
     def validate_email_config(cls, v):
         """Validate email configuration in production"""
@@ -334,7 +334,7 @@ class PydanticConfigValidator:
                 field = error['loc'][0]
                 msg = error['msg']
                 # Email config warnings are not critical in development
-                if field in ['MAILGUN_API_KEY', 'MAILGUN_DOMAIN'] and os.getenv('ENVIRONMENT') != 'production':
+                if field in ['MAILJET_API_KEY', 'MAILJET_API_SECRET'] and os.getenv('ENVIRONMENT') != 'production':
                     self.warnings.append(f"Application config - {field}: {msg}")
                 else:
                     self.errors.append(f"Application config - {field}: {msg}")
@@ -424,17 +424,18 @@ class VariableDefinitions:
         
         # Email Configuration
         EnvironmentVariable(
-            name="MAILGUN_API_KEY",
-            description="Mailgun API key for email sending",
+            name="MAILJET_API_KEY",
+            description="Mailjet API key for email sending",
             variable_type=VariableType.SECRET,
             required=False,
             sensitive=True
         ),
         EnvironmentVariable(
-            name="MAILGUN_DOMAIN",
-            description="Mailgun domain for email sending",
-            variable_type=VariableType.STRING,
-            required=False
+            name="MAILJET_API_SECRET",
+            description="Mailjet API secret for email sending",
+            variable_type=VariableType.SECRET,
+            required=False,
+            sensitive=True
         ),
     ]
 
@@ -535,9 +536,9 @@ class Settings:
         self.BACKEND_CORS_ORIGINS: List[str] = parse_cors(cors_origins)
         
         # ... (rest of the settings)
-        self.MAILGUN_API_KEY: str = os.getenv('MAILGUN_API_KEY', '')
-        self.MAILGUN_DOMAIN: str = os.getenv('MAILGUN_DOMAIN', '')
-        self.MAILGUN_FROM_EMAIL: str = os.getenv('MAILGUN_FROM_EMAIL', 'Banwee <noreply@banwee.com>')
+        self.MAILJET_API_KEY: str = os.getenv('MAILJET_API_KEY', '')
+        self.MAILJET_API_SECRET: str = os.getenv('MAILJET_API_SECRET', '')
+        self.MAILJET_FROM_EMAIL: str = os.getenv('MAILJET_FROM_EMAIL', 'Banwee <noreply@banwee.com>')
         self.TELEGRAM_BOT_TOKEN: str = os.getenv('TELEGRAM_BOT_TOKEN', '')
         self.WHATSAPP_ACCESS_TOKEN: str = os.getenv('WHATSAPP_ACCESS_TOKEN', '')
         self.PHONE_NUMBER_ID: str = os.getenv('PHONE_NUMBER_ID', '')
@@ -748,7 +749,7 @@ class EnvironmentValidator:
         # Adjust rules based on context
         if self.context.is_development:
             for rule in rules:
-                if rule.name in ['MAILGUN_API_KEY', 'MAILGUN_DOMAIN']:
+                if rule.name in ['MAILJET_API_KEY', 'MAILJET_API_SECRET']:
                     rule.required = False
         
         return rules
