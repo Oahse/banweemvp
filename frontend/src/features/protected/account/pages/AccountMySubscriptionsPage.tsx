@@ -92,6 +92,8 @@ const MySubscriptions = () => {
         return subscription.status === 'paused';
       case 'cancelled':
         return subscription.status === 'cancelled';
+      case 'payment_failed':
+        return subscription.status === 'payment_failed';
       default:
         return true;
     }
@@ -264,6 +266,8 @@ const MySubscriptions = () => {
         return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'payment_failed':
+        return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -322,6 +326,7 @@ const MySubscriptions = () => {
         tabs={[
           { id: 'all', label: 'all', count: subscriptions?.length || 0 },
           { id: 'active', label: 'active', count: subscriptions?.filter(s => s.status === 'active').length || 0 },
+          { id: 'payment_failed', label: 'payment failed', count: subscriptions?.filter(s => s.status === 'payment_failed').length || 0 },
           { id: 'paused', label: 'paused', count: subscriptions?.filter(s => s.status === 'paused').length || 0 },
           { id: 'cancelled', label: 'cancelled', count: subscriptions?.filter(s => s.status === 'cancelled').length || 0 }
         ]}

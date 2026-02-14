@@ -32,48 +32,85 @@ interface RetryConfig {
   retryCondition?: (error: APIError) => boolean;
 }
 
-// Enhanced subscription interface with product management support
+// Enhanced subscription interface matching new backend structure
 export interface Subscription {
   id: string;
+  user_id: string;
   name: string;
-  status: 'active' | 'cancelled' | 'paused';
-  price: number;
+  status: 'active' | 'cancelled' | 'paused' | 'payment_failed';
   currency: string;
   billing_cycle: 'weekly' | 'monthly' | 'yearly';
   auto_renew: boolean;
+  
+  // Billing dates
+  current_period_start?: string;
+  current_period_end?: string;
   next_billing_date?: string;
-  created_at: string;
-  updated_at?: string;
+  cancelled_at?: string;
+  paused_at?: string;
+  pause_reason?: string;
+  last_payment_error?: string;
+  
+  // Payment retry fields
+  payment_retry_count?: number;
+  last_payment_attempt?: string;
+  next_retry_date?: string;
+  
+  // Delivery info
+  delivery_type?: string;
+  delivery_address_id?: string;
+  
+  // Historical prices (at creation)
+  price_at_creation?: number;
+  variant_prices_at_creation?: Array<{
+    id: string;
+    price: number;
+    qty: number;
+  }>;
+  shipping_amount_at_creation?: number;
+  tax_amount_at_creation?: number;
+  tax_rate_at_creation?: number;
+  
+  // Current prices (updated each billing cycle)
+  current_variant_prices?: Array<{
+    id: string;
+    price: number;
+    qty: number;
+  }>;
+  current_shipping_amount?: number;
+  current_tax_amount?: number;
+  current_tax_rate?: number;
+  
+  // Products
+  variant_ids?: string[];
   products?: Array<{
     id: string;
     name: string;
     price: number;
     current_price?: number;
     image?: string;
+    variant_id?: string;
   }>;
-  variant_quantities?: { [variantId: string]: number };
-  cost_breakdown?: {
-    subtotal: number;
-    shipping_cost: number;
-    tax_amount: number;
-    tax_rate: number;
-    total_amount: number;
-    currency: string;
-    product_variants?: Array<{
-      variant_id: string;
-      name: string;
-      price: number;
-      quantity: number;
-    }>;
+  subscription_metadata?: {
+    variant_quantities?: { [variantId: string]: number };
+    last_order_created?: string;
+    orders_created_count?: number;
   };
-  // Simplified cost fields
-  shipping_cost?: number;
-  tax_amount?: number;
-  tax_rate?: number;
-  discount_amount?: number;
-  discounts?: AppliedDiscount[];
-  subtotal?: number;
-  total?: number;
+  
+  // Discount info
+  discount?: {
+    type?: string;
+    value?: number;
+    code?: string;
+  } | null;
+  discount_id?: string;
+  discount_type?: string;
+  discount_value?: number;
+  discount_code?: string;
+  
+  // Timestamps
+  created_at: string;
+  updated_at?: string;
 }
 
 // Subscription product interface
@@ -104,24 +141,22 @@ export interface AppliedDiscount {
 // Request interfaces
 export interface CreateSubscriptionRequest {
   name: string;
-  product_variant_ids: string[];
+  variant_ids: string[];  // Changed from product_variant_ids to match backend
   variant_quantities?: { [variantId: string]: number };
   delivery_type?: 'standard' | 'express' | 'overnight';
   delivery_address_id?: string;
-  payment_method_id?: string;
-  currency?: string;
   billing_cycle?: 'weekly' | 'monthly' | 'yearly';
-  auto_renew?: boolean;
+  currency?: string;
+  discount_code?: string;
 }
 
 export interface UpdateSubscriptionRequest {
   name?: string;
-  product_variant_ids?: string[];
+  variant_ids?: string[];  // Changed from product_variant_ids to match backend
+  variant_quantities?: { [variantId: string]: number };
   delivery_type?: 'standard' | 'express' | 'overnight';
   delivery_address_id?: string;
-  billing_cycle?: 'weekly' | 'monthly' | 'yearly';
   auto_renew?: boolean;
-  pause_reason?: string;
 }
 
 export interface CostCalculationRequest {

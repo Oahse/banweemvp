@@ -491,6 +491,20 @@ class InventoryService:
             if commit:
                 await self.db.commit()
             
+            # Sync product availability status after stock change
+            # Get the product_id from the variant
+            variant_result = await self.db.execute(
+                select(ProductVariant).where(ProductVariant.id == adjustment_data.variant_id)
+            )
+            variant = variant_result.scalar_one_or_none()
+            
+            if variant and variant.product_id:
+                # Sync availability status (don't fail if this fails)
+                try:
+                    await self.sync_product_availability_status(variant.product_id)
+                except Exception as e:
+                    logger.warning(f"Failed to sync product availability after stock adjustment: {e}")
+            
             return inventory
             
         except Exception as e:

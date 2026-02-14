@@ -3,7 +3,7 @@ Subscription Scheduler Service
 Handles automatic creation of orders for periodic shipments
 """
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_
 from sqlalchemy.orm import selectinload
 from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional
@@ -31,13 +31,25 @@ class SubscriptionScheduler:
         """Process all subscriptions that are due for billing"""
         current_time = datetime.now(timezone.utc)
         
-        # Find active subscriptions due for billing
+        # Find active subscriptions due for billing OR due for retry
         result = await self.db.execute(
             select(Subscription).where(
                 and_(
-                    Subscription.status == "active",
-                    Subscription.next_billing_date <= current_time,
-                    Subscription.auto_renew == True
+                    Subscription.status.in_(["active", "payment_failed"]),
+                    or_(
+                        # Regular billing
+                        and_(
+                            Subscription.next_billing_date <= current_time,
+                            Subscription.auto_renew == True,
+                            Subscription.status == "active"
+                        ),
+                        # Payment retry
+                        and_(
+                            Subscription.next_retry_date <= current_time,
+                            Subscription.status == "payment_failed",
+                            Subscription.payment_retry_count < 3
+                        )
+                    )
                 )
             ).options(selectinload(Subscription.products))
         )
@@ -65,7 +77,8 @@ class SubscriptionScheduler:
                     results.append({
                         "subscription_id": str(subscription.id),
                         "status": "failed",
-                        "reason": result.get("error", "Unknown error")
+                        "reason": result.get("error", "Unknown error"),
+                        "retry_count": subscription.payment_retry_count
                     })
             except Exception as e:
                 failed_count += 1
@@ -151,16 +164,56 @@ class SubscriptionScheduler:
             if payment_result.get("status") != "succeeded":
                 error_message = payment_result.get("error", "Payment processing failed")
                 
-                # Update subscription status
-                subscription.status = "payment_failed"
+                # Update retry tracking
+                subscription.payment_retry_count = (subscription.payment_retry_count or 0) + 1
+                subscription.last_payment_attempt = datetime.now(timezone.utc)
                 subscription.last_payment_error = error_message
+                
+                # Determine retry schedule
+                if subscription.payment_retry_count == 1:
+                    # First failure: retry in 6 hours
+                    subscription.next_retry_date = datetime.now(timezone.utc) + timedelta(hours=6)
+                    subscription.status = "payment_failed"
+                    
+                    logger.warning(f"Payment failed for subscription {subscription.id} (attempt 1/3). Retry in 6 hours.")
+                    
+                elif subscription.payment_retry_count == 2:
+                    # Second failure: retry in 24 hours (next day)
+                    subscription.next_retry_date = datetime.now(timezone.utc) + timedelta(hours=24)
+                    subscription.status = "payment_failed"
+                    
+                    logger.warning(f"Payment failed for subscription {subscription.id} (attempt 2/3). Retry in 24 hours.")
+                    
+                else:
+                    # Third failure: pause subscription
+                    subscription.status = "paused"
+                    subscription.paused_at = datetime.now(timezone.utc)
+                    subscription.pause_reason = f"Payment failed after 3 attempts: {error_message}"
+                    subscription.next_retry_date = None
+                    
+                    logger.error(f"Payment failed for subscription {subscription.id} (attempt 3/3). Subscription paused.")
+                    
+                    # Send email notification about paused subscription
+                    try:
+                        from services.email import EmailService
+                        email_service = EmailService(self.db)
+                        await email_service.send_subscription_payment_failed(
+                            user_email=user.email,
+                            subscription_id=str(subscription.id),
+                            subscription_name=subscription.name,
+                            error_message=error_message,
+                            retry_count=subscription.payment_retry_count
+                        )
+                    except Exception as e:
+                        logger.error(f"Failed to send payment failure email: {e}")
                 
                 await self.db.commit()
                 
-                logger.error(f"Payment failed for subscription {subscription.id}: {error_message}")
                 return {
                     "success": False,
-                    "error": error_message
+                    "error": error_message,
+                    "retry_count": subscription.payment_retry_count,
+                    "next_retry": subscription.next_retry_date.isoformat() if subscription.next_retry_date else None
                 }
             
             logger.info(f"✅ Payment succeeded for subscription {subscription.id}, creating order...")
@@ -251,6 +304,9 @@ class SubscriptionScheduler:
             # ========================================
             subscription.status = "active"
             subscription.last_payment_error = None
+            subscription.payment_retry_count = 0  # Reset retry count on success
+            subscription.last_payment_attempt = datetime.now(timezone.utc)
+            subscription.next_retry_date = None
             
             # Update billing dates
             await self._update_billing_dates(subscription)
@@ -304,15 +360,26 @@ class SubscriptionScheduler:
         }
     
     async def _update_billing_dates(self, subscription: Subscription):
-        """Update subscription billing dates"""
+        """Update subscription billing dates with proper month-end handling"""
+        from dateutil.relativedelta import relativedelta
+        
         current_period_end = subscription.current_period_end or datetime.now(timezone.utc)
         
         if subscription.billing_cycle == "weekly":
             next_period_end = current_period_end + timedelta(weeks=1)
+            
         elif subscription.billing_cycle == "yearly":
-            next_period_end = current_period_end + timedelta(days=365)
-        else:  # monthly
-            next_period_end = current_period_end + timedelta(days=30)
+            # Use relativedelta to handle leap years properly
+            next_period_end = current_period_end + relativedelta(years=1)
+            
+        else:  # monthly (default)
+            # Use relativedelta to handle month-end dates properly
+            # This automatically handles 28, 29, 30, 31 day months
+            next_period_end = current_period_end + relativedelta(months=1)
+            
+            # Example: Jan 31 + 1 month = Feb 28/29 (last day of Feb)
+            # Example: Jan 30 + 1 month = Feb 28/29 (last day of Feb)
+            # Example: Mar 31 + 1 month = Apr 30 (last day of Apr)
         
         subscription.current_period_start = current_period_end
         subscription.current_period_end = next_period_end
@@ -326,6 +393,8 @@ class SubscriptionScheduler:
             "last_order_created": datetime.now(timezone.utc).isoformat(),
             "orders_created_count": subscription.subscription_metadata.get("orders_created_count", 0) + 1
         })
+        
+        logger.info(f"Updated billing dates for subscription {subscription.id}: next billing on {next_period_end.date()}")
 
 
 # Standalone function for background task

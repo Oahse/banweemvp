@@ -106,6 +106,9 @@ class Subscription(BaseModel):
     paused_at = Column(DateTime(timezone=True), nullable=True)
     pause_reason = Column(Text, nullable=True)
     last_payment_error = Column(Text, nullable=True)
+    payment_retry_count = Column(Integer, default=0)
+    last_payment_attempt = Column(DateTime(timezone=True), nullable=True)
+    next_retry_date = Column(DateTime(timezone=True), nullable=True)
 
     # --- Payment info ---
     payment_gateway = Column(String(50), nullable=True)

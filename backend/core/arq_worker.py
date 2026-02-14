@@ -284,6 +284,35 @@ async def sync_product_availability_task(ctx: Dict[str, Any], product_id: str = 
 
 
 # ============================================================================
+# PROMOCODE TASKS - Scheduled status updates
+# ============================================================================
+
+async def update_promocode_statuses_task(ctx: Dict[str, Any]) -> str:
+    """Update promocode statuses based on validity dates"""
+    try:
+        from services.promocode.scheduler import PromoCodeScheduler
+        
+        factory = _get_session_factory(ctx)
+        if not factory:
+            raise RuntimeError('Database session factory not available in ARQ context')
+
+        async with factory() as db:
+            scheduler = PromoCodeScheduler(db)
+            result = await scheduler.update_promocode_statuses()
+            
+            if result.get("success"):
+                logger.info(f"✅ Promocode status update completed: {result.get('activated_count', 0)} activated, {result.get('deactivated_count', 0)} deactivated")
+                return f"Promocode update completed: {result.get('activated_count', 0)} activated, {result.get('deactivated_count', 0)} deactivated"
+            else:
+                logger.error(f"❌ Promocode status update failed: {result.get('error')}")
+                return f"Promocode update failed: {result.get('error')}"
+                
+    except Exception as e:
+        logger.error(f"Error updating promocode statuses: {e}")
+        raise
+
+
+# ============================================================================
 # CLEANUP TASKS - Scheduled maintenance
 # ============================================================================
 
@@ -315,36 +344,31 @@ class WorkerSettings:
         send_email_task,
         process_subscription_renewal_task,
         process_subscription_orders_task,
-        sync_product_availability_task,
-        cleanup_expired_carts_task,
+        update_promocode_statuses_task,
     ]
     
     # Cron jobs - Scheduled tasks that run automatically
     cron_jobs = [
-        # Process subscription renewals daily at 2 AM
+        # Process subscription renewals and retries - runs every 6 hours
+        # This catches both regular billing (2 AM) and retry attempts (6 hours, 24 hours)
         cron(
             process_subscription_orders_task,
-            hour=2,
+            hour={2, 8, 14, 20},  # Run at 2 AM, 8 AM, 2 PM, 8 PM
             minute=0,
             run_at_startup=False,  # Don't run immediately on worker start
             unique=True,  # Prevent duplicate runs
             timeout=600,  # 10 minutes timeout
         ),
-        # Sync product availability every 6 hours
+        
+        # Update promocode statuses - runs daily at 12 AM (midnight)
+        # Activates/deactivates promocodes based on validity dates and usage limits
         cron(
-            sync_product_availability_task,
-            hour={0, 6, 12, 18},  # Run at midnight, 6am, noon, 6pm
+            update_promocode_statuses_task,
+            hour=0,  # Run at 12 AM (midnight)
             minute=0,
-            run_at_startup=False,
-            unique=True,
-        ),
-        # Cleanup expired carts daily at 3 AM
-        cron(
-            cleanup_expired_carts_task,
-            hour=3,
-            minute=0,
-            run_at_startup=False,
-            unique=True,
+            run_at_startup=False,  # Don't run immediately on worker start
+            unique=True,  # Prevent duplicate runs
+            timeout=300,  # 5 minutes timeout
         ),
     ]
     
@@ -389,3 +413,9 @@ async def enqueue_cart_cleanup():
     """Enqueue cart cleanup task"""
     pool = await get_arq_pool()
     await pool.enqueue_job('cleanup_expired_carts_task')
+
+
+async def enqueue_promocode_update():
+    """Enqueue promocode status update task"""
+    pool = await get_arq_pool()
+    await pool.enqueue_job('update_promocode_statuses_task')

@@ -265,6 +265,55 @@ class EmailService:
         )
         print(f"📧 Order delivered email sent to {recipient_email}")
 
+    async def send_subscription_payment_failed(
+        self,
+        user_email: str,
+        subscription_id: str,
+        subscription_name: str,
+        error_message: str,
+        retry_count: int
+    ):
+        """Send subscription payment failed notification email"""
+        context = {
+            "subscription_name": subscription_name,
+            "subscription_id": subscription_id,
+            "error_message": error_message,
+            "retry_count": retry_count,
+            "update_payment_url": f"{settings.FRONTEND_URL}/account/subscriptions/{subscription_id}/payment",
+            "subscription_url": f"{settings.FRONTEND_URL}/account/subscriptions/{subscription_id}",
+            "company_name": "Banwee",
+            "support_email": "support@banwee.com",
+            "current_year": datetime.now().year,
+            "unsubscribe_url": f"{settings.FRONTEND_URL}/unsubscribe",
+            "privacy_policy_url": f"{settings.FRONTEND_URL}/privacy"
+        }
+        
+        # Determine subject based on retry count
+        if retry_count >= 3:
+            subject = f"Subscription Paused - Payment Failed"
+            context["is_paused"] = True
+            context["message"] = (
+                f"We've attempted to process payment for your subscription '{subscription_name}' "
+                f"three times, but all attempts have failed. Your subscription has been paused."
+            )
+        else:
+            subject = f"Payment Failed - Subscription '{subscription_name}'"
+            context["is_paused"] = False
+            context["message"] = (
+                f"We were unable to process payment for your subscription '{subscription_name}'. "
+                f"We'll automatically retry the payment soon."
+            )
+        
+        html_content = await self.render_email_with_template("system/subscription_payment_failed.html", context)
+        
+        from core.utils.messages.email import send_email_mailgun
+        await send_email_mailgun(
+            to_email=user_email,
+            subject=subject,
+            html_content=html_content
+        )
+        print(f"📧 Subscription payment failed email sent to {user_email}")
+
     async def render_email_with_template(
         self,
         template_name: str,

@@ -54,3 +54,50 @@ class PromocodeService:
         await self.db.delete(promocode)
         await self.db.commit()
         return True
+
+    async def increment_usage(self, promocode_id: UUID) -> Optional[Promocode]:
+        """Increment the used_count for a promocode when it's applied"""
+        promocode = await self.get_promocode_by_id(promocode_id)
+        if not promocode:
+            raise APIException(status_code=404, message="Promocode not found")
+        
+        # Increment usage count
+        promocode.used_count = (promocode.used_count or 0) + 1
+        
+        # Check if usage limit reached and deactivate if needed
+        if promocode.usage_limit and promocode.used_count >= promocode.usage_limit:
+            promocode.is_active = False
+        
+        await self.db.commit()
+        await self.db.refresh(promocode)
+        return promocode
+    
+    async def validate_promocode(self, code: str) -> tuple[bool, Optional[str], Optional[Promocode]]:
+        """
+        Validate a promocode and return (is_valid, error_message, promocode)
+        """
+        from datetime import datetime, timezone
+        
+        promocode = await self.get_promocode_by_code(code)
+        
+        if not promocode:
+            return False, "Promocode not found", None
+        
+        if not promocode.is_active:
+            return False, "Promocode is not active", None
+        
+        current_time = datetime.now(timezone.utc)
+        
+        # Check if promocode has started
+        if promocode.valid_from and promocode.valid_from > current_time:
+            return False, "Promocode is not yet valid", None
+        
+        # Check if promocode has expired
+        if promocode.valid_until and promocode.valid_until <= current_time:
+            return False, "Promocode has expired", None
+        
+        # Check usage limit
+        if promocode.usage_limit and promocode.used_count >= promocode.usage_limit:
+            return False, "Promocode usage limit reached", None
+        
+        return True, None, promocode

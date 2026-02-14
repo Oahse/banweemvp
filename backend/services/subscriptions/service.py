@@ -85,9 +85,11 @@ class SubscriptionService:
         if billing_cycle == "weekly":
             period_end = now + timedelta(weeks=1)
         elif billing_cycle == "yearly":
-            period_end = now + timedelta(days=365)
+            from dateutil.relativedelta import relativedelta
+            period_end = now + relativedelta(years=1)
         else:  # monthly
-            period_end = now + timedelta(days=30)
+            from dateutil.relativedelta import relativedelta
+            period_end = now + relativedelta(months=1)
         
         # Create subscription
         subscription = Subscription(

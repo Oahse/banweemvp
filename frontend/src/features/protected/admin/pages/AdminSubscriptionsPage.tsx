@@ -29,36 +29,70 @@ interface Subscription {
     name: string;
     email: string;
   };
-  subscription_plan_id: string;
-  subscription_plan?: {
-    id: string;
-    name: string;
-    description: string;
-    billing_interval: string;
-    base_price: number;
-  };
-  status: 'active' | 'paused' | 'cancelled' | 'expired' | 'pending';
-  current_period_start: string;
-  current_period_end: string;
-  next_billing_date?: string;
-  base_cost: number;
-  delivery_cost: number;
-  tax_amount: number;
-  discount_amount?: number;
-  total_cost: number;
+  name: string;
+  status: 'active' | 'paused' | 'cancelled' | 'payment_failed';
   currency: string;
-  delivery_address: {
+  billing_cycle: 'weekly' | 'monthly' | 'yearly';
+  auto_renew: boolean;
+  
+  // Billing dates
+  current_period_start?: string;
+  current_period_end?: string;
+  next_billing_date?: string;
+  cancelled_at?: string;
+  paused_at?: string;
+  pause_reason?: string;
+  last_payment_error?: string;
+  
+  // Payment retry fields
+  payment_retry_count?: number;
+  last_payment_attempt?: string;
+  next_retry_date?: string;
+  
+  // Delivery info
+  delivery_type?: string;
+  delivery_address_id?: string;
+  delivery_address?: {
     street: string;
     city: string;
     state: string;
     postal_code: string;
     country: string;
   };
-  created_at: string;
-  updated_at?: string;
-  cancelled_at?: string;
-  pause_reason?: string;
-  cancellation_reason?: string;
+  
+  // Historical prices (at creation)
+  price_at_creation?: number;
+  variant_prices_at_creation?: Array<{
+    id: string;
+    price: number;
+    qty: number;
+  }>;
+  shipping_amount_at_creation?: number;
+  tax_amount_at_creation?: number;
+  tax_rate_at_creation?: number;
+  
+  // Current prices (updated each billing cycle)
+  current_variant_prices?: Array<{
+    id: string;
+    price: number;
+    qty: number;
+  }>;
+  current_shipping_amount?: number;
+  current_tax_amount?: number;
+  current_tax_rate?: number;
+  
+  // Legacy fields for compatibility
+  base_cost?: number;
+  delivery_cost?: number;
+  tax_amount?: number;
+  discount_amount?: number;
+  total_cost?: number;
+  subtotal?: number;
+  shipping_cost?: number;
+  total?: number;
+  
+  // Products
+  variant_ids?: string[];
   variant_quantities?: Record<string, number>;
   variants?: Array<{
     id: string;
@@ -68,6 +102,28 @@ interface Subscription {
     current_price?: number;
     qty: number;
   }>;
+  
+  // Discount info
+  discount?: {
+    type?: string;
+    value?: number;
+    code?: string;
+  } | null;
+  discount_id?: string;
+  discount_type?: string;
+  discount_value?: number;
+  discount_code?: string;
+  
+  // Timestamps
+  created_at: string;
+  updated_at?: string;
+  
+  // Metadata
+  subscription_metadata?: {
+    variant_quantities?: { [variantId: string]: number };
+    last_order_created?: string;
+    orders_created_count?: number;
+  };
 }
 
 export const AdminSubscriptions = () => {
@@ -100,12 +156,37 @@ export const AdminSubscriptions = () => {
   };
 
   const getCostBreakdown = (subscription: Subscription) => {
-    const subtotal = Number(subscription.base_cost ?? 0);
-    const shipping = Number(subscription.delivery_cost ?? 0);
-    const tax = Number(subscription.tax_amount ?? 0);
-    const discount = Number(subscription.discount_amount ?? 0);
+    // Use current prices if available, fallback to creation prices, then legacy fields
+    const subtotal = Number(
+      subscription.subtotal ?? 
+      subscription.base_cost ?? 
+      subscription.price_at_creation ?? 
+      0
+    );
+    const shipping = Number(
+      subscription.current_shipping_amount ?? 
+      subscription.shipping_amount_at_creation ?? 
+      subscription.delivery_cost ?? 
+      subscription.shipping_cost ?? 
+      0
+    );
+    const tax = Number(
+      subscription.current_tax_amount ?? 
+      subscription.tax_amount_at_creation ?? 
+      subscription.tax_amount ?? 
+      0
+    );
+    const discount = Number(
+      subscription.discount_value ?? 
+      subscription.discount_amount ?? 
+      0
+    );
     const derivedTotal = subtotal + shipping + tax - discount;
-    const total = Number(subscription.total_cost ?? 0);
+    const total = Number(
+      subscription.total ?? 
+      subscription.total_cost ?? 
+      0
+    );
     return {
       subtotal,
       shipping,
@@ -237,11 +318,14 @@ export const AdminSubscriptions = () => {
       ),
     },
     {
-      key: 'subscription_plan',
-      label: 'Plan',
+      key: 'name',
+      label: 'Subscription',
       sortable: true,
-      render: (value: any, row: Subscription) => (
-        <TextComponent className="text-sm text-gray-900 dark:text-white">{value?.name || 'N/A'}</TextComponent>
+      render: (value: string, row: Subscription) => (
+        <div>
+          <TextComponent className="text-sm text-gray-900 dark:text-white">{value || 'N/A'}</TextComponent>
+          <TextComponent className="text-sm text-gray-500 dark:text-gray-400">{row.billing_cycle || 'monthly'}</TextComponent>
+        </div>
       ),
     },
     {
@@ -296,8 +380,7 @@ export const AdminSubscriptions = () => {
         { value: 'active', label: 'Active Only' },
         { value: 'paused', label: 'Paused Only' },
         { value: 'cancelled', label: 'Cancelled Only' },
-        { value: 'expired', label: 'Expired Only' },
-        { value: 'pending', label: 'Pending Only' }
+        { value: 'payment_failed', label: 'Payment Failed Only' }
       ],
       placeholder: 'All Status',
     },
@@ -308,11 +391,10 @@ export const AdminSubscriptions = () => {
       active: { color: 'bg-success/20 text-success', label: 'Active' },
       paused: { color: 'bg-warning/20 text-warning', label: 'Paused' },
       cancelled: { color: 'bg-error/20 text-error', label: 'Cancelled' },
-      expired: { color: 'bg-gray/20 text-gray', label: 'Expired' },
-      pending: { color: 'bg-blue/20 text-blue', label: 'Pending' }
+      payment_failed: { color: 'bg-orange/20 text-orange', label: 'Payment Failed' }
     };
     
-    const { color, label } = config[status as keyof typeof config] || config.pending;
+    const { color, label } = config[status as keyof typeof config] || { color: 'bg-gray/20 text-gray', label: status };
     
     return (
       <TextComponent className={`px-3 py-1 rounded-full text-sm font-semibold ${color}`}>
@@ -372,7 +454,7 @@ export const AdminSubscriptions = () => {
                 <div>
                   <Heading level={5} className="text-lg font-semibold">Subscription Details</Heading>
                   <Body className={`text-sm ${currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {selectedSubscription.subscription_plan?.name || 'Subscription'}
+                    {selectedSubscription.name || 'Subscription'}
                   </Body>
                 </div>
               </ModalHeader>
@@ -389,17 +471,42 @@ export const AdminSubscriptions = () => {
                   </div>
                   <div>
                     <TextComponent weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Billing</TextComponent>
+                    <TextComponent variant="body-sm">Cycle: {selectedSubscription.billing_cycle || 'monthly'}</TextComponent>
                     <TextComponent variant="body-sm">Next: {selectedSubscription.next_billing_date ? new Date(selectedSubscription.next_billing_date).toLocaleDateString() : 'N/A'}</TextComponent>
                     <TextComponent variant="body-sm">Period End: {selectedSubscription.current_period_end ? new Date(selectedSubscription.current_period_end).toLocaleDateString() : 'N/A'}</TextComponent>
+                    <TextComponent variant="body-sm">Auto-Renew: {selectedSubscription.auto_renew ? 'Yes' : 'No'}</TextComponent>
                   </div>
                   <div>
                     <TextComponent weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Costs</TextComponent>
                     <TextComponent variant="body-sm">Subtotal: {formatCurrency(getCostBreakdown(selectedSubscription).subtotal, selectedSubscription.currency)}</TextComponent>
                     <TextComponent variant="body-sm">Shipping: {formatCurrency(getCostBreakdown(selectedSubscription).shipping, selectedSubscription.currency)}</TextComponent>
                     <TextComponent variant="body-sm">Tax: {formatCurrency(getCostBreakdown(selectedSubscription).tax, selectedSubscription.currency)}</TextComponent>
-                    <TextComponent tone="success" variant="body-sm">Discount: -{formatCurrency(getCostBreakdown(selectedSubscription).discount, selectedSubscription.currency)}</TextComponent>
+                    {getCostBreakdown(selectedSubscription).discount > 0 && (
+                      <TextComponent tone="success" variant="body-sm">Discount: -{formatCurrency(getCostBreakdown(selectedSubscription).discount, selectedSubscription.currency)}</TextComponent>
+                    )}
                     <TextComponent variant="body-sm" weight="semibold">Total: {formatCurrency(getCostBreakdown(selectedSubscription).total, selectedSubscription.currency)}</TextComponent>
                   </div>
+                  
+                  {/* Payment Status */}
+                  {(selectedSubscription.status === 'payment_failed' || selectedSubscription.payment_retry_count) && (
+                    <div className="md:col-span-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                      <TextComponent weight="medium" className="text-yellow-800 dark:text-yellow-200">Payment Issue</TextComponent>
+                      {selectedSubscription.last_payment_error && (
+                        <TextComponent variant="body-sm" className="text-yellow-700 dark:text-yellow-300">{selectedSubscription.last_payment_error}</TextComponent>
+                      )}
+                      {selectedSubscription.payment_retry_count !== undefined && selectedSubscription.payment_retry_count > 0 && (
+                        <TextComponent variant="body-sm" className="text-yellow-700 dark:text-yellow-300">
+                          Retry attempt: {selectedSubscription.payment_retry_count} of 3
+                        </TextComponent>
+                      )}
+                      {selectedSubscription.next_retry_date && (
+                        <TextComponent variant="body-sm" className="text-yellow-700 dark:text-yellow-300">
+                          Next retry: {new Date(selectedSubscription.next_retry_date).toLocaleDateString()}
+                        </TextComponent>
+                      )}
+                    </div>
+                  )}
+                  
                   <div className="md:col-span-2">
                     <TextComponent weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Delivery Address</TextComponent>
                     {selectedSubscription.delivery_address ? (
@@ -448,6 +555,19 @@ export const AdminSubscriptions = () => {
                       <TextComponent variant="caption" tone="secondary">No variants found</TextComponent>
                     )}
                   </div>
+                  
+                  {/* Metadata */}
+                  {selectedSubscription.subscription_metadata && (
+                    <div className="md:col-span-2">
+                      <TextComponent weight="medium" tone={currentTheme === 'dark' ? 'secondary' : 'default'}>Subscription History</TextComponent>
+                      {selectedSubscription.subscription_metadata.orders_created_count !== undefined && (
+                        <TextComponent variant="body-sm">Orders Created: {selectedSubscription.subscription_metadata.orders_created_count}</TextComponent>
+                      )}
+                      {selectedSubscription.subscription_metadata.last_order_created && (
+                        <TextComponent variant="body-sm">Last Order: {new Date(selectedSubscription.subscription_metadata.last_order_created).toLocaleDateString()}</TextComponent>
+                      )}
+                    </div>
+                  )}
                 </div>
               </ModalBody>
             </>

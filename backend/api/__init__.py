@@ -9,6 +9,7 @@ from .inventory import router as inventory_router
 from .oauth import router as oauth_router
 from .orders import router as orders_router
 from .payments import router as payments_router
+from .promocodes import router as promocodes_router
 from .products import router as products_router
 from .refunds import router as refunds_router
 from .review import router as review_router
