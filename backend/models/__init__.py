@@ -86,10 +86,6 @@ __all__ = [
     # Wishlist models
     "Wishlist",
     "WishlistItem",
-
-    # Loyalty models
-    "LoyaltyAccount",
-    "PointsTransaction",
     
     # Variant tracking models
     "VariantTrackingEntry",
