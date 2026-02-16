@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'add_price_at_creation'
-down_revision = '2026_02_07_2207'
+down_revision = 'd4e8f9a1b2c3'
 branch_labels = None
 depends_on = None
 

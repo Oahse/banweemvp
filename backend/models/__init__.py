@@ -20,6 +20,7 @@ from .inventories import WarehouseLocation, Inventory, StockAdjustment
 from .admin import PricingConfig, SubscriptionCostHistory, SubscriptionAnalytics, PaymentAnalytics
 from .discounts import Discount, SubscriptionDiscount, ProductRemovalAudit
 from .validation_rules import TaxValidationRule, ShippingValidationRule
+from .variant_tracking import VariantTrackingEntry, VariantPriceHistory, VariantAnalytics, VariantSubstitution
 
 # Import utils if they exist
 try:

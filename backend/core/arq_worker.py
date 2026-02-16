@@ -39,14 +39,28 @@ async def startup(ctx: Dict[str, Any]) -> None:
     """Worker startup - initialize database connection"""
     logger.info("ARQ Worker starting up...")
     try:
-        import core.db as core_db
-        ctx['db_session'] = core_db.AsyncSessionDB
-    except Exception:
+        # Initialize database connection for ARQ worker
+        from core.db import initialize_db, db_manager
+        from core.config import settings
+        
+        # Initialize the database with the same settings as main app
+        initialize_db(
+            database_uri=settings.POSTGRES_DB_URL,
+            env_is_local=settings.ENVIRONMENT == "local",
+            use_optimized_engine=True
+        )
+        
+        # Set the session factory from the db manager
+        ctx['db_session'] = db_manager.session_factory
+        logger.info("Database session factory initialized for ARQ worker")
+    except Exception as e:
+        logger.error(f"Failed to initialize database session factory: {e}")
         ctx['db_session'] = None
 
     try:
         pool = await create_pool(ARQ_REDIS_SETTINGS)
         ctx['arq_pool'] = pool
+        logger.info("ARQ Redis pool initialized")
     except Exception as e:
         logger.warning(f"Failed to create ARQ pool in worker startup: {e}")
         ctx['arq_pool'] = None
