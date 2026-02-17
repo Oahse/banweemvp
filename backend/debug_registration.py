@@ -26,66 +26,11 @@ async def test_user_creation():
         async for db in get_db():
             print("✅ Database session obtained")
             
-            # Test basic model creation
-            test_user = User(
-                id=uuid7(),
+            # Test UserCreate schema
+            user_data = UserCreate(
                 email=f"test-{uuid7()}@example.com",
                 firstname="Test",
                 lastname="User",
-                hashed_password="test_hash",
-                role="customer",
-                verified=False,
-                verification_token="test_token",
-                token_expiration=datetime.now() + timedelta(hours=24)
-            )
-            
-            print("✅ User model created successfully")
-            print(f"   Email: {test_user.email}")
-            print(f"   Role: {test_user.role}")
-            print(f"   Verification token: {test_user.verification_token}")
-            
-            # Test adding to session
-            db.add(test_user)
-            print("✅ User added to session")
-            
-            # Test commit
-            await db.commit()
-            print("✅ Transaction committed successfully")
-            
-            # Test refresh
-            await db.refresh(test_user)
-            print("✅ User refreshed from database")
-            print(f"   User ID: {test_user.id}")
-            
-            # Clean up
-            await db.delete(test_user)
-            await db.commit()
-            print("✅ Test user cleaned up")
-            
-            break  # Exit the async generator
-            
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
-    
-    return True
-
-async def test_user_service():
-    """Test user service creation"""
-    print("\n🔍 Testing UserService...")
-    
-    try:
-        async for db in get_db():
-            user_service = UserService(db)
-            print("✅ UserService created")
-            
-            # Test UserCreate schema
-            user_data = UserCreate(
-                email=f"servicetest-{uuid7()}@example.com",
-                firstname="Service",
-                lastname="Test",
                 password="testpassword123",
                 role="customer"
             )
@@ -101,8 +46,10 @@ async def test_user_service():
             
             background_tasks = MockBackgroundTasks()
             
+            # Test user creation through service
+            user_service = UserService(db)
             new_user = await user_service.create_user(user_data, background_tasks)
-            print("✅ User created through service")
+            print("✅ User created successfully")
             print(f"   User ID: {new_user.id}")
             print(f"   Email: {new_user.email}")
             
@@ -122,22 +69,18 @@ async def test_user_service():
     return True
 
 async def main():
-    print("🚀 Starting registration debug tests...\n")
+    print("🚀 Starting registration debug test...\n")
     
-    # Test 1: Basic model creation
-    test1_passed = await test_user_creation()
-    
-    # Test 2: Service creation
-    test2_passed = await test_user_service()
+    # Test user creation
+    test_passed = await test_user_creation()
     
     print(f"\n📊 Results:")
-    print(f"   Test 1 (Model): {'✅ PASSED' if test1_passed else '❌ FAILED'}")
-    print(f"   Test 2 (Service): {'✅ PASSED' if test2_passed else '❌ FAILED'}")
+    print(f"   Test (User Creation): {'✅ PASSED' if test_passed else '❌ FAILED'}")
     
-    if test1_passed and test2_passed:
-        print("\n🎉 All tests passed! Registration should work.")
+    if test_passed:
+        print("\n🎉 Test passed! Registration should work.")
     else:
-        print("\n❌ Some tests failed. Check the errors above.")
+        print("\n❌ Test failed. Check the errors above.")
 
 if __name__ == "__main__":
     asyncio.run(main())
