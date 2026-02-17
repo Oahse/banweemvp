@@ -821,16 +821,23 @@ class InventoryService:
                     return await self._perform_decrement_stock(variant_id, quantity, location_id, order_id, user_id)
             else:
                 # Fallback to database-only lock if Redis unavailable
-                logger.warning(f"Redis lock service unavailable, using database-only lock", metadata={
-    "variant_id": str(variant_id)
-})
+                logger.warning("Redis unavailable, using database fallback", metadata={
+                    "redis_host": "localhost:6379",
+                    "fallback": "database_lock",
+                    "operation": "stock_decrement",
+                    "variant_id": str(variant_id),
+                    "impact": "reduced_performance"
+                })
                 return await self._perform_decrement_stock(variant_id, quantity, location_id, order_id, user_id)
                 
         except Exception as e:
             await self.db.rollback()
-            logger.error(f"Error decrementing stock", metadata={
-    "variant_id": str(variant_id)
-}, exception=e)
+            logger.error("Stock decrement failed", exception=e, metadata={
+                "variant_id": str(variant_id),
+                "quantity": quantity,
+                "operation": "stock_decrement",
+                "critical": True
+            })
             return {
                 "success": False,
                 "message": f"Failed to decrement stock: {str(e)}"
@@ -889,10 +896,14 @@ class InventoryService:
         
         await self.db.commit()
         
-        logger.info(f"Atomically decremented stock", metadata={
-    "variant_id": str(variant_id),
-    "quantity": quantity
-})
+        logger.info("Stock adjusted", metadata={
+                "variant_id": str(variant_id),
+                "previous_quantity": inventory.quantity_available + quantity,
+                "new_quantity": inventory.quantity_available,
+                "adjustment": -quantity,
+                "reason": "order_purchase",
+                "business_event": "inventory_management"
+            })
         
         # Queue product availability sync as background task (don't wait for it)
         try:
@@ -956,14 +967,23 @@ class InventoryService:
                     return await self._perform_increment_stock(variant_id, quantity, location_id, order_id, user_id)
             else:
                 # Fallback to database-only lock if Redis unavailable
-                logger.warning(f"Redis lock service unavailable, using database-only lock", metadata={
-    "variant_id": str(variant_id)
-})
+                logger.warning("Redis unavailable, using database fallback", metadata={
+                    "redis_host": "localhost:6379",
+                    "fallback": "database_lock",
+                    "operation": "stock_decrement",
+                    "variant_id": str(variant_id),
+                    "impact": "reduced_performance"
+                })
                 return await self._perform_increment_stock(variant_id, quantity, location_id, order_id, user_id)
                 
         except Exception as e:
             await self.db.rollback()
-            logger.error(f"Error incrementing stock for variant {variant_id}: {e}")
+            logger.error("Stock increment failed", exception=e, metadata={
+                "variant_id": str(variant_id),
+                "quantity": quantity,
+                "operation": "stock_increment",
+                "critical": True
+            })
             return {
                 "success": False,
                 "message": f"Failed to increment stock: {str(e)}"

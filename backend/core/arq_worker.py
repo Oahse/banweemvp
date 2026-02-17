@@ -3,7 +3,6 @@ ARQ (Async Redis Queue) Worker Configuration
 Handles background tasks: emails, subscriptions, and scheduled jobs
 """
 import asyncio
-import logging
 from typing import Dict, Any
 from datetime import datetime, timedelta
 from arq import create_pool, Worker

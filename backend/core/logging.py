@@ -96,9 +96,9 @@ class StructuredLogger:
             maxBytes=10 * 1024 * 1024,  # 10MB
             backupCount=5
         )
-        file_handler.setLevel(logging.INFO)  # Only INFO and above
+        file_handler.setLevel(logging.INFO)  # Only INFO, WARNING, ERROR
         
-        # Error log with daily rotation (ERROR only)
+        # Error log with daily rotation (ERROR only for critical failures)
         error_log_file = log_path / f"{self.name}_error.log"
         error_handler = TimedRotatingFileHandler(
             error_log_file,
@@ -106,7 +106,7 @@ class StructuredLogger:
             interval=1,
             backupCount=30
         )
-        error_handler.setLevel(logging.ERROR)  # Only ERROR and above
+        error_handler.setLevel(logging.ERROR)  # ERROR only
         
         # JSON formatter for file logs
         json_formatter = logging.Formatter('%(message)s')

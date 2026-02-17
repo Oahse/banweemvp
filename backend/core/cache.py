@@ -4,7 +4,6 @@ Implements Redis best practices for e-commerce MVP
 """
 import redis.asyncio as redis
 import json
-import logging
 from typing import Any, Optional, Dict, List, Union
 from datetime import datetime, timedelta
 from core.config import settings

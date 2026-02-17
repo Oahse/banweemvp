@@ -562,7 +562,15 @@ class OrderService:
             # Explicitly commit the transaction to persist all changes
             await self.db.commit()
             
-            logger.info(f"Order {order_number} created successfully for user {user_id}")
+            logger.info("Order completed", metadata={
+                "order_id": str(order.id),
+                "order_number": order_number,
+                "user_id": str(user_id),
+                "total_amount": float(order.total_amount),
+                "items_count": len(order.items),
+                "payment_status": "completed",
+                "milestone": "revenue"
+            })
             
             # Return order response using the items we collected
             return OrderResponse(
@@ -1189,7 +1197,11 @@ class OrderService:
             }
         except Exception as e:
             # Log the full error for debugging
-            logger.error(f"Error in get_user_orders: {str(e)}", exception=e)
+            logger.error("Order retrieval failed", exception=e, metadata={
+                "user_id": str(user_id),
+                "operation": "get_user_orders",
+                "critical": False
+            })
             
             # Re-raise with more context
             from core.errors import APIException
