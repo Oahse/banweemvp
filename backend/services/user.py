@@ -270,13 +270,15 @@ class UserService:
 
         # Send verification email in the background
         background_tasks.add_task(
-            self.send_verification_email, new_user, verification_token)
-
-        # User registration event handled by hybrid task system
+            self.send_verification_email, 
+            new_user.email, 
+            new_user.firstname, 
+            verification_token
+        ) # User registration event handled by hybrid task system
 
         return new_user
 
-    async def send_verification_email(self, user: User, token: str):
+    async def send_verification_email(self, email: str, firstname: str, token: str):
         """Sends a verification email using the send_email service."""
         if not settings.MAILJET_API_KEY or not settings.MAILJET_API_SECRET:
             print("Mailjet API key or secret not configured. Skipping email sending.")
@@ -285,7 +287,7 @@ class UserService:
         verification_link = f"{settings.FRONTEND_URL}/verify-email?token={token}"
 
         context = {
-            "customer_name": user.firstname,
+            "customer_name": firstname,
             "verification_link": verification_link,
             "company_name": "Banwee",
             "expiry_time": "24 hours",
@@ -295,14 +297,14 @@ class UserService:
         try:
             from core.utils.messages.email import send_email_mailjet_legacy
             await send_email_mailjet_legacy(
-                to_email=user.email,
+                to_email=email,
                 mail_type='activation',
                 context=context
             )
-            print(f"Verification email sent to {user.email} successfully.")
+            print(f"Verification email sent to {email} successfully.")
         except Exception as e:
             print(
-                f"Failed to send verification email to {user.email}. Error: {e}")
+                f"Failed to send verification email to {email}. Error: {e}")
 
     async def send_welcome_email(self, user: User):
         """Sends a welcome email after email verification."""
