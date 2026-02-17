@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional
 from uuid import UUID
 from core.utils.uuid_utils import uuid7
-import logging
+from core.logging import get_structured_logger
 
 from models.subscriptions import Subscription
 from models.orders import Order, OrderItem, OrderStatus, PaymentStatus, FulfillmentStatus, OrderSource
@@ -18,7 +18,7 @@ from models.user import User, Address
 from models.payments import PaymentMethod
 from core.db import get_db
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class SubscriptionScheduler:

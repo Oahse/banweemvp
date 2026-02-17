@@ -6,12 +6,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_
 from datetime import datetime, timezone
 from typing import Dict, Any, List
-import logging
+from core.logging import get_structured_logger
 
 from models.promocode import Promocode
 from core.db import get_db
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class PromoCodeScheduler:

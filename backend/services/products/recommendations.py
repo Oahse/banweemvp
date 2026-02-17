@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 from typing import List, Dict, Any, Tuple
 from uuid import UUID
 from datetime import datetime, timedelta, timezone
-import logging
+from core.logging import get_structured_logger
 
 from models.product import Product, ProductVariant
 from models.orders import Order, OrderItem
@@ -16,7 +16,7 @@ from models.cart import CartItem
 from models.review import Review
 from schemas.product import ProductResponse
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class RecommendationService:

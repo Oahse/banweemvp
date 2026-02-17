@@ -14,9 +14,9 @@ from uuid import UUID
 from datetime import datetime
 from typing import Dict, Any, Optional
 from core.config import settings
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class WebhookService:

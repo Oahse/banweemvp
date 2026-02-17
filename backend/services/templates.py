@@ -2,14 +2,14 @@
 Jinja Template Service for rendering emails and exports
 """
 import os
-import logging
 from typing import Dict, Any, Optional
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape, Template, TemplateError
 from pydantic import BaseModel
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class RenderedTemplate(BaseModel):

@@ -1,7 +1,6 @@
 """
 Painless refund service with automatic processing and intelligent approval
 """
-import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List, Optional
 from uuid import UUID
@@ -17,9 +16,10 @@ from models.payments import Transaction
 from models.user import User
 from schemas.refunds import RefundRequest, RefundResponse, RefundItemRequest
 from core.config import settings
+from core.logging import get_structured_logger
 import stripe
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class RefundService:

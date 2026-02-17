@@ -11,8 +11,9 @@ from core.config import settings
 import pickle
 import hashlib
 from uuid import UUID
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 class RedisManager:
     """

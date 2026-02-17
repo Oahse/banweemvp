@@ -1,7 +1,7 @@
 import asyncio
 import os
 import subprocess
-import logging
+from core.logging import get_structured_logger
 from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -54,9 +54,9 @@ async def lifespan(app: FastAPI):
     # Startup event
     # Validate environment variables first
     from core.config import validate_startup_environment, get_setup_instructions
-    import logging
+    from core.logging import get_structured_logger
     
-    logger = logging.getLogger(__name__)
+    logger = get_structured_logger(__name__)
     logger.info("Validating environment configuration...")
     
     validation_result = validate_startup_environment()

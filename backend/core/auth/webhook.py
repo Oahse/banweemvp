@@ -6,9 +6,9 @@ from fastapi import Request, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 import stripe
 from core.config import settings
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class WebhookSecurityError(Exception):

@@ -8,7 +8,7 @@ from sqlalchemy import select, and_, or_, func
 from typing import Optional, List
 from uuid import UUID
 from decimal import Decimal
-import logging
+from core.logging import get_logger
 
 from core.db import get_db
 from core.dependencies import get_current_user, require_admin
@@ -26,7 +26,7 @@ from schemas.tax import (
     TaxRateResponse,
 )
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 router = APIRouter(prefix="/tax", tags=["tax"])
 
 

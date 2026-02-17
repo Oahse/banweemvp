@@ -12,14 +12,14 @@ from contextlib import asynccontextmanager
 from fastapi import HTTPException
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
-import logging
+from core.logging import get_structured_logger
 from datetime import datetime as dt
 
 from core.logging import structured_logger
 from core.utils.uuid_utils import uuid7
 from core.errors.api_exceptions import DatabaseException, APIException
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 Base = declarative_base()
 CHAR_LENGTH = 255
@@ -571,8 +571,8 @@ def initialize_db(database_uri: str, env_is_local: bool, engine=None, use_optimi
 # Enhanced dependency to get the async session with retry logic
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Get database session with enhanced error handling and retry logic."""
-    # Get logger for this function
-    session_logger = logging.getLogger(__name__)
+    # Use the module-level structured logger
+    session_logger = logger
     
     # Ensure database is initialized before getting a session
     if not db_manager.session_factory:

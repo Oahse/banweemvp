@@ -10,8 +10,9 @@ from arq import create_pool, Worker
 from arq.connections import RedisSettings
 from arq.cron import cron
 from core.config import settings
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 # ARQ Redis settings
 ARQ_REDIS_SETTINGS = RedisSettings.from_dsn(settings.ARQ_REDIS_URL)

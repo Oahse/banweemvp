@@ -89,16 +89,16 @@ class StructuredLogger:
         log_path = Path(log_dir)
         log_path.mkdir(exist_ok=True)
         
-        # General application log with rotation
+        # General application log with rotation (INFO, WARNING, ERROR only)
         app_log_file = log_path / f"{self.name}.log"
         file_handler = RotatingFileHandler(
             app_log_file,
             maxBytes=10 * 1024 * 1024,  # 10MB
             backupCount=5
         )
-        file_handler.setLevel(logging.INFO)
+        file_handler.setLevel(logging.INFO)  # Only INFO and above
         
-        # Error log with daily rotation
+        # Error log with daily rotation (ERROR only)
         error_log_file = log_path / f"{self.name}_error.log"
         error_handler = TimedRotatingFileHandler(
             error_log_file,
@@ -106,7 +106,7 @@ class StructuredLogger:
             interval=1,
             backupCount=30
         )
-        error_handler.setLevel(logging.ERROR)
+        error_handler.setLevel(logging.ERROR)  # Only ERROR and above
         
         # JSON formatter for file logs
         json_formatter = logging.Formatter('%(message)s')

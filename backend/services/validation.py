@@ -10,9 +10,9 @@ from models.subscriptions import SubscriptionProduct
 from models.product import Product
 from decimal import Decimal
 from typing import List, Dict, Any, Optional
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class ValidationService:

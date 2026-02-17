@@ -3,7 +3,6 @@ Business Analytics Service
 Tracks and calculates key e-commerce metrics including conversion rates,
 cart abandonment, time to first purchase, refund rates, and repeat customers
 """
-import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List, Optional, Tuple
 from uuid import UUID
@@ -21,8 +20,9 @@ from models.orders import Order
 from models.user import User
 from models.refunds import Refund, RefundStatus
 from core.config import settings
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class AnalyticsService:

@@ -159,7 +159,11 @@ class OrderService:
         )
         # Tax is calculated on subtotal only (not shipping in most jurisdictions)
         tax_amount = (subtotal * Decimal(str(tax_rate))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        logger.info(f"Tax calculation: {tax_rate * 100}% on ${subtotal} = ${tax_amount}")
+        logger.info(f"Tax calculation", metadata={
+    "tax_rate_percent": tax_rate * 100,
+    "subtotal": float(subtotal),
+    "tax_amount": float(tax_amount)
+})
         
         # Step 4: Apply discount if provided
         discount_amount = Decimal('0.00')
@@ -1185,9 +1189,7 @@ class OrderService:
             }
         except Exception as e:
             # Log the full error for debugging
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"Error in get_user_orders: {str(e)}", exc_info=True)
+            logger.error(f"Error in get_user_orders: {str(e)}", exception=e)
             
             # Re-raise with more context
             from core.errors import APIException

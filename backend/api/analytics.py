@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 from uuid import UUID
-import logging
+from core.logging import get_logger
 
 from core.db import get_db
 from core.utils.response import Response
@@ -34,7 +34,7 @@ def require_admin(current_user: User = Depends(get_current_auth_user)):
         )
     return current_user
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 

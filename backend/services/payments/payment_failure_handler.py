@@ -5,14 +5,14 @@ Provides standardized failure categorization and recovery metadata.
 from enum import Enum
 from typing import Any, Dict, Optional
 from datetime import datetime
-import logging
+from core.logging import get_structured_logger
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from models.payments import PaymentIntent
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class PaymentFailureReason(str, Enum):

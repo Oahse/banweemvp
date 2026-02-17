@@ -6,9 +6,9 @@ from core.utils.uuid_utils import uuid7
 from models.shipping import ShippingMethod
 from schemas.shipping import ShippingMethodCreate, ShippingMethodUpdate
 from core.errors import APIException
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class ShippingService:

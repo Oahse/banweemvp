@@ -11,9 +11,9 @@ from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional, Tuple
 from decimal import Decimal
 from enum import Enum
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class DiscountType(Enum):

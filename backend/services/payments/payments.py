@@ -16,15 +16,15 @@ from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from enum import Enum
 from core.config import settings
+from core.logging import get_structured_logger
 import stripe
 import json
-import logging
 import time
 
 # Configure Stripe
 stripe.api_key = getattr(settings, 'STRIPE_SECRET_KEY', '')
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class PaymentFailureReason(Enum):

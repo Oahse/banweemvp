@@ -4,7 +4,7 @@ ARQ Worker Startup Script
 Run this to start the ARQ background task worker
 """
 import asyncio
-import logging
+from core.logging import get_structured_logger
 from arq import run_worker
 from core.arq_worker import WorkerSettings
 
@@ -14,7 +14,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 def main():
     """Start the ARQ worker"""

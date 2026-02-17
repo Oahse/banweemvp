@@ -18,9 +18,9 @@ from schemas.inventory import (
 )
 from core.errors import APIException
 import asyncio
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class InventoryService:
@@ -184,7 +184,9 @@ class InventoryService:
             return item_dict
             
         except Exception as e:
-            logger.error(f"Error serializing inventory item {item.id}: {e}", exc_info=True)
+            logger.error(f"Error serializing inventory item", metadata={
+    "item_id": str(item.id)
+}, exception=e)
             return None
 
     async def get_inventory_item_by_variant_id(self, variant_id: UUID) -> Optional[Inventory]:
@@ -196,7 +198,14 @@ class InventoryService:
 
     async def get_all_inventory_items(self, page: int = 1, limit: int = 10, product_id: Optional[UUID] = None, location_id: Optional[UUID] = None, low_stock: Optional[bool] = None, search: Optional[str] = None, sort_by: Optional[str] = None, sort_order: Optional[str] = None) -> dict:
         try:
-            logger.info(f"get_all_inventory_items called with params: page={page}, limit={limit}, sort_by={sort_by}, sort_order={sort_order}, low_stock={low_stock}, search={search}")
+            logger.info(f"get_all_inventory_items called", metadata={
+    "page": page,
+    "limit": limit,
+    "sort_by": sort_by,
+    "sort_order": sort_order,
+    "low_stock": low_stock,
+    "search": search
+})
             offset = (page - 1) * limit
             
             # Build query with proper eager loading
@@ -236,7 +245,10 @@ class InventoryService:
             sort_field = sort_by or "updated_at"
             sort_dir = sort_order or "desc"
             
-            logger.info(f"Applying sorting: sort_field={sort_field}, sort_dir={sort_dir}")
+            logger.info(f"Applying sorting", metadata={
+    "sort_field": sort_field,
+    "sort_dir": sort_dir
+})
             
             if sort_field == "created_at":
                 if sort_dir == "asc":
@@ -272,7 +284,9 @@ class InventoryService:
             query = query.offset(offset).limit(limit)
 
             # Log the final query for debugging
-            logger.info(f"Final SQL query: {str(query)}")
+            logger.info(f"Final SQL query", metadata={
+    "query": str(query)
+})
 
             # Execute queries
             total = await self.db.scalar(count_query) or 0
@@ -363,7 +377,9 @@ class InventoryService:
                     items_data.append(item_dict)
                     
                 except Exception as e:
-                    logger.error(f"Error serializing inventory item {getattr(item, 'id', 'unknown')}: {e}", exc_info=True)
+                    logger.error(f"Error serializing inventory item", metadata={
+    "item_id": str(getattr(item, 'id', 'unknown'))
+}, exception=e)
                     # Create a minimal safe item to prevent complete failure
                     safe_item = {
                         "id": str(getattr(item, 'id', '')),
@@ -394,7 +410,7 @@ class InventoryService:
         }
             
         except Exception as e:
-            logger.error(f"Error in get_all_inventory_items: {e}", exc_info=True)
+            logger.error(f"Error in get_all_inventory_items", exception=e)
             # Return empty result instead of raising exception
             return {
             "data": [],
@@ -474,12 +490,16 @@ class InventoryService:
                     return await self._perform_stock_adjustment(adjustment_data, adjusted_by_user_id, commit)
             else:
                 # Fallback to database-only lock if Redis unavailable
-                logger.warning(f"Redis lock service unavailable, using database-only lock for variant {adjustment_data.variant_id}")
+                logger.warning(f"Redis lock service unavailable, using database-only lock", metadata={
+    "variant_id": str(adjustment_data.variant_id)
+})
                 return await self._perform_stock_adjustment(adjustment_data, adjusted_by_user_id, commit)
                 
         except Exception as e:
             await self.db.rollback()
-            logger.error(f"Error adjusting stock for variant {adjustment_data.variant_id}: {e}")
+            logger.error(f"Error adjusting stock", metadata={
+    "variant_id": str(adjustment_data.variant_id)
+}, exception=e)
             raise
 
     async def _perform_stock_adjustment(self, adjustment_data: StockAdjustmentCreate, adjusted_by_user_id: Optional[UUID], commit: bool) -> Inventory:
@@ -521,12 +541,12 @@ class InventoryService:
                 try:
                     await self.sync_product_availability_status(variant.product_id)
                 except Exception as e:
-                    logger.warning(f"Failed to sync product availability after stock adjustment: {e}")
+                    logger.warning(f"Failed to sync product availability after stock adjustment", exception=e)
             
             return inventory
             
         except Exception as e:
-            logger.error(f"Error in stock adjustment: {e}")
+            logger.error(f"Error in stock adjustment", exception=e)
             raise APIException(
                 status_code=500,
                 message=f"Failed to adjust stock: {str(e)}"
@@ -697,7 +717,9 @@ class InventoryService:
                         })
                         
                 except Exception as e:
-                    logger.error(f"Error preparing warehouse data for variant {item_data.get('variant_id')}: {e}")
+                    logger.error(f"Error preparing warehouse data", metadata={
+    "variant_id": str(item_data.get('variant_id'))
+}, exception=e)
                     continue
             
             # Perform atomic bulk update
@@ -723,7 +745,7 @@ class InventoryService:
                 }
                 
         except Exception as e:
-            logger.error(f"Error in batch warehouse update: {e}")
+            logger.error(f"Error in batch warehouse update", exception=e)
             raise APIException(
                 status_code=500,
                 message=f"Failed to update inventory from warehouse data: {str(e)}"
@@ -771,7 +793,7 @@ class InventoryService:
         }
             
         except Exception as e:
-            logger.error(f"Error checking stock availability: {e}")
+            logger.error(f"Error checking stock availability", exception=e)
             return {
             "available": False,
             "current_stock": 0,
@@ -799,12 +821,16 @@ class InventoryService:
                     return await self._perform_decrement_stock(variant_id, quantity, location_id, order_id, user_id)
             else:
                 # Fallback to database-only lock if Redis unavailable
-                logger.warning(f"Redis lock service unavailable, using database-only lock for variant {variant_id}")
+                logger.warning(f"Redis lock service unavailable, using database-only lock", metadata={
+    "variant_id": str(variant_id)
+})
                 return await self._perform_decrement_stock(variant_id, quantity, location_id, order_id, user_id)
                 
         except Exception as e:
             await self.db.rollback()
-            logger.error(f"Error decrementing stock for variant {variant_id}: {e}")
+            logger.error(f"Error decrementing stock", metadata={
+    "variant_id": str(variant_id)
+}, exception=e)
             return {
                 "success": False,
                 "message": f"Failed to decrement stock: {str(e)}"
@@ -863,7 +889,10 @@ class InventoryService:
         
         await self.db.commit()
         
-        logger.info(f"Atomically decremented stock for variant {variant_id}: -{quantity}")
+        logger.info(f"Atomically decremented stock", metadata={
+    "variant_id": str(variant_id),
+    "quantity": quantity
+})
         
         # Queue product availability sync as background task (don't wait for it)
         try:
@@ -878,7 +907,9 @@ class InventoryService:
             if variant:
                 # Queue sync as background task - don't block the order response
                 await enqueue_sync_product_availability(str(variant.product_id))
-                logger.info(f"Queued inventory sync for product {variant.product_id}")
+                logger.info(f"Queued inventory sync", metadata={
+    "product_id": str(variant.product_id)
+})
         except Exception as sync_error:
             logger.warning(f"Failed to queue product availability sync: {sync_error}")
             # Don't fail the entire operation if queueing fails
@@ -925,7 +956,9 @@ class InventoryService:
                     return await self._perform_increment_stock(variant_id, quantity, location_id, order_id, user_id)
             else:
                 # Fallback to database-only lock if Redis unavailable
-                logger.warning(f"Redis lock service unavailable, using database-only lock for variant {variant_id}")
+                logger.warning(f"Redis lock service unavailable, using database-only lock", metadata={
+    "variant_id": str(variant_id)
+})
                 return await self._perform_increment_stock(variant_id, quantity, location_id, order_id, user_id)
                 
         except Exception as e:
@@ -980,7 +1013,9 @@ class InventoryService:
             if variant:
                 # Queue sync as background task - don't block the cancellation response
                 await enqueue_sync_product_availability(str(variant.product_id))
-                logger.info(f"Queued inventory sync for product {variant.product_id}")
+                logger.info(f"Queued inventory sync", metadata={
+    "product_id": str(variant.product_id)
+})
         except Exception as sync_error:
             logger.warning(f"Failed to queue product availability sync: {sync_error}")
             # Don't fail the entire operation if queueing fails

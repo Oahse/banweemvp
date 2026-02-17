@@ -14,9 +14,9 @@ from core.cache import RedisService, RedisKeyManager
 from core.config import settings
 from core.utils.response import Response as APIResponse
 from core.auth.config import security_settings
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 class SecurityService(RedisService):
     """Security service for abuse detection and protection"""

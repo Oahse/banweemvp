@@ -10,9 +10,9 @@ from core.db import BaseModel, CHAR_LENGTH, GUID
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List
 from uuid import UUID as UUIDType
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class WarehouseLocation(BaseModel):

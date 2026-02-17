@@ -15,9 +15,9 @@ from core.utils.messages.email import send_email
 import httpx
 from core.config import settings
 from core.utils.encryption import PasswordManager
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 class AddressService:
 

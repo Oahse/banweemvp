@@ -12,6 +12,9 @@ from models.product import ProductVariant
 from services.templates import JinjaTemplateService
 from core.config import settings
 from core.errors import APIException
+from core.logging import get_structured_logger
+
+logger = get_structured_logger(__name__)
 
 
 # ============================================================================

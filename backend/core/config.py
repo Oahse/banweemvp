@@ -18,10 +18,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import Field, field_validator, ValidationError, ConfigDict
 from pydantic_settings import BaseSettings
+from core.logging import get_structured_logger
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 # =============================================================================

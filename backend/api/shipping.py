@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from uuid import UUID
-import logging
+from core.logging import get_logger
 
 from core.db import get_db
 from core.dependencies import get_current_user, require_admin
@@ -20,7 +20,7 @@ from schemas.shipping import (
     ShippingMethodInDB
 )
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 router = APIRouter(prefix="/shipping", tags=["shipping"])
 
 

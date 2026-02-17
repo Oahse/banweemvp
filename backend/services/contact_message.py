@@ -11,7 +11,9 @@ from datetime import datetime
 
 from models.contact_message import ContactMessage
 from schemas.contact_message import ContactMessageCreate, ContactMessageUpdate
-from core.logging import logger
+from core.logging import get_structured_logger
+
+logger = get_structured_logger(__name__)
 
 
 class ContactMessageService:

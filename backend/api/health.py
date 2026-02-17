@@ -10,14 +10,14 @@ import asyncio
 import aiohttp
 import time
 from typing import Dict, Any, Optional
-import logging
+from core.logging import get_logger
 
 from core.db import get_db, DatabaseOptimizer
 from core.dependencies import get_current_user
 from models.user import User
 
 router = APIRouter(prefix="/health", tags=["health"])
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Health check response models
 

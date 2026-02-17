@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from uuid import UUID
 from core.utils.uuid_utils import uuid7
 from typing import List, Optional
-import logging
+from core.logging import get_structured_logger
 
 from models.wishlist import Wishlist, WishlistItem
 # Import Product and ProductVariant
@@ -13,7 +13,7 @@ from models.product import Product, ProductVariant
 from schemas.wishlist import WishlistCreate, WishlistUpdate, WishlistItemCreate
 
 # Configure logger
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class WishlistService:

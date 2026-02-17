@@ -8,11 +8,11 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Optional, Dict, Any, Callable, TypeVar, Generic
 from uuid import UUID
 from datetime import datetime
-import logging
+from core.logging import get_structured_logger
 from functools import wraps
 import asyncio
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 T = TypeVar('T')
 

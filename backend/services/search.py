@@ -7,9 +7,9 @@ from models.product import Product, Category
 from models.user import User
 from schemas.product import ProductResponse, CategoryResponse
 from schemas.user import UserResponse
-import logging
+from core.logging import get_structured_logger
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class SearchService:

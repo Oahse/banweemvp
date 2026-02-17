@@ -7,7 +7,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 import secrets
-import logging
+from core.logging import get_structured_logger
 from core.utils.uuid_utils import uuid7
 from core.config import settings
 from models.user import User
@@ -17,7 +17,7 @@ from core.db import get_db
 from core.utils.messages.email import send_email
 from core.utils.encryption import PasswordManager
 
-logger = logging.getLogger(__name__)
+logger = get_structured_logger(__name__)
 
 
 class AuthService:
