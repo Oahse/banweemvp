@@ -5,22 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Banwee - Authentic African Products{% endblock %}</title>
     <style>
-        /* Banwee Brand Colors - Matching Frontend */
+        /* Import Google Fonts - Matching Frontend */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap');
+        @import url('https://unpkg.com/lucide@latest/dist/css/lucide.css');
+
+        /* Banwee Brand Colors - Exact Frontend Match */
         :root {
-            --banwee-primary: #61b482;      /* Primary Green */
-            --banwee-primary-light: #8fd4a5; /* Primary Light */
-            --banwee-primary-dark: #4c9066;  /* Primary Dark */
-            --banwee-secondary: #f2c94c;    /* Secondary Yellow */
-            --banwee-secondary-light: #f5d563; /* Secondary Light */
-            --banwee-secondary-dark: #e6b843; /* Secondary Dark */
-            --banwee-main: #253d4e;         /* Main Dark */
-            --banwee-success: #61b482;     /* Success Green */
-            --banwee-warning: #f59e0b;     /* Warning Orange */
-            --banwee-error: #ef4444;       /* Error Red */
-            --banwee-text: #1e293b;        /* Text Color */
-            --banwee-text-light: #64748b;   /* Text Light */
-            --banwee-light: #f8fafc;        /* Light Background */
-            --banwee-white: #FFFFFF;
+            /* Brand Colors */
+            --color-main: #253d4e;
+            --color-primary: #61b482;
+            --color-primary-light: #8fd4a5;
+            --color-primary-dark: #4c9066;
+            --color-secondary: #f2c94c;
+            --color-secondary-light: #f5d563;
+            --color-secondary-dark: #e6b843;
+            
+            /* Semantic Colors */
+            --color-success: #61b482;
+            --color-success-light: #8fd4a5;
+            --color-success-dark: #4c9066;
+            --color-warning: #f59e0b;
+            --color-warning-light: #fbbf24;
+            --color-warning-dark: #d97706;
+            --color-error: #ef4444;
+            --color-error-light: #f87171;
+            --color-error-dark: #dc2626;
+            --color-info: #3b82f6;
+            --color-info-light: #60a5fa;
+            --color-info-dark: #2563eb;
+            --color-purple: #8b5cf6;
+            --color-purple-light: #a78bfa;
+            --color-purple-dark: #7c3aed;
+            --color-orange: #f97316;
+            --color-orange-light: #fb923c;
+            --color-orange-dark: #ea580c;
+            
+            /* Surface Colors */
+            --color-background: #f8fafc;
+            --color-surface: #ffffff;
+            --color-surface-elevated: #ffffff;
+            --color-surface-hover: #f1f5f9;
+            --color-surface-active: #e2e8f0;
+            --color-surface-disabled: #f8fafc;
+            
+            /* Text Colors */
+            --color-copy: #1e293b;
+            --color-copy-light: #64748b;
+            --color-copy-lighter: #94a3b8;
+            --color-copy-muted: #cbd5e1;
+            --color-copy-inverse: #ffffff;
+            
+            /* Border Colors */
+            --color-border: #e2e8f0;
+            --color-border-light: #f1f5f9;
+            --color-border-strong: #cbd5e1;
+            --color-border-focus: var(--color-primary);
+            
+            /* Interactive States */
+            --color-hover: rgba(97, 180, 130, 0.1);
+            --color-active: rgba(97, 180, 130, 0.2);
+            --color-focus: rgba(97, 180, 130, 0.3);
+            --color-disabled: #f1f5f9;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
         /* Fallback styles for email clients that don't support CSS variables */
@@ -36,12 +87,10 @@
             background: linear-gradient(135deg, #61b482 0%, #4c9066 100%) !important;
         }
         .email-content h1, .email-content h2, .email-content h3 {
-            color: #253d4e !important;
+            color: #1e293b !important;
         }
         .email-content p {
             color: #1e293b !important;
-        }
-        .email-content a {
             color: #61b482 !important;
         }
         .info-box {
@@ -144,48 +193,51 @@
         }
 
         .email-content h1 {
-            font-family: 'Montserrat', 'Roboto', sans-serif;
-            color: var(--banwee-main);
-            font-size: 28px;
+            font-family: 'Montserrat', sans-serif;
             font-weight: 700;
+            color: var(--color-copy);
+            font-size: 28px;
             margin: 0 0 20px 0;
             line-height: 1.2;
         }
 
         .email-content h2 {
-            font-family: 'Montserrat', 'Roboto', sans-serif;
-            color: var(--banwee-main);
-            font-size: 22px;
+            font-family: 'Montserrat', sans-serif;
             font-weight: 700;
+            color: var(--color-copy);
+            font-size: 22px;
             margin: 25px 0 15px 0;
             line-height: 1.2;
         }
 
         .email-content h3 {
-            font-family: 'Montserrat', 'Roboto', sans-serif;
-            color: var(--banwee-main);
-            font-size: 18px;
+            font-family: 'Montserrat', sans-serif;
             font-weight: 700;
+            color: var(--color-copy);
+            font-size: 18px;
             margin: 20px 0 10px 0;
             line-height: 1.2;
         }
 
         .email-content p {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 400;
             margin: 0 0 16px 0;
             font-size: 16px;
-            line-height: 1.7;
-            color: var(--banwee-text);
+            line-height: 1.6;
+            color: var(--color-copy);
         }
 
         .email-content a {
-            color: var(--banwee-secondary);
-            text-decoration: none;
+            font-family: 'Roboto', sans-serif;
             font-weight: 500;
-            transition: color 0.3s ease;
+            color: var(--color-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
         }
 
         .email-content a:hover {
-            color: #d35400;
+            color: var(--color-primary-dark);
             text-decoration: underline;
         }
 
@@ -241,7 +293,7 @@
             font-size: 18px;
         }
 
-        /* Call-to-Action Button - Matching Frontend Exactly */
+        /* Call-to-Action Button - Exact Frontend Match */
         .cta-container {
             text-align: center;
             margin: 30px 0;
@@ -251,15 +303,15 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: var(--banwee-primary);
-            color: var(--banwee-white);
+            background: var(--color-primary);
+            color: var(--color-copy-inverse);
             padding: 2px 20px;
             text-decoration: none;
             border-radius: 8px;
             font-family: 'Roboto', sans-serif;
             font-size: 14px;
             font-weight: 500;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-sm);
             transition: all 0.2s ease;
             border: none;
             cursor: pointer;
@@ -271,47 +323,47 @@
         }
 
         .cta-button:hover {
-            background: var(--banwee-primary-dark);
-            color: var(--banwee-white);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background: var(--color-primary-dark);
+            color: var(--color-copy-inverse);
+            box-shadow: var(--shadow-md);
             transform: translateY(-1px);
         }
 
         .cta-button:active {
-            background: var(--banwee-primary-dark);
-            color: var(--banwee-white);
+            background: var(--color-primary-dark);
+            color: var(--color-copy-inverse);
             transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-sm);
         }
 
         .cta-button:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--banwee-primary), 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: 2px solid var(--color-focus);
+            outline-offset: 2px;
         }
 
         .cta-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-            color: var(--banwee-white);
+            color: var(--color-copy-inverse);
         }
 
         /* Secondary Button Style */
         .cta-button-secondary {
             background: transparent;
-            color: var(--banwee-primary);
-            border: 2px solid var(--banwee-primary);
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
             box-shadow: none;
         }
 
         .cta-button-secondary:hover {
-            background: var(--banwee-primary);
-            color: var(--banwee-white);
+            background: var(--color-primary);
+            color: var(--color-copy-inverse);
         }
 
         .cta-button-secondary:disabled {
-            color: var(--banwee-text-light);
-            border-color: var(--banwee-text-light);
+            color: var(--color-copy-muted);
+            border-color: var(--color-copy-muted);
         }
 
         /* Info Box */
