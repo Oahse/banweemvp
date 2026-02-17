@@ -152,6 +152,12 @@ async def send_email_mailjet(
         print(f"   TextPart length: {len(payload['Messages'][0]['TextPart'])}")
         print(f"   HtmlPart length: {len(payload['Messages'][0]['HtmlPart'])}")
         
+        # Debug: Print the exact JSON payload being sent
+        import json
+        payload_json = json.dumps(payload, indent=2)
+        print(f"🔧 Debug: Full JSON payload being sent:")
+        print(payload_json)
+        
         # Send async request to Mailjet
         async with aiohttp.ClientSession() as session:
             async with session.post(
