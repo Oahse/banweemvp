@@ -158,6 +158,11 @@ async def send_email_mailjet(
         print(f"🔧 Debug: Full JSON payload being sent:")
         print(payload_json)
         
+        # Debug: Check if FromEmail is corrupted during JSON serialization
+        from_email_in_payload = payload['Messages'][0]['FromEmail']
+        print(f"🔧 Debug: FromEmail in payload before JSON: '{from_email_in_payload}'")
+        print(f"🔧 Debug: FromEmail in JSON: '{json.loads(payload_json)['Messages'][0]['FromEmail']}'")
+        
         # Send async request to Mailjet
         async with aiohttp.ClientSession() as session:
             async with session.post(
