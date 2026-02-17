@@ -155,6 +155,7 @@ class Subscription(BaseModel):
     delivery_address = relationship("Address", foreign_keys=[delivery_address_id])
     orders = relationship("Order", back_populates="subscription", lazy="select")
     applied_discounts = relationship("SubscriptionDiscount", back_populates="subscription", lazy="select")
+    variant_tracking_entries = relationship("VariantTrackingEntry", back_populates="subscription", lazy="select")
 
     def to_dict(self, include_products=False) -> Dict[str, Any]:
         data = {
