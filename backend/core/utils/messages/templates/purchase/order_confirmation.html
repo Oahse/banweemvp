@@ -3,39 +3,42 @@
 {% block title %}Order Confirmed - Banwee{% endblock %}
 
 {% block content %}
-<h1>✅ Order Confirmed!</h1>
+<div style="text-align: center; margin-bottom: 40px;">
+    <div style="display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: linear-gradient(135deg, var(--color-success), var(--color-success-dark)); border-radius: 50%; margin-bottom: 20px;">
+        <i data-lucide="check-circle" class="icon" style="color: var(--color-copy-inverse); width: 40px; height: 40px;"></i>
+    </div>
+    <h1>✅ Order Confirmed!</h1>
+</div>
 
 <p>Hi {{ customer_name | default("there") }},</p>
 
 <p>
     Thank you for your order! We're excited to prepare your authentic African products for delivery. 
-    Your order <strong style="color: #E67E22;">#{{ order_number }}</strong> has been confirmed and will be 
+    Your order <strong style="color: var(--color-primary);">#{{ order_number }}</strong> has been confirmed and will be 
     processed shortly.
 </p>
 
 <div class="highlight-box">
-    <h3>📦 Order Details</h3>
+    <h3><i data-lucide="package" class="icon" style="margin-right: 8px;"></i> Order Details</h3>
     <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
         <thead>
-            <tr style="border-bottom: 2px solid #2D5016;">
-                <th style="padding: 10px; text-align: left; color: #2D5016;">Product</th>
-                <th style="padding: 10px; text-align: center; color: #2D5016;">Qty</th>
-                <th style="padding: 10px; text-align: right; color: #2D5016;">Price</th>
+            <tr style="border-bottom: 2px solid var(--color-primary);">
+                <th style="text-align: left; padding: 10px; color: var(--color-copy); font-weight: 500;">Product</th>
+                <th style="text-align: left; padding: 10px; color: var(--color-copy); font-weight: 500;">Quantity</th>
+                <th style="text-align: right; padding: 10px; color: var(--color-copy); font-weight: 500;">Price</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in order_items %}
-            <tr style="border-bottom: 1px solid #ECF0F1;">
-                <td style="padding: 12px 10px;">{{ item.name }}</td>
-                <td style="padding: 12px 10px; text-align: center;">{{ item.quantity }}</td>
-                <td style="padding: 12px 10px; text-align: right; font-weight: 600;">{{ item.price }}</td>
+            <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 10px; color: var(--color-copy);">{{ product_name | default("Authentic African Products") }}</td>
+                <td style="padding: 10px; color: var(--color-copy);">{{ quantity | default("1") }}</td>
+                <td style="padding: 10px; color: var(--color-copy); text-align: right;">{{ total_amount | default("$0.00") }}</td>
             </tr>
-            {% endfor %}
         </tbody>
         <tfoot>
-            <tr style="border-top: 2px solid #2D5016;">
+            <tr style="border-top: 2px solid var(--color-primary);">
                 <td colspan="2" style="padding: 15px 10px; text-align: right; font-weight: bold; font-size: 16px;">Total:</td>
-                <td style="padding: 15px 10px; text-align: right; font-weight: bold; font-size: 18px; color: #E67E22;">{{ order_total }}</td>
+                <td style="padding: 15px 10px; text-align: right; font-weight: bold; font-size: 18px; color: var(--color-primary);">{{ order_total }}</td>
             </tr>
         </tfoot>
     </table>
@@ -55,25 +58,39 @@
     {% endif %}
 </div>
 
+<div class="info-box">
+    <p><strong><i data-lucide="truck" class="icon" style="margin-right: 4px;"></i> Shipping Information</strong><br>
+    Your order will be shipped to: {{ shipping_address | default("Your address") }}<br>
+    Expected delivery: 5-7 business days
+</p>
+</div>
+
 <div class="cta-container">
-    <a href="{{ order_tracking_url | default('#') }}" class="cta-button">
+    <a href="{{ frontend_url | default('https://banwee.com') }}/orders/{{ order_number | default('') }}" class="cta-button">
+        <i data-lucide="eye" class="icon" style="margin-right: 8px;"></i>
         Track Your Order
     </a>
 </div>
 
-<div class="info-box">
-    <p><strong>📧 What's Next?</strong><br>
-    You'll receive a shipping confirmation email with tracking information once your order is on its way. 
-    Estimated delivery: <strong>{{ estimated_delivery | default("3-5 business days") }}</strong></p>
+<div class="highlight-box">
+    <h3><i data-lucide="info" class="icon" style="margin-right: 8px;"></i> What's Next?</h3>
+    <ul>
+        <li><i data-lucide="package-2" class="icon" style="margin-right: 8px;"></i> We'll prepare your products with care</li>
+        <li><i data-lucide="mail" class="icon" style="margin-right: 8px;"></i> You'll receive shipping confirmation via email</li>
+        <li><i data-lucide="map-pin" class="icon" style="margin-right: 8px;"></i> Track your package in real-time</li>
+        <li><i data-lucide="home" class="icon" style="margin-right: 8px;"></i> Enjoy authentic African flavors at your doorstep</li>
+    </ul>
 </div>
 
-<p>
-    Thank you for supporting African farmers and artisans through your purchase. 
-    If you have any questions, our support team is here to help!
+<p style="margin-top: 30px;">
+    <strong><i data-lucide="help-circle" class="icon" style="margin-right: 4px;"></i> Questions About Your Order?</strong><br>
+    Our customer service team is here to help! Contact us at 
+    <a href="mailto:support@banwee.com" style="color: var(--color-primary);">support@banwee.com</a> or call us at 
+    <a href="tel:+1234567890" style="color: var(--color-primary);">+1 (234) 567-890</a>
 </p>
 
-<p style="margin-top: 30px;">
-    <strong>Happy Shopping!</strong><br>
-    The Banwee Team
+<p style="margin-top: 30px; text-align: center;">
+    <strong><i data-lucide="heart" class="icon" style="margin-right: 4px;"></i> Thank You for Supporting African Farmers!</strong><br>
+    <span style="color: var(--color-copy-light);">Your purchase helps sustain local communities and preserves traditional farming practices.</span>
 </p>
 {% endblock %}
