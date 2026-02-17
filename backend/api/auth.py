@@ -251,18 +251,36 @@ async def delete_address(
 
 @router.get("/verify-email")  # Changed to GET as it's typically a link click
 async def verify_email(
-    token: str,
-    background_tasks: BackgroundTasks,
+    token: str = Query(..., description="Verification token"),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: AsyncSession = Depends(get_db)
 ):
     """Verify user email with token."""
     try:
+        # Handle case where token might be embedded in HTML (frontend issue)
+        if token.startswith('<!DOCTYPE') or token.startswith('<!doctype'):
+            # Extract token from HTML - look for token parameter in URL
+            import re
+            # Look for token=...& or token=..." pattern
+            token_match = re.search(r'token=([^&"\s]+)', token)
+            if token_match:
+                token = token_match.group(1)
+                print(f"🔧 Debug: Extracted token from HTML: {token}")
+            else:
+                raise APIException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    message="Invalid verification token format"
+                )
+        
+        print(f"🔧 Debug: Processing verification token: {token}")
+        
         user_service = UserService(db)
         await user_service.verify_email(token, background_tasks)
         return APIResponse(success=True, message="Email verified successfully")
     except APIException:
         raise
     except Exception as e:
+        print(f"🔧 Debug: Verification error: {e}")
         raise APIException(
             status_code=status.HTTP_400_BAD_REQUEST,
             message="Invalid or expired verification token"
