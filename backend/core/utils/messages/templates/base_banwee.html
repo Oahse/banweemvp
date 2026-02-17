@@ -4,184 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Banwee - Authentic African Products{% endblock %}</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
     <style>
-        /* Import Google Fonts - Matching Frontend */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap');
-        @import url('https://unpkg.com/lucide@latest/dist/css/lucide.css');
-
-        /* Banwee Brand Colors - Exact Frontend Match */
+        /* Banwee Brand Colors */
         :root {
-            /* Brand Colors */
-            --color-main: #253d4e;
-            --color-primary: #61b482;
-            --color-primary-light: #8fd4a5;
-            --color-primary-dark: #4c9066;
-            --color-secondary: #f2c94c;
-            --color-secondary-light: #f5d563;
-            --color-secondary-dark: #e6b843;
-            
-            /* Semantic Colors */
-            --color-success: #61b482;
-            --color-success-light: #8fd4a5;
-            --color-success-dark: #4c9066;
-            --color-warning: #f59e0b;
-            --color-warning-light: #fbbf24;
-            --color-warning-dark: #d97706;
-            --color-error: #ef4444;
-            --color-error-light: #f87171;
-            --color-error-dark: #dc2626;
-            --color-info: #3b82f6;
-            --color-info-light: #60a5fa;
-            --color-info-dark: #2563eb;
-            --color-purple: #8b5cf6;
-            --color-purple-light: #a78bfa;
-            --color-purple-dark: #7c3aed;
-            --color-orange: #f97316;
-            --color-orange-light: #fb923c;
-            --color-orange-dark: #ea580c;
-            
-            /* Surface Colors */
-            --color-background: #f8fafc;
-            --color-surface: #ffffff;
-            --color-surface-elevated: #ffffff;
-            --color-surface-hover: #f1f5f9;
-            --color-surface-active: #e2e8f0;
-            --color-surface-disabled: #f8fafc;
-            
-            /* Text Colors */
-            --color-copy: #1e293b;
-            --color-copy-light: #64748b;
-            --color-copy-lighter: #94a3b8;
-            --color-copy-muted: #cbd5e1;
-            --color-copy-inverse: #ffffff;
-            
-            /* Border Colors */
-            --color-border: #e2e8f0;
-            --color-border-light: #f1f5f9;
-            --color-border-strong: #cbd5e1;
-            --color-border-focus: var(--color-primary);
-            
-            /* Interactive States */
-            --color-hover: rgba(97, 180, 130, 0.1);
-            --color-active: rgba(97, 180, 130, 0.2);
-            --color-focus: rgba(97, 180, 130, 0.3);
-            --color-disabled: #f1f5f9;
-            
-            /* Shadows */
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --banwee-primary: #2D5016;      /* Deep Forest Green */
+            --banwee-secondary: #E67E22;    /* Warm Orange */
+            --banwee-accent: #F39C12;       /* Golden Yellow */
+            --banwee-success: #27AE60;      /* Fresh Green */
+            --banwee-text: #2C3E50;         /* Dark Gray */
+            --banwee-light: #ECF0F1;        /* Light Gray */
+            --banwee-white: #FFFFFF;
         }
 
-        /* Fallback styles for email clients that don't support CSS variables */
-        .cta-button {
-            background: #61b482 !important;
-            color: #FFFFFF !important;
-        }
-        .cta-button:hover {
-            background: #4c9066 !important;
-            color: #FFFFFF !important;
-        }
-        .email-header {
-            background: linear-gradient(135deg, #61b482 0%, #4c9066 100%) !important;
-        }
-        .email-content h1, .email-content h2, .email-content h3 {
-            color: #1e293b !important;
-        }
-        .email-content p {
-            color: #1e293b !important;
-            color: #61b482 !important;
-        }
-        .info-box {
-            background: linear-gradient(135deg, #fffbf0 0%, #fff4d9 100%) !important;
-            border: 2px solid #f2c94c !important;
-        }
-        .info-box p {
-            color: #856404 !important;
-        }
-        .info-box strong {
-            color: #6d5103 !important;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
-            color: var(--banwee-text);
-            background-color: var(--banwee-light);
+            color: #2C3E50;
+            background-color: #F5F5F5;
             margin: 0;
             padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-
-        /* Import Google Fonts and Lucide Icons */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@700&display=swap');
-        @import url('https://unpkg.com/lucide@latest/dist/css/lucide.css');
 
         .email-wrapper {
             background-color: #F5F5F5;
             padding: 20px 10px;
+            width: 100%;
         }
 
         .email-container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: var(--banwee-white);
+            background-color: #FFFFFF;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-top: 6px solid var(--banwee-primary);
+            border-top: 6px solid #2D5016;
         }
 
         /* Header with Banwee Branding */
         .email-header {
-            background: linear-gradient(135deg, var(--banwee-primary) 0%, var(--banwee-primary-dark) 100%);
+            background: linear-gradient(135deg, #2D5016 0%, #3a6b1f 100%);
             padding: 35px 20px;
             text-align: center;
-            border-bottom: 4px solid var(--banwee-secondary);
+            border-bottom: 4px solid #E67E22;
         }
 
         .logo-container {
-            display: inline-block;
+            display: block;
             text-align: center;
         }
 
-        .email-header .logo-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--banwee-white);
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .email-header .logo-icon img {
+        .email-header .logo-image {
+            max-width: 180px;
             width: 100%;
-            height: 100%;
-            object-fit: contain;
-            padding: 8px;
-        }
-
-        .email-header .logo {
-            font-family: 'Montserrat', 'Roboto', sans-serif;
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--banwee-white);
-            text-decoration: none;
-            letter-spacing: 2px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            height: auto;
             display: block;
-            margin-bottom: 8px;
+            margin: 0 auto 12px;
         }
 
         .email-header .tagline {
-            color: var(--banwee-light);
-            font-size: 13px;
-            margin-top: 0;
+            color: #ECF0F1;
+            font-size: 14px;
+            margin-top: 8px;
             font-style: italic;
             letter-spacing: 0.5px;
         }
@@ -189,67 +90,59 @@
         /* Content Area */
         .email-content {
             padding: 45px 35px;
-            background-color: var(--banwee-white);
+            background-color: #FFFFFF;
         }
 
         .email-content h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            color: var(--color-copy);
+            color: #2D5016;
             font-size: 28px;
-            margin: 0 0 20px 0;
-            line-height: 1.2;
+            margin: 0 0 24px 0;
+            line-height: 1.3;
+            font-weight: 700;
         }
 
         .email-content h2 {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            color: var(--color-copy);
+            color: #2D5016;
             font-size: 22px;
-            margin: 25px 0 15px 0;
-            line-height: 1.2;
+            margin: 30px 0 16px 0;
+            font-weight: 600;
         }
 
         .email-content h3 {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            color: var(--color-copy);
+            color: #2D5016;
             font-size: 18px;
-            margin: 20px 0 10px 0;
-            line-height: 1.2;
+            margin: 20px 0 12px 0;
+            font-weight: 600;
         }
 
         .email-content p {
-            font-family: 'Roboto', sans-serif;
-            font-weight: 400;
             margin: 0 0 16px 0;
             font-size: 16px;
-            line-height: 1.6;
-            color: var(--color-copy);
+            line-height: 1.7;
+            color: #2C3E50;
         }
 
         .email-content a {
-            font-family: 'Roboto', sans-serif;
-            font-weight: 500;
-            color: var(--color-primary);
+            color: #E67E22;
             text-decoration: none;
-            transition: color 0.2s ease;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
 
         .email-content a:hover {
-            color: var(--color-primary-dark);
+            color: #d35400;
             text-decoration: underline;
         }
 
         .email-content strong {
-            color: var(--banwee-primary);
+            color: #2D5016;
             font-weight: 600;
         }
 
         /* Highlight Box */
         .highlight-box {
             background: linear-gradient(135deg, #f8fdf9 0%, #e8f5e9 100%);
-            border-left: 5px solid var(--banwee-success);
+            border-left: 5px solid #27AE60;
             border-radius: 10px;
             padding: 24px;
             margin: 28px 0;
@@ -257,7 +150,7 @@
         }
 
         .highlight-box h3 {
-            color: var(--banwee-primary);
+            color: #2D5016;
             margin: 0 0 16px 0;
             font-size: 19px;
             font-weight: 600;
@@ -288,88 +181,64 @@
             content: '✓';
             position: absolute;
             left: 0;
-            color: var(--banwee-primary);
+            color: #27AE60;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 20px;
+            top: 8px;
         }
 
-        /* Call-to-Action Button - Exact Frontend Match */
+        /* Call-to-Action Button */
         .cta-container {
             text-align: center;
-            margin: 30px 0;
+            margin: 35px 0;
         }
 
         .cta-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--color-primary);
-            color: var(--color-copy-inverse);
-            padding: 2px 20px;
+            display: inline-block;
+            background: linear-gradient(135deg, #E67E22 0%, #d35400 100%);
+            color: #FFFFFF;
+            padding: 18px 45px;
             text-decoration: none;
-            border-radius: 8px;
-            font-family: 'Roboto', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.2s ease;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 16px rgba(230, 126, 34, 0.35);
+            transition: all 0.3s ease;
             border: none;
-            cursor: pointer;
-            min-height: 36px;
-            text-align: center;
-            line-height: 1.4;
-            position: relative;
-            overflow: hidden;
         }
 
         .cta-button:hover {
-            background: var(--color-primary-dark);
-            color: var(--color-copy-inverse);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #d35400 0%, #E67E22 100%);
+            box-shadow: 0 8px 20px rgba(230, 126, 34, 0.45);
+            transform: translateY(-3px);
+            text-decoration: none;
+            color: #FFFFFF;
         }
 
-        .cta-button:active {
-            background: var(--color-primary-dark);
-            color: var(--color-copy-inverse);
-            transform: translateY(0);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .cta-button:focus {
-            outline: 2px solid var(--color-focus);
-            outline-offset: 2px;
-        }
-
-        .cta-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            color: var(--color-copy-inverse);
-        }
-
-        /* Secondary Button Style */
         .cta-button-secondary {
+            display: inline-block;
             background: transparent;
-            color: var(--color-primary);
-            border: 2px solid var(--color-primary);
-            box-shadow: none;
+            color: #2D5016;
+            padding: 16px 40px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid #2D5016;
+            transition: all 0.3s ease;
         }
 
         .cta-button-secondary:hover {
-            background: var(--color-primary);
-            color: var(--color-copy-inverse);
-        }
-
-        .cta-button-secondary:disabled {
-            color: var(--color-copy-muted);
-            border-color: var(--color-copy-muted);
+            background: #2D5016;
+            color: #FFFFFF;
+            text-decoration: none;
         }
 
         /* Info Box */
         .info-box {
             background: linear-gradient(135deg, #fffbf0 0%, #fff4d9 100%);
-            border: 2px solid var(--banwee-accent);
+            border: 2px solid #F39C12;
             border-radius: 10px;
             padding: 22px;
             margin: 28px 0;
@@ -389,7 +258,7 @@
         /* Success Box */
         .success-box {
             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border: 2px solid var(--banwee-success);
+            border: 2px solid #27AE60;
             border-radius: 10px;
             padding: 22px;
             margin: 28px 0;
@@ -420,8 +289,8 @@
 
         /* Footer */
         .email-footer {
-            background: linear-gradient(180deg, #1a3a0f 0%, var(--banwee-primary) 100%);
-            color: var(--banwee-light);
+            background: linear-gradient(180deg, #1a3a0f 0%, #2D5016 100%);
+            color: #ECF0F1;
             padding: 35px 25px 25px;
             text-align: center;
             font-size: 14px;
@@ -430,14 +299,14 @@
         .email-footer .footer-brand {
             font-size: 18px;
             font-weight: bold;
-            color: var(--banwee-white);
+            color: #FFFFFF;
             margin-bottom: 8px;
             letter-spacing: 2px;
         }
 
         .email-footer .footer-tagline {
             font-size: 13px;
-            color: var(--banwee-light);
+            color: #ECF0F1;
             margin-bottom: 20px;
             font-style: italic;
         }
@@ -448,70 +317,36 @@
         }
 
         .email-footer a {
-            color: var(--banwee-accent);
+            color: #F39C12;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
         }
 
         .email-footer a:hover {
-            color: var(--banwee-secondary);
+            color: #E67E22;
             text-decoration: underline;
         }
 
-        .email-footer .social-links {
+        .social-links {
             margin: 25px 0 20px 0;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
+            padding: 20px 0;
+            border-top: 1px solid rgba(236, 240, 241, 0.2);
+            border-bottom: 1px solid rgba(236, 240, 241, 0.2);
         }
 
-        .email-footer .social-links a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            color: var(--banwee-white);
+        .social-links a {
+            display: inline-block;
+            margin: 0 12px;
+            color: #FFFFFF;
             text-decoration: none;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            font-size: 15px;
+            transition: transform 0.3s ease, color 0.3s ease;
         }
 
-        .email-footer .social-links a:hover {
-            background: var(--banwee-secondary);
-            border-color: var(--banwee-secondary);
+        .social-links a:hover {
+            color: #F39C12;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(242, 156, 76, 0.3);
-        }
-
-        .email-footer .social-links a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, var(--banwee-secondary), var(--banwee-secondary-light));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            border-radius: 50%;
-        }
-
-        .email-footer .social-links a:hover::before {
-            opacity: 0.1;
-        }
-
-        .email-footer .social-links .icon {
-            width: 20px;
-            height: 20px;
-            stroke-width: 2;
         }
 
         .footer-links {
@@ -532,13 +367,22 @@
             line-height: 1.6;
         }
 
-        .divider {
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--banwee-light), transparent);
-            margin: 20px 0;
+        /* Table Styling */
+        table {
+            border-collapse: collapse;
+            width: 100%;
         }
 
-        /* Responsive */
+        table th {
+            font-weight: 600;
+            text-align: left;
+        }
+
+        table td {
+            vertical-align: top;
+        }
+
+        /* Responsive Design */
         @media only screen and (max-width: 600px) {
             .email-wrapper {
                 padding: 10px 5px;
@@ -552,19 +396,8 @@
                 padding: 25px 15px;
             }
 
-            .email-header .logo-icon {
-                width: 50px;
-                height: 50px;
-            }
-
-            .email-header .logo-icon svg {
-                width: 30px;
-                height: 30px;
-            }
-
-            .email-header .logo {
-                font-size: 26px;
-                letter-spacing: 2px;
+            .email-header .logo-image {
+                max-width: 150px;
             }
 
             .email-header .tagline {
@@ -577,15 +410,38 @@
 
             .email-content h1 {
                 font-size: 24px;
+                margin-bottom: 20px;
             }
 
             .email-content h2 {
                 font-size: 20px;
+                margin: 25px 0 12px 0;
+            }
+
+            .email-content h3 {
+                font-size: 17px;
+            }
+
+            .email-content p {
+                font-size: 15px;
             }
 
             .cta-button {
                 padding: 16px 35px;
                 font-size: 16px;
+                display: block;
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+
+            .cta-button-secondary {
+                padding: 14px 30px;
+                font-size: 15px;
+                display: block;
+                width: 100%;
+                max-width: 300px;
+                margin: 10px auto;
             }
 
             .highlight-box,
@@ -594,6 +450,10 @@
             .warning-box {
                 padding: 18px;
                 margin: 20px 0;
+            }
+
+            .highlight-box h3 {
+                font-size: 17px;
             }
 
             .social-links a {
@@ -605,27 +465,43 @@
                 padding: 25px 15px 20px;
             }
 
+            .footer-links a {
+                display: block;
+                margin: 8px 0;
+            }
+
             table {
                 font-size: 14px;
             }
 
             th, td {
                 padding: 8px 5px !important;
+                font-size: 14px !important;
             }
         }
 
-        /* Table Styling */
-        table {
-            border-collapse: collapse;
-        }
+        /* Extra small screens */
+        @media only screen and (max-width: 400px) {
+            .email-header .logo-image {
+                max-width: 120px;
+            }
 
-        table th {
-            font-weight: 600;
-            text-align: left;
-        }
+            .email-content h1 {
+                font-size: 22px;
+            }
 
-        table td {
-            vertical-align: top;
+            .email-content h2 {
+                font-size: 18px;
+            }
+
+            .email-content p {
+                font-size: 14px;
+            }
+
+            .cta-button {
+                padding: 14px 25px;
+                font-size: 15px;
+            }
         }
     </style>
 </head>
@@ -635,10 +511,9 @@
             <!-- Header -->
             <div class="email-header">
                 <div class="logo-container">
-                    <div class="logo-icon">
-                        <img src="https://banwee.com/banwee_logo_green.png" alt="Banwee Logo" onerror="this.src='http://localhost:5173/public/banwee_logo_green.png'" />
-                    </div>
-                    <a href="{{ frontend_url | default('https://banwee.com') }}" class="logo">BANWEE</a>
+                    <a href="{{ frontend_url | default('https://banwee.com') }}">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABVIAAAKsCAYAAABiDgXFAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABrSURBVHja7cEBDQAAAMKg909tDjegAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBby6EDAAFoB1fZAAAAAElFTkSuQmCC" alt="Banwee Logo" class="logo-image">
+                    </a>
                     <div class="tagline">Authentic African Products, Delivered Fresh</div>
                 </div>
             </div>
@@ -656,21 +531,11 @@
                 <div class="footer-tagline">Your trusted source for authentic African products</div>
                 
                 <div class="social-links">
-                    <a href="{{ social_facebook | default('https://facebook.com/banwee') }}" title="Follow us on Facebook" class="social-link">
-                        <i data-lucide="facebook" class="icon"></i>
-                    </a>
-                    <a href="{{ social_instagram | default('https://instagram.com/banwee') }}" title="Follow us on Instagram" class="social-link">
-                        <i data-lucide="instagram" class="icon"></i>
-                    </a>
-                    <a href="{{ social_twitter | default('https://twitter.com/banwee') }}" title="Follow us on Twitter" class="social-link">
-                        <i data-lucide="twitter" class="icon"></i>
-                    </a>
-                    <a href="{{ social_tiktok | default('https://tiktok.com/@banwee') }}" title="Follow us on TikTok" class="social-link">
-                        <i data-lucide="music" class="icon"></i>
-                    </a>
-                    <a href="{{ social_youtube | default('https://youtube.com/@banwee') }}" title="Subscribe on YouTube" class="social-link">
-                        <i data-lucide="youtube" class="icon"></i>
-                    </a>
+                    <a href="{{ social_facebook | default('https://facebook.com/banwee') }}" title="Follow us on Facebook">📘 Facebook</a>
+                    <a href="{{ social_instagram | default('https://instagram.com/banwee') }}" title="Follow us on Instagram">📷 Instagram</a>
+                    <a href="{{ social_twitter | default('https://twitter.com/banwee') }}" title="Follow us on Twitter">🐦 Twitter</a>
+                    <a href="{{ social_tiktok | default('https://tiktok.com/@banwee') }}" title="Follow us on TikTok">🎵 TikTok</a>
+                    <a href="{{ social_youtube | default('https://youtube.com/@banwee') }}" title="Subscribe on YouTube">📺 YouTube</a>
                 </div>
 
                 <div class="footer-links">
@@ -688,14 +553,5 @@
             </div>
         </div>
     </div>
-    
-    <!-- Initialize Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script>
-        // Initialize Lucide icons
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-    </script>
 </body>
 </html>
