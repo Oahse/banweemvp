@@ -163,22 +163,61 @@ async def send_email_mailjet(
         print(f"🔧 Debug: FromEmail in payload before JSON: '{from_email_in_payload}'")
         print(f"🔧 Debug: FromEmail in JSON: '{json.loads(payload_json)['Messages'][0]['FromEmail']}'")
         
+        # Try alternative payload format (Mailjet v3.0)
+        print(f"🔧 Debug: Trying alternative payload format...")
+        alt_payload = {
+            "FromEmail": str(from_address).strip(),
+            "FromName": str(from_name).strip(),
+            "Recipients": [
+                {
+                    "Email": str(to_email).strip(),
+                    "Name": str(context.get("to_name", "") or "").strip()
+                }
+            ],
+            "Subject": str(subject).strip(),
+            "Text-part": str(text_body).strip(),
+            "Html-part": str(html_body).strip()
+        }
+        
+        print(f"🔧 Debug: Alternative payload FromEmail: '{alt_payload['FromEmail']}'")
+        
         # Send async request to Mailjet
         async with aiohttp.ClientSession() as session:
-            async with session.post(
-                mailjet_url,
-                auth=aiohttp.BasicAuth(settings.MAILJET_API_KEY, settings.MAILJET_API_SECRET),
-                json=payload,
-                timeout=aiohttp.ClientTimeout(total=30)
-            ) as response:
-                if response.status == 200:
-                    result = await response.json()
-                    print(f"✅ Email sent successfully via Mailjet: {result}")
-                    return result
-                else:
-                    error_text = await response.text()
-                    print(f"❌ Mailjet error ({response.status}): {error_text}")
-                    raise Exception(f"Mailjet API error: {error_text}")
+            # Try with original payload first
+            try:
+                async with session.post(
+                    mailjet_url,
+                    auth=aiohttp.BasicAuth(settings.MAILJET_API_KEY, settings.MAILJET_API_SECRET),
+                    json=payload,
+                    timeout=aiohttp.ClientTimeout(total=30)
+                ) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        print(f"✅ Email sent successfully via Mailjet: {result}")
+                        return result
+                    else:
+                        error_text = await response.text()
+                        print(f"❌ Mailjet error with v3.1 format ({response.status}): {error_text}")
+                        
+                        # Try with alternative format
+                        print(f"🔧 Debug: Trying v3.0 format...")
+                        async with session.post(
+                            "https://api.mailjet.com/v3/send",
+                            auth=aiohttp.BasicAuth(settings.MAILJET_API_KEY, settings.MAILJET_API_SECRET),
+                            json=alt_payload,
+                            timeout=aiohttp.ClientTimeout(total=30)
+                        ) as alt_response:
+                            if alt_response.status == 200:
+                                result = await alt_response.json()
+                                print(f"✅ Email sent successfully via Mailjet v3.0: {result}")
+                                return result
+                            else:
+                                alt_error_text = await alt_response.text()
+                                print(f"❌ Mailjet error with v3.0 format ({alt_response.status}): {alt_error_text}")
+                                raise Exception(f"Both v3.1 and v3.0 failed. v3.1: {error_text}, v3.0: {alt_error_text}")
+            except Exception as e:
+                print(f"❌ Exception during Mailjet request: {e}")
+                raise
 
     except asyncio.TimeoutError:
         print("❌ Request timed out.")
