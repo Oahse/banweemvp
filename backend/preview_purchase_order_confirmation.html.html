@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Banwee - Authentic African Products{% endblock %}</title>
+    <title>Order Confirmed - Banwee</title>
     <style>
         /* Banwee Brand Colors */
         :root {
@@ -522,16 +522,76 @@
             <div class="email-header">
                 <div class="logo-container">
                     <div class="logo-icon"></div>
-                    <a href="{{ frontend_url | default('https://banwee.com') }}" class="logo">BANWEE</a>
+                    <a href="https://banwee.com" class="logo">BANWEE</a>
                     <div class="tagline">Authentic African Products, Delivered Fresh</div>
                 </div>
             </div>
 
             <!-- Content -->
             <div class="email-content">
-                {% block content %}
-                <!-- Email content goes here -->
-                {% endblock %}
+<h1>✅ Order Confirmed!</h1>
+
+<p>Hi Amina Johnson,</p>
+
+<p>
+    Thank you for your order! We're excited to prepare your authentic African products for delivery. 
+    Your order <strong style="color: #E67E22;">#BW-2024-12345</strong> has been confirmed and will be 
+    processed shortly.
+</p>
+
+<div class="highlight-box">
+    <h3>📦 Order Details</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+        <thead>
+            <tr style="border-bottom: 2px solid #2D5016;">
+                <th style="padding: 10px; text-align: left; color: #2D5016;">Product</th>
+                <th style="padding: 10px; text-align: center; color: #2D5016;">Qty</th>
+                <th style="padding: 10px; text-align: right; color: #2D5016;">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <tfoot>
+            <tr style="border-top: 2px solid #2D5016;">
+                <td colspan="2" style="padding: 15px 10px; text-align: right; font-weight: bold; font-size: 16px;">Total:</td>
+                <td style="padding: 15px 10px; text-align: right; font-weight: bold; font-size: 18px; color: #E67E22;"></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div style="background-color: #F5F5F5; padding: 20px; border-radius: 8px; margin: 25px 0;">
+    <p style="margin: 0 0 10px 0;"><strong>📅 Order Date:</strong> </p>
+    <p style="margin: 0 0 10px 0;"><strong>💳 Payment Method:</strong> Card</p>
+    <p style="margin: 0 0 5px 0;"><strong>📍 Shipping Address:</strong></p>
+    <p style="margin: 0; padding-left: 20px;">
+        <br>
+        , <br>
+        
+    </p>
+</div>
+
+<div class="cta-container">
+    <a href="#" class="cta-button">
+        Track Your Order
+    </a>
+</div>
+
+<div class="info-box">
+    <p><strong>📧 What's Next?</strong><br>
+    You'll receive a shipping confirmation email with tracking information once your order is on its way. 
+    Estimated delivery: <strong>3-5 business days</strong></p>
+</div>
+
+<p>
+    Thank you for supporting African farmers and artisans through your purchase. 
+    If you have any questions, our support team is here to help!
+</p>
+
+<p style="margin-top: 30px;">
+    <strong>Happy Shopping!</strong><br>
+    The Banwee Team
+</p>
             </div>
 
             <!-- Footer -->
@@ -540,23 +600,23 @@
                 <div class="footer-tagline">Your trusted source for authentic African products</div>
                 
                 <div class="social-links">
-                    <a href="{{ social_facebook | default('https://facebook.com/banwee') }}" title="Follow us on Facebook">📘 Facebook</a>
-                    <a href="{{ social_instagram | default('https://instagram.com/banwee') }}" title="Follow us on Instagram">📷 Instagram</a>
-                    <a href="{{ social_twitter | default('https://twitter.com/banwee') }}" title="Follow us on Twitter">🐦 Twitter</a>
-                    <a href="{{ social_tiktok | default('https://tiktok.com/@banwee') }}" title="Follow us on TikTok">🎵 TikTok</a>
-                    <a href="{{ social_youtube | default('https://youtube.com/@banwee') }}" title="Subscribe on YouTube">📺 YouTube</a>
+                    <a href="https://facebook.com/banwee" title="Follow us on Facebook">📘 Facebook</a>
+                    <a href="https://instagram.com/banwee" title="Follow us on Instagram">📷 Instagram</a>
+                    <a href="https://twitter.com/banwee" title="Follow us on Twitter">🐦 Twitter</a>
+                    <a href="https://tiktok.com/@banwee" title="Follow us on TikTok">🎵 TikTok</a>
+                    <a href="https://youtube.com/@banwee" title="Subscribe on YouTube">📺 YouTube</a>
                 </div>
 
                 <div class="footer-links">
-                    <a href="{{ help_url | default('#') }}">Help Center</a> •
-                    <a href="{{ contact_url | default('#') }}">Contact Us</a> •
-                    <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> •
-                    <a href="{{ privacy_url | default('#') }}">Privacy</a> •
-                    <a href="{{ terms_url | default('#') }}">Terms</a>
+                    <a href="#">Help Center</a> •
+                    <a href="#">Contact Us</a> •
+                    <a href="#">Unsubscribe</a> •
+                    <a href="#">Privacy</a> •
+                    <a href="#">Terms</a>
                 </div>
 
                 <div class="footer-copyright">
-                    &copy; {{ current_year | default('2026') }} Banwee. All rights reserved.<br>
+                    &copy; 2026 Banwee. All rights reserved.<br>
                     Supporting African farmers and artisans worldwide. 🌍
                 </div>
             </div>
