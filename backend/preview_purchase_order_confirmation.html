@@ -32,8 +32,9 @@
             padding: 0;
         }
 
-        /* Import Google Fonts */
+        /* Import Google Fonts and Lucide Icons */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@700&display=swap');
+        @import url('https://unpkg.com/lucide@latest/dist/css/lucide.css');
 
         .email-wrapper {
             background-color: #F5F5F5;
@@ -208,21 +209,23 @@
             font-size: 18px;
         }
 
-        /* Call-to-Action Button - Matching Frontend */
+        /* Call-to-Action Button - Matching Frontend Exactly */
         .cta-container {
             text-align: center;
             margin: 30px 0;
         }
 
         .cta-button {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             background: var(--banwee-primary);
             color: var(--banwee-white);
             padding: 16px 40px;
             text-decoration: none;
             border-radius: 8px;
             font-family: 'Roboto', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 500;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: all 0.2s ease;
@@ -231,6 +234,8 @@
             min-height: 40px;
             text-align: center;
             line-height: 1.4;
+            position: relative;
+            overflow: hidden;
         }
 
         .cta-button:hover {
@@ -242,6 +247,31 @@
         .cta-button:active {
             background: var(--banwee-primary-dark);
             transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--banwee-primary), 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Secondary Button Style */
+        .cta-button-secondary {
+            background: transparent;
+            color: var(--banwee-primary);
+            border: 2px solid var(--banwee-primary);
+            box-shadow: none;
+        }
+
+        .cta-button-secondary:hover {
+            background: var(--banwee-primary);
+            color: var(--banwee-white);
         }
 
         /* Info Box */
@@ -363,10 +393,10 @@
         }
 
         .email-footer .social-links a:hover {
-            background: var(--banwee-accent);
-            border-color: var(--banwee-accent);
+            background: var(--banwee-secondary);
+            border-color: var(--banwee-secondary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+            box-shadow: 0 4px 12px rgba(242, 156, 76, 0.3);
         }
 
         .email-footer .social-links a::before {
@@ -376,7 +406,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, var(--banwee-secondary), var(--banwee-accent));
+            background: linear-gradient(45deg, var(--banwee-secondary), var(--banwee-secondary-light));
             opacity: 0;
             transition: opacity 0.3s ease;
             border-radius: 50%;
@@ -384,6 +414,12 @@
 
         .email-footer .social-links a:hover::before {
             opacity: 0.1;
+        }
+
+        .email-footer .social-links .icon {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
         }
 
         .footer-links {
@@ -508,7 +544,7 @@
             <div class="email-header">
                 <div class="logo-container">
                     <div class="logo-icon">
-                        <img src="https://banwee.com/banwee_logo_green.png" alt="Banwee Logo" />
+                        <img src="https://banwee.com/banwee_logo_green.png" alt="Banwee Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiByeD0iMTIiIGZpbGw9IiM2MWI0ODIiLz4KPHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxMCIgeT0iMTAiPgo8cGF0aCBkPSJNMzAgMTBDMzAgMTAgMjAgMjAgMjAgMzBDMjAgNDAgMzAgNTAgMzAgNTBDNDAgNTAgNTAgNDAgNTAgMzBDNTAgMjAgNDAgMTAgMzAgMTBaIiBmaWxsPSIjZmZmZmZmIi8+CjxwYXRoIGQ9Ik0zMCAyMEMzMCAyMCAyNSAzMCAyNSAzNUMyNSA0MCAzMCA0NUMzNSA0NSA0MCA0NUM0MCA0MCA0NSA0MCA0NSAzNUM0NSAzMCA0MCAyMCAzNSAyMCAzNSAyMCAzNSAyMCAzNSAyMCAzNSAyMFoiIGZpbGw9IiM2MWI0ODIiLz4KPC9zdmc+Cjwvc3ZnPg=='" />
                     </div>
                     <a href="https://banwee.com" class="logo">BANWEE</a>
                     <div class="tagline">Authentic African Products, Delivered Fresh</div>
@@ -588,11 +624,21 @@
                 <div class="footer-tagline">Your trusted source for authentic African products</div>
                 
                 <div class="social-links">
-                    <a href="https://facebook.com/banwee" title="Follow us on Facebook">📘 Facebook</a>
-                    <a href="https://instagram.com/banwee" title="Follow us on Instagram">📷 Instagram</a>
-                    <a href="https://twitter.com/banwee" title="Follow us on Twitter">🐦 Twitter</a>
-                    <a href="https://tiktok.com/@banwee" title="Follow us on TikTok">🎵 TikTok</a>
-                    <a href="https://youtube.com/@banwee" title="Subscribe on YouTube">📺 YouTube</a>
+                    <a href="https://facebook.com/banwee" title="Follow us on Facebook" class="social-link">
+                        <i data-lucide="facebook" class="icon"></i>
+                    </a>
+                    <a href="https://instagram.com/banwee" title="Follow us on Instagram" class="social-link">
+                        <i data-lucide="instagram" class="icon"></i>
+                    </a>
+                    <a href="https://twitter.com/banwee" title="Follow us on Twitter" class="social-link">
+                        <i data-lucide="twitter" class="icon"></i>
+                    </a>
+                    <a href="https://tiktok.com/@banwee" title="Follow us on TikTok" class="social-link">
+                        <i data-lucide="music" class="icon"></i>
+                    </a>
+                    <a href="https://youtube.com/@banwee" title="Subscribe on YouTube" class="social-link">
+                        <i data-lucide="youtube" class="icon"></i>
+                    </a>
                 </div>
 
                 <div class="footer-links">
@@ -610,5 +656,14 @@
             </div>
         </div>
     </div>
+    
+    <!-- Initialize Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>

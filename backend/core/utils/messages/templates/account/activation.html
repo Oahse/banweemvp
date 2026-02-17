@@ -3,7 +3,12 @@
 {% block title %}Verify Your Email Address - Banwee{% endblock %}
 
 {% block content %}
-<h1>📧 Verify Your Email Address</h1>
+<div style="text-align: center; margin-bottom: 40px;">
+    <div style="display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: linear-gradient(135deg, var(--banwee-primary), var(--banwee-primary-dark)); border-radius: 50%; margin-bottom: 20px;">
+        <i data-lucide="mail" class="icon" style="color: white; width: 40px; height: 40px;"></i>
+    </div>
+    <h1>Verify Your Email Address</h1>
+</div>
 
 <p>Hi {{ customer_name | default("there") }},</p>
 
@@ -14,42 +19,44 @@
 
 <div class="cta-container">
     <a href="{{ verification_link | default('#') }}" class="cta-button">
+        <i data-lucide="check-circle" class="icon" style="margin-right: 8px;"></i>
         Verify Email Address
     </a>
 </div>
 
 <div class="info-box">
-    <p><strong>⏰ Quick Action Required:</strong> This verification link is valid for <strong>{{ expiry_time | default("24 hours") }}</strong>. 
+    <p><strong><i data-lucide="clock" class="icon" style="margin-right: 4px;"></i> Quick Action Required:</strong> This verification link is valid for <strong>{{ expiry_time | default("24 hours") }}</strong>. 
     Please verify your email soon to activate your account.</p>
 </div>
 
 <div class="highlight-box">
-    <h3>🎁 What You'll Get After Verification</h3>
+    <h3><i data-lucide="gift" class="icon" style="margin-right: 8px;"></i> What You'll Get After Verification</h3>
     <ul>
-        <li>Access to exclusive African products and artisan goods</li>
-        <li>Special welcome discount on your first order</li>
-        <li>Early access to new product launches</li>
-        <li>Personalized product recommendations</li>
-        <li>Order tracking and account management</li>
+        <li><i data-lucide="shopping-bag" class="icon" style="margin-right: 8px;"></i> Access to exclusive African products and artisan goods</li>
+        <li><i data-lucide="tag" class="icon" style="margin-right: 8px;"></i> Special welcome discount on your first order</li>
+        <li><i data-lucide="zap" class="icon" style="margin-right: 8px;"></i> Early access to new product launches</li>
+        <li><i data-lucide="heart" class="icon" style="margin-right: 8px;"></i> Personalized product recommendations</li>
+        <li><i data-lucide="package" class="icon" style="margin-right: 8px;"></i> Order tracking and account management</li>
     </ul>
 </div>
 
-<p style="text-align: center; color: #6B7280; font-size: 14px; margin-top: 30px;">
-    <strong>Didn't create an account?</strong><br>
+<p style="text-align: center; color: var(--banwee-text-light); font-size: 14px; margin-top: 30px;">
+    <strong><i data-lucide="info" class="icon" style="margin-right: 4px;"></i> Didn't create an account?</strong><br>
     If you didn't sign up for Banwee, you can safely ignore this email. No account will be created.
 </p>
 
 <p style="margin-top: 30px;">
-    If you're having trouble with the button above, copy and paste this link into your browser:<br>
-    <a href="{{ verification_link | default('#') }}" style="word-break: break-all; color: #E67E22;">{{ verification_link | default('#') }}</a>
+    <strong><i data-lucide="link" class="icon" style="margin-right: 4px;"></i> Having trouble with the button?</strong><br>
+    Copy and paste this link into your browser:<br>
+    <a href="{{ verification_link | default('#') }}" style="word-break: break-all; color: var(--banwee-primary);">{{ verification_link | default('#') }}</a>
 </p>
 
 <p style="margin-top: 30px;">
-    <strong>Need Help?</strong><br>
-    Our support team is here to assist you at support@banwee.com
+    <strong><i data-lucide="help-circle" class="icon" style="margin-right: 4px;"></i> Need Help?</strong><br>
+    Our support team is here to assist you at <a href="mailto:support@banwee.com" style="color: var(--banwee-primary);">support@banwee.com</a>
 </p>
 
-<p style="margin-top: 20px;">
-    Welcome to the Banwee family! 🌍
+<p style="margin-top: 30px; text-align: center;">
+    <strong><i data-lucide="globe" class="icon" style="margin-right: 4px;"></i> Welcome to the Banwee family!</strong>
 </p>
 {% endblock %}
