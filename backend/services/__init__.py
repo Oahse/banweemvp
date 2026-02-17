@@ -30,7 +30,6 @@ __all__ = [
     "AuthService",
     "CartService",
     "EmailService",
-    # "LoyaltyService",  # TODO: Implement loyalty service
     "ProductService",
     "PromocodeService",
     "ReviewService",

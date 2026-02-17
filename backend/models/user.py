@@ -90,7 +90,6 @@ class User(BaseModel):
     transactions = relationship("Transaction", back_populates="user", lazy="select")
     supplied_products = relationship("Product", back_populates="supplier", lazy="select")
     payment_intents = relationship("PaymentIntent", back_populates="user", lazy="select")
-    loyalty_account = relationship("LoyaltyAccount", back_populates="user", uselist=False, lazy="select")
     sessions = relationship("UserSession", back_populates="user", lazy="select")
     lifecycle_metrics = relationship("CustomerLifecycleMetrics", back_populates="user", lazy="select")
     

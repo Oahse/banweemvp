@@ -1,4 +1,5 @@
 # Models package - Consolidated imports only
+from core.db import Base
 from .user import User, Address
 from .product import Product, ProductVariant, ProductImage, Category
 from .cart import Cart, CartItem
