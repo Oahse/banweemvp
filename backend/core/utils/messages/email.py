@@ -91,10 +91,13 @@ async def send_email_mailjet(
         # Use pre-rendered HTML if provided, otherwise render template
         if html_content:
             html_body = html_content
+            print(f"🔧 Debug: Using provided html_content ({len(html_body)} chars)")
         else:
             html_body = await render_email(template_name, context)
+            print(f"🔧 Debug: Rendered template {template_name} ({len(html_body)} chars)")
         
         text_body = context.get("text_body", "This is a plain-text fallback.")
+        print(f"🔧 Debug: text_body = '{text_body}'")
         
         print(f'📤 Sending email via Mailjet to {to_email}...')
 
@@ -103,6 +106,8 @@ async def send_email_mailjet(
         
         # Parse from email
         from_email = settings.MAILJET_FROM_EMAIL
+        print(f"🔧 Debug: MAILJET_FROM_EMAIL = '{from_email}'")
+        
         if '<' in from_email and '>' in from_email:
             # Format: "Name <email@domain.com>"
             from_name = from_email.split('<')[0].strip()
@@ -111,6 +116,8 @@ async def send_email_mailjet(
             # Format: "email@domain.com"
             from_name = "Banwee"
             from_address = from_email
+        
+        print(f"🔧 Debug: from_name = '{from_name}', from_address = '{from_address}'")
         
         # Prepare Mailjet payload (v3.1 format)
         payload = {
@@ -130,6 +137,8 @@ async def send_email_mailjet(
                 }
             ]
         }
+        
+        print(f"🔧 Debug: Payload prepared with {len(html_body)} chars HTML and {len(text_body)} chars text")
         
         # Send async request to Mailjet
         async with aiohttp.ClientSession() as session:
