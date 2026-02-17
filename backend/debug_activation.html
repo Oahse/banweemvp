@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Banwee - Authentic African Products{% endblock %}</title>
+    <title>Verify Your Email Address - Banwee</title>
     <style>
         /* Banwee Brand Colors - Matching Frontend */
         :root {
@@ -586,16 +586,69 @@
                     <div class="logo-icon">
                         <img src="https://banwee.com/banwee_logo_green.png" alt="Banwee Logo" onerror="this.src='http://localhost:5173/public/banwee_logo_green.png'" />
                     </div>
-                    <a href="{{ frontend_url | default('https://banwee.com') }}" class="logo">BANWEE</a>
+                    <a href="https://banwee.com" class="logo">BANWEE</a>
                     <div class="tagline">Authentic African Products, Delivered Fresh</div>
                 </div>
             </div>
 
             <!-- Content -->
             <div class="email-content">
-                {% block content %}
-                <!-- Email content goes here -->
-                {% endblock %}
+<div style="text-align: center; margin-bottom: 40px;">
+    <div style="display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: linear-gradient(135deg, var(--banwee-primary), var(--banwee-primary-dark)); border-radius: 50%; margin-bottom: 20px;">
+        <i data-lucide="mail" class="icon" style="color: white; width: 40px; height: 40px;"></i>
+    </div>
+    <h1>Verify Your Email Address</h1>
+</div>
+
+<p>Hi Amina Johnson,</p>
+
+<p>
+    Thank you for creating a Banwee account! To complete your registration and start shopping for authentic African products, 
+    please verify your email address by clicking the button below.
+</p>
+
+<div class="cta-container">
+    <a href="https://banwee.com/verify-email?token=C427A86xeZDpJUAIoRFeC9t6N29SizcOBPKeD77NFPg" class="cta-button">
+        <i data-lucide="check-circle" class="icon" style="margin-right: 8px;"></i>
+        Verify Email Address
+    </a>
+</div>
+
+<div class="info-box">
+    <p><strong><i data-lucide="clock" class="icon" style="margin-right: 4px;"></i> Quick Action Required:</strong> This verification link is valid for <strong>24 hours</strong>. 
+    Please verify your email soon to activate your account.</p>
+</div>
+
+<div class="highlight-box">
+    <h3><i data-lucide="gift" class="icon" style="margin-right: 8px;"></i> What You'll Get After Verification</h3>
+    <ul>
+        <li><i data-lucide="shopping-bag" class="icon" style="margin-right: 8px;"></i> Access to exclusive African products and artisan goods</li>
+        <li><i data-lucide="tag" class="icon" style="margin-right: 8px;"></i> Special welcome discount on your first order</li>
+        <li><i data-lucide="zap" class="icon" style="margin-right: 8px;"></i> Early access to new product launches</li>
+        <li><i data-lucide="heart" class="icon" style="margin-right: 8px;"></i> Personalized product recommendations</li>
+        <li><i data-lucide="package" class="icon" style="margin-right: 8px;"></i> Order tracking and account management</li>
+    </ul>
+</div>
+
+<p style="text-align: center; color: var(--banwee-text-light); font-size: 14px; margin-top: 30px;">
+    <strong><i data-lucide="info" class="icon" style="margin-right: 4px;"></i> Didn't create an account?</strong><br>
+    If you didn't sign up for Banwee, you can safely ignore this email. No account will be created.
+</p>
+
+<p style="margin-top: 30px;">
+    <strong><i data-lucide="link" class="icon" style="margin-right: 4px;"></i> Having trouble with the button?</strong><br>
+    Copy and paste this link into your browser:<br>
+    <a href="https://banwee.com/verify-email?token=C427A86xeZDpJUAIoRFeC9t6N29SizcOBPKeD77NFPg" style="word-break: break-all; color: var(--banwee-primary);">https://banwee.com/verify-email?token=C427A86xeZDpJUAIoRFeC9t6N29SizcOBPKeD77NFPg</a>
+</p>
+
+<p style="margin-top: 30px;">
+    <strong><i data-lucide="help-circle" class="icon" style="margin-right: 4px;"></i> Need Help?</strong><br>
+    Our support team is here to assist you at <a href="mailto:support@banwee.com" style="color: var(--banwee-primary);">support@banwee.com</a>
+</p>
+
+<p style="margin-top: 30px; text-align: center;">
+    <strong><i data-lucide="globe" class="icon" style="margin-right: 4px;"></i> Welcome to the Banwee family!</strong>
+</p>
             </div>
 
             <!-- Footer -->
@@ -604,33 +657,33 @@
                 <div class="footer-tagline">Your trusted source for authentic African products</div>
                 
                 <div class="social-links">
-                    <a href="{{ social_facebook | default('https://facebook.com/banwee') }}" title="Follow us on Facebook" class="social-link">
+                    <a href="https://facebook.com/banwee" title="Follow us on Facebook" class="social-link">
                         <i data-lucide="facebook" class="icon"></i>
                     </a>
-                    <a href="{{ social_instagram | default('https://instagram.com/banwee') }}" title="Follow us on Instagram" class="social-link">
+                    <a href="https://instagram.com/banwee" title="Follow us on Instagram" class="social-link">
                         <i data-lucide="instagram" class="icon"></i>
                     </a>
-                    <a href="{{ social_twitter | default('https://twitter.com/banwee') }}" title="Follow us on Twitter" class="social-link">
+                    <a href="https://twitter.com/banwee" title="Follow us on Twitter" class="social-link">
                         <i data-lucide="twitter" class="icon"></i>
                     </a>
-                    <a href="{{ social_tiktok | default('https://tiktok.com/@banwee') }}" title="Follow us on TikTok" class="social-link">
+                    <a href="https://tiktok.com/@banwee" title="Follow us on TikTok" class="social-link">
                         <i data-lucide="music" class="icon"></i>
                     </a>
-                    <a href="{{ social_youtube | default('https://youtube.com/@banwee') }}" title="Subscribe on YouTube" class="social-link">
+                    <a href="https://youtube.com/@banwee" title="Subscribe on YouTube" class="social-link">
                         <i data-lucide="youtube" class="icon"></i>
                     </a>
                 </div>
 
                 <div class="footer-links">
-                    <a href="{{ help_url | default('#') }}">Help Center</a> •
-                    <a href="{{ contact_url | default('#') }}">Contact Us</a> •
-                    <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> •
-                    <a href="{{ privacy_url | default('#') }}">Privacy</a> •
-                    <a href="{{ terms_url | default('#') }}">Terms</a>
+                    <a href="https://banwee.com/help">Help Center</a> •
+                    <a href="https://banwee.com/contact">Contact Us</a> •
+                    <a href="https://banwee.com/unsubscribe">Unsubscribe</a> •
+                    <a href="https://banwee.com/privacy">Privacy</a> •
+                    <a href="https://banwee.com/terms">Terms</a>
                 </div>
 
                 <div class="footer-copyright">
-                    &copy; {{ current_year | default('2026') }} Banwee. All rights reserved.<br>
+                    &copy; 2026 Banwee. All rights reserved.<br>
                     Supporting African farmers and artisans worldwide. 🌍
                 </div>
             </div>
