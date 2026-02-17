@@ -386,24 +386,24 @@ class InventoryService:
                     items_data.append(safe_item)
 
             return {
-                "data": items_data,
-                "total": total,
-                "page": page,
-                "limit": limit,
-                "pages": (total + limit - 1) // limit if total > 0 else 0
-            }
+            "data": items_data,
+            "total": total,
+            "page": page,
+            "limit": limit,
+            "pages": (total + limit - 1) // limit if total > 0 else 0
+        }
             
         except Exception as e:
             logger.error(f"Error in get_all_inventory_items: {e}", exc_info=True)
             # Return empty result instead of raising exception
             return {
-                "data": [],
-                "total": 0,
-                "page": page,
-                "limit": limit,
-                "pages": 0,
-                "error": f"Database error: {str(e)}"
-            }
+            "data": [],
+            "total": 0,
+            "page": page,
+            "limit": limit,
+            "pages": 0,
+            "error": f"Database error: {str(e)}"
+        }
 
     async def create_inventory_item(self, inventory_data: InventoryCreate) -> InventoryResponse:
         existing_inventory = await self.get_inventory_item_by_variant_id(inventory_data.variant_id)
@@ -465,12 +465,30 @@ class InventoryService:
         await self.db.commit()
 
     async def adjust_stock(self, adjustment_data: StockAdjustmentCreate, adjusted_by_user_id: Optional[UUID] = None, commit: bool = True) -> Inventory:
-        """Adjust stock levels atomically with SELECT ... FOR UPDATE"""
+        """Adjust stock levels atomically with distributed and database locks"""
         try:
-            # Use atomic stock operation from the model
+            # Use distributed lock FIRST to prevent race conditions across servers
+            if self.lock_service:
+                lock = self.lock_service.get_inventory_lock(adjustment_data.variant_id, timeout=30)
+                async with lock:
+                    return await self._perform_stock_adjustment(adjustment_data, adjusted_by_user_id, commit)
+            else:
+                # Fallback to database-only lock if Redis unavailable
+                logger.warning(f"Redis lock service unavailable, using database-only lock for variant {adjustment_data.variant_id}")
+                return await self._perform_stock_adjustment(adjustment_data, adjusted_by_user_id, commit)
+                
+        except Exception as e:
+            await self.db.rollback()
+            logger.error(f"Error adjusting stock for variant {adjustment_data.variant_id}: {e}")
+            raise
+
+    async def _perform_stock_adjustment(self, adjustment_data: StockAdjustmentCreate, adjusted_by_user_id: Optional[UUID], commit: bool) -> Inventory:
+        """Internal method to perform stock adjustment with database lock"""
+        try:
+            # Use atomic stock operation from model
             from models.inventories import Inventory
             
-            # Get inventory with lock
+            # Get inventory with database lock
             inventory = await Inventory.get_with_lock(self.db, adjustment_data.variant_id)
             
             if not inventory:
@@ -492,7 +510,7 @@ class InventoryService:
                 await self.db.commit()
             
             # Sync product availability status after stock change
-            # Get the product_id from the variant
+            # Get product_id from variant
             variant_result = await self.db.execute(
                 select(ProductVariant).where(ProductVariant.id == adjustment_data.variant_id)
             )
@@ -743,24 +761,24 @@ class InventoryService:
             available = inventory.quantity_available >= quantity and inventory.quantity_available > 0
             
             return {
-                "available": available,
-                "current_stock": inventory.quantity_available,
-                "requested_quantity": quantity,
-                "inventory_id": str(inventory.id),
-                "location_id": str(inventory.location_id),
-                "stock_status": inventory.stock_status,
-                "message": "Stock available" if available else f"Out of stock" if inventory.quantity_available <= 0 else f"Insufficient stock. Available: {inventory.quantity_available}, Requested: {quantity}"
-            }
+            "available": available,
+            "current_stock": inventory.quantity_available,
+            "requested_quantity": quantity,
+            "inventory_id": str(inventory.id),
+            "location_id": str(inventory.location_id),
+            "stock_status": inventory.stock_status,
+            "message": "Stock available" if available else f"Out of stock" if inventory.quantity_available <= 0 else f"Insufficient stock. Available: {inventory.quantity_available}, Requested: {quantity}"
+        }
             
         except Exception as e:
             logger.error(f"Error checking stock availability: {e}")
             return {
-                "available": False,
-                "current_stock": 0,
-                "requested_quantity": quantity,
-                "stock_status": "out_of_stock",
-                "message": f"Error checking stock: {str(e)}"
-            }
+            "available": False,
+            "current_stock": 0,
+            "requested_quantity": quantity,
+            "stock_status": "out_of_stock",
+            "message": f"Error checking stock: {str(e)}"
+        }
 
     async def decrement_stock_on_purchase(
         self,
@@ -771,83 +789,109 @@ class InventoryService:
         user_id: Optional[UUID] = None
     ) -> Dict[str, Any]:
         """
-        Atomically decrement stock on purchase using SELECT ... FOR UPDATE
+        Atomically decrement stock on purchase using distributed and database locks
         """
         try:
-            # Get inventory with atomic lock - find by variant_id if location_id not provided
-            if location_id:
-                inventory = await self.db.execute(
-                    select(Inventory).where(
-                        and_(Inventory.variant_id == variant_id, Inventory.location_id == location_id)
-                    ).with_for_update()
-                )
+            # Use distributed lock FIRST to prevent race conditions across servers
+            if self.lock_service:
+                lock = self.lock_service.get_inventory_lock(variant_id, timeout=30)
+                async with lock:
+                    return await self._perform_decrement_stock(variant_id, quantity, location_id, order_id, user_id)
             else:
-                # Find first available inventory for this variant
-                inventory = await self.db.execute(
-                    select(Inventory).where(
-                        and_(Inventory.variant_id == variant_id, Inventory.quantity_available >= quantity)
-                    ).with_for_update().limit(1)
-                )
-            
-            inventory = inventory.scalar_one_or_none()
-            
-            if not inventory:
-                return {
-                    "success": False,
-                    "message": f"Inventory not found for variant {variant_id}" + (f" at location {location_id}" if location_id else "")
-                }
-            
-            # Check if sufficient stock available
-            if inventory.quantity_available < quantity:
-                return {
-                    "success": False,
-                    "message": f"Out of stock" if inventory.quantity_available <= 0 else f"Insufficient stock. Available: {inventory.quantity_available}, Requested: {quantity}",
-                    "available_quantity": inventory.quantity_available,
-                    "requested_quantity": quantity,
-                    "stock_status": inventory.stock_status
-                }
-            
-            # Perform atomic stock update
-            adjustment = await inventory.atomic_update_stock(
-                db=self.db,
-                quantity_change=-quantity,
-                reason="order_purchase",
-                user_id=user_id,
-                notes=f"Stock decremented for order {order_id}" if order_id else "Stock decremented for purchase"
-            )
-            
-            await self.db.commit()
-            
-            logger.info(f"Atomically decremented stock for variant {variant_id}: -{quantity}")
-            
-            # Queue product availability sync as background task (don't wait for it)
-            try:
-                from core.arq_worker import enqueue_sync_product_availability
+                # Fallback to database-only lock if Redis unavailable
+                logger.warning(f"Redis lock service unavailable, using database-only lock for variant {variant_id}")
+                return await self._perform_decrement_stock(variant_id, quantity, location_id, order_id, user_id)
                 
-                # Get the variant to find its product
-                variant_result = await self.db.execute(
-                    select(ProductVariant).where(ProductVariant.id == variant_id)
-                )
-                variant = variant_result.scalar_one_or_none()
-                
-                if variant:
-                    # Queue sync as background task - don't block the order response
-                    await enqueue_sync_product_availability(str(variant.product_id))
-                    logger.info(f"Queued inventory sync for product {variant.product_id}")
-            except Exception as sync_error:
-                logger.warning(f"Failed to queue product availability sync: {sync_error}")
-                # Don't fail the entire operation if queueing fails
-            
+        except Exception as e:
+            await self.db.rollback()
+            logger.error(f"Error decrementing stock for variant {variant_id}: {e}")
             return {
-                "success": True,
-                "old_quantity": inventory.quantity_available + quantity,
-                "new_quantity": inventory.quantity_available,
-                "quantity_decremented": quantity,
-                "inventory_id": str(inventory.id),
-                "location_id": str(inventory.location_id),
-                "stock_status": inventory.stock_status,
-                "adjustment_id": str(adjustment.id)
+                "success": False,
+                "message": f"Failed to decrement stock: {str(e)}"
             }
+
+    async def _perform_decrement_stock(
+        self,
+        variant_id: UUID,
+        quantity: int,
+        location_id: Optional[UUID] = None,
+        order_id: Optional[UUID] = None,
+        user_id: Optional[UUID] = None
+    ) -> Dict[str, Any]:
+        """Internal method to perform stock decrement with database lock"""
+        # Get inventory with atomic lock - find by variant_id if location_id not provided
+        if location_id:
+            inventory = await self.db.execute(
+                select(Inventory).where(
+                    and_(Inventory.variant_id == variant_id, Inventory.location_id == location_id)
+                ).with_for_update()
+            )
+        else:
+            # Find first available inventory for this variant
+            inventory = await self.db.execute(
+                select(Inventory).where(
+                    and_(Inventory.variant_id == variant_id, Inventory.quantity_available >= quantity)
+                ).with_for_update().limit(1)
+            )
+        
+        inventory = inventory.scalar_one_or_none()
+        
+        if not inventory:
+            return {
+                "success": False,
+                "message": f"Inventory not found for variant {variant_id}" + (f" at location {location_id}" if location_id else "")
+            }
+        
+        # Check if sufficient stock available
+        if inventory.quantity_available < quantity:
+            return {
+                "success": False,
+                "message": f"Out of stock" if inventory.quantity_available <= 0 else f"Insufficient stock. Available: {inventory.quantity_available}, Requested: {quantity}",
+                "available_quantity": inventory.quantity_available,
+                "requested_quantity": quantity,
+                "stock_status": inventory.stock_status
+            }
+        
+        # Perform atomic stock update
+        adjustment = await inventory.atomic_update_stock(
+            db=self.db,
+            quantity_change=-quantity,
+            reason="order_purchase",
+            user_id=user_id,
+            notes=f"Stock decremented for order {order_id}" if order_id else "Stock decremented for purchase"
+        )
+        
+        await self.db.commit()
+        
+        logger.info(f"Atomically decremented stock for variant {variant_id}: -{quantity}")
+        
+        # Queue product availability sync as background task (don't wait for it)
+        try:
+            from core.arq_worker import enqueue_sync_product_availability
+            
+            # Get the variant to find its product
+            variant_result = await self.db.execute(
+                select(ProductVariant).where(ProductVariant.id == variant_id)
+            )
+            variant = variant_result.scalar_one_or_none()
+            
+            if variant:
+                # Queue sync as background task - don't block the order response
+                await enqueue_sync_product_availability(str(variant.product_id))
+                logger.info(f"Queued inventory sync for product {variant.product_id}")
+        except Exception as sync_error:
+            logger.warning(f"Failed to queue product availability sync: {sync_error}")
+            # Don't fail the entire operation if queueing fails
+        
+            return {
+            "success": True,
+            "message": "Stock decremented successfully",
+            "inventory_id": str(inventory.id),
+            "previous_quantity": inventory.quantity_available + quantity,
+            "new_quantity": inventory.quantity_available,
+            "quantity_decremented": quantity,
+            "adjustment_id": str(adjustment.id) if adjustment else None
+        }
             
         except APIException:
             await self.db.rollback()
@@ -871,57 +915,85 @@ class InventoryService:
         user_id: Optional[UUID] = None
     ) -> Dict[str, Any]:
         """
-        Atomically increment stock when order is cancelled using SELECT ... FOR UPDATE
+        Atomically increment stock when order is cancelled using distributed and database locks
         """
         try:
-            # Get inventory with atomic lock
-            inventory = await Inventory.get_with_lock(self.db, variant_id)
-            
-            if not inventory:
-                raise APIException(
-                    status_code=404,
-                    message=f"Inventory not found for variant {variant_id}"
-                )
-            
-            # Perform atomic stock update
-            adjustment = await inventory.atomic_update_stock(
-                db=self.db,
-                quantity_change=quantity,
-                reason="order_cancelled",
-                user_id=user_id,
-                notes=f"Stock restored from cancelled order {order_id}" if order_id else "Stock restored from cancellation"
-            )
-            
-            await self.db.commit()
-            
-            logger.info(f"Atomically incremented stock for variant {variant_id}: +{quantity}")
-            
-            # Queue product availability sync as background task (don't wait for it)
-            try:
-                from core.arq_worker import enqueue_sync_product_availability
+            # Use distributed lock FIRST to prevent race conditions across servers
+            if self.lock_service:
+                lock = self.lock_service.get_inventory_lock(variant_id, timeout=30)
+                async with lock:
+                    return await self._perform_increment_stock(variant_id, quantity, location_id, order_id, user_id)
+            else:
+                # Fallback to database-only lock if Redis unavailable
+                logger.warning(f"Redis lock service unavailable, using database-only lock for variant {variant_id}")
+                return await self._perform_increment_stock(variant_id, quantity, location_id, order_id, user_id)
                 
-                # Get the variant to find its product
-                variant_result = await self.db.execute(
-                    select(ProductVariant).where(ProductVariant.id == variant_id)
-                )
-                variant = variant_result.scalar_one_or_none()
-                
-                if variant:
-                    # Queue sync as background task - don't block the cancellation response
-                    await enqueue_sync_product_availability(str(variant.product_id))
-                    logger.info(f"Queued inventory sync for product {variant.product_id}")
-            except Exception as sync_error:
-                logger.warning(f"Failed to queue product availability sync: {sync_error}")
-                # Don't fail the entire operation if queueing fails
-            
+        except Exception as e:
+            await self.db.rollback()
+            logger.error(f"Error incrementing stock for variant {variant_id}: {e}")
             return {
-                "success": True,
-                "old_quantity": inventory.quantity_available - quantity,
-                "new_quantity": inventory.quantity_available,
-                "quantity_incremented": quantity,
-                "inventory_id": str(inventory.id),
-                "adjustment_id": str(adjustment.id)
+                "success": False,
+                "message": f"Failed to increment stock: {str(e)}"
             }
+
+    async def _perform_increment_stock(
+        self,
+        variant_id: UUID,
+        quantity: int,
+        location_id: UUID,
+        order_id: Optional[UUID] = None,
+        user_id: Optional[UUID] = None
+    ) -> Dict[str, Any]:
+        """Internal method to perform stock increment with database lock"""
+        # Get inventory with atomic lock
+        inventory = await Inventory.get_with_lock(self.db, variant_id)
+        
+        if not inventory:
+            raise APIException(
+                status_code=404,
+                message=f"Inventory not found for variant {variant_id}"
+            )
+        
+        # Perform atomic stock update
+        adjustment = await inventory.atomic_update_stock(
+            db=self.db,
+            quantity_change=quantity,
+            reason="order_cancelled",
+            user_id=user_id,
+            notes=f"Stock restored from cancelled order {order_id}" if order_id else "Stock restored from cancellation"
+        )
+        
+        await self.db.commit()
+        
+        logger.info(f"Atomically incremented stock for variant {variant_id}: +{quantity}")
+        
+        # Queue product availability sync as background task (don't wait for it)
+        try:
+            from core.arq_worker import enqueue_sync_product_availability
+            
+            # Get the variant to find its product
+            variant_result = await self.db.execute(
+                select(ProductVariant).where(ProductVariant.id == variant_id)
+            )
+            variant = variant_result.scalar_one_or_none()
+            
+            if variant:
+                # Queue sync as background task - don't block the cancellation response
+                await enqueue_sync_product_availability(str(variant.product_id))
+                logger.info(f"Queued inventory sync for product {variant.product_id}")
+        except Exception as sync_error:
+            logger.warning(f"Failed to queue product availability sync: {sync_error}")
+            # Don't fail the entire operation if queueing fails
+        
+            return {
+            "success": True,
+            "message": "Stock incremented successfully",
+            "inventory_id": str(inventory.id),
+            "previous_quantity": inventory.quantity_available - quantity,
+            "new_quantity": inventory.quantity_available,
+            "quantity_incremented": quantity,
+            "adjustment_id": str(adjustment.id) if adjustment else None
+        }
             
         except APIException:
             await self.db.rollback()

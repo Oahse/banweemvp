@@ -684,6 +684,24 @@ class OrderService:
             cart_hash = self._generate_cart_hash(cart, request)
             idempotency_key = f"order_{user_id}_{cart_hash}"
         
+        # Use distributed lock to prevent duplicate orders for same user/cart combination
+        if self.lock_service:
+            order_lock = self.lock_service.get_custom_lock(f"order_creation_{user_id}_{idempotency_key}", timeout=60)
+            async with order_lock:
+                return await self._perform_order_placement(user_id, request, background_tasks, idempotency_key)
+        else:
+            # Fallback if Redis unavailable
+            logger.warning(f"Redis lock service unavailable, proceeding without order creation lock for user {user_id}")
+            return await self._perform_order_placement(user_id, request, background_tasks, idempotency_key)
+
+    async def _perform_order_placement(
+        self,
+        user_id: UUID,
+        request: CheckoutRequest,
+        background_tasks: BackgroundTasks,
+        idempotency_key: str
+    ) -> OrderResponse:
+        """Internal method to perform order placement with all validations"""
         # Check for existing order with this idempotency key
         existing_order = await self.db.execute(
             select(Order).where(Order.idempotency_key == idempotency_key)
