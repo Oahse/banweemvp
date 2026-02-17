@@ -117,23 +117,29 @@ async def send_email_mailjet(
             from_name = "Banwee"
             from_address = from_email
         
+        # Ensure from_address is not empty and is a valid email
+        if not from_address or '@' not in from_address:
+            print(f"🔧 Debug: Invalid from_address '{from_address}', using fallback")
+            from_address = "oscarchiagoziem@gmail.com"
+            from_name = "BanweeTest"
+        
         print(f"🔧 Debug: from_name = '{from_name}', from_address = '{from_address}'")
         
         # Prepare Mailjet payload (v3.1 format)
         payload = {
             "Messages": [
                 {
-                    "FromEmail": from_address,
-                    "FromName": from_name,
+                    "FromEmail": str(from_address).strip(),
+                    "FromName": str(from_name).strip(),
                     "To": [
                         {
-                            "Email": to_email,
-                            "Name": context.get("to_name", "") or ""
+                            "Email": str(to_email).strip(),
+                            "Name": str(context.get("to_name", "") or "").strip()
                         }
                     ],
-                    "Subject": subject,
-                    "TextPart": text_body,
-                    "HtmlPart": html_body
+                    "Subject": str(subject).strip(),
+                    "TextPart": str(text_body).strip(),
+                    "HtmlPart": str(html_body).strip()
                 }
             ]
         }
