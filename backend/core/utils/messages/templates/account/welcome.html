@@ -3,12 +3,7 @@
 {% block title %}Welcome to Banwee - Authentic African Products{% endblock %}
 
 {% block content %}
-<div style="text-align: center; margin-bottom: 40px;">
-    <div style="display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); border-radius: 50%; margin-bottom: 20px;">
-        <i data-lucide="party-popper" class="icon" style="color: var(--color-copy-inverse); width: 40px; height: 40px;"></i>
-    </div>
-    <h1>Welcome to Banwee, {{ customer_name | default("Friend") }}!</h1>
-</div>
+<h1>🎉 Welcome to Banwee, {{ customer_name | default("Friend") }}!</h1>
 
 <p>
     We're thrilled to have you join our community of food lovers who appreciate authentic African products. 
@@ -17,36 +12,35 @@
 </p>
 
 <div class="highlight-box">
-    <h3><i data-lucide="globe" class="icon" style="margin-right: 8px;"></i> What Makes Banwee Special?</h3>
+    <h3>🌍 What Makes Banwee Special?</h3>
     <ul>
-        <li><i data-lucide="users" class="icon" style="margin-right: 8px;"></i> Direct from African farmers and artisans</li>
-        <li><i data-lucide="leaf" class="icon" style="margin-right: 8px;"></i> 100% authentic, organic products</li>
-        <li><i data-lucide="hand-heart" class="icon" style="margin-right: 8px;"></i> Fair trade practices supporting local communities</li>
-        <li><i data-lucide="truck" class="icon" style="margin-right: 8px;"></i> Fresh delivery to your doorstep</li>
-        <li><i data-lucide="shield" class="icon" style="margin-right: 8px;"></i> Quality guaranteed with every purchase</li>
+        <li>Direct from African farmers and artisans</li>
+        <li>100% authentic, organic products</li>
+        <li>Fair trade practices supporting local communities</li>
+        <li>Fresh delivery to your doorstep</li>
+        <li>Quality guaranteed with every purchase</li>
     </ul>
 </div>
 
 <div class="cta-container">
     <a href="{{ frontend_url | default('https://banwee.com') }}/products" class="cta-button">
-        <i data-lucide="shopping-bag" class="icon" style="margin-right: 8px;"></i>
         Start Shopping
     </a>
 </div>
 
 <div class="info-box">
-    <p><strong><i data-lucide="gift" class="icon" style="margin-right: 4px;"></i> Special Welcome Offer!</strong> 
+    <p><strong>🎁 Special Welcome Offer!</strong> 
     Use code <strong>WELCOME10</strong> for 10% off your first order. Valid for 7 days!</p>
 </div>
 
 <p style="margin-top: 30px;">
-    <strong><i data-lucide="help-circle" class="icon" style="margin-right: 4px;"></i> Need Help Getting Started?</strong><br>
+    <strong>Need Help Getting Started?</strong><br>
     Our customer support team is here to help you discover the perfect African products for your needs.
-    <a href="{{ contact_url | default('https://banwee.com/contact') }}" style="color: var(--color-primary);">Contact Support</a>
+    Contact us at support@banwee.com
 </p>
 
 <p style="margin-top: 30px; text-align: center;">
-    <strong><i data-lucide="heart" class="icon" style="margin-right: 4px;"></i> Thank you for choosing Banwee!</strong><br>
-    <span style="color: var(--color-copy-light);">Together, we're supporting African farmers and bringing authentic flavors to your table.</span>
+    <strong>💚 Thank you for choosing Banwee!</strong><br>
+    Together, we're supporting African farmers and bringing authentic flavors to your table.
 </p>
 {% endblock %}

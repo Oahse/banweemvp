@@ -1,27 +1,35 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
-{% block title %}Subscription Renewed - {{ company_name }}{% endblock %}
+{% block title %}Subscription Renewed - Banwee{% endblock %}
 
 {% block content %}
-<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2c3e50;">Your Subscription Has Been Renewed</h2>
-        
-        <p>Hi {{ customer_name }},</p>
-        
-        <p>Great news! Your subscription has been successfully renewed and your next shipment is being prepared.</p>
-        
-        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">Subscription Details</h3>
-            <p><strong>Subscription ID:</strong> {{ subscription_id }}</p>
-            <p><strong>Renewal Date:</strong> {{ renewal_date.strftime('%B %d, %Y') }}</p>
-        </div>
-        
-        <p>Your products will be shipped according to your delivery schedule. You'll receive a shipping notification once your order is on its way.</p>
-        
-        <p>If you have any questions, please contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
-        
-        <p>Thank you for your continued subscription!</p>
-        
-        <p>Best regards,<br>
-        The {{ company_name }} Team</p>
+<h1>🔄 Your Subscription Has Been Renewed</h1>
+
+<p>Hi {{ customer_name }},</p>
+
+<p>Great news! Your subscription has been successfully renewed and your next shipment is being prepared.</p>
+
+<div class="highlight-box">
+    <h3>📦 Subscription Details</h3>
+    <p style="margin: 8px 0;"><strong>Subscription ID:</strong> {{ subscription_id }}</p>
+    <p style="margin: 8px 0;"><strong>Renewal Date:</strong> {{ renewal_date.strftime('%B %d, %Y') }}</p>
+    <p style="margin: 8px 0;"><strong>Next Billing Date:</strong> {{ next_billing_date.strftime('%B %d, %Y') if next_billing_date else 'N/A' }}</p>
+</div>
+
+<div class="success-box">
+    <p><strong>✓ What's Next?</strong> Your products will be shipped according to your delivery schedule. You'll receive a shipping notification once your order is on its way.</p>
+</div>
+
+<div class="cta-container">
+    <a href="{{ subscription_url | default('#') }}" class="cta-button">
+        Manage Subscription
+    </a>
+</div>
+
+<p>If you have any questions, please contact us at support@banwee.com</p>
+
+<p style="margin-top: 30px;">
+    <strong>Thank you for your continued subscription!</strong><br>
+    The Banwee Team
+</p>
 {% endblock %}

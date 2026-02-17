@@ -1,43 +1,49 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
-{% block title %}⚡ Flash Sale Alert! Don't Miss Out at {{ company_name | default('Our Store') }}!{% endblock %}
+{% block title %}⚡ Flash Sale Alert! - Banwee{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                This is not a drill! For a very limited time, get incredible discounts on your favorite items at
-                **{{ company_name | default('our store') }}**!
-            </p>
+<h1>⚡ Flash Sale Alert!</h1>
 
-            <div class="sale-banner">
-                <h2>{{ sale_headline | default("Up to 50% Off Everything!") }}</h2>
-                <p>Use code: <strong style="font-size: 28px; color: #e67e22;">{{ discount_code | default("FLASH20") }}</strong></p>
-                <p class="timer">Sale Ends: **{{ sale_end_time | default("in 24 hours") }}**</p>
-            </div>
+<p>Hi {{ customer_name | default("there") }},</p>
 
-            <p>
-                These deals won't last long, so hurry and grab your favorites before they're gone!
-            </p>
+<p>
+    This is not a drill! For a very limited time, get incredible discounts on your favorite authentic African products at Banwee!
+</p>
 
-            <div class="button-container">
-                <a href="{{ sale_url | default('https://www.yourstoreurl.com/flash-sale') }}" class="button">Shop the Flash Sale!</a>
-            </div>
+<div class="highlight-box" style="text-align: center; background: linear-gradient(135deg, #fff4d9 0%, #ffe8a3 100%); border-color: #E67E22; border-width: 3px;">
+    <h2 style="color: #E67E22; font-size: 32px; margin: 0 0 16px 0;">{{ sale_headline | default("Up to 50% Off Everything!") }}</h2>
+    <p style="margin: 16px 0;">Use code:</p>
+    <p style="font-size: 36px; font-weight: bold; color: #E67E22; letter-spacing: 3px; margin: 8px 0;">{{ discount_code | default("FLASH20") }}</p>
+    <p style="margin: 16px 0; font-size: 18px; color: #d35400;">⏰ Sale Ends: <strong>{{ sale_end_time | default("in 24 hours") }}</strong></p>
+</div>
 
-            <p>
-                Happy Shopping!
-            </p>
-        </div>
+<p style="text-align: center; font-size: 18px; margin: 30px 0;">
+    These deals won't last long, so hurry and grab your favorites before they're gone!
+</p>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay tuned for more:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+<div class="cta-container">
+    <a href="{{ sale_url | default('#') }}" class="cta-button" style="font-size: 20px; padding: 20px 50px;">
+        Shop the Flash Sale Now! 🔥
+    </a>
+</div>
+
+<div class="info-box">
+    <p><strong>🎯 Pro Tip:</strong> Add items to your cart quickly - popular products sell out fast during flash sales!</p>
+</div>
+
+<div class="highlight-box">
+    <h3>🌟 Featured Deals</h3>
+    <ul>
+        <li>Premium African cereals and grains</li>
+        <li>Fresh legumes and pulses</li>
+        <li>Exotic fruits and vegetables</li>
+        <li>Traditional oilseeds and spices</li>
+    </ul>
+</div>
+
+<p style="margin-top: 30px; text-align: center; font-size: 18px;">
+    <strong>Happy Shopping! 🛍️</strong><br>
+    The Banwee Team
+</p>
 {% endblock %}

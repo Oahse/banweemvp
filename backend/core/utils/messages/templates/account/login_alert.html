@@ -1,47 +1,44 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
-{% block title %}🚨 Security Alert: New Login to Your {{ company_name | default('Account') }}{% endblock %}
+{% block title %}Security Alert: New Login - Banwee{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                This is an automated alert to inform you that there has been a recent login to your account at
-                **{{ company_name | default('our service') }}**.
-            </p>
+<h1>🔐 Security Alert: New Login Detected</h1>
 
-            <div class="alert-details">
-                <p><strong>Login Time:</strong> {{ login_time | default("N/A") }}</p>
-                <p><strong>Device:</strong> {{ device_info | default("N/A") }}</p>
-                <p><strong>Location:</strong> {{ login_location | default("N/A") }}</p>
-                <p><strong>IP Address:</strong> {{ ip_address | default("N/A") }}</p>
-            </div>
+<p>Hi {{ customer_name | default("there") }},</p>
 
-            <p>
-                If this was you, you can disregard this email.
-            </p>
-            <p>
-                **If this was NOT you, please secure your account immediately.**
-            </p>
+<p>
+    This is an automated alert to inform you that there has been a recent login to your Banwee account.
+</p>
 
-            <div class="button-container">
-                <a href="{{ security_page_url | default('https://www.yourstoreurl.com/security') }}" class="button">Secure Your Account Now</a>
-            </div>
+<div class="highlight-box">
+    <h3>📋 Login Details</h3>
+    <p style="margin: 8px 0;"><strong>Login Time:</strong> {{ login_time | default("N/A") }}</p>
+    <p style="margin: 8px 0;"><strong>Device:</strong> {{ device_info | default("N/A") }}</p>
+    <p style="margin: 8px 0;"><strong>Location:</strong> {{ login_location | default("N/A") }}</p>
+    <p style="margin: 8px 0;"><strong>IP Address:</strong> {{ ip_address | default("N/A") }}</p>
+</div>
 
-            <p>
-                For your security, if you suspect any unauthorized activity, please change your password and contact our support team.
-            </p>
-        </div>
+<div class="success-box">
+    <p><strong>✓ Was this you?</strong> If you recognize this login, you can safely disregard this email.</p>
+</div>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay secure:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+<div class="warning-box">
+    <p><strong>⚠️ If this was NOT you:</strong> Please secure your account immediately by changing your password and reviewing your account activity.</p>
+</div>
+
+<div class="cta-container">
+    <a href="{{ security_page_url | default('#') }}" class="cta-button">
+        Secure Your Account Now
+    </a>
+</div>
+
+<p>
+    For your security, if you suspect any unauthorized activity, please change your password and contact our support team at support@banwee.com
+</p>
+
+<p style="margin-top: 30px;">
+    <strong>Stay Safe!</strong><br>
+    The Banwee Security Team
+</p>
 {% endblock %}

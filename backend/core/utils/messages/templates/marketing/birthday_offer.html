@@ -1,45 +1,44 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
-{% block title %}🎂 Happy Birthday, {{ customer_name | default("You") }}! Here's a Gift From Us!{% endblock %}
+{% block title %}Happy Birthday - Banwee{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                The team at **{{ company_name | default('our store') }}** wants to wish you a very happy birthday!
-                To celebrate your special day, we've got a gift just for you.
-            </p>
+<h1>🎂 Happy Birthday, {{ customer_name | default("Friend") }}!</h1>
 
-            <div class="birthday-offer-box">
-                <h2>Your Birthday Gift!</h2>
-                <p>{{ birthday_offer_description | default("Enjoy 20% off your next purchase!") }}</p>
-                <p>Use your exclusive code:</p>
-                <span class="coupon-code">{{ discount_code | default("BDAY20") }}</span>
-            </div>
+<p>Hi {{ customer_name | default("there") }},</p>
 
-            <p>
-                This offer is valid until **{{ expiry_date | default("next month") }}**,
-                so don't forget to treat yourself!
-            </p>
+<p>
+    The team at Banwee wants to wish you a very happy birthday!
+    To celebrate your special day, we've got a gift just for you.
+</p>
 
-            <div class="button-container">
-                <a href="{{ shop_url | default('https://www.yourstoreurl.com') }}" class="button">Shop Now & Redeem Your Gift!</a>
-            </div>
+<div class="highlight-box" style="text-align: center; background: linear-gradient(135deg, #fff4d9 0%, #ffe8a3 100%); border-color: #F39C12; border-width: 3px;">
+    <h2 style="color: #E67E22; margin: 0 0 16px 0;">🎁 Your Birthday Gift!</h2>
+    <p style="font-size: 18px; margin: 16px 0;">{{ birthday_offer_description | default("Enjoy 20% off your next purchase!") }}</p>
+    <p style="margin: 16px 0;">Use your exclusive code:</p>
+    <p style="font-size: 36px; font-weight: bold; color: #E67E22; letter-spacing: 3px; margin: 8px 0;">{{ discount_code | default("BDAY20") }}</p>
+</div>
 
-            <p>
-                We hope you have a wonderful birthday filled with joy!
-            </p>
-        </div>
+<div class="info-box">
+    <p><strong>⏰ Valid Until:</strong> This offer is valid until <strong>{{ expiry_date | default("next month") }}</strong>, so don't forget to treat yourself!</p>
+</div>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+<div class="cta-container">
+    <a href="{{ shop_url | default('#') }}" class="cta-button">
+        Shop Now & Redeem Your Gift! 🎁
+    </a>
+</div>
+
+<div class="success-box">
+    <p><strong>🌟 Birthday Bonus:</strong> Free shipping on all orders this month!</p>
+</div>
+
+<p style="margin-top: 30px; text-align: center; font-size: 18px;">
+    We hope you have a wonderful birthday filled with joy!
+</p>
+
+<p style="margin-top: 30px; text-align: center;">
+    <strong>Warmest Birthday Wishes! 🎉</strong><br>
+    The Banwee Team
+</p>
 {% endblock %}

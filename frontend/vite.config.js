@@ -67,6 +67,13 @@ export default defineConfig({
     watch: {
       usePolling: false,
       interval: 100
+    },
+    proxy: {
+      '/v1': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false
+      }
     }
   },
   preview: {

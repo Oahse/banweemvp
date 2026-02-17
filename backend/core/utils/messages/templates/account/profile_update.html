@@ -1,48 +1,47 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
-{% block title %}✅ Your Profile Update Confirmation - {{ company_name | default('Our Account') }}{% endblock %}
+{% block title %}Profile Update Confirmation - Banwee{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                This email confirms that your profile information for your **{{ company_name | default('account') }}** has been successfully updated.
-            </p>
+<h1>✅ Profile Updated Successfully</h1>
 
-            {% if updated_fields %}
-            <div class="update-details">
-                <h3>Details Updated:</h3>
-                <ul>
-                    {% for field, new_value in updated_fields.items() %}
-                    <li style="font-size: 16px;"><strong>{{ field | replace('_', ' ') | title }}:</strong> {{ new_value }}</li>
-                    {% endfor %}
-                </ul>
-                <p style="font-size: 14px; color: #777;">If you did not make these changes, please contact support immediately.</p>
-            </div>
-            {% else %}
-            <p>
-                No specific details were provided, but your profile update has been processed.
-            </p>
-            {% endif %}
+<p>Hi {{ customer_name | default("there") }},</p>
 
-            <div class="button-container">
-                <a href="{{ profile_url | default('https://www.yourstoreurl.com/profile') }}" class="button">View Your Profile</a>
-            </div>
+<p>
+    This email confirms that your profile information for your Banwee account has been successfully updated.
+</p>
 
-            <p>
-                Thank you for keeping your information current with us!
-            </p>
-        </div>
+{% if updated_fields %}
+<div class="highlight-box">
+    <h3>📝 Details Updated</h3>
+    <ul style="list-style: none; padding: 0; margin: 0;">
+        {% for field, new_value in updated_fields.items() %}
+        <li style="padding: 8px 0; border-bottom: 1px solid #ECF0F1;"><strong>{{ field | replace('_', ' ') | title }}:</strong> {{ new_value }}</li>
+        {% endfor %}
+    </ul>
+</div>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+<div class="warning-box">
+    <p><strong>⚠️ Security Notice:</strong> If you did not make these changes, please contact support immediately at support@banwee.com</p>
+</div>
+{% else %}
+<div class="success-box">
+    <p>Your profile update has been processed successfully.</p>
+</div>
+{% endif %}
+
+<div class="cta-container">
+    <a href="{{ profile_url | default('#') }}" class="cta-button">
+        View Your Profile
+    </a>
+</div>
+
+<p style="margin-top: 30px;">
+    Thank you for keeping your information current with us!
+</p>
+
+<p style="margin-top: 30px;">
+    <strong>Best Regards,</strong><br>
+    The Banwee Team
+</p>
 {% endblock %}

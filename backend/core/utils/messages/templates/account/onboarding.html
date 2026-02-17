@@ -1,46 +1,45 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
-{% block title %}🚀 Let's Get Started! Your Onboarding Guide to {{ company_name | default('Our Service') }}{% endblock %}
+{% block title %}Let's Get Started - Banwee{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                Welcome to **{{ company_name | default('our service') }}**! We're excited to have you.
-                To help you get the most out of your experience, here are a few simple steps to get started.
-            </p>
+<h1>🚀 Let's Get Started with Banwee!</h1>
 
-            <div class="onboarding-steps">
-                <h3>Your First Steps:</h3>
-                <ol>
-                    {% for step in onboarding_steps %}
-                    <li><strong>{{ step.title }}:</strong> {{ step.description }} <a href="{{ step.url }}" style="color: #28a745; text-decoration: none;">{{ step.cta_text | default("Go Now &rarr;") }}</a></li>
-                    {% endfor %}
-                </ol>
-            </div>
+<p>Hi {{ customer_name | default("there") }},</p>
 
-            <p>
-                Need a hand? Our help center is always available, or you can reach out to our support team.
-            </p>
+<p>
+    Welcome to Banwee! We're excited to have you join our community. 
+    To help you get the most out of your experience, here are a few simple steps to get started.
+</p>
 
-            <div class="button-container">
-                <a href="{{ main_dashboard_url | default('https://www.yourstoreurl.com/dashboard') }}" class="button">Go to Your Dashboard</a>
-            </div>
+<div class="highlight-box">
+    <h3>📝 Your First Steps</h3>
+    <ol style="margin: 0; padding-left: 20px;">
+        {% for step in onboarding_steps %}
+        <li style="margin: 12px 0; padding-left: 8px;">
+            <strong>{{ step.title }}:</strong> {{ step.description }} 
+            <a href="{{ step.url }}">{{ step.cta_text | default("Get Started →") }}</a>
+        </li>
+        {% endfor %}
+    </ol>
+</div>
 
-            <p>
-                We're thrilled to see what you'll achieve with {{ company_name | default('us') }}!
-            </p>
-        </div>
+<div class="cta-container">
+    <a href="{{ main_dashboard_url | default('#') }}" class="cta-button">
+        Go to Your Dashboard
+    </a>
+</div>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Follow us:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+<div class="info-box">
+    <p><strong>💡 Need a hand?</strong> Our help center is always available, or you can reach out to our support team at support@banwee.com</p>
+</div>
+
+<p style="margin-top: 30px;">
+    We're thrilled to see what you'll achieve with Banwee!
+</p>
+
+<p style="margin-top: 30px;">
+    <strong>Happy Shopping!</strong><br>
+    The Banwee Team
+</p>
 {% endblock %}

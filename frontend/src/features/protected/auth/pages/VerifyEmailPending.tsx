@@ -145,15 +145,15 @@ export const VerifyEmailPending = () => {
             onClick={handleResendEmail}
             disabled={resending}
             isLoading={resending}
-            className="mb-4"
+            className="mb-4 "
           >
             {resending ? (
               'Resending...'
             ) : (
-              <>
+              <span className='flex items-center'>
                 <RefreshCw size={16} className="mr-2" />
                 Resend Verification Email
-              </>
+              </span>
             )}
           </Button>
         ) : (

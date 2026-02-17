@@ -1,64 +1,60 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
-{% block title %}📰 {{ newsletter_title | default("Our Latest News & Updates") }} from {{ company_name | default('Us') }}{% endblock %}
+{% block title %}{{ newsletter_title | default("Latest News & Updates") }} - Banwee{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                Welcome to this edition of the **{{ company_name | default('Our Company') }}** newsletter!
-                We're excited to share some of our latest news, product highlights, and special offers with you.
-            </p>
+<h1>📰 {{ newsletter_title | default("Our Latest News & Updates") }}</h1>
 
-            {% if main_article %}
-            <h2 class="section-title">Featured Story</h2>
-            <div class="article-card">
-                {% if main_article.image_url %}
-                <img src="{{ main_article.image_url }}" alt="{{ main_article.title }}">
-                {% endif %}
-                <h3>{{ main_article.title }}</h3>
-                <p>{{ main_article.snippet }}</p>
-                <a href="{{ main_article.url }}">Read More &rarr;</a>
-            </div>
-            {% endif %}
+<p>Hi {{ customer_name | default("there") }},</p>
 
-            {% if new_products %}
-            <h2 class="section-title">New Arrivals</h2>
-            {% for product in new_products %}
-            <div class="article-card">
-                {% if product.image_url %}
-                <img src="{{ product.image_url }}" alt="{{ product.name }}">
-                {% endif %}
-                <h3>{{ product.name }}</h3>
-                <p>{{ product.description }}</p>
-                <p style="font-weight: bold; color: #e67e22;">Price: {{ product.price }}</p>
-                <a href="{{ product.url }}">Shop Now &rarr;</a>
-            </div>
-            {% endfor %}
-            {% endif %}
+<p>
+    Welcome to this edition of the Banwee newsletter!
+    We're excited to share some of our latest news, product highlights, and special offers with you.
+</p>
 
-            {% if special_offer_message or special_offer_url %}
-            <h2 class="section-title">Special Offer Just For You!</h2>
-            <p>{{ special_offer_message | default("Don't miss out on our exclusive discount!") }}</p>
-            <div class="button-container">
-                <a href="{{ special_offer_url | default('#') }}" class="button">Claim Your Offer!</a>
-            </div>
-            {% endif %}
+{% if main_article %}
+<h2>✨ Featured Story</h2>
+<div class="highlight-box">
+    {% if main_article.image_url %}
+    <img src="{{ main_article.image_url }}" alt="{{ main_article.title }}" style="width: 100%; border-radius: 8px; margin-bottom: 16px;">
+    {% endif %}
+    <h3 style="margin-top: 0;">{{ main_article.title }}</h3>
+    <p>{{ main_article.snippet }}</p>
+    <a href="{{ main_article.url }}" style="font-weight: 600;">Read More →</a>
+</div>
+{% endif %}
 
-            <p>
-                Thank you for being a valued subscriber. We'll be back soon with more exciting updates!
-            </p>
-        </div>
+{% if new_products %}
+<h2>🆕 New Arrivals</h2>
+{% for product in new_products %}
+<div class="highlight-box" style="margin: 20px 0;">
+    {% if product.image_url %}
+    <img src="{{ product.image_url }}" alt="{{ product.name }}" style="width: 100%; border-radius: 8px; margin-bottom: 16px;">
+    {% endif %}
+    <h3 style="margin-top: 0;">{{ product.name }}</h3>
+    <p>{{ product.description }}</p>
+    <p style="font-weight: bold; color: #E67E22; font-size: 18px;">{{ product.price }}</p>
+    <a href="{{ product.url }}" class="cta-button-secondary" style="display: inline-block; margin-top: 12px;">Shop Now →</a>
+</div>
+{% endfor %}
+{% endif %}
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Follow us:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+{% if special_offer_message or special_offer_url %}
+<h2>🎁 Special Offer Just For You!</h2>
+<div class="info-box">
+    <p>{{ special_offer_message | default("Don't miss out on our exclusive discount!") }}</p>
+</div>
+<div class="cta-container">
+    <a href="{{ special_offer_url | default('#') }}" class="cta-button">Claim Your Offer!</a>
+</div>
+{% endif %}
+
+<p style="margin-top: 30px;">
+    Thank you for being a valued subscriber. We'll be back soon with more exciting updates!
+</p>
+
+<p style="margin-top: 30px;">
+    <strong>Happy Shopping!</strong><br>
+    The Banwee Team
+</p>
 {% endblock %}

@@ -1,39 +1,37 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
-{% block title %}👋 You've Been Unsubscribed - {{ company_name | default('Our Updates') }}{% endblock %}
+{% block title %}You've Been Unsubscribed - Banwee{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                This confirms that you have successfully unsubscribed from our marketing emails from
-                **{{ company_name | default('our company') }}**.
-            </p>
-            <p>
-                You will no longer receive newsletters or promotional updates from us.
-                You may still receive essential transactional emails (e.g., order confirmations, shipping updates) related to your purchases.
-            </p>
+<h1>👋 You've Been Unsubscribed</h1>
 
-            <div class="re-subscribe-option">
-                <p>Changed your mind? You can always re-subscribe if you'd like to hear from us again!</p>
-                <div class="button-container" style="padding: 15px 0 0 0;">
-                    <a href="{{ re_subscribe_url | default('https://www.yourstoreurl.com/subscribe') }}" class="button" style="padding: 10px 20px; font-size: 16px;">Re-Subscribe</a>
-                </div>
-            </div>
+<p>Hi {{ customer_name | default("there") }},</p>
 
-            <p>
-                Thank you for your time with us.
-            </p>
-        </div>
+<p>
+    This confirms that you have successfully unsubscribed from our marketing emails from Banwee.
+</p>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+<div class="info-box">
+    <p><strong>📧 What This Means:</strong> You will no longer receive newsletters or promotional updates from us. 
+    You may still receive essential transactional emails (e.g., order confirmations, shipping updates) related to your purchases.</p>
+</div>
+
+<div class="highlight-box">
+    <h3>💭 Changed Your Mind?</h3>
+    <p>You can always re-subscribe if you'd like to hear from us again and get updates on new African products, special offers, and more!</p>
+    <div class="cta-container" style="margin-top: 20px;">
+        <a href="{{ re_subscribe_url | default('#') }}" class="cta-button-secondary">
+            Re-Subscribe
+        </a>
+    </div>
+</div>
+
+<p style="margin-top: 30px;">
+    Thank you for your time with us. We hope to see you again soon!
+</p>
+
+<p style="margin-top: 30px;">
+    <strong>Best Wishes,</strong><br>
+    The Banwee Team
+</p>
 {% endblock %}

@@ -1,44 +1,45 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
-{% block title %}💖 A Big Thank You from {{ company_name | default('Our Store') }}!{% endblock %}
+{% block title %}Thank You - Banwee{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                We just wanted to send a heartfelt **thank you** for your recent {{ interaction_type | default("interaction") }} with
-                **{{ company_name | default('our store') }}**. Whether it was a purchase, a review, or just visiting,
-                we truly appreciate your support.
-            </p>
-            <p>
-                It's customers like you that make what we do so rewarding. We're committed to providing
-                you with the best {{ product_type_or_service | default("products and service") }} possible.
-            </p>
+<h1>💚 A Big Thank You from Banwee!</h1>
 
-            {% if next_steps_message or next_step_url %}
-            <div class="cta-section">
-                <h3>What's Next?</h3>
-                <p>{{ next_steps_message | default("Explore more great items or connect with us on social media!") }}</p>
-                <div class="button-container">
-                    <a href="{{ next_step_url | default('https://www.yourstoreurl.com') }}" class="button">{{ next_step_cta | default("Explore Our Store") }}</a>
-                </div>
-            </div>
-            {% endif %}
+<p>Hi {{ customer_name | default("there") }},</p>
 
-            <p>
-                We look forward to serving you again soon!
-            </p>
-        </div>
+<p>
+    We just wanted to send a heartfelt thank you for your recent {{ interaction_type | default("interaction") }} with Banwee. 
+    Whether it was a purchase, a review, or just visiting, we truly appreciate your support.
+</p>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Connect with us:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+<p>
+    It's customers like you that make what we do so rewarding. We're committed to providing
+    you with the best {{ product_type_or_service | default("authentic African products and service") }} possible.
+</p>
+
+{% if next_steps_message or next_step_url %}
+<div class="highlight-box">
+    <h3>🌟 What's Next?</h3>
+    <p>{{ next_steps_message | default("Explore more great items or connect with us on social media!") }}</p>
+</div>
+
+<div class="cta-container">
+    <a href="{{ next_step_url | default('#') }}" class="cta-button">
+        {{ next_step_cta | default("Explore Our Store") }}
+    </a>
+</div>
+{% endif %}
+
+<div class="info-box">
+    <p><strong>🌍 Together We Make a Difference:</strong> Every purchase supports African farmers and artisans, helping preserve traditional agriculture and create sustainable livelihoods.</p>
+</div>
+
+<p style="margin-top: 30px;">
+    We look forward to serving you again soon!
+</p>
+
+<p style="margin-top: 30px;">
+    <strong>With Gratitude,</strong><br>
+    The Banwee Team
+</p>
 {% endblock %}

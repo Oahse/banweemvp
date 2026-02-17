@@ -54,7 +54,9 @@ async def render_email(template_name: str, context: dict) -> str:
             **context,
             'company_name': context.get('company_name', 'Banwee'),
             'support_email': context.get('support_email', 'support@banwee.com'),
-            'current_year': context.get('current_year', '2024')
+            'current_year': context.get('current_year', '2026'),
+            'frontend_url': context.get('frontend_url', settings.FRONTEND_URL),
+            'logo_url': context.get('logo_url', f"{settings.FRONTEND_URL}/banwee_logo_green.png"),
         }
         
         return template.render(**email_context)
