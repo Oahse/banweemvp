@@ -154,11 +154,7 @@ class Subscription(BaseModel):
     user = relationship("User", back_populates="subscriptions")
     delivery_address = relationship("Address", foreign_keys=[delivery_address_id])
     orders = relationship("Order", back_populates="subscription", lazy="select")
-
-    # --- Relationships ---
-    user = relationship("User", back_populates="subscriptions")
-    delivery_address = relationship("Address", foreign_keys=[delivery_address_id])
-    orders = relationship("Order", back_populates="subscription", lazy="select")
+    applied_discounts = relationship("SubscriptionDiscount", back_populates="subscription", lazy="select")
 
     def to_dict(self, include_products=False) -> Dict[str, Any]:
         data = {
