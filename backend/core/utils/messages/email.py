@@ -125,20 +125,26 @@ async def send_email_mailjet(
                 {
                     "FromEmail": from_address,
                     "FromName": from_name,
-                    "Recipients": [
+                    "To": [
                         {
                             "Email": to_email,
                             "Name": context.get("to_name", "") or ""
                         }
                     ],
                     "Subject": subject,
-                    "Text-part": text_body,
-                    "Html-part": html_body
+                    "TextPart": text_body,
+                    "HtmlPart": html_body
                 }
             ]
         }
         
-        print(f"🔧 Debug: Payload prepared with {len(html_body)} chars HTML and {len(text_body)} chars text")
+        print(f"🔧 Debug: Final payload structure:")
+        print(f"   FromEmail: '{payload['Messages'][0]['FromEmail']}'")
+        print(f"   FromName: '{payload['Messages'][0]['FromName']}'")
+        print(f"   To: {payload['Messages'][0]['To']}")
+        print(f"   Subject: '{payload['Messages'][0]['Subject']}'")
+        print(f"   TextPart length: {len(payload['Messages'][0]['TextPart'])}")
+        print(f"   HtmlPart length: {len(payload['Messages'][0]['HtmlPart'])}")
         
         # Send async request to Mailjet
         async with aiohttp.ClientSession() as session:
