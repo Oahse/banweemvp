@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Banwee - Authentic African Products{% endblock %}</title>
+    <title>Welcome to Banwee - Authentic African Products</title>
     <style>
         /* Banwee Brand Colors - Matching Frontend */
         :root {
@@ -510,16 +510,62 @@
                     <div class="logo-icon">
                         <img src="https://banwee.com/banwee_logo_green.png" alt="Banwee Logo" />
                     </div>
-                    <a href="{{ frontend_url | default('https://banwee.com') }}" class="logo">BANWEE</a>
+                    <a href="https://banwee.com" class="logo">BANWEE</a>
                     <div class="tagline">Authentic African Products, Delivered Fresh</div>
                 </div>
             </div>
 
             <!-- Content -->
             <div class="email-content">
-                {% block content %}
-                <!-- Email content goes here -->
-                {% endblock %}
+<h1>🎉 Welcome to Banwee, Amina Johnson!</h1>
+
+<p>
+    We're thrilled to have you join our community of food lovers who appreciate authentic African products. 
+    At Banwee, we connect you directly with trusted farmers and suppliers across Africa, bringing you the 
+    freshest cereals, legumes, fruits, and more.
+</p>
+
+<div class="highlight-box">
+    <h3>🌍 What Makes Banwee Special?</h3>
+    <ul>
+        <li>Direct from African farmers and artisans</li>
+        <li>100% authentic, organic products</li>
+        <li>Fair trade practices supporting local communities</li>
+        <li>Fresh delivery to your doorstep</li>
+        <li>Rich cultural heritage in every product</li>
+    </ul>
+</div>
+
+<div class="cta-container">
+    <a href="https://banwee.com/products" class="cta-button">
+        Start Shopping
+    </a>
+</div>
+
+<h2>🚀 Get Started in 3 Easy Steps:</h2>
+
+<p><strong>1. Explore Our Collections</strong><br>
+Browse through our carefully curated selection of cereal crops, legumes, fruits & vegetables, oilseeds, and more.</p>
+
+<p><strong>2. Add to Your Cart</strong><br>
+Select your favorite products and quantities. We offer various pack sizes to suit your needs.</p>
+
+<p><strong>3. Enjoy Fast Delivery</strong><br>
+We'll deliver your order fresh and fast, with tracking updates every step of the way.</p>
+
+<div class="info-box">
+    <p><strong>💡 Pro Tip:</strong> Create a wishlist to save your favorite products and get notified when they're on sale!</p>
+</div>
+
+<p>
+    If you have any questions or need assistance, our support team is here to help. 
+    Simply reply to this email or visit our help center.
+</p>
+
+<p style="margin-top: 30px;">
+    <strong>Happy Shopping!</strong><br>
+    The Banwee Team
+</p>
             </div>
 
             <!-- Footer -->
@@ -528,23 +574,23 @@
                 <div class="footer-tagline">Your trusted source for authentic African products</div>
                 
                 <div class="social-links">
-                    <a href="{{ social_facebook | default('https://facebook.com/banwee') }}" title="Follow us on Facebook">📘 Facebook</a>
-                    <a href="{{ social_instagram | default('https://instagram.com/banwee') }}" title="Follow us on Instagram">📷 Instagram</a>
-                    <a href="{{ social_twitter | default('https://twitter.com/banwee') }}" title="Follow us on Twitter">🐦 Twitter</a>
-                    <a href="{{ social_tiktok | default('https://tiktok.com/@banwee') }}" title="Follow us on TikTok">🎵 TikTok</a>
-                    <a href="{{ social_youtube | default('https://youtube.com/@banwee') }}" title="Subscribe on YouTube">📺 YouTube</a>
+                    <a href="https://facebook.com/banwee" title="Follow us on Facebook">📘 Facebook</a>
+                    <a href="https://instagram.com/banwee" title="Follow us on Instagram">📷 Instagram</a>
+                    <a href="https://twitter.com/banwee" title="Follow us on Twitter">🐦 Twitter</a>
+                    <a href="https://tiktok.com/@banwee" title="Follow us on TikTok">🎵 TikTok</a>
+                    <a href="https://youtube.com/@banwee" title="Subscribe on YouTube">📺 YouTube</a>
                 </div>
 
                 <div class="footer-links">
-                    <a href="{{ help_url | default('#') }}">Help Center</a> •
-                    <a href="{{ contact_url | default('#') }}">Contact Us</a> •
-                    <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> •
-                    <a href="{{ privacy_url | default('#') }}">Privacy</a> •
-                    <a href="{{ terms_url | default('#') }}">Terms</a>
+                    <a href="https://banwee.com/help">Help Center</a> •
+                    <a href="https://banwee.com/contact">Contact Us</a> •
+                    <a href="https://banwee.com/unsubscribe">Unsubscribe</a> •
+                    <a href="https://banwee.com/privacy">Privacy</a> •
+                    <a href="https://banwee.com/terms">Terms</a>
                 </div>
 
                 <div class="footer-copyright">
-                    &copy; {{ current_year | default('2026') }} Banwee. All rights reserved.<br>
+                    &copy; 2026 Banwee. All rights reserved.<br>
                     Supporting African farmers and artisans worldwide. 🌍
                 </div>
             </div>
