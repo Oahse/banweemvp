@@ -116,18 +116,17 @@ async def send_email_mailjet(
         payload = {
             "Messages": [
                 {
-                    "From": {
-                        "Email": from_address,
-                        "Name": from_name
-                    },
-                    "To": [
+                    "FromEmail": from_address,
+                    "FromName": from_name,
+                    "Recipients": [
                         {
-                            "Email": to_email
+                            "Email": to_email,
+                            "Name": context.get("to_name", "") or ""
                         }
                     ],
                     "Subject": subject,
-                    "TextPart": text_body,
-                    "HTMLPart": html_body
+                    "Text-part": text_body,
+                    "Html-part": html_body
                 }
             ]
         }
