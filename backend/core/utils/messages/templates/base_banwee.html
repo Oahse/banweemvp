@@ -221,7 +221,7 @@
             justify-content: center;
             background: var(--banwee-primary);
             color: var(--banwee-white);
-            padding: 16px 40px;
+            padding: 12px 32px;
             text-decoration: none;
             border-radius: 8px;
             font-family: 'Roboto', sans-serif;
@@ -231,7 +231,7 @@
             transition: all 0.2s ease;
             border: none;
             cursor: pointer;
-            min-height: 40px;
+            min-height: 36px;
             text-align: center;
             line-height: 1.4;
             position: relative;
@@ -240,12 +240,14 @@
 
         .cta-button:hover {
             background: var(--banwee-primary-dark);
+            color: var(--banwee-white);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             transform: translateY(-1px);
         }
 
         .cta-button:active {
             background: var(--banwee-primary-dark);
+            color: var(--banwee-white);
             transform: translateY(0);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -259,6 +261,7 @@
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+            color: var(--banwee-white);
         }
 
         /* Secondary Button Style */
@@ -272,6 +275,11 @@
         .cta-button-secondary:hover {
             background: var(--banwee-primary);
             color: var(--banwee-white);
+        }
+
+        .cta-button-secondary:disabled {
+            color: var(--banwee-text-light);
+            border-color: var(--banwee-text-light);
         }
 
         /* Info Box */
@@ -544,7 +552,7 @@
             <div class="email-header">
                 <div class="logo-container">
                     <div class="logo-icon">
-                        <img src="https://banwee.com/banwee_logo_green.png" alt="Banwee Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiByeD0iMTIiIGZpbGw9IiM2MWI0ODIiLz4KPHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxMCIgeT0iMTAiPgo8cGF0aCBkPSJNMzAgMTBDMzAgMTAgMjAgMjAgMjAgMzBDMjAgNDAgMzAgNTAgMzAgNTBDNDAgNTAgNTAgNDAgNTAgMzBDNTAgMjAgNDAgMTAgMzAgMTBaIiBmaWxsPSIjZmZmZmZmIi8+CjxwYXRoIGQ9Ik0zMCAyMEMzMCAyMCAyNSAzMCAyNSAzNUMyNSA0MCAzMCA0NUMzNSA0NSA0MCA0NUM0MCA0MCA0NSA0MCA0NSAzNUM0NSAzMCA0MCAyMCAzNSAyMCAzNSAyMCAzNSAyMCAzNSAyMCAzNSAyMFoiIGZpbGw9IiM2MWI0ODIiLz4KPC9zdmc+Cjwvc3ZnPg=='" />
+                        <img src="https://banwee.com/banwee_logo_green.png" alt="Banwee Logo" onerror="this.src='http://localhost:5173/public/banwee_logo_green.png'" />
                     </div>
                     <a href="{{ frontend_url | default('https://banwee.com') }}" class="logo">BANWEE</a>
                     <div class="tagline">Authentic African Products, Delivered Fresh</div>
