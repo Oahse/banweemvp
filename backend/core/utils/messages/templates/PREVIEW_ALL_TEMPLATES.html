@@ -1782,7 +1782,27 @@
                 // Fetch the actual template file
                 const response = await fetch(templateKey + '.html');
                 if (response.ok) {
-                    const templateContent = await response.text();
+                    let templateContent = await response.text();
+                    
+                    // Replace Jinja2 variables with sample values for preview
+                    templateContent = templateContent
+                        .replace(/\{\{\s*customer_name\s*\|\s*default\([^)]+\)\s*\}\}/g, 'John')
+                        .replace(/\{\{\s*customer_name\s*\}\}/g, 'John')
+                        .replace(/\{\{\s*verification_link\s*\|\s*default\([^)]+\)\s*\}\}/g, 'https://banwee.com/verify?token=abc123')
+                        .replace(/\{\{\s*verification_link\s*\}\}/g, 'https://banwee.com/verify?token=abc123')
+                        .replace(/\{\{\s*frontend_url\s*\|\s*default\([^)]+\)\s*\}\}/g, 'https://banwee.com')
+                        .replace(/\{\{\s*frontend_url\s*\}\}/g, 'https://banwee.com')
+                        .replace(/\{\{\s*discount_code\s*\|\s*default\([^)]+\)\s*\}\}/g, 'FLASH20')
+                        .replace(/\{\{\s*discount_code\s*\}\}/g, 'FLASH20')
+                        .replace(/\{\{\s*expiry_time\s*\|\s*default\([^)]+\)\s*\}\}/g, '24 hours')
+                        .replace(/\{\{\s*expiry_time\s*\}\}/g, '24 hours')
+                        .replace(/\{\{\s*sale_headline\s*\|\s*default\([^)]+\)\s*\}\}/g, 'Up to 50% Off Everything!')
+                        .replace(/\{\{\s*sale_headline\s*\}\}/g, 'Up to 50% Off Everything!')
+                        .replace(/\{\{\s*sale_end_time\s*\|\s*default\([^)]+\)\s*\}\}/g, 'in 24 hours')
+                        .replace(/\{\{\s*sale_end_time\s*\}\}/g, 'in 24 hours')
+                        .replace(/\{\{\s*sale_url\s*\|\s*default\([^)]+\)\s*\}\}/g, '#')
+                        .replace(/\{\{\s*sale_url\s*\}\}/g, '#');
+                    
                     doc.open();
                     doc.write(templateContent);
                     doc.close();
