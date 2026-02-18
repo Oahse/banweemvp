@@ -1762,30 +1762,55 @@
 `;
         }
 
-        function loadTemplate() {
+        async function loadTemplate() {
             const select = document.getElementById('template-select');
             const templateKey = select.value;
-            const data = templateData[templateKey] || {
-                title: select.options[select.selectedIndex].text,
-                category: select.options[select.selectedIndex].parentElement.label,
-                description: 'Updated email template',
-                content: defaultContent
-            };
             
             // Update info
-            document.getElementById('template-title').textContent = data.title;
+            document.getElementById('template-title').textContent = select.options[select.selectedIndex].text;
             document.getElementById('template-meta').innerHTML = `
-                <span>📁 ${data.category}</span>
-                <span>📝 ${data.description}</span>
+                <span>📁 ${select.options[select.selectedIndex].parentElement.label}</span>
+                <span>📝 Actual Template File</span>
                 <span>✅ Extends base_banwee.html</span>
             `;
             
-            // Load template
+            // Load actual template file
             const iframe = document.getElementById('preview-frame');
             const doc = iframe.contentDocument || iframe.contentWindow.document;
-            doc.open();
-            doc.write(getTemplateHTML(data.content));
-            doc.close();
+            
+            try {
+                // Fetch the actual template file
+                const response = await fetch(templateKey + '.html');
+                if (response.ok) {
+                    const templateContent = await response.text();
+                    doc.open();
+                    doc.write(templateContent);
+                    doc.close();
+                } else {
+                    // Fallback to templateData if file not found
+                    const data = templateData[templateKey] || {
+                        title: select.options[select.selectedIndex].text,
+                        category: select.options[select.selectedIndex].parentElement.label,
+                        description: 'Updated email template',
+                        content: defaultContent
+                    };
+                    doc.open();
+                    doc.write(getTemplateHTML(data.content));
+                    doc.close();
+                }
+            } catch (error) {
+                console.error('Error loading template:', error);
+                // Fallback to templateData
+                const data = templateData[templateKey] || {
+                    title: select.options[select.selectedIndex].text,
+                    category: select.options[select.selectedIndex].parentElement.label,
+                    description: 'Updated email template',
+                    content: defaultContent
+                };
+                doc.open();
+                doc.write(getTemplateHTML(data.content));
+                doc.close();
+            }
         }
 
         function setViewport(size) {
@@ -1794,8 +1819,8 @@
         }
 
         // Load first template on page load
-        window.onload = function() {
-            loadTemplate();
+        window.onload = async function() {
+            await loadTemplate();
         };
     </script>
 </body>
