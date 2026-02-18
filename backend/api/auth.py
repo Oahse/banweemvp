@@ -279,18 +279,11 @@ async def verify_email(
         return APIResponse(success=True, message="Email verified successfully")
     except APIException:
         raise
-    except Exception as e:
-        print(f"🔧 Debug: Verification error: {e}")
-        raise APIException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message="Invalid or expired verification token"
-        )
-
 
 @router.post("/resend-verification")
 async def resend_verification_email(
     request: ResendVerificationRequest,
-    background_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks = BackgroundTasks(),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -303,6 +296,64 @@ async def resend_verification_email(
     
     Returns success even if email doesn't exist (security)
     """
+    try:
+        user_service = UserService(db)
+        
+        # Find user by email
+        result = await db.execute(
+            select(User).where(User.email == request.email)
+        )
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            # For security, always return success but don't send email
+            return APIResponse(
+                success=True, 
+                message="If an account exists with this email, a verification email has been sent."
+            )
+        
+        if user.verified:
+            raise APIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                message="Email is already verified"
+            )
+        
+        # Generate new token
+        import secrets
+        from datetime import datetime, timedelta, timezone
+        verification_token = secrets.token_urlsafe(32)
+        token_expiration = datetime.now(timezone.utc) + timedelta(hours=24)
+        
+        # Update user with new token
+        user.verification_token = verification_token
+        user.token_expiration = token_expiration
+        await db.commit()
+        
+        # Send verification email
+        verification_link = f"{settings.FRONTEND_URL}/verify-email?token={verification_token}"
+        
+        context = {
+            "customer_name": user.firstname,
+            "verification_link": verification_link,
+            "company_name": "Banwee",
+            "expiry_time": "24 hours",
+            "current_year": datetime.now(timezone.utc).year,
+        }
+        
+        from core.utils.messages.email import send_email_mailjet_legacy
+        await send_email_mailjet_legacy(
+            to_email=request.email,
+            mail_type='activation',
+            context=context
+        )
+        
+        return APIResponse(
+            success=True, 
+            message="Verification email sent successfully. Please check your inbox."
+        )
+        
+    except APIException:
+        raise
     try:
         from datetime import datetime, timedelta
         import secrets
@@ -329,32 +380,35 @@ async def resend_verification_email(
         
         # Generate new verification token
         new_token = secrets.token_urlsafe(32)
-        new_expiration = datetime.now() + timedelta(hours=24)
+        new_expiration = datetime.now(timezone.utc) + timedelta(hours=24)
         
         # Update user with new token
         user.verification_token = new_token
         user.token_expiration = new_expiration
         await db.commit()
         
-        # Send new verification email
-        user_service = UserService(db)
-        background_tasks.add_task(
-            user_service.send_verification_email,
-            user,
-            new_token
-        )
+        # Send verification email
+        verification_link = f"{settings.FRONTEND_URL}/verify-email?token={new_token}"
         
+        context = {
+            "customer_name": user.firstname,
+            "verification_link": verification_link,
+            "company_name": "Banwee",
+            "expiry_time": "24 hours",
+            "current_year": datetime.now(timezone.utc).year,
         return APIResponse(
-            success=True,
-            message="A new verification link has been sent to your email."
+            success=True, 
+            message="Verification email sent successfully. Please check your inbox."
         )
         
+    except APIException:
+        raise
     except Exception as e:
         # Log error but return generic success message for security
         logger.error(f"Error resending verification email: {e}")
         return APIResponse(
             success=True,
-            message="If the email exists, a new verification link has been sent."
+            message="If an account exists with this email, a verification email has been sent."
         )
 
 
