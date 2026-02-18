@@ -1,45 +1,45 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
 {% block title %}⚖️ Important Policy Update - {{ company_name | default('Our Service') }}{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Dear {{ customer_name | default("valued user") }},</p>
-            <p>
-                We're updating our **{{ policy_type | default('Terms of Service and Privacy Policy') }}** to enhance clarity and reflect changes in our services.
-                These updates will take effect on **{{ effective_date | default('August 31, 2025') }}**.
-            </p>
+<tr>
+  <td align="center" style="padding: 50px 40px;">
+    <h1 class="heading" style="font-size: 24px; margin-bottom: 20px; color: #253d4e;">⚖️ Important Policy Update</h1>
 
-            <div class="policy-info">
-                <h3>Key Changes Include:</h3>
-                <ul>
-                    <li>{{ change_1 | default("Revised sections on data handling and privacy.") }}</li>
-                    <li>{{ change_2 | default("Updates to user responsibilities and content guidelines.") }}</li>
-                    <li>{{ change_3 | default("Clarifications on service limitations and liability.") }}</li>
-                    {% if change_4 %}<li>{{ change_4 }}</li>{% endif %}
-                </ul>
-                <p>We encourage you to read the full updated policies below.</p>
-            </div>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+      Dear {{ customer_name | default("valued user") }},
+    </p>
 
-            <div class="button-container">
-                <a href="{{ full_policy_url | default('#') }}" class="button">Review Updated Policies</a>
-            </div>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+      We're updating our <strong>{{ policy_type | default('Terms of Service and Privacy Policy') }}</strong> to enhance clarity and reflect changes in our services.
+      These updates will take effect on <strong>{{ effective_date | default('August 31, 2025') }}</strong>.
+    </p>
 
-            <p>
-                By continuing to use our services after {{ effective_date | default('August 31, 2025') }}, you agree to the updated policies.
-                If you have any questions, please <a href="{{ contact_us_url | default('#') }}">contact us</a>.
-            </p>
-        </div>
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+      <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">Key Changes Include:</h3>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="margin-bottom: 8px; color: #64748b; font-size: 14px;">• {{ change_1 | default("Revised sections on data handling and privacy.") }}</li>
+        <li style="margin-bottom: 8px; color: #64748b; font-size: 14px;">• {{ change_2 | default("Updates to user responsibilities and content guidelines.") }}</li>
+        <li style="margin-bottom: 8px; color: #64748b; font-size: 14px;">• {{ change_3 | default("Clarifications on service limitations and liability.") }}</li>
+        {% if change_4 %}<li style="color: #64748b; font-size: 14px;">• {{ change_4 }}</li>{% endif %}
+      </ul>
+      <p style="color: #64748b; font-size: 14px; margin: 15px 0 0 0;">We encourage you to read the full updated policies below.</p>
+    </div>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{ full_policy_url | default('#') }}" class="btn-verify">Review Updated Policies</a>
+    </div>
+
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 14px;">
+      By continuing to use our services after {{ effective_date | default('August 31, 2025') }}, you agree to the updated policies.
+      If you have any questions, please <a href="{{ contact_us_url | default('#') }}" style="color: #61b482;">contact us</a>.
+    </p>
+
+    <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">
+      <strong>📋 Thank you for your attention</strong><br>
+      <span style="color: #64748b; font-size: 14px;">The Banwee Team</span>
+    </p>
+  </td>
+</tr>
 {% endblock %}

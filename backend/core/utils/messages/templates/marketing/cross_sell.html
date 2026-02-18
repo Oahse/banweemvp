@@ -1,50 +1,50 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
 {% block title %}✨ Complement Your Purchase! Recommended Items for You{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                Since you recently purchased the **{{ purchased_product_name | default("product") }}**,
-                we thought you might be interested in these complementary items:
-            </p>
+<tr>
+  <td align="center" style="padding: 50px 40px;">
+    <h1 class="heading" style="font-size: 24px; margin-bottom: 20px; color: #253d4e;">✨ Complement Your Purchase! Recommended Items for You</h1>
 
-            {% if recommended_products %}
-            <div class="recommendations-grid">
-                {% for product in recommended_products %}
-                <div class="product-recommendation">
-                    {% if product.image_url %}<img src="{{ product.image_url }}" alt="{{ product.name }}">{% endif %}
-                    <h3>{{ product.name }}</h3>
-                    <p class="price">{{ product.price }}</p>
-                    <a href="{{ product.url }}" style="font-size: 14px; color: #28a745; text-decoration: none;">View Product &rarr;</a>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+      Hi {{ customer_name | default("there") }},
+    </p>
 
-            <p>
-                These items are often bought together and could enhance your experience.
-            </p>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+      Since you recently purchased the <strong>{{ purchased_product_name | default("product") }}</strong>,
+      we thought you might be interested in these complementary items:
+    </p>
 
-            <div class="button-container">
-                <a href="{{ shop_url | default('https://www.yourstoreurl.com/shop') }}" class="button">Browse More Items</a>
-            </div>
+    {% if recommended_products %}
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin: 30px 0;">
+      <tr>
+        {% for product in recommended_products %}
+        <td style="padding: 15px; background-color: #f8fafc; border: 1px solid #e2e8f0; text-align: center; vertical-align: top;">
+          {% if product.image_url %}
+          <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-width: 120px; height: auto; border-radius: 6px; margin-bottom: 10px;">
+          {% endif %}
+          <h3 class="heading" style="font-size: 16px; margin-bottom: 8px; color: #253d4e;">{{ product.name }}</h3>
+          <p style="color: #61b482; font-size: 16px; font-weight: bold; margin: 8px 0;">{{ product.price }}</p>
+          <a href="{{ product.url }}" style="color: #61b482; text-decoration: none; font-size: 14px; font-weight: 600;">View Product →</a>
+        </td>
+        {% endfor %}
+      </tr>
+    </table>
+    {% endif %}
 
-            <p>
-                Happy shopping!
-            </p>
-        </div>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+      These items are often bought together and could enhance your experience.
+    </p>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{ shop_url | default('https://banwee.com/shop') }}" class="btn-verify">Browse More Items</a>
+    </div>
+
+    <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">
+      <strong>Happy shopping!</strong><br>
+      <span style="color: #64748b; font-size: 14px;">The Banwee Team</span>
+    </p>
+  </td>
+</tr>
 {% endblock %}

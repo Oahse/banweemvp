@@ -1,51 +1,58 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
 {% block title %}📦 Part of Your Order #{{ order_number | default('XYZ123') }} Has Shipped!{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                Part of your order #<strong style="color: #28a745;">{{ order_number }}</strong> has shipped!
-                The remaining items will follow in a separate shipment.
-            </p>
+<tr>
+  <td align="center" style="padding: 50px 40px;">
+    <h1 class="heading" style="font-size: 24px; margin-bottom: 20px; color: #253d4e;">📦 Part of Your Order Has Shipped!</h1>
 
-            {% for shipment in shipments %}
-            <div class="shipment-details">
-                <h3>Shipment {{ loop.index }} of {{ shipments | length }}</h3>
-                <p><strong>Items in this shipment:</strong></p>
-                <ul>
-                    {% for item in shipment.items %}
-                    <li style="font-size: 16px;">{{ item.quantity }} x {{ item.name }}</li>
-                    {% endfor %}
-                </ul>
-                <div class="tracking-info">
-                    <p><strong>Tracking Number:</strong> <span class="tracking-number">{{ shipment.tracking_number | default("N/A") }}</span></p>
-                    <p><strong>Carrier:</strong> {{ shipment.carrier_name | default("N/A") }}</p>
-                    <p><strong>Estimated Delivery:</strong> {{ shipment.estimated_delivery_date | default("N/A") }}</p>
-                </div>
-            </div>
-            {% endfor %}
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+      Hi {{ customer_name | default("there") }},
+    </p>
 
-            <div class="button-container">
-                <a href="{{ order_tracking_url | default('https://www.yourstoreurl.com/order-tracking') }}" class="button">Track All Shipments</a>
-            </div>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+      Part of your order #<strong style="color: #61b482;">{{ order_number }}</strong> has shipped!
+      The remaining items will follow in a separate shipment.
+    </p>
 
-            <p>
-                You will receive another email when the rest of your order ships.
-                Thank you for your understanding!
-            </p>
-        </div>
+    {% for shipment in shipments %}
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+      <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">Shipment {{ loop.index }} of {{ shipments | length }}</h3>
+      <p style="color: #64748b; font-size: 14px; margin-bottom: 10px;"><strong>Items in this shipment:</strong></p>
+      <ul style="list-style: none; padding: 0; margin: 0 0 15px 0;">
+        {% for item in shipment.items %}
+        <li style="padding: 5px 0; color: #64748b; font-size: 14px;">• {{ item.quantity }} x {{ item.name }}</li>
+        {% endfor %}
+      </ul>
+      <div style="background-color: #ffffff; padding: 15px; border: 1px solid #e2e8f0; border-radius: 6px;">
+        <p style="margin: 5px 0; color: #64748b; font-size: 13px;"><strong>Tracking Number:</strong> <span style="color: #61b482; font-weight: bold;">{{ shipment.tracking_number | default("N/A") }}</span></p>
+        <p style="margin: 5px 0; color: #64748b; font-size: 13px;"><strong>Carrier:</strong> {{ shipment.carrier_name | default("N/A") }}</p>
+        <p style="margin: 5px 0; color: #64748b; font-size: 13px;"><strong>Estimated Delivery:</strong> {{ shipment.estimated_delivery_date | default("N/A") }}</p>
+      </div>
+    </div>
+    {% endfor %}
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{ order_tracking_url | default('https://banwee.com/order-tracking') }}" class="btn-verify">Track All Shipments</a>
+    </div>
+
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 14px;">
+      You will receive another email when the rest of your order ships.
+      Thank you for your understanding!
+    </p>
+
+    <div style="margin-top: 25px;">
+      <h3 class="heading" style="font-size: 16px; margin-bottom: 10px; color: #253d4e;">Need Help?</h3>
+      <p style="color: #64748b; font-size: 14px;">
+        If you have any questions about your shipments, contact our support team at support@banwee.com
+      </p>
+    </div>
+
+    <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">
+      <strong>📦 Your items are on their way!</strong><br>
+      <span style="color: #64748b; font-size: 14px;">The Banwee Team</span>
+    </p>
+  </td>
+</tr>
 {% endblock %}

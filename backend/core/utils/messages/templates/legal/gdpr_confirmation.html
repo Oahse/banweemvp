@@ -1,52 +1,54 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
 {% block title %}✅ GDPR Request Confirmation - {{ company_name | default('Our Service') }}{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Dear {{ customer_name | default("user") }},</p>
-            <p>
-                This is to confirm that your **GDPR {{ request_type | default('data request') }}** has been successfully received by {{ company_name | default('our service') }}.
-            </p>
+<tr>
+  <td align="center" style="padding: 50px 40px;">
+    <h1 class="heading" style="font-size: 24px; margin-bottom: 20px; color: #253d4e;">✅ GDPR Request Confirmation</h1>
 
-            <div class="confirmation-box">
-                <h3>Request Details:</h3>
-                <p><strong>Request ID:</strong> {{ request_id | default('GDPR-XYZ-789') }}</p>
-                <p><strong>Request Type:</strong> {{ request_type | default('Data Access') }}</p>
-                <p><strong>Date Submitted:</strong> {{ request_date | default('July 27, 2025') }}</p>
-                <p><strong>Status:</strong> {{ request_status | default('Processing') }}</p>
-                {% if expected_completion %}
-                <p>We anticipate completing your request within **{{ expected_completion | default('30 days') }}**.</p>
-                {% endif %}
-            </div>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+      Dear {{ customer_name | default("user") }},
+    </p>
 
-            <p>
-                We will notify you once your request has been fully processed or if we require further information.
-            </p>
-            <p>
-                Thank you for your patience and understanding.
-            </p>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+      This is to confirm that your <strong>GDPR {{ request_type | default('data request') }}</strong> has been successfully received by Banwee.
+    </p>
 
-            {% if learn_more_gdpr_url %}
-            <div class="button-container">
-                <a href="{{ learn_more_gdpr_url }}" class="button">Learn More About Your GDPR Rights</a>
-            </div>
-            {% endif %}
+    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 25px; border-radius: 8px; margin: 25px 0;">
+      <div style="font-size: 24px; margin-bottom: 15px; text-align: center;">📋</div>
+      <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e; text-align: center;">Request Details:</h3>
+      <p style="color: #166534; font-size: 14px; margin: 5px 0;"><strong>Request ID:</strong> {{ request_id | default('GDPR-XYZ-789') }}</p>
+      <p style="color: #166534; font-size: 14px; margin: 5px 0;"><strong>Request Type:</strong> {{ request_type | default('Data Access') }}</p>
+      <p style="color: #166534; font-size: 14px; margin: 5px 0;"><strong>Date Submitted:</strong> {{ request_date | default('July 27, 2025') }}</p>
+      <p style="color: #166534; font-size: 14px; margin: 5px 0;"><strong>Status:</strong> {{ request_status | default('Processing') }}</p>
+      {% if expected_completion %}
+      <p style="color: #166534; font-size: 14px; margin: 10px 0 0 0;">We anticipate completing your request within <strong>{{ expected_completion | default('30 days') }}</strong>.</p>
+      {% endif %}
+    </div>
 
-            <p>
-                If you have any questions, please feel free to <a href="{{ contact_us_url | default('#') }}">contact our privacy team</a>.
-            </p>
-        </div>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+      We will notify you once your request has been fully processed or if we require further information.
+    </p>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+      Thank you for your patience and understanding.
+    </p>
+
+    {% if learn_more_gdpr_url %}
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{ learn_more_gdpr_url }}" class="btn-verify">Learn More About Your GDPR Rights</a>
+    </div>
+    {% endif %}
+
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 14px;">
+      If you have any questions, please feel free to <a href="{{ contact_us_url | default('#') }}" style="color: #61b482;">contact our privacy team</a>.
+    </p>
+
+    <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">
+      <strong>🔒 Your privacy matters to us</strong><br>
+      <span style="color: #64748b; font-size: 14px;">The Banwee Team</span>
+    </p>
+  </td>
+</tr>
 {% endblock %}

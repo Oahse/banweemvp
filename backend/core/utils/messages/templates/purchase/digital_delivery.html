@@ -1,49 +1,62 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
 {% block title %}📥 Your Digital Purchase is Ready! - {{ company_name | default('Our Store') }}{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>Hi {{ customer_name | default("there") }},</p>
-            <p>
-                Thank you for your recent purchase from **{{ company_name | default('our store') }}**.
-                Your digital items are now available for download!
-            </p>
+<tr>
+  <td align="center" style="padding: 50px 40px;">
+    <h1 class="heading" style="font-size: 24px; margin-bottom: 20px; color: #253d4e;">📥 Your Digital Purchase is Ready!</h1>
 
-            <div class="digital-items">
-                <h3>Your Downloads:</h3>
-                {% for item in digital_products %}
-                <div class="digital-item">
-                    <p><strong>{{ item.name }}</strong></p>
-                    {% if item.access_code %}<p>Access Code: <span style="font-weight: bold; color: #e67e22;">{{ item.access_code }}</span></p>{% endif %}
-                    {% if item.license_key %}<p>License Key: <span style="font-weight: bold; color: #e67e22;">{{ item.license_key }}</span></p>{% endif %}
-                    <p><a href="{{ item.download_url }}">Download Now &rarr;</a></p>
-                </div>
-                {% endfor %}
-                <p style="font-size: 14px; color: #777;">
-                    Your download links will expire on {{ download_expiry_date | default("N/A") }}.
-                    Please download your files before then.
-                </p>
-            </div>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+      Hi {{ customer_name | default("there") }},
+    </p>
 
-            <div class="button-container">
-                <a href="{{ account_url | default('https://www.yourstoreurl.com/account') }}" class="button">Access My Account</a>
-            </div>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+      Thank you for your recent purchase from <strong>Banwee</strong>.
+      Your digital items are now available for download!
+    </p>
 
-            <p>
-                If you have any questions or need assistance, please don't hesitate to contact our support team.
-            </p>
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+      <h3 class="heading" style="font-size: 18px; margin-bottom: 20px; color: #253d4e;">Your Downloads:</h3>
+      {% for item in digital_products %}
+      <div style="background-color: #ffffff; padding: 20px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 15px;">
+        <h4 style="margin: 0 0 10px 0; color: #253d4e; font-size: 16px;">{{ item.name }}</h4>
+        {% if item.access_code %}
+        <p style="margin: 5px 0; color: #64748b; font-size: 14px;">Access Code: <span style="font-weight: bold; color: #61b482;">{{ item.access_code }}</span></p>
+        {% endif %}
+        {% if item.license_key %}
+        <p style="margin: 5px 0; color: #64748b; font-size: 14px;">License Key: <span style="font-weight: bold; color: #61b482;">{{ item.license_key }}</span></p>
+        {% endif %}
+        <div style="margin-top: 15px;">
+          <a href="{{ item.download_url }}" class="btn-verify" style="padding: 12px 25px; font-size: 14px;">Download Now →</a>
         </div>
+      </div>
+      {% endfor %}
+      
+      <div style="background-color: #fef3c7; border: 1px solid #fbbf24; padding: 15px; margin-top: 20px; text-align: center;">
+        <div style="font-size: 20px; margin-bottom: 8px;">⏰</div>
+        <p style="margin: 0; color: #92400e; font-size: 13px;">
+          Your download links will expire on <strong>{{ download_expiry_date | default("N/A") }}</strong>.
+          Please download your files before then.
+        </p>
+      </div>
+    </div>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{ account_url | default('https://banwee.com/account') }}" class="btn-verify">Access My Account</a>
+    </div>
+
+    <div style="margin-top: 25px;">
+      <h3 class="heading" style="font-size: 16px; margin-bottom: 10px; color: #253d4e;">Need Help?</h3>
+      <p style="color: #64748b; font-size: 14px;">
+        If you have any questions or need assistance, please don't hesitate to contact our support team at support@banwee.com
+      </p>
+    </div>
+
+    <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">
+      <strong>🎉 Thank you for your purchase!</strong><br>
+      <span style="color: #64748b; font-size: 14px;">The Banwee Team</span>
+    </p>
+  </td>
+</tr>
 {% endblock %}

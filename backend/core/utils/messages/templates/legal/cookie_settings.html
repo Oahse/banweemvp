@@ -1,81 +1,63 @@
-{%extends "base_banwee.html" %}
+{% extends "base_banwee.html" %}
 
 {% block title %}🍪 Cookie Settings - {{ company_name | default('Our Service') }}{% endblock %}
 
 {% block content %}
-<div class="content">
-            <p>
-                We use cookies to improve your experience on our site. You can choose to accept or decline certain categories of cookies.
-            </p>
+<tr>
+  <td align="center" style="padding: 50px 40px;">
+    <h1 class="heading" style="font-size: 24px; margin-bottom: 20px; color: #253d4e;">🍪 Cookie Settings</h1>
 
-            <div class="cookie-category">
-                <h3>Strictly Necessary Cookies</h3>
-                <p>These cookies are essential for the website to function and cannot be switched off in our systems. They are usually only set in response to actions made by you which amount to a request for services, such as setting your privacy preferences, logging in or filling in forms.</p>
-                <div class="toggle-switch">
-                    <label for="necessary-cookies">Always Active</label>
-                    <label class="switch">
-                        <input type="checkbox" id="necessary-cookies" checked disabled>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+      We use cookies to improve your experience on our site. You can choose to accept or decline certain categories of cookies.
+    </p>
 
-            <div class="cookie-category">
-                <h3>Performance Cookies</h3>
-                <p>These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site. They help us to know which pages are the most and least popular and see how visitors move around the site.</p>
-                <div class="toggle-switch">
-                    <label for="performance-cookies">Enable Performance Cookies</label>
-                    <label class="switch">
-                        <input type="checkbox" id="performance-cookies" {% if performance_cookies_enabled %}checked{% endif %}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+      <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">Strictly Necessary Cookies</h3>
+      <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">These cookies are essential for the website to function and cannot be switched off in our systems. They are usually only set in response to actions made by you which amount to a request for services, such as setting your privacy preferences, logging in or filling in forms.</p>
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #ffffff; border-radius: 6px;">
+        <span style="color: #64748b; font-size: 14px; font-weight: 500;">Always Active</span>
+        <span style="color: #61b482; font-size: 12px; background-color: #f0fdf4; padding: 4px 8px; border-radius: 4px;">ENABLED</span>
+      </div>
+    </div>
 
-            <div class="cookie-category">
-                <h3>Functional Cookies</h3>
-                <p>These cookies enable the website to provide enhanced functionality and personalization. They may be set by us or by third-party providers whose services we have added to our pages.</p>
-                <div class="toggle-switch">
-                    <label for="functional-cookies">Enable Functional Cookies</label>
-                    <label class="switch">
-                        <input type="checkbox" id="functional-cookies" {% if functional_cookies_enabled %}checked{% endif %}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+      <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">Performance Cookies</h3>
+      <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site. They help us to know which pages are the most and least popular and see how visitors move around the site.</p>
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="{{ performance_cookies_url | default('#') }}" class="btn-verify" style="padding: 10px 20px; font-size: 14px;">{% if performance_cookies_enabled %}Disable{% else %}Enable{% endif %} Performance Cookies</a>
+      </div>
+    </div>
 
-            <div class="cookie-category">
-                <h3>Targeting Cookies</h3>
-                <p>These cookies may be set through our site by our advertising partners. They may be used by those companies to build a profile of your interests and show you relevant adverts on other sites.</p>
-                <div class="toggle-switch">
-                    <label for="targeting-cookies">Enable Targeting Cookies</label>
-                    <label class="switch">
-                        <input type="checkbox" id="targeting-cookies" {% if targeting_cookies_enabled %}checked{% endif %}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+      <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">Functional Cookies</h3>
+      <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">These cookies enable the website to provide enhanced functionality and personalization. They may be set by us or by third-party providers whose services we have added to our pages.</p>
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="{{ functional_cookies_url | default('#') }}" class="btn-verify" style="padding: 10px 20px; font-size: 14px;">{% if functional_cookies_enabled %}Disable{% else %}Enable{% endif %} Functional Cookies</a>
+      </div>
+    </div>
 
-            <div class="button-container">
-                <a href="{{ accept_all_url | default('#') }}" class="button">Accept All</a>
-                <a href="{{ save_preferences_url | default('#') }}" class="button">Save Preferences</a>
-                <a href="{{ reject_all_url | default('#') }}" class="button secondary">Reject All</a>
-            </div>
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+      <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">Targeting Cookies</h3>
+      <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">These cookies may be set through our site by our advertising partners. They may be used by those companies to build a profile of your interests and show you relevant adverts on other sites.</p>
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="{{ targeting_cookies_url | default('#') }}" class="btn-verify" style="padding: 10px 20px; font-size: 14px;">{% if targeting_cookies_enabled %}Disable{% else %}Enable{% endif %} Targeting Cookies</a>
+      </div>
+    </div>
 
-            <p>
-                For more information about how we use cookies, please visit our <a href="{{ cookie_policy_url | default('#') }}">Cookie Policy</a>.
-            </p>
-        </div>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{ accept_all_url | default('#') }}" class="btn-verify" style="margin-right: 10px; margin-bottom: 10px; display: inline-block;">Accept All</a>
+      <a href="{{ save_preferences_url | default('#') }}" class="btn-verify" style="margin-right: 10px; margin-bottom: 10px; display: inline-block;">Save Preferences</a>
+      <a href="{{ reject_all_url | default('#') }}" style="color: #64748b; text-decoration: none; font-size: 14px; margin-bottom: 10px; display: inline-block;">Reject All</a>
+    </div>
 
-        <div class="footer">
-            <p>
-                &copy; {{ current_year | default("2025") }} {{ company_name | default("Your Company Name") }}. All rights reserved.<br>
-                <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> |
-                <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
-            </p>
-            <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
-            </p>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 14px;">
+      For more information about how we use cookies, please visit our <a href="{{ cookie_policy_url | default('#') }}" style="color: #61b482;">Cookie Policy</a>.
+    </p>
+
+    <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">
+      <strong>🔐 Your privacy is important</strong><br>
+      <span style="color: #64748b; font-size: 14px;">The Banwee Team</span>
+    </p>
+  </td>
+</tr>
 {% endblock %}

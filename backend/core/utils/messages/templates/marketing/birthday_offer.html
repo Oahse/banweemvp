@@ -3,42 +3,53 @@
 {% block title %}Happy Birthday - Banwee{% endblock %}
 
 {% block content %}
-<h1>🎂 Happy Birthday, {{ customer_name | default("Friend") }}!</h1>
+<tr>
+  <td align="center" style="padding: 50px 40px;">
+    <h1 class="heading" style="font-size: 28px; margin-bottom: 20px; color: #253d4e;">🎂 Happy Birthday, {{ customer_name | default("Friend") }}!</h1>
 
-<p>Hi {{ customer_name | default("there") }},</p>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+      Hi {{ customer_name | default("there") }},
+    </p>
 
-<p>
-    The team at Banwee wants to wish you a very happy birthday!
-    To celebrate your special day, we've got a gift just for you.
-</p>
+    <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+      The team at Banwee wants to wish you a very happy birthday!
+      To celebrate your special day, we've got a gift just for you.
+    </p>
 
-<div class="highlight-box" style="text-align: center; background: linear-gradient(135deg, #fff4d9 0%, #ffe8a3 100%); border-color: #F39C12; border-width: 3px;">
-    <h2 style="color: #E67E22; margin: 0 0 16px 0;">🎁 Your Birthday Gift!</h2>
-    <p style="font-size: 18px; margin: 16px 0;">{{ birthday_offer_description | default("Enjoy 20% off your next purchase!") }}</p>
-    <p style="margin: 16px 0;">Use your exclusive code:</p>
-    <p style="font-size: 36px; font-weight: bold; color: #E67E22; letter-spacing: 3px; margin: 8px 0;">{{ discount_code | default("BDAY20") }}</p>
-</div>
+    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 3px solid #f59e0b; padding: 30px; border-radius: 8px; margin: 25px 0; text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 15px;">🎁</div>
+      <h2 class="heading" style="color: #d97706; margin: 0 0 16px 0; font-size: 20px;">Your Birthday Gift!</h2>
+      <p style="font-size: 18px; margin: 16px 0; color: #92400e;">{{ birthday_offer_description | default("Enjoy 20% off your next purchase!") }}</p>
+      <p style="margin: 16px 0; color: #92400e; font-size: 16px;">Use your exclusive code:</p>
+      <p style="font-size: 28px; font-weight: bold; color: #d97706; letter-spacing: 3px; margin: 8px 0; background: #ffffff; padding: 10px 20px; border-radius: 6px; display: inline-block;">{{ discount_code | default("BDAY20") }}</p>
+    </div>
 
-<div class="info-box">
-    <p><strong>⏰ Valid Until:</strong> This offer is valid until <strong>{{ expiry_date | default("next month") }}</strong>, so don't forget to treat yourself!</p>
-</div>
+    <div style="background-color: #fef3c7; border: 1px solid #fbbf24; padding: 20px; margin: 25px 0; text-align: center;">
+      <div style="font-size: 20px; margin-bottom: 8px;">⏰</div>
+      <p style="margin: 0; color: #92400e; font-size: 14px;">
+        <strong>Valid Until:</strong> This offer is valid until <strong>{{ expiry_date | default("next month") }}</strong>, so don't forget to treat yourself!
+      </p>
+    </div>
 
-<div class="cta-container">
-    <a href="{{ shop_url | default('#') }}" class="cta-button">
-        Shop Now & Redeem Your Gift! 🎁
-    </a>
-</div>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{ shop_url | default('#') }}" class="btn-verify">Shop Now & Redeem Your Gift! 🎁</a>
+    </div>
 
-<div class="success-box">
-    <p><strong>🌟 Birthday Bonus:</strong> Free shipping on all orders this month!</p>
-</div>
+    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; margin: 25px 0; text-align: center;">
+      <div style="font-size: 24px; margin-bottom: 10px;">🌟</div>
+      <p style="margin: 0; color: #166534; font-size: 15px;">
+        <strong>Birthday Bonus:</strong> Free shipping on all orders this month!
+      </p>
+    </div>
 
-<p style="margin-top: 30px; text-align: center; font-size: 18px;">
-    We hope you have a wonderful birthday filled with joy!
-</p>
+    <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 18px;">
+      We hope you have a wonderful birthday filled with joy!
+    </p>
 
-<p style="margin-top: 30px; text-align: center;">
-    <strong>Warmest Birthday Wishes! 🎉</strong><br>
-    The Banwee Team
-</p>
+    <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">
+      <strong>Warmest Birthday Wishes! 🎉</strong><br>
+      <span style="color: #64748b; font-size: 14px;">The Banwee Team</span>
+    </p>
+  </td>
+</tr>
 {% endblock %}

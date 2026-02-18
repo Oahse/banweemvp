@@ -1,557 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Banwee - Authentic African Products{% endblock %}</title>
-    <!--[if mso]>
-    <noscript>
-        <xml>
-            <o:OfficeDocumentSettings>
-                <o:PixelsPerInch>96</o:PixelsPerInch>
-            </o:OfficeDocumentSettings>
-        </xml>
-    </noscript>
-    <![endif]-->
-    <style>
-        /* Banwee Brand Colors */
-        :root {
-            --banwee-primary: #2D5016;      /* Deep Forest Green */
-            --banwee-secondary: #E67E22;    /* Warm Orange */
-            --banwee-accent: #F39C12;       /* Golden Yellow */
-            --banwee-success: #27AE60;      /* Fresh Green */
-            --banwee-text: #2C3E50;         /* Dark Gray */
-            --banwee-light: #ECF0F1;        /* Light Gray */
-            --banwee-white: #FFFFFF;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #2C3E50;
-            background-color: #F5F5F5;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        .email-wrapper {
-            background-color: #F5F5F5;
-            padding: 20px 10px;
-            width: 100%;
-        }
-
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #FFFFFF;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-top: 6px solid #2D5016;
-        }
-
-        /* Header with Banwee Branding */
-        .email-header {
-            background: linear-gradient(135deg, #2D5016 0%, #3a6b1f 100%);
-            padding: 35px 20px;
-            text-align: center;
-            border-bottom: 4px solid #E67E22;
-        }
-
-        .logo-container {
-            display: block;
-            text-align: center;
-        }
-
-        .email-header .logo-image {
-            max-width: 180px;
-            width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto 12px;
-        }
-
-        .email-header .tagline {
-            color: #ECF0F1;
-            font-size: 14px;
-            margin-top: 8px;
-            font-style: italic;
-            letter-spacing: 0.5px;
-        }
-
-        /* Content Area */
-        .email-content {
-            padding: 45px 35px;
-            background-color: #FFFFFF;
-        }
-
-        .email-content h1 {
-            color: #2D5016;
-            font-size: 28px;
-            margin: 0 0 24px 0;
-            line-height: 1.3;
-            font-weight: 700;
-        }
-
-        .email-content h2 {
-            color: #2D5016;
-            font-size: 22px;
-            margin: 30px 0 16px 0;
-            font-weight: 600;
-        }
-
-        .email-content h3 {
-            color: #2D5016;
-            font-size: 18px;
-            margin: 20px 0 12px 0;
-            font-weight: 600;
-        }
-
-        .email-content p {
-            margin: 0 0 16px 0;
-            font-size: 16px;
-            line-height: 1.7;
-            color: #2C3E50;
-        }
-
-        .email-content a {
-            color: #E67E22;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .email-content a:hover {
-            color: #d35400;
-            text-decoration: underline;
-        }
-
-        .email-content strong {
-            color: #2D5016;
-            font-weight: 600;
-        }
-
-        /* Highlight Box */
-        .highlight-box {
-            background: linear-gradient(135deg, #f8fdf9 0%, #e8f5e9 100%);
-            border-left: 5px solid #27AE60;
-            border-radius: 10px;
-            padding: 24px;
-            margin: 28px 0;
-            box-shadow: 0 2px 8px rgba(45, 80, 22, 0.08);
-        }
-
-        .highlight-box h3 {
-            color: #2D5016;
-            margin: 0 0 16px 0;
-            font-size: 19px;
-            font-weight: 600;
-        }
-
-        .highlight-box p {
-            margin: 0 0 12px 0;
-        }
-
-        .highlight-box p:last-child {
-            margin-bottom: 0;
-        }
-
-        .highlight-box ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .highlight-box li {
-            padding: 10px 0 10px 32px;
-            position: relative;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        .highlight-box li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #27AE60;
-            font-weight: bold;
-            font-size: 20px;
-            top: 8px;
-        }
-
-        /* Call-to-Action Button */
-        .cta-container {
-            text-align: center;
-            margin: 35px 0;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #E67E22 0%, #d35400 100%);
-            color: #FFFFFF;
-            padding: 18px 45px;
-            text-decoration: none;
-            border-radius: 10px;
-            font-size: 17px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 6px 16px rgba(230, 126, 34, 0.35);
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .cta-button:hover {
-            background: linear-gradient(135deg, #d35400 0%, #E67E22 100%);
-            box-shadow: 0 8px 20px rgba(230, 126, 34, 0.45);
-            transform: translateY(-3px);
-            text-decoration: none;
-            color: #FFFFFF;
-        }
-
-        .cta-button-secondary {
-            display: inline-block;
-            background: transparent;
-            color: #2D5016;
-            padding: 16px 40px;
-            text-decoration: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            border: 2px solid #2D5016;
-            transition: all 0.3s ease;
-        }
-
-        .cta-button-secondary:hover {
-            background: #2D5016;
-            color: #FFFFFF;
-            text-decoration: none;
-        }
-
-        /* Info Box */
-        .info-box {
-            background: linear-gradient(135deg, #fffbf0 0%, #fff4d9 100%);
-            border: 2px solid #F39C12;
-            border-radius: 10px;
-            padding: 22px;
-            margin: 28px 0;
-            box-shadow: 0 2px 8px rgba(243, 156, 18, 0.15);
-        }
-
-        .info-box p {
-            margin: 0;
-            color: #856404;
-            line-height: 1.6;
-        }
-
-        .info-box strong {
-            color: #6d5103;
-        }
-
-        /* Success Box */
-        .success-box {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border: 2px solid #27AE60;
-            border-radius: 10px;
-            padding: 22px;
-            margin: 28px 0;
-            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.15);
-        }
-
-        .success-box p {
-            margin: 0;
-            color: #166534;
-            line-height: 1.6;
-        }
-
-        /* Warning Box */
-        .warning-box {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            border: 2px solid #ef4444;
-            border-radius: 10px;
-            padding: 22px;
-            margin: 28px 0;
-            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
-        }
-
-        .warning-box p {
-            margin: 0;
-            color: #991b1b;
-            line-height: 1.6;
-        }
-
-        /* Footer */
-        .email-footer {
-            background: linear-gradient(180deg, #1a3a0f 0%, #2D5016 100%);
-            color: #ECF0F1;
-            padding: 35px 25px 25px;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .email-footer .footer-brand {
-            font-size: 18px;
-            font-weight: bold;
-            color: #FFFFFF;
-            margin-bottom: 8px;
-            letter-spacing: 2px;
-        }
-
-        .email-footer .footer-tagline {
-            font-size: 13px;
-            color: #ECF0F1;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-
-        .email-footer p {
-            margin: 8px 0;
-            line-height: 1.6;
-        }
-
-        .email-footer a {
-            color: #F39C12;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .email-footer a:hover {
-            color: #E67E22;
-            text-decoration: underline;
-        }
-
-        .social-links {
-            margin: 25px 0 20px 0;
-            padding: 20px 0;
-            border-top: 1px solid rgba(236, 240, 241, 0.2);
-            border-bottom: 1px solid rgba(236, 240, 241, 0.2);
-        }
-
-        .social-links a {
-            display: inline-block;
-            margin: 0 12px;
-            color: #FFFFFF;
-            text-decoration: none;
-            font-size: 15px;
-            transition: transform 0.3s ease, color 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: #F39C12;
-            transform: translateY(-2px);
-        }
-
-        .footer-links {
-            margin: 20px 0;
-            font-size: 13px;
-        }
-
-        .footer-links a {
-            margin: 0 8px;
-        }
-
-        .footer-copyright {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(236, 240, 241, 0.2);
-            font-size: 12px;
-            color: rgba(236, 240, 241, 0.8);
-            line-height: 1.6;
-        }
-
-        /* Table Styling */
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        table th {
-            font-weight: 600;
-            text-align: left;
-        }
-
-        table td {
-            vertical-align: top;
-        }
-
-        /* Responsive Design */
-        @media only screen and (max-width: 600px) {
-            .email-wrapper {
-                padding: 10px 5px;
-            }
-
-            .email-container {
-                border-radius: 8px;
-            }
-
-            .email-header {
-                padding: 25px 15px;
-            }
-
-            .email-header .logo-image {
-                max-width: 150px;
-            }
-
-            .email-header .tagline {
-                font-size: 12px;
-            }
-
-            .email-content {
-                padding: 30px 20px;
-            }
-
-            .email-content h1 {
-                font-size: 24px;
-                margin-bottom: 20px;
-            }
-
-            .email-content h2 {
-                font-size: 20px;
-                margin: 25px 0 12px 0;
-            }
-
-            .email-content h3 {
-                font-size: 17px;
-            }
-
-            .email-content p {
-                font-size: 15px;
-            }
-
-            .cta-button {
-                padding: 16px 35px;
-                font-size: 16px;
-                display: block;
-                width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
-            }
-
-            .cta-button-secondary {
-                padding: 14px 30px;
-                font-size: 15px;
-                display: block;
-                width: 100%;
-                max-width: 300px;
-                margin: 10px auto;
-            }
-
-            .highlight-box,
-            .info-box,
-            .success-box,
-            .warning-box {
-                padding: 18px;
-                margin: 20px 0;
-            }
-
-            .highlight-box h3 {
-                font-size: 17px;
-            }
-
-            .social-links a {
-                display: block;
-                margin: 8px 0;
-            }
-
-            .email-footer {
-                padding: 25px 15px 20px;
-            }
-
-            .footer-links a {
-                display: block;
-                margin: 8px 0;
-            }
-
-            table {
-                font-size: 14px;
-            }
-
-            th, td {
-                padding: 8px 5px !important;
-                font-size: 14px !important;
-            }
-        }
-
-        /* Extra small screens */
-        @media only screen and (max-width: 400px) {
-            .email-header .logo-image {
-                max-width: 120px;
-            }
-
-            .email-content h1 {
-                font-size: 22px;
-            }
-
-            .email-content h2 {
-                font-size: 18px;
-            }
-
-            .email-content p {
-                font-size: 14px;
-            }
-
-            .cta-button {
-                padding: 14px 25px;
-                font-size: 15px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <title>{% block title %}Banwee - Authentic African Products{% endblock %}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap');
+
+    :root {
+      --color-main: #253d4e;
+      --color-primary: #61b482;
+      --color-background: #f8fafc;
+      --color-copy: #1e293b;
+      --color-copy-light: #64748b;
+      --color-border: #e2e8f0;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+
+    .heading { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+    
+    .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+    
+    .main-card { 
+      max-width: 600px; 
+      margin: 40px auto; 
+      background-color: #ffffff; 
+      border: 1px solid #e2e8f0; 
+      border-collapse: collapse;
+      border-radius: 0px; 
+    }
+
+    .btn-verify {
+      display: inline-block;
+      background-color: #61b482;
+      color: #ffffff !important;
+      padding: 18px 45px;
+      text-decoration: none;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 0px;
+    }
+
+    .social-icon {
+      color: #61b482;
+      text-decoration: none;
+      font-size: 18px;
+      margin-left: 15px;
+    }
+  </style>
 </head>
 <body>
-    <div class="email-wrapper">
-        <div class="email-container">
-            <!-- Header -->
-            <div class="email-header">
-                <div class="logo-container">
-                    <a href="{{ frontend_url | default('https://banwee.com') }}">
-                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABVIAAAKsCAYAAABiDgXFAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABrSURBVHja7cEBDQAAAMKg909tDjegAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBby6EDAAFoB1fZAAAAAElFTkSuQmCC" alt="Banwee Logo" class="logo-image">
-                    </a>
-                    <div class="tagline">Authentic African Products, Delivered Fresh</div>
-                </div>
-            </div>
 
-            <!-- Content -->
-            <div class="email-content">
-                {% block content %}
-                <!-- Email content goes here -->
-                {% endblock %}
-            </div>
+  <table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center">
+        
+        <table class="main-card" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          
+          <thead>
+            <tr>
+              <td align="center" style="background-color: #253d4e; padding: 40px 0;">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlY+tC7asAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMAAmsAAAW34ptEAAAAASUVORK5CYII=" alt="Banwee" width="100" style="display: block; margin-bottom: 10px;">
+                <h1 class="heading" style="color: #ffffff; margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 2px;">
+                  Ban<span style="color: #61b482;">wee</span>
+                </h1>
+              </td>
+            </tr>
+          </thead>
 
-            <!-- Footer -->
-            <div class="email-footer">
-                <div class="footer-brand">BANWEE</div>
-                <div class="footer-tagline">Your trusted source for authentic African products</div>
-                
-                <div class="social-links">
-                    <a href="{{ social_facebook | default('https://facebook.com/banwee') }}" title="Follow us on Facebook">📘 Facebook</a>
-                    <a href="{{ social_instagram | default('https://instagram.com/banwee') }}" title="Follow us on Instagram">📷 Instagram</a>
-                    <a href="{{ social_twitter | default('https://twitter.com/banwee') }}" title="Follow us on Twitter">🐦 Twitter</a>
-                    <a href="{{ social_tiktok | default('https://tiktok.com/@banwee') }}" title="Follow us on TikTok">🎵 TikTok</a>
-                    <a href="{{ social_youtube | default('https://youtube.com/@banwee') }}" title="Subscribe on YouTube">📺 YouTube</a>
-                </div>
+          <tbody>
+            {% block content %}
+            {% endblock %}
+          </tbody>
 
-                <div class="footer-links">
-                    <a href="{{ help_url | default('#') }}">Help Center</a> •
-                    <a href="{{ contact_url | default('#') }}">Contact Us</a> •
-                    <a href="{{ unsubscribe_url | default('#') }}">Unsubscribe</a> •
-                    <a href="{{ privacy_url | default('#') }}">Privacy</a> •
-                    <a href="{{ terms_url | default('#') }}">Terms</a>
-                </div>
+          <tfoot>
+            <tr>
+              <td style="background-color: #ffffff; padding: 40px; border-top: 1px solid #f1f5f9;">
+                <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                  <tr>
+                    <td width="60%" valign="top">
+                      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlY+tC7asAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMAAmsAAAW34ptEAAAAASUVORK5CYII=" alt="Banwee" width="70" style="margin-bottom: 15px;">
+                      <p style="font-size: 12px; color: #64748b; margin: 0 0 10px 0; max-width: 250px;">
+                        Ethically sourced and sustainably produced organic products from Africa.
+                      </p>
+                      <p style="font-size: 11px; color: #94a3b8; line-height: 1.6; margin: 0;">
+                        1234 Fashion Street, Suite 567, New York, NY 10001<br>
+                        info@banwee.com | (212) 555-1234
+                      </p>
+                    </td>
+                    
+                    <td width="40%" valign="top" style="padding-left: 20px;">
+                      <h3 class="heading" style="font-size: 13px; text-transform: uppercase; margin: 0 0 15px 0; color: #253d4e;">Shop</h3>
+                      <ul style="list-style: none; padding: 0; margin: 0; font-size: 12px; color: #64748b; line-height: 1.8;">
+                        <li>Cereal Crops</li>
+                        <li>Legumes</li>
+                        <li>Fruits & Vegetables</li>
+                        <li>Spices and Herbs</li>
+                        <li>Nuts & Beverages</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </table>
 
-                <div class="footer-copyright">
-                    &copy; {{ current_year | default('2026') }} Banwee. All rights reserved.<br>
-                    Supporting African farmers and artisans worldwide. 🌍
-                </div>
-            </div>
-        </div>
-    </div>
+                <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-top: 40px; border-top: 1px solid #f1f5f9; padding-top: 25px;">
+                  <tr>
+                    <td align="left" style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">
+                      © 2026 Banwee Store. All Rights Reserved.
+                    </td>
+                    <td align="right">
+                      <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                      <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                      <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                      <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
 </body>
 </html>
