@@ -42,13 +42,13 @@
       display: inline-block;
       background-color: #61b482;
       color: #ffffff !important;
-      padding: 18px 45px;
+      padding: 10px 35px;
       text-decoration: none;
       font-family: 'Montserrat', sans-serif;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      border-radius: 0px;
+      border-radius: 4px;
     }
 
     .social-icon {
@@ -69,12 +69,27 @@
           
           <thead>
             <tr>
-              <td align="center" style="background-color: #253d4e; padding: 40px 0;">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlY+tC7asAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMAAmsAAAW34ptEAAAAASUVORK5CYII=" alt="Banwee" width="100" style="display: block; margin-bottom: 10px;">
-                <h1 class="heading" style="color: #ffffff; margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 2px;">
-                  Ban<span style="color: #61b482;">wee</span>
-                </h1>
-              </td>
+              <td align="left" style="background-color: #253d4e; padding: 8px 12px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                    <!-- Logo -->
+                    <td style="vertical-align: middle;">
+                        <img 
+                            src="https://cdn.jsdelivr.net/gh/Oahse/web@main/frontend/public/banwee_logo_text_green.png" 
+                            alt="Banwee" 
+                            width="full"
+                            height="50" 
+                            style="display: block;"
+                        >
+                    </td>
+
+                    <!-- Space -->
+                    <td width="12"></td>
+
+                    </tr>
+                </table>
+                </td>
+
             </tr>
           </thead>
 
@@ -85,11 +100,11 @@
 
           <tfoot>
             <tr>
-              <td style="background-color: #ffffff; padding: 40px; border-top: 1px solid #f1f5f9;">
+              <td style="background-color: #f8fafc; padding: 40px; border-top: 1px solid #f1f5f9;">
                 <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
                   <tr>
                     <td width="60%" valign="top">
-                      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlY+tC7asAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMAAmsAAAW34ptEAAAAASUVORK5CYII=" alt="Banwee" width="70" style="margin-bottom: 15px;">
+                      <img src="https://cdn.jsdelivr.net/gh/Oahse/web@main/frontend/public/banwee_logo_text_green.png"  alt="Banwee" width="70" style="margin-bottom: 15px;">
                       <p style="font-size: 12px; color: #64748b; margin: 0 0 10px 0; max-width: 250px;">
                         Ethically sourced and sustainably produced organic products from Africa.
                       </p>
@@ -102,11 +117,11 @@
                     <td width="40%" valign="top" style="padding-left: 20px;">
                       <h3 class="heading" style="font-size: 13px; text-transform: uppercase; margin: 0 0 15px 0; color: #253d4e;">Shop</h3>
                       <ul style="list-style: none; padding: 0; margin: 0; font-size: 12px; color: #64748b; line-height: 1.8;">
-                        <li>Cereal Crops</li>
-                        <li>Legumes</li>
-                        <li>Fruits & Vegetables</li>
-                        <li>Spices and Herbs</li>
-                        <li>Nuts & Beverages</li>
+                        <li><a href="{{ frontend_url | default('https://banwee.com') }}/category/cereal-crops" style="color: #64748b; text-decoration: none;">Cereal Crops</a></li>
+                        <li><a href="{{ frontend_url | default('https://banwee.com') }}/category/legumes" style="color: #64748b; text-decoration: none;">Legumes</a></li>
+                        <li><a href="{{ frontend_url | default('https://banwee.com') }}/category/fruits-vegetables" style="color: #64748b; text-decoration: none;">Fruits & Vegetables</a></li>
+                        <li><a href="{{ frontend_url | default('https://banwee.com') }}/category/spices-herbs" style="color: #64748b; text-decoration: none;">Spices and Herbs</a></li>
+                        <li><a href="{{ frontend_url | default('https://banwee.com') }}/category/nuts-beverages" style="color: #64748b; text-decoration: none;">Nuts & Beverages</a></li>
                       </ul>
                     </td>
                   </tr>
@@ -118,10 +133,10 @@
                       © 2026 Banwee Store. All Rights Reserved.
                     </td>
                     <td align="right">
-                      <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                      <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                      <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                      <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                      <a href="https://facebook.com/banwee" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                      <a href="https://instagram.com/banwee" class="social-icon"><i class="fab fa-instagram"></i></a>
+                      <a href="https://twitter.com/banwee" class="social-icon"><i class="fab fa-twitter"></i></a>
+                      <a href="https://linkedin.com/company/banwee" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
                     </td>
                   </tr>
                 </table>

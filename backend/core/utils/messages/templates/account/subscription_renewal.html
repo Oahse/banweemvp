@@ -3,33 +3,40 @@
 {% block title %}Subscription Renewed - Banwee{% endblock %}
 
 {% block content %}
-<h1>🔄 Your Subscription Has Been Renewed</h1>
+<tr>
+  <td align="center" style="padding: 50px 40px;">
+    <h1 class="heading" style="font-size: 24px; margin-bottom: 20px; color: #253d4e;">🔄 Your Subscription Has Been Renewed</h1>
 
-<p>Hi {{ customer_name }},</p>
+      <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">Hi {{ customer_name | default("there") }},</p>
 
-<p>Great news! Your subscription has been successfully renewed and your next shipment is being prepared.</p>
+      <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+        Great news! Your subscription has been successfully renewed and your next shipment is being prepared.
+      </p>
 
-<div class="highlight-box">
-    <h3>📦 Subscription Details</h3>
-    <p style="margin: 8px 0;"><strong>Subscription ID:</strong> {{ subscription_id }}</p>
-    <p style="margin: 8px 0;"><strong>Renewal Date:</strong> {{ renewal_date.strftime('%B %d, %Y') }}</p>
-    <p style="margin: 8px 0;"><strong>Next Billing Date:</strong> {{ next_billing_date.strftime('%B %d, %Y') if next_billing_date else 'N/A' }}</p>
-</div>
+      <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+        <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">📦 Subscription Details</h3>
+        <p style="margin: 8px 0;"><strong>Subscription ID:</strong> {{ subscription_id }}</p>
+        <p style="margin: 8px 0;"><strong>Renewal Date:</strong> {{ renewal_date.strftime('%B %d, %Y') }}</p>
+        <p style="margin: 8px 0;"><strong>Next Billing Date:</strong> {{ next_billing_date.strftime('%B %d, %Y') if next_billing_date else 'N/A' }}</p>
+      </div>
 
-<div class="success-box">
-    <p><strong>✓ What's Next?</strong> Your products will be shipped according to your delivery schedule. You'll receive a shipping notification once your order is on its way.</p>
-</div>
+      <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; margin: 25px 0; text-align: center;">
+        <p style="margin: 0; color: #166534; font-size: 14px;"><strong>✓ What's Next?</strong> Your products will be shipped according to your delivery schedule. You'll receive a shipping notification once your order is on its way.</p>
+      </div>
 
-<div class="cta-container">
-    <a href="{{ subscription_url | default('#') }}" class="cta-button">
-        Manage Subscription
-    </a>
-</div>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ subscription_url | default('#') }}" class="btn-verify">Manage Subscription</a>
+      </div>
 
-<p>If you have any questions, please contact us at support@banwee.com</p>
+      <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 14px;">
+        If you have any questions, please contact us at support@banwee.com
+      </p>
 
-<p style="margin-top: 30px;">
-    <strong>Thank you for your continued subscription!</strong><br>
-    The Banwee Team
-</p>
+      <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">
+        <strong>Thank you for your continued subscription!</strong><br>
+        <span style="color: #64748b; font-size: 14px;">The Banwee Team</span>
+      </p>
+    </td>
+  </tr>
+</table>
 {% endblock %}

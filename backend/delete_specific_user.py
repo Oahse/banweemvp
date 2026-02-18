@@ -100,4 +100,8 @@ async def delete_specific_user(email: str):
     return True
 
 if __name__ == "__main__":
-    asyncio.run(delete_specific_user("oscaroguledo06@gmail.com"))
+    email = input("Enter email to delete: ")
+    if email:
+        asyncio.run(delete_specific_user(email))
+    else:
+        print("❌ No email provided")
