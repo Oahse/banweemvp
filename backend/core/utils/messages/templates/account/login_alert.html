@@ -13,7 +13,7 @@
       This is an automated alert to inform you that there has been a recent login to your Banwee account.
     </p>
 
-    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0;  margin: 25px 0;">
       <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">📋 Login Details</h3>
       <p style="margin: 8px 0;"><strong>Login Time:</strong> {{ login_time | default("N/A") }}</p>
       <p style="margin: 8px 0;"><strong>Device:</strong> {{ login_device | default("N/A") }}</p>
@@ -30,7 +30,7 @@
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ security_page_url | default('#') }}" class="btn-verify">Secure Your Account Now</a>
+      <a href="{{ security_page_url | default('#') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Secure Your Account Now</a>
     </div>
 
     <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 14px;">

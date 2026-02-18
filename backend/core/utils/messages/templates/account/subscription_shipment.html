@@ -11,7 +11,7 @@
 
     <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">Exciting news! Your subscription order has been shipped and is on its way to you.</p>
 
-    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0;  margin: 25px 0;">
       <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">🚚 Shipment Details</h3>
       <p style="margin: 8px 0;"><strong>Order Number:</strong> {{ order_number }}</p>
       <p style="margin: 8px 0;"><strong>Shipment Date:</strong> {{ shipment_date.strftime('%B %d, %Y') }}</p>
@@ -25,7 +25,7 @@
 
     {% if tracking_number %}
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ tracking_url | default('#') }}" class="btn-verify">Track Your Package</a>
+      <a href="{{ tracking_url | default('#') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Track Your Package</a>
     </div>
     {% endif %}
 

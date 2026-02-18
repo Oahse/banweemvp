@@ -16,7 +16,7 @@
       <strong style="color: #61b482;">#{{ order_number }}</strong> have been shipped and are heading your way!
     </p>
 
-    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0;  margin: 25px 0;">
       <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">📦 Shipping Information</h3>
       <table style="width: 100%; margin-top: 10px;">
         <tr>
@@ -44,7 +44,7 @@
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ tracking_url | default('#') }}" class="btn-verify">Track Your Package</a>
+      <a href="{{ tracking_url | default('#') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Track Your Package</a>
     </div>
 
     <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; margin: 25px 0; text-align: center;">

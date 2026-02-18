@@ -17,11 +17,11 @@
     </p>
 
     {% if cart_items %}
-    <div style="background-color: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+    <div style="background-color: #f8fafc; padding: 20px; border: 1px solid #e2e8f0;  margin: 25px 0;">
       {% for item in cart_items %}
       <div style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 20px;{% if not loop.last %} border-bottom: 1px solid #e2e8f0;{% endif %}">
         {% if item.image_url %}
-        <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
+        <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width: 80px; height: 80px;   margin-right: 15px;">
         {% endif %}
         <div style="flex-grow: 1;">
           <h3 style="margin: 0 0 5px 0; color: #253d4e; font-size: 16px;">{{ item.name }}</h3>
@@ -38,19 +38,9 @@
     </div>
     {% endif %}
 
-    {% if discount_code %}
-    <div style="background-color: #fef3c7; border: 1px solid #fbbf24; padding: 20px; margin: 25px 0; text-align: center;">
-      <div style="font-size: 24px; margin-bottom: 10px;">🎁</div>
-      <p style="margin: 0; color: #92400e; font-size: 15px;">
-        <strong>Special Offer Just for You!</strong><br>
-        Complete your purchase now and use code <strong style="color: #61b482; font-size: 18px;">{{ discount_code }}</strong> 
-        to get <strong>{{ discount_amount | default("10% off") }}</strong> your order!
-      </p>
-    </div>
-    {% endif %}
-
+    
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ cart_url | default('#') }}" class="btn-verify">Complete My Purchase</a>
+      <a href="{{ cart_url | default('#') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Complete My Purchase</a>
     </div>
 
     <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; margin: 25px 0;">

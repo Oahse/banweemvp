@@ -22,7 +22,7 @@
         {% for product in recommended_products %}
         <td style="padding: 15px; background-color: #f8fafc; border: 1px solid #e2e8f0; text-align: center; vertical-align: top;">
           {% if product.image_url %}
-          <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-width: 120px; height: auto; border-radius: 6px; margin-bottom: 10px;">
+          <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-width: 120px; height: auto;  margin-bottom: 10px;">
           {% endif %}
           <h3 class="heading" style="font-size: 16px; margin-bottom: 8px; color: #253d4e;">{{ product.name }}</h3>
           <p style="color: #61b482; font-size: 16px; font-weight: bold; margin: 8px 0;">{{ product.price }}</p>
@@ -38,7 +38,7 @@
     </p>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ shop_url | default('https://banwee.com/shop') }}" class="btn-verify">Browse More Items</a>
+      <a href="{{ shop_url | default('https://banwee.com/shop') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Browse More Items</a>
     </div>
 
     <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">

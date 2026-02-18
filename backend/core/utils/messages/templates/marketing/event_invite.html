@@ -18,11 +18,11 @@
 
     {% if event_image_url %}
     <div style="text-align: center; margin: 25px 0;">
-      <img src="{{ event_image_url }}" alt="{{ event_name }}" style="max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 20px;">
+      <img src="{{ event_image_url }}" alt="{{ event_name }}" style="max-width: 100%; height: auto;  margin-bottom: 20px;">
     </div>
     {% endif %}
 
-    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0;  margin: 25px 0;">
       <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">Event Details:</h3>
       <p style="color: #64748b; font-size: 14px; margin: 5px 0;"><strong>What:</strong> {{ event_name | default("Special Event") }}</p>
       <p style="color: #64748b; font-size: 14px; margin: 5px 0;"><strong>When:</strong> {{ event_date }} at {{ event_time }} ({{ event_timezone | default("Your Local Time") }})</p>
@@ -36,7 +36,7 @@
     </p>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ rsvp_url | default('#') }}" class="btn-verify">RSVP Now!</a>
+      <a href="{{ rsvp_url | default('#') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">RSVP Now!</a>
     </div>
 
     <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 14px;">

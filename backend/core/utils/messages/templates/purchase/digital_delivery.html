@@ -16,10 +16,10 @@
       Your digital items are now available for download!
     </p>
 
-    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0;  margin: 25px 0;">
       <h3 class="heading" style="font-size: 18px; margin-bottom: 20px; color: #253d4e;">Your Downloads:</h3>
       {% for item in digital_products %}
-      <div style="background-color: #ffffff; padding: 20px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 15px;">
+      <div style="background-color: #ffffff; padding: 20px; border: 1px solid #e2e8f0;  margin-bottom: 15px;">
         <h4 style="margin: 0 0 10px 0; color: #253d4e; font-size: 16px;">{{ item.name }}</h4>
         {% if item.access_code %}
         <p style="margin: 5px 0; color: #64748b; font-size: 14px;">Access Code: <span style="font-weight: bold; color: #61b482;">{{ item.access_code }}</span></p>
@@ -28,7 +28,7 @@
         <p style="margin: 5px 0; color: #64748b; font-size: 14px;">License Key: <span style="font-weight: bold; color: #61b482;">{{ item.license_key }}</span></p>
         {% endif %}
         <div style="margin-top: 15px;">
-          <a href="{{ item.download_url }}" class="btn-verify" style="padding: 12px 25px; font-size: 14px;">Download Now →</a>
+          <a href="{{ item.download_url }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;; "padding: 12px 25px; font-size: 14px;">Download Now →</a>
         </div>
       </div>
       {% endfor %}
@@ -43,7 +43,7 @@
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ account_url | default('https://banwee.com/account') }}" class="btn-verify">Access My Account</a>
+      <a href="{{ frontend_url | default('https://banwee.com') }}/account" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Access My Account</a>
     </div>
 
     <div style="margin-top: 25px;">

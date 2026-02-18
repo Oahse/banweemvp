@@ -16,7 +16,7 @@
       and help you find the perfect gifts for your loved ones (or yourself!).
     </p>
 
-    <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #bbf7d0; padding: 30px; border-radius: 8px; margin: 25px 0; text-align: center;">
+    <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #bbf7d0; padding: 30px;  margin: 25px 0; text-align: center;">
       <div style="font-size: 32px; margin-bottom: 15px;">🎁</div>
       <h2 class="heading" style="font-size: 20px; margin-bottom: 15px; color: #166534;">{{ holiday_message | default("Spread Joy with Our Special Offers!") }}</h2>
       <p style="color: #166534; font-size: 15px; margin: 10px 0;">Discover amazing deals and thoughtful gifts for everyone on your list.</p>
@@ -30,7 +30,7 @@
         {% for product in featured_products %}
         <td style="padding: 15px; background-color: #f8fafc; border: 1px solid #e2e8f0; text-align: center; vertical-align: top;">
           {% if product.image_url %}
-          <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-width: 120px; height: auto; border-radius: 6px; margin-bottom: 10px;">
+          <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-width: 120px; height: auto;  margin-bottom: 10px;">
           {% endif %}
           <h3 class="heading" style="font-size: 16px; margin-bottom: 8px; color: #253d4e;">{{ product.name }}</h3>
           <p style="color: #61b482; font-size: 16px; font-weight: bold; margin: 8px 0;">{{ product.price }}</p>
@@ -42,7 +42,7 @@
     {% endif %}
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ campaign_url | default('https://banwee.com/holiday-sale') }}" class="btn-verify">Shop Our {{ holiday_name | default("Holiday") }} Sale</a>
+      <a href="{{ campaign_url | default('https://banwee.com/holiday-sale') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Shop Our {{ holiday_name | default("Holiday") }} Sale</a>
     </div>
 
     <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px; text-align: center;">

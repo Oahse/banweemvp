@@ -16,7 +16,7 @@
       Here's a summary of your transaction.
     </p>
 
-    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0;  margin: 25px 0;">
       <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">Transaction Details</h3>
       <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
         <thead>
@@ -44,13 +44,13 @@
         <p style="margin: 8px 0; color: #64748b; font-size: 14px;"><strong>Payment Date:</strong> {{ payment_date }}</p>
         <p style="margin: 8px 0; color: #64748b; font-size: 14px;"><strong>Payment Method:</strong> {{ payment_method }}</p>
         {% if invoice_url %}
-        <p style="margin: 15px 0 0 0; color: #64748b; font-size: 14px;">You can view and download your full invoice <a href="{{ invoice_url }}" style="color: #61b482; text-decoration: none; font-weight: 600;">here</a>.</p>
+        <p style="margin: 15px 0 0 0; color: #64748b; font-size: 14px;">You can view and download your full invoice <a href="{{ invoice_url }}; "color: #61b482; text-decoration: none; font-weight: 600;">here</a>.</p>
         {% endif %}
       </div>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ account_url | default('https://banwee.com/account') }}" class="btn-verify">View My Account</a>
+      <a href="{{ account_url | default('https://banwee.com/account') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">View My Account</a>
     </div>
 
     <div style="margin-top: 25px;">

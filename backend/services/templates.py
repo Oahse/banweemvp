@@ -8,6 +8,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape, Template, TemplateError
 from pydantic import BaseModel
 from core.logging import get_structured_logger
+from core.config import settings
 
 logger = get_structured_logger(__name__)
 
@@ -110,7 +111,8 @@ class JinjaTemplateService:
                 **context,
                 'company_name': context.get('company_name', 'Banwee'),
                 'support_email': context.get('support_email', 'support@banwee.com'),
-                'current_year': context.get('current_year', '2024')
+                'current_year': context.get('current_year', '2024'),
+                'frontend_url': context.get('frontend_url', settings.FRONTEND_URL)
             }
             
             rendered_content = template.render(**email_context)

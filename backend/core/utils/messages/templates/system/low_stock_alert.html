@@ -22,7 +22,7 @@
         {% if low_stock_products %}
         <h3>Products Requiring Attention:</h3>
         {% for product in low_stock_products %}
-        <div class="product-item" style="background-color: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px;">
+        <div class="product-item" style="background-color: #f8f9fa; padding: 15px; margin: 10px 0; ">
             <p><strong>{{ product.name }}</strong></p>
             <p>SKU: {{ product.sku }}</p>
             <p>Current Stock: <span style="color: #dc3545; font-weight: bold;">{{ product.current_stock }}</span></p>

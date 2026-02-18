@@ -16,9 +16,9 @@
       Based on your past purchase, we thought you might be running low.
     </p>
 
-    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0; text-align: center;">
+    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0;  margin: 25px 0; text-align: center;">
       {% if product_image_url %}
-      <img src="{{ product_image_url }}" alt="{{ product_name }}" style="max-width: 200px; border-radius: 8px; margin-bottom: 16px;">
+      <img src="{{ product_image_url }}" alt="{{ product_name }}" style="max-width: 200px;  margin-bottom: 16px;">
       {% endif %}
       <h3 class="heading" style="font-size: 18px; margin-bottom: 10px; color: #253d4e;">{{ product_name | default("Product Name") }}</h3>
       <p style="color: #61b482; font-size: 20px; font-weight: bold; margin: 10px 0;">{{ product_price | default("$XX.XX") }}</p>
@@ -30,7 +30,7 @@
     </p>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ reorder_url | default('https://banwee.com/reorder') }}" class="btn-verify">Reorder Now!</a>
+      <a href="{{ frontend_url | default('https://banwee.com') }}/products" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Reorder Now!</a>
     </div>
 
     {% if subscription_url %}

@@ -6,8 +6,8 @@
 <div class="content">
             <p>Hi {{ customer_name | default("there") }},</p>
             <p>
-                Get ready! We're thrilled to unveil **{{ product_name | default("our brand-new product") }}**,
-                designed to **{{ product_tagline | default("revolutionize your daily routine") }}**!
+                Get ready! We're thrilled to unveil <strong style="color: #253d4e; font-weight: bold;">{{ product_name | default("OUR BRAND-NEW PRODUCT") }}</strong>,
+                designed to <strong style="color: #253d4e; font-weight: bold;">{{ product_tagline | default("REVOLUTIONIZE YOUR DAILY ROUTINE") }}</strong>!
             </p>
 
             {% if product_image_url %}
@@ -15,7 +15,7 @@
             {% endif %}
 
             <p>
-                We've poured our passion into creating **{{ product_name | default("this incredible item") }}**
+                We've poured our passion into creating <strong style="color: #253d4e; font-weight: bold;">{{ product_name | default("THIS INCREDIBLE ITEM") }}</strong>
                 with you in mind. Here's why you'll love it:
             </p>
 
@@ -29,7 +29,7 @@
 
             <p>
                 To celebrate its arrival, we're offering a special <span class="highlight-text">{{ offer_details | default("introductory discount") }}</span>
-                for a limited time! Don't miss out on getting **{{ product_name | default("this amazing product") }}** at a special price.
+                for a limited time! Don't miss out on getting <strong style="color: #253d4e; font-weight: bold;">{{ product_name | default("THIS AMAZING PRODUCT") }}</strong> at a special price.
             </p>
 
             <div class="button-container">
@@ -48,8 +48,8 @@
                 <a href="{{ privacy_policy_url | default('#') }}">Privacy Policy</a>
             </p>
             <p>Stay connected:
-                {% if social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
-                {% if social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
-                {% if social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
+                {% if social_links and social_links.facebook %}<a href="{{ social_links.facebook }}">Facebook</a>{% endif %}
+                {% if social_links and social_links.twitter %}| <a href="{{ social_links.twitter }}">Twitter</a>{% endif %}
+                {% if social_links and social_links.instagram %}| <a href="{{ social_links.instagram }}">Instagram</a>{% endif %}
             </p>
 {% endblock %}

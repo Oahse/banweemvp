@@ -16,7 +16,7 @@
       If you love our products as much as we do, why not share the joy with your friends and family?
     </p>
 
-    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 25px; border-radius: 8px; margin: 25px 0; text-align: center;">
+    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 25px;  margin: 25px 0; text-align: center;">
       <div style="font-size: 32px; margin-bottom: 15px;">🎁</div>
       <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">Give {{ friend_discount | default("$10 Off") }}, Get {{ your_reward | default("$10 Credit") }}!</h3>
       <p style="color: #166534; font-size: 15px; margin: 0;">
@@ -31,7 +31,7 @@
     </p>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ referral_program_url | default('https://banwee.com/refer') }}" class="btn-verify">Refer a Friend Now!</a>
+      <a href="{{ frontend_url | default('https://banwee.com') }}/account/referral" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Refer a Friend Now!</a>
     </div>
 
     <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 14px;">

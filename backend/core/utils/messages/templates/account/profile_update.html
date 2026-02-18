@@ -14,7 +14,7 @@
       </p>
 
       {% if updated_fields %}
-      <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+      <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0;  margin: 25px 0;">
         <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e;">📝 Details Updated</h3>
         <ul style="list-style: none; padding: 0; margin: 0;">
           {% for field, new_value in updated_fields.items() %}
@@ -33,7 +33,7 @@
       {% endif %}
 
       <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ profile_url | default('#') }}" class="btn-verify">View Your Profile</a>
+        <a href="{{ profile_url | default('#') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">View Your Profile</a>
       </div>
 
       <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 14px;">

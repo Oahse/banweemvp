@@ -16,12 +16,10 @@
       To celebrate your special day, we've got a gift just for you.
     </p>
 
-    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 3px solid #f59e0b; padding: 30px; border-radius: 8px; margin: 25px 0; text-align: center;">
+    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 3px solid #f59e0b; padding: 30px;  margin: 25px 0; text-align: center;">
       <div style="font-size: 32px; margin-bottom: 15px;">🎁</div>
       <h2 class="heading" style="color: #d97706; margin: 0 0 16px 0; font-size: 20px;">Your Birthday Gift!</h2>
-      <p style="font-size: 18px; margin: 16px 0; color: #92400e;">{{ birthday_offer_description | default("Enjoy 20% off your next purchase!") }}</p>
-      <p style="margin: 16px 0; color: #92400e; font-size: 16px;">Use your exclusive code:</p>
-      <p style="font-size: 28px; font-weight: bold; color: #d97706; letter-spacing: 3px; margin: 8px 0; background: #ffffff; padding: 10px 20px; border-radius: 6px; display: inline-block;">{{ discount_code | default("BDAY20") }}</p>
+      <p style="font-size: 18px; margin: 16px 0; color: #92400e;">{{ birthday_offer_description | default("Enjoy a special birthday gift on your next purchase!") }}</p>
     </div>
 
     <div style="background-color: #fef3c7; border: 1px solid #fbbf24; padding: 20px; margin: 25px 0; text-align: center;">
@@ -32,7 +30,7 @@
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{ shop_url | default('#') }}" class="btn-verify">Shop Now & Redeem Your Gift! 🎁</a>
+      <a href="{{ shop_url | default('#') }}" style="display:inline-block; background-color:#61b482; color:#ffffff; padding:10px 35px; text-decoration:none; font-weight:bold;">Shop Now & Redeem Your Gift! 🎁</a>
     </div>
 
     <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; margin: 25px 0; text-align: center;">
