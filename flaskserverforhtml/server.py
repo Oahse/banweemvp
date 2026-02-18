@@ -12,9 +12,32 @@ from datetime import datetime, timedelta
 # Set temp directory to avoid macOS issues
 tempfile.tempdir = '/tmp'
 
+# Environment-based frontend URL configuration
+def get_frontend_url():
+    """Get the appropriate frontend URL based on environment"""
+    env = os.getenv('ENVIRONMENT', 'local').lower()
+    
+    if env in ['production', 'prod']:
+        return 'https://banwee.com'
+    elif env in ['development', 'dev']:
+        return 'http://localhost:5173'
+    else:
+        # Default to local for any other environment
+        return 'http://localhost:5173'
+
+# Get the frontend URL once at startup
+FRONTEND_URL = get_frontend_url()
+
 app = Flask(__name__, 
     template_folder='../backend/core/utils/messages/templates',
     static_folder='../backend/core/utils/messages/templates')
+
+# Print environment info on startup
+print(f"🚀 Flask Email Template Server Starting...")
+print(f"📍 Environment: {os.getenv('ENVIRONMENT', 'local')}")
+print(f"🔗 Frontend URL: {FRONTEND_URL}")
+print(f"📧 Template Server: http://localhost:5000")
+print(f"✅ Ready to serve email templates!")
 
 # Serve static files (logo)
 @app.route('/banwee_logo_green.png')
@@ -25,16 +48,16 @@ def serve_logo():
 def get_account_data():
     return {
         'customer_name': 'Sarah Johnson',
-        'verification_link': 'https://banwee.com/verify?token=abc123xyz789',
+        'verification_link': f'{FRONTEND_URL}/verify?token=abc123xyz789',
         'expiry_time': '24 hours',
-        'frontend_url': 'https://banwee.com'
+        'frontend_url': FRONTEND_URL
     }
 
 def get_cart_data():
     return {
         'customer_name': 'Michael Chen',
-        'cart_url': 'https://banwee.com/cart/abc123',
-        'frontend_url': 'https://banwee.com',
+        'cart_url': f'{FRONTEND_URL}/cart/abc123',
+        'frontend_url': FRONTEND_URL,
         'cart_items': [
             {
                 'name': 'Organic Ethiopian Coffee Beans',
@@ -67,7 +90,7 @@ def get_order_data():
         'order_date': 'February 15, 2024',
         'shipping_address': '123 Main St, New York, NY 10001',
         'billing_address': '123 Main St, New York, NY 10001',
-        'frontend_url': 'https://banwee.com',
+        'frontend_url': FRONTEND_URL,
         'items': [
             {
                 'name': 'Kenyan Tea Collection',
@@ -96,10 +119,9 @@ def get_return_data():
         'customer_name': 'David Martinez',
         'order_number': 'BW-2024-12345',
         'return_window': '30 days',
-        'return_portal_url': 'https://banwee.com/returns/BW-2024-12345',
-        'return_policy_url': 'https://banwee.com/return-policy',
-        'carrier_name': 'UPS',
-        'frontend_url': 'https://banwee.com'
+        'return_portal_url': f'{FRONTEND_URL}/account/returns/BW-2024-12345',
+        'return_policy_url': f'{FRONTEND_URL}/return-policy',
+        'frontend_url': FRONTEND_URL
     }
 
 def get_marketing_data():
@@ -108,7 +130,7 @@ def get_marketing_data():
         'sale_end_date': 'February 20, 2024',
         'discount_code': 'AFRICA20',
         'discount_amount': '20% off',
-        'frontend_url': 'https://banwee.com',
+        'frontend_url': FRONTEND_URL,
         'featured_products': [
             {
                 'name': 'Tanzanian Vanilla Beans',
@@ -129,8 +151,8 @@ def get_legal_data():
         'policy_name': 'Privacy Policy',
         'effective_date': 'March 1, 2024',
         'changes_summary': 'Updated data processing and cookie usage policies',
-        'policy_url': 'https://banwee.com/privacy-policy',
-        'frontend_url': 'https://banwee.com'
+        'policy_url': f'{FRONTEND_URL}/privacy-policy',
+        'frontend_url': FRONTEND_URL
     }
 
 # Template routes by category
@@ -218,7 +240,7 @@ def account_login_alert():
     data['login_location'] = 'New York, NY'
     data['login_device'] = 'Chrome on macOS'
     data['ip_address'] = '192.168.1.100'
-    data['security_page_url'] = 'https://banwee.com/security'
+    data['security_page_url'] = f'{FRONTEND_URL}/security'
     return render_template('account/login_alert.html', **data)
 
 @app.route('/account/onboarding')
@@ -228,23 +250,23 @@ def account_onboarding():
         {
             'title': 'Complete Your Profile',
             'description': 'Add your shipping preferences and payment methods',
-            'url': 'https://banwee.com/profile',
+            'url': f'{FRONTEND_URL}/account/profile',
             'cta_text': 'Complete Profile →'
         },
         {
             'title': 'Browse Products',
             'description': 'Explore our selection of authentic African products',
-            'url': 'https://banwee.com/products',
+            'url': f'{FRONTEND_URL}/products',
             'cta_text': 'Start Shopping →'
         },
         {
             'title': 'Make Your First Purchase',
             'description': 'Get 10% off your first order with code WELCOME10',
-            'url': 'https://banwee.com/products?discount=WELCOME10',
+            'url': f'{FRONTEND_URL}/products?discount=WELCOME10',
             'cta_text': 'Shop Now →'
         }
     ]
-    data['main_dashboard_url'] = 'https://banwee.com/dashboard'
+    data['main_dashboard_url'] = f'{FRONTEND_URL}/account/dashboard'
     return render_template('account/onboarding.html', **data)
 
 @app.route('/account/profile_update')
@@ -254,7 +276,7 @@ def account_profile_update():
         'email': 'sarah.johnson.new@example.com',
         'phone_number': '+1 (555) 123-4567'
     }
-    data['profile_url'] = 'https://banwee.com/profile'
+    data['profile_url'] = f'{FRONTEND_URL}/account/profile'
     return render_template('account/profile_update.html', **data)
 
 @app.route('/account/subscription_renewal')
@@ -270,15 +292,15 @@ def account_subscription_shipment():
     data = get_order_data()
     data['subscription_box_name'] = 'African Discovery Box - February 2024'
     data['shipment_date'] = datetime.now()
-    data['tracking_url'] = f"https://banwee.com/track/{data['tracking_number']}"
-    data['renewal_url'] = 'https://banwee.com/account/subscription'
+    data['tracking_url'] = f"{FRONTEND_URL}/account/orders/{data['tracking_number']}"
+    data['renewal_url'] = f'{FRONTEND_URL}/account/subscription'
     return render_template('account/subscription_shipment.html', **data)
 
 @app.route('/account/unsubscribe_confirmation')
 def account_unsubscribe_confirmation():
     data = get_account_data()
-    data['re_subscribe_url'] = 'https://banwee.com/newsletter/signup'
-    data['manage_preferences_url'] = 'https://banwee.com/preferences'
+    data['re_subscribe_url'] = f'{FRONTEND_URL}/newsletter/signup'
+    data['manage_preferences_url'] = f'{FRONTEND_URL}/account/preferences'
     return render_template('account/unsubscribe_confirmation.html', **data)
 
 # Pre-purchase template routes
@@ -303,7 +325,7 @@ def pre_back_in_stock():
     data = get_marketing_data()
     data['product_name'] = 'Madagascar Vanilla Extract'
     data['product_price'] = '$34.99'
-    data['product_url'] = 'https://banwee.com/products/vanilla-extract'
+    data['product_url'] = f'{FRONTEND_URL}/products/vanilla-extract'
     data['product_image'] = 'https://via.placeholder.com/200x200/61b482/ffffff?text=Vanilla'
     return render_template('pre_purchase/back_in_stock.html', **data)
 
@@ -360,7 +382,7 @@ def purchase_digital_delivery():
     data['digital_products'] = [
         {
             'name': 'African Cooking E-Book',
-            'download_url': 'https://banwee.com/downloads/cookbook.pdf'
+            'download_url': f'{FRONTEND_URL}/downloads/cookbook.pdf'
         }
     ]
     return render_template('purchase/digital_delivery.html', **data)
@@ -380,7 +402,7 @@ def post_invoice_template():
 @app.route('/post/review_request')
 def post_review_request():
     data = get_order_data()
-    data['review_url'] = f"https://banwee.com/review/{data['order_number']}"
+    data['review_url'] = f"{FRONTEND_URL}/account/review/{data['order_number']}"
     return render_template('post_purchase/review_request.html', **data)
 
 @app.route('/post/referral_request')
@@ -393,7 +415,7 @@ def post_referral_request():
 @app.route('/post/reorder_reminder')
 def post_reorder_reminder():
     data = get_order_data()
-    data['reorder_url'] = 'https://banwee.com/reorder'
+    data['reorder_url'] = f'{FRONTEND_URL}/products'
     data['days_since_purchase'] = '45'
     return render_template('post_purchase/reorder_reminder.html', **data)
 
@@ -414,7 +436,7 @@ def post_return_process():
 def post_warranty_reminder():
     data = get_order_data()
     data['warranty_expiry'] = (datetime.now() + timedelta(days=365)).strftime('%B %d, %Y')
-    data['warranty_url'] = 'https://banwee.com/warranty'
+    data['warranty_url'] = f'{FRONTEND_URL}/account/warranty'
     return render_template('post_purchase/warranty_reminder.html', **data)
 
 # Marketing template routes
@@ -478,13 +500,13 @@ def legal_cookie_settings():
     data['performance_cookies_enabled'] = True
     data['functional_cookies_enabled'] = True
     data['targeting_cookies_enabled'] = False
-    data['cookie_policy_url'] = 'https://banwee.com/cookie-policy'
+    data['cookie_policy_url'] = f'{FRONTEND_URL}/privacy'
     return render_template('legal/cookie_settings.html', **data)
 
 @app.route('/legal/gdpr_confirmation')
 def legal_gdpr_confirmation():
     data = get_legal_data()
-    data['gdpr_policy_url'] = 'https://banwee.com/gdpr-policy'
+    data['gdpr_policy_url'] = f'{FRONTEND_URL}/privacy'
     return render_template('legal/gdpr_confirmation.html', **data)
 
 # API endpoint to get all template data as JSON
