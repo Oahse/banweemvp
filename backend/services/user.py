@@ -9,7 +9,7 @@ from models.user import Address, User
 from models.orders import Order
 from core.errors import APIException
 from schemas.user import UserCreate, UserUpdate
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import secrets
 from core.utils.messages.email import send_email
 import httpx
@@ -251,7 +251,7 @@ class UserService:
         hashed_password = self.password_manager.hash_password(
             user_data.password)
         verification_token = secrets.token_urlsafe(32)
-        token_expiration = datetime.now() + timedelta(hours=24)  # Token valid for 24 hours
+        token_expiration = datetime.now(timezone.utc) + timedelta(hours=24)  # Token valid for 24 hours
 
         new_user = User(
             id=uuid7(),
@@ -291,7 +291,7 @@ class UserService:
             "verification_link": verification_link,
             "company_name": "Banwee",
             "expiry_time": "24 hours",
-            "current_year": datetime.now().year,
+            "current_year": datetime.now(timezone.utc).year,
         }
 
         try:
@@ -319,7 +319,7 @@ class UserService:
             "store_url": settings.FRONTEND_URL,
             "company_name": "Banwee",
             "support_email": "support@banwee.com",
-            "current_year": datetime.now().year,
+            "current_year": datetime.now(timezone.utc).year,
         }
 
         try:
@@ -341,7 +341,7 @@ class UserService:
         )
         user = result.scalar_one_or_none()
 
-        if not user or user.token_expiration < datetime.now():
+        if not user or user.token_expiration < datetime.now(timezone.utc):
             raise APIException(
                 status_code=400,
                 message="Invalid or expired verification token",
