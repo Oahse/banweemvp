@@ -371,22 +371,31 @@
                 category: 'Account',
                 description: 'Email verification for new account activation',
                 content: `
-                    <h1>✉️ Verify Your Email Address</h1>
-                    <p>Hi John,</p>
-                    <p>Thank you for creating a Banwee account! To complete your registration, please verify your email address.</p>
-                    <div class="cta-container">
-                        <a href="#" class="cta-button">Verify Email Address</a>
+                    <h2 class="heading" style="font-size: 24px; margin-bottom: 20px; color: #253d4e;">Confirm Your Email</h2>
+                    <p style="color: #64748b; line-height: 1.6; margin-bottom: 35px; font-size: 16px;">
+                      Hi John,<br/>
+                      Thank you for joining <strong>Banwee</strong>. We bring the finest organic products from Africa straight to your door. Please verify your account to get started.
+                    </p>
+                    
+                    <a href="#" class="btn-verify">Verify Now</a>
+                    
+                    <div style="margin-top: 20px;">
+                      <p style="margin: 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Or copy this link into your browser:</p>
+                      <p style="margin: 5px 0 0 0; font-size: 12px; color: #61b482; word-break: break-all;">
+                        <a href="#" style="word-break: break-all;">https://banwee.com/verify?token=abc123</a>
+                      </p>
+                      <p style="margin: 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;"><strong>Quick Action Required:</strong> This verification link is valid for <strong>24 hours</strong>. 
+                      Please verify your email soon to activate your account.</p>
                     </div>
-                    <div class="info-box">
-                        <p><strong>⏰ Quick Action Required:</strong> This link is valid for <strong>24 hours</strong>.</p>
-                    </div>
-                    <div class="highlight-box">
-                        <h3>🎁 What You'll Get After Verification</h3>
-                        <ul>
-                            <li>Access to exclusive African products</li>
-                            <li>Special welcome discount</li>
-                            <li>Early access to new launches</li>
-                        </ul>
+
+                    <p style="text-align: center; color: #64748b; font-size: 14px; margin-top: 30px;">
+                      <strong>Didn't create an account?</strong><br>
+                      If you didn't sign up for Banwee, you can safely ignore this email. No account will be created.
+                    </p>
+                    
+                    <div style="margin-top: 20px;">
+                      <h3 class="heading" style="font-size: 16px; margin-bottom: 10px; color: #253d4e;">Need Help?</h3>
+                      <p style="color: #64748b; font-size: 14px;">Our support team is here to assist you at support@banwee.com</p>
                     </div>
                 `
             },
@@ -457,18 +466,53 @@
                 category: 'Marketing',
                 description: 'Limited time flash sale promotion',
                 content: `
-                    <h1>⚡ Flash Sale Alert!</h1>
-                    <p>Hi John,</p>
-                    <p>For a very limited time, get incredible discounts on authentic African products!</p>
-                    <div class="highlight-box" style="text-align: center; background: linear-gradient(135deg, #fff4d9 0%, #ffe8a3 100%); border-color: #E67E22;">
-                        <h2 style="color: #E67E22; font-size: 32px;">Up to 50% Off Everything!</h2>
-                        <p style="margin: 16px 0;">Use code:</p>
-                        <p style="font-size: 36px; font-weight: bold; color: #E67E22;">FLASH50</p>
-                        <p style="font-size: 18px; color: #d35400;">⏰ Sale Ends: in 24 hours</p>
+                    <h1 class="heading" style="font-size: 28px; margin-bottom: 20px; color: #253d4e;">⚡ Flash Sale Alert!</h1>
+
+                    <p style="color: #64748b; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+                      Hi John,
+                    </p>
+
+                    <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+                      This is not a drill! For a very limited time, get incredible discounts on your favorite authentic African products at Banwee!
+                    </p>
+
+                    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 3px solid #f59e0b; padding: 30px; border-radius: 8px; margin: 25px 0; text-align: center;">
+                      <div style="font-size: 32px; margin-bottom: 15px;">⚡</div>
+                      <h2 class="heading" style="color: #d97706; font-size: 24px; margin: 0 0 16px 0;">Up to 50% Off Everything!</h2>
+                      <p style="margin: 16px 0; color: #92400e; font-size: 16px;">Use code:</p>
+                      <p style="font-size: 28px; font-weight: bold; color: #d97706; letter-spacing: 3px; margin: 8px 0; background: #ffffff; padding: 10px 20px; border-radius: 6px; display: inline-block;">FLASH20</p>
+                      <p style="margin: 16px 0; font-size: 16px; color: #92400e;">⏰ Sale Ends: <strong>in 24 hours</strong></p>
                     </div>
-                    <div class="cta-container">
-                        <a href="#" class="cta-button" style="font-size: 20px; padding: 20px 50px;">Shop Now! 🔥</a>
+
+                    <p style="text-align: center; color: #64748b; font-size: 16px; margin: 30px 0;">
+                      These deals won't last long, so hurry and grab your favorites before they're gone!
+                    </p>
+
+                    <div style="text-align: center; margin: 30px 0;">
+                      <a href="#" class="btn-verify" style="padding: 20px 40px; font-size: 18px;">Shop the Flash Sale Now! 🔥</a>
                     </div>
+
+                    <div style="background-color: #fef3c7; border: 1px solid #fbbf24; padding: 20px; margin: 25px 0; text-align: center;">
+                      <div style="font-size: 20px; margin-bottom: 8px;">🎯</div>
+                      <p style="margin: 0; color: #92400e; font-size: 14px;">
+                        <strong>Pro Tip:</strong> Add items to your cart quickly - popular products sell out fast during flash sales!
+                      </p>
+                    </div>
+
+                    <div style="background-color: #f8fafc; padding: 25px; border: 1px solid #e2e8f0; border-radius: 8px; margin: 25px 0;">
+                      <h3 class="heading" style="font-size: 18px; margin-bottom: 15px; color: #253d4e; text-align: center;">🌟 Featured Deals</h3>
+                      <ul style="list-style: none; padding: 0; margin: 0; text-align: left;">
+                        <li style="margin-bottom: 8px; color: #64748b; font-size: 14px;">✓ Premium African cereals and grains</li>
+                        <li style="margin-bottom: 8px; color: #64748b; font-size: 14px;">✓ Fresh legumes and pulses</li>
+                        <li style="margin-bottom: 8px; color: #64748b; font-size: 14px;">✓ Exotic fruits and vegetables</li>
+                        <li style="color: #64748b; font-size: 14px;">✓ Traditional oilseeds and spices</li>
+                      </ul>
+                    </div>
+
+                    <p style="text-align: center; margin-top: 30px; color: #253d4e; font-size: 16px;">
+                      <strong>Happy Shopping! 🛍️</strong><br>
+                      <span style="color: #64748b; font-size: 14px;">The Banwee Team</span>
+                    </p>
                 `
             }
         };
