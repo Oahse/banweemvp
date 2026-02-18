@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Query, Header
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -14,6 +14,7 @@ from services.auth import AuthService
 from services.user import UserService, AddressService
 from models.user import User
 from uuid import UUID
+import time
 
 logger = get_logger(__name__)
 
@@ -280,14 +281,29 @@ async def verify_email(
     except APIException:
         raise
 
+# Simple in-memory rate limiter (in production, use Redis)
+_resend_requests = {}
+RATE_LIMIT_WINDOW = 300  # 5 minutes
+RATE_LIMIT_COUNT = 3    # Max 3 requests per window
+
 @router.post("/resend-verification")
 async def resend_verification_email(
     request: ResendVerificationRequest,
+    x_resend_token: str = Header(None, description="Resend verification token for security"),
     background_tasks: BackgroundTasks = BackgroundTasks(),
     db: AsyncSession = Depends(get_db)
 ):
     """
     Resend verification email to user.
+    
+    SECURITY: This endpoint should only be called from frontend 
+    when user clicks "Resend Verification" button after getting 
+    an expired token error.
+    
+    PROTECTION:
+    - Requires 'X-Resend-Token' header from frontend
+    - Rate limited: 3 requests per 5 minutes
+    - Prevents abuse and automated attacks
     
     - Finds user by email
     - Checks if already verified
@@ -297,11 +313,43 @@ async def resend_verification_email(
     Returns success even if email doesn't exist (security)
     """
     try:
+        # Rate limiting check
+        current_time = time.time()
+        email_key = request.email.lower()
+        
+        # Clean old requests
+        _resend_requests = {
+            email: current_time for email, timestamp in _resend_requests.get(email_key, [])
+            if current_time - timestamp < RATE_LIMIT_WINDOW
+        }
+        
+        # Check rate limit
+        recent_requests = [
+            timestamp for timestamp in _resend_requests[email_key]
+            if current_time - timestamp < RATE_LIMIT_WINDOW
+        ]
+        
+        if len(recent_requests) >= RATE_LIMIT_COUNT:
+            raise APIException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                message="Too many resend requests. Please try again later."
+            )
+        
+        # Add current request
+        _resend_requests[email_key].append(current_time)
+        
+        # Verify resend token header (additional security)
+        if not x_resend_token or len(x_resend_token) < 16:
+            raise APIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                message="Invalid request. Please use the resend verification form."
+            )
+        
         user_service = UserService(db)
         
         # Find user by email
         result = await db.execute(
-            select(User).where(User.email == request.email)
+            select(User).where(User.email == email_key)
         )
         user = result.scalar_one_or_none()
         
@@ -395,7 +443,7 @@ async def resend_verification_email(
             "verification_link": verification_link,
             "company_name": "Banwee",
             "expiry_time": "24 hours",
-            "current_year": datetime.now(timezone.utc).year,
+            "current_year": datetime.now(timezone.utc).year,}
         return APIResponse(
             success=True, 
             message="Verification email sent successfully. Please check your inbox."
